@@ -9,7 +9,7 @@ import {
   InMemorySpanExporter,
   AlwaysOnSampler,
 } from '../../../src';
-import { BasicTracerProvider } from '../../../src';
+import { TracerProvider } from '../../../src';
 
 /**
  * A test-only span exporter that naively simulates triggering instrumentation
@@ -35,7 +35,7 @@ export class TestTracingSpanExporter extends InMemorySpanExporter {
       },
     };
 
-    const tracerProvider = new BasicTracerProvider({
+    const tracerProvider = new TracerProvider({
       spanProcessors: [spanProcessor],
       sampler: new AlwaysOnSampler(),
     });

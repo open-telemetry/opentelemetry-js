@@ -28,7 +28,7 @@ import {
   AlwaysOnSampler,
   SamplingDecision,
 } from '../../src';
-import { BasicTracerProvider } from '../../src';
+import { TracerProvider } from '../../src';
 import { TestStackContextManager } from './export/TestStackContextManager';
 import * as sinon from 'sinon';
 import { invalidAttributes, validAttributes } from './util';
@@ -38,7 +38,7 @@ function getTestTracerImpl(
   sampler?: Sampler,
   spanProcessors?: SpanProcessor[]
 ): Tracer {
-  const tracerProvider = new BasicTracerProvider({ sampler, spanProcessors });
+  const tracerProvider = new TracerProvider({ sampler, spanProcessors });
   return tracerProvider.getTracer('default', '0.0.1') as Tracer;
 }
 

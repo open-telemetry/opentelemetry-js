@@ -13,7 +13,7 @@ import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,
 } from '../../../src';
-import { BasicTracerProvider } from '../../../src';
+import { TracerProvider } from '../../../src';
 
 /* eslint-disable no-console */
 describe('ConsoleSpanExporter', () => {
@@ -34,7 +34,7 @@ describe('ConsoleSpanExporter', () => {
     it('should export information about span', () => {
       assert.doesNotThrow(() => {
         consoleExporter = new ConsoleSpanExporter();
-        const basicTracerProvider = new BasicTracerProvider({
+        const basicTracerProvider = new TracerProvider({
           sampler: new AlwaysOnSampler(),
           spanProcessors: [new SimpleSpanProcessor(consoleExporter)],
         });

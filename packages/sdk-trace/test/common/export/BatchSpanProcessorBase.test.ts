@@ -22,7 +22,7 @@ import {
   InMemorySpanExporter,
   BatchSpanProcessor
 } from '../../../src';
-import { BasicTracerProvider } from '../../../src';
+import { TracerProvider } from '../../../src';
 import { context } from '@opentelemetry/api';
 import { TestRecordOnlySampler } from './TestRecordOnlySampler';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
@@ -30,7 +30,7 @@ import { TestStackContextManager } from './TestStackContextManager';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 
 function createSampledSpan(spanName: string): Span {
-  const tracer = new BasicTracerProvider({
+  const tracer = new TracerProvider({
     sampler: new AlwaysOnSampler(),
   }).getTracer('default');
   const span = tracer.startSpan(spanName);
@@ -39,7 +39,7 @@ function createSampledSpan(spanName: string): Span {
 }
 
 function createUnsampledSpan(spanName: string): Span {
-  const tracer = new BasicTracerProvider({
+  const tracer = new TracerProvider({
     sampler: new TestRecordOnlySampler(),
   }).getTracer('default');
   const span = tracer.startSpan(spanName);
@@ -193,7 +193,7 @@ describe('BatchSpanProcessorBase', () => {
       const spy = sinon.spy(exporter, 'export');
       const clock = sinon.useFakeTimers();
 
-      const tracer = new BasicTracerProvider({
+      const tracer = new TracerProvider({
         sampler: new AlwaysOnSampler(),
       }).getTracer('default');
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
@@ -401,7 +401,7 @@ describe('BatchSpanProcessorBase', () => {
       });
 
       it('should wait for pending resource on flush', async () => {
-        const tracer = new BasicTracerProvider({
+        const tracer = new TracerProvider({
           resource: resourceFromAttributes({
             async: new Promise<string>(resolve =>
               setTimeout(() => resolve('fromasync'), 1)

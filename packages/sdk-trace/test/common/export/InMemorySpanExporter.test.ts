@@ -8,18 +8,18 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '../../../src';
-import { BasicTracerProvider } from '../../../src';
+import { TracerProvider } from '../../../src';
 import { context, trace } from '@opentelemetry/api';
 import type { ExportResult } from '@opentelemetry/core';
 import { ExportResultCode } from '@opentelemetry/core';
 
 describe('InMemorySpanExporter', () => {
   let memoryExporter: InMemorySpanExporter;
-  let provider: BasicTracerProvider;
+  let provider: TracerProvider;
 
   beforeEach(() => {
     memoryExporter = new InMemorySpanExporter();
-    provider = new BasicTracerProvider({
+    provider = new TracerProvider({
       spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
     });
   });

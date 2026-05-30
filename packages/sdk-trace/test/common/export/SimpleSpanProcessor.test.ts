@@ -21,7 +21,7 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '../../../src';
-import { BasicTracerProvider } from '../../../src';
+import { TracerProvider } from '../../../src';
 import { SpanImpl } from '@opentelemetry/sdk-trace/src/Span';
 import { TestStackContextManager } from './TestStackContextManager';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
@@ -31,11 +31,11 @@ import { resourceFromAttributes } from '@opentelemetry/resources';
 import { cheatSpanLimitsFromTracer } from '../util';
 
 describe('SimpleSpanProcessor', () => {
-  let provider: BasicTracerProvider;
+  let provider: TracerProvider;
   let exporter: InMemorySpanExporter;
 
   beforeEach(() => {
-    provider = new BasicTracerProvider();
+    provider = new TracerProvider();
     exporter = new InMemorySpanExporter();
   });
 
@@ -164,7 +164,7 @@ describe('SimpleSpanProcessor', () => {
 
     it('should await unresolved resources', async () => {
       const processor = new SimpleSpanProcessor(exporter);
-      const providerWithAsyncResource = new BasicTracerProvider({
+      const providerWithAsyncResource = new TracerProvider({
         resource: resourceFromAttributes({
           async: new Promise<string>(resolve =>
             setTimeout(() => resolve('fromasync'), 1)
@@ -242,7 +242,7 @@ describe('SimpleSpanProcessor', () => {
       const testExporterWithDelay = new TestExporterWithDelay();
       const processor = new SimpleSpanProcessor(testExporterWithDelay);
 
-      const providerWithAsyncResource = new BasicTracerProvider({
+      const providerWithAsyncResource = new TracerProvider({
         resource: resourceFromAttributes({
           async: new Promise<string>(resolve =>
             setTimeout(() => resolve('fromasync'), 1)

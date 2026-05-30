@@ -31,7 +31,7 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import type { Span, SpanProcessor } from '../../src';
-import { BasicTracerProvider } from '../../src';
+import { TracerProvider } from '../../src';
 import { SpanImpl } from '@opentelemetry/sdk-trace/src/Span';
 import { invalidAttributes, validAttributes } from './util';
 import type { Tracer } from '@opentelemetry/sdk-trace/src/Tracer';
@@ -50,7 +50,7 @@ describe('Span', () => {
     sinon.restore();
   });
 
-  const tracer = new BasicTracerProvider({
+  const tracer = new TracerProvider({
     spanLimits: {
       attributeValueLengthLimit: 100,
       attributeCountLimit: 100,
@@ -346,7 +346,7 @@ describe('Span', () => {
 
     describe('when spanLimits options set', () => {
       describe('when "attributeCountLimit" option defined', () => {
-        const tracer = new BasicTracerProvider({
+        const tracer = new TracerProvider({
           spanLimits: {
             // Setting count limit
             attributeCountLimit: 100,
@@ -377,7 +377,7 @@ describe('Span', () => {
       });
 
       describe('when "attributeValueLengthLimit" option defined', () => {
-        const tracer = new BasicTracerProvider({
+        const tracer = new TracerProvider({
           spanLimits: {
             // Setting attribute value length limit
             attributeValueLengthLimit: 5,
@@ -432,7 +432,7 @@ describe('Span', () => {
       });
 
       describe('when "attributeValueLengthLimit" option is invalid', () => {
-        const tracer = new BasicTracerProvider({
+        const tracer = new TracerProvider({
           spanLimits: {
             // Setting invalid attribute value length limit
             attributeValueLengthLimit: -5,
@@ -581,7 +581,7 @@ describe('Span', () => {
   });
 
   it('should add no event', () => {
-    const tracer = new BasicTracerProvider({
+    const tracer = new TracerProvider({
       spanLimits: {
         eventCountLimit: 0,
       },
@@ -606,7 +606,7 @@ describe('Span', () => {
   });
 
   it('should enforce attributePerEventCountLimit', () => {
-    const tracer = new BasicTracerProvider({
+    const tracer = new TracerProvider({
       spanLimits: {
         attributePerEventCountLimit: 2,
       },
@@ -637,7 +637,7 @@ describe('Span', () => {
   });
 
   it('should truncate event attribute values', () => {
-    const tracer = new BasicTracerProvider({
+    const tracer = new TracerProvider({
       spanLimits: {
         attributeValueLengthLimit: 5,
       },
@@ -664,7 +664,7 @@ describe('Span', () => {
   });
 
   it('should enforce attributePerLinkCountLimit', () => {
-    const tracer = new BasicTracerProvider({
+    const tracer = new TracerProvider({
       spanLimits: {
         attributePerLinkCountLimit: 2,
       },
@@ -698,7 +698,7 @@ describe('Span', () => {
   });
 
   it('should truncate link attribute values', () => {
-    const tracer = new BasicTracerProvider({
+    const tracer = new TracerProvider({
       spanLimits: {
         attributeValueLengthLimit: 5,
       },
@@ -728,7 +728,7 @@ describe('Span', () => {
   });
 
   it('should enforce linkCountLimit with FIFO', () => {
-    const tracer = new BasicTracerProvider({
+    const tracer = new TracerProvider({
       spanLimits: {
         linkCountLimit: 3,
       },
@@ -760,7 +760,7 @@ describe('Span', () => {
   });
 
   it('should enforce linkCountLimit via constructor', () => {
-    const tracer = new BasicTracerProvider({
+    const tracer = new TracerProvider({
       spanLimits: {
         linkCountLimit: 2,
       },
@@ -792,7 +792,7 @@ describe('Span', () => {
   });
 
   it('should drop all links when linkCountLimit is 0', () => {
-    const tracer = new BasicTracerProvider({
+    const tracer = new TracerProvider({
       spanLimits: {
         linkCountLimit: 0,
       },
@@ -817,7 +817,7 @@ describe('Span', () => {
   });
 
   it('should enforce linkCountLimit via addLinks', () => {
-    const tracer = new BasicTracerProvider({
+    const tracer = new TracerProvider({
       spanLimits: {
         linkCountLimit: 2,
       },
@@ -1346,7 +1346,7 @@ describe('Span', () => {
         shutdown: () => Promise.resolve(),
       };
 
-      const provider = new BasicTracerProvider({
+      const provider = new TracerProvider({
         spanProcessors: [processor],
       });
 
@@ -1365,7 +1365,7 @@ describe('Span', () => {
         shutdown: () => Promise.resolve(),
       };
 
-      const provider = new BasicTracerProvider({
+      const provider = new TracerProvider({
         spanProcessors: [processor],
       });
 
@@ -1386,7 +1386,7 @@ describe('Span', () => {
         shutdown: () => Promise.resolve(),
       };
 
-      const provider = new BasicTracerProvider({
+      const provider = new TracerProvider({
         spanProcessors: [processor],
       });
 
@@ -1404,7 +1404,7 @@ describe('Span', () => {
         shutdown: () => Promise.resolve(),
       };
 
-      const provider = new BasicTracerProvider({
+      const provider = new TracerProvider({
         spanProcessors: [processor],
       });
 
@@ -1425,7 +1425,7 @@ describe('Span', () => {
         shutdown: () => Promise.resolve(),
       };
 
-      const provider = new BasicTracerProvider({
+      const provider = new TracerProvider({
         spanProcessors: [processor],
       });
 
