@@ -4,7 +4,11 @@
  */
 
 import { context, SpanKind } from '@opentelemetry/api';
-import type { Sampler, SamplingDecision, SamplingResult } from '@opentelemetry/sdk-trace';
+import type {
+  Sampler,
+  SamplingDecision,
+  SamplingResult,
+} from '@opentelemetry/sdk-trace';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,

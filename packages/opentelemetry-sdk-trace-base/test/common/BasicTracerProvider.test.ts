@@ -33,7 +33,7 @@ import {
   TestMetricReader,
   cheatResourceFromTracerProvider,
   cheatSpanLimitsFromTracer,
-  cheatSpanProcessorsFromTracerProvider
+  cheatSpanProcessorsFromTracerProvider,
 } from './util';
 
 describe('BasicTracerProvider', () => {
@@ -73,17 +73,9 @@ describe('BasicTracerProvider', () => {
         });
 
         const processors = cheatSpanProcessorsFromTracerProvider(tracer);
-        assert.ok(
-          processors.length === 1
-        );
-        assert.ok(
-          processors[0] instanceof SimpleSpanProcessor
-        );
-        assert.ok(
-          processors[0][
-            '_exporter'
-          ] instanceof ConsoleSpanExporter
-        );
+        assert.ok(processors.length === 1);
+        assert.ok(processors[0] instanceof SimpleSpanProcessor);
+        assert.ok(processors[0]['_exporter'] instanceof ConsoleSpanExporter);
       });
     });
 
@@ -99,9 +91,7 @@ describe('BasicTracerProvider', () => {
     describe('generalLimits', () => {
       describe('when not defined default values', () => {
         it('should have tracer with default values', () => {
-          const tracer = new BasicTracerProvider({}).getTracer(
-            'default'
-          );
+          const tracer = new BasicTracerProvider({}).getTracer('default');
           const spanLimits = cheatSpanLimitsFromTracer(tracer);
           assert.strictEqual(spanLimits.attributeValueLengthLimit, Infinity);
           assert.strictEqual(spanLimits.attributeCountLimit, 128);
@@ -146,9 +136,7 @@ describe('BasicTracerProvider', () => {
     describe('spanLimits', () => {
       describe('when not defined default values', () => {
         it('should have tracer with default values', () => {
-          const tracer = new BasicTracerProvider({}).getTracer(
-            'default'
-          );
+          const tracer = new BasicTracerProvider({}).getTracer('default');
           assert.deepStrictEqual(cheatSpanLimitsFromTracer(tracer), {
             attributeValueLengthLimit: Infinity,
             attributeCountLimit: 128,
@@ -470,7 +458,10 @@ describe('BasicTracerProvider', () => {
   describe('.resource', () => {
     it('should use the default resource when no resource is provided', function () {
       const tracerProvider = new BasicTracerProvider();
-      assert.deepStrictEqual(cheatResourceFromTracerProvider(tracerProvider), defaultResource());
+      assert.deepStrictEqual(
+        cheatResourceFromTracerProvider(tracerProvider),
+        defaultResource()
+      );
     });
 
     it('should use not use the default if resource passed', function () {
@@ -478,7 +469,10 @@ describe('BasicTracerProvider', () => {
       const tracerProvider = new BasicTracerProvider({
         resource: providedResource,
       });
-      assert.deepStrictEqual(cheatResourceFromTracerProvider(tracerProvider), providedResource);
+      assert.deepStrictEqual(
+        cheatResourceFromTracerProvider(tracerProvider),
+        providedResource
+      );
     });
   });
 

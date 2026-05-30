@@ -359,39 +359,28 @@ describe('startNodeSDK', function () {
     );
 
     const tracerProvider = trace.getTracerProvider();
-    const spanProcessors = (tracerProvider as any)._delegate._activeSpanProcessor._spanProcessors as SpanProcessor[];
+    const spanProcessors = (tracerProvider as any)._delegate
+      ._activeSpanProcessor._spanProcessors as SpanProcessor[];
     assert.strictEqual(spanProcessors.length, 4);
 
+    assert.ok(spanProcessors[0] instanceof BatchSpanProcessor);
     assert.ok(
-      spanProcessors[0] instanceof BatchSpanProcessor
-    );
-    assert.ok(
-      (spanProcessors[0] as any)['_exporter'] instanceof
-        OTLPProtoTraceExporter
+      (spanProcessors[0] as any)['_exporter'] instanceof OTLPProtoTraceExporter
     );
 
+    assert.ok(spanProcessors[1] instanceof BatchSpanProcessor);
     assert.ok(
-      spanProcessors[1] instanceof BatchSpanProcessor
-    );
-    assert.ok(
-      (spanProcessors[1] as any)['_exporter'] instanceof
-        OTLPHttpTraceExporter
+      (spanProcessors[1] as any)['_exporter'] instanceof OTLPHttpTraceExporter
     );
 
+    assert.ok(spanProcessors[2] instanceof BatchSpanProcessor);
     assert.ok(
-      spanProcessors[2] instanceof BatchSpanProcessor
-    );
-    assert.ok(
-      (spanProcessors[2] as any)['_exporter'] instanceof
-        OTLPGrpcTraceExporter
+      (spanProcessors[2] as any)['_exporter'] instanceof OTLPGrpcTraceExporter
     );
 
+    assert.ok(spanProcessors[3] instanceof SimpleSpanProcessor);
     assert.ok(
-      spanProcessors[3] instanceof SimpleSpanProcessor
-    );
-    assert.ok(
-      (spanProcessors[3] as any)['_exporter'] instanceof
-        ConsoleSpanExporter
+      (spanProcessors[3] as any)['_exporter'] instanceof ConsoleSpanExporter
     );
 
     stubLoggerWarn.reset();
@@ -804,7 +793,8 @@ describe('startNodeSDK', function () {
 
     const getSdkSpanProcessors = () => {
       const tracerProvider = trace.getTracerProvider();
-      return (tracerProvider as any)._delegate._activeSpanProcessor._spanProcessors as SpanProcessor[];
+      return (tracerProvider as any)._delegate._activeSpanProcessor
+        ._spanProcessors as SpanProcessor[];
     };
 
     beforeEach(() => {

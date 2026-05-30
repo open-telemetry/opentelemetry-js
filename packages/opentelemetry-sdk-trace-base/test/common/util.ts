@@ -7,7 +7,7 @@ import { MetricReader } from '@opentelemetry/sdk-metrics';
 import type { Tracer as ApiTracer } from '@opentelemetry/api';
 import type { Resource } from '@opentelemetry/resources';
 import type { SpanLimits, SpanProcessor } from '@opentelemetry/sdk-trace';
-import { BasicTracerProvider } from '../../src/BasicTracerProvider-shim';
+import type { BasicTracerProvider } from '../../src/BasicTracerProvider-shim';
 
 export const validAttributes = {
   string: 'string',
@@ -42,10 +42,14 @@ export class TestMetricReader extends MetricReader {
  * Many tests are written inspecting internal details of SDK implementation
  * classes. These `cheat*` functions attempt to abstract away the cheating part.
  */
-export function cheatSpanProcessorsFromTracerProvider(tracerProvider: BasicTracerProvider): SpanProcessor[] {
+export function cheatSpanProcessorsFromTracerProvider(
+  tracerProvider: BasicTracerProvider
+): SpanProcessor[] {
   return (tracerProvider as any)._activeSpanProcessor._spanProcessors;
 }
-export function cheatResourceFromTracerProvider(tracerProvider: BasicTracerProvider): Resource {
+export function cheatResourceFromTracerProvider(
+  tracerProvider: BasicTracerProvider
+): Resource {
   return (tracerProvider as any)._resource;
 }
 export function cheatSpanLimitsFromTracer(tracer: ApiTracer): SpanLimits {

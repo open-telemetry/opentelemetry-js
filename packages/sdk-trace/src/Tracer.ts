@@ -39,7 +39,7 @@ export class Tracer implements api.Tracer {
    */
   constructor(
     instrumentationScope: InstrumentationScope,
-    options: TracerOptions,
+    options: TracerOptions
   ) {
     this.instrumentationScope = instrumentationScope;
     this._sampler = options.sampler;
@@ -48,7 +48,10 @@ export class Tracer implements api.Tracer {
     this._idGenerator = options.idGenerator;
     this._spanProcessor = options.spanProcessor;
 
-    const meter = options.meterProvider.getMeter('@opentelemetry/sdk-trace', VERSION);
+    const meter = options.meterProvider.getMeter(
+      '@opentelemetry/sdk-trace',
+      VERSION
+    );
     this._tracerMetrics = new TracerMetrics(meter);
   }
 

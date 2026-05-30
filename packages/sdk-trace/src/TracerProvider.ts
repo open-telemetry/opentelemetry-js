@@ -58,7 +58,8 @@ export class TracerProvider implements ApiTracerProvider {
         }),
       spanLimits: {
         attributeCountLimit: options.spanLimits?.attributeCountLimit ?? 128,
-        attributeValueLengthLimit: options.spanLimits?.attributeValueLengthLimit ?? Infinity,
+        attributeValueLengthLimit:
+          options.spanLimits?.attributeValueLengthLimit ?? Infinity,
         eventCountLimit: options.spanLimits?.eventCountLimit ?? 128,
         linkCountLimit: options.spanLimits?.linkCountLimit ?? 128,
         attributePerEventCountLimit:
@@ -87,12 +88,11 @@ export class TracerProvider implements ApiTracerProvider {
         key,
         new Tracer(
           { name, version, schemaUrl: options?.schemaUrl },
-          this._tracerOptions,
+          this._tracerOptions
         )
       );
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this._tracers.get(key)!;
   }
 
@@ -164,12 +164,6 @@ export class TracerProvider implements ApiTracerProvider {
         p => p.constructor?.name ?? 'SpanProcessor'
       ),
     };
-    return formatInspect(
-      'TracerProvider',
-      payload,
-      depth,
-      options,
-      inspect
-    );
+    return formatInspect('TracerProvider', payload, depth, options, inspect);
   }
 }

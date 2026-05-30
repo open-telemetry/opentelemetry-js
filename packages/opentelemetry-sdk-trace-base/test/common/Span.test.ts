@@ -42,7 +42,6 @@ import {
 
 import { cheatSpanLimitsFromTracer } from './util';
 
-
 const performanceTimeOrigin: HrTime = [1, 1];
 
 describe('Span', () => {

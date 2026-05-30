@@ -9,7 +9,7 @@ import type { Span, SpanProcessor } from '@opentelemetry/sdk-trace';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-  TracerProvider
+  TracerProvider,
 } from '@opentelemetry/sdk-trace';
 import {
   setGlobalErrorHandler,

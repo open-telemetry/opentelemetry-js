@@ -3,10 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type {
-  ContextManager,
-  TextMapPropagator,
-} from '@opentelemetry/api';
+import type { ContextManager, TextMapPropagator } from '@opentelemetry/api';
 import type { TracerProviderOptions } from '@opentelemetry/sdk-trace';
 
 /**

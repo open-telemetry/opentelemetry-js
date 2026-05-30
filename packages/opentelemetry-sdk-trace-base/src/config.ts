@@ -8,7 +8,10 @@ import { getNumberFromEnv, getStringFromEnv } from '@opentelemetry/core';
 import type { Sampler } from '@opentelemetry/sdk-trace';
 import {
   AlwaysOffSampler,
-  AlwaysOnSampler, ParentBasedSampler, TraceIdRatioBasedSampler } from '@opentelemetry/sdk-trace';
+  AlwaysOnSampler,
+  ParentBasedSampler,
+  TraceIdRatioBasedSampler,
+} from '@opentelemetry/sdk-trace';
 
 const enum TracesSamplerValues {
   AlwaysOff = 'always_off',

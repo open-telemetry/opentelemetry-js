@@ -86,7 +86,10 @@ describe('BatchSpanProcessorBase', () => {
 
   describe('.onStart/.onEnd/.shutdown', () => {
     it('should call onShutdown', async () => {
-      const processor = new BatchSpanProcessor(exporter, defaultBufferConfig) as any;
+      const processor = new BatchSpanProcessor(
+        exporter,
+        defaultBufferConfig
+      ) as any;
       const onShutdownSpy = sinon.stub(processor, 'onShutdown');
       assert.strictEqual(onShutdownSpy.callCount, 0);
       await processor.shutdown();
@@ -221,7 +224,7 @@ describe('BatchSpanProcessorBase', () => {
         ' reached multiple times',
       done => {
         const originalTimeout = setTimeout;
-        const clock = sinon.useFakeTimers({shouldClearNativeTimers: true});
+        const clock = sinon.useFakeTimers({ shouldClearNativeTimers: true });
         const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
         const totalSpans = defaultBufferConfig.maxExportBatchSize * 2;
         for (let i = 0; i < totalSpans; i++) {

@@ -11,7 +11,6 @@ import {
 } from '@opentelemetry/sdk-trace';
 import { BasicTracerProvider } from '../../../src/index-shim';
 
-
 /**
  * A test-only span exporter that naively simulates triggering instrumentation
  * (creating new spans) during export.

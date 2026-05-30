@@ -30,18 +30,14 @@ describe('BasicTracerProvider - Node', () => {
 
         it('should have attribute value length limits value as defined with env', () => {
           process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '115';
-          const tracer = new BasicTracerProvider().getTracer(
-            'default'
-          );
+          const tracer = new BasicTracerProvider().getTracer('default');
           const spanLimits = cheatSpanLimitsFromTracer(tracer);
           assert.strictEqual(spanLimits.attributeValueLengthLimit, 115);
         });
         it('should have span and general attribute value length limits as defined in env', () => {
           process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '125';
           process.env.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT = '109';
-          const tracer = new BasicTracerProvider().getTracer(
-            'default'
-          );
+          const tracer = new BasicTracerProvider().getTracer('default');
           const spanLimits = cheatSpanLimitsFromTracer(tracer);
           assert.strictEqual(spanLimits.attributeValueLengthLimit, 109);
         });
@@ -55,18 +51,14 @@ describe('BasicTracerProvider - Node', () => {
 
         it('should general attribute count limit as defined with env', () => {
           process.env.OTEL_ATTRIBUTE_COUNT_LIMIT = '25';
-          const tracer = new BasicTracerProvider({}).getTracer(
-            'default'
-          );
+          const tracer = new BasicTracerProvider({}).getTracer('default');
           const spanLimits = cheatSpanLimitsFromTracer(tracer);
           assert.strictEqual(spanLimits.attributeCountLimit, 25);
         });
         it('should have span and general attribute count limits as defined in env', () => {
           process.env.OTEL_ATTRIBUTE_COUNT_LIMIT = '20';
           process.env.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT = '35';
-          const tracer = new BasicTracerProvider().getTracer(
-            'default'
-          );
+          const tracer = new BasicTracerProvider().getTracer('default');
           const spanLimits = cheatSpanLimitsFromTracer(tracer);
           assert.strictEqual(spanLimits.attributeCountLimit, 35);
         });

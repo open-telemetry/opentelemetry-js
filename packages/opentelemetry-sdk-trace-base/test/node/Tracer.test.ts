@@ -8,7 +8,6 @@ import { BasicTracerProvider } from '../../src/BasicTracerProvider-shim';
 import { TestStackContextManager } from '../common/export/TestStackContextManager';
 
 describe('Tracer', () => {
-
   beforeEach(() => {
     const contextManager = new TestStackContextManager().enable();
     context.setGlobalContextManager(contextManager);

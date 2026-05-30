@@ -436,7 +436,8 @@ describe('Node SDK', () => {
       const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
       assert.ok(tracerProvider instanceof NodeTracerProvider);
       assert.ok(
-        (tracerProvider as any)._tracerOptions.meterProvider instanceof MeterProvider
+        (tracerProvider as any)._tracerOptions.meterProvider instanceof
+          MeterProvider
       );
 
       const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
@@ -1818,7 +1819,8 @@ describe('Node SDK', () => {
       const listOfProcessors = getSdkSpanProcessors(sdk);
 
       assert.ok(
-        sdk['_tracerProvider']!['_tracerOptions']?.sampler instanceof AlwaysOffSampler
+        sdk['_tracerProvider']!['_tracerOptions']?.sampler instanceof
+          AlwaysOffSampler
       );
       assert.strictEqual(listOfProcessors.length, 1);
       assert.ok(listOfProcessors[0] instanceof SimpleSpanProcessor);

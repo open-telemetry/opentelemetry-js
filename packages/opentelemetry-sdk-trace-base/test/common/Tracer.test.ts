@@ -34,7 +34,10 @@ import * as sinon from 'sinon';
 import { invalidAttributes, validAttributes } from './util';
 import { Tracer } from '@opentelemetry/sdk-trace/build/src/Tracer';
 
-function getTestTracerImpl(sampler?: Sampler, spanProcessors?: SpanProcessor[]): Tracer {
+function getTestTracerImpl(
+  sampler?: Sampler,
+  spanProcessors?: SpanProcessor[]
+): Tracer {
   const tracerProvider = new BasicTracerProvider({ sampler, spanProcessors });
   return tracerProvider.getTracer('default', '0.0.1') as Tracer;
 }
@@ -233,7 +236,7 @@ describe('Tracer', () => {
     const onStartSpy = sinon.spy(sp, 'onStart');
     const sampler: Sampler = new AlwaysOnSampler();
     const shouldSampleSpy = sinon.spy(sampler, 'shouldSample');
-    const tracer = getTestTracerImpl(sampler,  [sp]);
+    const tracer = getTestTracerImpl(sampler, [sp]);
     const span = tracer.startSpan('a', { root: true }, context) as Span;
     assert.strictEqual(span.parentSpanContext?.spanId, undefined);
     sinon.assert.calledOnce(shouldSampleSpy);

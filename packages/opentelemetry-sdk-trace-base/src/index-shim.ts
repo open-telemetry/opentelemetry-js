@@ -21,7 +21,7 @@ export {
   AlwaysOnSampler,
   ParentBasedSampler,
   TraceIdRatioBasedSampler,
-  SamplingDecision
+  SamplingDecision,
 } from '@opentelemetry/sdk-trace';
 export type {
   ReadableSpan,
