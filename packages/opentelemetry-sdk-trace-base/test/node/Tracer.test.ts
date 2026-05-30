@@ -2,15 +2,15 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { context, TraceFlags } from '@opentelemetry/api';
+
 import * as assert from 'assert';
+import { context, TraceFlags } from '@opentelemetry/api';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { BasicTracerProvider } from '../../src/BasicTracerProvider-shim';
-import { TestStackContextManager } from '../common/export/TestStackContextManager';
 
 describe('Tracer', () => {
   beforeEach(() => {
-    const contextManager = new TestStackContextManager().enable();
-    context.setGlobalContextManager(contextManager);
+    context.setGlobalContextManager(new AsyncLocalStorageContextManager());
   });
 
   afterEach(() => {

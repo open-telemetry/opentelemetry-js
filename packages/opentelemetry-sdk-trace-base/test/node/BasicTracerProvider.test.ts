@@ -3,11 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { Tracer as ApiTracer } from '@opentelemetry/api';
 import { context, trace } from '@opentelemetry/api';
+import type { SpanLimits } from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { BasicTracerProvider } from '../../src/BasicTracerProvider-shim';
-import { cheatSpanLimitsFromTracer } from '../common/util';
+
+function cheatSpanLimitsFromTracer(tracer: ApiTracer): SpanLimits {
+  return (tracer as any)._spanLimits;
+}
 
 describe('BasicTracerProvider - Node', () => {
   beforeEach(() => {
