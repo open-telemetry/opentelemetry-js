@@ -43,10 +43,10 @@ export class TestMetricReader extends MetricReader {
  * classes. These `cheat*` functions attempt to abstract away the cheating part.
  */
 export function cheatSpanProcessorsFromTracerProvider(tracerProvider: BasicTracerProvider): SpanProcessor[] {
-  return (tracerProvider as any)._delegate._activeSpanProcessor._spanProcessors;
+  return (tracerProvider as any)._activeSpanProcessor._spanProcessors;
 }
 export function cheatResourceFromTracerProvider(tracerProvider: BasicTracerProvider): Resource {
-  return (tracerProvider as any)._delegate._resource;
+  return (tracerProvider as any)._resource;
 }
 export function cheatSpanLimitsFromTracer(tracer: ApiTracer): SpanLimits {
   return (tracer as any)._spanLimits;

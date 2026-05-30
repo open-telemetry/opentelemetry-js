@@ -4,7 +4,11 @@
  */
 
 export { BasicTracerProvider } from './BasicTracerProvider-shim';
-export type { GeneralLimits, TracerConfig } from './types-shim';
+export type {
+  GeneralLimits,
+  TracerConfig,
+  SDKRegistrationConfig,
+} from './types-shim';
 export { BatchSpanProcessor } from './BatchSpanProcessor-shim';
 
 export {
