@@ -6,9 +6,9 @@
 import type { Attributes, SpanContext } from '@opentelemetry/api';
 import { TraceFlags } from '@opentelemetry/api';
 import * as Benchmark from 'benchmark';
-import { BasicTracerProvider } from '../../src/index-shim';
+import { TracerProvider } from '../../src';
 
-const tracerProvider = new BasicTracerProvider();
+const tracerProvider = new TracerProvider();
 const tracer = tracerProvider.getTracer('test');
 
 /** Default span limit OTEL_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT / _LINK_ (128). */

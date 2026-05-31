@@ -5,8 +5,7 @@
 
 import * as Benchmark from 'benchmark';
 import type { SpanExporter, ReadableSpan } from '@opentelemetry/sdk-trace';
-import { BatchSpanProcessor } from '@opentelemetry/sdk-trace';
-import { BasicTracerProvider } from '../../../src/index-shim';
+import { BatchSpanProcessor, TracerProvider } from '../../../src';
 import type { ExportResult } from '@opentelemetry/core';
 import { ExportResultCode } from '@opentelemetry/core';
 
@@ -27,7 +26,7 @@ class NoopExporter implements SpanExporter {
   }
 }
 
-const tracerProvider = new BasicTracerProvider({
+const tracerProvider = new TracerProvider({
   spanProcessors: [new BatchSpanProcessor(new NoopExporter())],
 });
 const tracer = tracerProvider.getTracer('test');
