@@ -23,11 +23,7 @@ import type { InstrumentationScope } from '@opentelemetry/core';
 import { sanitizeAttributes, suppressTracing } from '@opentelemetry/core';
 import * as assert from 'assert';
 import type { Sampler, Span, SpanProcessor } from '../../src';
-import {
-  AlwaysOffSampler,
-  AlwaysOnSampler,
-  SamplingDecision,
-} from '../../src';
+import { AlwaysOffSampler, AlwaysOnSampler, SamplingDecision } from '../../src';
 import { TracerProvider } from '../../src';
 import { TestStackContextManager } from './export/TestStackContextManager';
 import * as sinon from 'sinon';

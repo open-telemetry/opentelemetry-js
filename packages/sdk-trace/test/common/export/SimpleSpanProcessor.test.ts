@@ -17,10 +17,7 @@ import {
 } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
-  InMemorySpanExporter,
-  SimpleSpanProcessor,
-} from '../../../src';
+import { InMemorySpanExporter, SimpleSpanProcessor } from '../../../src';
 import { TracerProvider } from '../../../src';
 import { SpanImpl } from '@opentelemetry/sdk-trace/src/Span';
 import { TestStackContextManager } from './TestStackContextManager';

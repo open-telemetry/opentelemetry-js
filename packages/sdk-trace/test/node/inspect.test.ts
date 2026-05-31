@@ -85,10 +85,7 @@ describe('util.inspect', () => {
       provider.getTracer('a');
       provider.getTracer('b', '0.0.1');
       const out = util.inspect(provider, { depth: 4, colors: false });
-      assert.ok(
-        out.startsWith('TracerProvider '),
-        `unexpected prefix: ${out}`
-      );
+      assert.ok(out.startsWith('TracerProvider '), `unexpected prefix: ${out}`);
       assert.ok(out.includes("'a@:'"));
       assert.ok(out.includes("'b@0.0.1:'"));
     });

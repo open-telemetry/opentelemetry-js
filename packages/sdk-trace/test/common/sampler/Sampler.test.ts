@@ -4,11 +4,7 @@
  */
 
 import { context, SpanKind } from '@opentelemetry/api';
-import type {
-  Sampler,
-  SamplingDecision,
-  SamplingResult,
-} from '../../../src';
+import type { Sampler, SamplingDecision, SamplingResult } from '../../../src';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,

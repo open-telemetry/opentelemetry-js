@@ -12,15 +12,11 @@ import {
 } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import type {
-  ReadableSpan,
-  Span,
-  SpanExporter,
-} from '../../../src';
+import type { ReadableSpan, Span, SpanExporter } from '../../../src';
 import {
   AlwaysOnSampler,
   InMemorySpanExporter,
-  BatchSpanProcessor
+  BatchSpanProcessor,
 } from '../../../src';
 import { TracerProvider } from '../../../src';
 import { context } from '@opentelemetry/api';

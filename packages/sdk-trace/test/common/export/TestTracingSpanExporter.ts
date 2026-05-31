@@ -5,10 +5,7 @@
 
 import type { ExportResult } from '@opentelemetry/core';
 import type { ReadableSpan, SpanProcessor } from '../../../src';
-import {
-  InMemorySpanExporter,
-  AlwaysOnSampler,
-} from '../../../src';
+import { InMemorySpanExporter, AlwaysOnSampler } from '../../../src';
 import { TracerProvider } from '../../../src';
 
 /**
