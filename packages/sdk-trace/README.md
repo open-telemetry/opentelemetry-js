@@ -198,7 +198,6 @@ It has generally been agreed that these better belong elsewhere,
 perhaps in [`@opentelemetry/browser-instrumentation`](https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation/src/utils).
 However, [many utilities have not yet been migrated](https://github.com/open-telemetry/opentelemetry-js/issues/6591).
 
-
 ### Migrating from sdk-trace-node
 
 **`NodeTracerProvider` -> `BasicTracerProvider` -> `TracerProvider`.**
@@ -241,7 +240,8 @@ See "Migrating from sdk-trace-base" below for some changes to the `TracerProvide
 
 Roughly speaking `sdk-trace` is `sdk-trace-base` with any reading of environment variables *removed*.
 
-The specific API changes are as follows
+The specific API changes are as follows:
+
 - **BasicTracerProvider -> TracerProvider** class name change
   - The `generalLimits` constructor option is no longer supported.
     The caller must merge those limits into the `spanLimits` argument.
@@ -257,13 +257,12 @@ The specific API changes are as follows
     - OTEL_TRACES_SAMPLER
     - OTEL_TRACES_SAMPLER_ARG
 - **BatchSpanProcessor** no longer reads the following environment variables for fallback values:
-    - OTEL_BSP_MAX_EXPORT_BATCH_SIZE
-    - OTEL_BSP_MAX_QUEUE_SIZE
-    - OTEL_BSP_SCHEDULE_DELAY
-    - OTEL_BSP_EXPORT_TIMEOUT
+  - OTEL_BSP_MAX_EXPORT_BATCH_SIZE
+  - OTEL_BSP_MAX_QUEUE_SIZE
+  - OTEL_BSP_SCHEDULE_DELAY
+  - OTEL_BSP_EXPORT_TIMEOUT
 
 For [SDK environment variable support](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/) it is recommended that users use the [sdk-node package](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-sdk-node/).
-
 
 ## Useful links
 
