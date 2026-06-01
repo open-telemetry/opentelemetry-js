@@ -196,7 +196,7 @@ See "Migrating from sdk-trace-base" below for some changes to the `TracerProvide
 There are a number of additional [utilities in sdk-trace-web](https://github.com/open-telemetry/opentelemetry-js/blob/v2.7.1/packages/opentelemetry-sdk-trace-web/src/index.ts#L8-L27).
 It has generally been agreed that these better belong elsewhere,
 perhaps in [`@opentelemetry/browser-instrumentation`](https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation/src/utils).
-However, many utilities have not yet been migrated.
+However, [many utilities have not yet been migrated](https://github.com/open-telemetry/opentelemetry-js/issues/6591).
 
 
 ### Migrating from sdk-trace-node
