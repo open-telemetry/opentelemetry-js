@@ -5,9 +5,9 @@
 
 import * as assert from 'assert';
 import { InMemorySpanExporter } from '@opentelemetry/sdk-trace';
-import { BatchSpanProcessor } from '../../../src/BatchSpanProcessor-shim';
+import { BatchSpanProcessor } from '../../src/BatchSpanProcessor-shim';
 
-describe('BatchSpanProcessor', () => {
+describe('BatchSpanProcessor - Node', () => {
   describe('constructor', () => {
     it('should read defaults from environment', () => {
       const bspConfig = {

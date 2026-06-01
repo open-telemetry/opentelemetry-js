@@ -4,7 +4,7 @@
  */
 
 import * as Benchmark from 'benchmark';
-import type { SpanExporter, ReadableSpan } from '@opentelemetry/sdk-trace';
+import type { SpanExporter, ReadableSpan } from '../../../src';
 import { BatchSpanProcessor, TracerProvider } from '../../../src';
 import type { ExportResult } from '@opentelemetry/core';
 import { ExportResultCode } from '@opentelemetry/core';

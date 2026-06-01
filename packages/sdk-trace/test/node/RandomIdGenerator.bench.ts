@@ -4,7 +4,7 @@
  */
 
 import * as Benchmark from 'benchmark';
-import { RandomIdGenerator } from '@opentelemetry/sdk-trace';
+import { RandomIdGenerator } from '../../src';
 
 const idGenerator = new RandomIdGenerator();
 
