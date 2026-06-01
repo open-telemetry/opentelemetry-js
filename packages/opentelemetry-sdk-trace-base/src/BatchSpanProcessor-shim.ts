@@ -4,7 +4,11 @@
  */
 
 import { getNumberFromEnv } from '@opentelemetry/core';
-import type { BufferConfig, SpanExporter } from '@opentelemetry/sdk-trace';
+import type {
+  BatchSpanProcessorBrowserConfig,
+  BufferConfig,
+  SpanExporter,
+} from '@opentelemetry/sdk-trace';
 import { BatchSpanProcessor as BatchSpanProcessNoEnvConfig } from '@opentelemetry/sdk-trace';
 
 /**
@@ -12,7 +16,10 @@ import { BatchSpanProcessor as BatchSpanProcessNoEnvConfig } from '@opentelemetr
  * https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/
  */
 export class BatchSpanProcessor extends BatchSpanProcessNoEnvConfig {
-  constructor(exporter: SpanExporter, config?: BufferConfig) {
+  constructor(
+    exporter: SpanExporter,
+    config?: BufferConfig | BatchSpanProcessorBrowserConfig
+  ) {
     if (!config) {
       config = {};
     }
