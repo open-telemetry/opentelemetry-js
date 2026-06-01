@@ -40,12 +40,17 @@ export interface TracerProviderOptions {
 
   /**
    * A meter provider to record trace SDK metrics to.
+   * This defaults to a no-op meter provider.
    * @experimental This option is experimental and is subject to breaking changes in minor releases.
    */
   meterProvider?: MeterProvider;
 }
 
-// XXX could perhaps share parts of TracerProviderOptions and TracerOptions, though note spanProcessor{,s} diff
+/**
+ * The constructor options for the internal Tracer implementation.
+ * This is similar to, but not exactly the same exactly the same as
+ * `TracerProviderOptions`.
+ */
 export interface TracerOptions {
   resource: Resource;
   sampler: Sampler;
