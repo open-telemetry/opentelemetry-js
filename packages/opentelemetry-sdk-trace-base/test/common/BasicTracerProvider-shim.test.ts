@@ -21,7 +21,7 @@ describe('BasicTracerProvider shim', () => {
       generalLimits: {
         attributeValueLengthLimit: 1234,
         attributeCountLimit: 42,
-      }
+      },
     });
 
     const spanLimits = (provider as any)._tracerOptions.spanLimits;
@@ -38,7 +38,7 @@ describe('BasicTracerProvider shim', () => {
       spanLimits: {
         attributeValueLengthLimit: 5678,
         attributeCountLimit: 84,
-      }
+      },
     });
 
     const spanLimits = (provider as any)._tracerOptions.spanLimits;
