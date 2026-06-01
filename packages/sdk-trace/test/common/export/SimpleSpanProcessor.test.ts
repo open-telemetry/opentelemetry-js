@@ -19,11 +19,11 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { InMemorySpanExporter, SimpleSpanProcessor } from '../../../src';
 import { TracerProvider } from '../../../src';
-import { SpanImpl } from '@opentelemetry/sdk-trace/src/Span';
+import { SpanImpl } from '../../../src/Span';
 import { TestStackContextManager } from './TestStackContextManager';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { TestExporterWithDelay } from './TestExporterWithDelay';
-import type { Tracer } from '@opentelemetry/sdk-trace/src/Tracer';
+import type { Tracer } from '../../../src/Tracer';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import { cheatSpanLimitsFromTracer } from '../util';
 

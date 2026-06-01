@@ -32,9 +32,9 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import type { Span, SpanProcessor } from '../../src';
 import { TracerProvider } from '../../src';
-import { SpanImpl } from '@opentelemetry/sdk-trace/src/Span';
+import { SpanImpl } from '../../src/Span';
 import { invalidAttributes, validAttributes } from './util';
-import type { Tracer } from '@opentelemetry/sdk-trace/src/Tracer';
+import type { Tracer } from '../../src/Tracer';
 
 import { cheatSpanLimitsFromTracer } from './util';
 

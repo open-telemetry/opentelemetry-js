@@ -15,7 +15,7 @@ import {
   setGlobalErrorHandler,
   loggingErrorHandler,
 } from '@opentelemetry/core';
-import { MultiSpanProcessor } from '@opentelemetry/sdk-trace/src/MultiSpanProcessor';
+import { MultiSpanProcessor } from '../../src/MultiSpanProcessor';
 
 class TestProcessor implements SpanProcessor {
   static events: string[] = [];
