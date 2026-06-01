@@ -94,6 +94,6 @@
     "@opentelemetry/resources": "2.7.1",
     "@opentelemetry/semantic-conventions": "^1.29.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-trace",
   "sideEffects": false
 }
