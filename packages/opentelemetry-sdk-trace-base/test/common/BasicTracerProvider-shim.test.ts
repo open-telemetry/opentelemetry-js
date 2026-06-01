@@ -7,7 +7,7 @@ import * as assert from 'assert';
 import { BasicTracerProvider } from '../../src/BasicTracerProvider-shim';
 import { TracerProvider } from '@opentelemetry/sdk-trace';
 
-describe('BasicTracerProvider', () => {
+describe('BasicTracerProvider shim', () => {
   it('should create instance of sdk-trace TracerProvider', () => {
     const provider = new BasicTracerProvider();
 

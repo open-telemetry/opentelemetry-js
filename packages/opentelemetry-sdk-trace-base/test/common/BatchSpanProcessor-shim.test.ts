@@ -14,7 +14,7 @@ import {
   InMemorySpanExporter,
 } from '@opentelemetry/sdk-trace';
 
-describe('BatchSpanProcessor', () => {
+describe('BatchSpanProcessor shim', () => {
   it('should create instance of sdk-trace BatchSpanProcessor', () => {
     const processor = new BatchSpanProcessor(new InMemorySpanExporter(), {
       maxExportBatchSize: 1234
