@@ -44,8 +44,6 @@ export class TracerProvider implements ApiTracerProvider {
   constructor(options: TracerProviderOptions = {}) {
     this._forceFlushTimeoutMillis = options.forceFlushTimeoutMillis ?? 30000;
     this._resource = options.resource ?? defaultResource();
-    // XXX FWIW sdk-logs sets NoopLogRecordProcessor if array is empty. Do same?
-    // XXX want to rename spanProcessors to processors? As in sdk-logs and declconf?
     const spanProcessors = options.spanProcessors ?? [];
     this._activeSpanProcessor = new MultiSpanProcessor(spanProcessors);
 
