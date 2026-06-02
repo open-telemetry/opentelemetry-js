@@ -170,14 +170,17 @@ function guardedRawAttributes(
     if (isPromiseLike(v)) {
       return [
         k,
-        v.catch(err => {
-          diag.debug(
-            'promise rejection for resource attribute: %s - %s',
-            k,
-            err
-          );
-          return undefined;
-        }),
+        v.then(
+          val => val,
+          err => {
+            diag.debug(
+              'promise rejection for resource attribute: %s - %s',
+              k,
+              err
+            );
+            return undefined;
+          }
+        ),
       ];
     }
     return [k, v];
