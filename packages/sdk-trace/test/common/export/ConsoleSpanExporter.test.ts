@@ -12,8 +12,8 @@ import {
   AlwaysOnSampler,
   ConsoleSpanExporter,
   SimpleSpanProcessor,
+  TracerProvider,
 } from '../../../src';
-import { TracerProvider } from '../../../src';
 
 /* eslint-disable no-console */
 describe('ConsoleSpanExporter', () => {

@@ -4,8 +4,11 @@
  */
 
 import * as assert from 'assert';
-import { InMemorySpanExporter, SimpleSpanProcessor } from '../../../src';
-import { TracerProvider } from '../../../src';
+import {
+  InMemorySpanExporter,
+  SimpleSpanProcessor,
+  TracerProvider,
+} from '../../../src';
 import { context, trace } from '@opentelemetry/api';
 import type { ExportResult } from '@opentelemetry/core';
 import { ExportResultCode } from '@opentelemetry/core';

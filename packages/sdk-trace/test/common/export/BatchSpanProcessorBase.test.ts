@@ -17,8 +17,8 @@ import {
   AlwaysOnSampler,
   InMemorySpanExporter,
   BatchSpanProcessor,
+  TracerProvider,
 } from '../../../src';
-import { TracerProvider } from '../../../src';
 import { context } from '@opentelemetry/api';
 import { TestRecordOnlySampler } from './TestRecordOnlySampler';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
