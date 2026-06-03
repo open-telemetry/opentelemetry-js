@@ -59,7 +59,7 @@ const {
 const propagator = new W3CTraceContextPropagator();
 const context = propagator.extract(
   ROOT_CONTEXT,
-  {},
+  undefined,
   new EnvironmentGetter()
 );
 const spanContext = trace.getSpanContext(context);

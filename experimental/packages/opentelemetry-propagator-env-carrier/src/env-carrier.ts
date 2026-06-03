@@ -54,7 +54,7 @@ function normalizeKey(key: string): string {
 /**
  * TextMapGetter that reads propagation values from an environment snapshot.
  */
-export class EnvironmentGetter implements TextMapGetter<unknown> {
+export class EnvironmentGetter implements TextMapGetter<void> {
   private readonly _carrier: EnvironmentCarrierMap = {};
 
   constructor() {
@@ -65,11 +65,11 @@ export class EnvironmentGetter implements TextMapGetter<unknown> {
     }
   }
 
-  get(_carrier: unknown, key: string): string | undefined {
+  get(_carrier: void, key: string): string | undefined {
     return this._carrier[normalizeKey(key)];
   }
 
-  keys(_carrier: unknown): string[] {
+  keys(_carrier: void): string[] {
     return Object.keys(this._carrier);
   }
 }

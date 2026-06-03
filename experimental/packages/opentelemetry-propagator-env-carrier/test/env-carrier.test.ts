@@ -114,14 +114,29 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
 
       const getter = new EnvironmentGetter();
 
-      assert.strictEqual(getter.get({}, 'traceparent'), 'traceparent-value');
-      assert.strictEqual(getter.get({}, 'trace-state'), 'tracestate-value');
-      assert.strictEqual(getter.get({}, 'foo.bar'), 'dot-value');
-      assert.strictEqual(getter.get({}, 'MiXeD_cAsE'), 'mixed-value');
-      assert.strictEqual(getter.get({}, 'h\u00e9llo'), 'non-ascii-value');
-      assert.strictEqual(getter.get({}, '1abc'), 'leading-digit-value');
-      assert.strictEqual(getter.get({}, 'X_B3_TRACEID'), 'b3-value');
-      assert.strictEqual(getter.get({}, 'x-b3-traceid'), 'b3-value');
+      assert.strictEqual(
+        getter.get(undefined, 'traceparent'),
+        'traceparent-value'
+      );
+      assert.strictEqual(
+        getter.get(undefined, 'trace-state'),
+        'tracestate-value'
+      );
+      assert.strictEqual(getter.get(undefined, 'foo.bar'), 'dot-value');
+      assert.strictEqual(
+        getter.get(undefined, 'MiXeD_cAsE'),
+        'mixed-value'
+      );
+      assert.strictEqual(
+        getter.get(undefined, 'h\u00e9llo'),
+        'non-ascii-value'
+      );
+      assert.strictEqual(
+        getter.get(undefined, '1abc'),
+        'leading-digit-value'
+      );
+      assert.strictEqual(getter.get(undefined, 'X_B3_TRACEID'), 'b3-value');
+      assert.strictEqual(getter.get(undefined, 'x-b3-traceid'), 'b3-value');
     });
 
     it('should return normalized snapshot keys', () => {
@@ -130,7 +145,7 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
 
       const getter = new EnvironmentGetter();
 
-      assert.deepStrictEqual(getter.keys({}).sort(), [
+      assert.deepStrictEqual(getter.keys(undefined).sort(), [
         'TRACEPARENT',
         'TRACE_STATE',
       ]);
@@ -139,7 +154,7 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
     it('should return empty keys for an empty environment snapshot', () => {
       const getter = new EnvironmentGetter();
 
-      assert.deepStrictEqual(getter.keys({}), []);
+      assert.deepStrictEqual(getter.keys(undefined), []);
     });
 
     it('should return undefined when a key is missing', () => {
@@ -147,7 +162,7 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
 
       const getter = new EnvironmentGetter();
 
-      assert.strictEqual(getter.get({}, 'tracestate'), undefined);
+      assert.strictEqual(getter.get(undefined, 'tracestate'), undefined);
     });
 
     it('should list duplicate normalized environment names once', () => {
@@ -156,7 +171,7 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
 
       const getter = new EnvironmentGetter();
 
-      assert.deepStrictEqual(getter.keys({}), ['TRACEPARENT']);
+      assert.deepStrictEqual(getter.keys(undefined), ['TRACEPARENT']);
     });
 
     it('should preserve empty string values', () => {
@@ -164,7 +179,7 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
 
       const getter = new EnvironmentGetter();
 
-      assert.strictEqual(getter.get({}, 'empty'), '');
+      assert.strictEqual(getter.get(undefined, 'empty'), '');
     });
 
     it('should snapshot process.env at construction time', () => {
@@ -174,17 +189,17 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
       process.env.TRACEPARENT = 'updated';
       process.env.TRACESTATE = 'added-after-construction';
 
-      assert.strictEqual(getter.get({}, 'traceparent'), 'original');
-      assert.strictEqual(getter.get({}, 'tracestate'), undefined);
+      assert.strictEqual(getter.get(undefined, 'traceparent'), 'original');
+      assert.strictEqual(getter.get(undefined, 'tracestate'), undefined);
     });
 
-    it('should ignore the carrier parameter', () => {
+    it('should read from the environment snapshot without a carrier', () => {
       process.env.TRACEPARENT = 'environment-value';
 
       const getter = new EnvironmentGetter();
 
       assert.strictEqual(
-        getter.get({ TRACEPARENT: 'carrier-value' }, 'traceparent'),
+        getter.get(undefined, 'traceparent'),
         'environment-value'
       );
     });
@@ -219,7 +234,7 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
       const propagator = new W3CTraceContextPropagator();
       const context = propagator.extract(
         ROOT_CONTEXT,
-        {},
+        undefined,
         new EnvironmentGetter()
       );
       const spanContext = trace.getSpanContext(context);
@@ -254,7 +269,7 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
       const propagator = new W3CBaggagePropagator();
       const context = propagator.extract(
         ROOT_CONTEXT,
-        {},
+        undefined,
         new EnvironmentGetter()
       );
       const baggage = propagation.getBaggage(context);
