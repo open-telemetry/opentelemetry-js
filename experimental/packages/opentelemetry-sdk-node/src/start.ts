@@ -16,6 +16,7 @@ import {
   propagation,
 } from '@opentelemetry/api';
 import {
+  getIdGeneratorFromConfiguration,
   getInstanceID,
   getLogRecordProcessorsFromConfiguration,
   getMeterReadersFromConfiguration,
@@ -160,18 +161,19 @@ function create(
   const spanProcessors = getSpanProcessorsFromConfiguration(config);
   if (spanProcessors) {
     const spanLimits = getSpanLimitsFromConfiguration(config);
+    const idGenerator = getIdGeneratorFromConfiguration(config);
     // TODO (6506): support sampler configuration from config
     const tracerProvider = new BasicTracerProvider({
       resource,
       spanProcessors,
       spanLimits,
+      idGenerator,
       generalLimits: {
         attributeValueLengthLimit:
           config.attribute_limits?.attribute_value_length_limit ?? undefined,
         attributeCountLimit:
           config.attribute_limits?.attribute_count_limit ?? undefined,
       },
-      // TODO (6616): support idGenerator configuration from config
       // TODO (6624): support for `meterProvider: components.meterProvider`
     });
     components.tracerProvider = tracerProvider;

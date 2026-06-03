@@ -31,6 +31,7 @@ import {
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 import type {
+  IdGenerator,
   Sampler,
   SpanExporter,
   SpanLimits,
@@ -42,6 +43,7 @@ import {
   BatchSpanProcessor,
   ConsoleSpanExporter,
   ParentBasedSampler,
+  RandomIdGenerator,
   SimpleSpanProcessor,
   TraceIdRatioBasedSampler,
 } from '@opentelemetry/sdk-trace-base';
@@ -859,6 +861,27 @@ export function getSpanProcessorsFromConfiguration(
   });
   if (spanProcessors.length > 0) {
     return spanProcessors;
+  }
+  return undefined;
+}
+
+export function getIdGeneratorFromConfiguration(
+  config: ConfigurationModel
+): IdGenerator | undefined {
+  const idGenerator = config.tracer_provider?.id_generator;
+  if (!idGenerator) {
+    return undefined;
+  }
+  if (idGenerator.random !== undefined) {
+    return new RandomIdGenerator();
+  }
+  // Any other key is a third-party / custom id_generator type which we
+  // don't currently support. Warn and fall back to SDK default.
+  const unknownKeys = Object.keys(idGenerator).filter(k => k !== 'random');
+  if (unknownKeys.length > 0) {
+    diag.warn(
+      `Unsupported id_generator type(s): ${unknownKeys.join(', ')}. Using default.`
+    );
   }
   return undefined;
 }

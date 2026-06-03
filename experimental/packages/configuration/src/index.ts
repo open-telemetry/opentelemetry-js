@@ -17,6 +17,7 @@ export type {
   NameStringValuePair as NameStringValuePairConfigModel,
   HttpTls as HttpTlsConfigModel,
   GrpcTls as GrpcTlsConfigModel,
+  IdGenerator as IdGeneratorConfigModel,
   SeverityNumber as SeverityNumberConfigModel,
 } from './generated/types';
 export { createConfigFactory } from './ConfigFactory';
