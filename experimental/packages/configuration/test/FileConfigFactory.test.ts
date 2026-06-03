@@ -151,9 +151,9 @@ const ksCardinality = {
 const ksPromExporter = (strategy: string) => ({
   host: 'localhost',
   port: 9464,
-  without_scope_info: false,
-  'without_target_info/development': false,
-  with_resource_constant_labels: {
+  scope_info_enabled: true,
+  'target_info_enabled/development': true,
+  resource_constant_labels: {
     included: ['service*'],
     excluded: ['service.attr1'],
   },

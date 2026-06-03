@@ -838,8 +838,8 @@ describe('EnvironmentConfigFactory', function () {
                 'prometheus/development': {
                   host: 'localhost',
                   port: 9464,
-                  without_scope_info: false,
-                  'without_target_info/development': false,
+                  scope_info_enabled: true,
+                  'target_info_enabled/development': true,
                 },
               },
             },
@@ -868,8 +868,8 @@ describe('EnvironmentConfigFactory', function () {
                 'prometheus/development': {
                   host: '0.0.0.0',
                   port: 8080,
-                  without_scope_info: false,
-                  'without_target_info/development': false,
+                  scope_info_enabled: true,
+                  'target_info_enabled/development': true,
                 },
               },
             },

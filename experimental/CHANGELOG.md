@@ -8,6 +8,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* chore(configuration)!: bump config schema to unreleased main SHA; rename `without_scope_info` → `scope_info_enabled` and `without_target_info/development` → `target_info_enabled/development` on the Prometheus pull exporter (semantics inverted), rename `with_resource_constant_labels` → `resource_constant_labels`. Temporary until v1.1.0 of opentelemetry-configuration is released ([open-telemetry/opentelemetry-configuration#643](https://github.com/open-telemetry/opentelemetry-configuration/issues/643)). [#TBD] @MikeGoldsmith
 * fix(configuration)!: stop removing `null` values from parsed config object [#6679](https://github.com/open-telemetry/opentelemetry-js/pull/6679) @trentm
   * It is now the responsibility of the user of a parsed declarative config object, typically just the `sdk-node` package, to handle `null` values.
 * fix(api-logs)!: Removed `NOOP_LOGGER` and `NoopLogger` exports from `@opentelemetry/api-logs`. Use `createNoopLogger(): Logger` instead. [#6713](https://github.com/open-telemetry/opentelemetry-js/pull/6713) @dyladan
