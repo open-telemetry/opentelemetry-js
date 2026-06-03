@@ -12,7 +12,8 @@ export interface LoggerOptions {
   schemaUrl?: string;
 
   /**
-   * The instrumentation scope attributes to associate with emitted telemetry
+   * The instrumentation scope attributes to associate with emitted telemetry.
+   * These attributes also participate in logger identity.
    */
-  scopeAttributes?: LogAttributes;
+  attributes?: LogAttributes;
 }

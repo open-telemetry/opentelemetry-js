@@ -738,7 +738,7 @@ describe('PrometheusSerializer', () => {
       assert.strictEqual(spy.calledOnce, true);
       sinon.assert.calledWith(
         spy,
-        `Normalization for metric "@#$%" resulted in an invalid name: "_"`
+        'Normalization for metric "@#$%" resulted in an invalid name: "_"'
       );
     });
 
@@ -759,7 +759,7 @@ describe('PrometheusSerializer', () => {
       assert.strictEqual(spy.calledOnce, true);
       sinon.assert.calledWith(
         spy,
-        `Normalization for metric "" resulted in empty name`
+        'Normalization for metric "" resulted in empty name'
       );
     });
   });

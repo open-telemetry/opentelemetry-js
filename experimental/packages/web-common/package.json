@@ -25,8 +25,8 @@
   "scripts": {
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "prepublishOnly": "npm run compile",
     "prewatch": "npm run precompile",
