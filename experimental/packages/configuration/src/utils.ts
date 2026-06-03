@@ -18,7 +18,7 @@ import type { ConfigurationModel, GrpcTls, HttpTls } from './generated/types';
  * Exported for testing.
  */
 export function substituteEnvVars(doc: yaml.Document) {
-  // Visit each (a) scalar (b) string (c) value in the document. These are
+  // Visit each scalar string value in the document. These are
   // the candidates for env var substitution.
   yaml.visit(doc, {
     Scalar: (key, node, _path) => {
