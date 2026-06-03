@@ -12,6 +12,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
   * It is now the responsibility of the user of a parsed declarative config object, typically just the `sdk-node` package, to handle `null` values.
 * fix(api-logs)!: Removed `NOOP_LOGGER` and `NoopLogger` exports from `@opentelemetry/api-logs`. Use `createNoopLogger(): Logger` instead. [#6713](https://github.com/open-telemetry/opentelemetry-js/pull/6713) @dyladan
 * feat(api-logs)!: rename scopeAttributes to attributes in LoggerOptions [#6573](https://github.com/open-telemetry/opentelemetry-js/pull/6573) @pichlermarc
+* fix(sdk-node)!: remove `buildSamplerFromConfig` export
 
 ### :rocket: Features
 
