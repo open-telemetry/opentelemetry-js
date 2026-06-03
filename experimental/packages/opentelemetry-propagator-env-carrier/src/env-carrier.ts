@@ -5,8 +5,6 @@
 
 import type { TextMapGetter, TextMapSetter } from '@opentelemetry/api';
 
-type EnvironmentCarrierMap = Record<string, string>;
-
 const ASCII_UPPER_A = 'A'.charCodeAt(0);
 const ASCII_UPPER_Z = 'Z'.charCodeAt(0);
 const ASCII_LOWER_A = 'a'.charCodeAt(0);
@@ -66,7 +64,7 @@ function normalizeKey(key: string): string {
  * @see https://opentelemetry.io/docs/specs/otel/context/env-carriers/
  */
 export class EnvironmentGetter implements TextMapGetter<void> {
-  private readonly _carrier: EnvironmentCarrierMap = {};
+  private readonly _carrier: Record<string, string> = {};
 
   constructor() {
     for (const [key, value] of Object.entries(process.env)) {
@@ -88,15 +86,24 @@ export class EnvironmentGetter implements TextMapGetter<void> {
 /**
  * TextMapSetter that writes propagation values to an environment map.
  *
- * `EnvironmentSetter` mutates only the carrier map supplied to `set()` and
- * never writes to `process.env`. Propagator keys are normalized before storing
- * their opaque string values. If multiple keys normalize to the same
- * environment variable name, the latest value written to the map is retained.
+ * `EnvironmentSetter` mutates only the environment map supplied to the
+ * constructor and never writes to `process.env`. Pass `undefined` as the
+ * carrier when using this setter with a `TextMapPropagator`.
+ *
+ * Propagator keys are normalized before storing their opaque string values. If
+ * multiple keys normalize to the same environment variable name, the latest
+ * value written to the map is retained.
  *
  * @see https://opentelemetry.io/docs/specs/otel/context/env-carriers/
  */
-export class EnvironmentSetter implements TextMapSetter<EnvironmentCarrierMap> {
-  set(carrier: EnvironmentCarrierMap, key: string, value: string): void {
-    carrier[normalizeKey(key)] = value;
+export class EnvironmentSetter implements TextMapSetter<void> {
+  private readonly _carrier: Record<string, string>;
+
+  constructor(carrier: Record<string, string>) {
+    this._carrier = carrier;
+  }
+
+  set(_carrier: void, key: string, value: string): void {
+    this._carrier[normalizeKey(key)] = value;
   }
 }

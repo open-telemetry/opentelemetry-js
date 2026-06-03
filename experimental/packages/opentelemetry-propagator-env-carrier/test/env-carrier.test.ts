@@ -19,8 +19,6 @@ import {
 
 import { EnvironmentGetter, EnvironmentSetter } from '../src';
 
-type EnvironmentCarrier = Record<string, string>;
-
 describe('EnvironmentGetter and EnvironmentSetter', () => {
   const originalEnv = { ...process.env };
 
@@ -35,15 +33,15 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
 
   describe('EnvironmentSetter', () => {
     it('should normalize keys when setting values', () => {
-      const carrier: EnvironmentCarrier = {};
-      const setter = new EnvironmentSetter();
+      const carrier: Record<string, string> = {};
+      const setter = new EnvironmentSetter(carrier);
 
-      setter.set(carrier, 'traceparent', 'traceparent-value');
-      setter.set(carrier, 'trace-state', 'tracestate-value');
-      setter.set(carrier, 'foo.bar', 'dot-value');
-      setter.set(carrier, 'MiXeD_cAsE', 'mixed-value');
-      setter.set(carrier, 'h\u00e9llo', 'non-ascii-value');
-      setter.set(carrier, '1abc', 'leading-digit-value');
+      setter.set(undefined, 'traceparent', 'traceparent-value');
+      setter.set(undefined, 'trace-state', 'tracestate-value');
+      setter.set(undefined, 'foo.bar', 'dot-value');
+      setter.set(undefined, 'MiXeD_cAsE', 'mixed-value');
+      setter.set(undefined, 'h\u00e9llo', 'non-ascii-value');
+      setter.set(undefined, '1abc', 'leading-digit-value');
 
       assert.deepStrictEqual(carrier, {
         TRACEPARENT: 'traceparent-value',
@@ -56,10 +54,10 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
     });
 
     it('should preserve digits and underscores when normalizing keys', () => {
-      const carrier: EnvironmentCarrier = {};
-      const setter = new EnvironmentSetter();
+      const carrier: Record<string, string> = {};
+      const setter = new EnvironmentSetter(carrier);
 
-      setter.set(carrier, 'a_1-b_2', 'value');
+      setter.set(undefined, 'a_1-b_2', 'value');
 
       assert.deepStrictEqual(carrier, {
         A_1_B_2: 'value',
@@ -67,11 +65,11 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
     });
 
     it('should overwrite values with the same normalized key', () => {
-      const carrier: EnvironmentCarrier = {};
-      const setter = new EnvironmentSetter();
+      const carrier: Record<string, string> = {};
+      const setter = new EnvironmentSetter(carrier);
 
-      setter.set(carrier, 'trace-state', 'first');
-      setter.set(carrier, 'TRACE_STATE', 'second');
+      setter.set(undefined, 'trace-state', 'first');
+      setter.set(undefined, 'TRACE_STATE', 'second');
 
       assert.deepStrictEqual(carrier, {
         TRACE_STATE: 'second',
@@ -79,11 +77,11 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
     });
 
     it('should treat values as opaque strings', () => {
-      const carrier: EnvironmentCarrier = {};
-      const setter = new EnvironmentSetter();
+      const carrier: Record<string, string> = {};
+      const setter = new EnvironmentSetter(carrier);
 
-      setter.set(carrier, 'empty', '');
-      setter.set(carrier, 'whitespace', '  value  ');
+      setter.set(undefined, 'empty', '');
+      setter.set(undefined, 'whitespace', '  value  ');
 
       assert.deepStrictEqual(carrier, {
         EMPTY: '',
@@ -92,10 +90,10 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
     });
 
     it('should not modify process.env', () => {
-      const carrier: EnvironmentCarrier = {};
-      const setter = new EnvironmentSetter();
+      const carrier: Record<string, string> = {};
+      const setter = new EnvironmentSetter(carrier);
 
-      setter.set(carrier, 'traceparent', 'value');
+      setter.set(undefined, 'traceparent', 'value');
 
       assert.deepStrictEqual(Object.keys(process.env), []);
       assert.deepStrictEqual(carrier, { TRACEPARENT: 'value' });
@@ -123,18 +121,12 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
         'tracestate-value'
       );
       assert.strictEqual(getter.get(undefined, 'foo.bar'), 'dot-value');
-      assert.strictEqual(
-        getter.get(undefined, 'MiXeD_cAsE'),
-        'mixed-value'
-      );
+      assert.strictEqual(getter.get(undefined, 'MiXeD_cAsE'), 'mixed-value');
       assert.strictEqual(
         getter.get(undefined, 'h\u00e9llo'),
         'non-ascii-value'
       );
-      assert.strictEqual(
-        getter.get(undefined, '1abc'),
-        'leading-digit-value'
-      );
+      assert.strictEqual(getter.get(undefined, '1abc'), 'leading-digit-value');
       assert.strictEqual(getter.get(undefined, 'X_B3_TRACEID'), 'b3-value');
       assert.strictEqual(getter.get(undefined, 'x-b3-traceid'), 'b3-value');
     });
@@ -217,9 +209,9 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
         traceFlags: TraceFlags.SAMPLED,
         traceState: new TraceState('vendor1=value1,vendor2=value2'),
       });
-      const carrier: EnvironmentCarrier = {};
+      const carrier: Record<string, string> = {};
 
-      propagator.inject(context, carrier, new EnvironmentSetter());
+      propagator.inject(context, undefined, new EnvironmentSetter(carrier));
 
       assert.deepStrictEqual(carrier, {
         TRACEPARENT: `00-${traceId}-${spanId}-01`,
@@ -256,9 +248,9 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
           second: { value: 'two' },
         })
       );
-      const carrier: EnvironmentCarrier = {};
+      const carrier: Record<string, string> = {};
 
-      propagator.inject(context, carrier, new EnvironmentSetter());
+      propagator.inject(context, undefined, new EnvironmentSetter(carrier));
 
       assert.strictEqual(carrier.BAGGAGE, 'first=one,second=two');
     });

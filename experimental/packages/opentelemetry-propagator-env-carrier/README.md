@@ -16,8 +16,9 @@ formats.
 ## Usage
 
 Use `EnvironmentSetter` to inject context into an environment map owned by your
-application. The map can then be passed to a child process.
-`EnvironmentSetter` writes only to the map supplied to the propagator and does
+application. Pass the map to `EnvironmentSetter`, and pass `undefined` as the
+carrier when injecting. The map can then be passed to a child process.
+`EnvironmentSetter` writes only to the map supplied to its constructor and does
 not modify `process.env`.
 
 ```javascript
@@ -36,7 +37,7 @@ const ctx = trace.setSpanContext(ROOT_CONTEXT, {
 const env = { ...process.env };
 const propagator = new W3CTraceContextPropagator();
 
-propagator.inject(ctx, env, new EnvironmentSetter());
+propagator.inject(ctx, undefined, new EnvironmentSetter(env));
 
 const output = execFileSync(
   process.execPath,
@@ -87,11 +88,12 @@ Environment variable names used for propagation are normalized by:
 For example, `traceparent` becomes `TRACEPARENT`, `trace-state` becomes
 `TRACE_STATE`, and `1abc` becomes `_1ABC`.
 
-`EnvironmentSetter` always writes normalized key names. `EnvironmentGetter`
-normalizes both the requested propagator key and the environment variable names
-from its snapshot before matching, and its `keys()` method returns normalized
-names. For example, a propagator request for `x-b3-traceid` matches either
-`X_B3_TRACEID` or `x-b3-traceid` from `process.env`.
+`EnvironmentSetter` always writes normalized key names to its environment map.
+`EnvironmentGetter` normalizes both the requested propagator key and the
+environment variable names from its snapshot before matching, and its `keys()`
+method returns normalized names. For example, a propagator request for
+`x-b3-traceid` matches either `X_B3_TRACEID` or `x-b3-traceid` from
+`process.env`.
 
 Name collisions after normalization should be avoided. For example,
 `trace-state` and `TRACE_STATE` both normalize to `TRACE_STATE`. When injecting,
