@@ -17,6 +17,8 @@ formats.
 
 Use `EnvironmentSetter` to inject context into an environment map owned by your
 application. The map can then be passed to a child process.
+`EnvironmentSetter` writes only to the map supplied to the propagator and does
+not modify `process.env`.
 
 ```javascript
 const { execFileSync } = require('node:child_process');
@@ -47,7 +49,8 @@ console.log(output);
 ```
 
 Use `EnvironmentGetter` during process startup to extract context that was
-provided through environment variables.
+provided through environment variables. It reads from its own snapshot, so pass
+`undefined` as the carrier when extracting.
 
 ```javascript
 const { ROOT_CONTEXT, trace } = require('@opentelemetry/api');
@@ -68,7 +71,8 @@ console.log(spanContext.traceId);
 // 0102030405060708090a0b0c0d0e0f10
 ```
 
-`EnvironmentGetter` snapshots `process.env` when it is constructed.
+`EnvironmentGetter` snapshots `process.env` when it is constructed. Later
+changes to `process.env` are not reflected in that getter.
 
 ## Key Normalization
 
@@ -89,8 +93,17 @@ from its snapshot before matching, and its `keys()` method returns normalized
 names. For example, a propagator request for `x-b3-traceid` matches either
 `X_B3_TRACEID` or `x-b3-traceid` from `process.env`.
 
+Name collisions after normalization should be avoided. For example,
+`trace-state` and `TRACE_STATE` both normalize to `TRACE_STATE`. When injecting,
+later writes to the same normalized name replace earlier values in the target
+map. When extracting from `process.env`, multiple environment variables that
+normalize to the same name are a name collision error scenario, and which value
+is read is unspecified.
+
 ## Useful links
 
+- OpenTelemetry Environment Variables as Context Propagation Carriers specification:
+  <https://opentelemetry.io/docs/specs/otel/context/env-carriers/>
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
 - For help or feedback on this project, join us in [GitHub Discussions][discussions-url]

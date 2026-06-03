@@ -52,7 +52,18 @@ function normalizeKey(key: string): string {
 }
 
 /**
- * TextMapGetter that reads propagation values from an environment snapshot.
+ * TextMapGetter that reads propagation values from a process environment
+ * snapshot.
+ *
+ * `EnvironmentGetter` snapshots `process.env` when it is constructed and
+ * ignores the carrier passed to `get()` and `keys()`. Pass `undefined` as the
+ * carrier when using this getter with a `TextMapPropagator`.
+ *
+ * Environment variable names are normalized before they are stored. If multiple
+ * environment variables normalize to the same key, that is a name collision
+ * error scenario and which original value is read is unspecified.
+ *
+ * @see https://opentelemetry.io/docs/specs/otel/context/env-carriers/
  */
 export class EnvironmentGetter implements TextMapGetter<void> {
   private readonly _carrier: EnvironmentCarrierMap = {};
@@ -76,6 +87,13 @@ export class EnvironmentGetter implements TextMapGetter<void> {
 
 /**
  * TextMapSetter that writes propagation values to an environment map.
+ *
+ * `EnvironmentSetter` mutates only the carrier map supplied to `set()` and
+ * never writes to `process.env`. Propagator keys are normalized before storing
+ * their opaque string values. If multiple keys normalize to the same
+ * environment variable name, the latest value written to the map is retained.
+ *
+ * @see https://opentelemetry.io/docs/specs/otel/context/env-carriers/
  */
 export class EnvironmentSetter implements TextMapSetter<EnvironmentCarrierMap> {
   set(carrier: EnvironmentCarrierMap, key: string, value: string): void {
