@@ -962,7 +962,7 @@ describe('startNodeSDK', function () {
       assert.throws(() => {
         const exporter: LogRecordExporterConfigModel = {};
         createLogRecordExporterFromConfig(exporter);
-      }, 'XXX');
+      });
     });
 
     it('should warn when exporter timeout is 0', async () => {
