@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   prometheus:
-    image: prom/prometheus:v2.47.2
+    image: prom/prometheus:v3.12.0@sha256:69f5241418838263316593f7274a304b095c40bcf22e57272865da91bd60a8ac
     extra_hosts:
       - host.docker.internal:host-gateway
     volumes:
