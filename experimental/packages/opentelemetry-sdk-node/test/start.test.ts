@@ -56,7 +56,7 @@ import {
 } from '../src/semconv';
 import { ATTR_OS_TYPE } from '@opentelemetry/resources/src/semconv';
 import {
-  getLogRecordExporter,
+  createLogRecordExporterFromConfig,
   getSpanExporter,
   setupContextManager,
 } from '../src/utils';
@@ -958,9 +958,11 @@ describe('startNodeSDK', function () {
   });
 
   describe('tests to increase code coverage', function () {
-    it('should return undefined for invalid log record exporter model', async () => {
-      const exporter: LogRecordExporterConfigModel = {};
-      assert.equal(getLogRecordExporter(exporter), undefined);
+    it('should throw for invalid log record exporter model', async () => {
+      assert.throws(() => {
+        const exporter: LogRecordExporterConfigModel = {};
+        createLogRecordExporterFromConfig(exporter);
+      }, 'XXX');
     });
 
     it('should warn when exporter timeout is 0', async () => {

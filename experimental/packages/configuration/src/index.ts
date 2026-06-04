@@ -18,5 +18,14 @@ export type {
   HttpTls as HttpTlsConfigModel,
   GrpcTls as GrpcTlsConfigModel,
   SeverityNumber as SeverityNumberConfigModel,
+
+  LoggerProvider as LoggerProviderConfigModel,
+  AttributeLimits as AttributeLimitsConfigModel,
+  LogRecordProcessor as LogRecordProcessorConfigModel,
+  BatchLogRecordProcessor as BatchLogRecordProcessorConfigModel,
+  SimpleLogRecordProcessor as SimpleLogRecordProcessorConfigModel,
+  OtlpHttpExporter as OtlpHttpExporterConfigModel,
+  OtlpGrpcExporter as OtlpGrpcExporterConfigModel,
+  LogRecordLimits as LogRecordLimitsConfigModel,
 } from './generated/types';
 export { createConfigFactory } from './ConfigFactory';
