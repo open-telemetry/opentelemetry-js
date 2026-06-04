@@ -18,7 +18,6 @@ export type {
   HttpTls as HttpTlsConfigModel,
   GrpcTls as GrpcTlsConfigModel,
   SeverityNumber as SeverityNumberConfigModel,
-
   LoggerProvider as LoggerProviderConfigModel,
   AttributeLimits as AttributeLimitsConfigModel,
   LogRecordProcessor as LogRecordProcessorConfigModel,
