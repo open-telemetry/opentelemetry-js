@@ -61,7 +61,7 @@ export type LoggerConfigurator = (
   loggerScope: InstrumentationScope
 ) => Required<LoggerConfig>;
 
-export interface LoggerProviderConfig {
+export interface LoggerProviderOptions {
   /** Resource associated with trace telemetry  */
   resource?: Resource;
 
@@ -91,6 +91,11 @@ export interface LoggerProviderConfig {
    */
   meterProvider?: MeterProvider;
 }
+
+/**
+ * @deprecated please use {@link LoggerProviderOptions}
+ */
+export type LoggerProviderConfig = LoggerProviderOptions;
 
 export interface LogRecordLimits {
   /** attributeValueLengthLimit is maximum allowed attribute value size */
