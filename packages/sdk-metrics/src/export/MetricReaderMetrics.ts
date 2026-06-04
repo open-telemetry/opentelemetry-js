@@ -14,7 +14,7 @@ import {
 const componentCounter = new Map<string, number>();
 
 /**
- * Generates `otel.sdk.metric_reader.*` metrics.
+ * Generates `otel.sdk.metric_reader.*` self-observability metrics.
  * https://opentelemetry.io/docs/specs/semconv/otel/sdk-metrics/#metric-otelsdkmetric_readercollectionduration
  */
 export class MetricReaderMetrics {

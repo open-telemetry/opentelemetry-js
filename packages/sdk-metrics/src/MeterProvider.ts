@@ -57,7 +57,7 @@ export class MeterProvider implements IMeterProvider {
         metricReader.setMetricProducer(collector);
         this._sharedState.metricCollectors.push(collector);
         if (options.sdkMetricsEnabled && metricReader instanceof MetricReader) {
-          metricReader._setMeterProvider(this);
+          metricReader._setSelfObsMeterProvider(this);
         }
       }
     }

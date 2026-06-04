@@ -58,7 +58,7 @@ export interface MetricReaderOptions {
    */
   metricProducers?: MetricProducer[];
   /**
-   * The component type used for reporting SDK metrics.
+   * The component type used for reporting self-observability SDK metrics.
    * @experimental This option is experimental and is subject to breaking changes in minor releases.
    */
   otelComponentType?: string;
@@ -141,7 +141,7 @@ export abstract class MetricReader implements IMetricReader {
   // MetricProducer used by this instance which produces metrics from the SDK
   private _sdkMetricProducer?: MetricProducer;
   // Metrics about the MetricReader itself
-  private _metrics: MetricReaderMetrics;
+  private _selfObsMetrics: MetricReaderMetrics;
   private readonly _aggregationTemporalitySelector: AggregationTemporalitySelector;
   private readonly _aggregationSelector: AggregationSelector;
   private readonly _cardinalitySelector?: CardinalitySelector;
@@ -157,7 +157,7 @@ export abstract class MetricReader implements IMetricReader {
     this._cardinalitySelector = options?.cardinalitySelector;
     this._otelComponentType =
       options?.otelComponentType ?? this.constructor.name;
-    this._metrics = new MetricReaderMetrics(
+    this._selfObsMetrics = new MetricReaderMetrics(
       this._otelComponentType,
       api.createNoopMeter()
     );
@@ -180,9 +180,9 @@ export abstract class MetricReader implements IMetricReader {
     this.onInitialized();
   }
 
-  _setMeterProvider(meterProvider: api.MeterProvider): void {
+  _setSelfObsMeterProvider(meterProvider: api.MeterProvider): void {
     const meter = meterProvider.getMeter('@opentelemetry/sdk-metrics', VERSION);
-    this._metrics = new MetricReaderMetrics(this._otelComponentType, meter);
+    this._selfObsMetrics = new MetricReaderMetrics(this._otelComponentType, meter);
   }
 
   selectAggregation(instrumentType: InstrumentType): AggregationOption {
@@ -256,7 +256,7 @@ export abstract class MetricReader implements IMetricReader {
     );
 
     const collectDuration = hrTimeToSeconds(hrTimeDuration(startTime, endTime));
-    this._metrics.recordCollection(
+    this._selfObsMetrics.recordCollection(
       collectDuration,
       errors.length > 0
         ? ((errors[0] as Error).name ?? 'collect_error')
