@@ -254,6 +254,21 @@ describe('startNodeSDK', function () {
     await sdk.shutdown();
   });
 
+  it('should diag.error and return NOOP_SDK when components in OTEL_CONFIG_FILE cannot be created', async () => {
+    const diagError = Sinon.spy(diag, 'error');
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/unknown-log-record-processor.yaml';
+    const sdk = startNodeSDK({});
+
+    assert.strictEqual(sdk, NOOP_SDK);
+    assert.strictEqual(diagError.callCount, 1);
+    assert.strictEqual(
+      diagError.args[0][0],
+      'Could not create OpenTelemetry SDK: unknown LogRecordProcessor name: "my_custom_processor"'
+    );
+
+    await sdk.shutdown();
+  });
+
   it('should register a logger provider if multiple log record processors are provided', async () => {
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/logger.yaml';
     const sdk = startNodeSDK({});
