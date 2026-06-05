@@ -256,7 +256,8 @@ describe('startNodeSDK', function () {
 
   it('should diag.error and return NOOP_SDK when components in OTEL_CONFIG_FILE cannot be created', async () => {
     const diagError = Sinon.spy(diag, 'error');
-    process.env.OTEL_CONFIG_FILE = 'test/fixtures/unknown-log-record-processor.yaml';
+    process.env.OTEL_CONFIG_FILE =
+      'test/fixtures/unknown-log-record-processor.yaml';
     const sdk = startNodeSDK({});
 
     assert.strictEqual(sdk, NOOP_SDK);
