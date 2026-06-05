@@ -58,6 +58,7 @@ export function getGrpcTlsConfig(
 export function initializeDefaultConfiguration(): ConfigurationModel {
   return {
     disabled: false,
+    log_level: 'info',
     resource: {},
     attribute_limits: {
       attribute_count_limit: 128,
