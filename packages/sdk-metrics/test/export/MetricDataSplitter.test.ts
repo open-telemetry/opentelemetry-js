@@ -39,8 +39,11 @@ describe('splitMetricData', () => {
         unit: options?.unit ?? `unit${num}`,
         valueType: ValueType.INT,
       },
-      aggregationTemporality: options?.aggregationTemporality ?? AggregationTemporality.CUMULATIVE,
-      ...(options?.isMonotonic !== undefined ? { isMonotonic: options.isMonotonic } : {}),
+      aggregationTemporality:
+        options?.aggregationTemporality ?? AggregationTemporality.CUMULATIVE,
+      ...(options?.isMonotonic !== undefined
+        ? { isMonotonic: options.isMonotonic }
+        : {}),
     };
   }
 
@@ -337,7 +340,9 @@ describe('splitMetricData', () => {
     it('should split batches when exceeding maxExportBatchSize (SUM)', () => {
       const resourceMetrics = createResourceMetrics([
         createScopeMetrics('test', [
-          createMetric(DataPointType.SUM, 'm1', [1, 2, 3], { isMonotonic: true }),
+          createMetric(DataPointType.SUM, 'm1', [1, 2, 3], {
+            isMonotonic: true,
+          }),
         ]),
       ]);
 
