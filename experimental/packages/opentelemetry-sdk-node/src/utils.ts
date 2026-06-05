@@ -62,6 +62,7 @@ import type {
   LogRecordExporterConfigModel,
   InstrumentTypeConfigModel,
   AggregationConfigModel,
+  MetricProducerConfigModel,
   PeriodicMetricReaderConfigModel,
   SpanExporterConfigModel,
   SamplerConfigModel,
@@ -102,6 +103,7 @@ import type {
   LogRecordProcessor,
   LogRecordLimits,
 } from '@opentelemetry/sdk-logs';
+import type { MetricProducer } from '@opentelemetry/sdk-metrics';
 import {
   BatchLogRecordProcessor,
   ConsoleLogRecordExporter,
@@ -529,6 +531,33 @@ export function getOtlpMetricExporterFromEnv(): PushMetricExporter {
   return new OTLPProtoMetricExporter();
 }
 
+function getMetricProducersFromConfiguration(
+  producers: MetricProducerConfigModel[] | undefined
+): MetricProducer[] | undefined {
+  if (!producers || producers.length === 0) {
+    return undefined;
+  }
+  const result: MetricProducer[] = [];
+  for (const producer of producers) {
+    if (producer.opencensus) {
+      try {
+        const {
+          OpenCensusMetricProducer,
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+        } = require('@opentelemetry/shim-opencensus');
+        result.push(new OpenCensusMetricProducer());
+      } catch {
+        diag.warn(
+          'OpenCensus metric producer configured but @opentelemetry/shim-opencensus is not installed.'
+        );
+      }
+    } else {
+      diag.warn('Unsupported metric producer configured.');
+    }
+  }
+  return result.length > 0 ? result : undefined;
+}
+
 export function getPeriodicMetricReaderFromConfiguration(
   periodic: PeriodicMetricReaderConfigModel
 ): IMetricReader | undefined {
@@ -563,17 +592,23 @@ export function getPeriodicMetricReaderFromConfiguration(
       });
     }
 
+    const metricProducers = getMetricProducersFromConfiguration(
+      periodic.producers
+    );
+
     if (exporter) {
       // TODO(6425): add cardinality_limits
       return new PeriodicExportingMetricReader({
         exportIntervalMillis: periodic.interval ?? 60_000,
         exportTimeoutMillis: periodic.timeout ?? 30_000,
         exporter,
+        metricProducers,
       });
     }
     if (periodic.exporter.console !== undefined) {
       return new PeriodicExportingMetricReader({
         exporter: new ConsoleMetricExporter(),
+        metricProducers,
       });
     }
   }

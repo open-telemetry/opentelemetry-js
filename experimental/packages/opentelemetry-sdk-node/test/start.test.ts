@@ -57,6 +57,7 @@ import {
 import { ATTR_OS_TYPE } from '@opentelemetry/resources/src/semconv';
 import {
   createLogRecordExporterFromConfig,
+  getPeriodicMetricReaderFromConfiguration,
   getSpanExporter,
   setupContextManager,
 } from '../src/utils';
@@ -979,6 +980,36 @@ describe('startNodeSDK', function () {
         const exporter: LogRecordExporterConfigModel = {};
         createLogRecordExporterFromConfig(exporter);
       });
+    });
+
+    it('should create metric reader with opencensus producer when shim is available', async () => {
+      const reader = getPeriodicMetricReaderFromConfiguration({
+        exporter: { console: {} },
+        producers: [{ opencensus: {} }],
+      });
+      assert.ok(reader !== undefined);
+      const producers = (reader as any)._metricProducers;
+      assert.ok(producers.length === 1);
+      assert.strictEqual(
+        producers[0].constructor.name,
+        'OpenCensusMetricProducer'
+      );
+      await (reader as PeriodicExportingMetricReader).shutdown();
+    });
+
+    it('should warn for unsupported metric producer', async () => {
+      const warnSpy = Sinon.spy(diag, 'warn');
+      const reader = getPeriodicMetricReaderFromConfiguration({
+        exporter: { console: {} },
+        producers: [{ 'unknown/producer': {} }],
+      });
+      assert.ok(reader !== undefined);
+      assert.ok(
+        warnSpy.args.some(args =>
+          String(args[0]).includes('Unsupported metric producer')
+        )
+      );
+      await (reader as PeriodicExportingMetricReader).shutdown();
     });
 
     it('should warn when exporter timeout is 0', async () => {
