@@ -26,11 +26,7 @@ const typescript = require('typescript');
 // Get latest version by running:
 //    git tag -l --sort=version:refname | grep -v -- - | tail -1
 // in git@github.com:open-telemetry/opentelemetry-configuration.git
-//
-// TEMPORARY: pinned to main SHA at PR #624 (add IdGenerator) until v1.1.0 is
-// released. Tracking issue: open-telemetry/opentelemetry-configuration#643.
-// Once v1.1.0 lands, change back to a tag like 'v1.1.0'.
-const CONFIG_VERSION = '9c5c6c4a8d097d0198c2f66bdce799c1ee3a0bcf';
+const CONFIG_VERSION = 'v1.1.0';
 
 const TOP = path.resolve(__dirname, '..');
 const SCHEMA_PATH = path.join(

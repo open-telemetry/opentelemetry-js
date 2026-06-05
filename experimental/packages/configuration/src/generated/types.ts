@@ -4,7 +4,7 @@
  */
 //
 // AUTO-GENERATED — do not edit
-// Generated from opentelemetry-configuration.git 9c5c6c4a8d097d0198c2f66bdce799c1ee3a0bcf
+// Generated from opentelemetry-configuration.git v1.1.0
 // Run `npm run generate:config` to regenerate
 //
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-object-type */

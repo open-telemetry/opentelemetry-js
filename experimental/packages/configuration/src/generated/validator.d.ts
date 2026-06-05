@@ -6,7 +6,7 @@
 /* eslint-disable */
 // AUTO-GENERATED — do not edit
 // Pre-compiled ajv validator for the OpenTelemetry configuration schema
-// Generated from opentelemetry-configuration.git 9c5c6c4a8d097d0198c2f66bdce799c1ee3a0bcf
+// Generated from opentelemetry-configuration.git v1.1.0
 // Run `npm run generate:config` to regenerate
 
 /** Minimal subset of ajv ErrorObject used by FileConfigFactory */
