@@ -539,6 +539,68 @@ describe('BatchLogRecordProcessorBase', () => {
       await processor.shutdown();
     });
 
+    it('should not throw when in-flight export completes between awaits in _flushAll', async () => {
+      // arrange
+      // Reproduces a race in _flushAll: when forceFlush() is called while a
+      // background export is in progress, _flushAll captures the in-flight
+      // export via `this._currentExport`. While awaiting `_exporter.forceFlush()`,
+      // the in-flight export may complete and `_exportOneBatch`'s completion
+      // handler nullifies `_currentExport`. When `_flushAll` resumes and reads
+      // `this._currentExport.exportCompleted`, it would dereference null.
+      let exportCallback: ((result: ExportResult) => void) | undefined;
+      let resolveExporterForceFlush: (() => void) | undefined;
+      const customExporter: LogRecordExporter = {
+        export: (_logs, callback) => {
+          // keep export pending so we can resolve it later
+          exportCallback = callback;
+        },
+        shutdown: async () => {},
+        forceFlush: () =>
+          new Promise<void>(resolve => {
+            // keep exporter.forceFlush() pending so _flushAll stays in await
+            resolveExporterForceFlush = resolve;
+          }),
+      };
+      const processor = new BatchLogRecordProcessor(customExporter, {
+        maxExportBatchSize: 1,
+        scheduledDelayMillis: 2500,
+      });
+
+      // trigger a background export by filling a batch
+      processor.onEmit(createLogRecord());
+      // yield so _exportOneBatch starts and exporter.export() is called
+      await new Promise(resolve => setTimeout(resolve, 0));
+      assert.ok(
+        exportCallback !== undefined,
+        'expected exporter.export() to have been called'
+      );
+
+      // call forceFlush — _flushAll will await exporter.forceFlush()
+      const flushPromise = processor.forceFlush();
+      // yield so _flushAll enters its await on exporter.forceFlush()
+      await new Promise(resolve => setTimeout(resolve, 0));
+      assert.ok(
+        resolveExporterForceFlush !== undefined,
+        'expected exporter.forceFlush() to have been called'
+      );
+
+      // complete the in-flight export — _exportOneBatch's .then handler
+      // will nullify _currentExport before _flushAll resumes
+      exportCallback({ code: ExportResultCode.SUCCESS });
+      // yield to let the .then() handler run and set _currentExport = null
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      // now resume _flushAll by resolving the exporter.forceFlush() promise.
+      // After the bug, _flushAll would read `this._currentExport.exportCompleted`
+      // and throw `Cannot read properties of null (reading 'exportCompleted')`.
+      resolveExporterForceFlush();
+
+      // assert — forceFlush must resolve, not reject with TypeError
+      await flushPromise;
+
+      await processor.shutdown();
+    });
+
     it('should not call forceFlush on exporter when queue is empty and no export in progress', async function () {
       // arrange
       const forceFlushSpy = sinon.spy(exporter, 'forceFlush');

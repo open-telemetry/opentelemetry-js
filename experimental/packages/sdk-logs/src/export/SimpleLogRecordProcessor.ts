@@ -17,6 +17,7 @@ import type { SdkLogRecord } from './SdkLogRecord';
 import type { LogRecordProcessorConfig } from './LogRecordProcessorConfig';
 import { OTEL_COMPONENT_TYPE_VALUE_SIMPLE_LOG_PROCESSOR } from '../semconv';
 import { LogRecordProcessorMetrics } from './LogRecordProcessorMetrics';
+import type { Context } from '@opentelemetry/api';
 
 /**
  * An implementation of the {@link LogRecordProcessor} interface that exports
@@ -47,7 +48,7 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
     );
   }
 
-  public onEmit(logRecord: SdkLogRecord): void {
+  public onEmit(logRecord: SdkLogRecord, _context?: Context): void {
     if (this._shutdownOnce.isCalled) {
       return;
     }
@@ -75,7 +76,6 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
         .then(() => {
           // Using TS Non-null assertion operator because exportPromise could not be null in here
           // if waitForAsyncAttributes is not present this code will never be reached
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           this._unresolvedExports.delete(exportPromise!);
           return doExport();
         }, globalErrorHandler);

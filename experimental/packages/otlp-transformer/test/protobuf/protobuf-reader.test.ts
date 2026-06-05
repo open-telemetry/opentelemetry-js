@@ -278,28 +278,26 @@ describe('ProtobufReader', function () {
       assert.strictEqual(reader.readVarint(), 0x2a);
     });
 
-    it('wire type 3 and 4: group is handled and does not throw', function () {
-      // Construct a deprecated start-group for field 1 containing an inner
-      // varint field 2 with value 3, then the matching end-group for field 1.
+    it('wire type 3 (start-group): throws because groups are not supported', function () {
       // start-group key for field 1: (1 << 3) | 3 = 0x0B
-      // field 2 varint key: (2 << 3) | 0 = 0x10
-      // varint value 3: 0x03
-      // end-group key for field 1: (1 << 3) | 4 = 0x0C
-      // Append a sentinel byte after the group so we can assert the reader
-      // stopped at the correct position and didn't consume the sentinel.
-      const bytes = new Uint8Array([0x0b, 0x10, 0x03, 0x0c, 0x2a]);
+      const bytes = new Uint8Array([0x0b, 0x10, 0x03, 0x0c]);
       const reader = new ProtobufReader(bytes);
 
-      // Read the start-group tag, ensure it is field 1 wire type 3
       const { fieldNumber, wireType } = reader.readTag();
       assert.strictEqual(fieldNumber, 1);
       assert.strictEqual(wireType, 3);
 
-      // Skip the group and verify we've advanced past the end-group but not
-      // the sentinel (sentinel should remain to be read by caller).
-      reader.skip(wireType);
-      assert.strictEqual(reader.pos, bytes.length - 1);
-      assert.strictEqual(reader.readVarint(), 0x2a);
+      assert.throws(() => reader.skip(wireType), /Unknown wire type 3/);
+    });
+
+    it('wire type 4 (end-group): throws because groups are not supported', function () {
+      // end-group key for field 1: (1 << 3) | 4 = 0x0C
+      const reader = new ProtobufReader(new Uint8Array([0x0c]));
+
+      const { wireType } = reader.readTag();
+      assert.strictEqual(wireType, 4);
+
+      assert.throws(() => reader.skip(wireType), /Unknown wire type 4/);
     });
 
     it('unknown tag (invalid wire type): skip throws and does not consume subsequent bytes', function () {
@@ -600,6 +598,77 @@ describe('ProtobufReader', function () {
       assert.deepStrictEqual(decoded.field6, []);
       assert.deepStrictEqual(decoded.field7, []);
       assert.deepStrictEqual(decoded.skippedFields, []);
+    });
+  });
+
+  describe('truncated buffer handling', function () {
+    describe('readVarint()', function () {
+      it('throws on empty buffer', function () {
+        const reader = new ProtobufReader(new Uint8Array(0));
+        assert.throws(
+          () => reader.readVarint(),
+          /Truncated buffer: unexpected end of data while reading varint/
+        );
+      });
+
+      it('throws when varint continuation bit set but no more bytes', function () {
+        // 0x80 has the continuation bit set, indicating more bytes follow
+        const reader = new ProtobufReader(new Uint8Array([0x80]));
+        assert.throws(
+          () => reader.readVarint(),
+          /Truncated buffer: unexpected end of data while reading varint/
+        );
+      });
+
+      it('throws on multi-byte varint truncated mid-sequence', function () {
+        // A valid 3-byte varint would be [0x80, 0x80, 0x01]
+        // Truncate after 2 bytes (both have continuation bit set)
+        const reader = new ProtobufReader(new Uint8Array([0x80, 0x80]));
+        assert.throws(
+          () => reader.readVarint(),
+          /Truncated buffer: unexpected end of data while reading varint/
+        );
+      });
+    });
+
+    describe('readBytes()', function () {
+      it('throws when length exceeds remaining buffer', function () {
+        // Varint 10 (0x0a) says 10 bytes follow, but only 3 are available
+        const reader = new ProtobufReader(
+          new Uint8Array([0x0a, 0x01, 0x02, 0x03])
+        );
+        assert.throws(
+          () => reader.readBytes(),
+          /Truncated buffer: expected 10 bytes at position 1, but only 3 available/
+        );
+      });
+
+      it('throws when length exceeds buffer with zero remaining bytes', function () {
+        // Varint 5 (0x05) says 5 bytes follow, but none are available
+        const reader = new ProtobufReader(new Uint8Array([0x05]));
+        assert.throws(
+          () => reader.readBytes(),
+          /Truncated buffer: expected 5 bytes at position 1, but only 0 available/
+        );
+      });
+
+      it('succeeds when length matches remaining buffer exactly', function () {
+        // Varint 3 (0x03) says 3 bytes follow, and exactly 3 are available
+        const reader = new ProtobufReader(
+          new Uint8Array([0x03, 0xaa, 0xbb, 0xcc])
+        );
+        const result = reader.readBytes();
+        assert.deepStrictEqual(result, new Uint8Array([0xaa, 0xbb, 0xcc]));
+        assert.ok(reader.isAtEnd());
+      });
+    });
+
+    describe('readString()', function () {
+      it('throws on truncated string', function () {
+        // Length says 10 bytes but only 2 content bytes available
+        const reader = new ProtobufReader(new Uint8Array([0x0a, 0x41, 0x42]));
+        assert.throws(() => reader.readString(), /Truncated buffer/);
+      });
     });
   });
 });
