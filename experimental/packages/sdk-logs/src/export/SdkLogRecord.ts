@@ -27,6 +27,13 @@ export interface SdkLogRecord {
   readonly hrTimeObserved: HrTime;
   readonly spanContext?: SpanContext;
   readonly resource: Resource;
+  /**
+   * The instrumentation scope associated with the log record.
+   *
+   * Downstream consumers may group exported records by the identity of this
+   * object. If a distinct grouping is required, construct a new scope object
+   * instead of reusing an existing one.
+   */
   readonly instrumentationScope: InstrumentationScope;
   readonly attributes: LogAttributes;
   severityText?: string;

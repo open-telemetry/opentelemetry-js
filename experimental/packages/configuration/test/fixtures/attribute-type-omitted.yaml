@@ -1,0 +1,11 @@
+file_format: "1.0"
+resource:
+  attributes:
+    # type is intentionally omitted here — spec says "if omitted, string is used",
+    # but we do NOT apply that default in the config parser. The consumer (SDK init)
+    # is responsible for interpreting undefined type as string.
+    - name: no-type-key
+      value: some-value
+    - name: explicit-string-key
+      value: explicit-value
+      type: string

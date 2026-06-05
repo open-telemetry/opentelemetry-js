@@ -39,6 +39,9 @@ const loggerProvider = new LoggerProvider({
 //  To create a log record, you first need to get a Logger instance
 const logger = loggerProvider.getLogger('default');
 
+// Reuse loggers where possible. getLogger() may be expensive, especially when
+// scopeAttributes are provided, so avoid calling it on hot paths.
+
 // You can also use global singleton
 logsAPI.logs.setGlobalLoggerProvider(loggerProvider);
 const logger = logsAPI.logs.getLogger('default');
