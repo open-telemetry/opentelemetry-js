@@ -4,6 +4,7 @@
  */
 
 import * as assert from 'assert';
+import { diag } from '@opentelemetry/api';
 import type { Attributes, UpDownCounter } from '@opentelemetry/api';
 import type { DataPoint, Histogram } from '@opentelemetry/sdk-metrics';
 import {
@@ -652,8 +653,16 @@ describe('PrometheusSerializer', () => {
     it('should rename metric of type counter when name misses _total suffix', async () => {
       const serializer = new PrometheusSerializer();
 
-      const result = await getCounterResult('test', serializer);
-      assert.strictEqual(result, 'test_total 1\n');
+      const result = await getCounterResult('test', serializer, {
+        exportAll: true,
+      });
+      assert.strictEqual(
+        result,
+        serializedDefaultResource +
+          '# HELP test_total description missing\n' +
+          '# TYPE test_total counter\n' +
+          'test_total{otel_scope_name="test"} 1\n'
+      );
     });
 
     it('should not rename metric of type counter when name contains _total suffix', async () => {
@@ -661,6 +670,97 @@ describe('PrometheusSerializer', () => {
       const result = await getCounterResult('test_total', serializer);
 
       assert.strictEqual(result, 'test_total 1\n');
+    });
+
+    it('replaces special characters with underscores when escaping is enabled', async () => {
+      const serializer = new PrometheusSerializer();
+      const result = await getCounterResult(
+        'metric@with#special$chars',
+        serializer,
+        {
+          exportAll: true,
+        }
+      );
+
+      assert.strictEqual(
+        result,
+        serializedDefaultResource +
+          '# HELP metric_with_special_chars_total description missing\n' +
+          '# TYPE metric_with_special_chars_total counter\n' +
+          'metric_with_special_chars_total{otel_scope_name="test"} 1\n'
+      );
+    });
+
+    it('metric names do not start with a digit when escaping is enabled', async () => {
+      const serializer = new PrometheusSerializer();
+      const result = await getCounterResult('123metric', serializer, {
+        exportAll: true,
+      });
+
+      assert.strictEqual(
+        result,
+        serializedDefaultResource +
+          '# HELP _123metric_total description missing\n' +
+          '# TYPE _123metric_total counter\n' +
+          '_123metric_total{otel_scope_name="test"} 1\n'
+      );
+    });
+
+    it('multiple special characters are collapsed to a single underscore when escaping is enabled', async () => {
+      const serializer = new PrometheusSerializer();
+      const result = await getCounterResult('metric@@##$$name', serializer, {
+        exportAll: true,
+      });
+
+      assert.strictEqual(
+        result,
+        serializedDefaultResource +
+          '# HELP metric_name_total description missing\n' +
+          '# TYPE metric_name_total counter\n' +
+          'metric_name_total{otel_scope_name="test"} 1\n'
+      );
+    });
+
+    it('metric names of only special characters are not serialized when escaping is enabled', async () => {
+      const serializer = new PrometheusSerializer();
+      const diagErr = diag.error;
+      const spy = sinon.spy();
+      diag.error = spy;
+      const result = await getCounterResult('@#$%', serializer, {
+        exportAll: true,
+      });
+      diag.error = diagErr;
+
+      assert.strictEqual(
+        result,
+        serializedDefaultResource + '# no registered metrics'
+      );
+      assert.strictEqual(spy.calledOnce, true);
+      sinon.assert.calledWith(
+        spy,
+        'Normalization for metric "@#$%" resulted in an invalid name: "_"'
+      );
+    });
+
+    it('metrics with empty names are not serialized', async () => {
+      const serializer = new PrometheusSerializer();
+      const diagErr = diag.error;
+      const spy = sinon.spy();
+      diag.error = spy;
+      const result = await getCounterResult('', serializer, {
+        exportAll: true,
+      });
+      diag.error = diagErr;
+
+      assert.strictEqual(
+        result,
+        serializedDefaultResource + '# no registered metrics'
+      );
+      assert.strictEqual(spy.calledOnce, true);
+      sinon.assert.calledWith(
+        spy,
+        'Normalization for metric "" resulted in empty name'
+      );
     });
   });
 

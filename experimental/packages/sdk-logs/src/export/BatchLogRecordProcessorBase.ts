@@ -209,11 +209,14 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
     // Clear timer to prevent concurrent exports
     this._clearTimer();
 
-    // Wait for any in-progress export to complete
-    if (this._currentExport !== null) {
+    // Wait for any in-progress export to complete. Capture the reference
+    // into a local because `_exportOneBatch` may null out `this._currentExport`
+    // from its completion handler while we are awaiting below.
+    const inFlight = this._currentExport;
+    if (inFlight !== null) {
       // speed up execution for current export
       await this._exporter.forceFlush();
-      await this._currentExport.exportCompleted;
+      await inFlight.exportCompleted;
       this._currentExport = null;
     }
 

@@ -46,7 +46,11 @@ describe('unmocked xhr', () => {
     });
   });
   afterEach(() => {
-    // nop
+    // NOTE: need to unwrap here to restore the API for the other test file
+    // @ts-expect-error -- property added by instrumentation.wrap(...)
+    XMLHttpRequest.prototype.send.__unwrap();
+    // @ts-expect-error -- property added by instrumentation.wrap(...)
+    XMLHttpRequest.prototype.open.__unwrap();
   });
 
   it('should find resource with a relative url', done => {
