@@ -182,7 +182,10 @@ export abstract class MetricReader implements IMetricReader {
 
   _setSelfObsMeterProvider(meterProvider: api.MeterProvider): void {
     const meter = meterProvider.getMeter('@opentelemetry/sdk-metrics', VERSION);
-    this._selfObsMetrics = new MetricReaderMetrics(this._otelComponentType, meter);
+    this._selfObsMetrics = new MetricReaderMetrics(
+      this._otelComponentType,
+      meter
+    );
   }
 
   selectAggregation(instrumentType: InstrumentType): AggregationOption {
