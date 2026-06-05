@@ -448,7 +448,7 @@ describe('Node SDK', () => {
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
       assert.notDeepEqual(
-        (metricReader as any)._metrics.collectionDuration,
+        (metricReader as any)._selfObsMetrics.collectionDuration,
         NOOP_HISTOGRAM_METRIC
       );
 
@@ -490,7 +490,7 @@ describe('Node SDK', () => {
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
       assert.deepEqual(
-        (metricReader as any)._metrics.collectionDuration,
+        (metricReader as any)._selfObsMetrics.collectionDuration,
         NOOP_HISTOGRAM_METRIC
       );
 
