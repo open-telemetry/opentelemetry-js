@@ -211,7 +211,6 @@ export class PeriodicExportingMetricReader extends MetricReader {
             const err = new Error(
               `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`
             );
-            api.diag.error(err.message);
             anyErr = err;
           }
         } catch (e) {
