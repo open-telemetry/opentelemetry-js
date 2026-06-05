@@ -92,8 +92,19 @@ export interface SpanLimits {
   attributePerLinkCountLimit?: number;
 }
 
-/** Interface configuration for a buffer. */
-export interface BufferConfig {
+/**
+ * Common options for SDK span processors.
+ */
+export interface SpanProcessorOptions {
+  /**
+   * A meter provider to which to record self-observability span processor metrics.
+   * @experimental This option is experimental and is subject to breaking changes in minor releases.
+   */
+  meterProvider?: MeterProvider;
+}
+
+/** BatchSpanProcessor configuration options. */
+export interface BufferConfig extends SpanProcessorOptions {
   /** The maximum batch size of every export. It must be smaller or equal to
    * maxQueueSize. The default value is 512. */
   maxExportBatchSize?: number;

@@ -13,7 +13,7 @@ import {
 } from '@opentelemetry/core';
 import type { Span } from '../Span';
 import type { SpanProcessor } from '../SpanProcessor';
-import type { SpanProcessorConfig } from './SpanProcessorConfig';
+import type { SpanProcessorOptions } from '../types';
 import type { ReadableSpan } from './ReadableSpan';
 import type { SpanExporter } from './SpanExporter';
 import { SpanProcessorMetrics } from './SpanProcessorMetrics';
@@ -33,7 +33,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
   private _shutdownOnce: BindOnceFuture<void>;
   private _pendingExports: Set<Promise<void>>;
 
-  constructor(exporter: SpanExporter, config?: SpanProcessorConfig) {
+  constructor(exporter: SpanExporter, config?: SpanProcessorOptions) {
     this._exporter = exporter;
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
     this._pendingExports = new Set<Promise<void>>();
