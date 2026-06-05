@@ -592,6 +592,50 @@ describe('PeriodicExportingMetricReader', () => {
       await firstFlush;
       await reader.shutdown();
     });
+
+    it('should await ongoing export before executing forceFlush on exporter', async () => {
+      const events: string[] = [];
+      const exporter = new TestMetricExporter();
+      exporter.export = (metrics, callback) => {
+        events.push('export start');
+        setTimeout(() => {
+          events.push('export end');
+          callback({ code: ExportResultCode.SUCCESS });
+        }, 50);
+      };
+      exporter.forceFlush = async () => {
+        events.push('forceFlush start');
+      };
+
+      const reader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: MAX_32_BIT_INT,
+        exportTimeoutMillis: 100,
+      });
+
+      reader.setMetricProducer(
+        new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+      );
+
+      // Start first flush
+      const p1 = reader.forceFlush();
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Start second flush while first export is ongoing
+      const p2 = reader.forceFlush();
+
+      await Promise.all([p1, p2]);
+
+      // Both forceFlush starts should happen AFTER the export end
+      assert.deepStrictEqual(events, [
+        'export start',
+        'export end',
+        'forceFlush start',
+        'forceFlush start',
+      ]);
+
+      await reader.shutdown();
+    });
   });
 
   describe('forceFlush', () => {

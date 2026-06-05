@@ -255,7 +255,18 @@ export class PeriodicExportingMetricReader extends MetricReader {
   }
 
   protected async onForceFlush(): Promise<void> {
-    await this._runOnce();
+    if (this._ongoingExportPromise) {
+      api.diag.debug(
+        'PeriodicExportingMetricReader: export already in progress, awaiting ongoing export'
+      );
+      try {
+        await this._ongoingExportPromise;
+      } catch (err) {
+        // Error is handled by the _runOnce() that initiated the export.
+      }
+    } else {
+      await this._runOnce();
+    }
     await this._exporter.forceFlush();
   }
 
