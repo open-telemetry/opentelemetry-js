@@ -14,7 +14,7 @@ const ASCII_DIGIT_9 = '9'.charCodeAt(0);
 const ASCII_UNDERSCORE = '_'.charCodeAt(0);
 const ASCII_CASE_OFFSET = ASCII_LOWER_A - ASCII_UPPER_A;
 
-/*
+/**
  * normalizeKey converts a propagator key to a valid POSIX environment variable
  * name. The conversion rules are:
  * - A-Z, 0-9, and _ are kept as-is.
