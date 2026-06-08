@@ -1,4 +1,4 @@
-const { SpanStatusCode, trace, metrics } = require('@opentelemetry/api');
+import { SpanStatusCode, trace, metrics } from '@opentelemetry/api';
 
 const tracer = trace.getTracer('dice-lib');
 const meter = metrics.getMeter('dice-lib');
@@ -13,7 +13,7 @@ const rollsGauge = meter.createGauge('dice.rolls_last_value', {
   description: 'Last value of the rolls parameter',
 });
 
-function rollOnce() {
+function rollOnce(): number {
   return tracer.startActiveSpan('rollOnce', (span) => {
     const result = Math.floor(Math.random() * 6) + 1;
     span.setAttribute('code.function', 'rollOnce');
@@ -24,7 +24,7 @@ function rollOnce() {
   });
 }
 
-function rollTheDice(rolls) {
+export function rollTheDice(rolls: number): number | number[] {
   return tracer.startActiveSpan('rollTheDice', (span) => {
     span.setAttribute('code.function', 'rollTheDice');
     span.setAttribute('dice.rolls', rolls);
@@ -39,7 +39,7 @@ function rollTheDice(rolls) {
       throw error;
     }
 
-    let result;
+    let result: number | number[];
     if (rolls === 1) {
       result = rollOnce();
     } else {
@@ -53,5 +53,3 @@ function rollTheDice(rolls) {
     return result;
   });
 }
-
-module.exports = { rollTheDice };

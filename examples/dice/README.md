@@ -13,7 +13,7 @@ Winston) and manual instrumentation of application logic.
 There are two versions:
 
 - **uninstrumented/** — the plain application with no OpenTelemetry
-- **instrumented/** — the same application with OpenTelemetry added via `--import ./instrumentation.mjs`
+- **instrumented/** — the same application with OpenTelemetry added via `--import ./instrumentation.ts`
 
 ## Installation
 
@@ -28,7 +28,7 @@ npm install
 
 ```sh
 cd uninstrumented
-node app.js
+npx tsx app.ts
 ```
 
 ### Instrumented
@@ -43,7 +43,7 @@ OTEL_SERVICE_NAME=dice-server \
 OTEL_TRACES_EXPORTER=console \
 OTEL_METRICS_EXPORTER=console \
 OTEL_LOGS_EXPORTER=console \
-node --import ./instrumentation.mjs app.js
+npx tsx --import ./instrumentation.ts app.ts
 ```
 
 Spans, metrics, and logs will be printed to the console. To send telemetry to an
@@ -55,7 +55,7 @@ OTEL_TRACES_EXPORTER=otlp \
 OTEL_METRICS_EXPORTER=otlp \
 OTEL_LOGS_EXPORTER=otlp \
 OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318 \
-node --import ./instrumentation.mjs app.js
+npx tsx --import ./instrumentation.ts app.ts
 ```
 
 You can also export telemetry to more than one destination:
@@ -66,7 +66,7 @@ OTEL_TRACES_EXPORTER=otlp,console \
 OTEL_METRICS_EXPORTER=otlp,console \
 OTEL_LOGS_EXPORTER=otlp,console \
 OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318 \
-node --import ./instrumentation.mjs app.js
+npx tsx --import ./instrumentation.ts app.ts
 ```
 
 To enable OpenTelemetry diagnostic logging, set `OTEL_LOG_LEVEL=debug`.

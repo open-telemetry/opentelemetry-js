@@ -1,8 +1,8 @@
-const express = require('express');
-const winston = require('winston');
-const { rollTheDice } = require('./dice.js');
+import express from 'express';
+import winston from 'winston';
+import { rollTheDice } from './dice.js';
 
-const PORT = Number.parseInt(process.env.APPLICATION_PORT || '8080', 10);
+const PORT: number = parseInt(process.env.APPLICATION_PORT || '8080', 10);
 const app = express();
 
 const logger = winston.createLogger({
@@ -33,10 +33,10 @@ app.get('/rolldice', (req, res) => {
     logger.debug(`${player} rolled ${JSON.stringify(result)}`);
   } catch (err) {
     res.status(500).end();
-    logger.error(`GET /rolldice 500 ${err.message}`);
+    logger.error(`GET /rolldice 500 ${(err as Error).message}`);
   }
 });
 
-app.listen(PORT, () => {
+export const server = app.listen(PORT, () => {
   logger.info(`Listening for requests on http://localhost:${PORT}`);
 });

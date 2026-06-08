@@ -1,11 +1,12 @@
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /usr/src/app
 
-COPY package.json ./
-RUN npm install --omit=dev --package-lock=false
+COPY package.json tsconfig.json ./
+RUN npm install --package-lock=false
 
-COPY app.js dice.js ./
+COPY *.ts ./
+RUN npx tsc
 
 EXPOSE 8080
-CMD ["node", "app.js"]
+CMD ["node", "build/app.js"]
