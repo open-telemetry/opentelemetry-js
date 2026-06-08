@@ -55,5 +55,5 @@
   "labels": ["dependencies"],
   "ignorePaths": ["**/bundler-tests/**"],
   "postUpdateOptions": ["npmDedupe"],
-  "minimumReleaseAge": "1 week"
+  "minimumReleaseAge": "3 days"
 }
