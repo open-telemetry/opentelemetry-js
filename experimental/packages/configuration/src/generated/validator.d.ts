@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/* eslint-disable */
 // AUTO-GENERATED — do not edit
 // Pre-compiled ajv validator for the OpenTelemetry configuration schema
 // Generated from opentelemetry-configuration.git v1.1.0

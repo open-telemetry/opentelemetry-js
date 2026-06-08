@@ -54,8 +54,6 @@ export default tseslint.config(
       '**/protos/**',
       '**/.tmp/**',
       'docs/**',
-      // Generated files committed back to the tree.
-      'experimental/packages/configuration/src/generated/**',
       // tsd-style negative type-check fixtures, intentionally outside tsconfig.
       'experimental/packages/configuration/test/fixtures/types/**',
       'experimental/packages/otlp-transformer/src/generated/**',

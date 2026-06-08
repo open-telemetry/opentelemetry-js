@@ -136,7 +136,6 @@ const validatorJsWithHeader = [
   '// Pre-compiled ajv validator for the OpenTelemetry configuration schema',
   `// Generated from opentelemetry-configuration.git ${CONFIG_VERSION}`,
   '// Run `npm run generate:config` to regenerate',
-  '// eslint-disable-next-line',
   '',
   validatorJs,
 ].join('\n');
@@ -149,7 +148,6 @@ console.log(`Written pre-compiled validator to ${VALIDATOR_JS_PATH}`);
 // ajv as a transitive dependency just for the .d.ts file.
 const validatorDts = [
   licenseHeader,
-  '/* eslint-disable */',
   '// AUTO-GENERATED — do not edit',
   '// Pre-compiled ajv validator for the OpenTelemetry configuration schema',
   `// Generated from opentelemetry-configuration.git ${CONFIG_VERSION}`,
