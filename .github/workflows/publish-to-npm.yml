@@ -22,6 +22,8 @@ jobs:
           # Require npm 11.5.1 or later for https://docs.npmjs.com/trusted-publishers.
           node-version: 24
           registry-url: 'https://registry.npmjs.org'
+          # Disable caching in release workflows (https://docs.zizmor.sh/audits/#cache-poisoning).
+          package-manager-cache: false
       - run: npm ci --ignore-scripts
       - run: npm run compile
       # Release Please has already incremented versions and published tags, so we just
