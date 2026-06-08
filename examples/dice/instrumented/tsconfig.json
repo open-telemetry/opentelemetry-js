@@ -1,33 +1,12 @@
 {
-  "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "outDir": "build",
-    "rootDir": ".",
     "skipLibCheck": true,
-    "strict": true,
     "target": "ES2022",
-    "types": [
-      "node"
-    ]
   },
-  "include": [
-    "*.ts",
-    "src/**/*.ts",
-    "test/**/*.ts"
-  ],
-  "references": [
-    {
-      "path": "../../../api"
-    },
-    {
-      "path": "../../../experimental/packages/opentelemetry-instrumentation-http"
-    },
-    {
-      "path": "../../../experimental/packages/opentelemetry-sdk-node"
-    }
-  ]
+  "include": ["*.ts"]
 }
