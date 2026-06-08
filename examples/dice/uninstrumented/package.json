@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "compile": "tsc",
-    "start": "tsx app.ts"
+    "start": "tsx app.ts",
+    "test": "tsc && node --test build/test.js"
   },
   "repository": {
     "type": "git",

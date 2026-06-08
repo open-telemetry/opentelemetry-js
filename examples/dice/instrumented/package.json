@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "compile": "tsc",
-    "start": "tsx --import ./instrumentation.ts app.ts"
+    "start": "tsx --import ./instrumentation.ts app.ts",
+    "test": "tsc && node --test build/test.js"
   },
   "repository": {
     "type": "git",
