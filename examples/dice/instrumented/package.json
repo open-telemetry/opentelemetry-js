@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "compile": "tsc",
-    "start": "tsx --import ./instrumentation.ts app.ts",
+    "start": "tsc && node --import ./build/instrumentation.js build/app.js",
     "test": "tsc && node --test build/test.js"
   },
   "repository": {
@@ -40,7 +40,6 @@
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.0.0",
-    "tsx": "^4.0.0",
     "typescript": "^5.5.0"
   }
 }

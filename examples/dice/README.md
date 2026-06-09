@@ -28,7 +28,7 @@ npm install
 
 ```sh
 cd uninstrumented
-npx tsx app.ts
+npm start
 ```
 
 ### Instrumented
@@ -43,7 +43,7 @@ OTEL_SERVICE_NAME=dice-server \
 OTEL_TRACES_EXPORTER=console \
 OTEL_METRICS_EXPORTER=console \
 OTEL_LOGS_EXPORTER=console \
-npx tsx --import ./instrumentation.ts app.ts
+npm start
 ```
 
 Spans, metrics, and logs will be printed to the console. To send telemetry to an
@@ -55,7 +55,7 @@ OTEL_TRACES_EXPORTER=otlp \
 OTEL_METRICS_EXPORTER=otlp \
 OTEL_LOGS_EXPORTER=otlp \
 OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318 \
-npx tsx --import ./instrumentation.ts app.ts
+npm start
 ```
 
 You can also export telemetry to more than one destination:
@@ -66,7 +66,7 @@ OTEL_TRACES_EXPORTER=otlp,console \
 OTEL_METRICS_EXPORTER=otlp,console \
 OTEL_LOGS_EXPORTER=otlp,console \
 OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318 \
-npx tsx --import ./instrumentation.ts app.ts
+npm start
 ```
 
 To enable OpenTelemetry diagnostic logging, set `OTEL_LOG_LEVEL=debug`.
