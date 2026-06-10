@@ -74,12 +74,14 @@ To enable OpenTelemetry diagnostic logging, set `OTEL_LOG_LEVEL=debug`.
 ### Docker
 
 Build and run the uninstrumented version:
+
 ```sh
 docker build -t otel-js-dice-uninstrumented ./uninstrumented
 docker run --rm -p 8080:8080 otel-js-dice-uninstrumented
 ```
 
 Build and run the instrumented version with console exporters:
+
 ```sh
 docker build -t otel-js-dice-instrumented ./instrumented
 docker run --rm -p 8080:8080 \
@@ -129,12 +131,12 @@ service-specific resource attributes.
 
 ### Traces
 
-| Span name                     | Kind       | Attributes                         |
-|-------------------------------|------------|------------------------------------|
+| Span name                     | Kind       | Attributes                          |
+|-------------------------------|------------|-------------------------------------|
 | `GET /rolldice`               | `SERVER`   | HTTP semantic convention attributes |
-| `request handler - /rolldice` | `INTERNAL` | Express instrumentation attributes |
-| `rollTheDice`                 | `INTERNAL` | `code.function`, `dice.rolls`      |
-| `rollOnce`                    | `INTERNAL` | `code.function`, `dice.value`      |
+| `request handler - /rolldice` | `INTERNAL` | Express instrumentation attributes  |
+| `rollTheDice`                 | `INTERNAL` | `code.function`, `dice.rolls`       |
+| `rollOnce`                    | `INTERNAL` | `code.function`, `dice.value`       |
 
 ### Metrics
 
