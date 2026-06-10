@@ -263,7 +263,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
       );
       try {
         await this._ongoingExportPromise;
-      } catch (err) {
+      } catch {
         // Error is handled by the _runOnce() that initiated the export.
       }
     } else {
