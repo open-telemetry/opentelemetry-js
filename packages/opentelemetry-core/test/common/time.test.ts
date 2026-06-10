@@ -13,8 +13,9 @@ import {
   timeInputToHrTime,
   hrTimeDuration,
   hrTimeToNanoseconds,
-  hrTimeToMilliseconds,
   hrTimeToMicroseconds,
+  hrTimeToMilliseconds,
+  hrTimeToSeconds,
   hrTimeToTimeStamp,
   isTimeInput,
   addHrTimes,
@@ -164,6 +165,13 @@ describe('time', () => {
     });
   });
 
+  describe('#hrTimeToMicroseconds', () => {
+    it('should return microseconds', () => {
+      const output = hrTimeToMicroseconds([1, 200000000]);
+      assert.deepStrictEqual(output, 1200000);
+    });
+  });
+
   describe('#hrTimeToMilliseconds', () => {
     it('should return milliseconds', () => {
       const output = hrTimeToMilliseconds([1, 200000000]);
@@ -171,12 +179,13 @@ describe('time', () => {
     });
   });
 
-  describe('#hrTimeToMicroseconds', () => {
-    it('should return microseconds', () => {
-      const output = hrTimeToMicroseconds([1, 200000000]);
-      assert.deepStrictEqual(output, 1200000);
+  describe('#hrTimeToSeconds', () => {
+    it('should return seconds', () => {
+      const output = hrTimeToSeconds([1, 200000000]);
+      assert.deepStrictEqual(output, 1.2);
     });
   });
+
   describe('#isTimeInput', () => {
     it('should return true for a number', () => {
       assert.strictEqual(isTimeInput(12), true);
