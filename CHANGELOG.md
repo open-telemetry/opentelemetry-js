@@ -14,6 +14,16 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 2.8.0
+
+### :rocket: Features
+
 * feat(sdk-trace-base): pretty-print `SpanImpl`, `Tracer`, and `BasicTracerProvider` via `util.inspect` so they render through `diag` and `console.log` [#6690](https://github.com/open-telemetry/opentelemetry-js/pull/6690) @mcollina
 * feat(sdk-metrics): implement metric reader self-observability metrics [#6449](https://github.com/open-telemetry/opentelemetry-js/pull/6449) @anuraaga
 * feat(core): add `hrTimeToSeconds` [#6449](https://github.com/open-telemetry/opentelemetry-js/pull/6449) @anuraaga
@@ -21,10 +31,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :bug: Bug Fixes
 
 * fix(core): limit processing of incoming "baggage" header to 8192 bytes @pichlermarc
-
-### :books: Documentation
-
-### :house: Internal
 
 ## 2.7.1
 
