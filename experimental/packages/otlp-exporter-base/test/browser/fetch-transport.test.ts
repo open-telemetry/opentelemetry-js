@@ -154,10 +154,9 @@ describe('FetchTransport', function () {
 
       // assert
       assert.strictEqual(response.status, 'failure');
-      assert.strictEqual(
-        (response as ExportResponseFailure).error.message,
-        'Fetch request errored'
-      );
+      const error = (response as ExportResponseFailure).error;
+      assert.strictEqual(error.message, 'Fetch request errored');
+      assert.ok(error.cause);
     });
 
     it('returns clean failure when send timeout aborts the request', async function () {
