@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sampler-jaeger-remote",
-  "version": "0.218.0",
+  "version": "0.219.0",
   "description": "Jaeger Remote Sampler",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -9,8 +9,8 @@
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc mocha 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "version": "node ../../../scripts/version-update.js",
@@ -41,7 +41,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/sdk-trace-base": "2.7.1",
+    "@opentelemetry/sdk-trace-base": "2.8.0",
     "axios": "^1.15.0"
   },
   "peerDependencies": {

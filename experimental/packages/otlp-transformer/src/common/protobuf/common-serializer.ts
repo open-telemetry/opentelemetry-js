@@ -199,7 +199,16 @@ export function writeAnyValue(writer: IProtobufWriter, value: AnyValue): void {
  */
 export function writeInstrumentationScope(
   writer: IProtobufWriter,
-  scope: InstrumentationScope,
+  scope: InstrumentationScope &
+    /**
+     * Additional properties that are currently only part of the logs-specific type.
+     * Once InstrumentationScope also includes `attributes` and `droppedAttributesCount`,
+     * we should remove these extensions.
+     */
+    {
+      attributes?: LogAttributes;
+      droppedAttributesCount?: number;
+    },
   fieldNumber: number
 ): void {
   writer.writeTag(fieldNumber, 2);
@@ -214,6 +223,17 @@ export function writeInstrumentationScope(
   if (scope.version) {
     writer.writeTag(2, 2);
     writer.writeString(scope.version);
+  }
+
+  if (scope.attributes) {
+    // attributes (field 3, repeated KeyValue)
+    writeAttributes(writer, scope.attributes, 3);
+  }
+
+  if (scope.droppedAttributesCount) {
+    // dropped_attributes_count (field 4, uint32)
+    writer.writeTag(4, 0);
+    writer.writeVarint(scope.droppedAttributesCount);
   }
 
   writer.finishLengthDelimited(start, writer.pos - startPos);

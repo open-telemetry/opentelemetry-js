@@ -13,8 +13,6 @@
  *    npm run generate:config
  */
 
-/* eslint-disable no-console */
-
 'use strict';
 
 const { compile } = require('json-schema-to-typescript');
@@ -116,7 +114,8 @@ const bashResult = spawnSync(
   {
     stdio: 'inherit',
     cwd: __dirname,
-  });
+  }
+);
 if (bashResult.error) {
   throw bashResult.error;
 }

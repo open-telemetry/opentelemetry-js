@@ -19,10 +19,10 @@ describe('NoopLoggerProvider', () => {
     );
   });
 
-  describe('LoggerOptions#scopeAttributes (LogAttributes)', () => {
-    it('should accept scopeAttributes with primitive values', () => {
+  describe('LoggerOptions#attributes (LogAttributes)', () => {
+    it('should accept attributes with primitive values', () => {
       const logger = loggerProvider.getLogger('logger-name', undefined, {
-        scopeAttributes: {
+        attributes: {
           'service.name': 'api',
           version: 1,
           enabled: true,
@@ -31,9 +31,9 @@ describe('NoopLoggerProvider', () => {
       assert.ok(logger);
     });
 
-    it('should accept scopeAttributes with LogAttribute value types', () => {
+    it('should accept attributes with LogAttribute value types', () => {
       const logger = loggerProvider.getLogger('logger-name', undefined, {
-        scopeAttributes: {
+        attributes: {
           scalar: 'value',
           number: 42,
           bool: true,

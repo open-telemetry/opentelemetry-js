@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         node_version:
-          - "22.22.1" # pin to avoid bug in 22.22.2
+          - "22"
     runs-on: oracle-bare-metal-64cpu-1024gb-x86-64-ubuntu-24
     container:
       image: ubuntu:24.04@sha256:c4a8d5503dfb2a3eb8ab5f807da5bc69a85730fb49b5cfca2330194ebcc41c7b
