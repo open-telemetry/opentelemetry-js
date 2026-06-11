@@ -152,6 +152,23 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
       assert.deepStrictEqual(getter.keys(undefined), []);
     });
 
+    it('should ignore empty environment names when snapshotting', () => {
+      const env = process.env;
+      process.env = {
+        '': 'ignored',
+        TRACEPARENT: 'traceparent-value',
+      };
+
+      try {
+        const getter = new EnvironmentGetter();
+
+        assert.deepStrictEqual(getter.keys(undefined), ['TRACEPARENT']);
+        assert.strictEqual(getter.get(undefined, ''), undefined);
+      } finally {
+        process.env = env;
+      }
+    });
+
     it('should return undefined when a key is missing', () => {
       process.env.TRACEPARENT = 'traceparent-value';
 
