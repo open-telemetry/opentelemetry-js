@@ -15,6 +15,45 @@ const ASCII_UNDERSCORE = '_'.charCodeAt(0);
 const ASCII_CASE_OFFSET = ASCII_LOWER_A - ASCII_UPPER_A;
 
 /**
+ * isNormalizedKey returns whether a key is already a normalized environment variable name.
+ *
+ * A normalized name is non-empty, starts with an ASCII uppercase letter or
+ * underscore, and contains only ASCII uppercase letters, digits, and
+ * underscores. Equivalently, it matches /^[A-Z_][A-Z0-9_]*$/.
+ */
+function isNormalizedKey(key: string): boolean {
+  if (key.length === 0) {
+    return false;
+  }
+
+  const firstCharCode = key.charCodeAt(0);
+  if (
+    !(
+      (firstCharCode >= ASCII_UPPER_A && firstCharCode <= ASCII_UPPER_Z) ||
+      firstCharCode === ASCII_UNDERSCORE
+    )
+  ) {
+    return false;
+  }
+
+  for (let i = 1; i < key.length; i++) {
+    const charCode = key.charCodeAt(i);
+
+    if (
+      !(
+        (charCode >= ASCII_UPPER_A && charCode <= ASCII_UPPER_Z) ||
+        (charCode >= ASCII_DIGIT_0 && charCode <= ASCII_DIGIT_9) ||
+        charCode === ASCII_UNDERSCORE
+      )
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
  * normalizeKey converts a propagator key to a valid POSIX environment variable
  * name. The conversion rules are:
  * - A-Z, 0-9, and _ are kept as-is.
@@ -57,9 +96,8 @@ function normalizeKey(key: string): string {
  * ignores the carrier passed to `get()` and `keys()`. Pass `undefined` as the
  * carrier when using this getter with a `TextMapPropagator`.
  *
- * Environment variable names are normalized before they are stored. If multiple
- * environment variables normalize to the same key, that is a name collision
- * error scenario and which original value is read is unspecified.
+ * Only environment variables whose names are already normalized are stored in
+ * the snapshot. The requested propagator key is normalized before lookup.
  *
  * @see https://opentelemetry.io/docs/specs/otel/context/env-carriers/
  */
@@ -68,8 +106,8 @@ export class EnvironmentGetter implements TextMapGetter<void> {
 
   constructor() {
     for (const [key, value] of Object.entries(process.env)) {
-      if (value !== undefined) {
-        this._carrier[normalizeKey(key)] = value;
+      if (value !== undefined && isNormalizedKey(key)) {
+        this._carrier[key] = value;
       }
     }
   }

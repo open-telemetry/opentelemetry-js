@@ -108,7 +108,7 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
       process.env.MIXED_CASE = 'mixed-value';
       process.env.H_LLO = 'non-ascii-value';
       process.env._1ABC = 'leading-digit-value';
-      process.env['x-b3-traceid'] = 'b3-value';
+      process.env.X_B3_TRACEID = 'b3-value';
 
       const getter = new EnvironmentGetter();
 
@@ -131,9 +131,12 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
       assert.strictEqual(getter.get(undefined, 'x-b3-traceid'), 'b3-value');
     });
 
-    it('should return normalized snapshot keys', () => {
-      process.env.traceparent = 'traceparent-value';
-      process.env['trace-state'] = 'tracestate-value';
+    it('should return only already normalized snapshot keys', () => {
+      process.env.TRACEPARENT = 'traceparent-value';
+      process.env.TRACE_STATE = 'tracestate-value';
+      process.env['trace-state'] = 'ignored';
+      process.env['X-B3-TRACEID'] = 'ignored';
+      process.env['1ABC'] = 'ignored';
 
       const getter = new EnvironmentGetter();
 
@@ -157,13 +160,19 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
       assert.strictEqual(getter.get(undefined, 'tracestate'), undefined);
     });
 
-    it('should list duplicate normalized environment names once', () => {
-      process.env.traceparent = 'first';
-      process.env.TRACEPARENT = 'second';
+    it('should ignore non-normalized environment names when reading values', () => {
+      process.env.traceparent = 'ignored';
+      process.env['trace-state'] = 'ignored';
+      process.env['x-b3-traceid'] = 'ignored';
+      process.env['1ABC'] = 'ignored';
 
       const getter = new EnvironmentGetter();
 
-      assert.deepStrictEqual(getter.keys(undefined), ['TRACEPARENT']);
+      assert.strictEqual(getter.get(undefined, 'traceparent'), undefined);
+      assert.strictEqual(getter.get(undefined, 'trace-state'), undefined);
+      assert.strictEqual(getter.get(undefined, 'x-b3-traceid'), undefined);
+      assert.strictEqual(getter.get(undefined, '1abc'), undefined);
+      assert.deepStrictEqual(getter.keys(undefined), []);
     });
 
     it('should preserve empty string values', () => {
@@ -237,6 +246,20 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
       assert.strictEqual(spanContext?.isRemote, true);
       assert.strictEqual(spanContext?.traceState?.get('vendor1'), 'value1');
       assert.strictEqual(spanContext?.traceState?.get('vendor2'), 'value2');
+    });
+
+    it('should ignore W3C trace context in non-normalized environment names', () => {
+      process.env.traceparent = `00-${traceId}-${spanId}-01`;
+      process.env.tracestate = 'vendor1=value1,vendor2=value2';
+
+      const propagator = new W3CTraceContextPropagator();
+      const context = propagator.extract(
+        ROOT_CONTEXT,
+        undefined,
+        new EnvironmentGetter()
+      );
+
+      assert.strictEqual(trace.getSpanContext(context), undefined);
     });
 
     it('should inject W3C baggage into an environment carrier', () => {

@@ -73,7 +73,8 @@ console.log(spanContext.traceId);
 ```
 
 `EnvironmentGetter` snapshots `process.env` when it is constructed. Later
-changes to `process.env` are not reflected in that getter.
+changes to `process.env` are not reflected in that getter. Only environment
+variables whose names are already normalized are included in the snapshot.
 
 ## Key Normalization
 
@@ -89,18 +90,16 @@ For example, `traceparent` becomes `TRACEPARENT`, `trace-state` becomes
 `TRACE_STATE`, and `1abc` becomes `_1ABC`.
 
 `EnvironmentSetter` always writes normalized key names to its environment map.
-`EnvironmentGetter` normalizes both the requested propagator key and the
-environment variable names from its snapshot before matching, and its `keys()`
-method returns normalized names. For example, a propagator request for
-`x-b3-traceid` matches either `X_B3_TRACEID` or `x-b3-traceid` from
-`process.env`.
+`EnvironmentGetter` normalizes the requested propagator key and reads the
+corresponding normalized environment variable name from its snapshot. Its
+`keys()` method returns only environment variable names that are already
+normalized. For example, a propagator request for `x-b3-traceid` matches
+`X_B3_TRACEID` from `process.env`, but does not match `x-b3-traceid`.
 
 Name collisions after normalization should be avoided. For example,
 `trace-state` and `TRACE_STATE` both normalize to `TRACE_STATE`. When injecting,
 later writes to the same normalized name replace earlier values in the target
-map. When extracting from `process.env`, multiple environment variables that
-normalize to the same name are a name collision error scenario, and which value
-is read is unspecified.
+map.
 
 ## Useful links
 
