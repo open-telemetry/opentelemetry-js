@@ -70,6 +70,7 @@ import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 
 import { NOOP_COUNTER_METRIC } from '../../../../api/src/metrics/NoopMeter';
 import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from '../src/semconv';
+import { NOOP_HISTOGRAM_METRIC } from '../../../../api/src/metrics/NoopMeter';
 
 function assertDefaultContextManagerRegistered() {
   assert.ok(
@@ -437,7 +438,13 @@ describe('Node SDK', () => {
         NOOP_COUNTER_METRIC
       );
 
-      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+      const meterProvider = metrics.getMeterProvider();
+      assert.ok(meterProvider instanceof MeterProvider);
+      assert.notDeepEqual(
+        (meterProvider as any)['_sharedState'].metricCollectors[0]._metricReader
+          ._selfObsMetrics.collectionDuration,
+        NOOP_HISTOGRAM_METRIC
+      );
 
       await sdk.shutdown();
     });
@@ -454,7 +461,7 @@ describe('Node SDK', () => {
       });
 
       const sdk = new NodeSDK({
-        metricReader: metricReader,
+        metricReaders: [metricReader],
         traceExporter: new ConsoleSpanExporter(),
         autoDetectResources: false,
       });
@@ -480,16 +487,30 @@ describe('Node SDK', () => {
       );
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+      assert.notDeepEqual(
+        (metricReader as any)._selfObsMetrics.collectionDuration,
+        NOOP_HISTOGRAM_METRIC
+      );
 
       await sdk.shutdown();
     });
 
     it('should not configure components for SDK metrics if disabled', async () => {
-      process.env.OTEL_TRACES_EXPORTER = 'console';
-      process.env.OTEL_LOGS_EXPORTER = 'console';
-      process.env.OTEL_METRICS_EXPORTER = 'console';
+      const exporter = new ConsoleMetricExporter();
+      const metricReader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
 
-      const sdk = new NodeSDK();
+      const sdk = new NodeSDK({
+        metricReaders: [metricReader],
+        traceExporter: new ConsoleSpanExporter(),
+        logRecordProcessors: [
+          new SimpleLogRecordProcessor(new InMemoryLogRecordExporter()),
+        ],
+        autoDetectResources: false,
+      });
 
       sdk.start();
 
@@ -510,6 +531,10 @@ describe('Node SDK', () => {
       );
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+      assert.deepEqual(
+        (metricReader as any)._selfObsMetrics.collectionDuration,
+        NOOP_HISTOGRAM_METRIC
+      );
 
       await sdk.shutdown();
     });
