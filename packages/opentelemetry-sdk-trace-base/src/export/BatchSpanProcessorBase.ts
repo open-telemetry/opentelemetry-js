@@ -68,8 +68,8 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
       this._maxExportBatchSize = this._maxQueueSize;
     }
 
-    const meter = config?.meterProvider
-      ? config.meterProvider.getMeter('@opentelemetry/sdk-trace')
+    const meter = config?.selfObsMeterProvider
+      ? config.selfObsMeterProvider.getMeter('@opentelemetry/sdk-trace')
       : createNoopMeter();
     this._metrics = new SpanProcessorMetrics(
       OTEL_COMPONENT_TYPE_VALUE_BATCHING_SPAN_PROCESSOR,

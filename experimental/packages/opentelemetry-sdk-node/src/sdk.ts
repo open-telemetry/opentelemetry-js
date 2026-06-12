@@ -353,7 +353,9 @@ export class NodeSDK {
       } else {
         spanProcessors = [
           new BatchSpanProcessor(this._tracerProviderConfig.traceExporter!, {
-            meterProvider: sdkMetricsEnabled ? this._meterProvider : undefined,
+            selfObsMeterProvider: sdkMetricsEnabled
+              ? this._meterProvider
+              : undefined,
           }),
         ];
       }

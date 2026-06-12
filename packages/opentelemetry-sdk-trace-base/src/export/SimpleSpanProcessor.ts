@@ -38,8 +38,8 @@ export class SimpleSpanProcessor implements SpanProcessor {
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
     this._pendingExports = new Set<Promise<void>>();
 
-    const meter = config?.meterProvider
-      ? config.meterProvider.getMeter('@opentelemetry/sdk-trace')
+    const meter = config?.selfObsMeterProvider
+      ? config.selfObsMeterProvider.getMeter('@opentelemetry/sdk-trace')
       : createNoopMeter();
     this._metrics = new SpanProcessorMetrics(
       OTEL_COMPONENT_TYPE_VALUE_SIMPLE_SPAN_PROCESSOR,

@@ -100,7 +100,7 @@ export interface SpanProcessorOptions {
    * A meter provider to which to record self-observability span processor metrics.
    * @experimental This option is experimental and is subject to breaking changes in minor releases.
    */
-  meterProvider?: MeterProvider;
+  selfObsMeterProvider?: MeterProvider;
 }
 
 /** BatchSpanProcessor configuration options. */

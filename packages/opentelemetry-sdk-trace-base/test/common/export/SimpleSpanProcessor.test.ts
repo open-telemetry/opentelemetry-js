@@ -347,7 +347,7 @@ describe('SimpleSpanProcessor', () => {
         readers: [metricReader],
       });
       const processor = new SimpleSpanProcessor(exporter, {
-        meterProvider,
+        selfObsMeterProvider: meterProvider,
       });
 
       const exportStub = sinon.stub(exporter, 'export');

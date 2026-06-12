@@ -252,9 +252,13 @@ export function getSpanProcessorsFromEnv(
 
   for (const exp of exporters) {
     if (exp instanceof ConsoleSpanExporter) {
-      processors.push(new SimpleSpanProcessor(exp, { meterProvider }));
+      processors.push(
+        new SimpleSpanProcessor(exp, { selfObsMeterProvider: meterProvider })
+      );
     } else {
-      processors.push(new BatchSpanProcessor(exp, { meterProvider }));
+      processors.push(
+        new BatchSpanProcessor(exp, { selfObsMeterProvider: meterProvider })
+      );
     }
   }
 
