@@ -33,7 +33,7 @@ export class OTLPLogExporter
         ProtobufLogsSerializer,
         OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_LOG_EXPORTER,
         LogsExporterMetricsHelper,
-        config.meterProvider,
+        config.selfObsMeterProvider,
         'LogsExportService',
         '/opentelemetry.proto.collector.logs.v1.LogsService/Export'
       )

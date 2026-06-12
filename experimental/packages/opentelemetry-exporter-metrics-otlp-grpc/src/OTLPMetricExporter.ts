@@ -30,7 +30,7 @@ export class OTLPMetricExporter extends OTLPMetricExporterBase {
         ProtobufMetricsSerializer,
         OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_METRIC_EXPORTER,
         MetricsExporterMetricsHelper,
-        config?.meterProvider,
+        config?.selfObsMeterProvider,
         'MetricsExportService',
         '/opentelemetry.proto.collector.metrics.v1.MetricsService/Export'
       ),
@@ -40,10 +40,10 @@ export class OTLPMetricExporter extends OTLPMetricExporterBase {
   }
 
   /**
-   * Sets the meter provider to use to collect metrics for this exporter.
+   * Sets the meter provider to use to collect metrics for the exporter itself.
    * @experimental This method is experimental and is subject to breaking changes in minor releases.
    */
-  setMeterProvider(meterProvider: MeterProvider) {
+  setSelfObsMeterProvider(meterProvider: MeterProvider) {
     this.setMetrics(
       createOtlpGrpcExporterMetrics(
         OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_METRIC_EXPORTER,

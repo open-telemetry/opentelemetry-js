@@ -78,7 +78,7 @@ describe('OTLPTraceExporter', function () {
         new SimpleSpanProcessor(
           new OTLPTraceExporter({
             url: 'http://localhost:1501',
-            meterProvider,
+            selfObsMeterProvider: meterProvider,
           })
         ),
       ],

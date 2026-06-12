@@ -33,7 +33,7 @@ export class OTLPMetricExporter extends OTLPMetricExporterBase {
         JsonMetricsSerializer,
         OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER,
         MetricsExporterMetricsHelper,
-        config?.meterProvider
+        config?.selfObsMeterProvider
       ),
       config
     );
@@ -41,10 +41,10 @@ export class OTLPMetricExporter extends OTLPMetricExporterBase {
   }
 
   /**
-   * Sets the meter provider to use to collect metrics for this exporter.
+   * Sets the meter provider to use to collect metrics for the exporter itself.
    * @experimental This method is experimental and is subject to breaking changes in minor releases.
    */
-  setMeterProvider(meterProvider: MeterProvider) {
+  setSelfObsMeterProvider(meterProvider: MeterProvider) {
     this.setMetrics(
       createOtlpHttpExporterMetrics(
         OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER,

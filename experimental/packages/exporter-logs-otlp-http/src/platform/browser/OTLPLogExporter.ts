@@ -31,7 +31,7 @@ export class OTLPLogExporter
         JsonLogsSerializer,
         OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_LOG_EXPORTER,
         LogsExporterMetricsHelper,
-        config.meterProvider,
+        config.selfObsMeterProvider,
         'v1/logs',
         { 'Content-Type': 'application/json' }
       )

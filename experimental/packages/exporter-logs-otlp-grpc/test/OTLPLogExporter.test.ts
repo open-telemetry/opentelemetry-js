@@ -78,7 +78,7 @@ describe('OTLPLogExporter', function () {
         new SimpleLogRecordProcessor(
           new OTLPLogExporter({
             url: 'http://localhost:1503',
-            meterProvider,
+            selfObsMeterProvider: meterProvider,
           })
         ),
       ],

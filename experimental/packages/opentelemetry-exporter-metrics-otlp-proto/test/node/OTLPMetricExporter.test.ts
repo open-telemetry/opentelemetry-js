@@ -72,7 +72,7 @@ describe('OTLPMetricExporter', () => {
           testMetricReader,
         ],
       });
-      exporter.setMeterProvider(meterProvider);
+      exporter.setSelfObsMeterProvider(meterProvider);
       meterProvider.getMeter('test-meter').createCounter('test-counter').add(1);
 
       // act

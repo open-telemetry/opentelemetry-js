@@ -31,7 +31,7 @@ export class OTLPTraceExporter
         ProtobufTraceSerializer,
         OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_SPAN_EXPORTER,
         TraceExporterMetricsHelper,
-        config.meterProvider,
+        config.selfObsMeterProvider,
         'TraceExportService',
         '/opentelemetry.proto.collector.trace.v1.TraceService/Export'
       )

@@ -32,7 +32,7 @@ export class OTLPTraceExporter
         ProtobufTraceSerializer,
         OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_SPAN_EXPORTER,
         TraceExporterMetricsHelper,
-        config.meterProvider
+        config.selfObsMeterProvider
       )
     );
   }

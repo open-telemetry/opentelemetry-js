@@ -38,8 +38,8 @@ export interface OTLPExporterConfigBase {
   timeoutMillis?: number;
 
   /**
-   * MeterProvider to record exporter metrics.
+   * MeterProvider to record metrics for the exporter itself.
    * @experimental This option is experimental and is subject to breaking changes in minor releases.
    */
-  meterProvider?: MeterProvider;
+  selfObsMeterProvider?: MeterProvider;
 }

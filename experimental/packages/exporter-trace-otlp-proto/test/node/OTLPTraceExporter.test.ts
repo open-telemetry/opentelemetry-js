@@ -67,7 +67,9 @@ describe('OTLPTraceExporter', () => {
 
       const tracerProvider = new BasicTracerProvider({
         spanProcessors: [
-          new SimpleSpanProcessor(new OTLPTraceExporter({ meterProvider })),
+          new SimpleSpanProcessor(
+            new OTLPTraceExporter({ selfObsMeterProvider: meterProvider })
+          ),
         ],
       });
 

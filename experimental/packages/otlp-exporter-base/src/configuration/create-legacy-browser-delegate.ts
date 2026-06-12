@@ -84,7 +84,7 @@ export function createLegacyOtlpBrowserExportDelegate<Internal, Response>(
       metricsComponentType,
       exporterMetricsHelper,
       options.url,
-      config.meterProvider
+      config.selfObsMeterProvider
     )
   );
 }
