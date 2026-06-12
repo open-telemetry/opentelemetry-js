@@ -14,7 +14,6 @@ import {
 } from '@opentelemetry/core';
 import type { Span } from '../Span';
 import type { SpanProcessor } from '../SpanProcessor';
-import type { SpanProcessorConfig } from './SpanProcessorConfig';
 import type { BufferConfig } from '../types';
 import type { ReadableSpan } from './ReadableSpan';
 import type { SpanExporter } from './SpanExporter';
@@ -41,7 +40,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
   private _shutdownOnce: BindOnceFuture<void>;
   private _droppedSpansCount: number = 0;
 
-  constructor(exporter: SpanExporter, config?: T & SpanProcessorConfig) {
+  constructor(exporter: SpanExporter, config?: T) {
     this._exporter = exporter;
     this._maxExportBatchSize =
       typeof config?.maxExportBatchSize === 'number'

@@ -26,6 +26,7 @@ export type {
   GeneralLimits,
   SDKRegistrationConfig,
   SpanLimits,
+  SpanProcessorOptions,
   TracerConfig,
 } from './types';
 export type { IdGenerator } from './IdGenerator';
