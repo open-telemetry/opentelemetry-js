@@ -3,31 +3,107 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import * as yaml from 'yaml';
 import { getStringFromEnv } from '@opentelemetry/core';
 import type { ConfigurationModel, GrpcTls, HttpTls } from './generated/types';
 
-export function envVariableSubstitution(value: string): string {
-  const str = String(value);
-  // Spec ABNF: $$ is a literal $; ${VAR}, ${VAR:-default}, ${env:VAR}, ${env:VAR:-default}
-  const TOKEN_RE = /\$\$|\$\{(?:env:)?([a-zA-Z_][a-zA-Z0-9_]*)(?::-(.*?))?\}/g;
-  let result = '';
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
+/**
+ * Handle (Environment) variable substitution per
+ * https://opentelemetry.io/docs/specs/otel/configuration/data-model/#environment-variable-substitution
+ *
+ * This changes the yaml.Document in-place.
+ * This must work with a yaml.Document, rather than a raw JS object from
+ * `yaml.parse()`, to distinguish between `foo: ${BAR}` and `foo: "${BAR}"`.
+ *
+ * Exported for testing.
+ */
+export function substituteEnvVars(doc: yaml.Document) {
+  // Visit each scalar string value in the document. These are
+  // the candidates for env var substitution.
+  yaml.visit(doc, {
+    Scalar: (key, node, _path) => {
+      if (key === 'key') return; // skip mapping keys
+      if (typeof node.value !== 'string') return;
+      let subbed: string | null | number | boolean = envVarSubst(node.value);
+      if (subbed !== node.value && node.type === yaml.Scalar.PLAIN) {
+        // "PLAIN" here is a simple YAML value (e.g. 42 in `foo: 42`).
+        // I.e., not quoted (`foo: "42"`) or in a block.
+        subbed = yamlScalarCoerce(subbed);
+      }
+      node.value = subbed;
+    },
+  });
+}
 
-  while ((match = TOKEN_RE.exec(str)) !== null) {
-    result += str.slice(lastIndex, match.index);
-    if (match[0] === '$$') {
-      result += '$';
-    } else {
-      const varName = match[1];
-      const defaultValue = match[2] ?? '';
-      result += getStringFromEnv(varName) || defaultValue;
+// ENV_SUBSTITUTION_RE *mostly* matches the `ENV-SUBSTITUTION` ABNF from the
+// spec with the exception of the DEFAULT-VALUE: we are using `[^\n}]*`
+// (copying the OTel Java regex) rather than a regex closer to ABNF
+// `*(VCHAR-WSP-NO-RBRACE)` (which is slightly ambiguous on what whitespace is
+// allowed in WSP).
+const ENV_SUBSTITUTION_RE = /^([a-zA-Z_][a-zA-Z0-9_]*)(?::-([^\n}]*))?$/;
+
+/**
+ * Do environment variable substitution for the given string value.
+ */
+function envVarSubst(s: string): string {
+  const ESCAPE_RE = /(\$\$)/;
+  const chunks = s.split(ESCAPE_RE);
+  for (let i = 0; i < chunks.length; ++i) {
+    if (i % 2 === 1) {
+      // Odd chunks are matched escape sequences, i.e. '$$'.
+      chunks[i] = '$';
+      continue;
     }
-    lastIndex = TOKEN_RE.lastIndex;
+
+    // Even chunks are processed for possible substition matches.
+    const SUBSTITUTION_REF_RE = /\$\{(?:env:)?([^}]+)\}/g;
+    let chunk = '';
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = SUBSTITUTION_REF_RE.exec(chunks[i])) !== null) {
+      chunk += chunks[i].slice(lastIndex, match.index);
+      const envMatch = ENV_SUBSTITUTION_RE.exec(match[1]);
+      if (!envMatch) {
+        // E.g.: `key: ${STRING_VALUE:?error}` test case
+        throw new Error(
+          `parse error: invalid env var substitution: ${match[0]}`
+        );
+      }
+      const envName = envMatch[1];
+      const defaultValue = envMatch[2] ?? '';
+      chunk += getStringFromEnv(envName) || defaultValue;
+      lastIndex = SUBSTITUTION_REF_RE.lastIndex;
+    }
+    chunk += chunks[i].slice(lastIndex);
+    chunks[i] = chunk;
   }
 
-  result += str.slice(lastIndex);
+  const result = chunks.join('');
   return result;
+}
+
+/**
+ * Re-interpret a string value from env var substitution as a possible
+ * YAML number, boolean, or null value.
+ *
+ * If the interpretted value is any other type, we return the original
+ * string:
+ * - sequences and  mappings may not result from env var substitution, per the spec
+ * - a re-parsed YAML string normalizes whitespace, which we do not want
+ */
+function yamlScalarCoerce(value: string): string | null | number | boolean {
+  let coerced;
+  try {
+    coerced = yaml.parse(value, { version: '1.2' });
+  } catch {
+    return value;
+  }
+  const type = typeof coerced;
+  if (coerced === null || type === 'number' || type === 'boolean') {
+    return coerced;
+  } else {
+    return value;
+  }
 }
 
 export function getGrpcTlsConfig(
