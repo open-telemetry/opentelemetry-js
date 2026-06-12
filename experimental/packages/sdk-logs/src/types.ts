@@ -105,8 +105,19 @@ export interface LogRecordLimits {
   attributeCountLimit?: number;
 }
 
-/** Interface configuration for a buffer. */
-export interface BufferConfig {
+/**
+ * Common options for SDK log processors.
+ */
+export interface LogRecordProcessorOptions {
+  /**
+   * A meter provider to which to record self-observability log processor metrics.
+   * @experimental This option is experimental and is subject to breaking changes in minor releases.
+   */
+  selfObsMeterProvider?: MeterProvider;
+}
+
+/** BatchLogProcessor configuration options. */
+export interface BufferConfig extends LogRecordProcessorOptions {
   /** The maximum batch size of every export. It must be smaller or equal to
    * maxQueueSize. The default value is 512. */
   maxExportBatchSize?: number;

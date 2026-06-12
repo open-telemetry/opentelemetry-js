@@ -15,7 +15,6 @@ import type { BufferConfig } from '../types';
 import type { SdkLogRecord } from './SdkLogRecord';
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
-import type { LogRecordProcessorConfig } from './LogRecordProcessorConfig';
 import { LogRecordProcessorMetrics } from './LogRecordProcessorMetrics';
 import { OTEL_COMPONENT_TYPE_VALUE_BATCHING_LOG_PROCESSOR } from '../semconv';
 
@@ -146,10 +145,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   private _shutdownOnce: BindOnceFuture<void>;
   private _flushing: boolean = false;
 
-  constructor(
-    exporter: LogRecordExporter,
-    config?: T & LogRecordProcessorConfig
-  ) {
+  constructor(exporter: LogRecordExporter, config?: T) {
     this._exporter = exporter;
     this._maxExportBatchSize = config?.maxExportBatchSize ?? 512;
     this._maxQueueSize = config?.maxQueueSize ?? 2048;
@@ -165,8 +161,8 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
       this._maxExportBatchSize = this._maxQueueSize;
     }
 
-    const meter = config?.meterProvider
-      ? config.meterProvider.getMeter('@opentelemetry/sdk-logs')
+    const meter = config?.selfObsMeterProvider
+      ? config.selfObsMeterProvider.getMeter('@opentelemetry/sdk-logs')
       : createNoopMeter();
 
     this._metrics = new LogRecordProcessorMetrics(

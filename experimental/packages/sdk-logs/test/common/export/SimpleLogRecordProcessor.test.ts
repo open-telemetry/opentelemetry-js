@@ -166,7 +166,7 @@ describe('SimpleLogRecordProcessor', () => {
       const exporter = new InMemoryLogRecordExporter();
       const { logRecord } = setup(exporter);
       const processor = new SimpleLogRecordProcessor(exporter, {
-        meterProvider,
+        selfObsMeterProvider: meterProvider,
       });
 
       const exportStub = sinon.stub(exporter, 'export');

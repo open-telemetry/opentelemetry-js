@@ -648,7 +648,7 @@ export function getBatchLogRecordProcessorFromEnv(
 ): BatchLogRecordProcessor {
   return new BatchLogRecordProcessor(exporter, {
     ...getBatchLogRecordProcessorConfigFromEnv(),
-    meterProvider,
+    selfObsMeterProvider: meterProvider,
   });
 }
 

@@ -699,7 +699,7 @@ describe('BatchLogRecordProcessorBase', () => {
         maxQueueSize: 1,
         maxExportBatchSize: 1,
         scheduledDelayMillis: 1_000_000_000, // Manually flush
-        meterProvider,
+        selfObsMeterProvider: meterProvider,
       });
 
       const exportStub = sinon.stub(exporter, 'export');

@@ -449,7 +449,9 @@ export class NodeSDK {
       this._loggerProviderConfig = {
         logRecordProcessors: exporters.map(exporter => {
           if (exporter instanceof ConsoleLogRecordExporter) {
-            return new SimpleLogRecordProcessor(exporter, { meterProvider });
+            return new SimpleLogRecordProcessor(exporter, {
+              selfObsMeterProvider: meterProvider,
+            });
           } else {
             return getBatchLogRecordProcessorFromEnv(exporter, meterProvider);
           }
