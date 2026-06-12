@@ -23,4 +23,3 @@ export { NodeSDK } from './sdk';
 export type { LoggerProviderConfig, MeterProviderConfig } from './sdk';
 export type { NodeSDKConfiguration } from './types';
 export { startNodeSDK } from './start';
-export { buildSamplerFromConfig } from './utils';
