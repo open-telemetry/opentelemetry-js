@@ -15,14 +15,14 @@ jobs:
       fail-fast: false
       matrix:
         node_version:
-          - "18.19.0"
-          - "18"
-          - "20.6.0"
-          - "20"
-          - "22"
-          - "24"
-          - "25"
-          - "26"
+          - '18.19.0'
+          - '18'
+          - '20.6.0'
+          - '20'
+          - '22'
+          - '24'
+          - '25'
+          - '26'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -35,31 +35,20 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: ${{ matrix.node_version }}
-
-      # npm@11.0.0 drops support for Node.js v18
-      # Install the latest npm compatible with this version of Node.js
-      # - npm@11.1.0 supports: {"node":"^20.17.0 || >=22.9.0"}
-      - run: npm install -g npm@"<11.0.0"
-        if: ${{
-          matrix.node_version == '18.19.0' ||
-          matrix.node_version == '18' ||
-          matrix.node_version == '20.6.0'
-          }}
-      - run: npm install -g npm@latest
-        if: ${{
-          matrix.node_version == '20' ||
-          matrix.node_version == '22' ||
-          matrix.node_version == '24' ||
-          matrix.node_version == '25' ||
-          matrix.node_version == '26'
-          }}
+          node-version: ^26.3.0
 
       - name: Bootstrap
         run: npm ci --ignore-scripts
 
       - name: Build 🔧
         run: npm run compile
+
+      # The compile above ran on the repo's build Node (^26.3.0) because tsdown
+      # does not support Node < 22.18. Tests, however, must cover every
+      # supported runtime, so switch to the matrix Node version for them.
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: ${{ matrix.node_version }}
 
       - run: npm test
 
@@ -82,9 +71,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: '22'
-
-      - run: npm install -g npm@latest
+          node-version: ^26.3.0
 
       - name: Bootstrap
         run: npm ci --ignore-scripts
@@ -111,7 +98,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: 22
+          node-version: ^26.3.0
 
       - name: Bootstrap
         run: npm ci --ignore-scripts
@@ -135,7 +122,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: 22
+          node-version: ^26.3.0
 
       - name: Bootstrap
         run: npm ci --ignore-scripts
@@ -163,7 +150,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: 22
+          node-version: ^26.3.0
 
       - name: Bootstrap
         run: npm ci --ignore-scripts

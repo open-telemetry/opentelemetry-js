@@ -24,7 +24,8 @@
         "{projectRoot}/**/*.proto",
         "{projectRoot}/package.json",
         "{projectRoot}/tsdown*.config.ts",
-        "{workspaceRoot}/tsdown.config.ts"
+        "{workspaceRoot}/tsdown.config.ts",
+        "{workspaceRoot}/package-lock.json"
       ],
       "outputs": [
         "{projectRoot}/dist"

@@ -178,9 +178,7 @@ npm ci
 
 ### Compile modules
 
-All modules are managed as a composite typescript project using [Project References](https://www.typescriptlang.org/docs/handbook/project-references.html). This means that a breaking change in one module will be reflected in compilations of its dependent modules automatically.
-
-DO NOT use lerna to compile all modules unless you know what you are doing because this will cause a new typescript process to be spawned for every module in the project.
+All modules are built with [tsdown](https://tsdown.dev/), orchestrated by nx: `npm run compile` builds each package's workspace dependencies before the package itself and caches results between runs. Building requires Node.js >= 22.18 (CI builds on Node ^26.3.0); tests still run on every supported Node version.
 
 ```sh
 # Build all modules

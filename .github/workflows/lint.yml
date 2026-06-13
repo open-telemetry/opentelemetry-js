@@ -24,7 +24,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: '22'
+          node-version: ^26.3.0
 
       - name: Bootstrap
         run: npm ci --ignore-scripts

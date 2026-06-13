@@ -24,17 +24,16 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: 22
+          node-version: ^26.3.0
 
       - name: Install and Bootstrap 🔧
         run: npm ci --ignore-scripts
 
-      - name: Generate version.ts files
-        run: npm run version:update
-
+      # validation-server.js is plain JS that requires built @opentelemetry/*
+      # packages; tsdown/nx builds them at the repo root (the package itself no
+      # longer carries a tsc project to compile).
       - name: Build 🔧
         run: npm run compile
-        working-directory: ./integration-tests/propagation-validation-server
 
       - name: Run W3C Test harness
         run: ./integration-tests/tracecontext-integration-test.sh

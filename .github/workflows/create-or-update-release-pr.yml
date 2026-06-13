@@ -63,9 +63,7 @@ jobs:
         with:
           cache: 'npm'
           cache-dependency-path: package-lock.json
-          node-version: 22
-      - run: npm install -g npm@latest
-
+          node-version: ^26.3.0
       - run: npm ci --ignore-scripts
 
       - name: Create/Update Release PR
