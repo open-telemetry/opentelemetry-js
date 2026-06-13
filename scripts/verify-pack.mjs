@@ -58,7 +58,8 @@ for (const { dir, pkg } of targets) {
         try {
           const req = createRequire(path.join(extracted, 'package.json'));
           const mod = req(filePath);
-          if (!mod || Object.keys(mod).length === 0) {
+          // A bare `module.exports = fn/class` has no enumerable keys but is valid.
+          if (!mod || (typeof mod !== 'function' && Object.keys(mod).length === 0)) {
             failures.push(`${label} :: require("${subpath}") resolved an empty module`);
           }
         } catch (err) {
@@ -99,13 +100,18 @@ function walk(dir, out, depth) {
   let entries;
   try {
     entries = readdirSync(dir, { withFileTypes: true });
-  } catch {
+  } catch (err) {
+    // ENOENT/ENOTDIR are expected (race, non-dir); anything else means a
+    // package directory was silently dropped, so surface it.
+    if (err.code !== 'ENOENT' && err.code !== 'ENOTDIR') {
+      failures.push(`${path.relative(REPO_ROOT, dir)} :: cannot read directory: ${err.message}`);
+    }
     return;
   }
   for (const ent of entries) {
     if (ent.name === 'node_modules' || ent.name === 'dist' || ent.name === 'build') continue;
+    if (ent.name.startsWith('.')) continue;
     // Scratch dirs (e.g. scripts/semconv/tmp-changelog-gen) hold extracted npm tarballs.
-    if (ent.name.startsWith('.') && ent.name !== '.github') continue;
     if (ent.name.startsWith('tmp-')) continue;
     const full = path.join(dir, ent.name);
     if (ent.isDirectory()) {
@@ -161,10 +167,11 @@ function collectEntries(pkg) {
 }
 
 // Classify a require/import failure: packaging bug or environmental.
-// npm pack doesn't install dependencies, so a *declared* dependency failing to
-// resolve is environmental (logged as a skip). Everything else is a bug:
-// relative or in-tarball absolute paths (file missing from the tarball),
-// self-references (broken own exports map), and undeclared bare specifiers.
+// npm pack doesn't install dependencies, so a *declared* dependency's bare
+// entry point failing to resolve is environmental (logged as a skip).
+// Everything else is a bug: relative or in-tarball absolute paths (file missing
+// from the tarball), self-references (broken own exports map), undeclared bare
+// specifiers, and deep subpath imports into a dep (e.g. a stale `dep/build/x`).
 function handleLoadError(err, pkg, context) {
   const msg = String(err?.message ?? '');
   const m = /Cannot find (?:package|module) '([^']+)'/.exec(msg);
@@ -177,7 +184,8 @@ function handleLoadError(err, pkg, context) {
       ...pkg.peerDependencies,
       ...pkg.optionalDependencies,
     });
-    const isDeclaredDep = declared.some(d => spec === d || spec.startsWith(`${d}/`));
+    // Exact match only: a deep import (`dep/sub`) into a dep is a real bug.
+    const isDeclaredDep = declared.includes(spec);
     if (!isPathSpec && !isSelfRef && isDeclaredDep) {
       console.log(`  skip ${context} cannot resolve declared dep "${spec}" (not packed)`);
       return;
