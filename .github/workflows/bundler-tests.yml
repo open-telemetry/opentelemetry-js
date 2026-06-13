@@ -21,8 +21,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: 24
-      - run: npm install -g npm@">=11.16.0"
+          node-version: ^26.3.0
       - name: Install dependencies
         run: npm ci --ignore-scripts
       - name: Build TypeScript packages
