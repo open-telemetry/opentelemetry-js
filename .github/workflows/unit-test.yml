@@ -15,14 +15,14 @@ jobs:
       fail-fast: false
       matrix:
         node_version:
-          - '18.19.0'
-          - '18'
-          - '20.6.0'
-          - '20'
-          - '22'
-          - '24'
-          - '25'
-          - '26'
+          - "18.19.0"
+          - "18"
+          - "20.6.0"
+          - "20"
+          - "22"
+          - "24"
+          - "25"
+          - "26"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
