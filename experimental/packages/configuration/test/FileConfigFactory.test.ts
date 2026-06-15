@@ -1088,45 +1088,6 @@ describe('FileConfigFactory', function () {
     assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
   });
 
-  it('decodes percent-encoded keys and values in attributes_list', function () {
-    process.env.OTEL_CONFIG_FILE =
-      'test/fixtures/attributes-list-percent-encoded.yaml';
-    const configFactory = createConfigFactory();
-    const config = configFactory.getConfigModel();
-    assert.deepStrictEqual(config.resource?.attributes, [
-      { name: 'my,key', value: 'value=with=equals', type: 'string' },
-      { name: 'unicode', value: 'café', type: 'string' },
-    ]);
-  });
-
-  it('discards all entries when attributes_list has invalid percent-encoding', function () {
-    const warnStub = Sinon.stub(diag, 'warn');
-    process.env.OTEL_CONFIG_FILE =
-      'test/fixtures/attributes-list-invalid-encoding.yaml';
-    const configFactory = createConfigFactory();
-    const config = configFactory.getConfigModel();
-    assert.strictEqual(config.resource?.attributes, undefined);
-    assert.ok(
-      warnStub.args.some(args =>
-        String(args[0]).includes('Failed to percent-decode')
-      )
-    );
-    warnStub.restore();
-  });
-
-  it('discards all entries when attributes_list has unencoded `=` in value', function () {
-    const warnStub = Sinon.stub(diag, 'warn');
-    process.env.OTEL_CONFIG_FILE =
-      'test/fixtures/attributes-list-unencoded-equals.yaml';
-    const configFactory = createConfigFactory();
-    const config = configFactory.getConfigModel();
-    assert.strictEqual(config.resource?.attributes, undefined);
-    assert.ok(
-      warnStub.args.some(args => String(args[0]).includes('Invalid format'))
-    );
-    warnStub.restore();
-  });
-
   it('leaves attribute type undefined when omitted in YAML', function () {
     // The spec says "if omitted, string is used" for attribute type, but we intentionally
     // do NOT apply this default in the config parser. The consumer (SDK init code) is
@@ -1189,6 +1150,7 @@ describe('mergeResourceAttributesConfig', function () {
     attributes?: AttributeNameValue[];
     attributes_list?: string | null;
     expected: AttributeNameValue[] | undefined;
+    diagWarn?: string,
     only?: boolean;
   }[] = [
     { expected: undefined },
@@ -1228,6 +1190,36 @@ describe('mergeResourceAttributesConfig', function () {
         { name: 'foo', value: '42', type: 'string' }, // no type coercion
       ],
     },
+    {
+      // Values include percent-encoded `,` (%2C) and `=` (%3D) in keys and
+      // values, plus a non-ASCII value encoded as UTF-8 (%C3%A9 = é).
+      attributes_list: 'my%2Ckey=value%3Dwith%3Dequals,unicode=caf%C3%A9',
+      expected: [
+        { name: 'my,key', value: 'value=with=equals', type: 'string' },
+        { name: 'unicode', value: 'café', type: 'string' },
+      ],
+    },
+    {
+      // `%ZZ` is not a valid percent-encoded sequence — should cause the entire
+      // attributes_list to be discarded per spec.
+      attributes_list: 'good=value,bad=%ZZ',
+      expected: [],
+      diagWarn:
+        'Failed to percent-decode resource.attributes_list entry "bad=%ZZ"',
+    },
+    {
+      // Unencoded `=` in value violates the spec format (must be %3D). Entire
+      // attributes_list should be discarded.
+      attributes_list: 'key=val=ue,other=ok',
+      expected: [],
+      diagWarn: 'Invalid format for resource.attributes_list entry',
+    },
+    {
+      // Discard all attribute_list entries if there is an empty name.
+      attributes_list: '=bar,spam=eggs',
+      expected: [],
+      diagWarn: 'Empty attribute name in resource.attributes_list entry',
+    },
   ];
 
   for (const item of corpus) {
@@ -1236,11 +1228,19 @@ describe('mergeResourceAttributesConfig', function () {
       ', ' +
       util.inspect(item.attributes_list);
     (item.only ? it.only : it)(testName, function () {
+      const warnStub = Sinon.stub(diag, 'warn');
       const actual = mergeResourceAttributesConfig(
         item.attributes,
         item.attributes_list
       );
       assert.deepStrictEqual(actual, item.expected);
+      if (item.diagWarn) {
+        assert.ok(
+          warnStub.args.some(args => String(args[0]).includes(item.diagWarn!)),
+          `a diag.warn() contains "${item.diagWarn}"`
+        );
+      }
+      warnStub.restore();
     });
   }
 });
