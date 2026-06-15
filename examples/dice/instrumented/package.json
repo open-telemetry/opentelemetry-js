@@ -31,8 +31,8 @@
     "express": "^5.2.1",
     "winston": "^3.19.0",
     "@opentelemetry/api": "^1.9.0",
-    "@opentelemetry/sdk-node": "^0.218.0",
-    "@opentelemetry/instrumentation-http": "^0.218.0",
+    "@opentelemetry/sdk-node": "^0.219.0",
+    "@opentelemetry/instrumentation-http": "^0.219.0",
     "@opentelemetry/instrumentation-express": "^0.66.0",
     "@opentelemetry/instrumentation-winston": "^0.62.0",
     "@opentelemetry/winston-transport": "^0.28.0"
