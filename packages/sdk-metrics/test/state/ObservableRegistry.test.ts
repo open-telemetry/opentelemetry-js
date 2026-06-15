@@ -105,13 +105,11 @@ describe('ObservableRegistry', () => {
 
     it('should ignore callback without associated instruments', () => {
       observableRegistry.addBatchCallback(callback1, []);
-      // eslint-disable-next-line no-sparse-arrays
-      observableRegistry.addBatchCallback(callback1, [
-        1 /* hole */,
-        ,
-        undefined,
-        2,
-      ] as unknown as ObservableInstrument[]);
+      observableRegistry.addBatchCallback(
+        callback1,
+        // eslint-disable-next-line no-sparse-arrays
+        [1, , undefined, 2] as unknown as ObservableInstrument[]
+      );
 
       assert.strictEqual(observableRegistry['_batchCallbacks'].length, 0);
     });

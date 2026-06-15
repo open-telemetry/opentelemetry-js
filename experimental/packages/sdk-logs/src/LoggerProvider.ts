@@ -88,7 +88,7 @@ export class LoggerProvider implements ILoggerProvider {
         new Logger(instrumentationScope, this._sharedState)
       );
     }
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     return this._sharedState.loggers.get(key)!;
   }
 

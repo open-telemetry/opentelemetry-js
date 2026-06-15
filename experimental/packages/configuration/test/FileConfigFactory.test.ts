@@ -6,6 +6,7 @@
 import * as util from 'util';
 import * as assert from 'assert';
 import * as Sinon from 'sinon';
+import { diag } from '@opentelemetry/api';
 import type { ConfigurationModel } from '../src';
 import { createConfigFactory } from '../src/ConfigFactory';
 import {
@@ -17,6 +18,7 @@ import type { AttributeNameValue, TextMapPropagator } from '../src/generated/typ
 
 const defaultConfig: ConfigurationModel = {
   disabled: false,
+  log_level: 'info',
   resource: {},
   attribute_limits: {
     attribute_count_limit: 128,
@@ -1081,6 +1083,45 @@ describe('FileConfigFactory', function () {
       },
     };
     assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+  });
+
+  it('decodes percent-encoded keys and values in attributes_list', function () {
+    process.env.OTEL_CONFIG_FILE =
+      'test/fixtures/attributes-list-percent-encoded.yaml';
+    const configFactory = createConfigFactory();
+    const config = configFactory.getConfigModel();
+    assert.deepStrictEqual(config.resource?.attributes, [
+      { name: 'my,key', value: 'value=with=equals', type: 'string' },
+      { name: 'unicode', value: 'café', type: 'string' },
+    ]);
+  });
+
+  it('discards all entries when attributes_list has invalid percent-encoding', function () {
+    const warnStub = Sinon.stub(diag, 'warn');
+    process.env.OTEL_CONFIG_FILE =
+      'test/fixtures/attributes-list-invalid-encoding.yaml';
+    const configFactory = createConfigFactory();
+    const config = configFactory.getConfigModel();
+    assert.strictEqual(config.resource?.attributes, undefined);
+    assert.ok(
+      warnStub.args.some(args =>
+        String(args[0]).includes('Failed to percent-decode')
+      )
+    );
+    warnStub.restore();
+  });
+
+  it('discards all entries when attributes_list has unencoded `=` in value', function () {
+    const warnStub = Sinon.stub(diag, 'warn');
+    process.env.OTEL_CONFIG_FILE =
+      'test/fixtures/attributes-list-unencoded-equals.yaml';
+    const configFactory = createConfigFactory();
+    const config = configFactory.getConfigModel();
+    assert.strictEqual(config.resource?.attributes, undefined);
+    assert.ok(
+      warnStub.args.some(args => String(args[0]).includes('Invalid format'))
+    );
+    warnStub.restore();
   });
 
   it('leaves attribute type undefined when omitted in YAML', function () {

@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { diag } from '@opentelemetry/api';
 import { getStringFromEnv } from '@opentelemetry/core';
-import type { ConfigFactory } from './IConfigFactory';
 import * as fs from 'fs';
 import * as yaml from 'yaml';
-import { envVariableSubstitution } from './utils';
+import type { ConfigFactory } from './IConfigFactory';
+import { substituteEnvVars } from './utils';
 import type {
   AttributeNameValue,
   ConfigurationModel,
@@ -34,9 +35,9 @@ export function parseConfigFile(): ConfigurationModel {
   const configFile = getStringFromEnv('OTEL_CONFIG_FILE') || '';
   const file = fs.readFileSync(configFile, 'utf8');
 
-  // Apply env var substitution to all string values before schema parsing
-  const rawParsed = yaml.parse(file) as Record<string, unknown>;
-  const processed = substituteEnvVars(rawParsed) as Record<string, unknown>;
+  const doc = yaml.parseDocument(file, { version: '1.2' });
+  substituteEnvVars(doc);
+  const processed = doc.toJS() as Record<string, unknown>;
 
   const fileFormat = processed?.file_format;
   if (!fileFormat || !supportedFileVersionPattern.test(String(fileFormat))) {
@@ -92,13 +93,45 @@ export function mergeResourceAttributesConfig(
   const mergedAttrs = attributes ? attributes.slice() : [];
   const existingNames = new Set(mergedAttrs.map(a => a.name));
 
-  // TODO(6769): handle percent-encoding, also apply attr limts if any in config?
+  // TODO: handle attribute limits, if any
+  const discard = false;
+  const listAttrs: Record<string, string> = {};
   for (const pair of attributes_list.split(',')) {
-    const eqIdx = pair.indexOf('=');
-    if (eqIdx > 0) {
-      const name = pair.slice(0, eqIdx).trim();
-      const value = pair.slice(eqIdx + 1).trim();
-      if (name && !existingNames.has(name)) {
+    if (pair.trim() === '') continue;
+
+    const parts = pair.split('=');
+    if (parts.length !== 2) {
+      diag.warn(
+        `Invalid format for resource.attributes_list entry "${pair}": expected key=value with '=' percent-encoded in keys/values. Discarding all entries.`
+      );
+      discard = true;
+      break;
+    }
+
+    const rawName = parts[0].trim();
+    const rawValue = parts[1].trim();
+    if (rawName === '') {
+      diag.warn(
+        `Empty attribute name in resource.attributes_list entry "${pair}". Discarding all entries.`
+      );
+      discard = true;
+      break;
+    }
+
+    try {
+      listAttrs[decodeURIComponent(rawName)] = decodeURIComponent(rawValue);
+    } catch (e) {
+      diag.warn(
+        `Failed to percent-decode resource.attributes_list entry "${pair}", discarding all entries: ${e}`
+      );
+      discard = true;
+      break;
+    }
+  }
+
+  if (!discard) {
+    for (const [name, value] of Object.entries(listAttrs)) {
+      if (!existingNames.has(name)) {
         mergedAttrs.push({ name, value, type: 'string' });
       }
     }
@@ -136,39 +169,4 @@ export function mergePropagatorCompositeConfig(
   }
 
   return mergedComposite;
-}
-
-const ENV_VAR_PATTERN = /\$\{[^}]+\}/;
-
-function substituteEnvVars(obj: unknown): unknown {
-  if (typeof obj === 'string') {
-    // Only coerce if the string contained env var substitution syntax,
-    // so that plain YAML strings (e.g. quoted "1234") are not type-coerced.
-    const hasSubstitution = ENV_VAR_PATTERN.test(obj);
-    const substituted = envVariableSubstitution(obj);
-    return hasSubstitution ? yamlCoerce(substituted) : substituted;
-  }
-  if (Array.isArray(obj)) {
-    return obj.map(substituteEnvVars);
-  }
-  if (typeof obj === 'object' && obj !== null) {
-    return Object.fromEntries(
-      Object.entries(obj).map(([k, v]) => [k, substituteEnvVars(v)])
-    );
-  }
-  return obj;
-}
-
-/**
- * Re-coerce a string value to its YAML-equivalent primitive type.
- * Env var substitution always returns strings; this converts them back
- * to booleans/numbers/null where the schema expects those types.
- */
-function yamlCoerce(value: string): unknown {
-  if (value === 'true') return true;
-  if (value === 'false') return false;
-  if (value === 'null' || value === '') return null;
-  if (/^-?\d+$/.test(value)) return parseInt(value, 10);
-  if (/^-?\d+\.\d+$/.test(value)) return parseFloat(value);
-  return value;
 }

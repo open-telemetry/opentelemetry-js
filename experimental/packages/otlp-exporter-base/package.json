@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/otlp-exporter-base",
-  "version": "0.218.0",
+  "version": "0.219.0",
   "description": "OpenTelemetry OTLP Exporter base (for internal use only)",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -31,8 +31,8 @@
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
     "test": "nyc mocha 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
@@ -74,8 +74,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/core": "2.7.1",
-    "@opentelemetry/otlp-transformer": "0.218.0"
+    "@opentelemetry/core": "2.8.0",
+    "@opentelemetry/otlp-transformer": "0.219.0"
   },
   "devDependencies": {
     "@babel/core": "7.29.0",

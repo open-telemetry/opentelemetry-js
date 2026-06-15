@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-trace-otlp-grpc",
-  "version": "0.218.0",
+  "version": "0.219.0",
   "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -9,8 +9,8 @@
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc mocha 'test/**/*.test.ts'",
     "version": "node ../../../scripts/version-update.js",
@@ -62,12 +62,12 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.14.3",
-    "@opentelemetry/core": "2.7.1",
-    "@opentelemetry/otlp-exporter-base": "0.218.0",
-    "@opentelemetry/otlp-grpc-exporter-base": "0.218.0",
-    "@opentelemetry/otlp-transformer": "0.218.0",
-    "@opentelemetry/resources": "2.7.1",
-    "@opentelemetry/sdk-trace-base": "2.7.1"
+    "@opentelemetry/core": "2.8.0",
+    "@opentelemetry/otlp-exporter-base": "0.219.0",
+    "@opentelemetry/otlp-grpc-exporter-base": "0.219.0",
+    "@opentelemetry/otlp-transformer": "0.219.0",
+    "@opentelemetry/resources": "2.8.0",
+    "@opentelemetry/sdk-trace-base": "2.8.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-trace-otlp-grpc",
   "sideEffects": false
