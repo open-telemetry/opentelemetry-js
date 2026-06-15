@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "OpenTelemetry is a distributed tracing and stats collection framework.",
   "scripts": {
-    "precompile": "npm run submodule && nx run-many -t protos:generate && nx run-many -t version",
+    "precompile": "npm run submodule && nx run-many -t protos:generate",
     "compile": "nx run-many -t compile",
     "watch": "nx run-many -t watch",
     "clean": "nx run-many -t clean",
