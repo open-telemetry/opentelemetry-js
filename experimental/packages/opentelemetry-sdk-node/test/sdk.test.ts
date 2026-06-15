@@ -70,6 +70,7 @@ import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 
 import { NOOP_COUNTER_METRIC } from '../../../../api/src/metrics/NoopMeter';
 import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from '../src/semconv';
+import { NOOP_HISTOGRAM_METRIC } from '../../../../api/src/metrics/NoopMeter';
 
 function assertDefaultContextManagerRegistered() {
   assert.ok(
@@ -419,7 +420,7 @@ describe('Node SDK', () => {
       });
 
       const sdk = new NodeSDK({
-        metricReader: metricReader,
+        metricReaders: [metricReader],
         traceExporter: new ConsoleSpanExporter(),
         logRecordProcessors: [
           new SimpleLogRecordProcessor(new InMemoryLogRecordExporter()),
@@ -447,6 +448,10 @@ describe('Node SDK', () => {
       );
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+      assert.notDeepEqual(
+        (metricReader as any)._selfObsMetrics.collectionDuration,
+        NOOP_HISTOGRAM_METRIC
+      );
 
       await sdk.shutdown();
     });
@@ -460,7 +465,7 @@ describe('Node SDK', () => {
       });
 
       const sdk = new NodeSDK({
-        metricReader: metricReader,
+        metricReaders: [metricReader],
         traceExporter: new ConsoleSpanExporter(),
         logRecordProcessors: [
           new SimpleLogRecordProcessor(new InMemoryLogRecordExporter()),
@@ -488,6 +493,10 @@ describe('Node SDK', () => {
       );
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+      assert.deepEqual(
+        (metricReader as any)._selfObsMetrics.collectionDuration,
+        NOOP_HISTOGRAM_METRIC
+      );
 
       await sdk.shutdown();
     });

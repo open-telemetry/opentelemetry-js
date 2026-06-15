@@ -42,6 +42,7 @@ const ignoredLernaProjects = [
   'examples/http',
   'examples/https',
   'examples/esm-http-ts',
+  'examples/dice/*',
   'bundler-tests/browser/*'
 ];
 

@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "outDir": "build",
+    "skipLibCheck": true,
+    "target": "ES2022",
+  },
+  "include": ["*.ts"]
+}
