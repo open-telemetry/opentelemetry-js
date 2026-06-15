@@ -14,7 +14,10 @@ import {
   mergePropagatorCompositeConfig,
   parseConfigFile,
 } from '../src/FileConfigFactory';
-import type { AttributeNameValue, TextMapPropagator } from '../src/generated/types';
+import type {
+  AttributeNameValue,
+  TextMapPropagator,
+} from '../src/generated/types';
 
 const defaultConfig: ConfigurationModel = {
   disabled: false,
