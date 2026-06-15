@@ -7,7 +7,10 @@ export default defineConfig({
   format: ['esm', 'cjs'],
   clean: true,
   publint: true,
-  dts: true,
+  // Keep JS sourcemaps but disable declaration maps; the top-level `sourcemap`
+  // otherwise propagates to rolldown-plugin-dts, emitting broken `.d.ts.map`
+  // files (SOURCEMAP_BROKEN warning).
+  dts: { sourcemap: false },
   sourcemap: true,
   target: 'es2022',
   unbundle: true,
