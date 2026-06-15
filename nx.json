@@ -23,7 +23,8 @@
         "{projectRoot}/test/**/*.ts",
         "{projectRoot}/**/*.proto",
         "{projectRoot}/package.json",
-        "{projectRoot}/tsdown*.config.ts",
+        "{projectRoot}/tsdown.config.ts",
+        "{projectRoot}/tsdown.*.config.ts",
         "{workspaceRoot}/tsdown.config.ts",
         "{workspaceRoot}/package-lock.json"
       ],
