@@ -99,6 +99,7 @@
     "examples/opentelemetry-web",
     "examples/http",
     "examples/https",
-    "examples/esm-http-ts"
+    "examples/esm-http-ts",
+    "examples/dice/*"
   ]
 }

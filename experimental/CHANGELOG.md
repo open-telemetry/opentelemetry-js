@@ -12,6 +12,10 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(configuration): percent-decode keys and values in `resource.attributes_list` per spec [#6787](https://github.com/open-telemetry/opentelemetry-js/pull/6787) @MikeGoldsmith
+* fix(sdk-node): apply spec-defined `schedule_delay: 1000` default for BatchLogRecordProcessor from declarative config (SDK defaults to 5000) [#6788](https://github.com/open-telemetry/opentelemetry-js/pull/6788) @MikeGoldsmith
+* fix(configuration): default `log_level` to `info` in env-based config initialization for consistency with file-based config [#6788](https://github.com/open-telemetry/opentelemetry-js/pull/6788) @MikeGoldsmith
+
 ### :books: Documentation
 
 ### :house: Internal
