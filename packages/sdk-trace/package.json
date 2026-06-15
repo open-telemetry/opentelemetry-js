@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sdk-trace",
-  "version": "2.7.1",
+  "version": "2.8.0",
   "description": "OpenTelemetry Tracing",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
