@@ -1150,7 +1150,7 @@ describe('mergeResourceAttributesConfig', function () {
     attributes?: AttributeNameValue[];
     attributes_list?: string | null;
     expected: AttributeNameValue[] | undefined;
-    diagWarn?: string,
+    diagWarn?: string;
     only?: boolean;
   }[] = [
     { expected: undefined },
