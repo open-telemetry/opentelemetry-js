@@ -166,12 +166,20 @@ function collectEntries(pkg) {
   return out;
 }
 
+// Package name of a bare specifier, keeping the scope for `@scope/pkg`.
+function pkgName(spec) {
+  const parts = spec.split('/');
+  return spec.startsWith('@') ? parts.slice(0, 2).join('/') : parts[0];
+}
+
 // Classify a require/import failure: packaging bug or environmental.
-// npm pack doesn't install dependencies, so a *declared* dependency's bare
-// entry point failing to resolve is environmental (logged as a skip).
-// Everything else is a bug: relative or in-tarball absolute paths (file missing
-// from the tarball), self-references (broken own exports map), undeclared bare
-// specifiers, and deep subpath imports into a dep (e.g. a stale `dep/build/x`).
+// npm pack doesn't install dependencies, so any entry point of a *declared*
+// dependency failing to resolve is environmental (logged as a skip), including
+// deep subpath imports (e.g. `jaeger-client/dist/src/...`) -- an unpacked dep is
+// equally unresolvable whether the subpath is stale or valid, so we can't tell
+// them apart here and don't flag either. Everything else is a bug: relative or
+// in-tarball absolute paths (file missing from the tarball), self-references
+// (broken own exports map), and undeclared bare specifiers.
 function handleLoadError(err, pkg, context) {
   const msg = String(err?.message ?? '');
   const m = /Cannot find (?:package|module) '([^']+)'/.exec(msg);
@@ -184,8 +192,8 @@ function handleLoadError(err, pkg, context) {
       ...pkg.peerDependencies,
       ...pkg.optionalDependencies,
     });
-    // Exact match only: a deep import (`dep/sub`) into a dep is a real bug.
-    const isDeclaredDep = declared.includes(spec);
+    // Match the package portion so deep subpaths (`dep/sub`) count as `dep`.
+    const isDeclaredDep = declared.includes(pkgName(spec));
     if (!isPathSpec && !isSelfRef && isDeclaredDep) {
       console.log(`  skip ${context} cannot resolve declared dep "${spec}" (not packed)`);
       return;
