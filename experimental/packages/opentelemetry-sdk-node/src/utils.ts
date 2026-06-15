@@ -708,7 +708,10 @@ export function getLogRecordProcessorsFromConfiguration(
             maxQueueSize: processor.batch.max_queue_size ?? undefined,
             maxExportBatchSize:
               processor.batch.max_export_batch_size ?? undefined,
-            scheduledDelayMillis: processor.batch.schedule_delay ?? undefined,
+            // The SDK's BatchLogRecordProcessor defaults schedule_delay to
+            // 5000ms (same as BSP), but the OTel config spec says BLRP
+            // defaults to 1000ms. Apply the spec-defined default here.
+            scheduledDelayMillis: processor.batch.schedule_delay ?? 1000,
             exportTimeoutMillis: processor.batch.export_timeout ?? undefined,
           })
         );
