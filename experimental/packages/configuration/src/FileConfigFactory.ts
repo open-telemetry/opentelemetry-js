@@ -5,10 +5,10 @@
 
 import { diag } from '@opentelemetry/api';
 import { getStringFromEnv } from '@opentelemetry/core';
-import type { ConfigFactory } from './IConfigFactory';
 import * as fs from 'fs';
 import * as yaml from 'yaml';
-import { envVariableSubstitution } from './utils';
+import type { ConfigFactory } from './IConfigFactory';
+import { substituteEnvVars } from './utils';
 import type {
   BatchLogRecordProcessor,
   BatchSpanProcessor,
@@ -37,9 +37,9 @@ export function parseConfigFile(): ConfigurationModel {
   const configFile = getStringFromEnv('OTEL_CONFIG_FILE') || '';
   const file = fs.readFileSync(configFile, 'utf8');
 
-  // Apply env var substitution to all string values before schema parsing
-  const rawParsed = yaml.parse(file) as Record<string, unknown>;
-  const processed = substituteEnvVars(rawParsed) as Record<string, unknown>;
+  const doc = yaml.parseDocument(file, { version: '1.2' });
+  substituteEnvVars(doc);
+  const processed = doc.toJS() as Record<string, unknown>;
 
   const fileFormat = processed?.file_format;
   if (!fileFormat || !supportedFileVersionPattern.test(String(fileFormat))) {
@@ -261,39 +261,4 @@ function applyConfigDefaults(data: ConfigurationModel): void {
   } else if (data.attribute_limits.attribute_count_limit == null) {
     data.attribute_limits.attribute_count_limit = 128;
   }
-}
-
-const ENV_VAR_PATTERN = /\$\{[^}]+\}/;
-
-function substituteEnvVars(obj: unknown): unknown {
-  if (typeof obj === 'string') {
-    // Only coerce if the string contained env var substitution syntax,
-    // so that plain YAML strings (e.g. quoted "1234") are not type-coerced.
-    const hasSubstitution = ENV_VAR_PATTERN.test(obj);
-    const substituted = envVariableSubstitution(obj);
-    return hasSubstitution ? yamlCoerce(substituted) : substituted;
-  }
-  if (Array.isArray(obj)) {
-    return obj.map(substituteEnvVars);
-  }
-  if (typeof obj === 'object' && obj !== null) {
-    return Object.fromEntries(
-      Object.entries(obj).map(([k, v]) => [k, substituteEnvVars(v)])
-    );
-  }
-  return obj;
-}
-
-/**
- * Re-coerce a string value to its YAML-equivalent primitive type.
- * Env var substitution always returns strings; this converts them back
- * to booleans/numbers/null where the schema expects those types.
- */
-function yamlCoerce(value: string): unknown {
-  if (value === 'true') return true;
-  if (value === 'false') return false;
-  if (value === 'null' || value === '') return null;
-  if (/^-?\d+$/.test(value)) return parseInt(value, 10);
-  if (/^-?\d+\.\d+$/.test(value)) return parseFloat(value);
-  return value;
 }

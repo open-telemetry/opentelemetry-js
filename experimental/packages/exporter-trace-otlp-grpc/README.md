@@ -179,7 +179,7 @@ The OTLPTraceExporter has a timeout configuration option which is the maximum ti
 By default no compression will be used. To use compression, set it programmatically in `collectorOptions` or with environment variables. Supported compression options: `gzip` and `none`.
 
 ```js
-const { CompressionAlgorithm } = require('@opentelemetry/exporter-trace-otlp-grpc');
+const { CompressionAlgorithm } = require('@opentelemetry/otlp-exporter-base');
 
 const collectorOptions = {
   // url is optional and can be omitted - default is http://localhost:4317
