@@ -4,12 +4,12 @@
  */
 
 import { getNumberFromEnv } from '@opentelemetry/core';
+import type { SpanExporter } from '@opentelemetry/sdk-trace';
+import { BatchSpanProcessor as BatchSpanProcessNoEnvConfig } from '@opentelemetry/sdk-trace';
 import type {
   BatchSpanProcessorBrowserConfig,
   BufferConfig,
-  SpanExporter,
-} from '@opentelemetry/sdk-trace';
-import { BatchSpanProcessor as BatchSpanProcessNoEnvConfig } from '@opentelemetry/sdk-trace';
+} from './types-shim';
 
 /**
  * A BatchSpanProcessor that applies `OTEL_*` environment variable fallbacks per
@@ -38,6 +38,6 @@ export class BatchSpanProcessor extends BatchSpanProcessNoEnvConfig {
       }
     }
 
-    super(exporter, config);
+    super({ exporter, ...config });
   }
 }

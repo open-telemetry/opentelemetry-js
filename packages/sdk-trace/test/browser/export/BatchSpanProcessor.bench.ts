@@ -27,7 +27,7 @@ class NoopExporter implements SpanExporter {
 }
 
 const tracerProvider = new TracerProvider({
-  spanProcessors: [new BatchSpanProcessor(new NoopExporter())],
+  spanProcessors: [new BatchSpanProcessor({ exporter: new NoopExporter() })],
 });
 const tracer = tracerProvider.getTracer('test');
 

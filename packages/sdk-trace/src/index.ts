@@ -21,8 +21,8 @@ export type { Span } from './Span';
 export type { SpanProcessor } from './SpanProcessor';
 export type { TimedEvent } from './TimedEvent';
 export type {
-  BatchSpanProcessorBrowserConfig,
-  BufferConfig,
+  BatchSpanProcessorOptions,
+  BatchSpanProcessorBrowserOptions,
   SpanLimits,
   TracerProviderOptions,
 } from './types';

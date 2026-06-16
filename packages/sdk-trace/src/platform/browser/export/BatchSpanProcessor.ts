@@ -4,25 +4,21 @@
  */
 
 import { BatchSpanProcessorBase } from '../../../export/BatchSpanProcessorBase';
-import type { SpanExporter } from '../../../export/SpanExporter';
-import type { BatchSpanProcessorBrowserConfig } from '../../../types';
+import type { BatchSpanProcessorBrowserOptions } from '../../../types';
 import { globalErrorHandler } from '@opentelemetry/core';
 
-export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcessorBrowserConfig> {
+export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcessorBrowserOptions> {
   private _visibilityChangeListener?: () => void;
   private _pageHideListener?: () => void;
 
-  constructor(
-    _exporter: SpanExporter,
-    config?: BatchSpanProcessorBrowserConfig
-  ) {
-    super(_exporter, config);
-    this.onInit(config);
+  constructor(options: BatchSpanProcessorBrowserOptions) {
+    super(options);
+    this.onInit(options);
   }
 
-  private onInit(config?: BatchSpanProcessorBrowserConfig): void {
+  private onInit(options: BatchSpanProcessorBrowserOptions): void {
     if (
-      config?.disableAutoFlushOnDocumentHide !== true &&
+      options?.disableAutoFlushOnDocumentHide !== true &&
       typeof document !== 'undefined'
     ) {
       this._visibilityChangeListener = () => {

@@ -5,6 +5,8 @@
 
 export { BasicTracerProvider } from './BasicTracerProvider-shim';
 export type {
+  BufferConfig,
+  BatchSpanProcessorBrowserConfig,
   GeneralLimits,
   TracerConfig,
   SDKRegistrationConfig,
@@ -31,8 +33,6 @@ export type {
   Span,
   SpanProcessor,
   TimedEvent,
-  BatchSpanProcessorBrowserConfig,
-  BufferConfig,
   SpanLimits,
   IdGenerator,
 } from '@opentelemetry/sdk-trace';
