@@ -14,6 +14,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(sdk-metrics): add `maxScale` option to `ExponentialHistogramAggregation` to allow limiting the scale of exponential histograms. **Breaking:** `ExponentialHistogramAccumulation` constructor parameters reordered — `maxScale` now comes before `recordMinMax`. Any code that passed positional arguments beyond `maxSize` will need to be updated. [#6493](https://github.com/open-telemetry/opentelemetry-js/pull/6493) @andidev
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
