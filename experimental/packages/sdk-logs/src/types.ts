@@ -112,7 +112,7 @@ export interface BufferConfig {
   maxExportBatchSize?: number;
 
   /** The delay interval in milliseconds between two consecutive exports.
-   *  The default value is 5000ms. */
+   *  The default value is 1000ms. */
   scheduledDelayMillis?: number;
 
   /** How long the export can run before it is cancelled.

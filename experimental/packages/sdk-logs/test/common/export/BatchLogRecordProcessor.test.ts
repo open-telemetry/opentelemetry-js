@@ -113,7 +113,7 @@ describe('BatchLogRecordProcessorBase', () => {
       assert.ok(processor instanceof BatchLogRecordProcessor);
       assert.strictEqual(processor['_maxExportBatchSize'], 512);
       assert.strictEqual(processor['_maxQueueSize'], 2048);
-      assert.strictEqual(processor['_scheduledDelayMillis'], 5000);
+      assert.strictEqual(processor['_scheduledDelayMillis'], 1000);
       assert.strictEqual(processor['_exportTimeoutMillis'], 30000);
       processor.shutdown();
     });
