@@ -292,7 +292,6 @@ function createExpectedMultiResourceSpanProtobuf() {
     kind: ESpanKind.SPAN_KIND_CLIENT,
     links: [
       {
-        droppedAttributesCount: 0,
         spanId: linkSpanId,
         traceId: linkTraceId,
         traceState: 'link=foo',
@@ -309,7 +308,6 @@ function createExpectedMultiResourceSpanProtobuf() {
     endTimeUnixNano: endTime,
     events: [
       {
-        droppedAttributesCount: 0,
         attributes: [
           {
             key: 'event-attribute',
@@ -326,9 +324,6 @@ function createExpectedMultiResourceSpanProtobuf() {
         value: { stringValue: 'some attribute value' },
       },
     ],
-    droppedAttributesCount: 0,
-    droppedEventsCount: 0,
-    droppedLinksCount: 0,
     status: {
       code: EStatusCode.STATUS_CODE_OK,
     },
@@ -345,7 +340,6 @@ function createExpectedMultiResourceSpanProtobuf() {
               value: { stringValue: 'resource attribute value' },
             },
           ],
-          droppedAttributesCount: 0,
         },
         scopeSpans: [
           {
@@ -367,7 +361,6 @@ function createExpectedMultiResourceSpanProtobuf() {
               value: { stringValue: 'another resource value' },
             },
           ],
-          droppedAttributesCount: 0,
         },
         scopeSpans: [
           {
