@@ -12,6 +12,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(sdk-node): pass all config properties (endpoint, headers, timeout, TLS, compression, temporality preference, default histogram aggregation) to OTLP metric exporters in declarative config [#6665](https://github.com/open-telemetry/opentelemetry-js/issues/6665) @MikeGoldsmith
 * fix(sdk-logs): default BatchLogRecordProcessor `scheduleDelayMillis` is 1000
 * fix(configuration): percent-decode keys and values in `resource.attributes_list` per spec [#6787](https://github.com/open-telemetry/opentelemetry-js/pull/6787) @MikeGoldsmith
 * fix(sdk-node): apply spec-defined `schedule_delay: 1000` default for BatchLogRecordProcessor from declarative config (SDK defaults to 5000) [#6788](https://github.com/open-telemetry/opentelemetry-js/pull/6788) @MikeGoldsmith

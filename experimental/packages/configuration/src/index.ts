@@ -8,6 +8,8 @@ export type {
   ConfigurationModel,
   LogRecordExporter as LogRecordExporterConfigModel,
   PushMetricExporter as PushMetricExporterConfigModel,
+  OtlpHttpMetricExporter as OtlpHttpMetricExporterConfigModel,
+  OtlpGrpcMetricExporter as OtlpGrpcMetricExporterConfigModel,
   InstrumentType as InstrumentTypeConfigModel,
   Aggregation as AggregationConfigModel,
   PeriodicMetricReader as PeriodicMetricReaderConfigModel,

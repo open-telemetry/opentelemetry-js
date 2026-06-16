@@ -10,6 +10,7 @@ import {
   getLoggerProviderConfigFromEnv,
   getBatchLogRecordProcessorConfigFromEnv,
   getPeriodicMetricReaderFromConfiguration,
+  getMetricExporter,
   getInstrumentType,
   getAggregationType,
   getResourceDetectorsFromConfiguration,
@@ -25,7 +26,11 @@ import type {
   InstrumentTypeConfigModel,
   ConfigurationModel,
   HttpTlsConfigModel,
+  PushMetricExporterConfigModel,
 } from '@opentelemetry/configuration';
+import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
+import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
+import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
 import {
   envDetector,
   hostDetector,
@@ -34,7 +39,12 @@ import {
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 import type { LoggerProviderOptions } from '@opentelemetry/sdk-logs';
-import { AggregationType, InstrumentType } from '@opentelemetry/sdk-metrics';
+import {
+  AggregationTemporality,
+  AggregationType,
+  ConsoleMetricExporter,
+  InstrumentType,
+} from '@opentelemetry/sdk-metrics';
 import type { SpanLimits } from '@opentelemetry/sdk-trace-node';
 
 describe('getPropagatorFromEnv', function () {
@@ -515,6 +525,113 @@ describe('getBatchLogRecordProcessorConfigFromEnv', function () {
     assert.deepStrictEqual(getAggregationType({ sum: {} }), {
       type: AggregationType.SUM,
     });
+  });
+});
+
+describe('getMetricExporter', function () {
+  afterEach(function () {
+    sinon.restore();
+  });
+
+  it('creates an OTLP http/protobuf exporter by default', function () {
+    const exporter = getMetricExporter({ otlp_http: {} });
+    assert.ok(exporter instanceof OTLPProtoMetricExporter);
+  });
+
+  it('creates an OTLP http/json exporter when encoding is json', function () {
+    const exporter = getMetricExporter({
+      otlp_http: { encoding: 'json' },
+    });
+    assert.ok(exporter instanceof OTLPHttpMetricExporter);
+  });
+
+  it('creates an OTLP gRPC exporter', function () {
+    const exporter = getMetricExporter({ otlp_grpc: {} });
+    assert.ok(exporter instanceof OTLPGrpcMetricExporter);
+  });
+
+  it('creates a console exporter', function () {
+    const exporter = getMetricExporter({ console: {} });
+    assert.ok(exporter instanceof ConsoleMetricExporter);
+  });
+
+  it('warns and returns undefined for an unsupported exporter', function () {
+    const warnStub = sinon.stub(diag, 'warn');
+    const exporter = getMetricExporter(
+      {} as unknown as PushMetricExporterConfigModel
+    );
+    assert.strictEqual(exporter, undefined);
+    sinon.assert.calledWithExactly(warnStub, 'Unsupported Metric Exporter.');
+  });
+
+  it('warns and returns undefined for an unsupported encoding', function () {
+    const warnStub = sinon.stub(diag, 'warn');
+    const exporter = getMetricExporter({
+      otlp_http: { encoding: 'invalid' },
+    } as unknown as PushMetricExporterConfigModel);
+    assert.strictEqual(exporter, undefined);
+    sinon.assert.calledWithExactly(
+      warnStub,
+      'Unsupported OTLP metrics encoding: invalid.'
+    );
+  });
+
+  it('maps temporality_preference onto the OTLP http exporter', function () {
+    const exporter = getMetricExporter({
+      otlp_http: { temporality_preference: 'delta' },
+    }) as OTLPProtoMetricExporter;
+    // delta uses DELTA temporality for counters
+    assert.strictEqual(
+      exporter.selectAggregationTemporality(InstrumentType.COUNTER),
+      AggregationTemporality.DELTA
+    );
+    // ...but cumulative for up-down counters
+    assert.strictEqual(
+      exporter.selectAggregationTemporality(InstrumentType.UP_DOWN_COUNTER),
+      AggregationTemporality.CUMULATIVE
+    );
+  });
+
+  it('maps temporality_preference onto the OTLP gRPC exporter', function () {
+    const exporter = getMetricExporter({
+      otlp_grpc: { temporality_preference: 'low_memory' },
+    }) as OTLPGrpcMetricExporter;
+    // low_memory uses DELTA for counters and histograms
+    assert.strictEqual(
+      exporter.selectAggregationTemporality(InstrumentType.COUNTER),
+      AggregationTemporality.DELTA
+    );
+    assert.strictEqual(
+      exporter.selectAggregationTemporality(InstrumentType.OBSERVABLE_GAUGE),
+      AggregationTemporality.CUMULATIVE
+    );
+  });
+
+  it('maps default_histogram_aggregation to exponential for histograms only', function () {
+    const exporter = getMetricExporter({
+      otlp_http: {
+        default_histogram_aggregation: 'base2_exponential_bucket_histogram',
+      },
+    }) as OTLPProtoMetricExporter;
+    assert.deepStrictEqual(
+      exporter.selectAggregation(InstrumentType.HISTOGRAM),
+      { type: AggregationType.EXPONENTIAL_HISTOGRAM }
+    );
+    assert.deepStrictEqual(exporter.selectAggregation(InstrumentType.COUNTER), {
+      type: AggregationType.DEFAULT,
+    });
+  });
+
+  it('maps default_histogram_aggregation explicit_bucket_histogram', function () {
+    const exporter = getMetricExporter({
+      otlp_grpc: {
+        default_histogram_aggregation: 'explicit_bucket_histogram',
+      },
+    }) as OTLPGrpcMetricExporter;
+    assert.deepStrictEqual(
+      exporter.selectAggregation(InstrumentType.HISTOGRAM),
+      { type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM }
+    );
   });
 });
 
