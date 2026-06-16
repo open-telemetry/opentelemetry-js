@@ -142,7 +142,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
     this._exporter = exporter;
     this._maxExportBatchSize = config?.maxExportBatchSize ?? 512;
     this._maxQueueSize = config?.maxQueueSize ?? 2048;
-    this._scheduledDelayMillis = config?.scheduledDelayMillis ?? 5000;
+    this._scheduledDelayMillis = config?.scheduledDelayMillis ?? 1000;
     this._exportTimeoutMillis = config?.exportTimeoutMillis ?? 30000;
 
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
