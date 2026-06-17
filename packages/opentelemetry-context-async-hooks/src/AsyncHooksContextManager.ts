@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Context } from '@opentelemetry/api';
+import type { Context, Token } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
 import * as asyncHooks from 'async_hooks';
 import { AbstractAsyncHooksContextManager } from './AbstractAsyncHooksContextManager';
@@ -49,6 +49,22 @@ export class AsyncHooksContextManager extends AbstractAsyncHooksContextManager {
     this._asyncHook.enable();
     return this;
   }
+
+  /**
+   * Not supported by this deprecated context manager: `async_hooks` has no
+   * imperative "enter and stay" primitive, so this is a no-op that does not
+   * change the active context. Use
+   * {@link AsyncLocalStorageContextManager} instead, which fully supports
+   * `attach()`/`detach()`.
+   */
+  attach(_context: Context): Token {
+    return ROOT_CONTEXT as unknown as Token;
+  }
+
+  /**
+   * No-op. @see {@link attach}
+   */
+  detach(_token: Token): void {}
 
   disable(): this {
     this._asyncHook.disable();

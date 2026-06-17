@@ -4,13 +4,23 @@
  */
 
 /// <reference types="zone.js" />
-import type { Context, ContextManager } from '@opentelemetry/api';
+import type { Context, ContextManager, Token } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
 import type { TargetWithEvents } from './types';
 import { isListenerObject } from './util';
 
 /* Key name to be used to save a context reference in Zone */
 const ZONE_CONTEXT_KEY = 'OT_ZONE_CONTEXT';
+/* Key name to be used to save the sequence number of a Zone context. It is used
+ * to determine recency relative to imperatively attached contexts. */
+const ZONE_CONTEXT_SEQ_KEY = 'OT_ZONE_CONTEXT_SEQ';
+
+/* An imperatively attached context together with the sequence number assigned at
+ * attach time, used by active() to resolve precedence against Zone contexts. */
+interface AttachedContext {
+  context: Context;
+  seq: number;
+}
 
 /**
  * ZoneContextManager
@@ -26,6 +36,20 @@ export class ZoneContextManager implements ContextManager {
    * whether the context manager is enabled or not
    */
   private _enabled = false;
+
+  /**
+   * Monotonically increasing counter used to order contexts established via
+   * `with()` (stored on the Zone) and via `attach()` (stored on the manager),
+   * so that `active()` can return whichever was established most recently.
+   */
+  private _seq = 0;
+
+  /**
+   * Stack of contexts attached imperatively via `attach()`. This state is
+   * manager-global and therefore not isolated across concurrent asynchronous
+   * Zones - see the note on `attach()`.
+   */
+  private _attachedContexts: AttachedContext[] = [];
 
   /**
    * @param context A context (span) to be executed within target function
@@ -85,6 +109,7 @@ export class ZoneContextManager implements ContextManager {
       name: zoneName,
       properties: {
         [ZONE_CONTEXT_KEY]: context,
+        [ZONE_CONTEXT_SEQ_KEY]: ++this._seq,
       },
       onCancelTask(
         parentZoneDelegate: ZoneDelegate,
@@ -159,6 +184,18 @@ export class ZoneContextManager implements ContextManager {
     if (!this._enabled || !Zone.current) {
       return ROOT_CONTEXT;
     }
+    // Prefer an imperatively attached context over the current Zone context when
+    // it was established more recently (higher sequence number). A Zone without a
+    // sequence (e.g. the root Zone) is treated as older than any attached context.
+    const attached = this._attachedContexts[this._attachedContexts.length - 1];
+    if (attached) {
+      const zoneSeq = Zone.current.get(ZONE_CONTEXT_SEQ_KEY) as
+        | number
+        | undefined;
+      if (zoneSeq === undefined || attached.seq > zoneSeq) {
+        return attached.context;
+      }
+    }
     return Zone.current.get(ZONE_CONTEXT_KEY) || ROOT_CONTEXT;
   }
 
@@ -182,7 +219,48 @@ export class ZoneContextManager implements ContextManager {
    */
   disable(): this {
     this._enabled = false;
+    this._attachedContexts = [];
     return this;
+  }
+
+  /**
+   * Sets the given context as the active one and returns a token that can be
+   * used to restore the previous context via {@link detach}.
+   *
+   * This is a best-effort implementation. Unlike {@link with}, which relies on
+   * Zone.js to propagate context across asynchronous boundaries, `attach` stores
+   * the context on the manager itself and is therefore **not isolated across
+   * concurrent asynchronous Zones**. It is intended for synchronous scopes (and
+   * for bridging callback boundaries that `with` cannot wrap). When guaranteed
+   * propagation across asynchronous operations is required, prefer
+   * {@link with}/{@link bind}.
+   *
+   * Every `attach` call must be paired with a {@link detach} call to avoid
+   * context leaks. `detach` may be called in any order relative to other
+   * `attach`/`detach` pairs.
+   *
+   * @param context the context to set as active
+   * @returns a token identifying the attached context
+   */
+  attach(context: Context): Token {
+    const attached: AttachedContext = { context, seq: ++this._seq };
+    this._attachedContexts.push(attached);
+    return attached as unknown as Token;
+  }
+
+  /**
+   * Restores the active context to the value it had before the corresponding
+   * {@link attach} call. Tokens that were never attached (or were already
+   * detached) are ignored.
+   *
+   * @param token a token returned by a previous call to {@link attach}
+   */
+  detach(token: Token): void {
+    const attached = token as unknown as AttachedContext;
+    const index = this._attachedContexts.lastIndexOf(attached);
+    if (index !== -1) {
+      this._attachedContexts.splice(index, 1);
+    }
   }
 
   /**

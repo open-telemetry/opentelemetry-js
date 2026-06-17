@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Context, ContextManager } from '@opentelemetry/api';
+import type { Context, ContextManager, Token } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
 
 /**
@@ -111,5 +111,35 @@ export class StackContextManager implements ContextManager {
     } finally {
       this._currentContext = previousContext;
     }
+  }
+
+  /**
+   * Sets the given context as the active one and returns a token that can be
+   * used to restore the previous context via {@link detach}.
+   *
+   * Unlike {@link with}, `attach` does not automatically restore the previous
+   * context, so every `attach` call must be paired with a {@link detach} call to
+   * avoid context leaks.
+   *
+   * This manager is fully synchronous and does not propagate context across
+   * asynchronous boundaries (the same limitation as {@link with}).
+   *
+   * @param context the context to set as active
+   * @returns a token holding the previously active context
+   */
+  attach(context: Context): Token {
+    const previousContext = this._currentContext;
+    this._currentContext = context ?? ROOT_CONTEXT;
+    return previousContext as unknown as Token;
+  }
+
+  /**
+   * Restores the active context to the value it had before the corresponding
+   * {@link attach} call.
+   *
+   * @param token a token returned by a previous call to {@link attach}
+   */
+  detach(token: Token): void {
+    this._currentContext = (token as unknown as Context) ?? ROOT_CONTEXT;
   }
 }

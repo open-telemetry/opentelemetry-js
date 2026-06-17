@@ -690,6 +690,20 @@ for (const contextManagerClass of [
           contextManager.enable();
         });
       });
+    } else {
+      describe('.attach() and .detach()', () => {
+        it('should be a no-op on the deprecated AsyncHooksContextManager', () => {
+          const context1 = ROOT_CONTEXT.setValue(key1, 1);
+          assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+
+          const token1 = contextManager.attach(context1);
+          // not supported: active context must remain unchanged
+          assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+
+          assert.doesNotThrow(() => contextManager.detach(token1));
+          assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+        });
+      });
     }
   });
 }

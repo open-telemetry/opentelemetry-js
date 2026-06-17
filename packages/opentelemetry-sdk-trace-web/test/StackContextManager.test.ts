@@ -214,4 +214,56 @@ describe('StackContextManager', function () {
       fn();
     });
   });
+
+  describe('.attach()/.detach()', function () {
+    it('should set the attached context as active and restore on detach', function () {
+      const context = ROOT_CONTEXT.setValue(key1, 1);
+      const token = contextManager.attach(context);
+      assert.strictEqual(
+        contextManager.active(),
+        context,
+        'attached context should be active'
+      );
+      contextManager.detach(token);
+      assert.strictEqual(
+        contextManager.active(),
+        ROOT_CONTEXT,
+        'previous context should be restored'
+      );
+    });
+
+    it('should support nested attach/detach (LIFO)', function () {
+      const ctx1 = ROOT_CONTEXT.setValue(key1, 1);
+      const ctx2 = ROOT_CONTEXT.setValue(key1, 2);
+      const token1 = contextManager.attach(ctx1);
+      const token2 = contextManager.attach(ctx2);
+      assert.strictEqual(contextManager.active(), ctx2);
+      contextManager.detach(token2);
+      assert.strictEqual(contextManager.active(), ctx1);
+      contextManager.detach(token1);
+      assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+    });
+
+    it('should restore the with() context when attaching inside with()', function () {
+      const withCtx = ROOT_CONTEXT.setValue(key1, 'with');
+      const attachedCtx = ROOT_CONTEXT.setValue(key1, 'attached');
+      contextManager.with(withCtx, () => {
+        const token = contextManager.attach(attachedCtx);
+        assert.strictEqual(contextManager.active(), attachedCtx);
+        contextManager.detach(token);
+        assert.strictEqual(
+          contextManager.active(),
+          withCtx,
+          'with() context should be restored after detach'
+        );
+      });
+      assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+    });
+
+    it('should default to ROOT_CONTEXT when detaching with a null-like token', function () {
+      contextManager.attach(ROOT_CONTEXT.setValue(key1, 1));
+      contextManager.detach(undefined as any);
+      assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+    });
+  });
 });

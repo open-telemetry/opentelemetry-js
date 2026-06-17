@@ -81,22 +81,36 @@ export interface ContextManager {
   disable(): this;
 
   /**
-   * Associates a Context with the caller's current execution unit.
-   * This is an optional global operation that allows context to be set
-   * imperatively rather than using with().
+   * Associates a Context with the caller's current execution unit. This allows
+   * context to be set imperatively rather than via the callback-scoped with().
+   * It is primarily intended for bridging callback boundaries that with() cannot
+   * wrap, such as Node.js `diagnostics_channel` tracing-channel subscribers.
+   *
+   * NOTE: support is **best-effort and varies by ContextManager**. Some
+   * implementations propagate the attached context across asynchronous boundaries
+   * (e.g. AsyncLocalStorageContextManager); others only provide synchronous
+   * best-effort with no isolation across concurrent async operations (e.g.
+   * ZoneContextManager); and some are a no-op (e.g. the NoopContextManager and the
+   * deprecated AsyncHooksContextManager). When guaranteed propagation across
+   * asynchronous operations is required, prefer with()/bind().
+   *
+   * Every attach() call must be paired with a detach() call to avoid context
+   * leaks.
    *
    * @param context The Context to attach
    * @returns A Token that can be used to restore the previous Context
    * @since 1.10.0
    */
-  attach?(context: Context): Token;
+  attach(context: Context): Token;
 
   /**
    * Restores the Context associated with the caller's current execution unit
    * to the value it had before the corresponding attach() call.
    *
+   * As with attach(), support is best-effort and varies by ContextManager.
+   *
    * @param token A Token returned by a previous call to attach()
    * @since 1.10.0
    */
-  detach?(token: Token): void;
+  detach(token: Token): void;
 }

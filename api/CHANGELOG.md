@@ -7,7 +7,11 @@ All notable changes to this project will be documented in this file.
 
 ### :boom: Breaking Changes
 
+* feat(api): `attach`/`detach` are now required methods on the `ContextManager` interface. Custom `ContextManager` implementations must now provide them (support may be best-effort or a no-op depending on the implementation). @pichlermarc
+
 ### :rocket: Features
+
+* feat(api): add imperative `context.attach`/`context.detach` for setting context across callback boundaries that `with()` cannot wrap (e.g. `diagnostics_channel` tracing-channel subscribers). @pichlermarc
 
 ### :bug: Bug Fixes
 

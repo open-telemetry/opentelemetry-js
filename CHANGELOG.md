@@ -14,6 +14,10 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(sdk-trace-web): implement `attach`/`detach` on `StackContextManager` (full synchronous support). @pichlermarc
+* feat(context-zone-peer-dep): implement best-effort `attach`/`detach` on `ZoneContextManager`; composes with `with()` but is not isolated across concurrent async zones. @pichlermarc
+* feat(context-async-hooks): implement no-op `attach`/`detach` on the deprecated `AsyncHooksContextManager`; use `AsyncLocalStorageContextManager` for full support. @pichlermarc
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
