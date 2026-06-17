@@ -1031,8 +1031,9 @@ describe('fetch', () => {
           );
           assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 200);
           assert.strictEqual(attributes[ATTR_SERVER_ADDRESS], 'example.com');
+          assert.strictEqual(attributes[ATTR_SERVER_PORT], 80);
 
-          assert.strictEqual(keys.length, 4, 'number of attributes is wrong');
+          assert.strictEqual(keys.length, 5, 'number of attributes is wrong');
         });
 
         it('span should have correct events', () => {
