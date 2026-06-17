@@ -38,9 +38,7 @@ describe('unmocked xhr', () => {
     });
     registerInstrumentations({
       instrumentations: [
-        new XMLHttpRequestInstrumentation({
-          semconvStabilityOptIn: 'http',
-        }),
+        new XMLHttpRequestInstrumentation({}),
       ],
       tracerProvider: provider,
     });

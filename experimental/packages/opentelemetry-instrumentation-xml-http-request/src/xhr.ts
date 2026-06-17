@@ -7,7 +7,6 @@ import * as api from '@opentelemetry/api';
 import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import {
   SemconvStability,
-  semconvStabilityFromStr,
   InstrumentationBase,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
@@ -91,8 +90,6 @@ export interface XMLHttpRequestInstrumentationConfig
   ignoreNetworkEvents?: boolean;
   /** Measure outgoing request size */
   measureRequestSize?: boolean;
-  /** Select the HTTP semantic conventions version(s) used. */
-  semconvStabilityOptIn?: string;
 }
 
 /**
@@ -106,7 +103,6 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   private _tasksCount = 0;
   private _xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
-  private _semconvStability: SemconvStability;
 
   // Note: Intentionally *not* using `_enabled` as the field name to avoid
   // any possible confusion with the `_enabled` field used on the *Node.js*
@@ -119,10 +115,6 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
 
   constructor(config: XMLHttpRequestInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-xml-http-request', VERSION, config);
-    this._semconvStability = semconvStabilityFromStr(
-      'http',
-      config?.semconvStabilityOptIn
-    );
   }
 
   init() {}
@@ -169,15 +161,11 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       const childSpan = this.tracer.startSpan('CORS Preflight', {
         startTime: corsPreFlightRequest[PTN.FETCH_START],
       });
-      const skipOldSemconvContentLengthAttrs = !(
-        this._semconvStability & SemconvStability.OLD
-      );
       addSpanNetworkEvents(
         childSpan,
         corsPreFlightRequest,
         this.getConfig().ignoreNetworkEvents,
-        undefined,
-        skipOldSemconvContentLengthAttrs
+        undefined
       );
       childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
     });
@@ -191,33 +179,11 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * @private
    */
   _addFinalSpanAttributes(span: api.Span, xhrMem: XhrMem, spanUrl?: string) {
-    if (this._semconvStability & SemconvStability.OLD) {
-      if (xhrMem.status !== undefined) {
-        span.setAttribute(ATTR_HTTP_STATUS_CODE, xhrMem.status);
-      }
-      if (xhrMem.statusText !== undefined) {
-        span.setAttribute(AttributeNames.HTTP_STATUS_TEXT, xhrMem.statusText);
-      }
-      if (typeof spanUrl === 'string') {
-        const parsedUrl = parseUrl(spanUrl);
-        span.setAttribute(ATTR_HTTP_HOST, parsedUrl.host);
-        span.setAttribute(
-          ATTR_HTTP_SCHEME,
-          parsedUrl.protocol.replace(':', '')
-        );
-      }
-
-      // @TODO do we want to collect this or it will be collected earlier once only or
-      //    maybe when parent span is not available ?
-      span.setAttribute(ATTR_HTTP_USER_AGENT, navigator.userAgent);
-    }
-    if (this._semconvStability & SemconvStability.STABLE) {
-      if (xhrMem.status) {
-        // Intentionally exclude status=0, because XHR uses 0 for before a
-        // response is received and semconv says to only add the attribute if
-        // received a response.
-        span.setAttribute(ATTR_HTTP_RESPONSE_STATUS_CODE, xhrMem.status);
-      }
+    if (xhrMem.status) {
+      // Intentionally exclude status=0, because XHR uses 0 for before a
+      // response is received and semconv says to only add the attribute if
+      // received a response.
+      span.setAttribute(ATTR_HTTP_RESPONSE_STATUS_CODE, xhrMem.status);
     }
   }
 
@@ -336,15 +302,11 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         this._addChildSpan(span, corsPreFlightRequest);
         this._markResourceAsUsed(corsPreFlightRequest);
       }
-      const skipOldSemconvContentLengthAttrs = !(
-        this._semconvStability & SemconvStability.OLD
-      );
       addSpanNetworkEvents(
         span,
         mainRequest,
         this.getConfig().ignoreNetworkEvents,
-        undefined,
-        skipOldSemconvContentLengthAttrs
+        undefined
       );
     }
   }
@@ -385,29 +347,22 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     }
     let name = '';
     const attributes = {} as api.Attributes;
-    if (this._semconvStability & SemconvStability.OLD) {
-      name = method.toUpperCase();
-      attributes[ATTR_HTTP_METHOD] = method;
-      attributes[ATTR_HTTP_URL] = parsedUrl.toString();
+    const origMethod = method;
+    const normMethod = normalizeHttpRequestMethod(method);
+    if (!name) {
+      // The "old" span name wins if emitting both old and stable semconv
+      // ('http/dup').
+      name = normMethod;
     }
-    if (this._semconvStability & SemconvStability.STABLE) {
-      const origMethod = method;
-      const normMethod = normalizeHttpRequestMethod(method);
-      if (!name) {
-        // The "old" span name wins if emitting both old and stable semconv
-        // ('http/dup').
-        name = normMethod;
-      }
-      attributes[ATTR_HTTP_REQUEST_METHOD] = normMethod;
-      if (normMethod !== origMethod) {
-        attributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = origMethod;
-      }
-      attributes[ATTR_URL_FULL] = parsedUrl.toString();
-      attributes[ATTR_SERVER_ADDRESS] = parsedUrl.hostname;
-      const serverPort = serverPortFromUrl(parsedUrl);
-      if (serverPort) {
-        attributes[ATTR_SERVER_PORT] = serverPort;
-      }
+    attributes[ATTR_HTTP_REQUEST_METHOD] = normMethod;
+    if (normMethod !== origMethod) {
+      attributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = origMethod;
+    }
+    attributes[ATTR_URL_FULL] = parsedUrl.toString();
+    attributes[ATTR_SERVER_ADDRESS] = parsedUrl.hostname;
+    const serverPort = serverPortFromUrl(parsedUrl);
+    if (serverPort) {
+      attributes[ATTR_SERVER_PORT] = serverPort;
     }
 
     const currentSpan = this.tracer.startSpan(name, {
@@ -513,19 +468,17 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         const span = xhrMem.span;
         plugin._applyAttributesAfterXHR(span, xhr);
 
-        if (plugin._semconvStability & SemconvStability.STABLE) {
-          if (isError) {
-            if (errorType) {
-              span.setStatus({
-                code: api.SpanStatusCode.ERROR,
-                message: errorType,
-              });
-              span.setAttribute(ATTR_ERROR_TYPE, errorType);
-            }
-          } else if (xhrMem.status && xhrMem.status >= 400) {
-            span.setStatus({ code: api.SpanStatusCode.ERROR });
-            span.setAttribute(ATTR_ERROR_TYPE, String(xhrMem.status));
+        if (isError) {
+          if (errorType) {
+            span.setStatus({
+              code: api.SpanStatusCode.ERROR,
+              message: errorType,
+            });
+            span.setAttribute(ATTR_ERROR_TYPE, errorType);
           }
+        } else if (xhrMem.status && xhrMem.status >= 400) {
+          span.setStatus({ code: api.SpanStatusCode.ERROR });
+          span.setAttribute(ATTR_ERROR_TYPE, String(xhrMem.status));
         }
       }
 
@@ -588,18 +541,10 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
             const body = args[0];
             const bodyLength = getXHRBodyLength(body);
             if (bodyLength !== undefined) {
-              if (plugin._semconvStability & SemconvStability.OLD) {
-                currentSpan.setAttribute(
-                  ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-                  bodyLength
-                );
-              }
-              if (plugin._semconvStability & SemconvStability.STABLE) {
-                currentSpan.setAttribute(
-                  ATTR_HTTP_REQUEST_BODY_SIZE,
-                  bodyLength
-                );
-              }
+              currentSpan.setAttribute(
+                ATTR_HTTP_REQUEST_BODY_SIZE,
+                bodyLength
+              );
             }
           }
 
