@@ -38,7 +38,7 @@ const collectorOptions = {
 };
 const logExporter = new OTLPLogExporter(collectorOptions);
 const loggerProvider = new LoggerProvider({
-  processors: [new BatchRecordProcessor(logExporter)]
+  processors: [new BatchLogRecordProcessor({ exporter: logExporter })]
 });
 
 const logger = loggerProvider.getLogger('default', '1.0.0');
@@ -67,7 +67,7 @@ const collectorOptions = {
 };
 const logExporter = new OTLPLogExporter(collectorOptions);
 const loggerProvider = new LoggerProvider({
-  processors: [new BatchRecordProcessor(logExporter)]
+  processors: [new BatchLogRecordProcessor({ exporter: logExporter })]
 });
 
 const logger = loggerProvider.getLogger('default', '1.0.0');
