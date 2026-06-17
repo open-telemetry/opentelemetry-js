@@ -13,7 +13,7 @@ import {
 } from '@opentelemetry/core';
 import type { Span } from '../Span';
 import type { SpanProcessor } from '../SpanProcessor';
-import type { BufferConfig } from '../types';
+import type { BatchSpanProcessorOptions } from '../types';
 import type { ReadableSpan } from './ReadableSpan';
 import type { SpanExporter } from './SpanExporter';
 
@@ -21,8 +21,9 @@ import type { SpanExporter } from './SpanExporter';
  * Implementation of the {@link SpanProcessor} that batches spans exported by
  * the SDK then pushes them to the exporter pipeline.
  */
-export abstract class BatchSpanProcessorBase<T extends BufferConfig>
-  implements SpanProcessor
+export abstract class BatchSpanProcessorBase<
+  T extends BatchSpanProcessorOptions,
+> implements SpanProcessor
 {
   private readonly _maxExportBatchSize: number;
   private readonly _maxQueueSize: number;
@@ -36,12 +37,12 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
   private _shutdownOnce: BindOnceFuture<void>;
   private _droppedSpansCount: number = 0;
 
-  constructor(exporter: SpanExporter, config?: T) {
-    this._exporter = exporter;
-    this._maxExportBatchSize = config?.maxExportBatchSize ?? 512;
-    this._maxQueueSize = config?.maxQueueSize ?? 2048;
-    this._scheduledDelayMillis = config?.scheduledDelayMillis ?? 5000;
-    this._exportTimeoutMillis = config?.exportTimeoutMillis ?? 30000;
+  constructor(options: T) {
+    this._exporter = options.exporter;
+    this._maxExportBatchSize = options.maxExportBatchSize ?? 512;
+    this._maxQueueSize = options.maxQueueSize ?? 2048;
+    this._scheduledDelayMillis = options.scheduledDelayMillis ?? 5000;
+    this._exportTimeoutMillis = options.exportTimeoutMillis ?? 30000;
 
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
 
