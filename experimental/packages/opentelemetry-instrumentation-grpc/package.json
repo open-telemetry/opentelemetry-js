@@ -64,7 +64,7 @@
     "@typescript/vfs": "1.6.4",
     "mocha": "11.7.5",
     "nyc": "17.1.0",
-    "sinon": "18.0.1",
+    "sinon": "22.0.0",
     "typescript": "5.0.4"
   },
   "peerDependencies": {
