@@ -1,0 +1,39 @@
+{
+  "name": "example-dice-uninstrumented",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Uninstrumented dice example application",
+  "type": "module",
+  "scripts": {
+    "compile": "tsc",
+    "start": "tsc && node build/app.js",
+    "test": "tsc && node --test build/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/open-telemetry/opentelemetry-js.git"
+  },
+  "keywords": [
+    "opentelemetry",
+    "dice",
+    "getting-started"
+  ],
+  "engines": {
+    "node": "^18.19.0 || >=20.6.0"
+  },
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/dice/uninstrumented",
+  "dependencies": {
+    "express": "^5.2.1",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.0"
+  }
+}

@@ -87,6 +87,9 @@
       "path": "packages/sdk-metrics/tsconfig.esm.json"
     },
     {
+      "path": "packages/sdk-trace/tsconfig.esm.json"
+    },
+    {
       "path": "semantic-conventions/tsconfig.esm.json"
     }
   ]
