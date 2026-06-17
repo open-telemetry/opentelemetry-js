@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1781701175342,
+  "lastUpdate": 1781709525604,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -88255,6 +88255,149 @@ window.BENCHMARK_DATA = {
             "range": "±1.40%",
             "unit": "ops/sec",
             "extra": "90 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "pellared@hotmail.com",
+            "name": "Robert Pająk",
+            "username": "pellared"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7d66f51303bf49ae8ce664ecd663dc2a413d0896",
+          "message": "feat(propagator-env-carrier): add environment variable carrier helpers (#6774)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2026-06-17T15:05:13Z",
+          "tree_id": "3434454bfc6491451d7f12856244677141f6c31b",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/7d66f51303bf49ae8ce664ecd663dc2a413d0896"
+        },
+        "date": 1781709524376,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 430080,
+            "range": "±3.17%",
+            "unit": "ops/sec",
+            "extra": "86 samples"
+          },
+          {
+            "name": "generateTraceId",
+            "value": 5902620,
+            "range": "±0.62%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "generateSpanId",
+            "value": 6748244,
+            "range": "±2.67%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 409181,
+            "range": "±2.76%",
+            "unit": "ops/sec",
+            "extra": "89 samples"
+          },
+          {
+            "name": "addEvent (128 attributes)",
+            "value": 32331,
+            "range": "±2.30%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "addLink (128 attributes)",
+            "value": 33767,
+            "range": "±2.07%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes w/ setAttributes)",
+            "value": 453222,
+            "range": "±1.40%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "parsePairKeyValue simple",
+            "value": 3434689,
+            "range": "±3.19%",
+            "unit": "ops/sec",
+            "extra": "85 samples"
+          },
+          {
+            "name": "parsePairKeyValue with metadata",
+            "value": 3467205,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "parsePairKeyValue URI encoded",
+            "value": 3365461,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "parsePairKeyValue complex",
+            "value": 2975290,
+            "range": "±0.61%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 512 spans (protobuf)",
+            "value": 417,
+            "range": "±0.39%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "transform 512 spans (json)",
+            "value": 473,
+            "range": "±2.60%",
+            "unit": "ops/sec",
+            "extra": "88 samples"
+          },
+          {
+            "name": "transform 512 logs (protobuf)",
+            "value": 395,
+            "range": "±2.69%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
+          },
+          {
+            "name": "transform 512 logs (json)",
+            "value": 546,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "transform 512 metrics (protobuf)",
+            "value": 457,
+            "range": "±0.57%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "transform 512 metrics (json)",
+            "value": 499,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
           }
         ]
       }
