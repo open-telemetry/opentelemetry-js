@@ -431,7 +431,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
           performanceEndTime
         );
         span.addEvent(eventName, endTime);
-        plugin._addFinalSpanAttributes(span, xhrMem, spanUrl);
+        plugin._addFinalSpanAttributes(span, xhrMem);
         span.end(endTime);
         plugin._tasksCount--;
       }

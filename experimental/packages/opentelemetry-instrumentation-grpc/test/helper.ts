@@ -503,18 +503,8 @@ export const runTests = (
         port: grpcPort,
       };
 
-      assertSpan(
-        moduleName,
-        serverSpan,
-        SpanKind.SERVER,
-        validations,
-      );
-      assertSpan(
-        moduleName,
-        clientSpan,
-        SpanKind.CLIENT,
-        validations,
-      );
+      assertSpan(moduleName, serverSpan, SpanKind.SERVER, validations);
+      assertSpan(moduleName, clientSpan, SpanKind.CLIENT, validations);
 
       assertPropagation(serverSpan, clientSpan);
 
@@ -698,18 +688,8 @@ export const runTests = (
             };
             const serverRoot = spans[0];
             const clientRoot = spans[1];
-            assertSpan(
-              moduleName,
-              serverRoot,
-              SpanKind.SERVER,
-              validations,
-            );
-            assertSpan(
-              moduleName,
-              clientRoot,
-              SpanKind.CLIENT,
-              validations,
-            );
+            assertSpan(moduleName, serverRoot, SpanKind.SERVER, validations);
+            assertSpan(moduleName, clientRoot, SpanKind.CLIENT, validations);
             assertPropagation(serverRoot, clientRoot);
           });
       });
@@ -745,18 +725,8 @@ export const runTests = (
                 host: 'localhost',
                 port: grpcPort,
               };
-              assertSpan(
-                moduleName,
-                serverSpan,
-                SpanKind.SERVER,
-                validations,
-              );
-              assertSpan(
-                moduleName,
-                clientSpan,
-                SpanKind.CLIENT,
-                validations,
-              );
+              assertSpan(moduleName, serverSpan, SpanKind.SERVER, validations);
+              assertSpan(moduleName, clientSpan, SpanKind.CLIENT, validations);
               assertPropagation(serverSpan, clientSpan);
               assert.strictEqual(
                 rootSpan.spanContext().traceId,

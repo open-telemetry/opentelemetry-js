@@ -49,11 +49,7 @@ import {
   ATTR_SERVER_PORT,
 } from '@opentelemetry/semantic-conventions';
 
-import {
-  ATTR_RPC_METHOD,
-  ATTR_RPC_SERVICE,
-  ATTR_RPC_SYSTEM,
-} from './semconv';
+import { ATTR_RPC_METHOD, ATTR_RPC_SERVICE, ATTR_RPC_SYSTEM } from './semconv';
 
 import {
   shouldNotTraceServerCall,
@@ -333,10 +329,7 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
           service,
           metadata
         );
-        instrumentation.extractNetMetadata(
-          this,
-          span,
-        );
+        instrumentation.extractNetMetadata(this, span);
 
         // Callback is only present when there is no responseStream
         if (!hasResponseStream) {
@@ -449,10 +442,7 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
             [ATTR_RPC_METHOD]: method,
             [ATTR_RPC_SERVICE]: service,
           });
-        instrumentation.extractNetMetadata(
-          this,
-          span,
-        );
+        instrumentation.extractNetMetadata(this, span);
 
         instrumentation._metadataCapture.client.captureRequestMetadata(
           span,
@@ -504,10 +494,7 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
     return span;
   }
 
-  private extractNetMetadata(
-    client: grpcJs.Client,
-    span: Span,
-  ) {
+  private extractNetMetadata(client: grpcJs.Client, span: Span) {
     // set net.peer.* from target (e.g., "dns:otel-productcatalogservice:8080") as a hint to APMs
     const parsedUri = URI_REGEX.exec(client.getChannel().getTarget());
     const hostname = parsedUri?.groups?.name;

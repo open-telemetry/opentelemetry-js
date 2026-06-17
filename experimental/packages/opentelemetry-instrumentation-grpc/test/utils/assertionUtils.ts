@@ -17,10 +17,7 @@ import {
   ATTR_SERVER_PORT,
 } from '@opentelemetry/semantic-conventions';
 
-import {
-  ATTR_RPC_GRPC_STATUS_CODE,
-} from '../../src/semconv';
-
+import { ATTR_RPC_GRPC_STATUS_CODE } from '../../src/semconv';
 
 export const grpcStatusCodeToOpenTelemetryStatusCode = (
   status: GrpcStatus
@@ -40,7 +37,7 @@ export const assertSpan = (
     status: GrpcStatus;
     host?: string;
     port?: number;
-  },
+  }
 ) => {
   assert.strictEqual(span.spanContext().traceId.length, 32);
   assert.strictEqual(span.spanContext().spanId.length, 16);
@@ -63,10 +60,7 @@ export const assertSpan = (
     validations.host !== undefined &&
     validations.port !== undefined
   ) {
-    assert.strictEqual(
-      span.attributes[ATTR_SERVER_ADDRESS],
-      validations.host
-    );
+    assert.strictEqual(span.attributes[ATTR_SERVER_ADDRESS], validations.host);
     assert.strictEqual(span.attributes[ATTR_SERVER_PORT], validations.port);
   }
 

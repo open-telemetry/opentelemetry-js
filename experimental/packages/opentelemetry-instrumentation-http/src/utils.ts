@@ -28,10 +28,6 @@ import {
   ATTR_USER_AGENT_ORIGINAL,
 } from '@opentelemetry/semantic-conventions';
 import {
-  ATTR_HTTP_FLAVOR,
-  ATTR_NET_TRANSPORT,
-  NET_TRANSPORT_VALUE_IP_TCP,
-  NET_TRANSPORT_VALUE_IP_UDP,
   ATTR_USER_AGENT_SYNTHETIC_TYPE,
   USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT,
   USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST,
@@ -148,10 +144,7 @@ export const satisfiesPattern = (
  * @param {Span} span the span that need to be set
  * @param {Error} error error that will be set to span
  */
-export const setSpanWithError = (
-  span: Span,
-  error: Err,
-): void => {
+export const setSpanWithError = (span: Span, error: Err): void => {
   const message = error.message;
   span.setAttribute(ATTR_ERROR_TYPE, error.name);
   span.setStatus({ code: SpanStatusCode.ERROR, message });
@@ -438,7 +431,7 @@ const getSyntheticType = (
  * @param {IncomingMessage} response the response object
  */
 export const getOutgoingRequestAttributesOnResponse = (
-  response: IncomingMessage,
+  response: IncomingMessage
 ): Attributes => {
   const { statusCode, socket } = response;
   const attributes: Attributes = {};
@@ -703,22 +696,17 @@ export const getIncomingRequestAttributes = (
   },
   logger: DiagLogger
 ): Attributes => {
-  const {
-    component,
-    enableSyntheticSourceDetection,
-    hookAttributes,
-  } = options;
+  const { component, enableSyntheticSourceDetection, hookAttributes } = options;
   const { headers, method } = request;
   const { 'user-agent': userAgent } = headers;
   const parsedUrl = getInfoFromIncomingMessage(component, request, logger);
-  let attributes: Attributes;
 
   // Stable attributes are used.
   const normalizedMethod = normalizeMethod(method);
   const serverAddress = getServerAddress(request, component);
   const remoteClientAddress = getRemoteClientAddress(request);
 
-  attributes = {
+  const attributes: Attributes = {
     [ATTR_HTTP_REQUEST_METHOD]: normalizedMethod,
     [ATTR_URL_SCHEME]: component,
     [ATTR_SERVER_ADDRESS]: serverAddress?.host,
@@ -751,8 +739,7 @@ export const getIncomingRequestAttributes = (
   }
 
   if (enableSyntheticSourceDetection && userAgent) {
-    attributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] =
-      getSyntheticType(userAgent);
+    attributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] = getSyntheticType(userAgent);
   }
 
   return Object.assign(attributes, hookAttributes);
@@ -763,7 +750,7 @@ export const getIncomingRequestAttributes = (
  * @param {(ServerResponse & { socket: Socket; })} response the response object
  */
 export const getIncomingRequestAttributesOnResponse = (
-  response: ServerResponse,
+  response: ServerResponse
 ): Attributes => {
   const { statusCode } = response;
 
@@ -775,7 +762,7 @@ export const getIncomingRequestAttributesOnResponse = (
   if (rpcMetadata?.type === RPCType.HTTP && rpcMetadata.route !== undefined) {
     attributes[ATTR_HTTP_ROUTE] = rpcMetadata.route;
   }
-  
+
   return attributes;
 };
 
@@ -799,10 +786,7 @@ export const getIncomingStableRequestMetricAttributesOnResponse = (
   return metricAttributes;
 };
 
-export function headerCapture(
-  type: 'request' | 'response',
-  headers: string[],
-) {
+export function headerCapture(type: 'request' | 'response', headers: string[]) {
   const normalizedHeaders = new Map<string, string>();
   for (let i = 0, len = headers.length; i < len; i++) {
     const capturedHeader = headers[i].toLowerCase();

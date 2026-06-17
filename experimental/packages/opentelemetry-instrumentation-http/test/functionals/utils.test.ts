@@ -260,9 +260,7 @@ describe('Utility', () => {
         recordException: () => undefined,
       } as unknown as Span;
       const mock = sinon.mock(span);
-      mock
-        .expects('setAttribute')
-        .calledWithExactly(ATTR_ERROR_TYPE, 'Error');
+      mock.expects('setAttribute').calledWithExactly(ATTR_ERROR_TYPE, 'Error');
       mock.expects('setStatus').calledWithExactly({
         code: SpanStatusCode.ERROR,
         message: errorMessage,
@@ -306,7 +304,7 @@ describe('Utility', () => {
         }),
         () => {
           const attributes = utils.getIncomingRequestAttributesOnResponse(
-            {} as ServerResponse,
+            {} as ServerResponse
           );
           assert.deepStrictEqual(attributes[ATTR_HTTP_ROUTE], '/user/:id');
           context.disable();
@@ -316,11 +314,9 @@ describe('Utility', () => {
     });
 
     it('should successfully process without middleware stack', () => {
-      const attributes = utils.getIncomingRequestAttributesOnResponse(
-        {
-          socket: {},
-        } as ServerResponse & { socket: Socket },
-      );
+      const attributes = utils.getIncomingRequestAttributesOnResponse({
+        socket: {},
+      } as ServerResponse & { socket: Socket });
       assert.deepEqual(attributes[ATTR_HTTP_ROUTE], undefined);
     });
   });
@@ -395,14 +391,12 @@ describe('Utility', () => {
 
   describe('headers to span attributes capture', () => {
     it('should capture attributes for request and response keys', () => {
-      const reqAttrs = utils.headerCapture(
-        'request',
-        ['Origin'],
-      )(() => 'localhost');
-      const resAttrs = utils.headerCapture(
-        'response',
-        ['Cookie'],
-      )(() => 'token=123');
+      const reqAttrs = utils.headerCapture('request', ['Origin'])(
+        () => 'localhost'
+      );
+      const resAttrs = utils.headerCapture('response', ['Cookie'])(
+        () => 'token=123'
+      );
 
       assert.deepStrictEqual(reqAttrs, {
         'http.request.header.origin': ['localhost'],
@@ -413,10 +407,10 @@ describe('Utility', () => {
     });
 
     it('should capture attributes for multiple values', () => {
-      const attrs = utils.headerCapture(
-        'request',
-        ['Origin'],
-      )(() => ['localhost', 'www.example.com']);
+      const attrs = utils.headerCapture('request', ['Origin'])(() => [
+        'localhost',
+        'www.example.com',
+      ]);
 
       assert.deepStrictEqual(attrs, {
         'http.request.header.origin': ['localhost', 'www.example.com'],
@@ -424,20 +418,19 @@ describe('Utility', () => {
     });
 
     it('should capture attributes for multiple headers', () => {
-      const attrs = utils.headerCapture(
-        'request',
-        ['Origin', 'Foo'],
-      )(header => {
-        if (header === 'origin') {
-          return 'localhost';
-        }
+      const attrs = utils.headerCapture('request', ['Origin', 'Foo'])(
+        header => {
+          if (header === 'origin') {
+            return 'localhost';
+          }
 
-        if (header === 'foo') {
-          return 42;
-        }
+          if (header === 'foo') {
+            return 42;
+          }
 
-        return undefined;
-      });
+          return undefined;
+        }
+      );
 
       assert.deepStrictEqual(attrs, {
         'http.request.header.origin': ['localhost'],
@@ -446,26 +439,24 @@ describe('Utility', () => {
     });
 
     it('should normalize header names', () => {
-      const attrs = utils.headerCapture(
-        'request',
-        ['X-Forwarded-For'],
-      )(() => 'foo');
+      const attrs = utils.headerCapture('request', ['X-Forwarded-For'])(
+        () => 'foo'
+      );
       assert.deepStrictEqual(attrs, {
         'http.request.header.x-forwarded-for': ['foo'],
       });
     });
 
     it('ignores non-existent headers', () => {
-      const attrs = utils.headerCapture(
-        'request',
-        ['Origin', 'Accept'],
-      )(header => {
-        if (header === 'origin') {
-          return 'localhost';
-        }
+      const attrs = utils.headerCapture('request', ['Origin', 'Accept'])(
+        header => {
+          if (header === 'origin') {
+            return 'localhost';
+          }
 
-        return undefined;
-      });
+          return undefined;
+        }
+      );
 
       assert.deepStrictEqual(attrs, {
         'http.request.header.origin': ['localhost'],

@@ -118,26 +118,14 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     );
   }
 
-  private _recordServerDuration(
-    durationMs: number,
-    attributes: Attributes
-  ) {
+  private _recordServerDuration(durationMs: number, attributes: Attributes) {
     // stable histogram is counted in S
-    this._httpServerDurationHistogram.record(
-      durationMs / 1000,
-      attributes
-    );
+    this._httpServerDurationHistogram.record(durationMs / 1000, attributes);
   }
 
-  private _recordClientDuration(
-    durationMs: number,
-    attributes: Attributes
-  ) {
+  private _recordClientDuration(durationMs: number, attributes: Attributes) {
     // stable histogram is counted in S
-    this._httpClientDurationHistogram.record(
-      durationMs / 1000,
-      attributes
-    );
+    this._httpClientDurationHistogram.record(durationMs / 1000, attributes);
   }
 
   override setConfig(config: HttpInstrumentationConfig = {}): void {
@@ -402,9 +390,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         if (request.listenerCount('response') <= 1) {
           response.resume();
         }
-        const responseAttributes = getOutgoingRequestAttributesOnResponse(
-          response,
-        );
+        const responseAttributes =
+          getOutgoingRequestAttributesOnResponse(response);
         span.setAttributes(responseAttributes);
         metricAttributes = Object.assign(
           metricAttributes,
@@ -490,12 +477,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         return;
       }
       responseFinished = true;
-      this._closeHttpSpan(
-        span,
-        SpanKind.CLIENT,
-        startTime,
-        metricAttributes
-      );
+      this._closeHttpSpan(span, SpanKind.CLIENT, startTime, metricAttributes);
     });
     request.on(errorMonitor, (error: Err) => {
       this._diag.debug('outgoingRequest on request error()', error);
@@ -503,12 +485,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         return;
       }
       responseFinished = true;
-      this._onOutgoingRequestError(
-        span,
-        metricAttributes,
-        startTime,
-        error
-      );
+      this._onOutgoingRequestError(span, metricAttributes, startTime, error);
     });
 
     this._diag.debug('http.ClientRequest return request');
@@ -819,9 +796,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     metricAttributes: Attributes,
     startTime: HrTime
   ) {
-    const attributes = getIncomingRequestAttributesOnResponse(
-      response,
-    );
+    const attributes = getIncomingRequestAttributesOnResponse(response);
     metricAttributes = Object.assign(
       metricAttributes,
       getIncomingStableRequestMetricAttributesOnResponse(attributes)
@@ -855,12 +830,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       );
     }
 
-    this._closeHttpSpan(
-      span,
-      SpanKind.SERVER,
-      startTime,
-      metricAttributes
-    );
+    this._closeHttpSpan(span, SpanKind.SERVER, startTime, metricAttributes);
   }
 
   private _onOutgoingRequestError(
@@ -872,12 +842,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     setSpanWithError(span, error);
     metricAttributes[ATTR_ERROR_TYPE] = error.name;
 
-    this._closeHttpSpan(
-      span,
-      SpanKind.CLIENT,
-      startTime,
-      metricAttributes
-    );
+    this._closeHttpSpan(span, SpanKind.CLIENT, startTime, metricAttributes);
   }
 
   private _onServerResponseError(
@@ -889,12 +854,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     setSpanWithError(span, error);
     metricAttributes[ATTR_ERROR_TYPE] = error.name;
 
-    this._closeHttpSpan(
-      span,
-      SpanKind.SERVER,
-      startTime,
-      metricAttributes
-    );
+    this._closeHttpSpan(span, SpanKind.SERVER, startTime, metricAttributes);
   }
 
   private _startHttpSpan(
@@ -944,15 +904,9 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     // Record metrics
     const duration = hrTimeToMilliseconds(hrTimeDuration(startTime, hrTime()));
     if (spanKind === SpanKind.SERVER) {
-      this._recordServerDuration(
-        duration,
-        metricAttributes
-      );
+      this._recordServerDuration(duration, metricAttributes);
     } else if (spanKind === SpanKind.CLIENT) {
-      this._recordClientDuration(
-        duration,
-        metricAttributes
-      );
+      this._recordClientDuration(duration, metricAttributes);
     }
   }
 
@@ -998,21 +952,21 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       client: {
         captureRequestHeaders: headerCapture(
           'request',
-          config.headersToSpanAttributes?.client?.requestHeaders ?? [],
+          config.headersToSpanAttributes?.client?.requestHeaders ?? []
         ),
         captureResponseHeaders: headerCapture(
           'response',
-          config.headersToSpanAttributes?.client?.responseHeaders ?? [],
+          config.headersToSpanAttributes?.client?.responseHeaders ?? []
         ),
       },
       server: {
         captureRequestHeaders: headerCapture(
           'request',
-          config.headersToSpanAttributes?.server?.requestHeaders ?? [],
+          config.headersToSpanAttributes?.server?.requestHeaders ?? []
         ),
         captureResponseHeaders: headerCapture(
           'response',
-          config.headersToSpanAttributes?.server?.responseHeaders ?? [],
+          config.headersToSpanAttributes?.server?.responseHeaders ?? []
         ),
       },
     };

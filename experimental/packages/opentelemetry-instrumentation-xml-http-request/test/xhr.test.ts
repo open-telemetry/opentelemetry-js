@@ -24,7 +24,7 @@ import {
 } from '@opentelemetry/sdk-trace-web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { ATTR_HTTP_URL, ATTR_HTTP_REQUEST_BODY_SIZE } from '../src/semconv';
+import { ATTR_HTTP_REQUEST_BODY_SIZE } from '../src/semconv';
 import { EventNames } from '../src/enums/EventNames';
 import type { XMLHttpRequestInstrumentationConfig } from '../src/xhr';
 import { XMLHttpRequestInstrumentation } from '../src/xhr';
@@ -801,7 +801,7 @@ describe('xhr', () => {
             assert.strictEqual(
               attributes[keys[1]],
               secondUrl,
-              `attribute ${ATTR_HTTP_URL} is wrong`
+              'attribute url.full is wrong'
             );
           });
         });
@@ -992,7 +992,7 @@ describe('xhr', () => {
             expectedNumAttrs += 6;
             assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
             assert.strictEqual(attributes[ATTR_URL_FULL], url);
-            assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],400);
+            assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 400);
             assert.strictEqual(
               attributes[ATTR_SERVER_ADDRESS],
               'raw.githubusercontent.com',
@@ -1696,7 +1696,7 @@ describe('xhr', () => {
             assert.strictEqual(
               attributes[keys[1]],
               secondUrl,
-              `attribute ${ATTR_HTTP_URL} is wrong`
+              'attribute url.full is wrong'
             );
           });
         });
