@@ -767,7 +767,8 @@ export function createLogRecordProcessorFromConfig(
     case 'batch': {
       const props = properties as BatchLogRecordProcessorConfigModel;
       const exporter = createLogRecordExporterFromConfig(props.exporter);
-      return new BatchLogRecordProcessor(exporter, {
+      return new BatchLogRecordProcessor({
+        exporter,
         maxQueueSize: props.max_queue_size ?? undefined,
         maxExportBatchSize: props.max_export_batch_size ?? undefined,
         scheduledDelayMillis: props.schedule_delay ?? undefined,
