@@ -218,15 +218,11 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       return;
     }
 
-    let name = '';
     const attributes = {} as Attributes;
     const origMethod = options.method;
     const normMethod = normalizeHttpRequestMethod(options.method || 'GET');
-    if (!name) {
-      // The "old" span name wins if emitting both old and stable semconv
-      // ('http/dup').
-      name = normMethod;
-    }
+    const name = normMethod;
+
     attributes[ATTR_HTTP_REQUEST_METHOD] = normMethod;
     if (normMethod !== origMethod) {
       attributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = origMethod;

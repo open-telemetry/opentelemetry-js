@@ -333,15 +333,11 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       this._diag.debug('ignoring span as url matches ignored url');
       return;
     }
-    let name = '';
     const attributes = {} as api.Attributes;
     const origMethod = method;
     const normMethod = normalizeHttpRequestMethod(method);
-    if (!name) {
-      // The "old" span name wins if emitting both old and stable semconv
-      // ('http/dup').
-      name = normMethod;
-    }
+    const name = normMethod;
+
     attributes[ATTR_HTTP_REQUEST_METHOD] = normMethod;
     if (normMethod !== origMethod) {
       attributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = origMethod;
