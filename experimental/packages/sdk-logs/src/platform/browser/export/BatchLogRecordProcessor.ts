@@ -32,7 +32,7 @@ export class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BatchLo
 
   private _onInit(options: BatchLogRecordProcessorBrowserOptions): void {
     if (
-      options?.disableAutoFlushOnDocumentHide === true ||
+      options.disableAutoFlushOnDocumentHide === true ||
       typeof document === 'undefined'
     ) {
       return;
