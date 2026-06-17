@@ -1,13 +1,9 @@
 import { defineConfig } from 'tsdown';
 import baseConfig from '../../tsdown.config.ts';
 
-// Platform barrels stay as entries so tsdown keeps the indirection in dist,
-// letting package.json#browser path-swap node->browser for bundlers.
+// Now a thin compat shim re-exporting @opentelemetry/sdk-trace; the platform
+// barrels moved to that package, so the only entry is the shim.
 export default defineConfig({
   ...baseConfig,
-  entry: [
-    'src/index.ts',
-    'src/platform/index.ts',
-    'src/platform/browser/index.ts',
-  ],
+  entry: ['src/index-shim.ts'],
 });
