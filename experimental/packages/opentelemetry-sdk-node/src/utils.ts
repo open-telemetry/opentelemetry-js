@@ -97,7 +97,7 @@ import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exp
 import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
 import type {
-  BufferConfig,
+  BatchLogRecordProcessorOptions,
   LogRecordExporter,
   LoggerProviderOptions,
   LogRecordProcessor,
@@ -636,7 +636,10 @@ export function getLoggerProviderConfigFromEnv(): LoggerProviderOptions {
 /**
  * Get configuration for BatchLogRecordProcessor from environment variables.
  */
-export function getBatchLogRecordProcessorConfigFromEnv(): BufferConfig {
+export function getBatchLogRecordProcessorConfigFromEnv(): Omit<
+  BatchLogRecordProcessorOptions,
+  'exporter'
+> {
   return {
     maxQueueSize: getNonNegativeNumberFromEnv('OTEL_BLRP_MAX_QUEUE_SIZE'),
     scheduledDelayMillis: getNonNegativeNumberFromEnv(
@@ -654,10 +657,10 @@ export function getBatchLogRecordProcessorConfigFromEnv(): BufferConfig {
 export function getBatchLogRecordProcessorFromEnv(
   exporter: LogRecordExporter
 ): BatchLogRecordProcessor {
-  return new BatchLogRecordProcessor(
+  return new BatchLogRecordProcessor({
     exporter,
-    getBatchLogRecordProcessorConfigFromEnv()
-  );
+    ...getBatchLogRecordProcessorConfigFromEnv(),
+  });
 }
 
 function createLogRecordLimitsFromConfig(

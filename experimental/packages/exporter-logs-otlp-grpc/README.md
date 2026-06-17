@@ -40,7 +40,7 @@ const collectorOptions = {
 
 const loggerExporter = new OTLPLogExporter(collectorOptions);
 const loggerProvider = new LoggerProvider({
-  processors: [new BatchLogRecordProcessor(loggerExporter)]
+  processors: [new BatchLogRecordProcessor({ exporter: loggerExporter })]
 });
 
 ['SIGINT', 'SIGTERM'].forEach(signal => {
@@ -67,7 +67,7 @@ const collectorOptions = {
 
 const loggerExporter = new OTLPLogExporter(collectorOptions);
 const loggerProvider = new LoggerProvider({
-  processors: [new BatchLogRecordProcessor(loggerExporter)]
+  processors: [new BatchLogRecordProcessor({ exporter: loggerExporter })]
 });
 ```
 
@@ -88,7 +88,7 @@ const collectorOptions = {
 
 const loggerExporter = new OTLPLogExporter(collectorOptions);
 const loggerProvider = new LoggerProvider({
-  processors: [new BatchLogRecordProcessor(loggerExporter)]
+  processors: [new BatchLogRecordProcessor({ exporter: loggerExporter })]
 });
 ```
 

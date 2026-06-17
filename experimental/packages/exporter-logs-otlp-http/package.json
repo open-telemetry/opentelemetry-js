@@ -69,7 +69,7 @@
   ],
   "sideEffects": false,
   "devDependencies": {
-    "@babel/core": "7.29.0",
+    "@babel/core": "7.29.6",
     "@babel/preset-env": "7.29.5",
     "@opentelemetry/api": "1.9.1",
     "@opentelemetry/resources": "2.8.0",

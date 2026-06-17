@@ -67,10 +67,7 @@ import {
   MeterProvider,
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
-import type {
-  SpanProcessor,
-  NodeTracerProvider,
-} from '@opentelemetry/sdk-trace-node';
+import type { SpanProcessor } from '@opentelemetry/sdk-trace-node';
 import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
 import {
   BatchSpanProcessor,
@@ -378,40 +375,29 @@ describe('startNodeSDK', function () {
       setGlobalTracerProviderSpy.lastCall.args[0] instanceof BasicTracerProvider
     );
 
-    const tracerProvider = trace.getTracerProvider() as BasicTracerProvider;
-    const delegateInfo = (tracerProvider as any)['_delegate'];
-    assert.strictEqual(delegateInfo._config.spanProcessors.length, 4);
+    const tracerProvider = trace.getTracerProvider();
+    const spanProcessors = (tracerProvider as any)._delegate
+      ._activeSpanProcessor._spanProcessors as SpanProcessor[];
+    assert.strictEqual(spanProcessors.length, 4);
 
+    assert.ok(spanProcessors[0] instanceof BatchSpanProcessor);
     assert.ok(
-      delegateInfo._config.spanProcessors[0] instanceof BatchSpanProcessor
-    );
-    assert.ok(
-      (delegateInfo._config.spanProcessors[0] as any)['_exporter'] instanceof
-        OTLPProtoTraceExporter
+      (spanProcessors[0] as any)['_exporter'] instanceof OTLPProtoTraceExporter
     );
 
+    assert.ok(spanProcessors[1] instanceof BatchSpanProcessor);
     assert.ok(
-      delegateInfo._config.spanProcessors[1] instanceof BatchSpanProcessor
-    );
-    assert.ok(
-      (delegateInfo._config.spanProcessors[1] as any)['_exporter'] instanceof
-        OTLPHttpTraceExporter
+      (spanProcessors[1] as any)['_exporter'] instanceof OTLPHttpTraceExporter
     );
 
+    assert.ok(spanProcessors[2] instanceof BatchSpanProcessor);
     assert.ok(
-      delegateInfo._config.spanProcessors[2] instanceof BatchSpanProcessor
-    );
-    assert.ok(
-      (delegateInfo._config.spanProcessors[2] as any)['_exporter'] instanceof
-        OTLPGrpcTraceExporter
+      (spanProcessors[2] as any)['_exporter'] instanceof OTLPGrpcTraceExporter
     );
 
+    assert.ok(spanProcessors[3] instanceof SimpleSpanProcessor);
     assert.ok(
-      delegateInfo._config.spanProcessors[3] instanceof SimpleSpanProcessor
-    );
-    assert.ok(
-      (delegateInfo._config.spanProcessors[3] as any)['_exporter'] instanceof
-        ConsoleSpanExporter
+      (spanProcessors[3] as any)['_exporter'] instanceof ConsoleSpanExporter
     );
 
     stubLoggerWarn.reset();
@@ -823,9 +809,9 @@ describe('startNodeSDK', function () {
     let stubLoggerInfo: Sinon.SinonStub;
 
     const getSdkSpanProcessors = () => {
-      const tracerProvider = trace.getTracerProvider() as NodeTracerProvider;
-      const delegateInfo = (tracerProvider as any)['_delegate'];
-      return delegateInfo?._config?.spanProcessors as SpanProcessor[];
+      const tracerProvider = trace.getTracerProvider();
+      return (tracerProvider as any)._delegate._activeSpanProcessor
+        ._spanProcessors as SpanProcessor[];
     };
 
     beforeEach(() => {
