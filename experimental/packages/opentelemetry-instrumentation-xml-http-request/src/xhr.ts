@@ -164,10 +164,9 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * Add attributes when span is going to end
    * @param span
    * @param xhr
-   * @param spanUrl
    * @private
    */
-  _addFinalSpanAttributes(span: api.Span, xhrMem: XhrMem, spanUrl?: string) {
+  _addFinalSpanAttributes(span: api.Span, xhrMem: XhrMem) {
     if (xhrMem.status) {
       // Intentionally exclude status=0, because XHR uses 0 for before a
       // response is received and semconv says to only add the attribute if
@@ -530,10 +529,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
             const body = args[0];
             const bodyLength = getXHRBodyLength(body);
             if (bodyLength !== undefined) {
-              currentSpan.setAttribute(
-                ATTR_HTTP_REQUEST_BODY_SIZE,
-                bodyLength
-              );
+              currentSpan.setAttribute(ATTR_HTTP_REQUEST_BODY_SIZE, bodyLength);
             }
           }
 

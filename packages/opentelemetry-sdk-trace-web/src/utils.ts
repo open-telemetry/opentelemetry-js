@@ -69,7 +69,7 @@ export function addSpanNetworkEvents(
   span: api.Span,
   resource: PerformanceEntries,
   ignoreNetworkEvents = false,
-  ignoreZeros?: boolean,
+  ignoreZeros?: boolean
 ): void {
   if (ignoreZeros === undefined) {
     ignoreZeros = resource[PTN.START_TIME] !== 0;

@@ -18,9 +18,7 @@ import {
 } from '@opentelemetry/instrumentation';
 import * as core from '@opentelemetry/core';
 import * as web from '@opentelemetry/sdk-trace-web';
-import {
-  ATTR_HTTP_REQUEST_BODY_SIZE,
-} from './semconv';
+import { ATTR_HTTP_REQUEST_BODY_SIZE } from './semconv';
 import {
   ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
@@ -233,7 +231,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     if (normMethod !== origMethod) {
       attributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = origMethod;
     }
-    attributes[ATTR_URL_FULL] = url; 
+    attributes[ATTR_URL_FULL] = url;
 
     return this.tracer.startSpan(name, {
       kind: SpanKind.CLIENT,
@@ -367,10 +365,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           getFetchBodyLength(...args)
             .then(bodyLength => {
               if (!bodyLength) return;
-                createdSpan.setAttribute(
-                  ATTR_HTTP_REQUEST_BODY_SIZE,
-                  bodyLength
-                );
+                createdSpan.setAttribute(ATTR_HTTP_REQUEST_BODY_SIZE, bodyLength);
             })
             .catch(error => {
               plugin._diag.warn('getFetchBodyLength', error);

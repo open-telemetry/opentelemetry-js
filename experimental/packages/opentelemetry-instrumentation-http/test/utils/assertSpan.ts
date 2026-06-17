@@ -85,10 +85,7 @@ export const assertSpan = (
   if (validations.reqHeaders) {
     const userAgent = validations.reqHeaders['user-agent'];
     if (userAgent) {
-      assert.strictEqual(
-        span.attributes[ATTR_USER_AGENT_ORIGINAL],
-        userAgent
-      );
+      assert.strictEqual(span.attributes[ATTR_USER_AGENT_ORIGINAL], userAgent);
     }
   }
 

@@ -24,10 +24,7 @@ import {
 } from '@opentelemetry/sdk-trace-web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
-  ATTR_HTTP_URL,
-  ATTR_HTTP_REQUEST_BODY_SIZE,
-} from '../src/semconv';
+import { ATTR_HTTP_URL, ATTR_HTTP_REQUEST_BODY_SIZE } from '../src/semconv';
 import { EventNames } from '../src/enums/EventNames';
 import type { XMLHttpRequestInstrumentationConfig } from '../src/xhr';
 import { XMLHttpRequestInstrumentation } from '../src/xhr';
@@ -223,10 +220,7 @@ function testForCorrectEvents(
 }
 
 describe('xhr', () => {
-  const asyncTests = [
-    { async: true },
-    { async: false },
-  ];
+  const asyncTests = [{ async: true }, { async: false }];
 
   let timer: sinon.SinonFakeTimers;
 
@@ -485,10 +479,7 @@ describe('xhr', () => {
 
             assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
             assert.strictEqual(attributes[ATTR_URL_FULL], url);
-            assert.strictEqual(
-              attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-              200
-            );
+            assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 200);
             assert.strictEqual(
               attributes[ATTR_SERVER_ADDRESS],
               parseUrl(url).hostname
@@ -1001,10 +992,7 @@ describe('xhr', () => {
             expectedNumAttrs += 6;
             assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
             assert.strictEqual(attributes[ATTR_URL_FULL], url);
-            assert.strictEqual(
-              attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-              400
-            );
+            assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],400);
             assert.strictEqual(
               attributes[ATTR_SERVER_ADDRESS],
               'raw.githubusercontent.com',
@@ -1016,7 +1004,6 @@ describe('xhr', () => {
               'server.port'
             );
             assert.strictEqual(attributes[ATTR_ERROR_TYPE], '400');
-
 
             assert.strictEqual(
               Object.keys(attributes).length,
@@ -1393,10 +1380,7 @@ describe('xhr', () => {
             expectedNumAttrs += 6;
             assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'POST');
             assert.strictEqual(attributes[ATTR_URL_FULL], url);
-            assert.strictEqual(
-              attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-              200
-            );
+            assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 200);
             assert.strictEqual(
               attributes[ATTR_SERVER_ADDRESS],
               parseUrl(url).hostname,
@@ -1902,10 +1886,7 @@ describe('xhr', () => {
             expectedNumAttrs += 6;
             assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'POST');
             assert.strictEqual(attributes[ATTR_URL_FULL], url);
-            assert.strictEqual(
-              attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-              400
-            );
+            assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 400);
             assert.strictEqual(
               attributes[ATTR_SERVER_ADDRESS],
               'raw.githubusercontent.com',

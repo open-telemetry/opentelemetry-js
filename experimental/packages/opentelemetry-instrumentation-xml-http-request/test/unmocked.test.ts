@@ -37,9 +37,7 @@ describe('unmocked xhr', () => {
       spanProcessors: [testSpans],
     });
     registerInstrumentations({
-      instrumentations: [
-        new XMLHttpRequestInstrumentation({}),
-      ],
+      instrumentations: [new XMLHttpRequestInstrumentation({})],
       tracerProvider: provider,
     });
   });

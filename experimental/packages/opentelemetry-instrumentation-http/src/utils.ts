@@ -413,24 +413,6 @@ export const getOutgoingRequestAttributes = (
 };
 
 /**
- * Returns attributes related to the kind of HTTP protocol used
- * @param {string} [kind] Kind of HTTP protocol used: "1.0", "1.1", "2", "SPDY" or "QUIC".
- */
-export const setAttributesFromHttpKind = (
-  kind: string | undefined,
-  attributes: Attributes
-): void => {
-  if (kind) {
-    attributes[ATTR_HTTP_FLAVOR] = kind;
-    if (kind.toUpperCase() !== 'QUIC') {
-      attributes[ATTR_NET_TRANSPORT] = NET_TRANSPORT_VALUE_IP_TCP;
-    } else {
-      attributes[ATTR_NET_TRANSPORT] = NET_TRANSPORT_VALUE_IP_UDP;
-    }
-  }
-};
-
-/**
  * Returns the type of synthetic source based on the user agent
  * @param {OutgoingHttpHeader} userAgent the user agent string
  */

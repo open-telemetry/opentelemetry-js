@@ -217,10 +217,7 @@ describe('HttpsInstrumentation Integration tests', () => {
       assert.strictEqual(spans.length, 2);
       assert.strictEqual(span.name, 'GET');
       assert.strictEqual(result.reqHeaders['x-foo'], 'foo');
-      assert.strictEqual(
-        span.attributes[ATTR_NETWORK_PROTOCOL_VERSION],
-        '1.1'
-      );
+      assert.strictEqual(span.attributes[ATTR_NETWORK_PROTOCOL_VERSION], '1.1');
       assertSpan(span, SpanKind.CLIENT, validations);
     });
 
