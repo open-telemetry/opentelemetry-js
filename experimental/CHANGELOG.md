@@ -8,7 +8,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
-* chore(configuration)!: bump config schema to v1.1.0; rename `without_scope_info` → `scope_info_enabled` and `without_target_info/development` → `target_info_enabled/development` on the Prometheus pull exporter (semantics inverted), rename `with_resource_constant_labels` → `resource_constant_labels`. Config files may now declare `file_format: "1.1"`; both `1.0` and `1.1` are accepted. [#6781](https://github.com/open-telemetry/opentelemetry-js/pull/6781) @MikeGoldsmith
+* chore(configuration)!: bump config schema to v1.1.0; rename `without_scope_info` → `scope_info_enabled` and `without_target_info/development` → `target_info_enabled/development` on the Prometheus pull exporter (semantics inverted), rename `with_resource_constant_labels` → `resource_constant_labels`. Validate `file_format` per the configuration versioning spec: accept any minor version of major `1` (e.g. `1.0`, `1.1`), warn when the minor version is newer than supported, and reject other major versions. [#6781](https://github.com/open-telemetry/opentelemetry-js/pull/6781) @MikeGoldsmith
 
 ### :rocket: Features
 

@@ -5,6 +5,7 @@
 
 import * as assert from 'assert';
 import * as Sinon from 'sinon';
+import { diag } from '@opentelemetry/api';
 import type { ConfigurationModel } from '../src';
 import { createConfigFactory } from '../src/ConfigFactory';
 import { parseConfigFile } from '../src/FileConfigFactory';
@@ -846,9 +847,21 @@ describe('FileConfigFactory', function () {
     assert.doesNotThrow(() => createConfigFactory());
   });
 
+  it('should accept a newer minor file_format with a warning', function () {
+    const warnStub = Sinon.stub(diag, 'warn');
+    process.env.OTEL_CONFIG_FILE =
+      'test/fixtures/file-format-future-minor.yaml';
+    assert.doesNotThrow(() => createConfigFactory());
+    Sinon.assert.calledWith(warnStub, Sinon.match(/newer minor version/));
+    warnStub.restore();
+  });
+
   it('should throw for an unsupported major file_format version', function () {
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/file-format-unsupported.yaml';
-    assert.throws(() => createConfigFactory(), /Unsupported file_format/);
+    assert.throws(
+      () => createConfigFactory(),
+      /Unsupported file_format.*supports schema version 1\.x/
+    );
   });
 
   it('should show multiple validation errors for invalid config', function () {
