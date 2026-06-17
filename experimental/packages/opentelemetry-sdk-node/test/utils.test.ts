@@ -592,6 +592,20 @@ describe('getMetricExporter', function () {
     );
   });
 
+  it('maps the cumulative temporality_preference', function () {
+    const exporter = getMetricExporter({
+      otlp_http: { temporality_preference: 'cumulative' },
+    }) as OTLPProtoMetricExporter;
+    assert.strictEqual(
+      exporter.selectAggregationTemporality(InstrumentType.COUNTER),
+      AggregationTemporality.CUMULATIVE
+    );
+    assert.strictEqual(
+      exporter.selectAggregationTemporality(InstrumentType.HISTOGRAM),
+      AggregationTemporality.CUMULATIVE
+    );
+  });
+
   it('maps temporality_preference onto the OTLP gRPC exporter', function () {
     const exporter = getMetricExporter({
       otlp_grpc: { temporality_preference: 'low_memory' },
