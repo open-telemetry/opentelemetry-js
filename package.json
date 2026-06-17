@@ -63,7 +63,7 @@
     "globals": "17.6.0",
     "typescript-eslint": "8.60.0",
     "gh-pages": "6.3.0",
-    "glob": "^13.0.0",
+    "glob": "13.0.6",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "2.2.1",
