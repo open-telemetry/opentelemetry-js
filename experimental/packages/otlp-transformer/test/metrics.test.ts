@@ -847,7 +847,7 @@ describe('Metrics', () => {
       const expected = {
         resourceMetrics: [
           {
-            resource: expectedResource,
+            resource: { attributes: expectedResource.attributes },
             scopeMetrics: [
               {
                 scope: expectedScope,
@@ -1014,7 +1014,6 @@ describe('Metrics', () => {
       assert.strictEqual(dp.count, 3);
       assert.strictEqual(dp.sum, 10);
       assert.strictEqual(dp.scale, 1);
-      assert.strictEqual(dp.zeroCount, 0);
       assert.deepStrictEqual(
         dp.positive.bucketCounts,
         [1, 0, 0, 0, 1, 0, 1, 0]

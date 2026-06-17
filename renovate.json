@@ -22,8 +22,8 @@
     },
     {
       "groupName": "typedoc packages",
-      "matchUpdateTypes": ["minor", "major"],
-      "matchPackageNames": ["/^typedoc(-|$)/"]
+      "matchPackageNames": ["/^typedoc(-|$)/"],
+      "separateMajorMinor": false
     },
     {
       "matchUpdateTypes": ["minor"],
