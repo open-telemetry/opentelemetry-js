@@ -32,7 +32,9 @@ export class FileConfigFactory implements ConfigFactory {
 }
 
 export function parseConfigFile(): ConfigurationModel {
-  const supportedFileVersionPattern = /^1\.0$/;
+  // Minor versions within the same major are backward compatible, so a 1.x
+  // SDK accepts both 1.0 and 1.1 config files.
+  const supportedFileVersionPattern = /^1\.[01]$/;
   const configFile = getStringFromEnv('OTEL_CONFIG_FILE') || '';
   const file = fs.readFileSync(configFile, 'utf8');
 
@@ -43,7 +45,7 @@ export function parseConfigFile(): ConfigurationModel {
   const fileFormat = processed?.file_format;
   if (!fileFormat || !supportedFileVersionPattern.test(String(fileFormat))) {
     throw new Error(
-      `${configFile}: Unsupported file_format: "${fileFormat}". Must match ${supportedFileVersionPattern}.`
+      `${configFile}: Unsupported file_format: "${fileFormat}". Supported versions: 1.0, 1.1.`
     );
   }
 

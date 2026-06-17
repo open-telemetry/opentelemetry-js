@@ -836,6 +836,21 @@ describe('FileConfigFactory', function () {
     assert.throws(() => createConfigFactory(), /Unsupported file_format/);
   });
 
+  it('should accept file_format 1.0 for backward compatibility', function () {
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/file-format-1.0.yaml';
+    assert.doesNotThrow(() => createConfigFactory());
+  });
+
+  it('should accept file_format 1.1', function () {
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/short-config.yml';
+    assert.doesNotThrow(() => createConfigFactory());
+  });
+
+  it('should throw for an unsupported major file_format version', function () {
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/file-format-unsupported.yaml';
+    assert.throws(() => createConfigFactory(), /Unsupported file_format/);
+  });
+
   it('should show multiple validation errors for invalid config', function () {
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid-multiple-errors.yaml';
     assert.throws(
