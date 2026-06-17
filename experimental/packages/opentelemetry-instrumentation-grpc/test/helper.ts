@@ -36,7 +36,6 @@ import {
 import { assertPropagation, assertSpan } from './utils/assertionUtils';
 import { promisify } from 'util';
 import type { GrpcInstrumentation } from '../src';
-import { SemconvStability } from '@opentelemetry/instrumentation';
 import * as path from 'path';
 
 const PROTO_PATH = path.resolve(__dirname, './fixtures/grpc-test.proto');
@@ -241,38 +240,6 @@ export async function startServer(proto: any, port: number) {
   server.start();
   return server;
 }
-
-export const runTestsWithSemconvStabilityLevels = (
-  plugin: GrpcInstrumentation,
-  moduleName: string,
-  grpcPort: number
-) => {
-  describe('GrpcInstrumentation with different semconvStability levels', () => {
-    describe('OLD semantic conventions', () => {
-      before(() => {
-        plugin['_semconvStability'] = SemconvStability.OLD;
-      });
-
-      runTests(plugin, moduleName, grpcPort);
-    });
-
-    describe('STABLE semantic conventions', () => {
-      before(() => {
-        plugin['_semconvStability'] = SemconvStability.STABLE;
-      });
-
-      runTests(plugin, moduleName, grpcPort);
-    });
-
-    describe('DUPLICATE semantic conventions', () => {
-      before(() => {
-        plugin['_semconvStability'] = SemconvStability.DUPLICATE;
-      });
-
-      runTests(plugin, moduleName, grpcPort);
-    });
-  });
-};
 
 export const runTests = (
   plugin: GrpcInstrumentation,
@@ -541,14 +508,12 @@ export const runTests = (
         serverSpan,
         SpanKind.SERVER,
         validations,
-        plugin['_semconvStability']
       );
       assertSpan(
         moduleName,
         clientSpan,
         SpanKind.CLIENT,
         validations,
-        plugin['_semconvStability']
       );
 
       assertPropagation(serverSpan, clientSpan);
@@ -738,14 +703,12 @@ export const runTests = (
               serverRoot,
               SpanKind.SERVER,
               validations,
-              plugin['_semconvStability']
             );
             assertSpan(
               moduleName,
               clientRoot,
               SpanKind.CLIENT,
               validations,
-              plugin['_semconvStability']
             );
             assertPropagation(serverRoot, clientRoot);
           });
@@ -787,14 +750,12 @@ export const runTests = (
                 serverSpan,
                 SpanKind.SERVER,
                 validations,
-                plugin['_semconvStability']
               );
               assertSpan(
                 moduleName,
                 clientSpan,
                 SpanKind.CLIENT,
                 validations,
-                plugin['_semconvStability']
               );
               assertPropagation(serverSpan, clientSpan);
               assert.strictEqual(

@@ -6,7 +6,6 @@
 import * as api from '@opentelemetry/api';
 import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import {
-  SemconvStability,
   InstrumentationBase,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
@@ -27,16 +26,7 @@ import {
   ATTR_SERVER_PORT,
   ATTR_URL_FULL,
 } from '@opentelemetry/semantic-conventions';
-import {
-  ATTR_HTTP_HOST,
-  ATTR_HTTP_METHOD,
-  ATTR_HTTP_SCHEME,
-  ATTR_HTTP_STATUS_CODE,
-  ATTR_HTTP_URL,
-  ATTR_HTTP_USER_AGENT,
-  ATTR_HTTP_REQUEST_BODY_SIZE,
-  ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-} from './semconv';
+import { ATTR_HTTP_REQUEST_BODY_SIZE } from './semconv';
 import { EventNames } from './enums/EventNames';
 import type {
   OpenFunction,
@@ -50,7 +40,6 @@ import {
   getXHRBodyLength,
 } from './utils';
 import { VERSION } from './version';
-import { AttributeNames } from './enums/AttributeNames';
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer

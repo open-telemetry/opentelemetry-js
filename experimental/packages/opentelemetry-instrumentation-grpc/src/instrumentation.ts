@@ -42,7 +42,6 @@ import {
 import {
   InstrumentationNodeModuleDefinition,
   InstrumentationBase,
-  SemconvStability,
 } from '@opentelemetry/instrumentation';
 
 import {
@@ -51,8 +50,6 @@ import {
 } from '@opentelemetry/semantic-conventions';
 
 import {
-  ATTR_NET_PEER_NAME,
-  ATTR_NET_PEER_PORT,
   ATTR_RPC_METHOD,
   ATTR_RPC_SERVICE,
   ATTR_RPC_SYSTEM,

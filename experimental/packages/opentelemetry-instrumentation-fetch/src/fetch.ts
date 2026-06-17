@@ -13,7 +13,6 @@ import {
 import type { Attributes, HrTime, Span } from '@opentelemetry/api';
 import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import {
-  SemconvStability,
   InstrumentationBase,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
@@ -283,15 +282,10 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         this._addChildSpan(span, corsPreFlightRequest);
         this._markResourceAsUsed(corsPreFlightRequest);
       }
-      const skipOldSemconvContentLengthAttrs = !(
-        this._semconvStability & SemconvStability.OLD
-      );
       web.addSpanNetworkEvents(
         span,
         mainRequest,
-        this.getConfig().ignoreNetworkEvents,
-        undefined,
-        skipOldSemconvContentLengthAttrs
+        this.getConfig().ignoreNetworkEvents
       );
     }
   }
