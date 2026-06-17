@@ -2,7 +2,7 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import type { Attributes, Span } from '@opentelemetry/api';
+import type { Span } from '@opentelemetry/api';
 import { SpanStatusCode, SpanKind, context, diag } from '@opentelemetry/api';
 import {
   ATTR_HTTP_ROUTE,
@@ -14,10 +14,6 @@ import type { Socket } from 'net';
 import * as sinon from 'sinon';
 import * as url from 'url';
 import {
-  ATTR_HTTP_REQUEST_CONTENT_LENGTH,
-  ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-  ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
-  ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
   ATTR_HTTP_TARGET,
   ATTR_USER_AGENT_SYNTHETIC_TYPE,
   USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT,
@@ -29,7 +25,6 @@ import type {
 import * as utils from '../../src/utils';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
-import { SemconvStability } from '@opentelemetry/instrumentation';
 import { extractHostnameAndPort } from '../../src/utils';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 import type { ParsedUrlQuery } from 'node:querystring';
@@ -277,7 +272,7 @@ describe('Utility', () => {
       });
       mock.expects('recordException').calledWithExactly(error);
 
-      utils.setSpanWithError(span, error, SemconvStability.OLD);
+      utils.setSpanWithError(span, error);
       mock.verify();
     });
   });
@@ -306,9 +301,6 @@ describe('Utility', () => {
   describe('getIncomingRequestAttributesOnResponse()', () => {
     it('should correctly parse the middleware stack if present', done => {
       context.setGlobalContextManager(new AsyncHooksContextManager().enable());
-      const request = {
-        socket: {},
-      } as IncomingMessage;
       context.with(
         setRPCMetadata(context.active(), {
           type: RPCType.HTTP,
@@ -317,9 +309,7 @@ describe('Utility', () => {
         }),
         () => {
           const attributes = utils.getIncomingRequestAttributesOnResponse(
-            request,
             {} as ServerResponse,
-            SemconvStability.OLD
           );
           assert.deepStrictEqual(attributes[ATTR_HTTP_ROUTE], '/user/:id');
           context.disable();
@@ -329,178 +319,12 @@ describe('Utility', () => {
     });
 
     it('should successfully process without middleware stack', () => {
-      const request = {
-        socket: {},
-      } as IncomingMessage;
       const attributes = utils.getIncomingRequestAttributesOnResponse(
-        request,
         {
           socket: {},
         } as ServerResponse & { socket: Socket },
-        SemconvStability.OLD
       );
       assert.deepEqual(attributes[ATTR_HTTP_ROUTE], undefined);
-    });
-  });
-
-  describe('getIncomingRequestMetricAttributesOnResponse()', () => {
-    it('should correctly add http_route if span has it', () => {
-      const spanAttributes: Attributes = {
-        [ATTR_HTTP_ROUTE]: '/user/:id',
-      };
-      const metricAttributes =
-        utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes);
-
-      assert.deepStrictEqual(metricAttributes[ATTR_HTTP_ROUTE], '/user/:id');
-    });
-
-    it('should skip http_route if span does not have it', () => {
-      const spanAttributes: Attributes = {};
-      const metricAttributes =
-        utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes);
-      assert.deepEqual(metricAttributes[ATTR_HTTP_ROUTE], undefined);
-    });
-  });
-
-  // Verify the key in the given attributes is set to the given value,
-  // and that no other HTTP Content Length attributes are set.
-  function verifyValueInAttributes(
-    attributes: Attributes,
-    key: string | undefined,
-    value: number
-  ) {
-    const SemanticAttributess = [
-      ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-      ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
-      ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-      ATTR_HTTP_REQUEST_CONTENT_LENGTH,
-    ];
-
-    for (const attr of SemanticAttributess) {
-      if (attr === key) {
-        assert.strictEqual(attributes[attr], value);
-      } else {
-        assert.strictEqual(attributes[attr], undefined);
-      }
-    }
-  }
-
-  describe('setRequestContentLengthAttributes()', () => {
-    it('should set request content-length uncompressed attribute with no content-encoding header', () => {
-      const attributes: Attributes = {};
-      const request = {} as IncomingMessage;
-
-      request.headers = {
-        'content-length': '1200',
-      };
-      utils.setRequestContentLengthAttribute(request, attributes);
-
-      verifyValueInAttributes(
-        attributes,
-        ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-        1200
-      );
-    });
-
-    it('should set request content-length uncompressed attribute with "identity" content-encoding header', () => {
-      const attributes: Attributes = {};
-      const request = {} as IncomingMessage;
-      request.headers = {
-        'content-length': '1200',
-        'content-encoding': 'identity',
-      };
-      utils.setRequestContentLengthAttribute(request, attributes);
-
-      verifyValueInAttributes(
-        attributes,
-        ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-        1200
-      );
-    });
-
-    it('should set request content-length compressed attribute with "gzip" content-encoding header', () => {
-      const attributes: Attributes = {};
-      const request = {} as IncomingMessage;
-      request.headers = {
-        'content-length': '1200',
-        'content-encoding': 'gzip',
-      };
-      utils.setRequestContentLengthAttribute(request, attributes);
-
-      verifyValueInAttributes(
-        attributes,
-        ATTR_HTTP_REQUEST_CONTENT_LENGTH,
-        1200
-      );
-    });
-  });
-
-  describe('setResponseContentLengthAttributes()', () => {
-    it('should set response content-length uncompressed attribute with no content-encoding header', () => {
-      const attributes: Attributes = {};
-
-      const response = {} as IncomingMessage;
-
-      response.headers = {
-        'content-length': '1200',
-      };
-      utils.setResponseContentLengthAttribute(response, attributes);
-
-      verifyValueInAttributes(
-        attributes,
-        ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-        1200
-      );
-    });
-
-    it('should set response content-length uncompressed attribute with "identity" content-encoding header', () => {
-      const attributes: Attributes = {};
-
-      const response = {} as IncomingMessage;
-
-      response.headers = {
-        'content-length': '1200',
-        'content-encoding': 'identity',
-      };
-
-      utils.setResponseContentLengthAttribute(response, attributes);
-
-      verifyValueInAttributes(
-        attributes,
-        ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-        1200
-      );
-    });
-
-    it('should set response content-length compressed attribute with "gzip" content-encoding header', () => {
-      const attributes: Attributes = {};
-
-      const response = {} as IncomingMessage;
-
-      response.headers = {
-        'content-length': '1200',
-        'content-encoding': 'gzip',
-      };
-
-      utils.setResponseContentLengthAttribute(response, attributes);
-
-      verifyValueInAttributes(
-        attributes,
-        ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
-        1200
-      );
-    });
-
-    it('should set no attributes with no content-length header', () => {
-      const attributes: Attributes = {};
-      const message = {} as IncomingMessage;
-
-      message.headers = {
-        'content-encoding': 'gzip',
-      };
-      utils.setResponseContentLengthAttribute(message, attributes);
-
-      verifyValueInAttributes(attributes, undefined, 1200);
     });
   });
 
@@ -519,7 +343,6 @@ describe('Utility', () => {
         request,
         {
           component: 'http',
-          semconvStability: SemconvStability.OLD,
           enableSyntheticSourceDetection: false,
         },
         diag
@@ -540,7 +363,6 @@ describe('Utility', () => {
         request,
         {
           component: 'http',
-          semconvStability: SemconvStability.OLD,
           enableSyntheticSourceDetection: false,
         },
         diag
@@ -562,7 +384,6 @@ describe('Utility', () => {
         request,
         {
           component: 'http',
-          semconvStability: SemconvStability.STABLE,
           enableSyntheticSourceDetection: true,
         },
         diag
@@ -580,12 +401,10 @@ describe('Utility', () => {
       const reqAttrs = utils.headerCapture(
         'request',
         ['Origin'],
-        SemconvStability.OLD
       )(() => 'localhost');
       const resAttrs = utils.headerCapture(
         'response',
         ['Cookie'],
-        SemconvStability.OLD
       )(() => 'token=123');
 
       assert.deepStrictEqual(reqAttrs, {
@@ -600,7 +419,6 @@ describe('Utility', () => {
       const attrs = utils.headerCapture(
         'request',
         ['Origin'],
-        SemconvStability.OLD
       )(() => ['localhost', 'www.example.com']);
 
       assert.deepStrictEqual(attrs, {
@@ -612,7 +430,6 @@ describe('Utility', () => {
       const attrs = utils.headerCapture(
         'request',
         ['Origin', 'Foo'],
-        SemconvStability.OLD
       )(header => {
         if (header === 'origin') {
           return 'localhost';
@@ -631,34 +448,10 @@ describe('Utility', () => {
       });
     });
 
-    it('should normalize header names (SemconvStability.OLD)', () => {
+    it('should normalize header names', () => {
       const attrs = utils.headerCapture(
         'request',
         ['X-Forwarded-For'],
-        SemconvStability.OLD
-      )(() => 'foo');
-      assert.deepStrictEqual(attrs, {
-        'http.request.header.x_forwarded_for': ['foo'],
-      });
-    });
-
-    it('should normalize header names (SemconvStability.STABLE)', () => {
-      const attrs = utils.headerCapture(
-        'request',
-        ['X-Forwarded-For'],
-        SemconvStability.STABLE
-      )(() => 'foo');
-      assert.deepStrictEqual(attrs, {
-        'http.request.header.x-forwarded-for': ['foo'],
-      });
-    });
-
-    it('should normalize header names (SemconvStability.DUPLICATE)', () => {
-      // STABLE semconv wins over OLD when "DUPLICATE" is selected.
-      const attrs = utils.headerCapture(
-        'request',
-        ['X-Forwarded-For'],
-        SemconvStability.DUPLICATE
       )(() => 'foo');
       assert.deepStrictEqual(attrs, {
         'http.request.header.x-forwarded-for': ['foo'],
@@ -669,7 +462,6 @@ describe('Utility', () => {
       const attrs = utils.headerCapture(
         'request',
         ['Origin', 'Accept'],
-        SemconvStability.OLD
       )(header => {
         if (header === 'origin') {
           return 'localhost';

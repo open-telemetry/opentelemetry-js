@@ -69,7 +69,7 @@ import type {
   RequestOptions,
   OutgoingHttpHeaders,
 } from 'http';
-import { isWrapped, SemconvStability } from '@opentelemetry/instrumentation';
+import { isWrapped } from '@opentelemetry/instrumentation';
 import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 
 const instrumentation = new HttpInstrumentation();
@@ -1064,7 +1064,6 @@ describe('HttpInstrumentation', () => {
       });
 
       before(async () => {
-        instrumentation['_semconvStability'] = SemconvStability.STABLE;
         instrumentation.setConfig({});
         instrumentation.enable();
         server = http.createServer((request, response) => {
@@ -1107,7 +1106,6 @@ describe('HttpInstrumentation', () => {
 
       after(() => {
         server.close();
-        instrumentation['_semconvStability'] = SemconvStability.OLD;
         instrumentation.setConfig({});
         instrumentation.disable();
       });
@@ -1233,7 +1231,6 @@ describe('HttpInstrumentation', () => {
       });
 
       before(async () => {
-        instrumentation['_semconvStability'] = SemconvStability.DUPLICATE;
         instrumentation.setConfig({});
         instrumentation.enable();
         server = http.createServer((request, response) => {
@@ -1255,7 +1252,6 @@ describe('HttpInstrumentation', () => {
 
       after(() => {
         server.close();
-        instrumentation['_semconvStability'] = SemconvStability.OLD;
         instrumentation.setConfig({});
         instrumentation.disable();
       });

@@ -2135,13 +2135,6 @@ describe('fetch', () => {
 
         it('span should have correct (absolute) url attribute(s)', () => {
           const span: tracing.ReadableSpan = exportedSpans[0];
-          // SemconvStability.OLD
-          assert.strictEqual(
-            span.attributes[ATTR_HTTP_URL],
-            `${ORIGIN}/api/status.json`,
-            `attributes ${ATTR_HTTP_URL} is wrong`
-          );
-          // SemconvStability.STABLE
           assert.strictEqual(
             span.attributes[ATTR_URL_FULL],
             `${ORIGIN}/api/status.json`,

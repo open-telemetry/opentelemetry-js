@@ -87,7 +87,7 @@ Hook type                                  | Parameters                         
 Prior to version `0.54.0`, this instrumentation created spans targeting an experimental semantic convention [Version 1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md).
 
 HTTP semantic conventions (semconv) were stabilized in v1.23.0, and a [migration process](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/non-normative/http-migration.md#http-semantic-convention-stability-migration) was defined.
-`instrumentation-http` versions 0.54.0 and later include support for migrating to stable HTTP semantic conventions, as described below.
+`instrumentation-http` versions 0.54.0 - XXXX include support for migrating to stable HTTP semantic conventions, as described below.
 The intent is to provide an approximate 6 month time window for users of this instrumentation to migrate to the new HTTP semconv, after which a new minor version will use the *new* semconv by default and drop support for the old semconv.
 See the [HTTP semconv migration plan for OpenTelemetry JS instrumentations](https://github.com/open-telemetry/opentelemetry-js/issues/5646).
 
@@ -96,6 +96,8 @@ To select which semconv version(s) is emitted from this instrumentation, use the
 - `http`: emit the new (stable) v1.23.0+ semantics
 - `http/dup`: emit **both** the old v1.7.0 and the new (stable) v1.23.0+ semantics
 - By default, if `OTEL_SEMCONV_STABILITY_OPT_IN` includes neither of the above tokens, the old v1.7.0 semconv is used.
+
+`instrumentation-http` versions XXX and later emit the stable v1.23.0+ semantics only.
 
 ### Attributes collected
 

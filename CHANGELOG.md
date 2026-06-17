@@ -12,6 +12,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* feat(sdk-trace-web)!: `addSpanNetworkEvents` no longer accepts the `skipOldSemconvContentLengthAttrs` parameter and no longer emits the old (v1.7.0) `http.response_content_length` and `http.response_content_length_uncompressed` span attributes. Only stable HTTP semantic conventions are emitted. [#XXXX](https://github.com/open-telemetry/opentelemetry-js/pull/XXXX) @maryliag
+
 ### :rocket: Features
 
 * feat(sdk-trace): add a new "sdk-trace" package to hold the Trace SDK, without environment variable configuration handling that belongs elsewhere [#6775](https://github.com/open-telemetry/opentelemetry-js/pull/6775) @trentm

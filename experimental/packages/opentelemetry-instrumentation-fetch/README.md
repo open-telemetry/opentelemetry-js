@@ -77,9 +77,15 @@ Fetch instrumentation plugin has few options available to choose from. You can s
 
 Up to and including v0.200.0, `instrumentation-fetch` generates telemetry using [Semantic Conventions v1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md).
 
-HTTP semantic conventions (semconv) were stabilized in semconv v1.23.0, and a [migration process](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/non-normative/http-migration.md#http-semantic-convention-stability-migration) was defined. `instrumentation-fetch` versions 0.201.0 and later include support for migrating to stable HTTP semantic conventions, as described below. The intent is to provide an approximate 6 month time window for users of this instrumentation to migrate to the new HTTP semconv, after which a new minor version will change to use the *new* semconv by default and drop support for the old semconv. See the [HTTP semconv migration plan for OpenTelemetry JS instrumentations](https://github.com/open-telemetry/opentelemetry-js/issues/5646).
+HTTP semantic conventions (semconv) were stabilized in semconv v1.23.0, and a [migration process](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/non-normative/http-migration.md#http-semantic-convention-stability-migration) was defined. `instrumentation-fetch` versions 0.201.0 - XXXX include support for migrating to stable HTTP semantic conventions, as described below. The intent is to provide an approximate 6 month time window for users of this instrumentation to migrate to the new HTTP semconv, after which a new minor version will change to use the *new* semconv by default and drop support for the old semconv. See the [HTTP semconv migration plan for OpenTelemetry JS instrumentations](https://github.com/open-telemetry/opentelemetry-js/issues/5646).
 
-// TODO update with info about the version that supports only new sem conv
+To select which semconv version(s) is emitted from this instrumentation, use the `semconvStabilityOptIn` configuration option. This option works [as described for `OTEL_SEMCONV_STABILITY_OPT_IN`](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/non-normative/http-migration.md):
+
+- `http`: emit the new (stable) v1.23.0 semantics
+- `http/dup`: emit **both** the old v1.7.0 and the new (stable) v1.23.0 semantics
+- By default, if `semconvStabilityOptIn` includes neither of the above tokens, the old v1.7.0 semconv is used.
+
+`instrumentation-fetch` versions XXX and later emit the stable v1.23.0+ semantics only.
 
 **Span name:** With the old v1.7.0 semconv the span name is `HTTP {method}` (for example 'HTTP GET'). Using the stable [semconv v1.23 for HTTP span names](https://github.com/open-telemetry/semantic-conventions/blob/v1.23.1/docs/http/http-spans.md#name), the span name is `{method}` (for example 'GET'). If both semconv versions are being emitted, the *old* name wins. (This instrumentation does not currently support adding an `{http.route}` to the span name.)
 

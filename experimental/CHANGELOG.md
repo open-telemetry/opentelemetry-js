@@ -8,6 +8,11 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* feat(instrumentation-http)!: emit only stable HTTP semantic conventions. The `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable no longer changes HTTP attribute or metric emission — old (v1.7.0) and duplicate (`http`/`http/dup`) semconv outputs have been removed. [#XXXX](https://github.com/open-telemetry/opentelemetry-js/pull/XXXX) @maryliag
+* feat(instrumentation-fetch)!: emit only stable HTTP semantic conventions. The `semconvStabilityOptIn` instrumentation config option has been removed; old (v1.7.0) and duplicate semconv outputs are no longer emitted. [#XXXX](https://github.com/open-telemetry/opentelemetry-js/pull/XXXX) @maryliag
+* feat(instrumentation-xml-http-request)!: emit only stable HTTP semantic conventions. The `semconvStabilityOptIn` instrumentation config option has been removed; old (v1.7.0) and duplicate semconv outputs are no longer emitted. [#XXXX](https://github.com/open-telemetry/opentelemetry-js/pull/XXXX) @maryliag
+* feat(instrumentation-grpc)!: emit only stable network semantic conventions. The `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable no longer changes attribute emission — `net.peer.name` and `net.peer.port` (old) are no longer set; only `server.address` and `server.port` (stable). [#XXXX](https://github.com/open-telemetry/opentelemetry-js/pull/XXXX) @maryliag
+
 ### :rocket: Features
 
 ### :bug: Bug Fixes

@@ -73,7 +73,6 @@ XHR instrumentation plugin has few options available to choose from. You can set
 | `applyCustomAttributesOnSpan` | `XHRCustomAttributeFunction` | Function for adding custom attributes                                                                                                                                                                                                                                                                 |
 | `ignoreNetworkEvents`         | boolean                      | Disable network events being added as span events (network events are added by default)                                                                                                                                                                                                               |
 | `measureRequestSize`          | boolean                      | Measure outgoing request length (outgoing request length is not measured by default)                                                                                                                                                                                                                  |
-| `semconvStabilityOptIn`       | string                       | A comma-separated string of tokens as described for `OTEL_SEMCONV_STABILITY_OPT_IN` in the [HTTP semantic convention stability migration](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/non-normative/http-migration.md) guide. See the "Semantic Conventions" section below. |
 
 ## Semantic Conventions
 
