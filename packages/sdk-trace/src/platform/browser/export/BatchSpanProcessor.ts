@@ -18,7 +18,7 @@ export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcesso
 
   private onInit(options: BatchSpanProcessorBrowserOptions): void {
     if (
-      options?.disableAutoFlushOnDocumentHide !== true &&
+      options.disableAutoFlushOnDocumentHide !== true &&
       typeof document !== 'undefined'
     ) {
       this._visibilityChangeListener = () => {
