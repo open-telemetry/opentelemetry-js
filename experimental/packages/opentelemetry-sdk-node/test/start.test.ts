@@ -56,7 +56,7 @@ import {
 } from '../src/semconv';
 import { ATTR_OS_TYPE } from '@opentelemetry/resources/src/semconv';
 import {
-  getLogRecordExporter,
+  createLogRecordExporterFromConfig,
   getPeriodicMetricReaderFromConfiguration,
   getSpanExporter,
   setupContextManager,
@@ -247,6 +247,22 @@ describe('startNodeSDK', function () {
       diagError.args[0][0].includes(
         'Could not load OpenTelemetry configuration, SDK will not be setup: ENOENT'
       )
+    );
+
+    await sdk.shutdown();
+  });
+
+  it('should diag.error and return NOOP_SDK when components in OTEL_CONFIG_FILE cannot be created', async () => {
+    const diagError = Sinon.spy(diag, 'error');
+    process.env.OTEL_CONFIG_FILE =
+      'test/fixtures/unknown-log-record-processor.yaml';
+    const sdk = startNodeSDK({});
+
+    assert.strictEqual(sdk, NOOP_SDK);
+    assert.strictEqual(diagError.callCount, 1);
+    assert.strictEqual(
+      diagError.args[0][0],
+      'Could not create OpenTelemetry SDK: unknown LogRecordProcessor name: "my_custom_processor"'
     );
 
     await sdk.shutdown();
@@ -945,9 +961,11 @@ describe('startNodeSDK', function () {
   });
 
   describe('tests to increase code coverage', function () {
-    it('should return undefined for invalid log record exporter model', async () => {
-      const exporter: LogRecordExporterConfigModel = {};
-      assert.equal(getLogRecordExporter(exporter), undefined);
+    it('should throw for invalid log record exporter model', async () => {
+      assert.throws(() => {
+        const exporter: LogRecordExporterConfigModel = {};
+        createLogRecordExporterFromConfig(exporter);
+      });
     });
 
     it('should create metric reader with opencensus producer when shim is available', async () => {
