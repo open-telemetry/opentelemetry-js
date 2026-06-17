@@ -1,26 +1,15 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
+import type {
   PerformanceEntries,
   PerformanceResourceTimingInfo,
   PropagateTraceHeaderCorsUrls,
 } from './types';
 import { PerformanceTimingNames as PTN } from './enums/PerformanceTimingNames';
-import * as api from '@opentelemetry/api';
+import type * as api from '@opentelemetry/api';
 import {
   hrTimeToNanoseconds,
   timeInputToHrTime,
@@ -363,7 +352,7 @@ export function normalizeUrl(url: string): string {
  * @param optimised - when id attribute of element is present the xpath can be
  * simplified to contain id
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-module-boundary-types
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getElementXPath(target: any, optimised?: boolean): string {
   if (target.nodeType === Node.DOCUMENT_NODE) {
     return '/';
@@ -374,7 +363,7 @@ export function getElementXPath(target: any, optimised?: boolean): string {
   }
   let xpath = '';
   if (target.parentNode) {
-    xpath += getElementXPath(target.parentNode, false);
+    xpath += getElementXPath(target.parentNode, optimised);
   }
   xpath += targetValue;
 
@@ -416,7 +405,7 @@ function getNodeIndex(target: HTMLElement): number {
 function getNodeValue(target: HTMLElement, optimised?: boolean): string {
   const nodeType = target.nodeType;
   const index = getNodeIndex(target);
-  let nodeValue = '';
+  let nodeValue: string;
   if (nodeType === Node.ELEMENT_NODE) {
     const id = target.getAttribute('id');
     if (optimised && id) {

@@ -1,27 +1,12 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
-  getElementXPath,
-  normalizeUrl,
-  parseUrl,
-  URLLike,
-} from '../../src/utils';
+import type { URLLike } from '../../src/utils';
+import { getElementXPath, normalizeUrl, parseUrl } from '../../src/utils';
 
 const fixture = `
 <div>
@@ -60,6 +45,7 @@ const fixture = `
     <div></div>
   </div>
   <div></div>
+  <div id="body-id"><div></div></div>
 </div>
 `;
 
@@ -90,6 +76,13 @@ describe('utils', function () {
         $fixture.find('#btn22')[0],
         getElementByXpath(element)
       );
+    });
+
+    it('should use ancestor id when optimised recursively', function () {
+      const inner = $fixture.find('#body-id div')[0];
+      const element = getElementXPath(inner, true);
+      assert.strictEqual(element, '//*[@id="body-id"]/div');
+      assert.strictEqual(inner, getElementByXpath(element));
     });
 
     it(

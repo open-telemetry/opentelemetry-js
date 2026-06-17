@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-async-hooks",
-  "version": "2.5.0",
+  "version": "2.8.0",
   "description": "OpenTelemetry AsyncLocalStorage-based Context Manager",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -11,8 +11,8 @@
     "clean": "tsc --build --clean",
     "test": "nyc mocha 'test/**/*.test.ts'",
     "tdd": "npm run test -- --watch-extensions ts --watch",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "version": "node ../../scripts/version-update.js",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../scripts/peer-api-check.js",

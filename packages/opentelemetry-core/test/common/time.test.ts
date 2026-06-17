@@ -1,31 +1,21 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
 import { otperformance as performance } from '../../src/platform';
 import * as sinon from 'sinon';
-import * as api from '@opentelemetry/api';
+import type * as api from '@opentelemetry/api';
 import {
   getTimeOrigin,
   hrTime,
   timeInputToHrTime,
   hrTimeDuration,
   hrTimeToNanoseconds,
-  hrTimeToMilliseconds,
   hrTimeToMicroseconds,
+  hrTimeToMilliseconds,
+  hrTimeToSeconds,
   hrTimeToTimeStamp,
   isTimeInput,
   addHrTimes,
@@ -175,6 +165,13 @@ describe('time', () => {
     });
   });
 
+  describe('#hrTimeToMicroseconds', () => {
+    it('should return microseconds', () => {
+      const output = hrTimeToMicroseconds([1, 200000000]);
+      assert.deepStrictEqual(output, 1200000);
+    });
+  });
+
   describe('#hrTimeToMilliseconds', () => {
     it('should return milliseconds', () => {
       const output = hrTimeToMilliseconds([1, 200000000]);
@@ -182,12 +179,13 @@ describe('time', () => {
     });
   });
 
-  describe('#hrTimeToMicroseconds', () => {
-    it('should return microseconds', () => {
-      const output = hrTimeToMicroseconds([1, 200000000]);
-      assert.deepStrictEqual(output, 1200000);
+  describe('#hrTimeToSeconds', () => {
+    it('should return seconds', () => {
+      const output = hrTimeToSeconds([1, 200000000]);
+      assert.deepStrictEqual(output, 1.2);
     });
   });
+
   describe('#isTimeInput', () => {
     it('should return true for a number', () => {
       assert.strictEqual(isTimeInput(12), true);

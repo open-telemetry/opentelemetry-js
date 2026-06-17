@@ -16,9 +16,9 @@ jobs:
       matrix:
         node_version:
           - "22"
-    runs-on: oracle-bare-metal-64cpu-512gb-x86-64
+    runs-on: oracle-bare-metal-64cpu-1024gb-x86-64-ubuntu-24
     container:
-      image: ubuntu:24.04@sha256:cd1dba651b3080c3686ecf4e3c4220f026b521fb76978881737d24f200828b2b
+      image: ubuntu:24.04@sha256:c4a8d5503dfb2a3eb8ab5f807da5bc69a85730fb49b5cfca2330194ebcc41c7b
     timeout-minutes: 10
     steps:
       # Apt packages:
@@ -29,12 +29,14 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
 
       # Avoid "detected dubious ownership in repository" error when running
       # `npm run submodule`.
       - run: git config --global --add safe.directory $GITHUB_WORKSPACE
 
-      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           cache: 'npm'
           cache-dependency-path: |
@@ -55,7 +57,7 @@ jobs:
           find . -name .benchmark-results.txt -exec cat {} + > combined_benchmarks.txt
 
       - name: Store benchmark results
-        uses: benchmark-action/github-action-benchmark@v1
+        uses: benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba # v1
         with:
           tool: 'benchmarkjs'
           output-file-path: combined_benchmarks.txt

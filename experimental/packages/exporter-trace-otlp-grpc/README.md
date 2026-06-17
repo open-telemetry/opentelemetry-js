@@ -44,7 +44,46 @@ provider.register();
 });
 ```
 
-By default, plaintext connection is used. In order to use TLS in Node.js, provide `credentials` option like so:
+By default, the exporter creates a secure (TLS) connection. When connecting to a local development collector without TLS, you can use an insecure connection by specifying the `http://` scheme in the URL:
+
+```js
+const { NodeTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-node');
+const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc');
+
+const collectorOptions = {
+  url: 'http://localhost:4317',  // http:// creates an insecure connection
+};
+
+const exporter = new OTLPTraceExporter(collectorOptions);
+const provider = new NodeTracerProvider({
+  spanProcessors: [new SimpleSpanProcessor(exporter)]
+});
+
+provider.register();
+```
+
+Alternatively, you can explicitly configure insecure credentials:
+
+```js
+const grpc = require('@grpc/grpc-js');
+
+const { NodeTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-node');
+const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc');
+
+const collectorOptions = {
+  url: 'localhost:4317',
+  credentials: grpc.credentials.createInsecure(),
+};
+
+const exporter = new OTLPTraceExporter(collectorOptions);
+const provider = new NodeTracerProvider({
+  spanProcessors: [new SimpleSpanProcessor(exporter)]
+});
+
+provider.register();
+```
+
+To use TLS in Node.js, provide `credentials` option like so:
 
 ```js
 const fs = require('fs');
@@ -140,7 +179,7 @@ The OTLPTraceExporter has a timeout configuration option which is the maximum ti
 By default no compression will be used. To use compression, set it programmatically in `collectorOptions` or with environment variables. Supported compression options: `gzip` and `none`.
 
 ```js
-const { CompressionAlgorithm } = require('@opentelemetry/exporter-trace-otlp-grpc');
+const { CompressionAlgorithm } = require('@opentelemetry/otlp-exporter-base');
 
 const collectorOptions = {
   // url is optional and can be omitted - default is http://localhost:4317

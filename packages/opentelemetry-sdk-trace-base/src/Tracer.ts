@@ -1,33 +1,27 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as api from '@opentelemetry/api';
-import {
-  InstrumentationScope,
-  sanitizeAttributes,
-  isTracingSuppressed,
-} from '@opentelemetry/core';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import { sanitizeAttributes, isTracingSuppressed } from '@opentelemetry/core';
 import { SpanImpl } from './Span';
-import { GeneralLimits, SpanLimits, TracerConfig } from './types';
+import type { GeneralLimits, SpanLimits, TracerConfig } from './types';
 import { mergeConfig } from './utility';
-import { SpanProcessor } from './SpanProcessor';
-import { Sampler } from './Sampler';
-import { IdGenerator } from './IdGenerator';
+import type { SpanProcessor } from './SpanProcessor';
+import type { Sampler } from './Sampler';
+import type { IdGenerator } from './IdGenerator';
 import { RandomIdGenerator } from './platform';
-import { Resource } from '@opentelemetry/resources';
+import type { Resource } from '@opentelemetry/resources';
+import { TracerMetrics } from './TracerMetrics';
+import { VERSION } from './version';
+import type { InspectFn, InspectStylizeOptions } from './inspect';
+import {
+  formatInspect,
+  inspectCustom,
+  settledResourceAttributes,
+} from './inspect';
 
 /**
  * This class represents a basic tracer.
@@ -41,6 +35,7 @@ export class Tracer implements api.Tracer {
 
   private readonly _resource: Resource;
   private readonly _spanProcessor: SpanProcessor;
+  private readonly _tracerMetrics: TracerMetrics;
 
   /**
    * Constructs a new Tracer instance.
@@ -59,6 +54,11 @@ export class Tracer implements api.Tracer {
     this._resource = resource;
     this._spanProcessor = spanProcessor;
     this.instrumentationScope = instrumentationScope;
+
+    const meter = localConfig.meterProvider
+      ? localConfig.meterProvider.getMeter('@opentelemetry/sdk-trace', VERSION)
+      : api.createNoopMeter();
+    this._tracerMetrics = new TracerMetrics(meter);
   }
 
   /**
@@ -120,6 +120,11 @@ export class Tracer implements api.Tracer {
       links
     );
 
+    const recordEndMetrics = this._tracerMetrics.startSpan(
+      parentSpanContext,
+      samplingResult.decision
+    );
+
     traceState = samplingResult.traceState ?? traceState;
 
     const traceFlags =
@@ -154,6 +159,7 @@ export class Tracer implements api.Tracer {
       startTime: options.startTime,
       spanProcessor: this._spanProcessor,
       spanLimits: this._spanLimits,
+      recordEndMetrics,
     });
     return span;
   }
@@ -163,6 +169,11 @@ export class Tracer implements api.Tracer {
    * created span as first argument.
    * Additionally the new span gets set in context and this context is activated
    * for the duration of the function call.
+   *
+   * **Important**: The callback function is responsible for calling `span.end()`
+   * to finish the span. Unlike some other OpenTelemetry implementations, the span
+   * is NOT automatically ended when the callback returns. If `span.end()` is not
+   * called, the span will never be exported and will be silently lost.
    *
    * @param name The name of the span
    * @param [options] SpanOptions used for span creation
@@ -254,5 +265,19 @@ export class Tracer implements api.Tracer {
   /** Returns the active {@link SpanLimits}. */
   getSpanLimits(): SpanLimits {
     return this._spanLimits;
+  }
+
+  [inspectCustom](
+    depth: number,
+    options: InspectStylizeOptions | undefined,
+    inspect: InspectFn | undefined
+  ): unknown {
+    const payload = {
+      instrumentationScope: this.instrumentationScope,
+      resource: { attributes: settledResourceAttributes(this._resource) },
+      spanLimits: this._spanLimits,
+      generalLimits: this._generalLimits,
+    };
+    return formatInspect('Tracer', payload, depth, options, inspect);
   }
 }

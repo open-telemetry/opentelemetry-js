@@ -1,42 +1,28 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import {
+import type {
   AggregationOption,
-  AggregationType,
   CollectionResult,
-  InstrumentType,
+  Histogram,
   MetricProducer,
   PushMetricExporter,
 } from '../../src';
-import {
-  DataPointType,
+import { AggregationType, InstrumentType, MeterProvider } from '../../src';
+import type {
   ResourceMetrics,
   ScopeMetrics,
 } from '../../src/export/MetricData';
+import { DataPointType } from '../../src/export/MetricData';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { TimeoutError } from '../../src/utils';
-import {
-  ExportResult,
-  ExportResultCode,
-  setGlobalErrorHandler,
-} from '@opentelemetry/core';
+import type { ExportResult } from '@opentelemetry/core';
+import { ExportResultCode, setGlobalErrorHandler } from '@opentelemetry/core';
 import { TestMetricProducer } from './TestMetricProducer';
 import {
   assertAggregationSelector,
@@ -261,6 +247,140 @@ describe('PeriodicExportingMetricReader', () => {
       await new Promise(resolve => setTimeout(resolve, 50));
 
       exporterMock.verify();
+    });
+  });
+
+  describe('cardinalityLimits', () => {
+    const instrumentTypes = [
+      { instrument: InstrumentType.COUNTER, name: 'counter' },
+      { instrument: InstrumentType.GAUGE, name: 'gauge' },
+      { instrument: InstrumentType.HISTOGRAM, name: 'histogram' },
+      { instrument: InstrumentType.UP_DOWN_COUNTER, name: 'upDownCounter' },
+      {
+        instrument: InstrumentType.OBSERVABLE_COUNTER,
+        name: 'observableCounter',
+      },
+      { instrument: InstrumentType.OBSERVABLE_GAUGE, name: 'observableGauge' },
+      {
+        instrument: InstrumentType.OBSERVABLE_UP_DOWN_COUNTER,
+        name: 'observableUpDownCounter',
+      },
+    ] as const;
+
+    it('should use default cardinality limit value if not specified', () => {
+      const exporter = new TestDeltaMetricExporter();
+
+      const p = new PeriodicExportingMetricReader({
+        exporter,
+        exportIntervalMillis: 1,
+        exportTimeoutMillis: 1,
+      });
+
+      assert.strictEqual(
+        p.selectCardinalityLimit(InstrumentType.COUNTER),
+        2000
+      );
+    });
+
+    instrumentTypes.forEach(({ instrument, name }) => {
+      it('should use the provided cardinality limit for ' + name, () => {
+        const exporter = new TestDeltaMetricExporter();
+
+        const p = new PeriodicExportingMetricReader({
+          exporter,
+          exportIntervalMillis: 1,
+          exportTimeoutMillis: 1,
+          cardinalityLimits: {
+            [name]: 5000,
+          },
+        });
+        assert.strictEqual(p.selectCardinalityLimit(instrument), 5000);
+      });
+    });
+
+    it('should use the provided default cardinality limit when no specific limit is provided', () => {
+      const exporter = new TestDeltaMetricExporter();
+
+      const defaultLimit = 1;
+
+      const instrumentTypesValues = [
+        InstrumentType.COUNTER,
+        InstrumentType.GAUGE,
+        InstrumentType.HISTOGRAM,
+        InstrumentType.UP_DOWN_COUNTER,
+        InstrumentType.OBSERVABLE_COUNTER,
+        InstrumentType.OBSERVABLE_GAUGE,
+        InstrumentType.OBSERVABLE_UP_DOWN_COUNTER,
+      ];
+
+      const p = new PeriodicExportingMetricReader({
+        exporter,
+        exportIntervalMillis: 1,
+        exportTimeoutMillis: 1,
+        cardinalityLimits: { default: defaultLimit },
+      });
+
+      instrumentTypesValues.forEach(instrument => {
+        assert.strictEqual(p.selectCardinalityLimit(instrument), defaultLimit);
+      });
+    });
+
+    it('should use the provided values for a given instrument type, or fallback to the default value otherwise', () => {
+      const exporter = new TestDeltaMetricExporter();
+
+      const p = new PeriodicExportingMetricReader({
+        exporter,
+        exportIntervalMillis: 1,
+        exportTimeoutMillis: 1,
+        cardinalityLimits: {
+          counter: 1000,
+          histogram: 3000,
+          observableCounter: 4000,
+        },
+      });
+
+      assert.strictEqual(
+        p.selectCardinalityLimit(InstrumentType.COUNTER),
+        1000
+      );
+      assert.strictEqual(
+        p.selectCardinalityLimit(InstrumentType.HISTOGRAM),
+        3000
+      );
+      assert.strictEqual(
+        p.selectCardinalityLimit(InstrumentType.OBSERVABLE_COUNTER),
+        4000
+      );
+      assert.strictEqual(p.selectCardinalityLimit(InstrumentType.GAUGE), 2000);
+      assert.strictEqual(
+        p.selectCardinalityLimit(InstrumentType.UP_DOWN_COUNTER),
+        2000
+      );
+      assert.strictEqual(
+        p.selectCardinalityLimit(InstrumentType.OBSERVABLE_GAUGE),
+        2000
+      );
+      assert.strictEqual(
+        p.selectCardinalityLimit(InstrumentType.OBSERVABLE_UP_DOWN_COUNTER),
+        2000
+      );
+    });
+
+    it("should fallback to the default value if the specified cardinality selector doesn't exists", () => {
+      const exporter = new TestDeltaMetricExporter();
+      const defaultLimit = 1;
+
+      const p = new PeriodicExportingMetricReader({
+        exporter,
+        exportIntervalMillis: 1,
+        exportTimeoutMillis: 1,
+        cardinalityLimits: { default: defaultLimit },
+      });
+
+      assert.strictEqual(
+        p.selectCardinalityLimit('' as InstrumentType),
+        defaultLimit
+      );
     });
   });
 
@@ -661,6 +781,107 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       await assert.rejects(() => reader.shutdown(), /Error during forceFlush/);
+    });
+  });
+
+  describe('sdk metrics', () => {
+    it('should record collection duration when meter provider set', async () => {
+      const exporter = new TestMetricExporter();
+      const reader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 30,
+        exportTimeoutMillis: 20,
+      });
+      const meterProvider = new MeterProvider({
+        readers: [reader],
+        sdkMetricsEnabled: true,
+      });
+
+      const counter = meterProvider
+        .getMeter('test')
+        .createCounter('test_counter');
+      counter.add(1);
+
+      // First export will not have the collection metric, so wait for two.
+      const result = await exporter.waitForNumberOfExports(2);
+      assert.strictEqual(result.length, 2);
+      const scopeMetrics = result[1].scopeMetrics.find(
+        sm => sm.scope.name === '@opentelemetry/sdk-metrics'
+      );
+      assert.ok(scopeMetrics);
+      const collectionDurationMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.metric_reader.collection.duration'
+      );
+      assert.ok(collectionDurationMetric);
+      const histogram = collectionDurationMetric.dataPoints[0]
+        .value as Histogram;
+      assert.strictEqual(histogram.count, 1);
+      const attrs = collectionDurationMetric.dataPoints[0].attributes;
+      assert.strictEqual(
+        attrs['otel.component.type'],
+        'periodic_metric_reader'
+      );
+      assert.ok(
+        attrs['otel.component.name']
+          ?.toString()
+          .startsWith('periodic_metric_reader/')
+      );
+      assert.strictEqual(attrs['error.type'], undefined);
+
+      await meterProvider.shutdown();
+    });
+
+    it('should record collection error', async () => {
+      const exporter = new TestMetricExporter();
+      const reader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 30,
+        exportTimeoutMillis: 20,
+      });
+      const meterProvider = new MeterProvider({
+        readers: [reader],
+        sdkMetricsEnabled: true,
+      });
+
+      meterProvider
+        .getMeter('test')
+        .createObservableCounter('bad_counter')
+        .addCallback(() => {
+          throw new Error('bad metric');
+        });
+
+      const counter = meterProvider
+        .getMeter('test')
+        .createCounter('test_counter');
+      counter.add(1);
+
+      // First export will not have the collection metric, so wait for two.
+      const result = await exporter.waitForNumberOfExports(2);
+      assert.strictEqual(result.length, 2);
+      const scopeMetrics = result[1].scopeMetrics.find(
+        sm => sm.scope.name === '@opentelemetry/sdk-metrics'
+      );
+      assert.ok(scopeMetrics);
+      const collectionDurationMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.metric_reader.collection.duration'
+      );
+      assert.ok(collectionDurationMetric);
+      const histogram = collectionDurationMetric.dataPoints[0]
+        .value as Histogram;
+      assert.strictEqual(histogram.count, 1);
+      const attrs = collectionDurationMetric.dataPoints[0].attributes;
+      assert.strictEqual(
+        attrs['otel.component.type'],
+        'periodic_metric_reader'
+      );
+      assert.ok(
+        attrs['otel.component.name']
+          ?.toString()
+          .startsWith('periodic_metric_reader/')
+      );
+      assert.strictEqual(attrs['error.type'], 'Error');
+
+      await meterProvider.shutdown();
     });
   });
 });

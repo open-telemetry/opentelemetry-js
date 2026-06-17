@@ -1,22 +1,11 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context } from '../context/types';
-import { Span } from './span';
-import { SpanOptions } from './SpanOptions';
+import type { Context } from '../context/types';
+import type { Span } from './span';
+import type { SpanOptions } from './SpanOptions';
 
 /**
  * Tracer provides an interface for creating {@link Span}s.
@@ -45,6 +34,11 @@ export interface Tracer {
    * created span as first argument.
    * Additionally the new span gets set in context and this context is activated
    * for the duration of the function call.
+   *
+   * **Important**: The callback function is responsible for calling `span.end()`
+   * to finish the span. Unlike some other OpenTelemetry implementations, the span
+   * is NOT automatically ended when the callback returns. If `span.end()` is not
+   * called, the span will never be exported and will be silently lost.
    *
    * @param name The name of the span
    * @param [options] SpanOptions used for span creation

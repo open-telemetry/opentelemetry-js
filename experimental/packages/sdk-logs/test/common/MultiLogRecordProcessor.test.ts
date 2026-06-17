@@ -1,22 +1,12 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
+import { ROOT_CONTEXT } from '@opentelemetry/api';
 import type { LogRecordProcessor, ReadableLogRecord } from '../../src';
 import {
   LoggerProvider,
@@ -26,16 +16,23 @@ import {
 import { MultiLogRecordProcessor } from './../../src/MultiLogRecordProcessor';
 
 class TestProcessor implements LogRecordProcessor {
+  shutdownCalled = false;
   logRecords: ReadableLogRecord[] = [];
   onEmit(logRecord: ReadableLogRecord): void {
-    this.logRecords.push(logRecord);
+    if (!this.shutdownCalled) {
+      this.logRecords.push(logRecord);
+    }
   }
   shutdown(): Promise<void> {
     this.logRecords = [];
+    this.shutdownCalled = true;
     return Promise.resolve();
   }
   forceFlush(): Promise<void> {
     return Promise.resolve();
+  }
+  enabled(): boolean {
+    return !this.shutdownCalled;
   }
 }
 
@@ -203,6 +200,28 @@ describe('MultiLogRecordProcessor', () => {
         processor1.logRecords.length,
         processor2.logRecords.length
       );
+    });
+  });
+
+  describe('enabled', () => {
+    const processor1 = new TestProcessor();
+    const processor2 = new TestProcessor();
+    const { multiProcessor } = setup([processor1, processor2]);
+    const context = ROOT_CONTEXT;
+    const instrumentationScope = { name: 'test', version: '0.0.0' };
+
+    it('should return "true" if all processors are enabled', async () => {
+      assert.ok(multiProcessor.enabled({ context, instrumentationScope }));
+    });
+
+    it('should return "true" if any of the processors is enabled', async () => {
+      await processor1.shutdown();
+      assert.ok(multiProcessor.enabled({ context, instrumentationScope }));
+    });
+
+    it('should return "false" if all processors are not enabled', async () => {
+      await processor2.shutdown();
+      assert.ok(!multiProcessor.enabled({ context, instrumentationScope }));
     });
   });
 });

@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 //-----------------------------------------------------------------------------------------------------------------
@@ -69,6 +58,17 @@ export const EVENT_AZURE_RESOURCE_LOG = 'azure.resource.log' as const;
 export const EVENT_BROWSER_WEB_VITAL = 'browser.web_vital' as const;
 
 /**
+ * This event represents an exception that occurred during a database client operation, such as connection failures, query errors, timeouts, or other errors that prevent the operation from completing successfully.
+ *
+ * @note This event **SHOULD** be recorded when an exception occurs during database client operations.
+ * Instrumentations **SHOULD** set the severity to WARN (severity number 13) when recording this event.
+ * Instrumentations **MAY** provide a configuration option to populate exception events with the attributes captured on the corresponding database client span.
+ *
+ * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const EVENT_DB_CLIENT_OPERATION_EXCEPTION = 'db.client.operation.exception' as const;
+
+/**
  * This event represents an occurrence of a lifecycle transition on Android or iOS platform.
  *
  * @note The event body fields **MUST** be used to describe the state of the application at the time of the event.
@@ -78,6 +78,17 @@ export const EVENT_BROWSER_WEB_VITAL = 'browser.web_vital' as const;
  * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const EVENT_DEVICE_APP_LIFECYCLE = 'device.app.lifecycle' as const;
+
+/**
+ * This event represents an exception that occurred during FaaS function invocation, such as application errors, internal failures, or other exceptions that prevent the function from completing successfully.
+ *
+ * @note This event **SHOULD** be recorded when an exception occurs during FaaS function invocation.
+ * Instrumentations **SHOULD** set the severity to ERROR (severity number 17) when recording this event.
+ * Instrumentations **MAY** provide a configuration option to populate exception events with the attributes captured on the corresponding FaaS span.
+ *
+ * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const EVENT_FAAS_INVOCATION_EXCEPTION = 'faas.invocation.exception' as const;
 
 /**
  * Defines feature flag evaluation as an event.
@@ -116,6 +127,17 @@ export const EVENT_GEN_AI_CHOICE = 'gen_ai.choice' as const;
 export const EVENT_GEN_AI_CLIENT_INFERENCE_OPERATION_DETAILS = 'gen_ai.client.inference.operation.details' as const;
 
 /**
+ * This event represents an exception that occurred during a Generative AI client operation, such as API errors, rate limiting, model errors, timeouts, or other errors that prevent the operation from completing successfully.
+ *
+ * @note This event **SHOULD** be recorded when an exception occurs during Generative AI client operations.
+ * Instrumentations **SHOULD** set the severity to WARN (severity number 13) when recording this event.
+ * Instrumentations **MAY** provide a configuration option to populate exception events with the attributes captured on the corresponding Generative AI client span.
+ *
+ * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const EVENT_GEN_AI_CLIENT_OPERATION_EXCEPTION = 'gen_ai.client.operation.exception' as const;
+
+/**
  * This event captures the result of evaluating GenAI output for quality, accuracy, or other characteristics. This event **SHOULD** be parented to GenAI operation span being evaluated when possible or set `gen_ai.response.id` when span id is not available.
  *
  * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -150,13 +172,115 @@ export const EVENT_GEN_AI_TOOL_MESSAGE = 'gen_ai.tool.message' as const;
 export const EVENT_GEN_AI_USER_MESSAGE = 'gen_ai.user.message' as const;
 
 /**
+ * This event represents an exception that occurred during an HTTP client request, such as network failures, timeouts, or other errors that prevent the request from completing successfully.
+ *
+ * @note This event **SHOULD** be recorded when an exception occurs during HTTP client operations.
+ * Instrumentations **SHOULD** set the severity to WARN (severity number 13) when recording this event.
+ * Some HTTP client frameworks generate artificial exceptions for non-successful HTTP status codes (e.g., 404 Not Found). When possible, instrumentations **SHOULD NOT** record these artificial exceptions, or **SHOULD** set the severity to DEBUG (severity number 5).
+ * Instrumentations **MAY** provide a configuration option to populate exception events with the attributes captured on the corresponding HTTP client span.
+ *
+ * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const EVENT_HTTP_CLIENT_REQUEST_EXCEPTION = 'http.client.request.exception' as const;
+
+/**
+ * This event represents an exception that occurred during HTTP server request processing, such as application errors, internal failures, or other exceptions that prevent the server from successfully handling the request.
+ *
+ * @note This event **SHOULD** be recorded when an exception occurs during HTTP server request processing.
+ * Instrumentations **SHOULD** set the severity to ERROR (severity number 17) when recording this event.
+ * Instrumentations **MAY** provide a configuration option to populate exception events with the attributes captured on the corresponding HTTP server span.
+ *
+ * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const EVENT_HTTP_SERVER_REQUEST_EXCEPTION = 'http.server.request.exception' as const;
+
+/**
+ * This event represents an exception that occurred during a messaging create operation.
+ *
+ * @note This event **SHOULD** be recorded when an exception occurs during a messaging create operation.
+ * Instrumentations **SHOULD** set the severity to WARN (severity number 13) when recording this event.
+ * Instrumentations **MAY** provide a configuration option to populate exception events with the attributes captured on the corresponding messaging create span.
+ *
+ * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const EVENT_MESSAGING_CREATE_EXCEPTION = 'messaging.create.exception' as const;
+
+/**
+ * This event represents an exception that occurred during messaging process operations.
+ *
+ * @note This event **SHOULD** be recorded when an exception occurs during messaging process operations.
+ * Instrumentations **SHOULD** set the severity to ERROR (severity number 17) when recording this event.
+ * Instrumentations **MAY** provide a configuration option to populate exception events with the attributes captured on the corresponding messaging process span.
+ *
+ * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const EVENT_MESSAGING_PROCESS_EXCEPTION = 'messaging.process.exception' as const;
+
+/**
+ * This event represents an exception that occurred during a messaging receive operation.
+ *
+ * @note This event **SHOULD** be recorded when an exception occurs during a messaging receive operation.
+ * Instrumentations **SHOULD** set the severity to WARN (severity number 13) when recording this event.
+ * Instrumentations **MAY** provide a configuration option to populate exception events with the attributes captured on the corresponding messaging receive span.
+ *
+ * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const EVENT_MESSAGING_RECEIVE_EXCEPTION = 'messaging.receive.exception' as const;
+
+/**
+ * This event represents an exception that occurred during a messaging send operation.
+ *
+ * @note This event **SHOULD** be recorded when an exception occurs during a messaging send operation.
+ * Instrumentations **SHOULD** set the severity to WARN (severity number 13) when recording this event.
+ * Instrumentations **MAY** provide a configuration option to populate exception events with the attributes captured on the corresponding messaging send span.
+ *
+ * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const EVENT_MESSAGING_SEND_EXCEPTION = 'messaging.send.exception' as const;
+
+/**
+ * This event represents an exception that occurred during a messaging settle operation.
+ *
+ * @note This event **SHOULD** be recorded when an exception occurs during a messaging settle operation.
+ * Instrumentations **SHOULD** set the severity to WARN (severity number 13) when recording this event.
+ * Instrumentations **MAY** provide a configuration option to populate exception events with the attributes captured on the corresponding messaging settle span.
+ *
+ * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const EVENT_MESSAGING_SETTLE_EXCEPTION = 'messaging.settle.exception' as const;
+
+/**
+ * This event represents an exception that occurred during an outgoing RPC call, such as network failures, timeouts, serialization errors, or other errors that prevent the call from completing successfully.
+ *
+ * @note This event **SHOULD** be recorded when an exception occurs during RPC client call operations.
+ * Instrumentations **SHOULD** set the severity to WARN (severity number 13) when recording this event.
+ * Instrumentations **MAY** provide a configuration option to populate exception events with the attributes captured on the corresponding RPC client span.
+ *
+ * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const EVENT_RPC_CLIENT_CALL_EXCEPTION = 'rpc.client.call.exception' as const;
+
+/**
  * Describes a message sent or received within the context of an RPC call.
  *
  * @note In the lifetime of an RPC stream, an event for each message sent/received on client and server spans **SHOULD** be created. In case of unary calls message events **SHOULD NOT** be recorded.
  *
  * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Deprecated, no replacement at this time.
  */
 export const EVENT_RPC_MESSAGE = 'rpc.message' as const;
+
+/**
+ * This event represents an exception that occurred during incoming RPC call processing, such as application errors, internal failures, or other exceptions that prevent the server from successfully handling the call.
+ *
+ * @note This event **SHOULD** be recorded when an exception occurs during RPC server call processing.
+ * Instrumentations **SHOULD** set the severity to ERROR (severity number 17) when recording this event.
+ * Instrumentations **MAY** provide a configuration option to populate exception events with the attributes captured on the corresponding RPC server span.
+ *
+ * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const EVENT_RPC_SERVER_CALL_EXCEPTION = 'rpc.server.call.exception' as const;
 
 /**
  * Indicates that a session has ended.

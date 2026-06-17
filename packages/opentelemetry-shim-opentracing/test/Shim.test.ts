@@ -1,23 +1,14 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
 import * as opentracing from 'opentracing';
-import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
-import { SpanContextShim, SpanShim, TracerShim } from '../src/shim';
+import type { Span } from '@opentelemetry/sdk-trace-base';
+import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
+import type { SpanShim } from '../src/shim';
+import { SpanContextShim, TracerShim } from '../src/shim';
 import {
   CompositePropagator,
   W3CBaggagePropagator,
@@ -338,7 +329,9 @@ describe('OpenTracing Shim', () => {
 
         span.setTag('error', false);
         assert.strictEqual(otSpan.status.code, SpanStatusCode.OK);
+      });
 
+      it('maps string error tag to status code', () => {
         span.setTag('error', 'true');
         assert.strictEqual(otSpan.status.code, SpanStatusCode.ERROR);
 
@@ -361,7 +354,9 @@ describe('OpenTracing Shim', () => {
 
         span.addTags({ hello: 'stars', error: false });
         assert.strictEqual(otSpan.status.code, SpanStatusCode.OK);
+      });
 
+      it('maps string error tag to status code when adding multiple tags', () => {
         span.addTags({ hello: 'stars', error: 'true' });
         assert.strictEqual(otSpan.status.code, SpanStatusCode.ERROR);
 

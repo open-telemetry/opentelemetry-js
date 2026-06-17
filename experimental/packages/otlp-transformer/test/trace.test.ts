@@ -1,33 +1,29 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
-import * as root from '../src/generated/root';
-import { SpanKind, SpanStatusCode, TraceFlags } from '@opentelemetry/api';
+import * as signals from '../test/generated/signals';
+import { diag, SpanKind, SpanStatusCode, TraceFlags } from '@opentelemetry/api';
+import type { InstrumentationScope } from '@opentelemetry/core';
 import { TraceState } from '@opentelemetry/core';
-import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
-import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import { toBase64 } from './utils';
-import { OtlpEncodingOptions } from '../src/common/internal-types';
+import type { OtlpEncodingOptions } from '../src/common/internal-types';
 import { ESpanKind, EStatusCode } from '../src/trace/internal-types';
 import { createExportTraceServiceRequest } from '../src/trace/internal';
 import { ProtobufTraceSerializer } from '../src/trace/protobuf';
 import { JsonTraceSerializer } from '../src/trace/json';
 import { hexToBinary } from '../src/common/hex-to-binary';
-import { ISpan } from '../src/trace/internal-types';
+import type { ISpan } from '../src/trace/internal-types';
 import { JSON_ENCODER, PROTOBUF_ENCODER } from '../src/common/utils';
+import {
+  GROWING_BUFFER_DEBUG_MESSAGE,
+  ProtobufWriter,
+} from '../src/common/protobuf/protobuf-writer';
 
 function createExpectedSpanJson(options: OtlpEncodingOptions) {
   const useHex = options.useHex ?? false;
@@ -142,7 +138,141 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
   };
 }
 
-function createExpectedSpanProtobuf() {
+function createExpectedSpanData(options: OtlpEncodingOptions) {
+  const useHex = options.useHex ?? false;
+  const useLongBits = options.useLongBits ?? true;
+
+  const startTime = useLongBits
+    ? { low: 1155450124, high: 382008859 }
+    : '1640715557342725388';
+  const endTime = useLongBits
+    ? { low: 2455450124, high: 382008859 }
+    : '1640715558642725388';
+  const eventTime = useLongBits
+    ? { low: 2355450124, high: 382008859 }
+    : '1640715558542725388';
+
+  const traceId = useHex
+    ? '00000000000000000000000000000001'
+    : hexToBinary('00000000000000000000000000000001');
+  const spanId = useHex ? '0000000000000002' : hexToBinary('0000000000000002');
+  const parentSpanId = useHex
+    ? '0000000000000001'
+    : hexToBinary('0000000000000001');
+  const linkSpanId = useHex
+    ? '0000000000000003'
+    : hexToBinary('0000000000000003');
+  const linkTraceId = useHex
+    ? '00000000000000000000000000000002'
+    : hexToBinary('00000000000000000000000000000002');
+
+  return {
+    traceId,
+    spanId,
+    parentSpanId,
+    traceState: 'span=bar',
+    name: 'span-name',
+    kind: ESpanKind.SPAN_KIND_CLIENT,
+    links: [
+      {
+        droppedAttributesCount: 0,
+        spanId: linkSpanId,
+        traceId: linkTraceId,
+        traceState: 'link=foo',
+        attributes: [
+          {
+            key: 'link-attribute',
+            value: { stringValue: 'string value' },
+          },
+        ],
+        flags: 0x101,
+      },
+    ],
+    startTimeUnixNano: startTime,
+    endTimeUnixNano: endTime,
+    events: [
+      {
+        droppedAttributesCount: 0,
+        attributes: [
+          {
+            key: 'event-attribute',
+            value: { stringValue: 'some string value' },
+          },
+        ],
+        name: 'some event',
+        timeUnixNano: eventTime,
+      },
+    ],
+    attributes: [
+      {
+        key: 'string-attribute',
+        value: { stringValue: 'some attribute value' },
+      },
+    ],
+    droppedAttributesCount: 0,
+    droppedEventsCount: 0,
+    droppedLinksCount: 0,
+    status: {
+      code: EStatusCode.STATUS_CODE_OK,
+      message: undefined,
+    },
+    flags: 0x101,
+  };
+}
+
+function createExpectedMultiResourceSpanJson(options: OtlpEncodingOptions) {
+  const spanData = createExpectedSpanData(options);
+
+  return {
+    resourceSpans: [
+      {
+        resource: {
+          attributes: [
+            {
+              key: 'resource-attribute',
+              value: { stringValue: 'resource attribute value' },
+            },
+          ],
+          droppedAttributesCount: 0,
+        },
+        schemaUrl: undefined,
+        scopeSpans: [
+          {
+            scope: { name: 'myLib', version: '0.1.0' },
+            spans: [spanData],
+            schemaUrl: 'http://url.to.schema',
+          },
+          {
+            scope: { name: 'myOtherLib' },
+            spans: [spanData],
+            schemaUrl: undefined,
+          },
+        ],
+      },
+      {
+        resource: {
+          attributes: [
+            {
+              key: 'resource-attribute',
+              value: { stringValue: 'another resource value' },
+            },
+          ],
+          droppedAttributesCount: 0,
+        },
+        schemaUrl: undefined,
+        scopeSpans: [
+          {
+            scope: { name: 'myLib', version: '0.1.0' },
+            spans: [spanData],
+            schemaUrl: 'http://url.to.schema',
+          },
+        ],
+      },
+    ],
+  };
+}
+
+function createExpectedMultiResourceSpanProtobuf() {
   const startTime = 1640715557342725400;
   const endTime = 1640715558642725400;
   const eventTime = 1640715558542725400;
@@ -152,6 +282,58 @@ function createExpectedSpanProtobuf() {
   const parentSpanId = toBase64('0000000000000001');
   const linkSpanId = toBase64('0000000000000003');
   const linkTraceId = toBase64('00000000000000000000000000000002');
+
+  const spanData = {
+    traceId,
+    spanId,
+    traceState: 'span=bar',
+    parentSpanId,
+    name: 'span-name',
+    kind: ESpanKind.SPAN_KIND_CLIENT,
+    links: [
+      {
+        droppedAttributesCount: 0,
+        spanId: linkSpanId,
+        traceId: linkTraceId,
+        traceState: 'link=foo',
+        attributes: [
+          {
+            key: 'link-attribute',
+            value: { stringValue: 'string value' },
+          },
+        ],
+        flags: 0x101,
+      },
+    ],
+    startTimeUnixNano: startTime,
+    endTimeUnixNano: endTime,
+    events: [
+      {
+        droppedAttributesCount: 0,
+        attributes: [
+          {
+            key: 'event-attribute',
+            value: { stringValue: 'some string value' },
+          },
+        ],
+        name: 'some event',
+        timeUnixNano: eventTime,
+      },
+    ],
+    attributes: [
+      {
+        key: 'string-attribute',
+        value: { stringValue: 'some attribute value' },
+      },
+    ],
+    droppedAttributesCount: 0,
+    droppedEventsCount: 0,
+    droppedLinksCount: 0,
+    status: {
+      code: EStatusCode.STATUS_CODE_OK,
+    },
+    flags: 0x101,
+  };
 
   return {
     resourceSpans: [
@@ -168,63 +350,29 @@ function createExpectedSpanProtobuf() {
         scopeSpans: [
           {
             scope: { name: 'myLib', version: '0.1.0' },
-            spans: [
-              {
-                traceId: traceId,
-                spanId: spanId,
-                traceState: 'span=bar',
-                parentSpanId: parentSpanId,
-                name: 'span-name',
-                kind: ESpanKind.SPAN_KIND_CLIENT,
-                links: [
-                  {
-                    droppedAttributesCount: 0,
-                    spanId: linkSpanId,
-                    traceId: linkTraceId,
-                    traceState: 'link=foo',
-                    attributes: [
-                      {
-                        key: 'link-attribute',
-                        value: {
-                          stringValue: 'string value',
-                        },
-                      },
-                    ],
-                    flags: 0x101, // TraceFlags (0x01) | HAS_IS_REMOTE
-                  },
-                ],
-                startTimeUnixNano: startTime,
-                endTimeUnixNano: endTime,
-                events: [
-                  {
-                    droppedAttributesCount: 0,
-                    attributes: [
-                      {
-                        key: 'event-attribute',
-                        value: {
-                          stringValue: 'some string value',
-                        },
-                      },
-                    ],
-                    name: 'some event',
-                    timeUnixNano: eventTime,
-                  },
-                ],
-                attributes: [
-                  {
-                    key: 'string-attribute',
-                    value: { stringValue: 'some attribute value' },
-                  },
-                ],
-                droppedAttributesCount: 0,
-                droppedEventsCount: 0,
-                droppedLinksCount: 0,
-                status: {
-                  code: EStatusCode.STATUS_CODE_OK,
-                },
-                flags: 0x101, // TraceFlags (0x01) | HAS_IS_REMOTE
-              },
-            ],
+            spans: [spanData],
+            schemaUrl: 'http://url.to.schema',
+          },
+          {
+            scope: { name: 'myOtherLib' },
+            spans: [spanData],
+          },
+        ],
+      },
+      {
+        resource: {
+          attributes: [
+            {
+              key: 'resource-attribute',
+              value: { stringValue: 'another resource value' },
+            },
+          ],
+          droppedAttributesCount: 0,
+        },
+        scopeSpans: [
+          {
+            scope: { name: 'myLib', version: '0.1.0' },
+            spans: [spanData],
             schemaUrl: 'http://url.to.schema',
           },
         ],
@@ -234,10 +382,36 @@ function createExpectedSpanProtobuf() {
 }
 
 describe('Trace', () => {
-  let resource: Resource;
-  let span: ReadableSpan;
+  let resource_1: Resource;
+  let resource_2: Resource;
 
-  function createSpanWithResource(spanResource: Resource): ReadableSpan {
+  /*
+  The following span_X_Y should follow the pattern
+    - X is the resource
+    - Y is the scope
+   */
+
+  // using `resource_1`, `scope_1`
+  let span_1_1: ReadableSpan;
+  // using `resource_1`, `scope_2`
+  let span_1_2: ReadableSpan;
+  // using `resource_2`, `scope_1`
+  let span_2_1: ReadableSpan;
+
+  const scope_1: InstrumentationScope = {
+    name: 'myLib',
+    version: '0.1.0',
+    schemaUrl: 'http://url.to.schema',
+  };
+
+  const scope_2: InstrumentationScope = {
+    name: 'myOtherLib',
+  };
+
+  function createSpan(
+    spanResource: Resource,
+    scope: InstrumentationScope
+  ): ReadableSpan {
     return {
       spanContext: () => ({
         spanId: '0000000000000002',
@@ -264,11 +438,7 @@ describe('Trace', () => {
           },
         },
       ],
-      instrumentationScope: {
-        name: 'myLib',
-        version: '0.1.0',
-        schemaUrl: 'http://url.to.schema',
-      },
+      instrumentationScope: scope,
       kind: SpanKind.CLIENT,
       links: [
         {
@@ -297,10 +467,15 @@ describe('Trace', () => {
   }
 
   beforeEach(() => {
-    resource = resourceFromAttributes({
+    resource_1 = resourceFromAttributes({
       'resource-attribute': 'resource attribute value',
     });
-    span = createSpanWithResource(resource);
+    resource_2 = resourceFromAttributes({
+      'resource-attribute': 'another resource value',
+    });
+    span_1_1 = createSpan(resource_1, scope_1);
+    span_1_2 = createSpan(resource_1, scope_2);
+    span_2_1 = createSpan(resource_2, scope_1);
   });
 
   describe('createExportTraceServiceRequest', () => {
@@ -315,7 +490,7 @@ describe('Trace', () => {
 
     it('serializes a span with json encoder', () => {
       const exportRequest = createExportTraceServiceRequest(
-        [span],
+        [span_1_1],
         JSON_ENCODER
       );
       assert.ok(exportRequest);
@@ -327,7 +502,7 @@ describe('Trace', () => {
 
     it('serializes a span with protobuf encoder', () => {
       const exportRequest = createExportTraceServiceRequest(
-        [span],
+        [span_1_1],
         PROTOBUF_ENCODER
       );
       assert.ok(exportRequest);
@@ -339,7 +514,7 @@ describe('Trace', () => {
 
     it('serializes a span with string timestamps', () => {
       const exportRequest = createExportTraceServiceRequest(
-        [span],
+        [span_1_1],
         JSON_ENCODER
       );
       assert.ok(exportRequest);
@@ -350,9 +525,9 @@ describe('Trace', () => {
     });
 
     it('serializes a span without a parent with useHex = true', () => {
-      (span as any).parentSpanContext.spanId = undefined;
+      (span_1_1 as any).parentSpanContext.spanId = undefined;
       const exportRequest = createExportTraceServiceRequest(
-        [span],
+        [span_1_1],
         JSON_ENCODER
       );
       assert.ok(exportRequest);
@@ -364,9 +539,9 @@ describe('Trace', () => {
     });
 
     it('serializes a span without a parent with useHex = false', () => {
-      (span as any).parentSpanContext.spanId = undefined;
+      (span_1_1 as any).parentSpanContext.spanId = undefined;
       const exportRequest = createExportTraceServiceRequest(
-        [span],
+        [span_1_1],
         PROTOBUF_ENCODER
       );
       assert.ok(exportRequest);
@@ -379,10 +554,10 @@ describe('Trace', () => {
 
     describe('status code', () => {
       it('error', () => {
-        span.status.code = SpanStatusCode.ERROR;
-        span.status.message = 'error message';
+        span_1_1.status.code = SpanStatusCode.ERROR;
+        span_1_1.status.message = 'error message';
         const exportRequest = createExportTraceServiceRequest(
-          [span],
+          [span_1_1],
           JSON_ENCODER
         );
         assert.ok(exportRequest);
@@ -393,9 +568,9 @@ describe('Trace', () => {
       });
 
       it('unset', () => {
-        span.status.code = SpanStatusCode.UNSET;
+        span_1_1.status.code = SpanStatusCode.UNSET;
         const exportRequest = createExportTraceServiceRequest(
-          [span],
+          [span_1_1],
           JSON_ENCODER
         );
         assert.ok(exportRequest);
@@ -408,9 +583,9 @@ describe('Trace', () => {
 
     describe('span kind', () => {
       it('consumer', () => {
-        (span as any).kind = SpanKind.CONSUMER;
+        (span_1_1 as any).kind = SpanKind.CONSUMER;
         const exportRequest = createExportTraceServiceRequest(
-          [span],
+          [span_1_1],
           JSON_ENCODER
         );
         assert.ok(exportRequest);
@@ -420,9 +595,9 @@ describe('Trace', () => {
         );
       });
       it('internal', () => {
-        (span as any).kind = SpanKind.INTERNAL;
+        (span_1_1 as any).kind = SpanKind.INTERNAL;
         const exportRequest = createExportTraceServiceRequest(
-          [span],
+          [span_1_1],
           JSON_ENCODER
         );
         assert.ok(exportRequest);
@@ -432,9 +607,9 @@ describe('Trace', () => {
         );
       });
       it('producer', () => {
-        (span as any).kind = SpanKind.PRODUCER;
+        (span_1_1 as any).kind = SpanKind.PRODUCER;
         const exportRequest = createExportTraceServiceRequest(
-          [span],
+          [span_1_1],
           JSON_ENCODER
         );
         assert.ok(exportRequest);
@@ -444,9 +619,9 @@ describe('Trace', () => {
         );
       });
       it('server', () => {
-        (span as any).kind = SpanKind.SERVER;
+        (span_1_1 as any).kind = SpanKind.SERVER;
         const exportRequest = createExportTraceServiceRequest(
-          [span],
+          [span_1_1],
           JSON_ENCODER
         );
         assert.ok(exportRequest);
@@ -456,9 +631,9 @@ describe('Trace', () => {
         );
       });
       it('unspecified', () => {
-        (span as any).kind = undefined;
+        (span_1_1 as any).kind = undefined;
         const exportRequest = createExportTraceServiceRequest(
-          [span],
+          [span_1_1],
           JSON_ENCODER
         );
         assert.ok(exportRequest);
@@ -475,7 +650,7 @@ describe('Trace', () => {
         { schemaUrl: 'https://opentelemetry.test/schemas/1.2.3' }
       );
 
-      const spanFromSDK = createSpanWithResource(resourceWithSchema);
+      const spanFromSDK = createSpan(resourceWithSchema, scope_1);
 
       const exportRequest = createExportTraceServiceRequest(
         [spanFromSDK],
@@ -492,16 +667,30 @@ describe('Trace', () => {
   });
 
   describe('ProtobufTracesSerializer', function () {
+    let diagStub: sinon.SinonStub;
+
+    beforeEach(function () {
+      diagStub = sinon.stub(diag, 'debug');
+    });
+
+    afterEach(function () {
+      sinon.restore();
+    });
+
     it('serializes an export request', () => {
-      const serialized = ProtobufTraceSerializer.serializeRequest([span]);
+      const serialized = ProtobufTraceSerializer.serializeRequest([
+        span_1_1,
+        span_1_2,
+        span_2_1,
+      ]);
       assert.ok(serialized, 'serialized response is undefined');
       const decoded =
-        root.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest.decode(
+        signals.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest.decode(
           serialized
         );
-      const expected = createExpectedSpanProtobuf();
+      const expected = createExpectedMultiResourceSpanProtobuf();
       const decodedObj =
-        root.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest.toObject(
+        signals.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest.toObject(
           decoded,
           {
             // This incurs some precision loss that's taken into account in createExpectedSpanProtobuf()
@@ -514,11 +703,12 @@ describe('Trace', () => {
           }
         );
       assert.deepStrictEqual(decodedObj, expected);
+      sinon.assert.neverCalledWith(diagStub, GROWING_BUFFER_DEBUG_MESSAGE);
     });
 
     it('deserializes a response', () => {
       const protobufSerializedResponse =
-        root.opentelemetry.proto.collector.trace.v1.ExportTraceServiceResponse.encode(
+        signals.opentelemetry.proto.collector.trace.v1.ExportTraceServiceResponse.encode(
           {
             partialSuccess: {
               errorMessage: 'foo',
@@ -546,6 +736,52 @@ describe('Trace', () => {
       assert.doesNotThrow(() =>
         ProtobufTraceSerializer.deserializeResponse(new Uint8Array([]))
       );
+      sinon.assert.neverCalledWith(diagStub, GROWING_BUFFER_DEBUG_MESSAGE);
+    });
+
+    it('does not throw when encountering unexpected wiretypes during deserialization', function () {
+      const writer = new ProtobufWriter(50);
+      // Construct an ExportTraceServiceResponse where the embedded
+      // ExportTracePartialSuccess has fields encoded with incorrect wire types.
+      // ExportTraceServiceResponse { 1: partial_success (length-delimited) }
+      // ExportTracePartialSuccess expects:
+      //   1: rejected_spans (varint)
+      //   2: error_message (length-delimited string)
+
+      // first pretend the field number 1 is a varint (type 0, correct format expects a length delimited field)
+      writer.writeTag(1, 0);
+      writer.writeVarint(3);
+
+      // also pretend we have an extra field that we don't know yet what to do with
+      writer.writeTag(99, 0);
+      writer.writeVarint(42);
+
+      // now write field 1 again, but this time as length-delimited, as expected.
+      writer.writeTag(1, 2);
+      const lengthVarintPosition = writer.startLengthDelimited();
+      const innerStartPos = writer.pos;
+      // instead of putting the correct data here, we put unexpected wire-types for each field, ensuring it's handled gracefully.
+      // Write field 1 but with wire type 2 (length-delimited) and a string (correct format expects a varint)
+      writer.writeTag(1, 2);
+      writer.writeString('not-a-number');
+      // Write field 2 but with wire type 0 (varint) instead of length-delimited (correct format expects a string, which is length delimited)
+      writer.writeTag(2, 0);
+      writer.writeVarint(12345);
+      // Write field 99, which is completely unknown to us; pretend it's a varint (type 0)
+      writer.writeTag(99, 0);
+      writer.writeVarint(42);
+
+      // finish up
+      writer.finishLengthDelimited(
+        lengthVarintPosition,
+        writer.pos - innerStartPos
+      );
+
+      // Ensure deserialization does not throw when encountering these
+      // unexpected wire types.
+      assert.doesNotThrow(() =>
+        ProtobufTraceSerializer.deserializeResponse(writer.finish())
+      );
     });
   });
 
@@ -554,20 +790,24 @@ describe('Trace', () => {
       // stringify, then parse to remove undefined keys in the expected JSON
       const expected = JSON.parse(
         JSON.stringify(
-          createExpectedSpanJson({
+          createExpectedMultiResourceSpanJson({
             useHex: true,
             useLongBits: false,
           })
         )
       );
-      const serialized = JsonTraceSerializer.serializeRequest([span]);
+      const serialized = JsonTraceSerializer.serializeRequest([
+        span_1_1,
+        span_1_2,
+        span_2_1,
+      ]);
 
       const decoder = new TextDecoder();
       assert.deepStrictEqual(JSON.parse(decoder.decode(serialized)), expected);
     });
 
     it('hrtime contains float value', () => {
-      const span = createSpanWithResource(resource);
+      const span = createSpan(resource_1, scope_1);
       (span as any).startTime = [1640715557.5, 342725388.5];
       JsonTraceSerializer.serializeRequest([span]);
     });
@@ -596,6 +836,21 @@ describe('Trace', () => {
       );
     });
 
+    it('deserializes a malformed response', () => {
+      const malformedResponse =
+        '{ "partialSuccess": { "errorMessage": foo, "rejectedLogRecords": 1, }';
+      const encoder = new TextEncoder();
+      const encodedResponse = encoder.encode(malformedResponse);
+      const deserializedResponse =
+        JsonTraceSerializer.deserializeResponse(encodedResponse);
+
+      assert.deepEqual(
+        deserializedResponse,
+        {},
+        'Malformed response should result in an empty object being returned'
+      );
+    });
+
     it('does not throw when deserializing an empty response', () => {
       assert.doesNotThrow(() =>
         JsonTraceSerializer.deserializeResponse(new Uint8Array([]))
@@ -606,7 +861,7 @@ describe('Trace', () => {
   describe('span flags', () => {
     it('sets flags to 0x101 for local parent span context', () => {
       const exportRequest = createExportTraceServiceRequest(
-        [span],
+        [span_1_1],
         JSON_ENCODER
       );
       assert.ok(exportRequest);
@@ -625,7 +880,7 @@ describe('Trace', () => {
       };
 
       const spanWithRemoteParent = {
-        ...span,
+        ...span_1_1,
         parentSpanContext: remoteParentSpanContext,
       };
 
@@ -641,7 +896,7 @@ describe('Trace', () => {
 
     it('sets flags to 0x101 for links with local context', () => {
       const exportRequest = createExportTraceServiceRequest(
-        [span],
+        [span_1_1],
         JSON_ENCODER
       );
       assert.ok(exportRequest);
@@ -667,7 +922,7 @@ describe('Trace', () => {
       };
 
       const spanWithRemoteLink = {
-        ...span,
+        ...span_1_1,
         links: [remoteLink],
       };
 
@@ -692,11 +947,11 @@ describe('Trace', () => {
     ];
 
     it('composes span flags with local and remote parent across traceFlags', () => {
-      const baseCtx = span.spanContext();
+      const baseCtx = span_1_1.spanContext();
       for (const c of cases) {
         // Local parent
         const spanLocal = {
-          ...span,
+          ...span_1_1,
           spanContext: () => ({
             spanId: baseCtx.spanId,
             traceId: baseCtx.traceId,
@@ -705,7 +960,7 @@ describe('Trace', () => {
             traceState: baseCtx.traceState,
           }),
           parentSpanContext: {
-            ...span.parentSpanContext,
+            ...span_1_1.parentSpanContext,
             isRemote: false,
           },
         } as unknown as ReadableSpan;
@@ -721,7 +976,7 @@ describe('Trace', () => {
         const spanRemote = {
           ...spanLocal,
           parentSpanContext: {
-            ...span.parentSpanContext,
+            ...span_1_1.parentSpanContext,
             isRemote: true,
           },
         } as unknown as ReadableSpan;
@@ -749,7 +1004,7 @@ describe('Trace', () => {
           droppedAttributesCount: 0,
         };
         const spanWithLocalLink = {
-          ...span,
+          ...span_1_1,
           links: [linkLocal],
         } as unknown as ReadableSpan;
         const reqLocal = createExportTraceServiceRequest(
@@ -765,7 +1020,7 @@ describe('Trace', () => {
           context: { ...linkLocal.context, isRemote: true },
         };
         const spanWithRemoteLink = {
-          ...span,
+          ...span_1_1,
           links: [linkRemote],
         } as unknown as ReadableSpan;
         const reqRemote = createExportTraceServiceRequest(
@@ -780,10 +1035,10 @@ describe('Trace', () => {
     });
 
     it('composes root span flags across traceFlags (no parent)', () => {
-      const baseCtx = span.spanContext();
+      const baseCtx = span_1_1.spanContext();
       for (const c of cases) {
         const rootSpan = {
-          ...span,
+          ...span_1_1,
           spanContext: () => ({
             spanId: baseCtx.spanId,
             traceId: baseCtx.traceId,

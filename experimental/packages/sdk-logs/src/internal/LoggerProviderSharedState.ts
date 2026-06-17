@@ -1,28 +1,24 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Logger } from '@opentelemetry/api-logs';
+import { type MeterProvider, createNoopMeter } from '@opentelemetry/api';
+import type { Logger } from '@opentelemetry/api-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
-import { Resource } from '@opentelemetry/resources';
+import type { Resource } from '@opentelemetry/resources';
 import type { InstrumentationScope } from '@opentelemetry/core';
-import { LogRecordProcessor } from '../LogRecordProcessor';
-import { LogRecordLimits, LoggerConfig, LoggerConfigurator } from '../types';
+import type { LogRecordProcessor } from '../LogRecordProcessor';
+import type {
+  LogRecordLimits,
+  LoggerConfig,
+  LoggerConfigurator,
+} from '../types';
 import { NoopLogRecordProcessor } from '../export/NoopLogRecordProcessor';
 import { MultiLogRecordProcessor } from '../MultiLogRecordProcessor';
 import { getInstrumentationScopeKey } from './utils';
+import { LoggerMetrics } from '../LoggerMetrics';
+import { VERSION } from '../version';
 
 const DEFAULT_LOGGER_CONFIG: Required<LoggerConfig> = {
   disabled: false,
@@ -45,6 +41,7 @@ export class LoggerProviderSharedState {
   readonly forceFlushTimeoutMillis: number;
   readonly logRecordLimits: Required<LogRecordLimits>;
   readonly processors: LogRecordProcessor[];
+  readonly loggerMetrics: LoggerMetrics;
   private _loggerConfigurator: LoggerConfigurator;
   private _loggerConfigs: Map<string, Required<LoggerConfig>> = new Map();
 
@@ -53,7 +50,8 @@ export class LoggerProviderSharedState {
     forceFlushTimeoutMillis: number,
     logRecordLimits: Required<LogRecordLimits>,
     processors: LogRecordProcessor[],
-    loggerConfigurator?: LoggerConfigurator
+    loggerConfigurator?: LoggerConfigurator,
+    meterProvider?: MeterProvider
   ) {
     this.resource = resource;
     this.forceFlushTimeoutMillis = forceFlushTimeoutMillis;
@@ -71,6 +69,11 @@ export class LoggerProviderSharedState {
 
     this._loggerConfigurator =
       loggerConfigurator ?? DEFAULT_LOGGER_CONFIGURATOR;
+
+    const meter = meterProvider
+      ? meterProvider.getMeter('@opentelemetry/sdk-logs', VERSION)
+      : createNoopMeter();
+    this.loggerMetrics = new LoggerMetrics(meter);
   }
 
   /**

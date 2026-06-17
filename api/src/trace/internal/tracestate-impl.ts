@@ -1,20 +1,9 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { TraceState } from '../trace_state';
+import type { TraceState } from '../trace_state';
 import { validateKey, validateValue } from './tracestate-validators';
 
 const MAX_TRACE_STATE_ITEMS = 32;
@@ -30,6 +19,8 @@ const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
  * - New key-value pair should be added into the beginning of the list
  * - The value of any key can be updated. Modified keys MUST be moved to the
  * beginning of the list.
+ *
+ * @deprecated Use TraceState from "@opentelemetry/core". This will be removed in the next major version.
  */
 export class TraceStateImpl implements TraceState {
   private _internalState: Map<string, string> = new Map();

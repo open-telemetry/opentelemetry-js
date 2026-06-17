@@ -1,35 +1,49 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
-import { NoopLogger } from '../../src/NoopLogger';
 import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
 
 describe('NoopLoggerProvider', () => {
-  it('should not crash', () => {
-    const loggerProvider = new NoopLoggerProvider();
+  const loggerProvider = new NoopLoggerProvider();
 
-    assert.ok(loggerProvider.getLogger('logger-name') instanceof NoopLogger);
-    assert.ok(
-      loggerProvider.getLogger('logger-name', 'v1') instanceof NoopLogger
-    );
+  it('should not crash', () => {
+    assert.ok(loggerProvider.getLogger('logger-name'));
+    assert.ok(loggerProvider.getLogger('logger-name', 'v1'));
     assert.ok(
       loggerProvider.getLogger('logger-name', 'v1', {
         schemaUrl: 'https://opentelemetry.io/schemas/1.7.0',
-      }) instanceof NoopLogger
+      })
     );
+  });
+
+  describe('LoggerOptions#attributes (LogAttributes)', () => {
+    it('should accept attributes with primitive values', () => {
+      const logger = loggerProvider.getLogger('logger-name', undefined, {
+        attributes: {
+          'service.name': 'api',
+          version: 1,
+          enabled: true,
+        },
+      });
+      assert.ok(logger);
+    });
+
+    it('should accept attributes with LogAttribute value types', () => {
+      const logger = loggerProvider.getLogger('logger-name', undefined, {
+        attributes: {
+          scalar: 'value',
+          number: 42,
+          bool: true,
+          arr: [1, 2, 3],
+          nested: { key: 'value' },
+          bytes: new Uint8Array([1, 2, 3]),
+          nullVal: null,
+        },
+      });
+      assert.ok(logger);
+    });
   });
 });

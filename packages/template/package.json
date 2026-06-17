@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/template",
-  "version": "2.5.0",
+  "version": "2.8.0",
   "private": true,
   "publishConfig": {
     "access": "restricted"
@@ -38,8 +38,8 @@
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
     "test": "nyc mocha test/**/*.test.ts",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "version": "node ../../scripts/version-update.js",
     "watch": "tsc --build --watch"
   },

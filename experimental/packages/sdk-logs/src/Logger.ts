@@ -1,22 +1,11 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import type * as logsAPI from '@opentelemetry/api-logs';
+import type { Logger as ILogger, LogRecord } from '@opentelemetry/api-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
-import type { InstrumentationScope } from '@opentelemetry/core';
+import type { Context } from '@opentelemetry/api';
 import {
   context,
   trace,
@@ -25,63 +14,33 @@ import {
 } from '@opentelemetry/api';
 
 import { LogRecordImpl } from './LogRecordImpl';
-import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
-import { LoggerConfig } from './types';
+import type { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
+import type { LoggerConfig } from './types';
+import type { LogInstrumentationScope } from './internal/utils';
 
-export class Logger implements logsAPI.Logger {
-  public readonly instrumentationScope: InstrumentationScope;
-  private _sharedState: LoggerProviderSharedState;
+export class Logger implements ILogger {
+  private readonly _instrumentationScope: LogInstrumentationScope;
+  private readonly _sharedState: LoggerProviderSharedState;
   private readonly _loggerConfig: Required<LoggerConfig>;
 
   constructor(
-    instrumentationScope: InstrumentationScope,
+    instrumentationScope: LogInstrumentationScope,
     sharedState: LoggerProviderSharedState
   ) {
-    this.instrumentationScope = instrumentationScope;
+    this._instrumentationScope = instrumentationScope;
     this._sharedState = sharedState;
     // Cache the logger configuration at construction time
     // Since we don't support re-configuration, this avoids map lookups
     // and string allocations on each emit() call
     this._loggerConfig = this._sharedState.getLoggerConfig(
-      this.instrumentationScope
+      this._instrumentationScope
     );
   }
 
-  public emit(logRecord: logsAPI.LogRecord): void {
-    const loggerConfig = this._loggerConfig;
-
+  public emit(logRecord: LogRecord): void {
     const currentContext = logRecord.context || context.active();
-
-    // Apply minimum severity filtering
-    const recordSeverity =
-      logRecord.severityNumber ?? SeverityNumber.UNSPECIFIED;
-
-    // 1. Minimum severity: If the log record's SeverityNumber is specified
-    //    (i.e. not 0) and is less than the configured minimum_severity,
-    //    the log record MUST be dropped.
-    if (
-      recordSeverity !== SeverityNumber.UNSPECIFIED &&
-      recordSeverity < loggerConfig.minimumSeverity
-    ) {
-      // Log record is dropped due to minimum severity filter
+    if (!this.enabled(logRecord)) {
       return;
-    }
-
-    // 2. Trace-based: If trace_based is true, and if the log record has a
-    //    SpanId and the TraceFlags SAMPLED flag is unset, the log record MUST be dropped.
-    if (loggerConfig.traceBased) {
-      const spanContext = trace.getSpanContext(currentContext);
-      if (spanContext && isSpanContextValid(spanContext)) {
-        // Check if the trace is unsampled (SAMPLED flag is unset)
-        const isSampled =
-          (spanContext.traceFlags & TraceFlags.SAMPLED) === TraceFlags.SAMPLED;
-        if (!isSampled) {
-          // Log record is dropped due to trace-based filter
-          return;
-        }
-      }
-      // If there's no valid span context, the log record is not associated with a trace
-      // and therefore bypasses trace-based filtering (as per spec)
     }
 
     /**
@@ -91,12 +50,13 @@ export class Logger implements logsAPI.Logger {
      */
     const logRecordInstance = new LogRecordImpl(
       this._sharedState,
-      this.instrumentationScope,
+      this._instrumentationScope,
       {
         context: currentContext,
         ...logRecord,
       }
     );
+    this._sharedState.loggerMetrics.emitLog();
     /**
      * the explicitly passed Context,
      * the current Context, or an empty Context if the Logger was obtained with include_trace_context=false
@@ -107,5 +67,54 @@ export class Logger implements logsAPI.Logger {
      * If logRecord is needed after OnEmit returns (i.e. for asynchronous processing) only reads are permitted.
      */
     logRecordInstance._makeReadonly();
+  }
+
+  public enabled(options?: {
+    context?: Context;
+    severityNumber?: SeverityNumber;
+    eventName?: string;
+  }): boolean {
+    const loggerConfig = this._loggerConfig;
+
+    if (loggerConfig.disabled) {
+      return false;
+    }
+
+    // Severity number given and lower than the min configured
+    const severityNumber = options?.severityNumber;
+    if (
+      typeof severityNumber === 'number' &&
+      severityNumber !== SeverityNumber.UNSPECIFIED &&
+      severityNumber < loggerConfig.minimumSeverity
+    ) {
+      return false;
+    }
+
+    const currentContext = options?.context || context.active();
+    // Trace based: the context (given or the active) has a unsampled Span
+    if (loggerConfig.traceBased) {
+      const spanContext = trace.getSpanContext(currentContext);
+      if (spanContext && isSpanContextValid(spanContext)) {
+        const isSampled =
+          (spanContext.traceFlags & TraceFlags.SAMPLED) === TraceFlags.SAMPLED;
+        if (!isSampled) {
+          return false;
+        }
+      }
+    }
+
+    // Lastly check if there is any enabled processor
+    const enabledOpts = {
+      context: currentContext,
+      instrumentationScope: this._instrumentationScope,
+      severityNumber: options?.severityNumber,
+      eventName: options?.eventName,
+    };
+    for (const processor of this._sharedState.processors) {
+      if (!processor.enabled || processor.enabled(enabledOpts)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

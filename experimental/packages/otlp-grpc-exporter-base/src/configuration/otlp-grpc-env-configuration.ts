@@ -1,19 +1,8 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
-import { UnresolvedOtlpGrpcConfiguration } from './otlp-grpc-configuration';
+import type { UnresolvedOtlpGrpcConfiguration } from './otlp-grpc-configuration';
 import type { ChannelCredentials, Metadata } from '@grpc/grpc-js';
 import { parseKeyPairsIntoRecord } from '@opentelemetry/core';
 import {
@@ -102,7 +91,7 @@ function getUrlFromEnv(signalIdentifier: string) {
   const specificEndpoint =
     process.env[`OTEL_EXPORTER_OTLP_${signalIdentifier}_ENDPOINT`]?.trim();
   const nonSpecificEndpoint =
-    process.env[`OTEL_EXPORTER_OTLP_ENDPOINT`]?.trim();
+    process.env['OTEL_EXPORTER_OTLP_ENDPOINT']?.trim();
 
   return fallbackIfNullishOrBlank(specificEndpoint, nonSpecificEndpoint);
 }
@@ -134,7 +123,7 @@ function getInsecureSettingFromEnv(signalIdentifier: string): boolean {
     ?.toLowerCase()
     .trim();
   const nonSignalSpecificInsecureValue = process.env[
-    `OTEL_EXPORTER_OTLP_INSECURE`
+    'OTEL_EXPORTER_OTLP_INSECURE'
   ]
     ?.toLowerCase()
     .trim();

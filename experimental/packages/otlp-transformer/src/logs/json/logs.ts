@@ -1,23 +1,13 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
-import { ISerializer } from '../../i-serializer';
-import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
+import type { ISerializer } from '../../i-serializer';
+import type { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { createExportLogsServiceRequest } from '../internal';
-import { IExportLogsServiceResponse } from '../export-response';
+import type { IExportLogsServiceResponse } from '../export-response';
 import { JSON_ENCODER } from '../../common/utils';
+import { diag } from '@opentelemetry/api';
 
 /*
  * @experimental this serializer may receive breaking changes in minor versions, pin this package's version when using this constant
@@ -36,6 +26,13 @@ export const JsonLogsSerializer: ISerializer<
       return {};
     }
     const decoder = new TextDecoder();
-    return JSON.parse(decoder.decode(arg)) as IExportLogsServiceResponse;
+    try {
+      return JSON.parse(decoder.decode(arg)) as IExportLogsServiceResponse;
+    } catch (err) {
+      diag.warn(
+        `Failed to parse logs export response: ${err.message}. Returning empty response`
+      );
+      return {};
+    }
   },
 };

@@ -1,34 +1,34 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
-import { HrTime, TraceFlags } from '@opentelemetry/api';
-import { InstrumentationScope } from '@opentelemetry/core';
-import { Resource, resourceFromAttributes } from '@opentelemetry/resources';
+import type { HrTime } from '@opentelemetry/api';
+import { diag, TraceFlags } from '@opentelemetry/api';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import type { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 import * as assert from 'assert';
-import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
+import * as sinon from 'sinon';
+import type { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
-import { JSON_ENCODER, PROTOBUF_ENCODER, Encoder } from '../src/common/utils';
+import type { Encoder } from '../src/common/utils';
+import { JSON_ENCODER, PROTOBUF_ENCODER } from '../src/common/utils';
 import { toBase64 } from './utils';
-import * as root from '../src/generated/root';
-import {
-  ESeverityNumber,
-  IExportLogsServiceRequest,
-} from '../src/logs/internal-types';
+import * as signals from '../test/generated/signals';
+import type { IExportLogsServiceRequest } from '../src/logs/internal-types';
+import { ESeverityNumber } from '../src/logs/internal-types';
 import { createExportLogsServiceRequest } from '../src/logs/internal';
 import { ProtobufLogsSerializer } from '../src/logs/protobuf';
 import { JsonLogsSerializer } from '../src/logs/json';
+import {
+  GROWING_BUFFER_DEBUG_MESSAGE,
+  ProtobufWriter,
+} from '../src/common/protobuf/protobuf-writer';
+
+type InstrumentationScopeWithAttributes = InstrumentationScope & {
+  attributes?: Record<string, unknown>;
+  droppedAttributesCount?: number;
+};
 
 function createExpectedLogJson(encoder: Encoder): IExportLogsServiceRequest {
   const timeUnixNano = encoder.encodeHrTime([1680253513, 123241635]);
@@ -59,6 +59,21 @@ function createExpectedLogJson(encoder: Encoder): IExportLogsServiceRequest {
             scope: {
               name: 'scope_name_1',
               version: '0.1.0',
+              attributes: [
+                {
+                  key: 'scope-attribute',
+                  value: { stringValue: 'scope attribute value' },
+                },
+                {
+                  key: 'scope-array',
+                  value: {
+                    arrayValue: {
+                      values: [{ stringValue: 'prod' }, { boolValue: true }],
+                    },
+                  },
+                },
+              ],
+              droppedAttributesCount: 1,
             },
             logRecords: [
               {
@@ -77,6 +92,10 @@ function createExpectedLogJson(encoder: Encoder): IExportLogsServiceRequest {
                   {
                     key: 'bytes-attribute',
                     value: { bytesValue: bytesValue },
+                  },
+                  {
+                    key: 'double-attribute',
+                    value: { doubleValue: 1.23 },
                   },
                 ],
                 droppedAttributesCount: 0,
@@ -117,7 +136,25 @@ function createExpectedLogProtobuf(): IExportLogsServiceRequest {
         },
         scopeLogs: [
           {
-            scope: { name: 'scope_name_1', version: '0.1.0' },
+            scope: {
+              name: 'scope_name_1',
+              version: '0.1.0',
+              attributes: [
+                {
+                  key: 'scope-attribute',
+                  value: { stringValue: 'scope attribute value' },
+                },
+                {
+                  key: 'scope-array',
+                  value: {
+                    arrayValue: {
+                      values: [{ stringValue: 'prod' }, { boolValue: true }],
+                    },
+                  },
+                },
+              ],
+              droppedAttributesCount: 1,
+            },
             logRecords: [
               {
                 timeUnixNano: 1680253513123241700,
@@ -134,6 +171,10 @@ function createExpectedLogProtobuf(): IExportLogsServiceRequest {
                   {
                     key: 'bytes-attribute',
                     value: { bytesValue: bytesValue },
+                  },
+                  {
+                    key: 'double-attribute',
+                    value: { doubleValue: 1.23 },
                   },
                 ],
                 droppedAttributesCount: 0,
@@ -159,6 +200,7 @@ const DEFAULT_LOG_FRAGMENT: Omit<
   attributes: {
     'some-attribute': 'some attribute value',
     'bytes-attribute': new Uint8Array([1, 2, 3, 4, 5]),
+    'double-attribute': 1.23,
   },
   droppedAttributesCount: 0,
   severityNumber: SeverityNumber.ERROR,
@@ -175,8 +217,8 @@ const DEFAULT_LOG_FRAGMENT: Omit<
 describe('Logs', () => {
   let resource_1: Resource;
   let resource_2: Resource;
-  let scope_1: InstrumentationScope;
-  let scope_2: InstrumentationScope;
+  let scope_1: InstrumentationScopeWithAttributes;
+  let scope_2: InstrumentationScopeWithAttributes;
 
   /*
   The following log_X_Y_Z should follow the pattern
@@ -196,7 +238,7 @@ describe('Logs', () => {
 
   function createReadableLogRecord(
     resource: Resource,
-    scope: InstrumentationScope,
+    scope: InstrumentationScopeWithAttributes,
     logFragment: Omit<ReadableLogRecord, 'resource' | 'instrumentationScope'>
   ): ReadableLogRecord {
     return {
@@ -217,6 +259,11 @@ describe('Logs', () => {
       name: 'scope_name_1',
       version: '0.1.0',
       schemaUrl: 'http://url.to.schema',
+      attributes: {
+        'scope-attribute': 'scope attribute value',
+        'scope-array': ['prod', true],
+      },
+      droppedAttributesCount: 1,
     };
     scope_2 = {
       name: 'scope_name_2',
@@ -293,6 +340,51 @@ describe('Logs', () => {
       assert.strictEqual(exportRequest.resourceLogs?.[0].scopeLogs.length, 2);
     });
 
+    it('separates logs with different attributes into different scope groups', () => {
+      const logWithDifferentScopeAttributes = createReadableLogRecord(
+        resource_1,
+        {
+          ...scope_1,
+          attributes: {
+            'scope-attribute': 'another scope attribute value',
+          },
+        },
+        DEFAULT_LOG_FRAGMENT
+      );
+
+      const exportRequest = createExportLogsServiceRequest(
+        [log_1_1_1, logWithDifferentScopeAttributes],
+        PROTOBUF_ENCODER
+      );
+
+      assert.ok(exportRequest);
+      assert.strictEqual(exportRequest.resourceLogs?.length, 1);
+      assert.strictEqual(exportRequest.resourceLogs?.[0].scopeLogs.length, 2);
+    });
+
+    it('keeps different scope objects separate even if their data matches', () => {
+      const logWithEquivalentScope = createReadableLogRecord(
+        resource_1,
+        {
+          ...scope_1,
+          attributes: {
+            'scope-attribute': 'scope attribute value',
+            'scope-array': ['prod', true],
+          },
+        },
+        DEFAULT_LOG_FRAGMENT
+      );
+
+      const exportRequest = createExportLogsServiceRequest(
+        [log_1_1_1, logWithEquivalentScope],
+        PROTOBUF_ENCODER
+      );
+
+      assert.ok(exportRequest);
+      assert.strictEqual(exportRequest.resourceLogs?.length, 1);
+      assert.strictEqual(exportRequest.resourceLogs?.[0].scopeLogs.length, 2);
+    });
+
     it('aggregates multiple logs with different resources', () => {
       const exportRequest = createExportLogsServiceRequest(
         [log_1_1_1, log_2_1_1],
@@ -342,20 +434,61 @@ describe('Logs', () => {
       assert.strictEqual(bytesAttr.value.bytesValue, 'AQIDBAU=');
       assert.strictEqual(bytesAttr.value.stringValue, undefined);
     });
+
+    it('exports scope attributes on scope logs', () => {
+      const exportRequest = createExportLogsServiceRequest(
+        [log_1_1_1],
+        JSON_ENCODER
+      );
+
+      assert.ok(exportRequest);
+      assert.deepStrictEqual(
+        exportRequest.resourceLogs?.[0].scopeLogs[0].scope?.attributes,
+        [
+          {
+            key: 'scope-attribute',
+            value: { stringValue: 'scope attribute value' },
+          },
+          {
+            key: 'scope-array',
+            value: {
+              arrayValue: {
+                values: [{ stringValue: 'prod' }, { boolValue: true }],
+              },
+            },
+          },
+        ]
+      );
+      assert.strictEqual(
+        exportRequest.resourceLogs?.[0].scopeLogs[0].scope
+          ?.droppedAttributesCount,
+        1
+      );
+    });
   });
 
   describe('ProtobufLogsSerializer', function () {
-    it('serializes an export request', () => {
+    let diagStub: sinon.SinonStub;
+
+    beforeEach(function () {
+      diagStub = sinon.stub(diag, 'debug');
+    });
+
+    afterEach(function () {
+      sinon.restore();
+    });
+
+    it('serializes an export request', function () {
       const serialized = ProtobufLogsSerializer.serializeRequest([log_1_1_1]);
       assert.ok(serialized, 'serialized response is undefined');
       const decoded =
-        root.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest.decode(
+        signals.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest.decode(
           serialized
         );
 
       const expected = createExpectedLogProtobuf();
       const decodedObj =
-        root.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest.toObject(
+        signals.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest.toObject(
           decoded,
           {
             // This incurs some precision loss that's taken into account in createExpectedLogsProtobuf()
@@ -369,11 +502,12 @@ describe('Logs', () => {
         );
 
       assert.deepStrictEqual(decodedObj, expected);
+      sinon.assert.neverCalledWith(diagStub, GROWING_BUFFER_DEBUG_MESSAGE);
     });
 
     it('deserializes a response', () => {
       const protobufSerializedResponse =
-        root.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse.encode(
+        signals.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse.encode(
           {
             partialSuccess: {
               errorMessage: 'foo',
@@ -397,9 +531,55 @@ describe('Logs', () => {
       );
     });
 
-    it('does not throw when deserializing an empty response', () => {
+    it('does not throw when deserializing an empty response', function () {
       assert.doesNotThrow(() =>
         ProtobufLogsSerializer.deserializeResponse(new Uint8Array([]))
+      );
+      sinon.assert.neverCalledWith(diagStub, GROWING_BUFFER_DEBUG_MESSAGE);
+    });
+
+    it('does not throw when encountering unexpected wiretypes during deserialization', function () {
+      const writer = new ProtobufWriter(50);
+      // Construct an ExportLogsServiceResponse where the embedded
+      // ExportLogsPartialSuccess has fields encoded with incorrect wire types.
+      // ExportLogsServiceResponse { 1: partial_success (length-delimited) }
+      // ExportLogsPartialSuccess expects:
+      //   1: rejected_log_records (varint)
+      //   2: error_message (length-delimited string)
+
+      // first pretend the field number 1 is a varint (type 0, correct format expects a length delimited field)
+      writer.writeTag(1, 0);
+      writer.writeVarint(3);
+
+      // also pretend we have an extra field that we don't know yet what to do with
+      writer.writeTag(99, 0);
+      writer.writeVarint(42);
+
+      // now write field 1 again, but this time as length-delimited, as expected.
+      writer.writeTag(1, 2);
+      const lengthVarintPosition = writer.startLengthDelimited();
+      const innerStartPos = writer.pos;
+      // instead of putting the correct data here, we put unexpected wire-types for each field, ensuring it's handled gracefully.
+      // Write field 1 but with wire type 2 (length-delimited) and a string (correct format expects a varint)
+      writer.writeTag(1, 2);
+      writer.writeString('not-a-number');
+      // Write field 2 but with wire type 0 (varint) instead of length-delimited (corrent format expects a string, which is length delimited)
+      writer.writeTag(2, 0);
+      writer.writeVarint(12345);
+      // Write field 99, which is completely unknown to us; pretend it's a varint (type 0)
+      writer.writeTag(99, 0);
+      writer.writeVarint(42);
+
+      // finish up
+      writer.finishLengthDelimited(
+        lengthVarintPosition,
+        writer.pos - innerStartPos
+      );
+
+      // Ensure deserialization does not throw when encountering these
+      // unexpected wire types.
+      assert.doesNotThrow(() =>
+        ProtobufLogsSerializer.deserializeResponse(writer.finish())
       );
     });
   });
@@ -439,6 +619,21 @@ describe('Logs', () => {
       assert.equal(
         Number(deserializedResponse.partialSuccess.rejectedLogRecords),
         1
+      );
+    });
+
+    it('deserializes a malformed response', () => {
+      const malformedResponse =
+        '{ "partialSuccess": { "errorMessage": foo, "rejectedLogRecords": 1, }';
+      const encoder = new TextEncoder();
+      const encodedResponse = encoder.encode(malformedResponse);
+      const deserializedResponse =
+        JsonLogsSerializer.deserializeResponse(encodedResponse);
+
+      assert.deepEqual(
+        deserializedResponse,
+        {},
+        'Malformed response should result in an empty object being returned'
       );
     });
 
