@@ -8,19 +8,16 @@ For example, consider an HTTP client making a `GET /users/42` request that recei
 
 To allow users to **migrate** from old names to the stabilized names over a period of time, OpenTelemetry defined a recommended migration process based on setting the `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable to indicate whether old, stable, or both sets of field names should be used. See [the HTTP migration guide](https://opentelemetry.io/docs/specs/semconv/non-normative/http-migration/) and the [database migration guide](https://opentelemetry.io/docs/specs/semconv/non-normative/db-migration/).
 
-For **OTel JS users**, as of 2025-10, **not all instrumentations support stable semconv and `OTEL_SEMCONV_STABILITY_OPT_IN` yet**. Support for `http.*` attributes is complete, but not yet for `net.*` and `db.*` attributes.
+For **OTel JS users**, as of 2025-01, all `@opentelemetry/*` instrumentations support stable semconv and `OTEL_SEMCONV_STABILITY_OPT_IN`. By default for backwards compatibility, instrumentations emit the *old* semconv.
 
 ## What's the easiest thing I can do?
 
-1. Set the `OTEL_SEMCONV_STABILITY_OPT_IN=http/dup,database/dup` environment variable when you configure an OTel JS SDK. This tells instrumentations (that support it) to *emit* both old and stable semconv attributes.
-2. Migrate queries/dashboards/alerts in your Observability system to **use the stable `http.*` semconv** as described in [the HTTP migration guide](https://opentelemetry.io/docs/specs/semconv/non-normative/http-migration/).
-3. For now, continue to **use the old `net.*` and `db.*` attributes** in your Observability system.
+1. Set the `OTEL_SEMCONV_STABILITY_OPT_IN=http/dup,database/dup` environment variable when you configure an OTel JS SDK. This tells instrumentations to *emit* both old and stable semconv attributes.
+2. Migrate queries/dashboards/alerts in your Observability system to **use the stable `http.*` and `net.*` semconv** as described in [the HTTP migration guide](https://opentelemetry.io/docs/specs/semconv/non-normative/http-migration/) and **the stable `db.*` semconv`** as described in [the DB migration guide](https://opentelemetry.io/docs/specs/semconv/non-normative/db-migration/).
 
 Future:
 
-4. When [OTel JS instrumentations support it](https://github.com/open-telemetry/opentelemetry-js/issues/5663): migrate queries/dashboards/alerts in your Observability system to use the stable `net.*` semconv as described in [the HTTP migration guide](https://opentelemetry.io/docs/specs/semconv/non-normative/http-migration/).
-5. When [OTel JS instrumentations support it](https://github.com/open-telemetry/opentelemetry-js-contrib/issues/2953): migrate queries/dashboards/alerts in your Observability system to use the stable `db.*` semconv as described in [the database migration guide](https://opentelemetry.io/docs/specs/semconv/non-normative/db-migration/).
-6. Sometime after a OTel JS SDK 3.0 release (anticipated to be in or after June 2026), you can drop usage of the `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable. In JS SDK 3.0, instrumentations will only support the stable HTTP and database semantic conventions.
+3. Sometime after a OTel JS SDK 3.0 release (anticipated to be in or after June 2026), you can drop usage of the "http" and "db"-related values in the `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable. In JS SDK 3.0, instrumentations will only support the stable HTTP and database semantic conventions.
 
 ## Browser instrumentations
 
@@ -34,8 +31,9 @@ Some HTTP-related instrumentations are for use in the browser:
 - 2023-11:03: In [semconv v1.23.0](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1230-2023-11-03), HTTP semantic conventions were stabilized.
 - 2025-05-02: In [semconv v1.33.0](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1330), database semantic conventions were stabilized.
 - 2024-09-10 to 2025-09-19: All OTel JS instrumentations producing `http.*` were updated to support stable semconv and `OTEL_SEMCONV_STABILITY_OPT_IN`.
-- Ongoing: [OTel JS instrumentations producing **`net.*` semconv** are being updated](https://github.com/open-telemetry/opentelemetry-js/issues/5663) to support stable semconv and `OTEL_SEMCONV_STABILITY_OPT_IN`
-- Ongoing: [OTel JS instrumentations producing **`db.*` semconv** are being updated](https://github.com/open-telemetry/opentelemetry-js-contrib/issues/2953) to support stable semconv and `OTEL_SEMCONV_STABILITY_OPT_IN`
+- 2025-12-19: [OTel JS instrumentations producing **`net.*` semconv** are being updated](https://github.com/open-telemetry/opentelemetry-js/issues/5663) to support stable semconv and `OTEL_SEMCONV_STABILITY_OPT_IN`
+- 2025-12-19: [OTel JS instrumentations producing **`db.*` semconv** are being updated](https://github.com/open-telemetry/opentelemetry-js-contrib/issues/2953) to support stable semconv and `OTEL_SEMCONV_STABILITY_OPT_IN`
+- 2026-01-15: A release of packages from the opentelemetry-js-contrib.git repo include the final set of instrumentations supporting `OTEL_SEMCONV_STABILITY_OPT_IN` for the stable `db.*` and `net.*` semconv.
 - Projected 2026-06: As part of OTel JS SDK 3.0, instrumentations will emit *stable* HTTP and database semantic conventions by default, and drop support for old names.
 
 ## Q&A
@@ -46,4 +44,4 @@ The semantic conventions for a number of networking-related attributes were stab
 
 Even though `net.*` attributes are used in non-HTTP instrumentations (e.g. `@opentelemetry/instrumentation-amqplib`, `@opentelemetry/instrumentation-mysql2`) they will still use the `http` (or `http/dup`) value in `OTEL_SEMCONV_STABILITY_OPT_IN`.
 
-(Note: One exception to this is `@opentelemetry/instrumentation-pg`, which added support for stable semconv migration using `OTEL_SEMCONV_STABILITY_OPT_IN=db/dup` for both `net.*` and `db.*` attributes **before** the plan in this document was discussed.)
+(Note: Two exceptions to this are the `@opentelemetry/instrumentation-pg` and `@opentelemetry/instruemntation-redis` packages, which added support for stable semconv migration using `OTEL_SEMCONV_STABILITY_OPT_IN=db/dup` for both `net.*` and `db.*` attributes **before** the plan in this document was discussed.)

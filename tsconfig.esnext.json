@@ -84,6 +84,9 @@
       "path": "packages/sdk-metrics/tsconfig.esnext.json"
     },
     {
+      "path": "packages/sdk-trace/tsconfig.esnext.json"
+    },
+    {
       "path": "semantic-conventions/tsconfig.esnext.json"
     }
   ]

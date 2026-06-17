@@ -1,0 +1,5 @@
+file_format: "1.0"
+resource:
+  # `%ZZ` is not a valid percent-encoded sequence — should cause the entire
+  # attributes_list to be discarded per spec.
+  attributes_list: "good=value,bad=%ZZ"

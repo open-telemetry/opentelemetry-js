@@ -1,8 +1,19 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "lib": [
+      "es2022",
+      "dom",
+      "dom.iterable"
+    ],
     "outDir": "build",
-    "rootDir": "."
+    "rootDir": ".",
+    "types": [
+      "node",
+      "mocha",
+      "webpack-env",
+      "jquery"
+    ]
   },
   "files": [],
   "include": [

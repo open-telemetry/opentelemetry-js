@@ -1,21 +1,10 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import type { HrTime, SpanContext } from '@opentelemetry/api';
-import { InstrumentationScope } from '@opentelemetry/core';
+import type { InstrumentationScope } from '@opentelemetry/core';
 import type {
   AnyValue,
   LogBody,
@@ -25,7 +14,7 @@ import type {
 import type { Resource } from '@opentelemetry/resources';
 
 /**
- * A recording of a event. Typically the record includes a timestamp indicating when the
+ * A recording of an event. Typically, the record includes a timestamp indicating when the
  * event happened as well as other data that describes what happened, where it happened, etc.
  *
  * @remarks
@@ -38,6 +27,13 @@ export interface SdkLogRecord {
   readonly hrTimeObserved: HrTime;
   readonly spanContext?: SpanContext;
   readonly resource: Resource;
+  /**
+   * The instrumentation scope associated with the log record.
+   *
+   * Downstream consumers may group exported records by the identity of this
+   * object. If a distinct grouping is required, construct a new scope object
+   * instead of reusing an existing one.
+   */
   readonly instrumentationScope: InstrumentationScope;
   readonly attributes: LogAttributes;
   severityText?: string;

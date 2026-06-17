@@ -1,27 +1,14 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
-import {
+import type {
   Attributes,
-  SpanStatusCode,
   Span,
-  context,
-  SpanKind,
   DiagLogger,
   AttributeValue,
 } from '@opentelemetry/api';
+import { SpanStatusCode, context, SpanKind } from '@opentelemetry/api';
 import {
   ATTR_CLIENT_ADDRESS,
   ATTR_ERROR_TYPE,
@@ -68,7 +55,7 @@ import {
   USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT,
   USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST,
 } from './semconv';
-import {
+import type {
   IncomingHttpHeaders,
   IncomingMessage,
   OutgoingHttpHeader,
@@ -80,7 +67,11 @@ import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 import { SemconvStability } from '@opentelemetry/instrumentation';
 import * as url from 'url';
 import { AttributeNames } from './enums/AttributeNames';
-import { Err, IgnoreMatcher, ParsedRequestOptions } from './internal-types';
+import type {
+  Err,
+  IgnoreMatcher,
+  ParsedRequestOptions,
+} from './internal-types';
 import { SYNTHETIC_BOT_NAMES, SYNTHETIC_TEST_NAMES } from './internal-types';
 import {
   DEFAULT_QUERY_STRINGS_TO_REDACT,
@@ -472,7 +463,7 @@ export const getOutgoingRequestAttributes = (
   const port = options.port;
   const method = requestOptions.method ?? 'GET';
   const normalizedMethod = normalizeMethod(method);
-  const headers = requestOptions.headers || {};
+  const headers = (requestOptions.headers || {}) as OutgoingHttpHeaders;
   const userAgent = headers['user-agent'];
   const urlFull = getAbsoluteUrl(
     requestOptions,
@@ -886,96 +877,104 @@ export const getIncomingRequestAttributes = (
   },
   logger: DiagLogger
 ): Attributes => {
-  const headers = request.headers;
-  const userAgent = headers['user-agent'];
-  const ips = headers['x-forwarded-for'];
-  const httpVersion = request.httpVersion;
-  const host = headers.host;
-  const hostname = host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') || 'localhost';
+  const {
+    component,
+    enableSyntheticSourceDetection,
+    hookAttributes,
+    semconvStability,
+    serverName,
+  } = options;
+  const { headers, httpVersion, method } = request;
+  const { host, 'user-agent': userAgent, 'x-forwarded-for': ips } = headers;
+  const parsedUrl = getInfoFromIncomingMessage(component, request, logger);
+  let newAttributes: Attributes;
+  let oldAttributes: Attributes;
 
-  const method = request.method;
-  const normalizedMethod = normalizeMethod(method);
+  if (semconvStability !== SemconvStability.OLD) {
+    // Stable attributes are used.
+    const normalizedMethod = normalizeMethod(method);
+    const serverAddress = getServerAddress(request, component);
+    const remoteClientAddress = getRemoteClientAddress(request);
 
-  const serverAddress = getServerAddress(request, options.component);
-  const serverName = options.serverName;
-  const remoteClientAddress = getRemoteClientAddress(request);
+    newAttributes = {
+      [ATTR_HTTP_REQUEST_METHOD]: normalizedMethod,
+      [ATTR_URL_SCHEME]: component,
+      [ATTR_SERVER_ADDRESS]: serverAddress?.host,
+      [ATTR_NETWORK_PEER_ADDRESS]: request.socket.remoteAddress,
+      [ATTR_NETWORK_PEER_PORT]: request.socket.remotePort,
+      [ATTR_NETWORK_PROTOCOL_VERSION]: request.httpVersion,
+      [ATTR_USER_AGENT_ORIGINAL]: userAgent,
+    };
 
-  const newAttributes: Attributes = {
-    [ATTR_HTTP_REQUEST_METHOD]: normalizedMethod,
-    [ATTR_URL_SCHEME]: options.component,
-    [ATTR_SERVER_ADDRESS]: serverAddress?.host,
-    [ATTR_NETWORK_PEER_ADDRESS]: request.socket.remoteAddress,
-    [ATTR_NETWORK_PEER_PORT]: request.socket.remotePort,
-    [ATTR_NETWORK_PROTOCOL_VERSION]: request.httpVersion,
-    [ATTR_USER_AGENT_ORIGINAL]: userAgent,
-  };
+    if (parsedUrl.pathname != null) {
+      newAttributes[ATTR_URL_PATH] = parsedUrl.pathname;
+    }
 
-  const parsedUrl = getInfoFromIncomingMessage(
-    options.component,
-    request,
-    logger
-  );
+    if (parsedUrl.search) {
+      // Remove leading '?' from URL search (https://developer.mozilla.org/en-US/docs/Web/API/URL/search).
+      newAttributes[ATTR_URL_QUERY] = parsedUrl.search.slice(1);
+    }
 
-  if (parsedUrl?.pathname != null) {
-    newAttributes[ATTR_URL_PATH] = parsedUrl.pathname;
+    if (remoteClientAddress != null) {
+      newAttributes[ATTR_CLIENT_ADDRESS] = remoteClientAddress;
+    }
+
+    if (serverAddress?.port != null) {
+      newAttributes[ATTR_SERVER_PORT] = Number(serverAddress.port);
+    }
+
+    // Conditionally required if request method required case normalization.
+    if (method !== normalizedMethod) {
+      newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
+    }
+
+    if (enableSyntheticSourceDetection && userAgent) {
+      newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] =
+        getSyntheticType(userAgent);
+    }
   }
 
-  if (parsedUrl.search) {
-    // Remove leading '?' from URL search (https://developer.mozilla.org/en-US/docs/Web/API/URL/search).
-    newAttributes[ATTR_URL_QUERY] = parsedUrl.search.slice(1);
+  if (semconvStability !== SemconvStability.STABLE) {
+    // Old attributes are used.
+    const hostname = host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') || 'localhost';
+
+    oldAttributes = {
+      [ATTR_HTTP_URL]: parsedUrl.toString(),
+      [ATTR_HTTP_HOST]: host,
+      [ATTR_NET_HOST_NAME]: hostname,
+      [ATTR_HTTP_METHOD]: method,
+      [ATTR_HTTP_SCHEME]: component,
+    };
+
+    if (typeof ips === 'string') {
+      oldAttributes[ATTR_HTTP_CLIENT_IP] = ips.split(',')[0];
+    }
+
+    if (typeof serverName === 'string') {
+      oldAttributes[ATTR_HTTP_SERVER_NAME] = serverName;
+    }
+
+    if (parsedUrl.pathname) {
+      oldAttributes[ATTR_HTTP_TARGET] =
+        parsedUrl.pathname + parsedUrl.search || '/';
+    }
+
+    if (userAgent !== undefined) {
+      oldAttributes[ATTR_HTTP_USER_AGENT] = userAgent;
+    }
+
+    setRequestContentLengthAttribute(request, oldAttributes);
+    setAttributesFromHttpKind(httpVersion, oldAttributes);
   }
 
-  if (remoteClientAddress != null) {
-    newAttributes[ATTR_CLIENT_ADDRESS] = remoteClientAddress;
-  }
-
-  if (serverAddress?.port != null) {
-    newAttributes[ATTR_SERVER_PORT] = Number(serverAddress.port);
-  }
-
-  // conditionally required if request method required case normalization
-  if (method !== normalizedMethod) {
-    newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
-  }
-
-  if (options.enableSyntheticSourceDetection && userAgent) {
-    newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] = getSyntheticType(userAgent);
-  }
-  const oldAttributes: Attributes = {
-    [ATTR_HTTP_URL]: parsedUrl.toString(),
-    [ATTR_HTTP_HOST]: host,
-    [ATTR_NET_HOST_NAME]: hostname,
-    [ATTR_HTTP_METHOD]: method,
-    [ATTR_HTTP_SCHEME]: options.component,
-  };
-
-  if (typeof ips === 'string') {
-    oldAttributes[ATTR_HTTP_CLIENT_IP] = ips.split(',')[0];
-  }
-
-  if (typeof serverName === 'string') {
-    oldAttributes[ATTR_HTTP_SERVER_NAME] = serverName;
-  }
-
-  if (parsedUrl?.pathname) {
-    oldAttributes[ATTR_HTTP_TARGET] =
-      parsedUrl?.pathname + parsedUrl?.search || '/';
-  }
-
-  if (userAgent !== undefined) {
-    oldAttributes[ATTR_HTTP_USER_AGENT] = userAgent;
-  }
-  setRequestContentLengthAttribute(request, oldAttributes);
-  setAttributesFromHttpKind(httpVersion, oldAttributes);
-
-  switch (options.semconvStability) {
+  switch (semconvStability) {
     case SemconvStability.STABLE:
-      return Object.assign(newAttributes, options.hookAttributes);
+      return Object.assign(newAttributes!, hookAttributes);
     case SemconvStability.OLD:
-      return Object.assign(oldAttributes, options.hookAttributes);
+      return Object.assign(oldAttributes!, hookAttributes);
+    default:
+      return Object.assign(oldAttributes!, newAttributes!, hookAttributes);
   }
-
-  return Object.assign(oldAttributes, newAttributes, options.hookAttributes);
 };
 
 /**
@@ -1079,17 +1078,30 @@ export const getIncomingStableRequestMetricAttributesOnResponse = (
   return metricAttributes;
 };
 
-export function headerCapture(type: 'request' | 'response', headers: string[]) {
+export function headerCapture(
+  type: 'request' | 'response',
+  headers: string[],
+  semconvStability: SemconvStability
+) {
   const normalizedHeaders = new Map<string, string>();
   for (let i = 0, len = headers.length; i < len; i++) {
     const capturedHeader = headers[i].toLowerCase();
-    normalizedHeaders.set(capturedHeader, capturedHeader.replace(/-/g, '_'));
+    if (semconvStability & SemconvStability.STABLE) {
+      normalizedHeaders.set(capturedHeader, capturedHeader);
+    } else {
+      // In old semconv, the header name converted hypen to underscore, e.g.:
+      // `http.request.header.content_length`.
+      normalizedHeaders.set(
+        capturedHeader,
+        capturedHeader.replaceAll('-', '_')
+      );
+    }
   }
 
   return (
-    span: Span,
     getHeader: (key: string) => undefined | string | string[] | number
-  ) => {
+  ): Attributes => {
+    const attributes: Attributes = {};
     for (const capturedHeader of normalizedHeaders.keys()) {
       const value = getHeader(capturedHeader);
 
@@ -1101,13 +1113,14 @@ export function headerCapture(type: 'request' | 'response', headers: string[]) {
       const key = `http.${type}.header.${normalizedHeader}`;
 
       if (typeof value === 'string') {
-        span.setAttribute(key, [value]);
+        attributes[key] = [value];
       } else if (Array.isArray(value)) {
-        span.setAttribute(key, value);
+        attributes[key] = value;
       } else {
-        span.setAttribute(key, [value]);
+        attributes[key] = [value];
       }
     }
+    return attributes;
   };
 }
 
@@ -1124,6 +1137,9 @@ const KNOWN_METHODS = new Set([
 
   // PATCH from https://www.rfc-editor.org/rfc/rfc5789.html
   'PATCH',
+
+  // QUERY from https://datatracker.ietf.org/doc/draft-ietf-httpbis-safe-method-w-body/
+  'QUERY',
 ]);
 
 function normalizeMethod(method?: string | null) {

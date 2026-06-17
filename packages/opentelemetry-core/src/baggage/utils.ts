@@ -1,28 +1,20 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
-import {
+import type {
   Baggage,
+  BaggageEntry,
   BaggageEntryMetadata,
-  baggageEntryMetadataFromString,
 } from '@opentelemetry/api';
+import { baggageEntryMetadataFromString } from '@opentelemetry/api';
 import {
   BAGGAGE_ITEMS_SEPARATOR,
   BAGGAGE_PROPERTIES_SEPARATOR,
   BAGGAGE_KEY_PAIR_SEPARATOR,
   BAGGAGE_MAX_TOTAL_LENGTH,
+  BAGGAGE_MAX_NAME_VALUE_PAIRS,
+  BAGGAGE_MAX_PER_NAME_VALUE_PAIRS,
 } from './constants';
 
 type ParsedBaggageKeyValue = {
@@ -90,6 +82,43 @@ export function parsePairKeyValue(
   }
 
   return { key, value, metadata };
+}
+
+/**
+ * Parses a single baggage header string into the provided record, applying limits defined in this package.
+ * Uses indexOf/substring in a while loop to avoid allocating a full array of split entries.
+ * Returns the updated pair count so callers can track totals across multiple header values.
+ */
+export function parseBaggageHeaderString(
+  value: string,
+  baggage: Record<string, BaggageEntry>,
+  count: number,
+  totalSize: number
+): [count: number, totalSize: number] {
+  let start = 0;
+  while (start < value.length && count < BAGGAGE_MAX_NAME_VALUE_PAIRS) {
+    const end = value.indexOf(BAGGAGE_ITEMS_SEPARATOR, start);
+    const entryEnd = end === -1 ? value.length : end;
+    const entryLength = entryEnd - start;
+
+    if (entryLength <= BAGGAGE_MAX_PER_NAME_VALUE_PAIRS) {
+      const keyPair = parsePairKeyValue(value.substring(start, entryEnd));
+      if (keyPair) {
+        // Comma separator is counted for every accepted entry after the first
+        const entrySize = (count === 0 ? 0 : 1) + entryLength;
+        if (totalSize + entrySize > BAGGAGE_MAX_TOTAL_LENGTH) break;
+        baggage[keyPair.key] = keyPair.metadata
+          ? { value: keyPair.value, metadata: keyPair.metadata }
+          : { value: keyPair.value };
+        count++;
+        totalSize += entrySize;
+      }
+    }
+
+    if (end === -1) break;
+    start = end + 1;
+  }
+  return [count, totalSize];
 }
 
 /**

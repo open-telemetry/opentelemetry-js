@@ -1,28 +1,12 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
 
-import {
-  context,
-  SpanContext,
-  SpanKind,
-  TraceFlags,
-  trace,
-} from '@opentelemetry/api';
+import type { SpanContext } from '@opentelemetry/api';
+import { context, SpanKind, TraceFlags, trace } from '@opentelemetry/api';
 import { SamplingDecision } from '@opentelemetry/sdk-trace-base';
 
 import {
@@ -30,7 +14,7 @@ import {
   createComposableAlwaysOffSampler,
   createComposableAlwaysOnSampler,
   createComposableParentThresholdSampler,
-  createComposableTraceIDRatioBasedSampler,
+  createComposableProbabilitySampler,
 } from '../src';
 import { INVALID_RANDOM_VALUE, INVALID_THRESHOLD } from '../src/util';
 import {
@@ -100,7 +84,7 @@ describe('ConsistentSampler', () => {
       testId: 'parent based in legacy mode',
     },
     {
-      sampler: createComposableTraceIDRatioBasedSampler(0.5),
+      sampler: createComposableProbabilitySampler(0.5),
       parentSampled: true,
       parentThreshold: undefined,
       parentRandomValue: 0x7fffffffffffffn,
@@ -110,7 +94,7 @@ describe('ConsistentSampler', () => {
       testId: 'half threshold not sampled',
     },
     {
-      sampler: createComposableTraceIDRatioBasedSampler(0.5),
+      sampler: createComposableProbabilitySampler(0.5),
       parentSampled: false,
       parentThreshold: undefined,
       parentRandomValue: 0x80000000000000n,
@@ -120,7 +104,7 @@ describe('ConsistentSampler', () => {
       testId: 'half threshold sampled',
     },
     {
-      sampler: createComposableTraceIDRatioBasedSampler(1.0),
+      sampler: createComposableProbabilitySampler(1.0),
       parentSampled: false,
       parentThreshold: 0x80000000000000n,
       parentRandomValue: 0x80000000000000n,

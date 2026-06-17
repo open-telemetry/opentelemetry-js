@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import type { ExportResult } from '@opentelemetry/core';
@@ -24,6 +13,7 @@ import {
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
 import type { SdkLogRecord } from './SdkLogRecord';
+import type { Context } from '@opentelemetry/api';
 
 /**
  * An implementation of the {@link LogRecordProcessor} interface that exports
@@ -35,15 +25,17 @@ import type { SdkLogRecord } from './SdkLogRecord';
  * using the {@link BatchLogRecordProcessor} instead.
  */
 export class SimpleLogRecordProcessor implements LogRecordProcessor {
+  private readonly _exporter: LogRecordExporter;
   private _shutdownOnce: BindOnceFuture<void>;
   private _unresolvedExports: Set<Promise<void>>;
 
-  constructor(private readonly _exporter: LogRecordExporter) {
+  constructor(exporter: LogRecordExporter) {
+    this._exporter = exporter;
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
     this._unresolvedExports = new Set<Promise<void>>();
   }
 
-  public onEmit(logRecord: SdkLogRecord): void {
+  public onEmit(logRecord: SdkLogRecord, _context?: Context): void {
     if (this._shutdownOnce.isCalled) {
       return;
     }
@@ -70,7 +62,6 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
         .then(() => {
           // Using TS Non-null assertion operator because exportPromise could not be null in here
           // if waitForAsyncAttributes is not present this code will never be reached
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           this._unresolvedExports.delete(exportPromise!);
           return doExport();
         }, globalErrorHandler);

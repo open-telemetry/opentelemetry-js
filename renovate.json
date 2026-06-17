@@ -1,5 +1,8 @@
 {
-  "extends": ["config:recommended"],
+  "extends": [
+    "config:best-practices",
+    "helpers:pinGitHubActionDigestsToSemver"
+  ],
   "packageRules": [
     {
       "matchManagers": ["github-actions"],
@@ -19,12 +22,18 @@
     },
     {
       "groupName": "typedoc packages",
-      "matchUpdateTypes": ["minor", "major"],
-      "matchPackageNames": ["/^typedoc(-|$)/"]
+      "matchPackageNames": ["/^typedoc(-|$)/"],
+      "separateMajorMinor": false
     },
     {
       "matchUpdateTypes": ["minor"],
+      "matchManagers": ["js"],
       "dependencyDashboardApproval": true
+    },
+    {
+      "matchUpdateTypes": ["minor"],
+      "matchManagers": ["!js"],
+      "schedule": ["before 3am on Monday"]
     },
     {
       "matchUpdateTypes": ["major"],
@@ -46,9 +55,11 @@
     "@types/node"
   ],
   "constraints": {
-    "npm": "11.6.0"
+    "npm": ">=11.6.3"
   },
   "assignees": ["@dyladan", "@legendecas", "@pichlermarc", "@trentm"],
   "labels": ["dependencies"],
-  "postUpdateOptions": ["npmDedupe"]
+  "ignorePaths": ["**/bundler-tests/**"],
+  "postUpdateOptions": ["npmDedupe"],
+  "minimumReleaseAge": "3 days"
 }

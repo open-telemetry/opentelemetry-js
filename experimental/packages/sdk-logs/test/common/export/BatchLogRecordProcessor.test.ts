@@ -1,47 +1,34 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import type { ExportResult } from '@opentelemetry/core';
 import {
-  ExportResult,
   ExportResultCode,
   loggingErrorHandler,
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
 
-import {
+import type {
   BufferConfig,
   LogRecordLimits,
   SdkLogRecord,
-  InMemoryLogRecordExporter,
   LogRecordExporter,
 } from '../../../src';
+import { InMemoryLogRecordExporter } from '../../../src';
 import { BatchLogRecordProcessorBase } from '../../../src/export/BatchLogRecordProcessorBase';
-import { reconfigureLimits } from '../../../src/config';
 import { LoggerProviderSharedState } from '../../../src/internal/LoggerProviderSharedState';
+import type { Resource } from '@opentelemetry/resources';
 import {
   defaultResource,
-  Resource,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
 import { LogRecordImpl } from '../../../src/LogRecordImpl';
 
 class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BufferConfig> {
-  onInit() {}
   onShutdown() {}
 }
 
@@ -52,10 +39,13 @@ const createLogRecord = (
   const sharedState = new LoggerProviderSharedState(
     resource || defaultResource(),
     Infinity,
-    reconfigureLimits(limits ?? {}),
+    {
+      attributeCountLimit: limits?.attributeCountLimit ?? 128,
+      attributeValueLengthLimit: limits?.attributeValueLengthLimit ?? Infinity,
+    },
     []
   );
-  const logRecord = new LogRecordImpl(
+  return new LogRecordImpl(
     sharedState,
     {
       name: 'test name',
@@ -66,7 +56,6 @@ const createLogRecord = (
       body: 'body',
     }
   );
-  return logRecord;
 };
 
 describe('BatchLogRecordProcessorBase', () => {
@@ -83,6 +72,7 @@ describe('BatchLogRecordProcessorBase', () => {
   afterEach(() => {
     exporter.reset();
     sinon.restore();
+    setGlobalErrorHandler(loggingErrorHandler);
   });
 
   describe('constructor', () => {
@@ -123,7 +113,7 @@ describe('BatchLogRecordProcessorBase', () => {
       assert.ok(processor instanceof BatchLogRecordProcessor);
       assert.strictEqual(processor['_maxExportBatchSize'], 512);
       assert.strictEqual(processor['_maxQueueSize'], 2048);
-      assert.strictEqual(processor['_scheduledDelayMillis'], 5000);
+      assert.strictEqual(processor['_scheduledDelayMillis'], 1000);
       assert.strictEqual(processor['_exportTimeoutMillis'], 30000);
       processor.shutdown();
     });
@@ -292,12 +282,15 @@ describe('BatchLogRecordProcessorBase', () => {
       await processor.shutdown();
     });
 
-    it('should force flush when timeout exceeded for partial batches', done => {
+    it('should force flush when timeout exceeded for partial batches', async function () {
+      // arrange
       const clock = sinon.useFakeTimers();
       const processor = new BatchLogRecordProcessor(
         exporter,
         defaultBufferConfig
       );
+
+      // act
       // Add only a partial batch (less than maxExportBatchSize)
       const partialBatchSize = Math.floor(
         defaultBufferConfig.maxExportBatchSize / 2
@@ -307,15 +300,14 @@ describe('BatchLogRecordProcessorBase', () => {
         processor.onEmit(logRecord);
         assert.strictEqual(exporter.getFinishedLogRecords().length, 0);
       }
-      setTimeout(() => {
-        // Should export the partial batch after timeout
-        assert.strictEqual(
-          exporter.getFinishedLogRecords().length,
-          partialBatchSize
-        );
-        done();
-      }, defaultBufferConfig.scheduledDelayMillis + 1000);
-      clock.tick(defaultBufferConfig.scheduledDelayMillis + 1000);
+      await clock.tickAsync(defaultBufferConfig.scheduledDelayMillis + 1000);
+
+      // assert
+      // Should export the partial batch after timeout
+      assert.strictEqual(
+        exporter.getFinishedLogRecords().length,
+        partialBatchSize
+      );
       clock.restore();
     });
 
@@ -365,7 +357,8 @@ describe('BatchLogRecordProcessorBase', () => {
       });
     });
 
-    it('should call globalErrorHandler when exporting fails', done => {
+    it('should call globalErrorHandler when exporting fails', async function () {
+      // arrange
       const clock = sinon.useFakeTimers();
       const expectedError = new Error('Exporter failed');
       sinon.stub(exporter, 'export').callsFake((_, callback) => {
@@ -379,23 +372,52 @@ describe('BatchLogRecordProcessorBase', () => {
         exporter,
         defaultBufferConfig
       );
+
+      // act
       for (let i = 0; i < defaultBufferConfig.maxExportBatchSize; i++) {
         const logRecord = createLogRecord();
         processor.onEmit(logRecord);
       }
-      clock.tick(defaultBufferConfig.scheduledDelayMillis + 1000);
-      clock.restore();
-      setTimeout(() => {
-        assert.strictEqual(errorHandlerSpy.callCount, 1);
-        const [[error]] = errorHandlerSpy.args;
-        assert.deepStrictEqual(error, expectedError);
-        // reset global error handler
-        setGlobalErrorHandler(loggingErrorHandler());
-        done();
-      });
+      await clock.tickAsync(defaultBufferConfig.scheduledDelayMillis + 1000);
+
+      // assert
+      sinon.assert.calledOnceWithExactly(errorHandlerSpy, expectedError);
+      // reset global error handler
+      setGlobalErrorHandler(loggingErrorHandler());
     });
 
-    it('should drop logRecords when there are more logRecords than "maxQueueSize"', () => {
+    it('should call globalErrorHandler when export exceeds timeout', async function () {
+      // arrange
+      const clock = sinon.useFakeTimers();
+      const exportTimeoutMillis = 1000;
+      sinon.stub(exporter, 'export').callsFake((_, callback) => {
+        // never call the callback to simulate a hung export
+        // the timeout should trigger instead.
+      });
+      const errorHandlerSpy = sinon.spy();
+      setGlobalErrorHandler(errorHandlerSpy);
+      const processor = new BatchLogRecordProcessor(exporter, {
+        maxExportBatchSize: 1,
+        scheduledDelayMillis: 2500,
+        exportTimeoutMillis,
+      });
+
+      // act
+      processor.onEmit(createLogRecord());
+      await clock.tickAsync(exportTimeoutMillis + 100);
+
+      // assert
+      sinon.assert.calledOnceWithMatch(
+        errorHandlerSpy,
+        sinon.match.instanceOf(Error)
+      );
+      sinon.assert.calledOnceWithMatch(
+        errorHandlerSpy,
+        sinon.match.has('message', 'Timeout')
+      );
+    });
+
+    it('should drop logRecords when there are more logRecords than "maxQueueSize"', function () {
       // Use a large batch size to prevent automatic exports during this test
       const maxQueueSize = 6;
       const maxExportBatchSize = 20; // Will be clamped to maxQueueSize (6) by constructor
@@ -475,6 +497,120 @@ describe('BatchLogRecordProcessorBase', () => {
         'fromasync'
       );
     });
+
+    it('should call forceFlush on exporter when export is in progress', async () => {
+      // arrange
+      let exportCallback: ((result: ExportResult) => void) | undefined;
+      const customExporter: LogRecordExporter = {
+        export: (logs, callback) => {
+          // keep export pending, so that we can resolve it later
+          exportCallback = callback;
+        },
+        shutdown: async () => {},
+        forceFlush: async () => {},
+      };
+      const forceFlushSpy = sinon.spy(customExporter, 'forceFlush');
+      const processor = new BatchLogRecordProcessor(customExporter, {
+        maxExportBatchSize: 1,
+        scheduledDelayMillis: 2500,
+      });
+
+      // emit enough logs to trigger export
+      processor.onEmit(createLogRecord());
+      // yield to allow export to start
+      await new Promise(resolve => setTimeout(resolve, 0));
+      // sanity check - ensure export is indeed in progress
+      assert.ok(exportCallback !== undefined);
+
+      // act
+      const forceFlushPromise = processor.forceFlush();
+      // yield to allow forceFlush to continue
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      // assert
+      sinon.assert.calledOnce(forceFlushSpy);
+
+      if (exportCallback !== undefined) {
+        exportCallback({ code: ExportResultCode.SUCCESS });
+      }
+      await forceFlushPromise;
+      await processor.shutdown();
+    });
+
+    it('should not throw when in-flight export completes between awaits in _flushAll', async () => {
+      // arrange
+      // Reproduces a race in _flushAll: when forceFlush() is called while a
+      // background export is in progress, _flushAll captures the in-flight
+      // export via `this._currentExport`. While awaiting `_exporter.forceFlush()`,
+      // the in-flight export may complete and `_exportOneBatch`'s completion
+      // handler nullifies `_currentExport`. When `_flushAll` resumes and reads
+      // `this._currentExport.exportCompleted`, it would dereference null.
+      let exportCallback: ((result: ExportResult) => void) | undefined;
+      let resolveExporterForceFlush: (() => void) | undefined;
+      const customExporter: LogRecordExporter = {
+        export: (_logs, callback) => {
+          // keep export pending so we can resolve it later
+          exportCallback = callback;
+        },
+        shutdown: async () => {},
+        forceFlush: () =>
+          new Promise<void>(resolve => {
+            // keep exporter.forceFlush() pending so _flushAll stays in await
+            resolveExporterForceFlush = resolve;
+          }),
+      };
+      const processor = new BatchLogRecordProcessor(customExporter, {
+        maxExportBatchSize: 1,
+        scheduledDelayMillis: 2500,
+      });
+
+      // trigger a background export by filling a batch
+      processor.onEmit(createLogRecord());
+      // yield so _exportOneBatch starts and exporter.export() is called
+      await new Promise(resolve => setTimeout(resolve, 0));
+      assert.ok(
+        exportCallback !== undefined,
+        'expected exporter.export() to have been called'
+      );
+
+      // call forceFlush — _flushAll will await exporter.forceFlush()
+      const flushPromise = processor.forceFlush();
+      // yield so _flushAll enters its await on exporter.forceFlush()
+      await new Promise(resolve => setTimeout(resolve, 0));
+      assert.ok(
+        resolveExporterForceFlush !== undefined,
+        'expected exporter.forceFlush() to have been called'
+      );
+
+      // complete the in-flight export — _exportOneBatch's .then handler
+      // will nullify _currentExport before _flushAll resumes
+      exportCallback({ code: ExportResultCode.SUCCESS });
+      // yield to let the .then() handler run and set _currentExport = null
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      // now resume _flushAll by resolving the exporter.forceFlush() promise.
+      // After the bug, _flushAll would read `this._currentExport.exportCompleted`
+      // and throw `Cannot read properties of null (reading 'exportCompleted')`.
+      resolveExporterForceFlush();
+
+      // assert — forceFlush must resolve, not reject with TypeError
+      await flushPromise;
+
+      await processor.shutdown();
+    });
+
+    it('should not call forceFlush on exporter when queue is empty and no export in progress', async function () {
+      // arrange
+      const forceFlushSpy = sinon.spy(exporter, 'forceFlush');
+      const processor = new BatchLogRecordProcessor(exporter);
+
+      // act - nothing in the queue and no export in progress
+      await processor.forceFlush();
+
+      // assert
+      sinon.assert.notCalled(forceFlushSpy);
+      await processor.shutdown();
+    });
   });
 
   describe('shutdown', () => {
@@ -505,6 +641,7 @@ describe('BatchLogRecordProcessorBase', () => {
 
   describe('Concurrency', () => {
     it('should only send a single batch at a time', async () => {
+      // arrange
       const callbacks: ((result: ExportResult) => void)[] = [];
       const logRecords: SdkLogRecord[] = [];
       const exporter: LogRecordExporter = {
@@ -516,16 +653,23 @@ describe('BatchLogRecordProcessorBase', () => {
           logRecords.push(...exportedLogRecords);
         },
         shutdown: async () => {},
+        forceFlush: async () => {},
       };
       const processor = new BatchLogRecordProcessor(exporter, {
         maxExportBatchSize: 5,
         maxQueueSize: 6,
       });
+
+      // act
       const totalLogRecords = 50;
       for (let i = 0; i < totalLogRecords; i++) {
         const logRecord = createLogRecord();
         processor.onEmit(logRecord);
       }
+
+      // yield to allow an export to start
+      await new Promise(resolve => setTimeout(resolve, 0));
+      // assert
       assert.equal(callbacks.length, 1);
       assert.equal(logRecords.length, 5);
       callbacks[0]({ code: ExportResultCode.SUCCESS });

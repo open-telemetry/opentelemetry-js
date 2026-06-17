@@ -1,19 +1,12 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 export class Buckets {
+  public backing;
+  public indexBase;
+  public indexStart;
+  public indexEnd;
   /**
    * The term index refers to the number of the exponential histogram bucket
    * used to determine its boundaries. The lower boundary of a bucket is
@@ -32,11 +25,16 @@ export class Buckets {
    * the backing array.
    */
   constructor(
-    public backing = new BucketsBacking(),
-    public indexBase = 0,
-    public indexStart = 0,
-    public indexEnd = 0
-  ) {}
+    backing = new BucketsBacking(),
+    indexBase = 0,
+    indexStart = 0,
+    indexEnd = 0
+  ) {
+    this.backing = backing;
+    this.indexBase = indexBase;
+    this.indexStart = indexStart;
+    this.indexEnd = indexEnd;
+  }
 
   /**
    * Offset is the bucket index of the smallest entry in the counts array
@@ -216,7 +214,11 @@ export class Buckets {
  * manage them.
  */
 class BucketsBacking {
-  constructor(private _counts = [0]) {}
+  private _counts;
+
+  constructor(counts = [0]) {
+    this._counts = counts;
+  }
 
   /**
    * length returns the physical size of the backing array, which

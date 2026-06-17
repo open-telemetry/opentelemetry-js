@@ -1,63 +1,13 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { buildSamplerFromEnv, loadDefaultConfig } from './config';
-import { Sampler } from './Sampler';
-import { SpanLimits, TracerConfig, GeneralLimits } from './types';
+import type { TracerConfig } from './types-shim';
 import { getNumberFromEnv } from '@opentelemetry/core';
 
 export const DEFAULT_ATTRIBUTE_COUNT_LIMIT = 128;
 export const DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT = Infinity;
-
-/**
- * Function to merge Default configuration (as specified in './config') with
- * user provided configurations.
- */
-export function mergeConfig(userConfig: TracerConfig): TracerConfig & {
-  sampler: Sampler;
-  spanLimits: SpanLimits;
-  generalLimits: GeneralLimits;
-} {
-  const perInstanceDefaults: Partial<TracerConfig> = {
-    sampler: buildSamplerFromEnv(),
-  };
-
-  const DEFAULT_CONFIG = loadDefaultConfig();
-
-  const target = Object.assign(
-    {},
-    DEFAULT_CONFIG,
-    perInstanceDefaults,
-    userConfig
-  );
-
-  target.generalLimits = Object.assign(
-    {},
-    DEFAULT_CONFIG.generalLimits,
-    userConfig.generalLimits || {}
-  );
-
-  target.spanLimits = Object.assign(
-    {},
-    DEFAULT_CONFIG.spanLimits,
-    userConfig.spanLimits || {}
-  );
-
-  return target;
-}
 
 /**
  * When general limits are provided and model specific limits are not,

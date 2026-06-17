@@ -1,37 +1,31 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as api from '@opentelemetry/api';
-import { AggregationTemporality } from './AggregationTemporality';
-import { MetricProducer } from './MetricProducer';
-import { CollectionResult, InstrumentType } from './MetricData';
+import type { AggregationTemporality } from './AggregationTemporality';
+import type { MetricProducer } from './MetricProducer';
+import type { CollectionResult, InstrumentType } from './MetricData';
 import { callWithTimeout } from '../utils';
-import {
+import type {
   CollectionOptions,
   ForceFlushOptions,
   ShutdownOptions,
 } from '../types';
-import {
+import type {
   AggregationSelector,
   AggregationTemporalitySelector,
+} from './AggregationSelector';
+import {
   DEFAULT_AGGREGATION_SELECTOR,
   DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
 } from './AggregationSelector';
-import { AggregationOption } from '../view/AggregationOption';
-import { CardinalitySelector } from './CardinalitySelector';
+import type { AggregationOption } from '../view/AggregationOption';
+import type { CardinalitySelector } from './CardinalitySelector';
+import { MetricReaderMetrics } from './MetricReaderMetrics';
+import { VERSION } from '../version';
+import { hrTime, hrTimeDuration, hrTimeToSeconds } from '@opentelemetry/core';
 
 export interface MetricReaderOptions {
   /**
@@ -63,6 +57,11 @@ export interface MetricReaderOptions {
    * @experimental
    */
   metricProducers?: MetricProducer[];
+  /**
+   * The component type used for reporting self-observability SDK metrics.
+   * @experimental This option is experimental and is subject to breaking changes in minor releases.
+   */
+  otelComponentType?: string;
 }
 
 /**
@@ -141,9 +140,12 @@ export abstract class MetricReader implements IMetricReader {
   private _metricProducers: MetricProducer[];
   // MetricProducer used by this instance which produces metrics from the SDK
   private _sdkMetricProducer?: MetricProducer;
+  // Metrics about the MetricReader itself
+  private _selfObsMetrics: MetricReaderMetrics;
   private readonly _aggregationTemporalitySelector: AggregationTemporalitySelector;
   private readonly _aggregationSelector: AggregationSelector;
   private readonly _cardinalitySelector?: CardinalitySelector;
+  private readonly _otelComponentType: string;
 
   constructor(options?: MetricReaderOptions) {
     this._aggregationSelector =
@@ -153,16 +155,37 @@ export abstract class MetricReader implements IMetricReader {
       DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR;
     this._metricProducers = options?.metricProducers ?? [];
     this._cardinalitySelector = options?.cardinalitySelector;
+    this._otelComponentType =
+      options?.otelComponentType ?? this.constructor.name;
+    this._selfObsMetrics = new MetricReaderMetrics(
+      this._otelComponentType,
+      api.createNoopMeter()
+    );
   }
 
   setMetricProducer(metricProducer: MetricProducer) {
     if (this._sdkMetricProducer) {
+      // This check ensures the following requirement from the spec
+      // (https://opentelemetry.io/docs/specs/otel/metrics/sdk/#metricreader):
+      // > The SDK MUST NOT allow a `MetricReader` instance to be registered
+      // > on more than one `MeterProvider` instance.
+      //
+      // So while the argument is a `MetricProducer`, the relevant user-level
+      // error message is about the **MeterProvider**.
       throw new Error(
         'MetricReader can not be bound to a MeterProvider again.'
       );
     }
     this._sdkMetricProducer = metricProducer;
     this.onInitialized();
+  }
+
+  _setSelfObsMeterProvider(meterProvider: api.MeterProvider): void {
+    const meter = meterProvider.getMeter('@opentelemetry/sdk-metrics', VERSION);
+    this._selfObsMetrics = new MetricReaderMetrics(
+      this._otelComponentType,
+      meter
+    );
   }
 
   selectAggregation(instrumentType: InstrumentType): AggregationOption {
@@ -216,6 +239,7 @@ export abstract class MetricReader implements IMetricReader {
       throw new Error('MetricReader is shutdown');
     }
 
+    const startTime = hrTime();
     const [sdkCollectionResults, ...additionalCollectionResults] =
       await Promise.all([
         this._sdkMetricProducer.collect({
@@ -227,11 +251,21 @@ export abstract class MetricReader implements IMetricReader {
           })
         ),
       ]);
+    const endTime = hrTime();
 
     // Merge the results, keeping the SDK's Resource
     const errors = sdkCollectionResults.errors.concat(
       additionalCollectionResults.flatMap(result => result.errors)
     );
+
+    const collectDuration = hrTimeToSeconds(hrTimeDuration(startTime, endTime));
+    this._selfObsMetrics.recordCollection(
+      collectDuration,
+      errors.length > 0
+        ? ((errors[0] as Error).name ?? 'collect_error')
+        : undefined
+    );
+
     const resource = sdkCollectionResults.resourceMetrics.resource;
     const scopeMetrics =
       sdkCollectionResults.resourceMetrics.scopeMetrics.concat(

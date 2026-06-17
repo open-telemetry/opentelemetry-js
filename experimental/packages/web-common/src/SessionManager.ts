@@ -1,26 +1,16 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { SessionIdGenerator } from './types/SessionIdGenerator';
-import { Session } from './types/Session';
-import { SessionProvider } from './types/SessionProvider';
-import { SessionObserver } from './types/SessionObserver';
-import { SessionStore } from './types/SessionStore';
-import { SessionPublisher } from './types/SessionPublisher';
+import type { SessionIdGenerator } from './types/SessionIdGenerator';
+import type { Session } from './types/Session';
+import type { SessionProvider } from './types/SessionProvider';
+import type { SessionObserver } from './types/SessionObserver';
+import type { SessionStore } from './types/SessionStore';
+import type { SessionPublisher } from './types/SessionPublisher';
 
+const MAX_DURATION_MS = 2147483647; // max setTimeout value in milliseconds (~24.8 days)
 export interface SessionManagerConfig {
   /** Class responsible for generating a session ID */
   sessionIdGenerator: SessionIdGenerator;
@@ -156,9 +146,10 @@ export class SessionManager implements SessionProvider, SessionPublisher {
       clearTimeout(this._inactivityTimeoutId);
     }
 
+    const timeoutIn = Math.min(this._inactivityTimeout * 1000, MAX_DURATION_MS);
     this._inactivityTimeoutId = setTimeout(() => {
       this.resetSession();
-    }, this._inactivityTimeout * 1000);
+    }, timeoutIn);
   }
 
   private resetMaxDurationTimer() {
@@ -170,8 +161,13 @@ export class SessionManager implements SessionProvider, SessionPublisher {
       clearTimeout(this._maxDurationTimeoutId);
     }
 
-    const timeoutIn =
-      this._maxDuration * 1000 - (Date.now() - this._session?.startTimestamp);
+    const timeoutIn = Math.max(
+      0, // a backgrounded tab can cause a negative timeout value, so we use 0 to trigger session reset immediately on resume of the tab
+      Math.min(
+        this._maxDuration * 1000 - (Date.now() - this._session.startTimestamp),
+        MAX_DURATION_MS
+      )
+    );
 
     this._maxDurationTimeoutId = setTimeout(() => {
       this.resetSession();

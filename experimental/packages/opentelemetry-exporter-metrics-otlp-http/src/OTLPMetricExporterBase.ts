@@ -1,38 +1,25 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import { getStringFromEnv } from '@opentelemetry/core';
-import {
-  AggregationTemporality,
+import type {
   AggregationTemporalitySelector,
-  InstrumentType,
   PushMetricExporter,
   ResourceMetrics,
   AggregationSelector,
   AggregationOption,
-  AggregationType,
 } from '@opentelemetry/sdk-metrics';
 import {
-  AggregationTemporalityPreference,
-  OTLPMetricExporterOptions,
-} from './OTLPMetricExporterOptions';
-import {
-  IOtlpExportDelegate,
-  OTLPExporterBase,
-} from '@opentelemetry/otlp-exporter-base';
+  AggregationTemporality,
+  InstrumentType,
+  AggregationType,
+} from '@opentelemetry/sdk-metrics';
+import type { OTLPMetricExporterOptions } from './OTLPMetricExporterOptions';
+import { AggregationTemporalityPreference } from './OTLPMetricExporterOptions';
+import type { IOtlpExportDelegate } from '@opentelemetry/otlp-exporter-base';
+import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import { diag } from '@opentelemetry/api';
 
 export const CumulativeTemporalitySelector: AggregationTemporalitySelector =

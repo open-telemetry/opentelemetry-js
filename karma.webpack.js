@@ -1,17 +1,6 @@
-/*!
+/*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 const webpack = require('webpack')
@@ -37,6 +26,12 @@ module.exports = {
       // Thanks to https://stackoverflow.com/a/65018686/14239942
       // NOTE: I wish there was a better way as this pollutes the tests with a defined 'process' global.
       process: 'process/browser.js'
+    }),
+    // Benchmark.js checks for AMD's define function which doesn't exist in webpack.
+    // NOTE: This pollutes tests with a defined 'self.define' global.
+    new webpack.BannerPlugin({
+      banner: 'self.define = self.define || Object.assign(function(){}, {amd: false});',
+      raw: true
     })
   ],
   module: {

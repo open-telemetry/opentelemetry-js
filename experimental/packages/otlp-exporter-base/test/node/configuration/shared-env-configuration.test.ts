@@ -1,24 +1,13 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag } from '@opentelemetry/api';
 import * as process from 'process';
-import { OtlpSharedConfiguration } from '../../../src';
+import type { OtlpSharedConfiguration } from '../../../src';
 import { getSharedConfigurationFromEnvironment } from '../../../src/index-node-http';
 
 export function testSharedConfigurationFromEnvironment(
@@ -78,11 +67,11 @@ export function testSharedConfigurationFromEnvironment(
       sinon.assert.calledTwice(spyLoggerWarn);
       sinon.assert.calledWithExactly(
         spyLoggerWarn,
-        `Unknown value 'NaN' for OTEL_EXPORTER_OTLP_METRICS_TIMEOUT, expected a number, using defaults`
+        "Unknown value 'NaN' for OTEL_EXPORTER_OTLP_METRICS_TIMEOUT, expected a number, using defaults"
       );
       sinon.assert.calledWithExactly(
         spyLoggerWarn,
-        `Unknown value 'foo' for OTEL_EXPORTER_OTLP_TIMEOUT, expected a number, using defaults`
+        "Unknown value 'foo' for OTEL_EXPORTER_OTLP_TIMEOUT, expected a number, using defaults"
       );
       assert.strictEqual(config.timeoutMillis, undefined);
     });
@@ -96,7 +85,7 @@ export function testSharedConfigurationFromEnvironment(
       sinon.assert.calledTwice(spyLoggerWarn);
       sinon.assert.calledWithExactly(
         spyLoggerWarn,
-        `Configuration: OTEL_EXPORTER_OTLP_TIMEOUT is invalid, expected number greater than 0 (actual: Infinity)`
+        'Configuration: OTEL_EXPORTER_OTLP_TIMEOUT is invalid, expected number greater than 0 (actual: Infinity)'
       );
       sinon.assert.calledWithExactly(
         spyLoggerWarn,
