@@ -67,10 +67,9 @@ export function timeInputToHrTime(time: api.TimeInput): api.HrTime {
     // document/process started, so it is bounded by system uptime. No real
     // system has been running long enough for performance.now() to reach half
     // the current epoch time (~1994 in ms terms). We therefore treat any value
-    // that is both less than performance.timeOrigin AND less than half of
-    // performance.timeOrigin as a relative performance.now() reading, and
-    // everything else as an absolute epoch-millisecond timestamp.
-    if (time < performance.timeOrigin && time < performance.timeOrigin / 2) {
+    // below half of performance.timeOrigin as a relative performance.now()
+    // reading, and everything else as an absolute epoch-millisecond timestamp.
+    if (time < performance.timeOrigin / 2) {
       return hrTime(time);
     } else {
       // epoch milliseconds or performance.timeOrigin
