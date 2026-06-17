@@ -66,7 +66,7 @@ function validateFileFormat(configFile: string, fileFormat: unknown): void {
 
   if (minor > SUPPORTED_FILE_FORMAT_MINOR) {
     diag.warn(
-      `Configuration file_format "${fileFormat}" has a newer minor version than this SDK supports (${SUPPORTED_FILE_FORMAT_MAJOR}.${SUPPORTED_FILE_FORMAT_MINOR}); some settings may be ignored.`
+      `${configFile}: Configuration file_format "${fileFormat}" has a newer minor version than this SDK supports (${SUPPORTED_FILE_FORMAT_MAJOR}.${SUPPORTED_FILE_FORMAT_MINOR}); some settings may be ignored.`
     );
   }
 }
