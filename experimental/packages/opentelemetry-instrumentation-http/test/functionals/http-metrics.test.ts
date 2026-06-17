@@ -19,16 +19,6 @@ import {
   ATTR_SERVER_PORT,
   ATTR_URL_SCHEME,
 } from '@opentelemetry/semantic-conventions';
-import {
-  ATTR_HTTP_FLAVOR,
-  ATTR_HTTP_METHOD,
-  ATTR_HTTP_SCHEME,
-  ATTR_HTTP_STATUS_CODE,
-  ATTR_NET_HOST_NAME,
-  ATTR_NET_HOST_PORT,
-  ATTR_NET_PEER_NAME,
-  ATTR_NET_PEER_PORT,
-} from '../../src/semconv';
 import * as assert from 'assert';
 import { HttpInstrumentation } from '../../src/http';
 import { httpRequest } from '../utils/httpRequest';
@@ -87,92 +77,6 @@ describe('metrics', () => {
     server.close();
     instrumentation.disable();
   });
-  describe('with no stability set', () => {
-    it('should add server/client duration metrics', async () => {
-      const requestCount = 3;
-      for (let i = 0; i < requestCount; i++) {
-        await httpRequest.get(
-          `${protocol}://${hostname}:${serverPort}${pathname}`
-        );
-      }
-      await metricReader.collectAndExport();
-      const resourceMetrics = metricsMemoryExporter.getMetrics();
-      const scopeMetrics = resourceMetrics[0].scopeMetrics;
-      assert.strictEqual(scopeMetrics.length, 1, 'scopeMetrics count');
-      const metrics = scopeMetrics[0].metrics;
-      assert.strictEqual(metrics.length, 2, 'metrics count');
-      assert.strictEqual(metrics[0].dataPointType, DataPointType.HISTOGRAM);
-      assert.strictEqual(
-        metrics[0].descriptor.description,
-        'Measures the duration of inbound HTTP requests.'
-      );
-      assert.strictEqual(metrics[0].descriptor.name, 'http.server.duration');
-      assert.strictEqual(metrics[0].descriptor.unit, 'ms');
-      assert.strictEqual(metrics[0].dataPoints.length, 1);
-      assert.strictEqual(
-        (metrics[0].dataPoints[0].value as any).count,
-        requestCount
-      );
-      assert.strictEqual(
-        metrics[0].dataPoints[0].attributes[ATTR_HTTP_SCHEME],
-        'http'
-      );
-      assert.strictEqual(
-        metrics[0].dataPoints[0].attributes[ATTR_HTTP_METHOD],
-        'GET'
-      );
-      assert.strictEqual(
-        metrics[0].dataPoints[0].attributes[ATTR_HTTP_FLAVOR],
-        '1.1'
-      );
-      assert.strictEqual(
-        metrics[0].dataPoints[0].attributes[ATTR_NET_HOST_NAME],
-        'localhost'
-      );
-      assert.strictEqual(
-        metrics[0].dataPoints[0].attributes[ATTR_HTTP_STATUS_CODE],
-        200
-      );
-      assert.strictEqual(
-        metrics[0].dataPoints[0].attributes[ATTR_NET_HOST_PORT],
-        22346
-      );
-
-      assert.strictEqual(metrics[1].dataPointType, DataPointType.HISTOGRAM);
-      assert.strictEqual(
-        metrics[1].descriptor.description,
-        'Measures the duration of outbound HTTP requests.'
-      );
-      assert.strictEqual(metrics[1].descriptor.name, 'http.client.duration');
-      assert.strictEqual(metrics[1].descriptor.unit, 'ms');
-      assert.strictEqual(metrics[1].dataPoints.length, 1);
-      assert.strictEqual(
-        (metrics[1].dataPoints[0].value as any).count,
-        requestCount
-      );
-      assert.strictEqual(
-        metrics[1].dataPoints[0].attributes[ATTR_HTTP_METHOD],
-        'GET'
-      );
-      assert.strictEqual(
-        metrics[1].dataPoints[0].attributes[ATTR_NET_PEER_NAME],
-        'localhost'
-      );
-      assert.strictEqual(
-        metrics[1].dataPoints[0].attributes[ATTR_NET_PEER_PORT],
-        22346
-      );
-      assert.strictEqual(
-        metrics[1].dataPoints[0].attributes[ATTR_HTTP_STATUS_CODE],
-        200
-      );
-      assert.strictEqual(
-        metrics[1].dataPoints[0].attributes[ATTR_HTTP_FLAVOR],
-        '1.1'
-      );
-    });
-  });
-
   describe('with stable semconv', () => {
     it('should add server/client duration metrics', async () => {
       const requestCount = 3;

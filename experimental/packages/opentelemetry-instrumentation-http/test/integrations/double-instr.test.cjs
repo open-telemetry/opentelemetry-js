@@ -43,7 +43,13 @@ function assertTwoSpans(spans, opts) {
       '@opentelemetry/instrumentation-http'
     );
     if (opts.pathname) {
-      assert.strictEqual(span.attributes['http.target'], opts.pathname);
+      if (span.kind === SpanKind.SERVER) {
+        assert.strictEqual(span.attributes['url.path'], opts.pathname);
+      } else {
+        assert.ok(
+          (span.attributes['url.full'] ?? '').endsWith(opts.pathname)
+        );
+      }
     }
   }
   assert.strictEqual(spans[0].kind, SpanKind.SERVER);

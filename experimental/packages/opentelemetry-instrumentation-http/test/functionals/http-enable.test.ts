@@ -33,25 +33,6 @@ import {
   ATTR_URL_SCHEME,
   HTTP_REQUEST_METHOD_VALUE_GET,
 } from '@opentelemetry/semantic-conventions';
-import {
-  ATTR_HTTP_CLIENT_IP,
-  ATTR_HTTP_FLAVOR,
-  ATTR_HTTP_HOST,
-  ATTR_HTTP_METHOD,
-  ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-  ATTR_HTTP_SCHEME,
-  ATTR_HTTP_STATUS_CODE,
-  ATTR_HTTP_TARGET,
-  ATTR_HTTP_URL,
-  ATTR_NET_HOST_IP,
-  ATTR_NET_HOST_NAME,
-  ATTR_NET_HOST_PORT,
-  ATTR_NET_PEER_IP,
-  ATTR_NET_PEER_NAME,
-  ATTR_NET_PEER_PORT,
-  ATTR_NET_TRANSPORT,
-  NET_TRANSPORT_VALUE_IP_TCP,
-} from '../../src/semconv';
 import * as assert from 'assert';
 import * as nock from 'nock';
 import * as path from 'path';
@@ -77,7 +58,6 @@ instrumentation.enable();
 instrumentation.disable();
 
 import * as http from 'http';
-import { AttributeNames } from '../../src/enums/AttributeNames';
 import { getRemoteClientAddress } from '../../src/utils';
 
 const applyCustomAttributesOnSpanErrorMessage =
@@ -225,16 +205,16 @@ describe('HttpInstrumentation', () => {
         assertSpan(incomingSpan, SpanKind.SERVER, validations);
         assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
         assert.strictEqual(
-          incomingSpan.attributes[ATTR_NET_HOST_PORT],
+          incomingSpan.attributes[ATTR_SERVER_PORT],
           serverPort
         );
         assert.strictEqual(
-          outgoingSpan.attributes[ATTR_NET_PEER_PORT],
+          outgoingSpan.attributes[ATTR_SERVER_PORT],
           serverPort
         );
       });
 
-      it('should redact auth from the `http.url` attribute (client side and server side)', async () => {
+      it('should redact auth from the `url.full` attribute (client side and server side)', async () => {
         await httpRequest.get(
           `${protocol}://user:pass@${hostname}:${serverPort}${pathname}`
         );
@@ -244,11 +224,7 @@ describe('HttpInstrumentation', () => {
         assert.strictEqual(incomingSpan.kind, SpanKind.SERVER);
         assert.strictEqual(outgoingSpan.kind, SpanKind.CLIENT);
         assert.strictEqual(
-          incomingSpan.attributes[ATTR_HTTP_URL],
-          `${protocol}://${hostname}:${serverPort}${pathname}`
-        );
-        assert.strictEqual(
-          outgoingSpan.attributes[ATTR_HTTP_URL],
+          outgoingSpan.attributes[ATTR_URL_FULL],
           `${protocol}://REDACTED:REDACTED@${hostname}:${serverPort}${pathname}`
         );
       });
@@ -408,25 +384,24 @@ describe('HttpInstrumentation', () => {
 
         assert.strictEqual(spans.length, 2);
         assert.strictEqual(
-          incomingSpan.attributes[ATTR_HTTP_CLIENT_IP],
+          incomingSpan.attributes[ATTR_CLIENT_ADDRESS],
           '<client>'
         );
         assert.strictEqual(
-          incomingSpan.attributes[ATTR_NET_HOST_PORT],
+          incomingSpan.attributes[ATTR_SERVER_PORT],
           serverPort
         );
         assert.strictEqual(
-          outgoingSpan.attributes[ATTR_NET_PEER_PORT],
+          outgoingSpan.attributes[ATTR_SERVER_PORT],
           serverPort
         );
         [
           { span: incomingSpan, kind: SpanKind.SERVER },
           { span: outgoingSpan, kind: SpanKind.CLIENT },
         ].forEach(({ span, kind }) => {
-          assert.strictEqual(span.attributes[ATTR_HTTP_FLAVOR], '1.1');
           assert.strictEqual(
-            span.attributes[ATTR_NET_TRANSPORT],
-            NET_TRANSPORT_VALUE_IP_TCP
+            span.attributes[ATTR_NETWORK_PROTOCOL_VERSION],
+            '1.1'
           );
           assertSpan(span, kind, validations);
         });
@@ -857,7 +832,10 @@ describe('HttpInstrumentation', () => {
             const [span] = spans;
             assert.strictEqual(spans.length, 1);
             assert.ok(Object.keys(span.attributes).length > 6);
-            assert.strictEqual(span.attributes[ATTR_HTTP_STATUS_CODE], 404);
+            assert.strictEqual(
+              span.attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
+              404
+            );
             assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
             done();
           });
@@ -1224,165 +1202,6 @@ describe('HttpInstrumentation', () => {
       });
     });
 
-    describe('with semconv stability set to http/dup', () => {
-      beforeEach(() => {
-        memoryExporter.reset();
-        instrumentation.setConfig({});
-      });
-
-      before(async () => {
-        instrumentation.setConfig({});
-        instrumentation.enable();
-        server = http.createServer((request, response) => {
-          if (request.url?.includes('/setroute')) {
-            const rpcData = getRPCMetadata(context.active());
-            assert.ok(rpcData != null);
-            assert.strictEqual(rpcData.type, RPCType.HTTP);
-            assert.strictEqual(rpcData.route, undefined);
-            rpcData.route = 'TheRoute';
-          }
-          response.setHeader('Content-Type', 'application/json');
-          response.end(
-            JSON.stringify({ address: getRemoteClientAddress(request) })
-          );
-        });
-
-        await new Promise<void>(resolve => server.listen(serverPort, resolve));
-      });
-
-      after(() => {
-        server.close();
-        instrumentation.setConfig({});
-        instrumentation.disable();
-      });
-
-      it('should create client spans with semconv 1.27 and old 1.7', async () => {
-        const response = await httpRequest.get(
-          `${protocol}://${hostname}:${serverPort}${pathname}`
-        );
-        const spans = memoryExporter.getFinishedSpans();
-        assert.strictEqual(spans.length, 2);
-        const outgoingSpan = spans[1];
-
-        // should have only required and recommended attributes for semconv 1.27
-        assert.deepStrictEqual(outgoingSpan.attributes, {
-          // 1.27 attributes
-          [ATTR_HTTP_REQUEST_METHOD]: HTTP_REQUEST_METHOD_VALUE_GET,
-          [ATTR_SERVER_ADDRESS]: hostname,
-          [ATTR_SERVER_PORT]: serverPort,
-          [ATTR_URL_FULL]: `http://${hostname}:${serverPort}${pathname}`,
-          [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
-          [ATTR_NETWORK_PEER_ADDRESS]: response.address,
-          [ATTR_NETWORK_PEER_PORT]: serverPort,
-          [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
-
-          // 1.7 attributes
-          [ATTR_HTTP_FLAVOR]: '1.1',
-          [ATTR_HTTP_HOST]: `${hostname}:${serverPort}`,
-          [ATTR_HTTP_METHOD]: 'GET',
-          [ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED]:
-            response.data.length,
-          [ATTR_HTTP_STATUS_CODE]: 200,
-          [ATTR_HTTP_TARGET]: '/test',
-          [ATTR_HTTP_URL]: `http://${hostname}:${serverPort}${pathname}`,
-          [ATTR_NET_PEER_IP]: response.address,
-          [ATTR_NET_PEER_NAME]: hostname,
-          [ATTR_NET_PEER_PORT]: serverPort,
-          [ATTR_NET_TRANSPORT]: 'ip_tcp',
-
-          // unspecified old names
-          [AttributeNames.HTTP_STATUS_TEXT]: 'OK',
-        });
-      });
-
-      it('should create server spans with semconv 1.27 and old 1.7', async () => {
-        const response = await httpRequest.get(
-          `${protocol}://${hostname}:${serverPort}${pathname}`
-        );
-        const spans = memoryExporter.getFinishedSpans();
-        assert.strictEqual(spans.length, 2);
-        const incomingSpan = spans[0];
-        const body = JSON.parse(response.data);
-
-        // should have only required and recommended attributes for semconv 1.27
-        assert.deepStrictEqual(incomingSpan.attributes, {
-          // 1.27 attributes
-          [ATTR_CLIENT_ADDRESS]: body.address,
-          [ATTR_HTTP_REQUEST_METHOD]: HTTP_REQUEST_METHOD_VALUE_GET,
-          [ATTR_SERVER_ADDRESS]: hostname,
-          [ATTR_SERVER_PORT]: serverPort,
-          [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
-          [ATTR_NETWORK_PEER_ADDRESS]: body.address,
-          [ATTR_NETWORK_PEER_PORT]: response.clientRemotePort,
-          [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
-          [ATTR_URL_PATH]: pathname,
-          [ATTR_URL_SCHEME]: protocol,
-
-          // 1.7 attributes
-          [ATTR_HTTP_FLAVOR]: '1.1',
-          [ATTR_HTTP_HOST]: `${hostname}:${serverPort}`,
-          [ATTR_HTTP_METHOD]: 'GET',
-          [ATTR_HTTP_SCHEME]: protocol,
-          [ATTR_HTTP_STATUS_CODE]: 200,
-          [ATTR_HTTP_TARGET]: '/test',
-          [ATTR_HTTP_URL]: `http://${hostname}:${serverPort}${pathname}`,
-          [ATTR_NET_TRANSPORT]: 'ip_tcp',
-          [ATTR_NET_HOST_IP]: body.address,
-          [ATTR_NET_HOST_NAME]: hostname,
-          [ATTR_NET_HOST_PORT]: serverPort,
-          [ATTR_NET_PEER_IP]: body.address,
-          [ATTR_NET_PEER_PORT]: response.clientRemotePort,
-
-          // unspecified old names
-          [AttributeNames.HTTP_STATUS_TEXT]: 'OK',
-        });
-      });
-
-      it('should create server spans with semconv 1.27 and old 1.7 including http.route if RPC metadata is available', async () => {
-        const response = await httpRequest.get(
-          `${protocol}://${hostname}:${serverPort}${pathname}/setroute`
-        );
-        const spans = memoryExporter.getFinishedSpans();
-        assert.strictEqual(spans.length, 2);
-        const incomingSpan = spans[0];
-        const body = JSON.parse(response.data);
-
-        // should have only required and recommended attributes for semconv 1.27
-        assert.deepStrictEqual(incomingSpan.attributes, {
-          // 1.27 attributes
-          [ATTR_CLIENT_ADDRESS]: body.address,
-          [ATTR_HTTP_REQUEST_METHOD]: HTTP_REQUEST_METHOD_VALUE_GET,
-          [ATTR_SERVER_ADDRESS]: hostname,
-          [ATTR_SERVER_PORT]: serverPort,
-          [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
-          [ATTR_NETWORK_PEER_ADDRESS]: body.address,
-          [ATTR_NETWORK_PEER_PORT]: response.clientRemotePort,
-          [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
-          [ATTR_URL_PATH]: `${pathname}/setroute`,
-          [ATTR_URL_SCHEME]: protocol,
-          [ATTR_HTTP_ROUTE]: 'TheRoute',
-
-          // 1.7 attributes
-          [ATTR_HTTP_FLAVOR]: '1.1',
-          [ATTR_HTTP_HOST]: `${hostname}:${serverPort}`,
-          [ATTR_HTTP_METHOD]: 'GET',
-          [ATTR_HTTP_SCHEME]: protocol,
-          [ATTR_HTTP_STATUS_CODE]: 200,
-          [ATTR_HTTP_TARGET]: `${pathname}/setroute`,
-          [ATTR_HTTP_URL]: `http://${hostname}:${serverPort}${pathname}/setroute`,
-          [ATTR_NET_TRANSPORT]: 'ip_tcp',
-          [ATTR_NET_HOST_IP]: body.address,
-          [ATTR_NET_HOST_NAME]: hostname,
-          [ATTR_NET_HOST_PORT]: serverPort,
-          [ATTR_NET_PEER_IP]: body.address,
-          [ATTR_NET_PEER_PORT]: response.clientRemotePort,
-
-          // unspecified old names
-          [AttributeNames.HTTP_STATUS_TEXT]: 'OK',
-        });
-      });
-    });
-
     describe('with require parent span', () => {
       beforeEach(done => {
         memoryExporter.reset();
@@ -1599,31 +1418,31 @@ describe('HttpInstrumentation', () => {
       assert.strictEqual(spans.length, 2);
 
       assert.deepStrictEqual(
-        incomingSpan.attributes['http.request.header.x_client_header2'],
+        incomingSpan.attributes['http.request.header.x-client-header2'],
         ['123client']
       );
 
       assert.deepStrictEqual(
-        incomingSpan.attributes['http.response.header.x_server_header2'],
+        incomingSpan.attributes['http.response.header.x-server-header2'],
         ['123server']
       );
 
       assert.strictEqual(
-        incomingSpan.attributes['http.request.header.x_client_header1'],
+        incomingSpan.attributes['http.request.header.x-client-header1'],
         undefined
       );
 
       assert.strictEqual(
-        incomingSpan.attributes['http.response.header.x_server_header1'],
+        incomingSpan.attributes['http.response.header.x-server-header1'],
         undefined
       );
 
       assert.deepStrictEqual(
-        outgoingSpan.attributes['http.request.header.x_client_header1'],
+        outgoingSpan.attributes['http.request.header.x-client-header1'],
         ['client123']
       );
       assert.deepStrictEqual(
-        outgoingSpan.attributes['http.response.header.x_server_header1'],
+        outgoingSpan.attributes['http.response.header.x-server-header1'],
         ['server123']
       );
 
@@ -1668,15 +1487,9 @@ describe('HttpInstrumentation', () => {
       assert.strictEqual(incomingSpan.kind, SpanKind.SERVER);
       assert.strictEqual(outgoingSpan.kind, SpanKind.CLIENT);
 
-      // Server shouldn't see auth in URL
-      assert.strictEqual(
-        incomingSpan.attributes[ATTR_HTTP_URL],
-        `${protocol}://${hostname}:${serverPort}${pathname}`
-      );
-
       // Client should have redacted auth
       assert.strictEqual(
-        outgoingSpan.attributes[ATTR_HTTP_URL],
+        outgoingSpan.attributes[ATTR_URL_FULL],
         `${protocol}://REDACTED:REDACTED@${hostname}:${serverPort}${pathname}`
       );
     });
@@ -1688,7 +1501,7 @@ describe('HttpInstrumentation', () => {
       const [_, outgoingSpan] = spans;
 
       assert.strictEqual(
-        outgoingSpan.attributes[ATTR_HTTP_URL],
+        outgoingSpan.attributes[ATTR_URL_FULL],
         `${protocol}://${hostname}:${serverPort}${pathname}?X-Goog-Signature=REDACTED&normal=value`
       );
     });
@@ -1701,7 +1514,7 @@ describe('HttpInstrumentation', () => {
       const [_, outgoingSpan] = spans;
 
       assert.strictEqual(
-        outgoingSpan.attributes[ATTR_HTTP_URL],
+        outgoingSpan.attributes[ATTR_URL_FULL],
         `${protocol}://REDACTED:REDACTED@${hostname}:${serverPort}${pathname}?AWSAccessKeyId=REDACTED`
       );
     });
@@ -1713,7 +1526,7 @@ describe('HttpInstrumentation', () => {
       const [_, outgoingSpan] = spans;
 
       assert.strictEqual(
-        outgoingSpan.attributes[ATTR_HTTP_URL],
+        outgoingSpan.attributes[ATTR_URL_FULL],
         `${protocol}://REDACTED:REDACTED@${hostname}:${serverPort}${pathname}?sig=REDACTED`
       );
     });
@@ -1726,7 +1539,7 @@ describe('HttpInstrumentation', () => {
       const [_, outgoingSpan] = spans;
 
       assert.strictEqual(
-        outgoingSpan.attributes[ATTR_HTTP_URL],
+        outgoingSpan.attributes[ATTR_URL_FULL],
         `${protocol}://${hostname}:${serverPort}${pathname}?X-Goog-Signature=REDACTED&=nokey&malformed=`
       );
     });
@@ -1738,7 +1551,7 @@ describe('HttpInstrumentation', () => {
       const [_, outgoingSpan] = spans;
 
       assert.strictEqual(
-        outgoingSpan.attributes[ATTR_HTTP_URL],
+        outgoingSpan.attributes[ATTR_URL_FULL],
         `${protocol}://${hostname}:${serverPort}${pathname}?param=value&another=123`
       );
     });
@@ -1751,7 +1564,7 @@ describe('HttpInstrumentation', () => {
       const [_, outgoingSpan] = spans;
 
       assert.strictEqual(
-        outgoingSpan.attributes[ATTR_HTTP_URL],
+        outgoingSpan.attributes[ATTR_URL_FULL],
         `${protocol}://${hostname}:${serverPort}${pathname}`
       );
     });
@@ -1764,7 +1577,7 @@ describe('HttpInstrumentation', () => {
       const [_, outgoingSpan] = spans;
 
       assert.strictEqual(
-        outgoingSpan.attributes[ATTR_HTTP_URL],
+        outgoingSpan.attributes[ATTR_URL_FULL],
         `${protocol}://${hostname}:${serverPort}${pathname}?sig=&empty=`
       );
     });
@@ -1777,7 +1590,7 @@ describe('HttpInstrumentation', () => {
       const [_, outgoingSpan] = spans;
 
       assert.strictEqual(
-        outgoingSpan.attributes[ATTR_HTTP_URL],
+        outgoingSpan.attributes[ATTR_URL_FULL],
         `${protocol}://${hostname}:${serverPort}${pathname}?normal=value&Signature=REDACTED&other=data`
       );
     });
@@ -1794,7 +1607,7 @@ describe('HttpInstrumentation', () => {
       const [_, outgoingSpan] = spans;
 
       assert.strictEqual(
-        outgoingSpan.attributes[ATTR_HTTP_URL],
+        outgoingSpan.attributes[ATTR_URL_FULL],
         `${protocol}://${hostname}:${serverPort}${pathname}?sig=abc123&authorize=REDACTED&normal=value`
       );
     });
@@ -1811,7 +1624,7 @@ describe('HttpInstrumentation', () => {
       const [_, outgoingSpan] = spans;
 
       assert.strictEqual(
-        outgoingSpan.attributes[ATTR_HTTP_URL],
+        outgoingSpan.attributes[ATTR_URL_FULL],
         `${protocol}://${hostname}:${serverPort}${pathname}?X-Goog-Signature=secret&api_key=12345&normal=value`
       );
     });
@@ -1828,7 +1641,7 @@ describe('HttpInstrumentation', () => {
 
       // This tests whether parameter name matching is case-sensitive or case-insensitive
       assert.strictEqual(
-        outgoingSpan.attributes[ATTR_HTTP_URL],
+        outgoingSpan.attributes[ATTR_URL_FULL],
         `${protocol}://${hostname}:${serverPort}${pathname}?token=lowercase&TOKEN=REDACTED&sig=secret`
       );
     });
@@ -1851,7 +1664,7 @@ describe('HttpInstrumentation', () => {
         'sig=abc123&api_key=REDACTED&normal=value&Signature=xyz&' +
         'token=REDACTED&X-Goog-Signature=gcp&AWSAccessKeyId=aws';
 
-      assert.strictEqual(outgoingSpan.attributes[ATTR_HTTP_URL], expectedUrl);
+      assert.strictEqual(outgoingSpan.attributes[ATTR_URL_FULL], expectedUrl);
     });
   });
 });

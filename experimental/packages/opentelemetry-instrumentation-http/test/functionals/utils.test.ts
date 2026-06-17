@@ -5,7 +5,9 @@
 import type { Span } from '@opentelemetry/api';
 import { SpanStatusCode, SpanKind, context, diag } from '@opentelemetry/api';
 import {
+  ATTR_ERROR_TYPE,
   ATTR_HTTP_ROUTE,
+  ATTR_URL_PATH,
   ATTR_USER_AGENT_ORIGINAL,
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
@@ -14,7 +16,6 @@ import type { Socket } from 'net';
 import * as sinon from 'sinon';
 import * as url from 'url';
 import {
-  ATTR_HTTP_TARGET,
   ATTR_USER_AGENT_SYNTHETIC_TYPE,
   USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT,
 } from '../../src/semconv';
@@ -26,7 +27,6 @@ import * as utils from '../../src/utils';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { extractHostnameAndPort } from '../../src/utils';
-import { AttributeNames } from '../../src/enums/AttributeNames';
 import type { ParsedUrlQuery } from 'node:querystring';
 
 describe('Utility', () => {
@@ -262,10 +262,7 @@ describe('Utility', () => {
       const mock = sinon.mock(span);
       mock
         .expects('setAttribute')
-        .calledWithExactly(AttributeNames.HTTP_ERROR_NAME, 'error');
-      mock
-        .expects('setAttribute')
-        .calledWithExactly(AttributeNames.HTTP_ERROR_MESSAGE, errorMessage);
+        .calledWithExactly(ATTR_ERROR_TYPE, 'Error');
       mock.expects('setStatus').calledWithExactly({
         code: SpanStatusCode.ERROR,
         message: errorMessage,
@@ -367,7 +364,7 @@ describe('Utility', () => {
         },
         diag
       );
-      assert.strictEqual(attributes[ATTR_HTTP_TARGET], '/user/?q=val');
+      assert.strictEqual(attributes[ATTR_URL_PATH], '/user/');
       assert.strictEqual(attributes[ATTR_USER_AGENT_SYNTHETIC_TYPE], undefined);
     });
 
