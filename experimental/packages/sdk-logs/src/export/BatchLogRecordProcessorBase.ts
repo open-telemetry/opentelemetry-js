@@ -141,10 +141,10 @@ export abstract class BatchLogRecordProcessorBase<
 
   constructor(options: T) {
     this._exporter = options.exporter;
-    this._maxExportBatchSize = options?.maxExportBatchSize ?? 512;
-    this._maxQueueSize = options?.maxQueueSize ?? 2048;
-    this._scheduledDelayMillis = options?.scheduledDelayMillis ?? 1000;
-    this._exportTimeoutMillis = options?.exportTimeoutMillis ?? 30000;
+    this._maxExportBatchSize = options.maxExportBatchSize ?? 512;
+    this._maxQueueSize = options.maxQueueSize ?? 2048;
+    this._scheduledDelayMillis = options.scheduledDelayMillis ?? 1000;
+    this._exportTimeoutMillis = options.exportTimeoutMillis ?? 30000;
 
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
 
