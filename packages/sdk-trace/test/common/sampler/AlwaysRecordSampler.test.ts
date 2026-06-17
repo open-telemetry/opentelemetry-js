@@ -4,7 +4,9 @@
  */
 
 import * as assert from 'assert';
-import * as api from '@opentelemetry/api';
+import { context, SpanKind } from '@opentelemetry/api';
+import { TraceState } from '@opentelemetry/core';
+import type { Sampler } from '../../../src';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,
@@ -12,8 +14,8 @@ import {
   SamplingDecision,
 } from '../../../src';
 
-describe('AlwaysRecordSampler', () => {
-  it('should reflect delegate name in toString()', () => {
+describe('AlwaysRecordSampler', function () {
+  it('should reflect delegate name in toString()', function () {
     const sampler = createAlwaysRecordSampler(new AlwaysOffSampler());
     assert.strictEqual(
       sampler.toString(),
@@ -21,54 +23,54 @@ describe('AlwaysRecordSampler', () => {
     );
   });
 
-  it('should throw when delegate is null', () => {
+  it('should throw when delegate is null', function () {
     assert.throws(
-      () => createAlwaysRecordSampler(null as unknown as api.Sampler),
+      () => createAlwaysRecordSampler(null as unknown as Sampler),
       /AlwaysRecordSampler requires a delegate sampler/
     );
   });
 
-  it('should throw when delegate is undefined', () => {
+  it('should throw when delegate is undefined', function () {
     assert.throws(
-      () => createAlwaysRecordSampler(undefined as unknown as api.Sampler),
+      () => createAlwaysRecordSampler(undefined as unknown as Sampler),
       /AlwaysRecordSampler requires a delegate sampler/
     );
   });
 
-  it('should pass through RECORD_AND_SAMPLED unchanged', () => {
+  it('should pass through RECORD_AND_SAMPLED unchanged', function () {
     const sampler = createAlwaysRecordSampler(new AlwaysOnSampler());
     const result = sampler.shouldSample(
-      api.context.active(),
+      context.active(),
       '0af7651916cd43dd8448eb211c80319c',
       'spanName',
-      api.SpanKind.CLIENT,
+      SpanKind.CLIENT,
       {},
       []
     );
     assert.strictEqual(result.decision, SamplingDecision.RECORD_AND_SAMPLED);
   });
 
-  it('should pass through RECORD unchanged', () => {
-    const delegate: api.Sampler = {
+  it('should pass through RECORD unchanged', function () {
+    const delegate: Sampler = {
       shouldSample: () => ({ decision: SamplingDecision.RECORD }),
       toString: () => 'RecordSampler',
     };
     const sampler = createAlwaysRecordSampler(delegate);
     const result = sampler.shouldSample(
-      api.context.active(),
+      context.active(),
       '0af7651916cd43dd8448eb211c80319c',
       'spanName',
-      api.SpanKind.CLIENT,
+      SpanKind.CLIENT,
       {},
       []
     );
     assert.strictEqual(result.decision, SamplingDecision.RECORD);
   });
 
-  it('should upgrade NOT_RECORD to RECORD and preserve attributes and traceState', () => {
-    const traceState = api.createTraceState('key=value');
+  it('should upgrade NOT_RECORD to RECORD and preserve attributes and traceState', function () {
+    const traceState = new TraceState('key=value');
     const attrs = { foo: 'bar' };
-    const delegate: api.Sampler = {
+    const delegate: Sampler = {
       shouldSample: () => ({
         decision: SamplingDecision.NOT_RECORD,
         attributes: attrs,
@@ -78,10 +80,10 @@ describe('AlwaysRecordSampler', () => {
     };
     const sampler = createAlwaysRecordSampler(delegate);
     const result = sampler.shouldSample(
-      api.context.active(),
+      context.active(),
       '0af7651916cd43dd8448eb211c80319c',
       'spanName',
-      api.SpanKind.CLIENT,
+      SpanKind.CLIENT,
       {},
       []
     );
