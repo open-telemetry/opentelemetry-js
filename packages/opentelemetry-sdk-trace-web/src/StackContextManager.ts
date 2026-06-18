@@ -126,6 +126,7 @@ export class StackContextManager implements ContextManager {
    *
    * @param context the context to set as active
    * @returns a token holding the previously active context
+   * @experimental This API is experimental and may change in minor releases without prior notice.
    */
   attach(context: Context): Token {
     const previousContext = this._currentContext;
@@ -138,6 +139,7 @@ export class StackContextManager implements ContextManager {
    * {@link attach} call.
    *
    * @param token a token returned by a previous call to {@link attach}
+   * @experimental This API is experimental and may change in minor releases without prior notice.
    */
   detach(token: Token): void {
     this._currentContext = (token as unknown as Context) ?? ROOT_CONTEXT;

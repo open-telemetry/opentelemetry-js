@@ -41,8 +41,10 @@ export abstract class AbstractAsyncHooksContextManager
 
   abstract disable(): this;
 
+  /** @experimental This API is experimental and may change in minor releases without prior notice. */
   abstract attach(context: Context): Token;
 
+  /** @experimental This API is experimental and may change in minor releases without prior notice. */
   abstract detach(token: Token): void;
 
   /**

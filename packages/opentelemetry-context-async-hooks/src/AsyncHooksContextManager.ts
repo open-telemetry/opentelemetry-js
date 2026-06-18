@@ -56,6 +56,8 @@ export class AsyncHooksContextManager extends AbstractAsyncHooksContextManager {
    * change the active context. Use
    * {@link AsyncLocalStorageContextManager} instead, which fully supports
    * `attach()`/`detach()`.
+   *
+   * @experimental This API is experimental and may change in minor releases without prior notice.
    */
   attach(_context: Context): Token {
     return ROOT_CONTEXT as unknown as Token;
@@ -63,6 +65,7 @@ export class AsyncHooksContextManager extends AbstractAsyncHooksContextManager {
 
   /**
    * No-op. @see {@link attach}
+   * @experimental This API is experimental and may change in minor releases without prior notice.
    */
   detach(_token: Token): void {}
 

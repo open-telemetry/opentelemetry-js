@@ -544,5 +544,38 @@ describe('ZoneContextManager', () => {
       contextManager.disable();
       assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
     });
+
+    it('should not leak an attached context from one zone into a concurrent sibling zone', () => {
+      // This test verifies per-zone isolation: Zone B calling attach() must not
+      // affect what Zone A sees as its active context.
+      // The previous global-array implementation failed this: attach() pushed to a
+      // manager-global stack whose seq number was higher than Zone A's zone seq, so
+      // active() in Zone A returned Zone B's attached context instead of ctxA.
+      const ctxA = ROOT_CONTEXT.setValue(key1, 'A');
+      const ctxB = ROOT_CONTEXT.setValue(key1, 'B');
+      const attachedInB = ROOT_CONTEXT.setValue(key1, 'attached-in-B');
+
+      // Capture Zone A's zone reference (the zone created by with())
+      let zoneA!: Zone;
+      contextManager.with(ctxA, () => {
+        zoneA = Zone.current;
+      });
+
+      // In Zone B, attach a context and then run code explicitly in Zone A.
+      // This simulates Zone A's async callback firing while Zone B's attach is live.
+      contextManager.with(ctxB, () => {
+        const token = contextManager.attach(attachedInB);
+
+        zoneA.run(() => {
+          assert.strictEqual(
+            contextManager.active(),
+            ctxA,
+            'Zone A should not see the context attached by Zone B'
+          );
+        });
+
+        contextManager.detach(token);
+      });
+    });
   });
 });

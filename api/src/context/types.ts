@@ -37,6 +37,7 @@ export interface Context {
  * This is an opaque type to prevent misuse and ensure type safety.
  *
  * @since 1.10.0
+ * @experimental This API is experimental and may change in minor releases without prior notice.
  */
 export type Token = { readonly __brand: 'Token' };
 
@@ -100,6 +101,7 @@ export interface ContextManager {
    * @param context The Context to attach
    * @returns A Token that can be used to restore the previous Context
    * @since 1.10.0
+   * @experimental This API is experimental and may change in minor releases without prior notice.
    */
   attach(context: Context): Token;
 
@@ -111,6 +113,7 @@ export interface ContextManager {
    *
    * @param token A Token returned by a previous call to attach()
    * @since 1.10.0
+   * @experimental This API is experimental and may change in minor releases without prior notice.
    */
   detach(token: Token): void;
 }

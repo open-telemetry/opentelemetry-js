@@ -51,6 +51,7 @@ export class AsyncLocalStorageContextManager extends AbstractAsyncHooksContextMa
    *
    * @param context The context to attach
    * @returns A token containing the previous context, used to restore it via detach()
+   * @experimental This API is experimental and may change in minor releases without prior notice.
    * @example
    * ```typescript
    * const token = contextManager.attach(myContext);
@@ -73,6 +74,7 @@ export class AsyncLocalStorageContextManager extends AbstractAsyncHooksContextMa
    * have a corresponding `detach()` to avoid context leaks.
    *
    * @param token The token returned by attach(), containing the previous context
+   * @experimental This API is experimental and may change in minor releases without prior notice.
    * @example
    * ```typescript
    * const token = contextManager.attach(myContext);

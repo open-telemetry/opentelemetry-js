@@ -11,15 +11,10 @@ import { isListenerObject } from './util';
 
 /* Key name to be used to save a context reference in Zone */
 const ZONE_CONTEXT_KEY = 'OT_ZONE_CONTEXT';
-/* Key name to be used to save the sequence number of a Zone context. It is used
- * to determine recency relative to imperatively attached contexts. */
-const ZONE_CONTEXT_SEQ_KEY = 'OT_ZONE_CONTEXT_SEQ';
 
-/* An imperatively attached context together with the sequence number assigned at
- * attach time, used by active() to resolve precedence against Zone contexts. */
+/* Wrapper object whose identity serves as the opaque Token. */
 interface AttachedContext {
   context: Context;
-  seq: number;
 }
 
 /**
@@ -38,18 +33,12 @@ export class ZoneContextManager implements ContextManager {
   private _enabled = false;
 
   /**
-   * Monotonically increasing counter used to order contexts established via
-   * `with()` (stored on the Zone) and via `attach()` (stored on the manager),
-   * so that `active()` can return whichever was established most recently.
+   * Per-zone stacks of contexts attached imperatively via `attach()`.
+   * Using a WeakMap keyed by Zone isolates concurrent async Zones from each
+   * other, avoiding the cross-zone interference that a manager-global array
+   * would cause.
    */
-  private _seq = 0;
-
-  /**
-   * Stack of contexts attached imperatively via `attach()`. This state is
-   * manager-global and therefore not isolated across concurrent asynchronous
-   * Zones - see the note on `attach()`.
-   */
-  private _attachedContexts: AttachedContext[] = [];
+  private _attachedContextsByZone = new WeakMap<Zone, AttachedContext[]>();
 
   /**
    * @param context A context (span) to be executed within target function
@@ -108,8 +97,7 @@ export class ZoneContextManager implements ContextManager {
     return Zone.current.fork({
       name: zoneName,
       properties: {
-        [ZONE_CONTEXT_KEY]: context,
-        [ZONE_CONTEXT_SEQ_KEY]: ++this._seq,
+        [ZONE_CONTEXT_KEY]: context ?? ROOT_CONTEXT,
       },
       onCancelTask(
         parentZoneDelegate: ZoneDelegate,
@@ -178,25 +166,30 @@ export class ZoneContextManager implements ContextManager {
   }
 
   /**
-   * Returns the active context
+   * Returns the active context by walking up the zone hierarchy. For each zone,
+   * the per-zone attached-context stack is checked first (set via `attach()`),
+   * then the zone property set by `with()`. This ensures that a context
+   * attached inside a `with()` zone overrides the zone's own context, while a
+   * `with()` entered after an `attach()` overrides the attached context (because
+   * `with()` creates a child zone that is checked before its parent).
    */
   active(): Context {
     if (!this._enabled || !Zone.current) {
       return ROOT_CONTEXT;
     }
-    // Prefer an imperatively attached context over the current Zone context when
-    // it was established more recently (higher sequence number). A Zone without a
-    // sequence (e.g. the root Zone) is treated as older than any attached context.
-    const attached = this._attachedContexts[this._attachedContexts.length - 1];
-    if (attached) {
-      const zoneSeq = Zone.current.get(ZONE_CONTEXT_SEQ_KEY) as
-        | number
-        | undefined;
-      if (zoneSeq === undefined || attached.seq > zoneSeq) {
-        return attached.context;
+    let zone: Zone | null | undefined = Zone.current;
+    while (zone) {
+      const stack = this._attachedContextsByZone.get(zone);
+      if (stack?.length) {
+        return stack[stack.length - 1].context;
       }
+      const zoneCtx = zone.get(ZONE_CONTEXT_KEY) as Context | undefined;
+      if (zoneCtx != null) {
+        return zoneCtx;
+      }
+      zone = zone.parent;
     }
-    return Zone.current.get(ZONE_CONTEXT_KEY) || ROOT_CONTEXT;
+    return ROOT_CONTEXT;
   }
 
   /**
@@ -219,7 +212,7 @@ export class ZoneContextManager implements ContextManager {
    */
   disable(): this {
     this._enabled = false;
-    this._attachedContexts = [];
+    this._attachedContextsByZone = new WeakMap();
     return this;
   }
 
@@ -229,10 +222,11 @@ export class ZoneContextManager implements ContextManager {
    *
    * This is a best-effort implementation. Unlike {@link with}, which relies on
    * Zone.js to propagate context across asynchronous boundaries, `attach` stores
-   * the context on the manager itself and is therefore **not isolated across
-   * concurrent asynchronous Zones**. It is intended for synchronous scopes (and
-   * for bridging callback boundaries that `with` cannot wrap). When guaranteed
-   * propagation across asynchronous operations is required, prefer
+   * the context on the current Zone's stack. Contexts from different Zones are
+   * isolated from each other, so concurrent async operations in sibling Zones
+   * do not interfere. `attach`/`detach` are primarily intended for synchronous
+   * scopes (and for bridging callback boundaries that `with` cannot wrap). When
+   * guaranteed propagation across asynchronous operations is required, prefer
    * {@link with}/{@link bind}.
    *
    * Every `attach` call must be paired with a {@link detach} call to avoid
@@ -241,10 +235,18 @@ export class ZoneContextManager implements ContextManager {
    *
    * @param context the context to set as active
    * @returns a token identifying the attached context
+   * @experimental This API is experimental and may change in minor releases without prior notice.
    */
   attach(context: Context): Token {
-    const attached: AttachedContext = { context, seq: ++this._seq };
-    this._attachedContexts.push(attached);
+    const attached: AttachedContext = { context };
+    if (Zone.current) {
+      let stack = this._attachedContextsByZone.get(Zone.current);
+      if (!stack) {
+        stack = [];
+        this._attachedContextsByZone.set(Zone.current, stack);
+      }
+      stack.push(attached);
+    }
     return attached as unknown as Token;
   }
 
@@ -254,12 +256,16 @@ export class ZoneContextManager implements ContextManager {
    * detached) are ignored.
    *
    * @param token a token returned by a previous call to {@link attach}
+   * @experimental This API is experimental and may change in minor releases without prior notice.
    */
   detach(token: Token): void {
+    if (!Zone.current) return;
     const attached = token as unknown as AttachedContext;
-    const index = this._attachedContexts.lastIndexOf(attached);
+    const stack = this._attachedContextsByZone.get(Zone.current);
+    if (!stack) return;
+    const index = stack.lastIndexOf(attached);
     if (index !== -1) {
-      this._attachedContexts.splice(index, 1);
+      stack.splice(index, 1);
     }
   }
 

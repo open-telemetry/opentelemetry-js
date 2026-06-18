@@ -94,6 +94,7 @@ export class ContextAPI {
    * @param context The Context to attach
    * @returns A Token that can be used to restore the previous Context
    * @since 1.10.0
+   * @experimental This API is experimental and may change in minor releases without prior notice.
    */
   public attach(context: Context): Token {
     return this._getContextManager().attach(context);
@@ -108,6 +109,7 @@ export class ContextAPI {
    *
    * @param token A Token returned by a previous call to attach()
    * @since 1.10.0
+   * @experimental This API is experimental and may change in minor releases without prior notice.
    */
   public detach(token: Token): void {
     return this._getContextManager().detach(token);
