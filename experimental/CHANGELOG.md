@@ -15,8 +15,9 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
-* chore(configuration): bump config schema to v1.1.0; rename `without_scope_info` → `scope_info_enabled` and `without_target_info/development` → `target_info_enabled/development` on the Prometheus pull exporter (semantics inverted), rename `with_resource_constant_labels` → `resource_constant_labels`. [#6781](https://github.com/open-telemetry/opentelemetry-js/pull/6781) @MikeGoldsmith
 * feat(sdk-node): wire up `id_generator` from declarative config [#6782](https://github.com/open-telemetry/opentelemetry-js/pull/6782) @MikeGoldsmith
+* feat(configuration): bump config schema to v1.1.0; rename `without_scope_info` → `scope_info_enabled` and `without_target_info/development` → `target_info_enabled/development` on the Prometheus pull exporter (semantics inverted), rename `with_resource_constant_labels` → `resource_constant_labels`. Validate `file_format` per the configuration versioning spec: accept any minor version of major `1` (e.g. `1.0`, `1.1`), warn when the minor version is newer than supported, and reject other major versions. [#6781](https://github.com/open-telemetry/opentelemetry-js/pull/6781) @MikeGoldsmith
+* feat(propagator-env-carrier): empty name normalization [#6827](https://github.com/open-telemetry/opentelemetry-js/pull/6827) @pellared
 
 ### :bug: Bug Fixes
 
