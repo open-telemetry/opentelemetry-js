@@ -1,17 +1,24 @@
+/*
+ * Copyright The OpenTelemetry Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { diag } from '@opentelemetry/api';
 import { NodeSDK } from '@opentelemetry/sdk-node';
-import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 import {
-  libraryOperationInstrumentation,
-} from './tracing-channel-instrumentation.ts';
+  ConsoleSpanExporter,
+  SimpleSpanProcessor,
+} from '@opentelemetry/sdk-trace-base';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
+import { libraryOperationInstrumentation } from './tracing-channel-instrumentation.ts';
 
 const sdk = new NodeSDK({
-  spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter()),
-    new SimpleSpanProcessor(new OTLPTraceExporter())
+  spanProcessors: [
+    new SimpleSpanProcessor(new ConsoleSpanExporter()),
+    new SimpleSpanProcessor(new OTLPTraceExporter()),
   ],
   metricReaders: [],
-  logRecordProcessors: []
+  logRecordProcessors: [],
 });
 
 sdk.start();

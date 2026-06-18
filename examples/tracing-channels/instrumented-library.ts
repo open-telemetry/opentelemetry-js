@@ -1,3 +1,8 @@
+/*
+ * Copyright The OpenTelemetry Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { tracingChannel } from 'diagnostics_channel';
 import { thirdPartyLibraryOperation } from './third-party-library.ts';
 
@@ -9,7 +14,8 @@ import { thirdPartyLibraryOperation } from './third-party-library.ts';
 export interface LibraryOperationsMessage {
   opName?: string;
 }
-export const LIBRARY_CHANNEL_NAME = 'tracing:@opentelemetry/tracing-channels:instrumented-library:all-ops-operation';
+export const LIBRARY_CHANNEL_NAME =
+  'tracing:@opentelemetry/tracing-channels:instrumented-library:all-ops-operation';
 
 const libraryChannel = tracingChannel(LIBRARY_CHANNEL_NAME);
 
@@ -18,18 +24,31 @@ async function waitSomeTime() {
 }
 
 export async function asyncOperation(): Promise<void> {
-  await libraryChannel.tracePromise(async () => {await waitSomeTime()}, { opName: 'asyncOperation' });
+  await libraryChannel.tracePromise(
+    async () => {
+      await waitSomeTime();
+    },
+    { opName: 'asyncOperation' }
+  );
 }
 
 export async function asyncOperationWithError(): Promise<void> {
-  await libraryChannel.tracePromise(async () => {
-    await waitSomeTime();
-    throw new Error('Something went wrong!');
-  }, { opName: 'asyncOperationWithError' });
+  await libraryChannel.tracePromise(
+    async () => {
+      await waitSomeTime();
+      throw new Error('Something went wrong!');
+    },
+    { opName: 'asyncOperationWithError' }
+  );
 }
 
 export function syncOperation() {
-  libraryChannel.traceSync(() => { /* do some sync work */ }, { opName: 'syncOperation' });
+  libraryChannel.traceSync(
+    () => {
+      /* do some sync work */
+    },
+    { opName: 'syncOperation' }
+  );
 }
 
 export function syncOperationWithError() {
@@ -66,39 +85,47 @@ export function recursiveSyncOperation(depth: number): void {
 }
 
 async function asyncOperationCallsOTelInstrumentedLibrary(): Promise<void> {
-  await libraryChannel.tracePromise(async () => {
-    // some operations may use third-party libraries that are "traditionally" instrumented with patching + OTel,
-    // but we still want them to be part of the same trace and parented to the currently active span.
-    // This simulates such a case.
-    await thirdPartyLibraryOperation()
-  }, { opName: 'asyncOperationCallsOTelInstrumentedLibrary' });
+  await libraryChannel.tracePromise(
+    async () => {
+      // some operations may use third-party libraries that are "traditionally" instrumented with patching + OTel,
+      // but we still want them to be part of the same trace and parented to the currently active span.
+      // This simulates such a case.
+      await thirdPartyLibraryOperation();
+    },
+    { opName: 'asyncOperationCallsOTelInstrumentedLibrary' }
+  );
 }
 
 async function asyncOperationErrorsInSyncPart(): Promise<void> {
-  await libraryChannel.tracePromise(async () => {
-    throw new Error('Error in sync part of async operation');
-    await waitSomeTime();
-  }, { opName: 'asyncOperationErrorsInSyncPart' });
+  await libraryChannel.tracePromise(
+    async () => {
+      throw new Error('Error in sync part of async operation');
+      await waitSomeTime();
+    },
+    { opName: 'asyncOperationErrorsInSyncPart' }
+  );
 }
 
-
 export async function asyncOperationCallsOtherOperations(): Promise<void> {
-  await libraryChannel.tracePromise(async () => {
-    syncOperation();
-    await waitSomeTime();
-    await asyncOperation();
-    try {
-      syncOperationWithError();
-    } catch (error) {
-      // ignore
-    }
-    try {
-      await asyncOperationWithError();
-    } catch (error) {
-      // ignore
-    }
-    recursiveSyncOperation(4);
-    await recursiveAsyncOperation(3);
-    await asyncOperationCallsOTelInstrumentedLibrary();
-  }, { opName: 'asyncOperationCallsOtherOperations' });
+  await libraryChannel.tracePromise(
+    async () => {
+      syncOperation();
+      await waitSomeTime();
+      await asyncOperation();
+      try {
+        syncOperationWithError();
+      } catch (error) {
+        // ignore
+      }
+      try {
+        await asyncOperationWithError();
+      } catch (error) {
+        // ignore
+      }
+      recursiveSyncOperation(4);
+      await recursiveAsyncOperation(3);
+      await asyncOperationCallsOTelInstrumentedLibrary();
+    },
+    { opName: 'asyncOperationCallsOtherOperations' }
+  );
 }
