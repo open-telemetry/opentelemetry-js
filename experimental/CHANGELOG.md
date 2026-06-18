@@ -15,6 +15,11 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(sdk-node): migrate to use the new sdk-trace package
+  * There is a new `trace` export. It re-exports `@opentelemetry/sdk-trace`.
+    This should be used instead of the `node` re-export of `@opentelemetry/sdk-trace-node` and `tracing` re-export of `@opentelemetry/sdk-trace-base`,
+    both of which are now *deprecated*.
+
 ### :bug: Bug Fixes
 
 * fix(sdk-logs): default BatchLogRecordProcessor `scheduleDelayMillis` is 1000 [#6796](https://github.com/open-telemetry/opentelemetry-js/pull/6796) @trentm
