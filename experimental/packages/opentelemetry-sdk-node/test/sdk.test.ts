@@ -533,9 +533,9 @@ describe('Node SDK', () => {
       const simpleLogRecordProcessor = new SimpleLogRecordProcessor(
         logRecordExporter
       );
-      const batchLogRecordProcessor = new BatchLogRecordProcessor(
-        logRecordExporter
-      );
+      const batchLogRecordProcessor = new BatchLogRecordProcessor({
+        exporter: logRecordExporter,
+      });
       const sdk = new NodeSDK({
         logRecordProcessors: [
           simpleLogRecordProcessor,
