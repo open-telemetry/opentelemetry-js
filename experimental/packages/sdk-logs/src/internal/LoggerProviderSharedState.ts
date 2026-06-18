@@ -42,6 +42,11 @@ export class LoggerProviderSharedState {
   readonly logRecordLimits: Required<LogRecordLimits>;
   readonly processors: LogRecordProcessor[];
   readonly loggerMetrics: LoggerMetrics;
+  /**
+   * Whether the owning LoggerProvider has been shut down. Once `true`, Loggers
+   * sharing this state must not do any work on `emit()`.
+   */
+  hasShutdown = false;
   private _loggerConfigurator: LoggerConfigurator;
   private _loggerConfigs: Map<string, Required<LoggerConfig>> = new Map();
 

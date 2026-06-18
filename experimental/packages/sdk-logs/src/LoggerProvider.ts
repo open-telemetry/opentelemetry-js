@@ -121,6 +121,9 @@ export class LoggerProvider implements ILoggerProvider {
   }
 
   private _shutdown(): Promise<void> {
+    // Mark the shared state as shut down so any Logger.emit() calls (including
+    // ones that race with the in-flight processor shutdown) become no-ops.
+    this._sharedState.hasShutdown = true;
     return this._sharedState.activeProcessor.shutdown();
   }
 }
