@@ -55,7 +55,7 @@ export interface SDKOptions {
 }
 
 export interface SDKComponents {
-  contextManager: ContextManager;
+  contextManager?: ContextManager;
   loggerProvider?: LoggerProvider;
   meterProvider?: MeterProvider;
   tracerProvider?: BasicTracerProvider;

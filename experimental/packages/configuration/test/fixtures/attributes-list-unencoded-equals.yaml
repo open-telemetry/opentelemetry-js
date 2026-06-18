@@ -1,0 +1,5 @@
+file_format: "1.0"
+resource:
+  # Unencoded `=` in value violates the spec format (must be %3D). Entire
+  # attributes_list should be discarded.
+  attributes_list: "key=val=ue,other=ok"
