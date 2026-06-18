@@ -42,6 +42,7 @@ export default tseslint.config(
       // tsd-style negative type-check fixtures, intentionally outside tsconfig.
       'experimental/packages/configuration/test/fixtures/types/**',
       'experimental/packages/otlp-transformer/src/generated/**',
+      'experimental/packages/otlp-transformer/test/generated/**',
       // protobuf-ts generated test fixtures (buf generate output, gitignored).
       'experimental/packages/opentelemetry-instrumentation-grpc/test/proto/**',
       // protobuf-generated example sources.

@@ -1180,6 +1180,45 @@ describe('FileConfigFactory', function () {
     assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
   });
 
+  it('decodes percent-encoded keys and values in attributes_list', function () {
+    process.env.OTEL_CONFIG_FILE =
+      'test/fixtures/attributes-list-percent-encoded.yaml';
+    const configFactory = createConfigFactory();
+    const config = configFactory.getConfigModel();
+    assert.deepStrictEqual(config.resource?.attributes, [
+      { name: 'my,key', value: 'value=with=equals', type: 'string' },
+      { name: 'unicode', value: 'café', type: 'string' },
+    ]);
+  });
+
+  it('discards all entries when attributes_list has invalid percent-encoding', function () {
+    const warnStub = Sinon.stub(diag, 'warn');
+    process.env.OTEL_CONFIG_FILE =
+      'test/fixtures/attributes-list-invalid-encoding.yaml';
+    const configFactory = createConfigFactory();
+    const config = configFactory.getConfigModel();
+    assert.strictEqual(config.resource?.attributes, undefined);
+    assert.ok(
+      warnStub.args.some(args =>
+        String(args[0]).includes('Failed to percent-decode')
+      )
+    );
+    warnStub.restore();
+  });
+
+  it('discards all entries when attributes_list has unencoded `=` in value', function () {
+    const warnStub = Sinon.stub(diag, 'warn');
+    process.env.OTEL_CONFIG_FILE =
+      'test/fixtures/attributes-list-unencoded-equals.yaml';
+    const configFactory = createConfigFactory();
+    const config = configFactory.getConfigModel();
+    assert.strictEqual(config.resource?.attributes, undefined);
+    assert.ok(
+      warnStub.args.some(args => String(args[0]).includes('Invalid format'))
+    );
+    warnStub.restore();
+  });
+
   it('leaves attribute type undefined when omitted in YAML', function () {
     // The spec says "if omitted, string is used" for attribute type, but we intentionally
     // do NOT apply this default in the config parser. The consumer (SDK init code) is
