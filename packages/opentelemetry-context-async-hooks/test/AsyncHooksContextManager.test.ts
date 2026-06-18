@@ -673,6 +673,40 @@ for (const contextManagerClass of [
           assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
         });
 
+        it('should not leak an attached context into a concurrent sibling async chain', async () => {
+          // enterWith() only affects the current async execution chain, so two
+          // concurrent chains that each attach() their own context must not
+          // observe each other's context, even while both are still attached.
+          const cm = contextManager as AsyncLocalStorageContextManager;
+          const contextA = ROOT_CONTEXT.setValue(key1, 'A');
+          const contextB = ROOT_CONTEXT.setValue(key1, 'B');
+
+          const chain = (ctx: typeof contextA, ms: number) =>
+            new Promise<void>(resolve => {
+              setTimeout(() => {
+                const token = cm.attach(ctx);
+                assert.strictEqual(cm.active(), ctx);
+                setTimeout(() => {
+                  // By now the sibling chain has attached its own context;
+                  // this chain must still see its own.
+                  assert.strictEqual(
+                    cm.active(),
+                    ctx,
+                    'concurrent sibling chain must not pollute this context'
+                  );
+                  cm.detach(token);
+                  resolve();
+                }, ms);
+              }, ms);
+            });
+
+          await Promise.all([chain(contextA, 10), chain(contextB, 5)]);
+
+          // The attach() calls happened in timer callbacks (separate async
+          // frames), so the test's own frame is unaffected.
+          assert.strictEqual(cm.active(), ROOT_CONTEXT);
+        });
+
         it('should work correctly when disabled', () => {
           contextManager.disable();
 

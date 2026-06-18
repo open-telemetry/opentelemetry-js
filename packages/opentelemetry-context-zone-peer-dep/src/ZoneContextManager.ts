@@ -217,24 +217,14 @@ export class ZoneContextManager implements ContextManager {
   }
 
   /**
-   * Sets the given context as the active one and returns a token that can be
-   * used to restore the previous context via {@link detach}.
+   * Imperatively sets `context` as active and returns a token for {@link detach}.
+   * Best-effort: the context is stored on the current Zone's stack (Zones are
+   * isolated, so sibling async Zones do not interfere), but unlike {@link with}
+   * it is not propagated across async boundaries by Zone.js. See the contract on
+   * {@link ContextManager.attach} (prefer `with()`/`bind()`; pair every `attach`
+   * with a LIFO `detach`). This manager tolerates out-of-order `detach`, but
+   * other managers do not, so portable code must not rely on it.
    *
-   * This is a best-effort implementation. Unlike {@link with}, which relies on
-   * Zone.js to propagate context across asynchronous boundaries, `attach` stores
-   * the context on the current Zone's stack. Contexts from different Zones are
-   * isolated from each other, so concurrent async operations in sibling Zones
-   * do not interfere. `attach`/`detach` are primarily intended for synchronous
-   * scopes (and for bridging callback boundaries that `with` cannot wrap). When
-   * guaranteed propagation across asynchronous operations is required, prefer
-   * {@link with}/{@link bind}.
-   *
-   * Every `attach` call must be paired with a {@link detach} call to avoid
-   * context leaks. `detach` may be called in any order relative to other
-   * `attach`/`detach` pairs.
-   *
-   * @param context the context to set as active
-   * @returns a token identifying the attached context
    * @experimental This API is experimental and may change in minor releases without prior notice.
    */
   attach(context: Context): Token {

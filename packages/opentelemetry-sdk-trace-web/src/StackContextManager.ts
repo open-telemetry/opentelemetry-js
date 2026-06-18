@@ -114,18 +114,12 @@ export class StackContextManager implements ContextManager {
   }
 
   /**
-   * Sets the given context as the active one and returns a token that can be
-   * used to restore the previous context via {@link detach}.
+   * Imperatively sets `context` as active and returns a token for {@link detach}.
+   * Fully synchronous - like {@link with}, it does not propagate across async
+   * boundaries. Does not auto-restore: see the contract on
+   * {@link ContextManager.attach} (prefer `with()`/`bind()`; pair every `attach`
+   * with a LIFO `detach`).
    *
-   * Unlike {@link with}, `attach` does not automatically restore the previous
-   * context, so every `attach` call must be paired with a {@link detach} call to
-   * avoid context leaks.
-   *
-   * This manager is fully synchronous and does not propagate context across
-   * asynchronous boundaries (the same limitation as {@link with}).
-   *
-   * @param context the context to set as active
-   * @returns a token holding the previously active context
    * @experimental This API is experimental and may change in minor releases without prior notice.
    */
   attach(context: Context): Token {
@@ -135,10 +129,9 @@ export class StackContextManager implements ContextManager {
   }
 
   /**
-   * Restores the active context to the value it had before the corresponding
-   * {@link attach} call.
+   * Restores the context captured by the {@link attach} call that produced
+   * `token`. See {@link ContextManager.detach}.
    *
-   * @param token a token returned by a previous call to {@link attach}
    * @experimental This API is experimental and may change in minor releases without prior notice.
    */
   detach(token: Token): void {

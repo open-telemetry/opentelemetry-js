@@ -168,7 +168,7 @@ export function subscriberWithContextManagement<TMessage extends object>(
       }
 
       // Always attach context to ensure proper context flow, even if no span was created
-      state.contextToken = context.attach?.(state.context);
+      state.contextToken = context.attach(state.context);
     },
 
     asyncStart(message: MessageWithState) {
@@ -191,7 +191,7 @@ export function subscriberWithContextManagement<TMessage extends object>(
 
       // Always attach context to ensure proper context flow, even if no span was created
       // Use a different token for async context, as sync ends before async end is called
-      state.asyncContextToken = context.attach?.(state.context);
+      state.asyncContextToken = context.attach(state.context);
     },
 
     end(message: MessageWithState) {
@@ -202,7 +202,7 @@ export function subscriberWithContextManagement<TMessage extends object>(
 
       // Restore previous context
       if (state.contextToken) {
-        context.detach?.(state.contextToken);
+        context.detach(state.contextToken);
       }
     },
 
@@ -214,7 +214,7 @@ export function subscriberWithContextManagement<TMessage extends object>(
 
       // Restore previous context
       if (state.asyncContextToken) {
-        context.detach?.(state.asyncContextToken);
+        context.detach(state.asyncContextToken);
       }
     },
 

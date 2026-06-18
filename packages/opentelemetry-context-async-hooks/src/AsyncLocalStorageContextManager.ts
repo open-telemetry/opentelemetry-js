@@ -40,25 +40,12 @@ export class AsyncLocalStorageContextManager extends AbstractAsyncHooksContextMa
   }
 
   /**
-   * Attach a context to the current asynchronous execution chain.
+   * Imperatively sets `context` as active for the current async execution chain
+   * and operations spawned from it. Propagates across async boundaries, but does
+   * not auto-restore - see the contract on {@link ContextManager.attach} (prefer
+   * `with()`/`bind()`; pair every `attach` with a LIFO `detach`).
    *
-   * This method synchronously sets the given context as active for the current
-   * async execution chain and all subsequent async operations spawned from it
-   * (e.g., Promises, setTimeout, setImmediate, async/await).
-   *
-   * Unlike `with()`, which automatically restores context when the callback completes,
-   * `attach()` requires manual cleanup via `detach()` to prevent context leaks.
-   *
-   * @param context The context to attach
-   * @returns A token containing the previous context, used to restore it via detach()
    * @experimental This API is experimental and may change in minor releases without prior notice.
-   * @example
-   * ```typescript
-   * const token = contextManager.attach(myContext);
-   * // myContext is now active and will propagate to async operations
-   * await doSomethingAsync(); // myContext is still active here
-   * contextManager.detach(token); // Restore previous context
-   * ```
    */
   attach(context: Context): Token {
     const previousContext = this.active();
@@ -67,23 +54,10 @@ export class AsyncLocalStorageContextManager extends AbstractAsyncHooksContextMa
   }
 
   /**
-   * Restore the context to the value it had before the corresponding attach() call.
+   * Restores the context captured by the {@link attach} call that produced
+   * `token`. See {@link ContextManager.detach}.
    *
-   * This method synchronously restores the context stored in the token, which should
-   * be the return value from a previous `attach()` call. Each `attach()` call should
-   * have a corresponding `detach()` to avoid context leaks.
-   *
-   * @param token The token returned by attach(), containing the previous context
    * @experimental This API is experimental and may change in minor releases without prior notice.
-   * @example
-   * ```typescript
-   * const token = contextManager.attach(myContext);
-   * try {
-   *   // Do work with myContext active
-   * } finally {
-   *   contextManager.detach(token); // Always restore context
-   * }
-   * ```
    */
   detach(token: Token): void {
     this._asyncLocalStorage.enterWith(token as unknown as Context);

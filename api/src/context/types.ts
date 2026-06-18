@@ -82,38 +82,34 @@ export interface ContextManager {
   disable(): this;
 
   /**
-   * Associates a Context with the caller's current execution unit. This allows
-   * context to be set imperatively rather than via the callback-scoped with().
-   * It is primarily intended for bridging callback boundaries that with() cannot
-   * wrap, such as Node.js `diagnostics_channel` tracing-channel subscribers.
+   * Imperatively sets `context` as active, returning a {@link Token} for {@link detach}.
    *
-   * NOTE: support is **best-effort and varies by ContextManager**. Some
-   * implementations propagate the attached context across asynchronous boundaries
-   * (e.g. AsyncLocalStorageContextManager); others only provide synchronous
-   * best-effort with no isolation across concurrent async operations (e.g.
-   * ZoneContextManager); and some are a no-op (e.g. the NoopContextManager and the
-   * deprecated AsyncHooksContextManager). When guaranteed propagation across
-   * asynchronous operations is required, prefer with()/bind().
-   *
-   * Every attach() call must be paired with a detach() call to avoid context
-   * leaks.
+   * This is a delicate, low-level API - prefer {@link with}/{@link bind}, which
+   * restore context automatically. `attach`/`detach` exist mainly to bridge
+   * callback boundaries that `with` cannot wrap (e.g. Node.js
+   * `diagnostics_channel` tracing-channel subscribers), and the caller is
+   * responsible for the bookkeeping that `with` would otherwise handle:
+   * - Calls must be LIFO-nested: pair every `attach` with a `detach` in reverse
+   *   order. Unpaired or out-of-order calls leak or mis-restore context.
+   * - Support is optional and best-effort, varying by ContextManager (some
+   *   propagate across async boundaries, some are synchronous-only, some no-op).
+   *   When omitted, {@link ContextAPI.attach} logs a warning and no-ops.
    *
    * @param context The Context to attach
    * @returns A Token that can be used to restore the previous Context
    * @since 1.10.0
    * @experimental This API is experimental and may change in minor releases without prior notice.
    */
-  attach(context: Context): Token;
+  attach?(context: Context): Token;
 
   /**
-   * Restores the Context associated with the caller's current execution unit
-   * to the value it had before the corresponding attach() call.
-   *
-   * As with attach(), support is best-effort and varies by ContextManager.
+   * Restores the Context to the value it had before the corresponding
+   * {@link attach} call. Optional and best-effort; implement if and only if
+   * {@link attach} is implemented, and see {@link attach} for the usage contract.
    *
    * @param token A Token returned by a previous call to attach()
    * @since 1.10.0
    * @experimental This API is experimental and may change in minor releases without prior notice.
    */
-  detach(token: Token): void;
+  detach?(token: Token): void;
 }
