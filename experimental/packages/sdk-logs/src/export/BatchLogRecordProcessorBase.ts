@@ -11,7 +11,7 @@ import {
   suppressTracing,
 } from '@opentelemetry/core';
 
-import type { BufferConfig } from '../types';
+import type { BatchLogRecordProcessorOptions } from '../types';
 import type { SdkLogRecord } from './SdkLogRecord';
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
@@ -123,8 +123,9 @@ class ExportOperation {
   }
 }
 
-export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
-  implements LogRecordProcessor
+export abstract class BatchLogRecordProcessorBase<
+  T extends BatchLogRecordProcessorOptions,
+> implements LogRecordProcessor
 {
   private readonly _maxExportBatchSize: number;
   private readonly _maxQueueSize: number;
@@ -138,12 +139,12 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   private _shutdownOnce: BindOnceFuture<void>;
   private _flushing: boolean = false;
 
-  constructor(exporter: LogRecordExporter, config?: T) {
-    this._exporter = exporter;
-    this._maxExportBatchSize = config?.maxExportBatchSize ?? 512;
-    this._maxQueueSize = config?.maxQueueSize ?? 2048;
-    this._scheduledDelayMillis = config?.scheduledDelayMillis ?? 5000;
-    this._exportTimeoutMillis = config?.exportTimeoutMillis ?? 30000;
+  constructor(options: T) {
+    this._exporter = options.exporter;
+    this._maxExportBatchSize = options.maxExportBatchSize ?? 512;
+    this._maxQueueSize = options.maxQueueSize ?? 2048;
+    this._scheduledDelayMillis = options.scheduledDelayMillis ?? 1000;
+    this._exportTimeoutMillis = options.exportTimeoutMillis ?? 30000;
 
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
 
@@ -209,11 +210,14 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
     // Clear timer to prevent concurrent exports
     this._clearTimer();
 
-    // Wait for any in-progress export to complete
-    if (this._currentExport !== null) {
+    // Wait for any in-progress export to complete. Capture the reference
+    // into a local because `_exportOneBatch` may null out `this._currentExport`
+    // from its completion handler while we are awaiting below.
+    const inFlight = this._currentExport;
+    if (inFlight !== null) {
       // speed up execution for current export
       await this._exporter.forceFlush();
-      await this._currentExport.exportCompleted;
+      await inFlight.exportCompleted;
       this._currentExport = null;
     }
 

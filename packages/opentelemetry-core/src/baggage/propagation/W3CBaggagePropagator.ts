@@ -15,11 +15,14 @@ import { propagation } from '@opentelemetry/api';
 import { isTracingSuppressed } from '../../trace/suppress-tracing';
 import {
   BAGGAGE_HEADER,
-  BAGGAGE_ITEMS_SEPARATOR,
   BAGGAGE_MAX_NAME_VALUE_PAIRS,
   BAGGAGE_MAX_PER_NAME_VALUE_PAIRS,
 } from '../constants';
-import { getKeyPairs, parsePairKeyValue, serializeKeyPairs } from '../utils';
+import {
+  getKeyPairs,
+  parseBaggageHeaderString,
+  serializeKeyPairs,
+} from '../utils';
 
 /**
  * Propagates {@link Baggage} through Context format propagation.
@@ -44,28 +47,36 @@ export class W3CBaggagePropagator implements TextMapPropagator {
 
   extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
     const headerValue = getter.get(carrier, BAGGAGE_HEADER);
-    const baggageString = Array.isArray(headerValue)
-      ? headerValue.join(BAGGAGE_ITEMS_SEPARATOR)
-      : headerValue;
-    if (!baggageString) return context;
+    if (!headerValue) {
+      return context;
+    }
+
     const baggage: Record<string, BaggageEntry> = {};
-    if (baggageString.length === 0) {
-      return context;
-    }
-    const pairs = baggageString.split(BAGGAGE_ITEMS_SEPARATOR);
-    pairs.forEach(entry => {
-      const keyPair = parsePairKeyValue(entry);
-      if (keyPair) {
-        const baggageEntry: BaggageEntry = { value: keyPair.value };
-        if (keyPair.metadata) {
-          baggageEntry.metadata = keyPair.metadata;
-        }
-        baggage[keyPair.key] = baggageEntry;
+    let count = 0;
+
+    let totalSize = 0;
+    if (Array.isArray(headerValue)) {
+      for (let i = 0; i < headerValue.length; i++) {
+        [count, totalSize] = parseBaggageHeaderString(
+          headerValue[i],
+          baggage,
+          count,
+          totalSize
+        );
       }
-    });
-    if (Object.entries(baggage).length === 0) {
+    } else {
+      [count] = parseBaggageHeaderString(
+        headerValue,
+        baggage,
+        count,
+        totalSize
+      );
+    }
+
+    if (count === 0) {
       return context;
     }
+
     return propagation.setBaggage(context, propagation.createBaggage(baggage));
   }
 

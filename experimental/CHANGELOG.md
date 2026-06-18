@@ -8,16 +8,42 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
-* chore(configuration)!: bump config schema to v1.1.0; rename `without_scope_info` → `scope_info_enabled` and `without_target_info/development` → `target_info_enabled/development` on the Prometheus pull exporter (semantics inverted), rename `with_resource_constant_labels` → `resource_constant_labels`. [#6781](https://github.com/open-telemetry/opentelemetry-js/pull/6781) @MikeGoldsmith
+* refactor(sdk-logs)!: refactor BatchLogRecordProcessor constructor signature [#6817](https://github.com/open-telemetry/opentelemetry-js/pull/6817) @trentm
+  * (user-facing): `BatchLogRecordProcessor` now takes a single options object will all possible properties, instead of two separate arguments. For example, before `new BatchLogRecordProcessor(exporter, { maxQueueSize: 1000 })`, after `new BatchLogRecordProcessor({ exporter, maxQueueSize: 1000 })`.
+  * `interface BufferConfig` -> `interface BatchLogRecordProcessorOptions`, and now includes the `exporter` property
+  * `interface BatchLogRecordProcessorBrowserConfig` -> `interface BatchLogRecordProcessorBrowserOptions`
+
+### :rocket: Features
+
+* chore(configuration): bump config schema to v1.1.0; rename `without_scope_info` → `scope_info_enabled` and `without_target_info/development` → `target_info_enabled/development` on the Prometheus pull exporter (semantics inverted), rename `with_resource_constant_labels` → `resource_constant_labels`. [#6781](https://github.com/open-telemetry/opentelemetry-js/pull/6781) @MikeGoldsmith
+* feat(sdk-node): wire up `id_generator` from declarative config [#6782](https://github.com/open-telemetry/opentelemetry-js/pull/6782) @MikeGoldsmith
+
+### :bug: Bug Fixes
+
+* fix(sdk-logs): default BatchLogRecordProcessor `scheduleDelayMillis` is 1000 [#6796](https://github.com/open-telemetry/opentelemetry-js/pull/6796) @trentm
+* fix(configuration): percent-decode keys and values in `resource.attributes_list` per spec [#6787](https://github.com/open-telemetry/opentelemetry-js/pull/6787) @MikeGoldsmith
+* fix(configuration): default `log_level` to `info` in env-based config initialization for consistency with file-based config [#6788](https://github.com/open-telemetry/opentelemetry-js/pull/6788) @MikeGoldsmith
+* fix(sdk-node): fail-fast on LoggerProvider creation with startNodeSDK() and declarative config [#6785](https://github.com/open-telemetry/opentelemetry-js/pull/6785) @trentm
+
+### :books: Documentation
+
+### :house: Internal
+
+## 0.219.0
+
+### :boom: Breaking Changes
+
 * fix(configuration)!: stop removing `null` values from parsed config object [#6679](https://github.com/open-telemetry/opentelemetry-js/pull/6679) @trentm
   * It is now the responsibility of the user of a parsed declarative config object, typically just the `sdk-node` package, to handle `null` values.
 * fix(api-logs)!: Removed `NOOP_LOGGER` and `NoopLogger` exports from `@opentelemetry/api-logs`. Use `createNoopLogger(): Logger` instead. [#6713](https://github.com/open-telemetry/opentelemetry-js/pull/6713) @dyladan
 * feat(api-logs)!: rename scopeAttributes to attributes in LoggerOptions [#6573](https://github.com/open-telemetry/opentelemetry-js/pull/6573) @pichlermarc
+* fix(sdk-node)!: remove `buildSamplerFromConfig` export [#6784](https://github.com/open-telemetry/opentelemetry-js/pull/6784) @trentm
 
 ### :rocket: Features
 
-* feat(sdk-node): wire up `id_generator` from declarative config [#TBD] @MikeGoldsmith
+* feat(sdk-node): wire up metric producers from declarative config [#6712](https://github.com/open-telemetry/opentelemetry-js/pull/6712) @MikeGoldsmith
 * feat(sdk-logs)!: add support for attributes in LoggerOptions [#6573](https://github.com/open-telemetry/opentelemetry-js/pull/6573) @pichlermarc
+* feat(propagator-env-carrier): add environment variable carrier helpers for context propagation [#6774](https://github.com/open-telemetry/opentelemetry-js/pull/6774) @pellared
 
 ### :bug: Bug Fixes
 
@@ -29,8 +55,12 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(browser-detector): use the right semantic convention for user agent resource attribute [#6729](https://github.com/open-telemetry/opentelemetry-js/pull/6729) @david-luna
 * fix(browser-detector): user agent resource attribute always [#6754](https://github.com/open-telemetry/opentelemetry-js/pull/6754) @david-luna
 * fix(opentelemetry-exporter-prometheus): handle additional edge cases in metric name conversion [#6727](https://github.com/open-telemetry/opentelemetry-js/pull/6727) @cjihrig
+* fix(sdk-logs): avoid null dereference in `BatchLogRecordProcessor._flushAll` when an in-flight export completes between awaits [#6763](https://github.com/open-telemetry/opentelemetry-js/pull/6763) @Janealter
+* fix(configuration): improve environment variable substitution to handle all the cases shown in the spec [#6757](https://github.com/open-telemetry/opentelemetry-js/pull/6757) @trentm
 
 ### :books: Documentation
+
+* docs(otlp-exporter-base): index the package's public API in generated docs so types like `OTLPExporterNodeConfigBase` resolve and link from consumer exporter pages [#6725](https://github.com/open-telemetry/opentelemetry-js/issues/6725) @devareddy05
 
 ### :house: Internal
 

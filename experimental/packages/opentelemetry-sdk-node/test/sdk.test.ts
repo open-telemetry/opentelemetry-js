@@ -70,6 +70,7 @@ import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 
 import { NOOP_COUNTER_METRIC } from '../../../../api/src/metrics/NoopMeter';
 import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from '../src/semconv';
+import { NOOP_HISTOGRAM_METRIC } from '../../../../api/src/metrics/NoopMeter';
 
 function assertDefaultContextManagerRegistered() {
   assert.ok(
@@ -419,7 +420,7 @@ describe('Node SDK', () => {
       });
 
       const sdk = new NodeSDK({
-        metricReader: metricReader,
+        metricReaders: [metricReader],
         traceExporter: new ConsoleSpanExporter(),
         logRecordProcessors: [
           new SimpleLogRecordProcessor(new InMemoryLogRecordExporter()),
@@ -436,7 +437,8 @@ describe('Node SDK', () => {
       const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
       assert.ok(tracerProvider instanceof NodeTracerProvider);
       assert.ok(
-        (tracerProvider as any)._config.meterProvider instanceof MeterProvider
+        (tracerProvider as any)._tracerOptions.meterProvider instanceof
+          MeterProvider
       );
 
       const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
@@ -446,6 +448,10 @@ describe('Node SDK', () => {
       );
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+      assert.notDeepEqual(
+        (metricReader as any)._selfObsMetrics.collectionDuration,
+        NOOP_HISTOGRAM_METRIC
+      );
 
       await sdk.shutdown();
     });
@@ -459,7 +465,7 @@ describe('Node SDK', () => {
       });
 
       const sdk = new NodeSDK({
-        metricReader: metricReader,
+        metricReaders: [metricReader],
         traceExporter: new ConsoleSpanExporter(),
         logRecordProcessors: [
           new SimpleLogRecordProcessor(new InMemoryLogRecordExporter()),
@@ -474,8 +480,11 @@ describe('Node SDK', () => {
 
       assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
       const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
-      assert.ok(tracerProvider instanceof NodeTracerProvider);
-      assert.equal((tracerProvider as any)._config.meterProvider, undefined);
+      const tracer = tracerProvider.getTracer('testing');
+      assert.deepEqual(
+        (tracer as any)._tracerMetrics.startedSpans,
+        NOOP_COUNTER_METRIC
+      );
 
       const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
       assert.deepEqual(
@@ -484,6 +493,10 @@ describe('Node SDK', () => {
       );
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+      assert.deepEqual(
+        (metricReader as any)._selfObsMetrics.collectionDuration,
+        NOOP_HISTOGRAM_METRIC
+      );
 
       await sdk.shutdown();
     });
@@ -520,9 +533,9 @@ describe('Node SDK', () => {
       const simpleLogRecordProcessor = new SimpleLogRecordProcessor(
         logRecordExporter
       );
-      const batchLogRecordProcessor = new BatchLogRecordProcessor(
-        logRecordExporter
-      );
+      const batchLogRecordProcessor = new BatchLogRecordProcessor({
+        exporter: logRecordExporter,
+      });
       const sdk = new NodeSDK({
         logRecordProcessors: [
           simpleLogRecordProcessor,
@@ -1815,7 +1828,8 @@ describe('Node SDK', () => {
       const listOfProcessors = getSdkSpanProcessors(sdk);
 
       assert.ok(
-        sdk['_tracerProvider']!['_config']?.sampler instanceof AlwaysOffSampler
+        sdk['_tracerProvider']!['_tracerOptions']?.sampler instanceof
+          AlwaysOffSampler
       );
       assert.strictEqual(listOfProcessors.length, 1);
       assert.ok(listOfProcessors[0] instanceof SimpleSpanProcessor);

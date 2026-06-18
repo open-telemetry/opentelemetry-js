@@ -56,7 +56,8 @@ import {
 } from '../src/semconv';
 import { ATTR_OS_TYPE } from '@opentelemetry/resources/src/semconv';
 import {
-  getLogRecordExporter,
+  createLogRecordExporterFromConfig,
+  getPeriodicMetricReaderFromConfiguration,
   getSpanExporter,
   setupContextManager,
 } from '../src/utils';
@@ -66,10 +67,7 @@ import {
   MeterProvider,
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
-import type {
-  SpanProcessor,
-  NodeTracerProvider,
-} from '@opentelemetry/sdk-trace-node';
+import type { SpanProcessor } from '@opentelemetry/sdk-trace-node';
 import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
 import {
   BatchSpanProcessor,
@@ -254,6 +252,22 @@ describe('startNodeSDK', function () {
     await sdk.shutdown();
   });
 
+  it('should diag.error and return NOOP_SDK when components in OTEL_CONFIG_FILE cannot be created', async () => {
+    const diagError = Sinon.spy(diag, 'error');
+    process.env.OTEL_CONFIG_FILE =
+      'test/fixtures/unknown-log-record-processor.yaml';
+    const sdk = startNodeSDK({});
+
+    assert.strictEqual(sdk, NOOP_SDK);
+    assert.strictEqual(diagError.callCount, 1);
+    assert.strictEqual(
+      diagError.args[0][0],
+      'Could not create OpenTelemetry SDK: unknown LogRecordProcessor name: "my_custom_processor"'
+    );
+
+    await sdk.shutdown();
+  });
+
   it('should register a logger provider if multiple log record processors are provided', async () => {
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/logger.yaml';
     const sdk = startNodeSDK({});
@@ -361,40 +375,29 @@ describe('startNodeSDK', function () {
       setGlobalTracerProviderSpy.lastCall.args[0] instanceof BasicTracerProvider
     );
 
-    const tracerProvider = trace.getTracerProvider() as BasicTracerProvider;
-    const delegateInfo = (tracerProvider as any)['_delegate'];
-    assert.strictEqual(delegateInfo._config.spanProcessors.length, 4);
+    const tracerProvider = trace.getTracerProvider();
+    const spanProcessors = (tracerProvider as any)._delegate
+      ._activeSpanProcessor._spanProcessors as SpanProcessor[];
+    assert.strictEqual(spanProcessors.length, 4);
 
+    assert.ok(spanProcessors[0] instanceof BatchSpanProcessor);
     assert.ok(
-      delegateInfo._config.spanProcessors[0] instanceof BatchSpanProcessor
-    );
-    assert.ok(
-      (delegateInfo._config.spanProcessors[0] as any)['_exporter'] instanceof
-        OTLPProtoTraceExporter
+      (spanProcessors[0] as any)['_exporter'] instanceof OTLPProtoTraceExporter
     );
 
+    assert.ok(spanProcessors[1] instanceof BatchSpanProcessor);
     assert.ok(
-      delegateInfo._config.spanProcessors[1] instanceof BatchSpanProcessor
-    );
-    assert.ok(
-      (delegateInfo._config.spanProcessors[1] as any)['_exporter'] instanceof
-        OTLPHttpTraceExporter
+      (spanProcessors[1] as any)['_exporter'] instanceof OTLPHttpTraceExporter
     );
 
+    assert.ok(spanProcessors[2] instanceof BatchSpanProcessor);
     assert.ok(
-      delegateInfo._config.spanProcessors[2] instanceof BatchSpanProcessor
-    );
-    assert.ok(
-      (delegateInfo._config.spanProcessors[2] as any)['_exporter'] instanceof
-        OTLPGrpcTraceExporter
+      (spanProcessors[2] as any)['_exporter'] instanceof OTLPGrpcTraceExporter
     );
 
+    assert.ok(spanProcessors[3] instanceof SimpleSpanProcessor);
     assert.ok(
-      delegateInfo._config.spanProcessors[3] instanceof SimpleSpanProcessor
-    );
-    assert.ok(
-      (delegateInfo._config.spanProcessors[3] as any)['_exporter'] instanceof
-        ConsoleSpanExporter
+      (spanProcessors[3] as any)['_exporter'] instanceof ConsoleSpanExporter
     );
 
     stubLoggerWarn.reset();
@@ -806,9 +809,9 @@ describe('startNodeSDK', function () {
     let stubLoggerInfo: Sinon.SinonStub;
 
     const getSdkSpanProcessors = () => {
-      const tracerProvider = trace.getTracerProvider() as NodeTracerProvider;
-      const delegateInfo = (tracerProvider as any)['_delegate'];
-      return delegateInfo?._config?.spanProcessors as SpanProcessor[];
+      const tracerProvider = trace.getTracerProvider();
+      return (tracerProvider as any)._delegate._activeSpanProcessor
+        ._spanProcessors as SpanProcessor[];
     };
 
     beforeEach(() => {
@@ -958,9 +961,41 @@ describe('startNodeSDK', function () {
   });
 
   describe('tests to increase code coverage', function () {
-    it('should return undefined for invalid log record exporter model', async () => {
-      const exporter: LogRecordExporterConfigModel = {};
-      assert.equal(getLogRecordExporter(exporter), undefined);
+    it('should throw for invalid log record exporter model', async () => {
+      assert.throws(() => {
+        const exporter: LogRecordExporterConfigModel = {};
+        createLogRecordExporterFromConfig(exporter);
+      });
+    });
+
+    it('should create metric reader with opencensus producer when shim is available', async () => {
+      const reader = getPeriodicMetricReaderFromConfiguration({
+        exporter: { console: {} },
+        producers: [{ opencensus: {} }],
+      });
+      assert.ok(reader !== undefined);
+      const producers = (reader as any)._metricProducers;
+      assert.ok(producers.length === 1);
+      assert.strictEqual(
+        producers[0].constructor.name,
+        'OpenCensusMetricProducer'
+      );
+      await (reader as PeriodicExportingMetricReader).shutdown();
+    });
+
+    it('should warn for unsupported metric producer', async () => {
+      const warnSpy = Sinon.spy(diag, 'warn');
+      const reader = getPeriodicMetricReaderFromConfiguration({
+        exporter: { console: {} },
+        producers: [{ 'unknown/producer': {} }],
+      });
+      assert.ok(reader !== undefined);
+      assert.ok(
+        warnSpy.args.some(args =>
+          String(args[0]).includes('Unsupported metric producer')
+        )
+      );
+      await (reader as PeriodicExportingMetricReader).shutdown();
     });
 
     it('should warn when exporter timeout is 0', async () => {

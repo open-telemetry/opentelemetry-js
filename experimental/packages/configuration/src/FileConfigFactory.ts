@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { diag } from '@opentelemetry/api';
 import { getStringFromEnv } from '@opentelemetry/core';
-import type { ConfigFactory } from './IConfigFactory';
 import * as fs from 'fs';
 import * as yaml from 'yaml';
-import { envVariableSubstitution } from './utils';
+import type { ConfigFactory } from './IConfigFactory';
+import { substituteEnvVars } from './utils';
 import type {
   BatchLogRecordProcessor,
   BatchSpanProcessor,
@@ -36,9 +37,9 @@ export function parseConfigFile(): ConfigurationModel {
   const configFile = getStringFromEnv('OTEL_CONFIG_FILE') || '';
   const file = fs.readFileSync(configFile, 'utf8');
 
-  // Apply env var substitution to all string values before schema parsing
-  const rawParsed = yaml.parse(file) as Record<string, unknown>;
-  const processed = substituteEnvVars(rawParsed) as Record<string, unknown>;
+  const doc = yaml.parseDocument(file, { version: '1.2' });
+  substituteEnvVars(doc);
+  const processed = doc.toJS() as Record<string, unknown>;
 
   const fileFormat = processed?.file_format;
   if (!fileFormat || !supportedFileVersionPattern.test(String(fileFormat))) {
@@ -115,11 +116,52 @@ function applyOtlpHttpEncodingDefaults(data: ConfigurationModel): void {
 /**
  * Merge resource.attributes_list (comma-separated key=value pairs) into
  * resource.attributes, with entries already in attributes taking precedence.
+ *
+ * Per the spec, `,` and `=` in keys and values MUST be percent-encoded, and
+ * other characters MAY be percent-encoded. On any parse or decode error, the
+ * entire attributes_list is discarded and a warning is emitted.
+ * See https://opentelemetry.io/docs/specs/otel/resource/sdk/#specifying-resource-information-via-an-environment-variable
  */
 function mergeAttributesList(data: ConfigurationModel): void {
   const resource = data.resource;
   const list = resource?.attributes_list;
   if (typeof list !== 'string' || !list.trim()) return;
+
+  const decoded: Array<{ key: string; value: string }> = [];
+  for (const pair of list.split(',')) {
+    if (pair.trim() === '') continue;
+
+    // Per spec, `=` must be percent-encoded in keys/values, so a valid entry
+    // splits into exactly two parts.
+    const parts = pair.split('=');
+    if (parts.length !== 2) {
+      diag.warn(
+        `Invalid format for resource.attributes_list entry "${pair}": expected key=value with '=' percent-encoded in keys/values. Discarding all entries.`
+      );
+      return;
+    }
+
+    const rawKey = parts[0].trim();
+    const rawValue = parts[1].trim();
+    if (rawKey === '') {
+      diag.warn(
+        `Empty attribute key in resource.attributes_list entry "${pair}". Discarding all entries.`
+      );
+      return;
+    }
+
+    try {
+      decoded.push({
+        key: decodeURIComponent(rawKey),
+        value: decodeURIComponent(rawValue),
+      });
+    } catch (e) {
+      diag.warn(
+        `Failed to percent-decode resource.attributes_list entry "${pair}", discarding all entries: ${e}`
+      );
+      return;
+    }
+  }
 
   if (resource!.attributes == null) {
     resource!.attributes = [];
@@ -129,14 +171,9 @@ function mergeAttributesList(data: ConfigurationModel): void {
     resource!.attributes.map((a: { name: string }) => a.name)
   );
 
-  for (const pair of list.split(',')) {
-    const eqIdx = pair.indexOf('=');
-    if (eqIdx > 0) {
-      const key = pair.slice(0, eqIdx).trim();
-      const value = pair.slice(eqIdx + 1).trim();
-      if (key && !existingKeys.has(key)) {
-        resource!.attributes.push({ name: key, value, type: 'string' });
-      }
+  for (const { key, value } of decoded) {
+    if (!existingKeys.has(key)) {
+      resource!.attributes.push({ name: key, value, type: 'string' });
     }
   }
 }
@@ -224,39 +261,4 @@ function applyConfigDefaults(data: ConfigurationModel): void {
   } else if (data.attribute_limits.attribute_count_limit == null) {
     data.attribute_limits.attribute_count_limit = 128;
   }
-}
-
-const ENV_VAR_PATTERN = /\$\{[^}]+\}/;
-
-function substituteEnvVars(obj: unknown): unknown {
-  if (typeof obj === 'string') {
-    // Only coerce if the string contained env var substitution syntax,
-    // so that plain YAML strings (e.g. quoted "1234") are not type-coerced.
-    const hasSubstitution = ENV_VAR_PATTERN.test(obj);
-    const substituted = envVariableSubstitution(obj);
-    return hasSubstitution ? yamlCoerce(substituted) : substituted;
-  }
-  if (Array.isArray(obj)) {
-    return obj.map(substituteEnvVars);
-  }
-  if (typeof obj === 'object' && obj !== null) {
-    return Object.fromEntries(
-      Object.entries(obj).map(([k, v]) => [k, substituteEnvVars(v)])
-    );
-  }
-  return obj;
-}
-
-/**
- * Re-coerce a string value to its YAML-equivalent primitive type.
- * Env var substitution always returns strings; this converts them back
- * to booleans/numbers/null where the schema expects those types.
- */
-function yamlCoerce(value: string): unknown {
-  if (value === 'true') return true;
-  if (value === 'false') return false;
-  if (value === 'null' || value === '') return null;
-  if (/^-?\d+$/.test(value)) return parseInt(value, 10);
-  if (/^-?\d+\.\d+$/.test(value)) return parseFloat(value);
-  return value;
 }
