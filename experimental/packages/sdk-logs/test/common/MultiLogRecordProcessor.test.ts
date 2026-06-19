@@ -122,12 +122,12 @@ describe('MultiLogRecordProcessor', () => {
 
     it('should wait for all log record processors to finish flushing', done => {
       let flushed = 0;
-      const processor1 = new SimpleLogRecordProcessor(
-        new InMemoryLogRecordExporter()
-      );
-      const processor2 = new SimpleLogRecordProcessor(
-        new InMemoryLogRecordExporter()
-      );
+      const processor1 = new SimpleLogRecordProcessor({
+        exporter: new InMemoryLogRecordExporter(),
+      });
+      const processor2 = new SimpleLogRecordProcessor({
+        exporter: new InMemoryLogRecordExporter(),
+      });
 
       const spy1 = sinon.stub(processor1, 'forceFlush').callsFake(() => {
         flushed++;

@@ -779,7 +779,7 @@ export function createLogRecordProcessorFromConfig(
     case 'simple': {
       const props = properties as SimpleLogRecordProcessorConfigModel;
       const exporter = createLogRecordExporterFromConfig(props.exporter);
-      return new SimpleLogRecordProcessor(exporter);
+      return new SimpleLogRecordProcessor({ exporter });
     }
 
     default:
