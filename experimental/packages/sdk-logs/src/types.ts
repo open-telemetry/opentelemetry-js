@@ -8,6 +8,7 @@ import type { SeverityNumber } from '@opentelemetry/api-logs';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import type { MeterProvider } from '@opentelemetry/api';
 import type { LogRecordProcessor } from './LogRecordProcessor';
+import type { LogRecordExporter } from './export/LogRecordExporter';
 
 /**
  * A LoggerConfig defines various configurable aspects of a Logger's behavior.
@@ -116,14 +117,15 @@ export interface LogRecordProcessorOptions {
   selfObsMeterProvider?: MeterProvider;
 }
 
-/** BatchLogProcessor configuration options. */
-export interface BufferConfig extends LogRecordProcessorOptions {
+export interface BatchLogRecordProcessorOptions extends LogRecordProcessorOptions {
+  exporter: LogRecordExporter;
+
   /** The maximum batch size of every export. It must be smaller or equal to
    * maxQueueSize. The default value is 512. */
   maxExportBatchSize?: number;
 
   /** The delay interval in milliseconds between two consecutive exports.
-   *  The default value is 5000ms. */
+   *  The default value is 1000ms. */
   scheduledDelayMillis?: number;
 
   /** How long the export can run before it is cancelled.
@@ -135,7 +137,8 @@ export interface BufferConfig extends LogRecordProcessorOptions {
   maxQueueSize?: number;
 }
 
-export interface BatchLogRecordProcessorBrowserConfig extends BufferConfig {
+export interface BatchLogRecordProcessorBrowserOptions
+  extends BatchLogRecordProcessorOptions {
   /** Disable flush when a user navigates to a new page, closes the tab or the browser, or,
    * on mobile, switches to a different app. Auto flush is enabled by default. */
   disableAutoFlushOnDocumentHide?: boolean;

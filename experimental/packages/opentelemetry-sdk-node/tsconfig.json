@@ -40,6 +40,9 @@
       "path": "../../../packages/sdk-metrics"
     },
     {
+      "path": "../../../packages/sdk-trace"
+    },
+    {
       "path": "../../../semantic-conventions"
     },
     {

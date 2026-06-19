@@ -14,7 +14,7 @@ import {
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
 
 import type {
-  BufferConfig,
+  BatchLogRecordProcessorOptions,
   LogRecordLimits,
   SdkLogRecord,
   LogRecordExporter,
@@ -30,7 +30,7 @@ import {
 import { LogRecordImpl } from '../../../src/LogRecordImpl';
 import { TestMetricReader, withResolvers } from '../utils';
 
-class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BufferConfig> {
+class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BatchLogRecordProcessorOptions> {
   onShutdown() {}
 }
 
@@ -79,7 +79,7 @@ describe('BatchLogRecordProcessorBase', () => {
 
   describe('constructor', () => {
     it('should create a BatchLogRecordProcessor instance', () => {
-      const processor = new BatchLogRecordProcessor(exporter);
+      const processor = new BatchLogRecordProcessor({ exporter });
       assert.ok(processor instanceof BatchLogRecordProcessor);
       processor.shutdown();
     });
@@ -91,7 +91,10 @@ describe('BatchLogRecordProcessorBase', () => {
         exportTimeoutMillis: 2000,
         maxQueueSize: 200,
       };
-      const processor = new BatchLogRecordProcessor(exporter, bufferConfig);
+      const processor = new BatchLogRecordProcessor({
+        exporter,
+        ...bufferConfig,
+      });
       assert.ok(processor instanceof BatchLogRecordProcessor);
       assert.strictEqual(
         processor['_maxExportBatchSize'],
@@ -110,12 +113,12 @@ describe('BatchLogRecordProcessorBase', () => {
     });
 
     it('should create a BatchLogRecordProcessor instance with empty config', () => {
-      const processor = new BatchLogRecordProcessor(exporter);
+      const processor = new BatchLogRecordProcessor({ exporter });
 
       assert.ok(processor instanceof BatchLogRecordProcessor);
       assert.strictEqual(processor['_maxExportBatchSize'], 512);
       assert.strictEqual(processor['_maxQueueSize'], 2048);
-      assert.strictEqual(processor['_scheduledDelayMillis'], 5000);
+      assert.strictEqual(processor['_scheduledDelayMillis'], 1000);
       assert.strictEqual(processor['_exportTimeoutMillis'], 30000);
       processor.shutdown();
     });
@@ -125,7 +128,10 @@ describe('BatchLogRecordProcessorBase', () => {
         maxExportBatchSize: 200,
         maxQueueSize: 100,
       };
-      const processor = new BatchLogRecordProcessor(exporter, bufferConfig);
+      const processor = new BatchLogRecordProcessor({
+        exporter,
+        ...bufferConfig,
+      });
       assert.strictEqual(
         processor['_maxExportBatchSize'],
         processor['_maxQueueSize']
@@ -135,10 +141,10 @@ describe('BatchLogRecordProcessorBase', () => {
 
   describe('onEmit', () => {
     it('should export the log records with buffer size reached', done => {
-      const processor = new BatchLogRecordProcessor(
+      const processor = new BatchLogRecordProcessor({
         exporter,
-        defaultBufferConfig
-      );
+        ...defaultBufferConfig,
+      });
       // Add logs up to maxExportBatchSize - 1 (should not trigger export yet)
       for (let i = 0; i < defaultBufferConfig.maxExportBatchSize - 1; i++) {
         const logRecord = createLogRecord();
@@ -162,10 +168,10 @@ describe('BatchLogRecordProcessorBase', () => {
     });
 
     it('should export immediately when maxExportBatchSize is reached', async () => {
-      const processor = new BatchLogRecordProcessor(
+      const processor = new BatchLogRecordProcessor({
         exporter,
-        defaultBufferConfig
-      );
+        ...defaultBufferConfig,
+      });
       const exportSpy = sinon.spy(exporter, 'export');
 
       // Add logs up to maxExportBatchSize - 1
@@ -194,10 +200,11 @@ describe('BatchLogRecordProcessorBase', () => {
     });
 
     it('should export immediately without waiting for timer when batch size reached', async () => {
-      const processor = new BatchLogRecordProcessor(
+      const processor = new BatchLogRecordProcessor({
         exporter,
-        { ...defaultBufferConfig, scheduledDelayMillis: 10000 } // Long delay
-      );
+        ...defaultBufferConfig,
+        scheduledDelayMillis: 10000, // Long delay
+      });
       const exportSpy = sinon.spy(exporter, 'export');
 
       // Fill the batch completely
@@ -220,10 +227,10 @@ describe('BatchLogRecordProcessorBase', () => {
     });
 
     it('should handle multiple immediate exports when batches fill up', async () => {
-      const processor = new BatchLogRecordProcessor(
+      const processor = new BatchLogRecordProcessor({
         exporter,
-        defaultBufferConfig
-      );
+        ...defaultBufferConfig,
+      });
       const exportSpy = sinon.spy(exporter, 'export');
 
       // Fill up exactly 2 batches worth of logs
@@ -244,10 +251,11 @@ describe('BatchLogRecordProcessorBase', () => {
     });
 
     it('should still use timer for partial batches after immediate export', async () => {
-      const processor = new BatchLogRecordProcessor(
+      const processor = new BatchLogRecordProcessor({
         exporter,
-        { ...defaultBufferConfig, scheduledDelayMillis: 100 } // Shorter delay for testing
-      );
+        ...defaultBufferConfig,
+        scheduledDelayMillis: 100, // Shorter delay for testing
+      });
       const exportSpy = sinon.spy(exporter, 'export');
 
       // Fill one complete batch - should trigger immediate export
@@ -287,10 +295,10 @@ describe('BatchLogRecordProcessorBase', () => {
     it('should force flush when timeout exceeded for partial batches', async function () {
       // arrange
       const clock = sinon.useFakeTimers();
-      const processor = new BatchLogRecordProcessor(
+      const processor = new BatchLogRecordProcessor({
         exporter,
-        defaultBufferConfig
-      );
+        ...defaultBufferConfig,
+      });
 
       // act
       // Add only a partial batch (less than maxExportBatchSize)
@@ -316,7 +324,7 @@ describe('BatchLogRecordProcessorBase', () => {
     it('should not export empty log record lists', done => {
       const spy = sinon.spy(exporter, 'export');
       const clock = sinon.useFakeTimers();
-      new BatchLogRecordProcessor(exporter, defaultBufferConfig);
+      new BatchLogRecordProcessor({ exporter, ...defaultBufferConfig });
       setTimeout(() => {
         assert.strictEqual(exporter.getFinishedLogRecords().length, 0);
         sinon.assert.notCalled(spy);
@@ -331,10 +339,10 @@ describe('BatchLogRecordProcessorBase', () => {
     it('should export each log record exactly once with buffer size  reached multiple times', done => {
       const originalTimeout = setTimeout;
       const clock = sinon.useFakeTimers();
-      const processor = new BatchLogRecordProcessor(
+      const processor = new BatchLogRecordProcessor({
         exporter,
-        defaultBufferConfig
-      );
+        ...defaultBufferConfig,
+      });
       const totalLogRecords = defaultBufferConfig.maxExportBatchSize * 2;
       for (let i = 0; i < totalLogRecords; i++) {
         const logRecord = createLogRecord();
@@ -370,10 +378,10 @@ describe('BatchLogRecordProcessorBase', () => {
       });
       const errorHandlerSpy = sinon.spy();
       setGlobalErrorHandler(errorHandlerSpy);
-      const processor = new BatchLogRecordProcessor(
+      const processor = new BatchLogRecordProcessor({
         exporter,
-        defaultBufferConfig
-      );
+        ...defaultBufferConfig,
+      });
 
       // act
       for (let i = 0; i < defaultBufferConfig.maxExportBatchSize; i++) {
@@ -398,7 +406,8 @@ describe('BatchLogRecordProcessorBase', () => {
       });
       const errorHandlerSpy = sinon.spy();
       setGlobalErrorHandler(errorHandlerSpy);
-      const processor = new BatchLogRecordProcessor(exporter, {
+      const processor = new BatchLogRecordProcessor({
+        exporter,
         maxExportBatchSize: 1,
         scheduledDelayMillis: 2500,
         exportTimeoutMillis,
@@ -423,7 +432,8 @@ describe('BatchLogRecordProcessorBase', () => {
       // Use a large batch size to prevent automatic exports during this test
       const maxQueueSize = 6;
       const maxExportBatchSize = 20; // Will be clamped to maxQueueSize (6) by constructor
-      const processor = new BatchLogRecordProcessor(exporter, {
+      const processor = new BatchLogRecordProcessor({
+        exporter,
         maxQueueSize,
         maxExportBatchSize,
       });
@@ -454,10 +464,10 @@ describe('BatchLogRecordProcessorBase', () => {
 
   describe('forceFlush', () => {
     it('should force flush on demand', async () => {
-      const processor = new BatchLogRecordProcessor(
+      const processor = new BatchLogRecordProcessor({
         exporter,
-        defaultBufferConfig
-      );
+        ...defaultBufferConfig,
+      });
       // Add partial batch (less than maxExportBatchSize) so it doesn't export automatically
       const partialBatchSize = Math.floor(
         defaultBufferConfig.maxExportBatchSize / 2
@@ -475,7 +485,7 @@ describe('BatchLogRecordProcessorBase', () => {
     });
 
     it('should call an async callback when flushing is complete', async () => {
-      const processor = new BatchLogRecordProcessor(exporter);
+      const processor = new BatchLogRecordProcessor({ exporter });
       const logRecord = createLogRecord();
       processor.onEmit(logRecord);
       await processor.forceFlush();
@@ -483,7 +493,7 @@ describe('BatchLogRecordProcessorBase', () => {
     });
 
     it('should wait for pending resource on flush', async () => {
-      const processor = new BatchLogRecordProcessor(exporter);
+      const processor = new BatchLogRecordProcessor({ exporter });
       const asyncResource = resourceFromAttributes({
         async: new Promise<string>(resolve =>
           setTimeout(() => resolve('fromasync'), 1)
@@ -512,7 +522,8 @@ describe('BatchLogRecordProcessorBase', () => {
         forceFlush: async () => {},
       };
       const forceFlushSpy = sinon.spy(customExporter, 'forceFlush');
-      const processor = new BatchLogRecordProcessor(customExporter, {
+      const processor = new BatchLogRecordProcessor({
+        exporter: customExporter,
         maxExportBatchSize: 1,
         scheduledDelayMillis: 2500,
       });
@@ -561,7 +572,8 @@ describe('BatchLogRecordProcessorBase', () => {
             resolveExporterForceFlush = resolve;
           }),
       };
-      const processor = new BatchLogRecordProcessor(customExporter, {
+      const processor = new BatchLogRecordProcessor({
+        exporter: customExporter,
         maxExportBatchSize: 1,
         scheduledDelayMillis: 2500,
       });
@@ -604,7 +616,7 @@ describe('BatchLogRecordProcessorBase', () => {
     it('should not call forceFlush on exporter when queue is empty and no export in progress', async function () {
       // arrange
       const forceFlushSpy = sinon.spy(exporter, 'forceFlush');
-      const processor = new BatchLogRecordProcessor(exporter);
+      const processor = new BatchLogRecordProcessor({ exporter });
 
       // act - nothing in the queue and no export in progress
       await processor.forceFlush();
@@ -617,7 +629,7 @@ describe('BatchLogRecordProcessorBase', () => {
 
   describe('shutdown', () => {
     it('should call onShutdown', async () => {
-      const processor = new BatchLogRecordProcessor(exporter);
+      const processor = new BatchLogRecordProcessor({ exporter });
       const onShutdownSpy = sinon.stub(processor, 'onShutdown');
       assert.strictEqual(onShutdownSpy.callCount, 0);
       await processor.shutdown();
@@ -632,7 +644,7 @@ describe('BatchLogRecordProcessorBase', () => {
           callback({ code: ExportResultCode.SUCCESS });
         }, 0);
       });
-      const processor = new BatchLogRecordProcessor(exporter);
+      const processor = new BatchLogRecordProcessor({ exporter });
       const logRecord = createLogRecord();
       processor.onEmit(logRecord);
       await processor.shutdown();
@@ -657,7 +669,8 @@ describe('BatchLogRecordProcessorBase', () => {
         shutdown: async () => {},
         forceFlush: async () => {},
       };
-      const processor = new BatchLogRecordProcessor(exporter, {
+      const processor = new BatchLogRecordProcessor({
+        exporter,
         maxExportBatchSize: 5,
         maxQueueSize: 6,
       });

@@ -26,7 +26,7 @@ const typescript = require('typescript');
 // Get latest version by running:
 //    git tag -l --sort=version:refname | grep -v -- - | tail -1
 // in git@github.com:open-telemetry/opentelemetry-configuration.git
-const CONFIG_VERSION = 'v1.0.0';
+const CONFIG_VERSION = 'v1.1.0';
 
 const TOP = path.resolve(__dirname, '..');
 const SCHEMA_PATH = path.join(
@@ -136,7 +136,6 @@ const validatorJsWithHeader = [
   '// Pre-compiled ajv validator for the OpenTelemetry configuration schema',
   `// Generated from opentelemetry-configuration.git ${CONFIG_VERSION}`,
   '// Run `npm run generate:config` to regenerate',
-  '// eslint-disable-next-line',
   '',
   validatorJs,
 ].join('\n');
@@ -149,7 +148,6 @@ console.log(`Written pre-compiled validator to ${VALIDATOR_JS_PATH}`);
 // ajv as a transitive dependency just for the .d.ts file.
 const validatorDts = [
   licenseHeader,
-  '/* eslint-disable */',
   '// AUTO-GENERATED — do not edit',
   '// Pre-compiled ajv validator for the OpenTelemetry configuration schema',
   `// Generated from opentelemetry-configuration.git ${CONFIG_VERSION}`,

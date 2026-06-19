@@ -39,10 +39,7 @@ import {
   ConsoleMetricExporter,
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
-import type { SpanProcessor } from '@opentelemetry/sdk-trace-base';
-import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
-import type { NodeTracerConfig } from '@opentelemetry/sdk-trace-node';
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+import { TracerProvider } from '@opentelemetry/sdk-trace';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import type { NodeSDKConfiguration } from './types';
 import {
@@ -62,11 +59,11 @@ import {
   getBatchLogRecordProcessorFromEnv,
   getLoggerProviderConfigFromEnv,
 } from './utils';
-
-type TracerProviderConfig = {
-  tracerConfig: NodeTracerConfig;
-  spanProcessors: SpanProcessor[];
-};
+import {
+  createBatchSpanProcessorFromEnv,
+  createSamplerFromEnv,
+  createSpanLimitsFromEnv,
+} from './create-from-env';
 
 export type MeterProviderConfig = {
   /**
@@ -150,7 +147,6 @@ function getMetricReadersFromEnv(): IMetricReader[] {
  *    nodeSdk.start(); // registers all configured SDK components
  */
 export class NodeSDK {
-  private _tracerProviderConfig?: TracerProviderConfig;
   private _loggerProviderConfig?: LoggerProviderConfig;
   private _meterProviderConfig?: MeterProviderConfig;
   private _instrumentations: Instrumentation[];
@@ -160,7 +156,7 @@ export class NodeSDK {
 
   private _autoDetectResources: boolean;
 
-  private _tracerProvider?: NodeTracerProvider;
+  private _tracerProvider?: TracerProvider;
   private _loggerProvider?: LoggerProvider;
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
@@ -201,40 +197,10 @@ export class NodeSDK {
 
     this._serviceName = configuration.serviceName;
 
-    // If a tracer provider can be created from manual configuration, create it
-    if (
-      configuration.traceExporter ||
-      configuration.spanProcessor ||
-      configuration.spanProcessors
-    ) {
-      const tracerProviderConfig: NodeTracerConfig = {};
-
-      if (configuration.sampler) {
-        tracerProviderConfig.sampler = configuration.sampler;
-      }
-      if (configuration.spanLimits) {
-        tracerProviderConfig.spanLimits = configuration.spanLimits;
-      }
-      if (configuration.idGenerator) {
-        tracerProviderConfig.idGenerator = configuration.idGenerator;
-      }
-
-      if (configuration.spanProcessor) {
-        diag.warn(
-          "The 'spanProcessor' option is deprecated. Please use 'spanProcessors' instead."
-        );
-      }
-
-      const spanProcessor =
-        configuration.spanProcessor ??
-        new BatchSpanProcessor(configuration.traceExporter!);
-
-      const spanProcessors = configuration.spanProcessors ?? [spanProcessor];
-
-      this._tracerProviderConfig = {
-        tracerConfig: tracerProviderConfig,
-        spanProcessors,
-      };
+    if (configuration.spanProcessor) {
+      diag.warn(
+        "The 'spanProcessor' option is deprecated. Please use 'spanProcessors' instead."
+      );
     }
 
     if (configuration.logRecordProcessors) {
@@ -338,16 +304,31 @@ export class NodeSDK {
       }
     }
 
-    const spanProcessors = this._tracerProviderConfig
-      ? this._tracerProviderConfig.spanProcessors
-      : getSpanProcessorsFromEnv();
+    // Determine `spanProcessors` from multiple possible options.
+    let spanProcessors;
+    if (this._configuration?.spanProcessors) {
+      spanProcessors = this._configuration.spanProcessors;
+    } else if (this._configuration?.spanProcessor) {
+      spanProcessors = [this._configuration.spanProcessor];
+    } else if (this._configuration?.traceExporter) {
+      spanProcessors = [
+        createBatchSpanProcessorFromEnv(this._configuration.traceExporter!),
+      ];
+    } else {
+      spanProcessors = getSpanProcessorsFromEnv();
+    }
 
     // Only register if there is a span processor
     if (spanProcessors.length > 0) {
-      this._tracerProvider = new NodeTracerProvider({
-        ...this._configuration,
+      this._tracerProvider = new TracerProvider({
+        sampler: this._configuration?.sampler ?? createSamplerFromEnv(),
+        spanLimits: {
+          ...createSpanLimitsFromEnv(),
+          ...this._configuration?.spanLimits,
+        },
         resource: this._resource,
         meterProvider: sdkMetricsEnabled ? this._meterProvider : undefined,
+        idGenerator: this._configuration?.idGenerator,
         spanProcessors,
       });
       trace.setGlobalTracerProvider(this._tracerProvider);
