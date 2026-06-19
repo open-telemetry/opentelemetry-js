@@ -13,7 +13,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
   * `interface BufferConfig` -> `interface BatchLogRecordProcessorOptions`, and now includes the `exporter` property
   * `interface BatchLogRecordProcessorBrowserConfig` -> `interface BatchLogRecordProcessorBrowserOptions`
 * refactor(configuration)!: change config file *parsing* to *not* add default values for unspecified fields [#6765](https://github.com/open-telemetry/opentelemetry-js/pull/6765) @trentm
-  * Responsibility for handling declarative config "nullBehavior" and "defaultBehavior" (see https://opentelemetry.io/docs/specs/otel/configuration/sdk/#create) belongs in the "create" handling, currently in the "sdk-node" package.
+  * Responsibility for handling [declarative config "nullBehavior" and "defaultBehavior"](https://opentelemetry.io/docs/specs/otel/configuration/sdk/#create) belongs in the "create" handling, currently in the "sdk-node" package.
 
 ### :rocket: Features
 
