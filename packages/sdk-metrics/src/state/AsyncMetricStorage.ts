@@ -15,6 +15,8 @@ import type { MetricCollectorHandle } from './MetricCollector';
 import { AttributeHashMap } from './HashMap';
 import type { AsyncWritableMetricStorage } from './WritableMetricStorage';
 import type { IAttributesProcessor } from '../view/AttributesProcessor';
+import type { ExemplarFilter } from '../exemplar/ExemplarFilter';
+import type { ExemplarReservoir } from '../exemplar/ExemplarReservoir';
 
 /**
  * Internal interface.
@@ -35,7 +37,9 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>>
     aggregator: Aggregator<T>,
     attributesProcessor: IAttributesProcessor,
     collectorHandles: MetricCollectorHandle[],
-    aggregationCardinalityLimit?: number
+    aggregationCardinalityLimit?: number,
+    _exemplarFilter?: ExemplarFilter,
+    _exemplarReservoirFactory?: () => ExemplarReservoir
   ) {
     super(_instrumentDescriptor);
     this._aggregationCardinalityLimit = aggregationCardinalityLimit;

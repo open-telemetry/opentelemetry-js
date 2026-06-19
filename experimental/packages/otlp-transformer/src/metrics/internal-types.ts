@@ -258,7 +258,7 @@ export interface IExemplar {
   filteredAttributes?: IKeyValue[];
 
   /** Exemplar timeUnixNano */
-  timeUnixNano?: string;
+  timeUnixNano?: Fixed64;
 
   /** Exemplar asDouble */
   asDouble?: number;
