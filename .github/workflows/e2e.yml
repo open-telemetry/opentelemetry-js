@@ -20,7 +20,6 @@ jobs:
           - "20"
           - "22"
           - "24"
-          - "25"
           - "26"
     runs-on: ubuntu-latest
     steps:
@@ -49,7 +48,6 @@ jobs:
           matrix.node_version == '20' ||
           matrix.node_version == '22' ||
           matrix.node_version == '24' ||
-          matrix.node_version == '25' ||
           matrix.node_version == '26'
           }}
 
