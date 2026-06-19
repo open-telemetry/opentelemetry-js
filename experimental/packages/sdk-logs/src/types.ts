@@ -106,7 +106,18 @@ export interface LogRecordLimits {
   attributeCountLimit?: number;
 }
 
-export interface BatchLogRecordProcessorOptions {
+/**
+ * Common options for SDK log processors.
+ */
+export interface LogRecordProcessorOptions {
+  /**
+   * A meter provider to which to record self-observability log processor metrics.
+   * @experimental This option is experimental and is subject to breaking changes in minor releases.
+   */
+  selfObsMeterProvider?: MeterProvider;
+}
+
+export interface BatchLogRecordProcessorOptions extends LogRecordProcessorOptions {
   exporter: LogRecordExporter;
 
   /** The maximum batch size of every export. It must be smaller or equal to

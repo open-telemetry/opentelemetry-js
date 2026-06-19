@@ -81,6 +81,7 @@ import type {
   AggregationOption,
   IAttributesProcessor,
   IMetricReader,
+  MeterProvider,
   PushMetricExporter,
   ViewOptions,
 } from '@opentelemetry/sdk-metrics';
@@ -655,10 +656,12 @@ export function getBatchLogRecordProcessorConfigFromEnv(): Omit<
 }
 
 export function getBatchLogRecordProcessorFromEnv(
-  exporter: LogRecordExporter
+  exporter: LogRecordExporter,
+  selfObsMeterProvider: MeterProvider | undefined
 ): BatchLogRecordProcessor {
   return new BatchLogRecordProcessor({
     exporter,
+    selfObsMeterProvider,
     ...getBatchLogRecordProcessorConfigFromEnv(),
   });
 }

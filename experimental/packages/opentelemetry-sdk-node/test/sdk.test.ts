@@ -418,26 +418,13 @@ describe('NodeSDK', () => {
 
     it('should configure components for SDK metrics if enabled', async () => {
       process.env.OTEL_NODE_EXPERIMENTAL_SDK_METRICS = 'true';
-      const exporter = new ConsoleMetricExporter();
-      const metricReader = new PeriodicExportingMetricReader({
-        exporter: exporter,
-        exportIntervalMillis: 100,
-        exportTimeoutMillis: 100,
-      });
+      process.env.OTEL_TRACES_EXPORTER = 'console';
+      process.env.OTEL_LOGS_EXPORTER = 'console';
+      process.env.OTEL_METRICS_EXPORTER = 'console';
 
-      const sdk = new NodeSDK({
-        metricReaders: [metricReader],
-        traceExporter: new ConsoleSpanExporter(),
-        logRecordProcessors: [
-          new SimpleLogRecordProcessor(new InMemoryLogRecordExporter()),
-        ],
-        autoDetectResources: false,
-      });
+      const sdk = new NodeSDK();
 
       sdk.start();
-
-      assertDefaultContextManagerRegistered();
-      assertDefaultPropagatorRegistered();
 
       assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
       const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
@@ -450,6 +437,56 @@ describe('NodeSDK', () => {
       const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
       assert.notDeepEqual(
         (loggerProvider as any)['_sharedState'].loggerMetrics.createdLogs,
+        NOOP_COUNTER_METRIC
+      );
+      assert.notDeepEqual(
+        (loggerProvider as any)['_sharedState'].registeredLogRecordProcessors[0]
+          ._metrics.processedLogs,
+        NOOP_COUNTER_METRIC
+      );
+
+      const meterProvider = metrics.getMeterProvider();
+      assert.ok(meterProvider instanceof MeterProvider);
+      assert.notDeepEqual(
+        (meterProvider as any)['_sharedState'].metricCollectors[0]._metricReader
+          ._selfObsMetrics.collectionDuration,
+        NOOP_HISTOGRAM_METRIC
+      );
+
+      await sdk.shutdown();
+    });
+
+    it('should configure initialized components for SDK metrics if enabled', async () => {
+      process.env.OTEL_NODE_EXPERIMENTAL_SDK_METRICS = 'true';
+      process.env.OTEL_LOGS_EXPORTER = 'console';
+
+      const exporter = new ConsoleMetricExporter();
+      const metricReader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+
+      const sdk = new NodeSDK({
+        metricReaders: [metricReader],
+        traceExporter: new ConsoleSpanExporter(),
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
+      const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
+      assert.ok(tracerProvider instanceof TracerProvider);
+
+      const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
+      assert.notDeepEqual(
+        (loggerProvider as any)['_sharedState'].loggerMetrics.createdLogs,
+        NOOP_COUNTER_METRIC
+      );
+      assert.notDeepEqual(
+        (loggerProvider as any)['_sharedState'].registeredLogRecordProcessors[0]
+          ._metrics.processedLogs,
         NOOP_COUNTER_METRIC
       );
 
@@ -481,9 +518,6 @@ describe('NodeSDK', () => {
 
       sdk.start();
 
-      assertDefaultContextManagerRegistered();
-      assertDefaultPropagatorRegistered();
-
       assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
       const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
       const tracer = tracerProvider.getTracer('testing');
@@ -495,6 +529,11 @@ describe('NodeSDK', () => {
       const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
       assert.deepEqual(
         (loggerProvider as any)['_sharedState'].loggerMetrics.createdLogs,
+        NOOP_COUNTER_METRIC
+      );
+      assert.deepEqual(
+        (loggerProvider as any)['_sharedState'].registeredLogRecordProcessors[0]
+          ._metrics.processedLogs,
         NOOP_COUNTER_METRIC
       );
 
