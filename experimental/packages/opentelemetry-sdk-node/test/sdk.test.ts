@@ -29,19 +29,19 @@ import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exp
 import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
 import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { PrometheusExporter as PrometheusMetricExporter } from '@opentelemetry/exporter-prometheus';
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+import { AlwaysOnSampler, TracerProvider } from '@opentelemetry/sdk-trace';
 import {
   assertServiceInstanceIdIsUUID,
   assertServiceResource,
 } from './util/resource-assertions';
-import type { IdGenerator, SpanProcessor } from '@opentelemetry/sdk-trace-base';
+import type { IdGenerator, SpanProcessor } from '@opentelemetry/sdk-trace';
 import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,
   BatchSpanProcessor,
   NoopSpanProcessor,
   AlwaysOffSampler,
-} from '@opentelemetry/sdk-trace-base';
+} from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
 import * as Sinon from 'sinon';
 import { NodeSDK } from '../src';
@@ -87,7 +87,15 @@ function assertDefaultPropagatorRegistered() {
   ]);
 }
 
-describe('Node SDK', () => {
+function clearOTelEnv() {
+  for (const key of Object.keys(process.env)) {
+    if (key.startsWith('OTEL_')) {
+      delete process.env[key];
+    }
+  }
+}
+
+describe('NodeSDK', () => {
   let setGlobalTracerProviderSpy: Sinon.SinonSpy;
   let setGlobalLoggerProviderSpy: Sinon.SinonSpy;
 
@@ -193,8 +201,7 @@ describe('Node SDK', () => {
 
       assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
       assert.ok(
-        setGlobalTracerProviderSpy.lastCall.args[0] instanceof
-          NodeTracerProvider
+        setGlobalTracerProviderSpy.lastCall.args[0] instanceof TracerProvider
       );
       await sdk.shutdown();
     });
@@ -216,8 +223,7 @@ describe('Node SDK', () => {
         'tracer provider should have changed once'
       );
       assert.ok(
-        setGlobalTracerProviderSpy.lastCall.args[0] instanceof
-          NodeTracerProvider
+        setGlobalTracerProviderSpy.lastCall.args[0] instanceof TracerProvider
       );
       await sdk.shutdown();
     });
@@ -229,7 +235,7 @@ describe('Node SDK', () => {
         spanProcessors: [
           new NoopSpanProcessor(),
           new SimpleSpanProcessor(exporter),
-          new BatchSpanProcessor(exporter),
+          new BatchSpanProcessor({ exporter }),
         ],
         autoDetectResources: false,
       });
@@ -239,11 +245,11 @@ describe('Node SDK', () => {
       assertDefaultContextManagerRegistered();
       assertDefaultPropagatorRegistered();
 
-      const nodeTracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
+      const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
       assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
-      assert.ok(nodeTracerProvider instanceof NodeTracerProvider);
+      assert.ok(tracerProvider instanceof TracerProvider);
 
-      const spanProcessor = nodeTracerProvider['_activeSpanProcessor'] as any;
+      const spanProcessor = tracerProvider['_activeSpanProcessor'] as any;
 
       assert.ok(
         spanProcessor.constructor.name === 'MultiSpanProcessor',
@@ -435,7 +441,7 @@ describe('Node SDK', () => {
 
       assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
       const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
-      assert.ok(tracerProvider instanceof NodeTracerProvider);
+      assert.ok(tracerProvider instanceof TracerProvider);
       assert.ok(
         (tracerProvider as any)._tracerOptions.meterProvider instanceof
           MeterProvider
@@ -1735,7 +1741,7 @@ describe('Node SDK', () => {
     const getSdkSpanProcessors = (sdk: NodeSDK) => {
       const tracerProvider = sdk['_tracerProvider'];
 
-      assert.ok(tracerProvider instanceof NodeTracerProvider);
+      assert.ok(tracerProvider instanceof TracerProvider);
 
       const activeSpanProcessor = tracerProvider['_activeSpanProcessor'];
 
@@ -2045,6 +2051,144 @@ describe('Node SDK', () => {
       assert.ok(
         listOfProcessors[1]['_exporter'] instanceof OTLPProtoTraceExporter
       );
+      await sdk.shutdown();
+    });
+  });
+
+  describe('configure sampler', async () => {
+    beforeEach(function () {
+      // Undo some of the env setup in the top-level `beforeEach`.
+      clearOTelEnv();
+    });
+    afterEach(function () {
+      clearOTelEnv();
+    });
+
+    it('should configure default sampler', async () => {
+      const sdk = new NodeSDK();
+      sdk.start();
+
+      const tracer = trace.getTracer('test');
+      const samplerRepr = (tracer as any)._sampler.toString();
+      assert.equal(
+        samplerRepr,
+        'ParentBased{root=AlwaysOnSampler, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}'
+      );
+
+      await sdk.shutdown();
+    });
+
+    it('should use given sampler', async () => {
+      const sdk = new NodeSDK({
+        sampler: new AlwaysOffSampler(),
+      });
+      sdk.start();
+
+      const tracer = trace.getTracer('test');
+      const samplerRepr = (tracer as any)._sampler.toString();
+      assert.equal(samplerRepr, 'AlwaysOffSampler');
+
+      await sdk.shutdown();
+    });
+
+    it('should use sampler from env', async () => {
+      process.env.OTEL_TRACES_SAMPLER = 'traceidratio';
+      process.env.OTEL_TRACES_SAMPLER_ARG = '0.42';
+      const sdk = new NodeSDK();
+      sdk.start();
+
+      const tracer = trace.getTracer('test');
+      const samplerRepr = (tracer as any)._sampler.toString();
+      assert.equal(samplerRepr, 'TraceIdRatioBased{0.42}');
+
+      await sdk.shutdown();
+    });
+
+    it('given sampler should win over env', async () => {
+      process.env.OTEL_TRACES_SAMPLER = 'traceidratio';
+      process.env.OTEL_TRACES_SAMPLER_ARG = '0.42';
+      const sdk = new NodeSDK({
+        sampler: new AlwaysOnSampler(),
+      });
+      sdk.start();
+
+      const tracer = trace.getTracer('test');
+      const samplerRepr = (tracer as any)._sampler.toString();
+      assert.equal(samplerRepr, 'AlwaysOnSampler');
+
+      await sdk.shutdown();
+    });
+  });
+
+  describe('configure spanLimits', async () => {
+    beforeEach(function () {
+      // Undo some of the env setup in the top-level `beforeEach`.
+      clearOTelEnv();
+    });
+    afterEach(function () {
+      clearOTelEnv();
+    });
+
+    it('should configure default span limits', async () => {
+      const sdk = new NodeSDK();
+      sdk.start();
+
+      const tracer = trace.getTracer('test');
+      const spanLimits = (tracer as any)._spanLimits;
+      assert.deepStrictEqual(spanLimits, {
+        attributeCountLimit: 128,
+        attributePerEventCountLimit: 128,
+        attributePerLinkCountLimit: 128,
+        attributeValueLengthLimit: Infinity,
+        eventCountLimit: 128,
+        linkCountLimit: 128,
+      });
+
+      await sdk.shutdown();
+    });
+
+    it('should use given spanLimits and envvars', async () => {
+      process.env.OTEL_ATTRIBUTE_COUNT_LIMIT = '42'; // loses to `attributeCountLimit` arg
+      process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '12';
+      process.env.OTEL_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT = '13';
+      const sdk = new NodeSDK({
+        spanLimits: {
+          attributeCountLimit: 10,
+          attributePerEventCountLimit: 11,
+        },
+      });
+      sdk.start();
+
+      const tracer = trace.getTracer('test');
+      const spanLimits = (tracer as any)._spanLimits;
+      assert.deepStrictEqual(spanLimits, {
+        attributeCountLimit: 10,
+        attributePerEventCountLimit: 11,
+        attributePerLinkCountLimit: 13,
+        attributeValueLengthLimit: 12,
+        eventCountLimit: 128,
+        linkCountLimit: 128,
+      });
+
+      await sdk.shutdown();
+    });
+  });
+
+  describe('configure BatchSpanProcessor from env', async () => {
+    beforeEach(clearOTelEnv);
+    afterEach(clearOTelEnv);
+
+    it('should configure using OTEL_BSP_ env vars', async () => {
+      process.env.OTEL_BSP_MAX_QUEUE_SIZE = '1000';
+      const sdk = new NodeSDK();
+      sdk.start();
+
+      const tracer = trace.getTracer('test');
+      const bsp = (tracer as any)._spanProcessor._spanProcessors[0];
+      assert.strictEqual(bsp._maxQueueSize, 1000); // from env
+      assert.strictEqual(bsp._maxExportBatchSize, 512); // default value
+      assert.ok(bsp instanceof BatchSpanProcessor);
+
       await sdk.shutdown();
     });
   });

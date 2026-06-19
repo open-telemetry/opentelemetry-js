@@ -34,9 +34,8 @@ import type {
   IdGenerator,
   Sampler,
   SpanExporter,
-  SpanLimits,
   SpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
+} from '@opentelemetry/sdk-trace';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,
@@ -46,7 +45,7 @@ import {
   RandomIdGenerator,
   SimpleSpanProcessor,
   TraceIdRatioBasedSampler,
-} from '@opentelemetry/sdk-trace-base';
+} from '@opentelemetry/sdk-trace';
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
@@ -113,6 +112,7 @@ import {
   LoggerProvider,
 } from '@opentelemetry/sdk-logs';
 import * as fs from 'fs';
+import { createBatchSpanProcessorFromEnv } from './create-from-env';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';
@@ -260,7 +260,7 @@ export function getSpanProcessorsFromEnv(): SpanProcessor[] {
     if (exp instanceof ConsoleSpanExporter) {
       processors.push(new SimpleSpanProcessor(exp));
     } else {
-      processors.push(new BatchSpanProcessor(exp));
+      processors.push(createBatchSpanProcessorFromEnv(exp));
     }
   }
 
@@ -937,7 +937,8 @@ export function getSpanProcessorsFromConfiguration(
       const exporter = getSpanExporter(processor.batch.exporter);
       if (exporter) {
         spanProcessors.push(
-          new BatchSpanProcessor(exporter, {
+          new BatchSpanProcessor({
+            exporter,
             maxQueueSize: processor.batch.max_queue_size ?? undefined,
             maxExportBatchSize:
               processor.batch.max_export_batch_size ?? undefined,

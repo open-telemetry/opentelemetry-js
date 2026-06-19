@@ -19,8 +19,8 @@ import type {
   SpanLimits,
   SpanProcessor,
   IdGenerator,
-} from '@opentelemetry/sdk-trace-base';
-import type { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
+} from '@opentelemetry/sdk-trace';
+import type { TracerProvider } from '@opentelemetry/sdk-trace';
 
 export interface NodeSDKConfiguration {
   autoDetectResources: boolean;
@@ -58,6 +58,6 @@ export interface SDKComponents {
   contextManager?: ContextManager;
   loggerProvider?: LoggerProvider;
   meterProvider?: MeterProvider;
-  tracerProvider?: BasicTracerProvider;
+  tracerProvider?: TracerProvider;
   propagator?: TextMapPropagator;
 }
