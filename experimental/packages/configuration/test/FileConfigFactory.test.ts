@@ -153,9 +153,9 @@ const ksCardinality = {
 const ksPromExporter = (strategy: string) => ({
   host: 'localhost',
   port: 9464,
-  without_scope_info: false,
-  'without_target_info/development': false,
-  with_resource_constant_labels: {
+  scope_info_enabled: true,
+  'target_info_enabled/development': true,
+  resource_constant_labels: {
     included: ['service*'],
     excluded: ['service.attr1'],
   },
@@ -835,6 +835,33 @@ describe('FileConfigFactory', function () {
   it('should throw from invalid config file format', function () {
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid.yaml';
     assert.throws(() => createConfigFactory(), /Unsupported file_format/);
+  });
+
+  it('should accept file_format 1.0 for backward compatibility', function () {
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/file-format-1.0.yaml';
+    assert.doesNotThrow(() => createConfigFactory());
+  });
+
+  it('should accept file_format 1.1', function () {
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/short-config.yml';
+    assert.doesNotThrow(() => createConfigFactory());
+  });
+
+  it('should accept a newer minor file_format with a warning', function () {
+    const warnStub = Sinon.stub(diag, 'warn');
+    process.env.OTEL_CONFIG_FILE =
+      'test/fixtures/file-format-future-minor.yaml';
+    assert.doesNotThrow(() => createConfigFactory());
+    Sinon.assert.calledWith(warnStub, Sinon.match(/newer minor version/));
+    warnStub.restore();
+  });
+
+  it('should throw for an unsupported major file_format version', function () {
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/file-format-unsupported.yaml';
+    assert.throws(
+      () => createConfigFactory(),
+      /Unsupported file_format.*supports schema version 1\.x/
+    );
   });
 
   it('should show multiple validation errors for invalid config', function () {

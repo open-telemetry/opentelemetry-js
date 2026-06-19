@@ -4,7 +4,7 @@
  */
 //
 // AUTO-GENERATED — do not edit
-// Generated from opentelemetry-configuration.git v1.0.0
+// Generated from opentelemetry-configuration.git v1.1.0
 // Run `npm run generate:config` to regenerate
 //
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-object-type */
@@ -232,6 +232,12 @@ export type ExperimentalOtlpFileExporter = {
 export type ConsoleExporter = {} | null;
 
 /**
+ * Configure an event to span event bridge log record processor.
+ * If omitted, ignore.
+ */
+export type ExperimentalEventToSpanEventBridgeLogRecordProcessor = {} | null;
+
+/**
  * Configure exporter to be OTLP with HTTP transport.
  * If omitted, ignore.
  */
@@ -383,16 +389,16 @@ export type ExperimentalPrometheusMetricExporter = {
    */
   port?: number | null;
   /**
-   * Configure Prometheus Exporter to produce metrics without scope labels.
-   * If omitted or null, false is used.
+   * Configure Prometheus Exporter to produce metrics with scope labels.
+   * If omitted or null, true is used.
    */
-  without_scope_info?: boolean | null;
+  scope_info_enabled?: boolean | null;
   /**
-   * Configure Prometheus Exporter to produce metrics without a target info metric for the resource.
-   * If omitted or null, false is used.
+   * Configure Prometheus Exporter to produce metrics with a target info metric for the resource.
+   * If omitted or null, true is used.
    */
-  'without_target_info/development'?: boolean | null;
-  with_resource_constant_labels?: IncludeExclude;
+  'target_info_enabled/development'?: boolean | null;
+  resource_constant_labels?: IncludeExclude;
   translation_strategy?: ExperimentalPrometheusTranslationStrategy;
 } | null;
 
@@ -653,6 +659,12 @@ export type TraceIdRatioBasedSampler = {
 } | null;
 
 /**
+ * Configure the ID generator to randomly generate TraceIds and SpanIds (spec default).
+ * If omitted, ignore.
+ */
+export type RandomIdGenerator = {} | null;
+
+/**
  * The attribute type.
  * Values include:
  * * bool: Boolean attribute value.
@@ -766,6 +778,7 @@ export interface LoggerProvider {
 export interface LogRecordProcessor {
   batch?: BatchLogRecordProcessor;
   simple?: SimpleLogRecordProcessor;
+  'event_to_span_event_bridge/development'?: ExperimentalEventToSpanEventBridgeLogRecordProcessor;
   [k: string]: object | null | undefined;
 }
 
@@ -887,7 +900,7 @@ export interface ExperimentalLoggerConfig {
 
 export interface ExperimentalLoggerMatcherAndConfig {
   /**
-   * Configure logger names to match, evaluated as follows:
+   * Configure logger names to match. Matching is case-sensitive, evaluated as follows:
    *
    *  * If the logger name exactly matches.
    *  * If the logger name matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
@@ -943,6 +956,11 @@ export interface PeriodicMetricReader {
    * If omitted or null, 30000 is used.
    */
   timeout?: number | null;
+  /**
+   * Configure maximum export batch size.
+   * If omitted or null, no limit is used.
+   */
+  'max_export_batch_size/development'?: number | null;
   exporter: PushMetricExporter;
   /**
    * Configure metric producers.
@@ -1051,7 +1069,7 @@ export interface PullMetricExporter {
 export interface IncludeExclude {
   /**
    * Configure list of value patterns to include.
-   * Values are evaluated to match as follows:
+   * Matching is case-sensitive. Values are evaluated to match as follows:
    *  * If the value exactly matches.
    *  * If the value matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
    * If omitted, all values are included.
@@ -1061,7 +1079,7 @@ export interface IncludeExclude {
   included?: string[];
   /**
    * Configure list of value patterns to exclude. Applies after .included (i.e. excluded has higher priority than included).
-   * Values are evaluated to match as follows:
+   * Matching is case-sensitive. Values are evaluated to match as follows:
    *  * If the value exactly matches.
    *  * If the value matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
    * If omitted, .included attributes are included.
@@ -1176,7 +1194,7 @@ export interface ExperimentalMeterConfig {
 
 export interface ExperimentalMeterMatcherAndConfig {
   /**
-   * Configure meter names to match, evaluated as follows:
+   * Configure meter names to match. Matching is case-sensitive, evaluated as follows:
    *
    *  * If the meter name exactly matches.
    *  * If the meter name matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
@@ -1230,6 +1248,7 @@ export interface TracerProvider {
   processors: SpanProcessor[];
   limits?: SpanLimits;
   sampler?: Sampler;
+  id_generator?: IdGenerator;
   'tracer_configurator/development'?: ExperimentalTracerConfigurator;
 }
 
@@ -1437,7 +1456,7 @@ export interface ExperimentalComposableRuleBasedSamplerRuleAttributePatterns {
   key: string;
   /**
    * Configure list of value patterns to include.
-   * Values are evaluated to match as follows:
+   * Matching is case-sensitive. Values are evaluated to match as follows:
    *  * If the value exactly matches.
    *  * If the value matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
    * If omitted, all values are included.
@@ -1447,7 +1466,7 @@ export interface ExperimentalComposableRuleBasedSamplerRuleAttributePatterns {
   included?: string[];
   /**
    * Configure list of value patterns to exclude. Applies after .included (i.e. excluded has higher priority than included).
-   * Values are evaluated to match as follows:
+   * Matching is case-sensitive. Values are evaluated to match as follows:
    *  * If the value exactly matches.
    *  * If the value matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
    * If omitted, .included attributes are included.
@@ -1455,6 +1474,15 @@ export interface ExperimentalComposableRuleBasedSamplerRuleAttributePatterns {
    * @minItems 1
    */
   excluded?: string[];
+}
+
+/**
+ * Configure the trace and span ID generator.
+ * If omitted, RandomIdGenerator is used.
+ */
+export interface IdGenerator {
+  random?: RandomIdGenerator;
+  [k: string]: object | null | undefined;
 }
 
 /**
@@ -1486,7 +1514,7 @@ export interface ExperimentalTracerConfig {
 
 export interface ExperimentalTracerMatcherAndConfig {
   /**
-   * Configure tracer names to match, evaluated as follows:
+   * Configure tracer names to match. Matching is case-sensitive, evaluated as follows:
    *
    *  * If the tracer name exactly matches.
    *  * If the tracer name matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
@@ -1531,7 +1559,7 @@ export interface AttributeNameValue {
   /**
    * The attribute value.
    * The type of value must match .type.
-   * Property is required and must be non-null.
+   * Property must be present, but if null the entry is ignored.
    */
   value: string | number | boolean | null | string[] | boolean[] | number[];
   type?: AttributeType;

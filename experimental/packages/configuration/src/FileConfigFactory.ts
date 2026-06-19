@@ -32,8 +32,46 @@ export class FileConfigFactory implements ConfigFactory {
   }
 }
 
+// The schema version this SDK targets. Per the configuration versioning spec,
+// an implementation MUST reject a config file whose MAJOR version differs (a
+// breaking-change boundary), accepts any MINOR version within that major, and
+// SHOULD warn when the MINOR version is newer than it targets since unknown
+// settings may be ignored. See
+// https://github.com/open-telemetry/opentelemetry-configuration/blob/main/VERSIONING.md
+const SUPPORTED_FILE_FORMAT_MAJOR = 1;
+const SUPPORTED_FILE_FORMAT_MINOR = 1;
+
+function validateFileFormat(configFile: string, fileFormat: unknown): void {
+  if (typeof fileFormat !== 'string' || fileFormat.length === 0) {
+    throw new Error(
+      `${configFile}: Unsupported file_format: "${fileFormat}". Expected a "MAJOR.MINOR" version string.`
+    );
+  }
+
+  // Drop any pre-release / meta tag, e.g. "1.0-rc.2" -> "1.0".
+  const parts = fileFormat.split('-', 1)[0].split('.');
+  const major = Number(parts[0]);
+  const minor = parts.length > 1 ? Number(parts[1]) : 0;
+  if (!Number.isInteger(major) || !Number.isInteger(minor)) {
+    throw new Error(
+      `${configFile}: Unsupported file_format: "${fileFormat}". Expected "MAJOR.MINOR" version numbers.`
+    );
+  }
+
+  if (major !== SUPPORTED_FILE_FORMAT_MAJOR) {
+    throw new Error(
+      `${configFile}: Unsupported file_format: "${fileFormat}". This SDK supports schema version ${SUPPORTED_FILE_FORMAT_MAJOR}.x.`
+    );
+  }
+
+  if (minor > SUPPORTED_FILE_FORMAT_MINOR) {
+    diag.warn(
+      `${configFile}: Configuration file_format "${fileFormat}" has a newer minor version than this SDK supports (${SUPPORTED_FILE_FORMAT_MAJOR}.${SUPPORTED_FILE_FORMAT_MINOR}); some settings may be ignored.`
+    );
+  }
+}
+
 export function parseConfigFile(): ConfigurationModel {
-  const supportedFileVersionPattern = /^1\.0$/;
   const configFile = getStringFromEnv('OTEL_CONFIG_FILE') || '';
   const file = fs.readFileSync(configFile, 'utf8');
 
@@ -41,12 +79,7 @@ export function parseConfigFile(): ConfigurationModel {
   substituteEnvVars(doc);
   const processed = doc.toJS() as Record<string, unknown>;
 
-  const fileFormat = processed?.file_format;
-  if (!fileFormat || !supportedFileVersionPattern.test(String(fileFormat))) {
-    throw new Error(
-      `${configFile}: Unsupported file_format: "${fileFormat}". Must match ${supportedFileVersionPattern}.`
-    );
-  }
+  validateFileFormat(configFile, processed?.file_format);
 
   const valid = validateConfig(processed);
   if (!valid) {
