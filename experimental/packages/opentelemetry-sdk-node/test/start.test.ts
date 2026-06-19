@@ -67,13 +67,13 @@ import {
   MeterProvider,
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
-import type { SpanProcessor } from '@opentelemetry/sdk-trace-node';
-import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
+import type { SpanProcessor } from '@opentelemetry/sdk-trace';
 import {
   BatchSpanProcessor,
   ConsoleSpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace-node';
+  TracerProvider,
+} from '@opentelemetry/sdk-trace';
 
 describe('startNodeSDK', function () {
   let setGlobalLoggerProviderSpy: Sinon.SinonSpy;
@@ -372,7 +372,7 @@ describe('startNodeSDK', function () {
 
     assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
     assert.ok(
-      setGlobalTracerProviderSpy.lastCall.args[0] instanceof BasicTracerProvider
+      setGlobalTracerProviderSpy.lastCall.args[0] instanceof TracerProvider
     );
 
     const tracerProvider = trace.getTracerProvider();

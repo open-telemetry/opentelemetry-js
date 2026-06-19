@@ -15,6 +15,9 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(configuration): bump config schema to v1.1.0; rename `without_scope_info` → `scope_info_enabled` and `without_target_info/development` → `target_info_enabled/development` on the Prometheus pull exporter (semantics inverted), rename `with_resource_constant_labels` → `resource_constant_labels`. Validate `file_format` per the configuration versioning spec: accept any minor version of major `1` (e.g. `1.0`, `1.1`), warn when the minor version is newer than supported, and reject other major versions. [#6781](https://github.com/open-telemetry/opentelemetry-js/pull/6781) @MikeGoldsmith
+* feat(propagator-env-carrier): empty name normalization [#6827](https://github.com/open-telemetry/opentelemetry-js/pull/6827) @pellared
+
 ### :bug: Bug Fixes
 
 * fix(sdk-logs): default BatchLogRecordProcessor `scheduleDelayMillis` is 1000 [#6796](https://github.com/open-telemetry/opentelemetry-js/pull/6796) @trentm
@@ -25,6 +28,9 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :books: Documentation
 
 ### :house: Internal
+
+* chore(sdk-node): migrate to use the new sdk-trace package [#6828](https://github.com/open-telemetry/opentelemetry-js/pull/6828/) @trentm
+  * The `node` re-export of `@opentelemetry/sdk-trace-node` and `tracing` re-export of `@opentelemetry/sdk-trace-base` have been deprecated. (Historically the `@opentelemetry/sdk-node` package has [re-exported from a number of core packages](https://github.com/open-telemetry/opentelemetry-js/blob/3db60e7cb46608e68258c489b2f610c1e1540248/experimental/packages/opentelemetry-sdk-node/src/index.ts#L12-L19). It is now recommended that users directly import from those other packages.)
 
 ## 0.219.0
 

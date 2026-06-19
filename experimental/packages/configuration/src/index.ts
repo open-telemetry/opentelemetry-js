@@ -14,6 +14,7 @@ export type {
   Sampler as SamplerConfigModel,
   SpanExporter as SpanExporterConfigModel,
   SpanProcessor as SpanProcessorConfigModel,
+  SpanLimits as SpanLimitsConfigModel,
   MetricProducer as MetricProducerConfigModel,
   NameStringValuePair as NameStringValuePairConfigModel,
   HttpTls as HttpTlsConfigModel,

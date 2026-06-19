@@ -453,8 +453,8 @@ export function setMeterProvider(config: ConfigurationModel): void {
             host:
               getStringFromEnv('OTEL_EXPORTER_PROMETHEUS_HOST') ?? 'localhost',
             port: getNumberFromEnv('OTEL_EXPORTER_PROMETHEUS_PORT') ?? 9464,
-            without_scope_info: false,
-            'without_target_info/development': false,
+            scope_info_enabled: true,
+            'target_info_enabled/development': true,
           },
         },
       };
