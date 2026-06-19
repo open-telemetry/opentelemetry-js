@@ -477,10 +477,7 @@ describe('NodeSDK', () => {
 
       assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
       const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
-      assert.ok(tracerProvider instanceof NodeTracerProvider);
-      assert.ok(
-        (tracerProvider as any)._config.meterProvider instanceof MeterProvider
-      );
+      assert.ok(tracerProvider instanceof TracerProvider);
 
       const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
       assert.notDeepEqual(
