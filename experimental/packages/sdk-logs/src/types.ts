@@ -106,6 +106,10 @@ export interface LogRecordLimits {
   attributeCountLimit?: number;
 }
 
+export interface SimpleLogRecordProcessorOptions {
+  exporter: LogRecordExporter;
+}
+
 export interface BatchLogRecordProcessorOptions {
   exporter: LogRecordExporter;
 

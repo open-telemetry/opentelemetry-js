@@ -429,7 +429,9 @@ describe('NodeSDK', () => {
         metricReaders: [metricReader],
         traceExporter: new ConsoleSpanExporter(),
         logRecordProcessors: [
-          new SimpleLogRecordProcessor(new InMemoryLogRecordExporter()),
+          new SimpleLogRecordProcessor({
+            exporter: new InMemoryLogRecordExporter(),
+          }),
         ],
         autoDetectResources: false,
       });
@@ -474,7 +476,9 @@ describe('NodeSDK', () => {
         metricReaders: [metricReader],
         traceExporter: new ConsoleSpanExporter(),
         logRecordProcessors: [
-          new SimpleLogRecordProcessor(new InMemoryLogRecordExporter()),
+          new SimpleLogRecordProcessor({
+            exporter: new InMemoryLogRecordExporter(),
+          }),
         ],
         autoDetectResources: false,
       });
@@ -509,9 +513,9 @@ describe('NodeSDK', () => {
 
     it('should register a logger provider if a log record processor is provided', async () => {
       const logRecordExporter = new InMemoryLogRecordExporter();
-      const logRecordProcessor = new SimpleLogRecordProcessor(
-        logRecordExporter
-      );
+      const logRecordProcessor = new SimpleLogRecordProcessor({
+        exporter: logRecordExporter,
+      });
       const sdk = new NodeSDK({
         logRecordProcessor: logRecordProcessor,
         autoDetectResources: false,
@@ -536,9 +540,9 @@ describe('NodeSDK', () => {
 
     it('should register a logger provider if multiple log record processors are provided', async () => {
       const logRecordExporter = new InMemoryLogRecordExporter();
-      const simpleLogRecordProcessor = new SimpleLogRecordProcessor(
-        logRecordExporter
-      );
+      const simpleLogRecordProcessor = new SimpleLogRecordProcessor({
+        exporter: logRecordExporter,
+      });
       const batchLogRecordProcessor = new BatchLogRecordProcessor({
         exporter: logRecordExporter,
       });
@@ -1374,9 +1378,9 @@ describe('NodeSDK', () => {
       process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = '10';
 
       const logRecordExporter = new InMemoryLogRecordExporter();
-      const logRecordProcessor = new SimpleLogRecordProcessor(
-        logRecordExporter
-      );
+      const logRecordProcessor = new SimpleLogRecordProcessor({
+        exporter: logRecordExporter,
+      });
       const sdk = new NodeSDK({
         logRecordProcessors: [logRecordProcessor],
         autoDetectResources: false,
