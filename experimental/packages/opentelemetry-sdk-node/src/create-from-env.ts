@@ -8,7 +8,8 @@
  * https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/
  */
 
-import { diag, MeterProvider } from '@opentelemetry/api';
+import type { MeterProvider } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import { getNumberFromEnv, getStringFromEnv } from '@opentelemetry/core';
 import type {
   Sampler,
