@@ -437,7 +437,8 @@ describe('Node SDK', () => {
       const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
       assert.ok(tracerProvider instanceof NodeTracerProvider);
       assert.ok(
-        (tracerProvider as any)._config.meterProvider instanceof MeterProvider
+        (tracerProvider as any)._tracerOptions.meterProvider instanceof
+          MeterProvider
       );
       assert.notDeepEqual(
         (tracerProvider as any)._activeSpanProcessor._spanProcessors[0]._metrics
@@ -484,11 +485,9 @@ describe('Node SDK', () => {
 
       assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
       const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
-      assert.ok(tracerProvider instanceof NodeTracerProvider);
-      assert.equal((tracerProvider as any)._config.meterProvider, undefined);
+      const tracer = tracerProvider.getTracer('testing');
       assert.deepEqual(
-        (tracerProvider as any)._activeSpanProcessor._spanProcessors[0]._metrics
-          .processedSpans,
+        (tracer as any)._tracerMetrics.startedSpans,
         NOOP_COUNTER_METRIC
       );
 
@@ -539,9 +538,9 @@ describe('Node SDK', () => {
       const simpleLogRecordProcessor = new SimpleLogRecordProcessor(
         logRecordExporter
       );
-      const batchLogRecordProcessor = new BatchLogRecordProcessor(
-        logRecordExporter
-      );
+      const batchLogRecordProcessor = new BatchLogRecordProcessor({
+        exporter: logRecordExporter,
+      });
       const sdk = new NodeSDK({
         logRecordProcessors: [
           simpleLogRecordProcessor,
@@ -1834,7 +1833,8 @@ describe('Node SDK', () => {
       const listOfProcessors = getSdkSpanProcessors(sdk);
 
       assert.ok(
-        sdk['_tracerProvider']!['_config']?.sampler instanceof AlwaysOffSampler
+        sdk['_tracerProvider']!['_tracerOptions']?.sampler instanceof
+          AlwaysOffSampler
       );
       assert.strictEqual(listOfProcessors.length, 1);
       assert.ok(listOfProcessors[0] instanceof SimpleSpanProcessor);

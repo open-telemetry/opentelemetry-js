@@ -3,20 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { LogRecordExporter } from './../../../export/LogRecordExporter';
-import type { BatchLogRecordProcessorBrowserConfig } from '../../../types';
+import type { BatchLogRecordProcessorBrowserOptions } from '../../../types';
 import { BatchLogRecordProcessorBase } from '../../../export/BatchLogRecordProcessorBase';
 
-export class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BatchLogRecordProcessorBrowserConfig> {
+export class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BatchLogRecordProcessorBrowserOptions> {
   private _visibilityChangeListener?: () => void;
   private _pageHideListener?: () => void;
 
-  constructor(
-    exporter: LogRecordExporter,
-    config?: BatchLogRecordProcessorBrowserConfig
-  ) {
-    super(exporter, config);
-    this._onInit(config);
+  constructor(options: BatchLogRecordProcessorBrowserOptions) {
+    super(options);
+    this._onInit(options);
   }
 
   protected onShutdown(): void {
@@ -34,9 +30,9 @@ export class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BatchLo
     }
   }
 
-  private _onInit(config?: BatchLogRecordProcessorBrowserConfig): void {
+  private _onInit(options: BatchLogRecordProcessorBrowserOptions): void {
     if (
-      config?.disableAutoFlushOnDocumentHide === true ||
+      options.disableAutoFlushOnDocumentHide === true ||
       typeof document === 'undefined'
     ) {
       return;
