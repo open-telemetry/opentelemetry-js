@@ -9,10 +9,10 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :boom: Breaking Changes
 
 * refactor(sdk-logs)!: refactor BatchLogRecordProcessor constructor signature [#6817](https://github.com/open-telemetry/opentelemetry-js/pull/6817) @trentm
-  * (user-facing): `BatchLogRecordProcessor` now takes a single options object will all possible properties, instead of two separate arguments. For example, before `new BatchLogRecordProcessor(exporter, { maxQueueSize: 1000 })`, after `new BatchLogRecordProcessor({ exporter, maxQueueSize: 1000 })`.
+  * (user-facing): `BatchLogRecordProcessor` now takes a single `options` object with all possible properties, instead of two separate arguments. For example, before `new BatchLogRecordProcessor(exporter, { maxQueueSize: 1000 })`, after `new BatchLogRecordProcessor({ exporter, maxQueueSize: 1000 })`.
   * `interface BufferConfig` -> `interface BatchLogRecordProcessorOptions`, and now includes the `exporter` property
   * `interface BatchLogRecordProcessorBrowserConfig` -> `interface BatchLogRecordProcessorBrowserOptions`
-  * (user-facing): `SimpleLogRecordProcessor` now takes a single options object will all possible properties, instead of two separate arguments. For example, before `new SimpleLogRecordProcessor(exporter)`, after `new SimpleLogRecordProcessor({ exporter })`. [#6836](https://github.com/open-telemetry/opentelemetry-js/pull/6836)
+  * (user-facing): `SimpleLogRecordProcessor` now takes a single `options` object with all possible properties. For example, before `new SimpleLogRecordProcessor(exporter)`, after `new SimpleLogRecordProcessor({ exporter })`. [#6836](https://github.com/open-telemetry/opentelemetry-js/pull/6836)
 
 ### :rocket: Features
 
