@@ -34,7 +34,7 @@ const collectorOptions = {
 const logExporter = new OTLPLogExporter(collectorOptions);
 const logProvider = new LoggerProvider({
   resource: resourceFromAttributes({'service.name': 'testApp'}),
-  processors: [new SimpleLogRecordProcessor(logExporter)]
+  processors: [new SimpleLogRecordProcessor({ exporter: logExporter })]
   });
 
 const logger = logProvider.getLogger('test_log_instrumentation');

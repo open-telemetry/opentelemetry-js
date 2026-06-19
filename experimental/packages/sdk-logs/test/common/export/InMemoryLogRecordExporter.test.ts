@@ -17,7 +17,7 @@ import {
 const setup = () => {
   const memoryExporter = new InMemoryLogRecordExporter();
   const provider = new LoggerProvider({
-    processors: [new SimpleLogRecordProcessor(memoryExporter)],
+    processors: [new SimpleLogRecordProcessor({ exporter: memoryExporter })],
   });
   return { provider, memoryExporter };
 };

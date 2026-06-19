@@ -30,7 +30,9 @@ describe('OTLPLogExporter', function () {
         .stub(window, 'fetch')
         .resolves(new Response('', { status: 200 }));
       const loggerProvider = new LoggerProvider({
-        processors: [new SimpleLogRecordProcessor(new OTLPLogExporter())],
+        processors: [
+          new SimpleLogRecordProcessor({ exporter: new OTLPLogExporter() }),
+        ],
       });
 
       // act
