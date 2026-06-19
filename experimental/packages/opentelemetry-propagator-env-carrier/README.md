@@ -80,6 +80,7 @@ variables whose names are already normalized are included in the snapshot.
 
 Environment variable names used for propagation are normalized by:
 
+- replacing an empty name with a single underscore,
 - uppercasing ASCII letters,
 - replacing every character that is not an ASCII letter, digit, or underscore
   with an underscore,
