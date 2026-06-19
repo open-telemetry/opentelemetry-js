@@ -29,6 +29,9 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+* chore(sdk-node): migrate to use the new sdk-trace package [#6828](https://github.com/open-telemetry/opentelemetry-js/pull/6828/) @trentm
+  * The `node` re-export of `@opentelemetry/sdk-trace-node` and `tracing` re-export of `@opentelemetry/sdk-trace-base` have been deprecated. (Historically the `@opentelemetry/sdk-node` package has [re-exported from a number of core packages](https://github.com/open-telemetry/opentelemetry-js/blob/3db60e7cb46608e68258c489b2f610c1e1540248/experimental/packages/opentelemetry-sdk-node/src/index.ts#L12-L19). It is now recommended that users directly import from those other packages.)
+
 ## 0.219.0
 
 ### :boom: Breaking Changes
