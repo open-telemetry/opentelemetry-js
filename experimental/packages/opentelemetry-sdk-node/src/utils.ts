@@ -266,8 +266,14 @@ export function getSpanProcessorsFromEnv(
         new SimpleSpanProcessor(exp, { selfObsMeterProvider: meterProvider })
       );
     } else {
+      // XXX This needs to wait for https://github.com/open-telemetry/opentelemetry-js/pull/6828
+      //     then use, adding support for the selfObsMeterProvider.
+      //  processors.push(createBatchSpanProcessorFromEnv(exp, meterProvider));
+      //     Note: also need to do the SimpleSpanProcessor ctor updates.
       processors.push(
-        new BatchSpanProcessor(exp, { selfObsMeterProvider: meterProvider })
+        new BatchSpanProcessor(
+          exp /* XXX , { selfObsMeterProvider: meterProvider } */
+        )
       );
     }
   }
