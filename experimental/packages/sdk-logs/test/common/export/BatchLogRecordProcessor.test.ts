@@ -708,7 +708,8 @@ describe('BatchLogRecordProcessorBase', () => {
       const meterProvider = new MeterProvider({
         readers: [metricReader],
       });
-      const processor = new BatchLogRecordProcessor(exporter, {
+      const processor = new BatchLogRecordProcessor({
+        exporter,
         maxQueueSize: 1,
         maxExportBatchSize: 1,
         scheduledDelayMillis: 1_000_000_000, // Manually flush

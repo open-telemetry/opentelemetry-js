@@ -162,8 +162,8 @@ export abstract class BatchLogRecordProcessorBase<
       this._maxExportBatchSize = this._maxQueueSize;
     }
 
-    const meter = config?.selfObsMeterProvider
-      ? config.selfObsMeterProvider.getMeter('@opentelemetry/sdk-logs')
+    const meter = options?.selfObsMeterProvider
+      ? options.selfObsMeterProvider.getMeter('@opentelemetry/sdk-logs')
       : createNoopMeter();
 
     this._metrics = new LogRecordProcessorMetrics(
