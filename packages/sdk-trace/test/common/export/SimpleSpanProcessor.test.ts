@@ -373,7 +373,7 @@ describe('SimpleSpanProcessor', () => {
         spanContext,
         name: 'span-name',
         kind: SpanKind.CLIENT,
-        spanLimits: tracer.getSpanLimits(),
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
         spanProcessor: tracer['_spanProcessor'],
       });
       processor.onStart(span, ROOT_CONTEXT);

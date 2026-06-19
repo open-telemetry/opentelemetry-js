@@ -591,7 +591,8 @@ describe('BatchSpanProcessorBase', () => {
       const meterProvider = new MeterProvider({
         readers: [metricReader],
       });
-      const processor = new BatchSpanProcessor(exporter, {
+      const processor = new BatchSpanProcessor({
+        exporter,
         maxQueueSize: 1,
         maxExportBatchSize: 1,
         scheduledDelayMillis: 1_000_000_000, // Manually flush
