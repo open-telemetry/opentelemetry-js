@@ -37,9 +37,8 @@ import {
 import type {
   Sampler,
   SpanExporter,
-  SpanLimits,
   SpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
+} from '@opentelemetry/sdk-trace';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,
@@ -48,7 +47,7 @@ import {
   ParentBasedSampler,
   SimpleSpanProcessor,
   TraceIdRatioBasedSampler,
-} from '@opentelemetry/sdk-trace-base';
+} from '@opentelemetry/sdk-trace';
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
@@ -115,6 +114,7 @@ import {
   LoggerProvider,
 } from '@opentelemetry/sdk-logs';
 import * as fs from 'fs';
+import { createBatchSpanProcessorFromEnv } from './create-from-env';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';
@@ -218,7 +218,7 @@ function getOtlpExporterFromEnv(): SpanExporter {
 }
 
 export function getSpanProcessorsFromEnv(
-  meterProvider: MeterProvider | undefined
+  selfObsMeterProvider: MeterProvider | undefined
 ): SpanProcessor[] {
   const exportersMap = new Map<string, () => SpanExporter>([
     ['otlp', () => getOtlpExporterFromEnv()],
@@ -263,17 +263,12 @@ export function getSpanProcessorsFromEnv(
   for (const exp of exporters) {
     if (exp instanceof ConsoleSpanExporter) {
       processors.push(
-        new SimpleSpanProcessor(exp, { selfObsMeterProvider: meterProvider })
+        // XXX Update call sig.
+        new SimpleSpanProcessor(exp, { selfObsMeterProvider })
       );
     } else {
-      // XXX This needs to wait for https://github.com/open-telemetry/opentelemetry-js/pull/6828
-      //     then use, adding support for the selfObsMeterProvider.
-      //  processors.push(createBatchSpanProcessorFromEnv(exp, meterProvider));
-      //     Note: also need to do the SimpleSpanProcessor ctor updates.
       processors.push(
-        new BatchSpanProcessor(
-          exp /* XXX , { selfObsMeterProvider: meterProvider } */
-        )
+        createBatchSpanProcessorFromEnv(exp, selfObsMeterProvider)
       );
     }
   }
@@ -951,7 +946,8 @@ export function getSpanProcessorsFromConfiguration(
       const exporter = getSpanExporter(processor.batch.exporter);
       if (exporter) {
         spanProcessors.push(
-          new BatchSpanProcessor(exporter, {
+          new BatchSpanProcessor({
+            exporter,
             maxQueueSize: processor.batch.max_queue_size ?? undefined,
             maxExportBatchSize:
               processor.batch.max_export_batch_size ?? undefined,
@@ -970,30 +966,6 @@ export function getSpanProcessorsFromConfiguration(
   });
   if (spanProcessors.length > 0) {
     return spanProcessors;
-  }
-  return undefined;
-}
-
-export function getSpanLimitsFromConfiguration(
-  config: ConfigurationModel
-): SpanLimits | undefined {
-  if (config.tracer_provider?.limits) {
-    const limitsConfig = config.tracer_provider.limits;
-    const spanLimits: SpanLimits = {};
-    spanLimits.attributeCountLimit = limitsConfig.attribute_count_limit ?? 128;
-    spanLimits.eventCountLimit = limitsConfig.event_count_limit ?? 128;
-    spanLimits.linkCountLimit = limitsConfig.link_count_limit ?? 128;
-    spanLimits.attributePerLinkCountLimit =
-      limitsConfig.link_attribute_count_limit ?? 128;
-    spanLimits.attributePerEventCountLimit =
-      limitsConfig.event_attribute_count_limit ?? 128;
-
-    if (limitsConfig.attribute_value_length_limit != null) {
-      spanLimits.attributeValueLengthLimit =
-        limitsConfig.attribute_value_length_limit;
-    }
-
-    return spanLimits;
   }
   return undefined;
 }

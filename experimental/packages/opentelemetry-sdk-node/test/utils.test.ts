@@ -15,7 +15,6 @@ import {
   getResourceDetectorsFromConfiguration,
   getHeadersFromConfiguration,
   getMeterViewsFromConfiguration,
-  getSpanLimitsFromConfiguration,
   getHttpAgentOptionsFromTls,
 } from '../src/utils';
 import * as assert from 'assert';
@@ -35,7 +34,6 @@ import {
 } from '@opentelemetry/resources';
 import type { LoggerProviderOptions } from '@opentelemetry/sdk-logs';
 import { AggregationType, InstrumentType } from '@opentelemetry/sdk-metrics';
-import type { SpanLimits } from '@opentelemetry/sdk-trace-node';
 
 describe('getPropagatorFromEnv', function () {
   afterEach(() => {
@@ -785,42 +783,6 @@ describe('getMeterViewsFromConfiguration', function () {
     assert.ok(result);
     assert.strictEqual(result.length, 1);
     assert.strictEqual(result[0].attributesProcessors, undefined);
-  });
-});
-
-describe('getSpanLimitsFromConfiguration', function () {
-  it('return undefined with no config for tracer limits', async () => {
-    assert.equal(
-      getSpanLimitsFromConfiguration({} as ConfigurationModel),
-      undefined
-    );
-  });
-
-  it('return span limits', async () => {
-    const config: ConfigurationModel = {
-      tracer_provider: {
-        processors: [],
-        limits: {
-          attribute_count_limit: 10,
-          event_count_limit: 20,
-          link_count_limit: 30,
-          attribute_value_length_limit: 40,
-          event_attribute_count_limit: 50,
-          link_attribute_count_limit: 60,
-        },
-      },
-    } as ConfigurationModel;
-    const expectedSpanLimits: SpanLimits = {
-      attributeCountLimit: 10,
-      eventCountLimit: 20,
-      linkCountLimit: 30,
-      attributeValueLengthLimit: 40,
-      attributePerEventCountLimit: 50,
-      attributePerLinkCountLimit: 60,
-    };
-
-    const spanLimits = getSpanLimitsFromConfiguration(config);
-    assert.deepEqual(spanLimits, expectedSpanLimits);
   });
 });
 
