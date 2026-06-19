@@ -263,8 +263,7 @@ export function getSpanProcessorsFromEnv(
   for (const exp of exporters) {
     if (exp instanceof ConsoleSpanExporter) {
       processors.push(
-        // XXX Update call sig.
-        new SimpleSpanProcessor(exp, { selfObsMeterProvider })
+        new SimpleSpanProcessor({ exporter: exp, selfObsMeterProvider })
       );
     } else {
       processors.push(
@@ -960,7 +959,7 @@ export function getSpanProcessorsFromConfiguration(
     if (processor.simple) {
       const exporter = getSpanExporter(processor.simple.exporter);
       if (exporter) {
-        spanProcessors.push(new SimpleSpanProcessor(exporter));
+        spanProcessors.push(new SimpleSpanProcessor({ exporter }));
       }
     }
   });

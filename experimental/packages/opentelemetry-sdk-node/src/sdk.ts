@@ -315,7 +315,6 @@ export class NodeSDK {
       spanProcessors = [this._configuration.spanProcessor];
     } else if (this._configuration?.traceExporter) {
       spanProcessors = [
-        // XXX update createBatchSpanProcessorFromEnv to take selfObsMeterProvider
         createBatchSpanProcessorFromEnv(
           this._configuration.traceExporter!,
           sdkMetricsEnabled ? this._meterProvider : undefined

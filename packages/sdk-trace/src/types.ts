@@ -88,7 +88,10 @@ export interface SpanProcessorOptions {
   selfObsMeterProvider?: MeterProvider;
 }
 
-/** BatchSpanProcessor configuration options. */
+export interface SimpleSpanProcessorOptions extends SpanProcessorOptions {
+  exporter: SpanExporter;
+}
+
 export interface BatchSpanProcessorOptions extends SpanProcessorOptions {
   exporter: SpanExporter;
 

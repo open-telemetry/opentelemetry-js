@@ -40,14 +40,14 @@ describe('SimpleSpanProcessor', () => {
 
   describe('constructor', () => {
     it('should create a SimpleSpanProcessor instance', () => {
-      const processor = new SimpleSpanProcessor(exporter);
+      const processor = new SimpleSpanProcessor({ exporter });
       assert.ok(processor instanceof SimpleSpanProcessor);
     });
   });
 
   describe('.onStart/.onEnd/.shutdown', () => {
     it('should handle span started and ended when SAMPLED', async () => {
-      const processor = new SimpleSpanProcessor(exporter);
+      const processor = new SimpleSpanProcessor({ exporter });
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
         spanId: '5e0c63257de34c92',
@@ -75,7 +75,7 @@ describe('SimpleSpanProcessor', () => {
     });
 
     it('should handle span started and ended when UNSAMPLED', async () => {
-      const processor = new SimpleSpanProcessor(exporter);
+      const processor = new SimpleSpanProcessor({ exporter });
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
         spanId: '5e0c63257de34c92',
@@ -104,7 +104,7 @@ describe('SimpleSpanProcessor', () => {
 
     it('should call globalErrorHandler when exporting fails', async () => {
       const expectedError = new Error('Exporter failed');
-      const processor = new SimpleSpanProcessor(exporter);
+      const processor = new SimpleSpanProcessor({ exporter });
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
         spanId: '5e0c63257de34c92',
@@ -155,14 +155,14 @@ describe('SimpleSpanProcessor', () => {
   describe('force flush', () => {
     it('should call forceflush on exporter', () => {
       const spyflush = sinon.spy(exporter, 'forceFlush');
-      const processor = new SimpleSpanProcessor(exporter);
+      const processor = new SimpleSpanProcessor({ exporter });
       processor.forceFlush().then(() => {
         assert.ok(spyflush.calledOnce);
       });
     });
 
     it('should await unresolved resources', async () => {
-      const processor = new SimpleSpanProcessor(exporter);
+      const processor = new SimpleSpanProcessor({ exporter });
       const providerWithAsyncResource = new TracerProvider({
         resource: resourceFromAttributes({
           async: new Promise<string>(resolve =>
@@ -206,7 +206,9 @@ describe('SimpleSpanProcessor', () => {
 
     it('should await doExport() and delete from _pendingExports', async () => {
       const testExporterWithDelay = new TestExporterWithDelay();
-      const processor = new SimpleSpanProcessor(testExporterWithDelay);
+      const processor = new SimpleSpanProcessor({
+        exporter: testExporterWithDelay,
+      });
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
         spanId: '5e0c63257de34c92',
@@ -239,7 +241,9 @@ describe('SimpleSpanProcessor', () => {
 
     it('should await doExport() and delete from _pendingExports with async resource', async () => {
       const testExporterWithDelay = new TestExporterWithDelay();
-      const processor = new SimpleSpanProcessor(testExporterWithDelay);
+      const processor = new SimpleSpanProcessor({
+        exporter: testExporterWithDelay,
+      });
 
       const providerWithAsyncResource = new TracerProvider({
         resource: resourceFromAttributes({
@@ -280,7 +284,7 @@ describe('SimpleSpanProcessor', () => {
 
     describe('when flushing complete', () => {
       it('should call an async callback', done => {
-        const processor = new SimpleSpanProcessor(exporter);
+        const processor = new SimpleSpanProcessor({ exporter });
         processor.forceFlush().then(() => {
           done();
         });
@@ -289,7 +293,7 @@ describe('SimpleSpanProcessor', () => {
 
     describe('when shutdown is complete', () => {
       it('should call an async callback', done => {
-        const processor = new SimpleSpanProcessor(exporter);
+        const processor = new SimpleSpanProcessor({ exporter });
         processor.shutdown().then(() => {
           done();
         });
@@ -309,7 +313,9 @@ describe('SimpleSpanProcessor', () => {
 
     it('should prevent instrumentation prior to export', () => {
       const testTracingExporter = new TestTracingSpanExporter();
-      const processor = new SimpleSpanProcessor(testTracingExporter);
+      const processor = new SimpleSpanProcessor({
+        exporter: testTracingExporter,
+      });
 
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
@@ -343,7 +349,8 @@ describe('SimpleSpanProcessor', () => {
       const meterProvider = new MeterProvider({
         readers: [metricReader],
       });
-      const processor = new SimpleSpanProcessor(exporter, {
+      const processor = new SimpleSpanProcessor({
+        exporter,
         selfObsMeterProvider: meterProvider,
       });
 
