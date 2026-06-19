@@ -8,7 +8,7 @@
  * https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/
  */
 
-import { diag } from '@opentelemetry/api';
+import { diag, MeterProvider } from '@opentelemetry/api';
 import { getNumberFromEnv, getStringFromEnv } from '@opentelemetry/core';
 import type {
   Sampler,
@@ -97,10 +97,12 @@ export function createSpanLimitsFromEnv(): SpanLimits | undefined {
 }
 
 export function createBatchSpanProcessorFromEnv(
-  exporter: SpanExporter
+  exporter: SpanExporter,
+  selfObsMeterProvider?: MeterProvider
 ): BatchSpanProcessor {
   return new BatchSpanProcessor({
     exporter,
+    selfObsMeterProvider,
     maxQueueSize: getNonNegativeNumberFromEnv('OTEL_BSP_MAX_QUEUE_SIZE'),
     scheduledDelayMillis: getNonNegativeNumberFromEnv(
       'OTEL_BSP_SCHEDULE_DELAY'
