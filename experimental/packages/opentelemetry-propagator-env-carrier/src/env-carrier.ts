@@ -56,12 +56,17 @@ function isNormalizedKey(key: string): boolean {
 /**
  * normalizeKey converts a propagator key to a valid POSIX environment variable
  * name. The conversion rules are:
+ * - An empty key is replaced with a single underscore.
  * - A-Z, 0-9, and _ are kept as-is.
  * - a-z are uppercased.
  * - All other characters are replaced with _.
  * - If the result would start with a digit, an underscore is prepended.
  */
 function normalizeKey(key: string): string {
+  if (key.length === 0) {
+    return '_';
+  }
+
   let result = '';
 
   for (let i = 0; i < key.length; i++) {
