@@ -38,12 +38,6 @@ export class Logger implements ILogger {
   }
 
   public emit(logRecord: LogRecord): void {
-    // Once the owning LoggerProvider has been shut down, emit() must not do any
-    // work (record construction, metrics reporting, processor onEmit). This
-    // mirrors the shutdown guard in the OpenTelemetry Java SDK.
-    if (this._sharedState.hasShutdown) {
-      return;
-    }
     const currentContext = logRecord.context || context.active();
     if (!this.enabled(logRecord)) {
       return;
@@ -80,8 +74,6 @@ export class Logger implements ILogger {
     severityNumber?: SeverityNumber;
     eventName?: string;
   }): boolean {
-    // After the owning LoggerProvider has been shut down, emit() is a no-op, so
-    // report not-enabled to let callers skip building log records altogether.
     if (this._sharedState.hasShutdown) {
       return false;
     }
