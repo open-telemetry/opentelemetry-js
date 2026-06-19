@@ -1,0 +1,69 @@
+file_format: "1.1"
+
+# Set OTEL_SDK_DISABLED=true to disable the SDK without code changes.
+disabled: false
+log_level: info
+
+resource:
+  attributes:
+    - name: service.name
+      value: declarative-config-example
+    - name: service.version
+      value: "0.1.0"
+    - name: deployment.environment.name
+      value: ${DEPLOYMENT_ENV:-development}
+
+# Comma-separated list of W3C propagators. tracecontext + baggage is the spec default.
+propagator:
+  composite:
+    - tracecontext: {}
+    - baggage: {}
+
+tracer_provider:
+  processors:
+    - batch:
+        exporter:
+          otlp_http:
+            endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://localhost:4318}/v1/traces
+            # Headers support env var substitution so secrets don't live in the YAML.
+            headers:
+              - name: x-example-api-key
+                value: ${EXAMPLE_API_KEY:-}
+            compression: gzip
+            timeout: 10000
+  # Sampler is parsed but not yet applied to the SDK (see #6506). The YAML is
+  # spec-conformant so it will start sampling once that lands.
+  sampler:
+    parent_based:
+      root:
+        trace_id_ratio_based:
+          ratio: 1.0
+      remote_parent_sampled:
+        always_on: {}
+      remote_parent_not_sampled:
+        always_off: {}
+      local_parent_sampled:
+        always_on: {}
+      local_parent_not_sampled:
+        always_off: {}
+
+meter_provider:
+  readers:
+    - periodic:
+        interval: 10000
+        timeout: 5000
+        exporter:
+          otlp_http:
+            endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://localhost:4318}/v1/metrics
+            compression: gzip
+            timeout: 10000
+            temporality_preference: cumulative
+
+logger_provider:
+  processors:
+    - batch:
+        exporter:
+          otlp_http:
+            endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://localhost:4318}/v1/logs
+            compression: gzip
+            timeout: 10000

@@ -127,6 +127,45 @@ One intentional exception in both paths: `AttributeNameValue.type` is **not** de
 ## Supported schema versions
 
 - `1.0`
+- `1.1`
+
+`file_format` must specify a major and minor version (e.g. `"1.0"` or `"1.1"`).
+Newer minor versions of major `1` are accepted with a warning; other major
+versions are rejected.
+
+## Supported fields
+
+The SDK currently wires these YAML fields through to runtime components:
+
+| Section | Fields |
+| --- | --- |
+| Top-level | `disabled`, `log_level`, `attribute_limits` |
+| `resource` | `attributes`, `attributes_list`, `schema_url`, `detection/development.detectors` |
+| `propagator` | `composite`, `composite_list` |
+| `tracer_provider` | `processors` (batch + simple), `limits`, `id_generator` |
+| `meter_provider` | `readers.periodic` (with OTLP HTTP / gRPC exporters), `views` |
+| `logger_provider` | `processors` (batch + simple), `limits` |
+
+OTLP exporter configuration (HTTP and gRPC) honours `endpoint`, `headers`,
+`headers_list`, `tls`, `compression`, `timeout`, `encoding`, plus
+`temporality_preference` and `default_histogram_aggregation` for metrics.
+
+## Current limitations
+
+Spec fields that the SDK does **not** yet apply, even though the YAML is parsed
+and validated:
+
+| Field | Tracking issue |
+| --- | --- |
+| `tracer_provider.sampler` | [#6506](https://github.com/open-telemetry/opentelemetry-js/issues/6506) |
+| `meter_provider.readers.pull` (Prometheus) | [#6063](https://github.com/open-telemetry/opentelemetry-js/issues/6063), [#6426](https://github.com/open-telemetry/opentelemetry-js/issues/6426) |
+| `meter_provider.exemplar_filter` | not yet filed |
+| `tracer_configurator`, `meter_configurator`, `logger_configurator` | not yet filed |
+| Warnings on invalid / unrecognized values | [#6107](https://github.com/open-telemetry/opentelemetry-js/issues/6107) |
+| Third-party component providers (samplers, exporters, propagators) | [#5824](https://github.com/open-telemetry/opentelemetry-js/issues/5824), [#5825](https://github.com/open-telemetry/opentelemetry-js/issues/5825) |
+
+See the [JavaScript Declarative Configuration project board](https://github.com/orgs/open-telemetry/projects/157)
+for the current state of all tracked work.
 
 ## Useful links
 
