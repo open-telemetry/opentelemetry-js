@@ -525,7 +525,7 @@ describe('PeriodicExportingMetricReader', () => {
       await reader.shutdown();
     });
 
-    it('should not initiate collect when an export is ongoing', async () => {
+    it('should initiate collect after ongoing export finishes', async () => {
       const exporter = new TestMetricExporter();
       exporter.exportTime = 100; // Make it slow
       const reader = new PeriodicExportingMetricReader({
@@ -550,15 +550,15 @@ describe('PeriodicExportingMetricReader', () => {
       // Trigger second export
       await reader.forceFlush();
 
-      // The second forceFlush should have skipped collection.
-      assert.strictEqual(collectSpy.callCount, 1);
+      // The second forceFlush should have run a new collection after waiting.
+      assert.strictEqual(collectSpy.callCount, 2);
 
       // Wait for the first export to complete to clean up
       await firstFlush;
       await reader.shutdown();
     });
 
-    it('should not initiate collect when a previous collect is ongoing', async () => {
+    it('should initiate collect after previous ongoing collect finishes', async () => {
       const exporter = new TestMetricExporter();
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
@@ -583,10 +583,11 @@ describe('PeriodicExportingMetricReader', () => {
       await new Promise(resolve => setTimeout(resolve, 10));
 
       // Trigger second export
+      // first forceFlush is still in collect phase
       await reader.forceFlush();
 
-      // The second forceFlush should have skipped collection because the first is still ongoing
-      assert.strictEqual(collectStub.callCount, 1);
+      // The second forceFlush should have run a new collection after waiting.
+      assert.strictEqual(collectStub.callCount, 2);
 
       // Wait for the first export to complete to clean up
       await firstFlush;
@@ -628,6 +629,61 @@ describe('PeriodicExportingMetricReader', () => {
 
       // Both forceFlush starts should happen AFTER the export end
       assert.deepStrictEqual(events, [
+        'export start',
+        'export end',
+        'forceFlush start',
+        'export start',
+        'export end',
+        'forceFlush start',
+      ]);
+
+      await reader.shutdown();
+    });
+
+    // This test simulates three overlapping calls to forceFlush (p1, p2, and p3) 
+    // to ensure that p3 piggybacks on the fresh export started by p2,
+    // rather than starting a third one.
+    it('should reuse concurrent fresh export if started while waiting', async () => {
+      const events: string[] = [];
+      const exporter = new TestMetricExporter();
+      exporter.export = (metrics, callback) => {
+        events.push('export start');
+        setTimeout(() => {
+          events.push('export end');
+          callback({ code: ExportResultCode.SUCCESS });
+        }, 50);
+      };
+      exporter.forceFlush = async () => {
+        events.push('forceFlush start');
+      };
+
+      const reader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: MAX_32_BIT_INT,
+        exportTimeoutMillis: 100,
+      });
+
+      reader.setMetricProducer(
+        new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+      );
+
+      // Start p1 (export 1)
+      const p1 = reader.forceFlush();
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Start p2 (will wait for p1, then start export 2)
+      const p2 = reader.forceFlush();
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Start p3 (will wait for p1, and should then wait for p2's export instead of starting export 3)
+      const p3 = reader.forceFlush();
+
+      await Promise.all([p1, p2, p3]);
+
+      assert.deepStrictEqual(events, [
+        'export start',
+        'export end',
+        'forceFlush start',
         'export start',
         'export end',
         'forceFlush start',
@@ -1100,7 +1156,7 @@ describe('PeriodicExportingMetricReader', () => {
         await reader.shutdown();
       });
 
-      it('should skip subsequent export when one is ongoing', async () => {
+      it('should run subsequent export after ongoing export finishes', async () => {
         const exporter = new TestMetricExporter();
         exporter.exportTime = 50; // Make export take some time
         const reader = new PeriodicExportingMetricReader({
@@ -1158,9 +1214,9 @@ describe('PeriodicExportingMetricReader', () => {
         await Promise.all([p1, p2]);
 
         const exports = exporter.getExports();
-        assert.strictEqual(exports.length, 1);
+        assert.strictEqual(exports.length, 2);
 
-        // Assert that they didn't overlap (only 1 ran)
+        // Assert that they didn't overlap (they ran sequentially)
         assert.strictEqual(exporter.maxConcurrentCalls, 1);
 
         await reader.shutdown();

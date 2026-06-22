@@ -257,6 +257,26 @@ export class PeriodicExportingMetricReader extends MetricReader {
   }
 
   protected async onForceFlush(): Promise<void> {
+    // Wait for any in-progress export to finish first so that we never run
+    // collect + export concurrently with it.
+    await this._awaitOngoingExport();
+    // forceFlush SHOULD collect and export the latest metrics. If a concurrent
+    // caller already started a fresh export while we were waiting above, await
+    // that one instead of starting yet another collect + export cycle;
+    // otherwise run our own.
+    if (this._ongoingExportPromise) {
+      await this._awaitOngoingExport();
+    } else {
+      await this._runOnce();
+    }
+    await this._exporter.forceFlush();
+  }
+
+  /**
+   * Helper function to wait for an ongoing export to complete.
+   * Errors are swallowed and handled by the original _runOnce().
+   */
+  private async _awaitOngoingExport(): Promise<void> {
     if (this._ongoingExportPromise) {
       api.diag.debug(
         'PeriodicExportingMetricReader: export already in progress, awaiting ongoing export'
@@ -266,10 +286,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
       } catch {
         // Error is handled by the _runOnce() that initiated the export.
       }
-    } else {
-      await this._runOnce();
     }
-    await this._exporter.forceFlush();
   }
 
   protected async onShutdown(): Promise<void> {
