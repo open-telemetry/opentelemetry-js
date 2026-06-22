@@ -640,7 +640,7 @@ describe('PeriodicExportingMetricReader', () => {
       await reader.shutdown();
     });
 
-    // This test simulates three overlapping calls to forceFlush (p1, p2, and p3) 
+    // This test simulates three overlapping calls to forceFlush (p1, p2, and p3)
     // to ensure that p3 piggybacks on the fresh export started by p2,
     // rather than starting a third one.
     it('should reuse concurrent fresh export if started while waiting', async () => {
