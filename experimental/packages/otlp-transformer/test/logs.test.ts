@@ -112,7 +112,7 @@ function createExpectedLogJson(encoder: Encoder): IExportLogsServiceRequest {
   };
 }
 
-function createExpectedLogProtobuf(): IExportLogsServiceRequest {
+function createExpectedLogProtobuf() {
   const traceId = toBase64('00000000000000000000000000000001');
   const spanId = toBase64('0000000000000002');
 
@@ -132,7 +132,6 @@ function createExpectedLogProtobuf(): IExportLogsServiceRequest {
               value: { stringValue: 'some attribute value' },
             },
           ],
-          droppedAttributesCount: 0,
         },
         scopeLogs: [
           {
@@ -177,7 +176,6 @@ function createExpectedLogProtobuf(): IExportLogsServiceRequest {
                     value: { doubleValue: 1.23 },
                   },
                 ],
-                droppedAttributesCount: 0,
                 flags: 1,
                 traceId: traceId,
                 spanId: spanId,
