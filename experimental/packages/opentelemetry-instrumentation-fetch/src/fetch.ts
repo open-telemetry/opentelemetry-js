@@ -10,7 +10,7 @@ import {
   SpanStatusCode,
   trace,
 } from '@opentelemetry/api';
-import type { Attributes, HrTime, Span } from '@opentelemetry/api';
+import type { Attributes, Span } from '@opentelemetry/api';
 import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import {
   SemconvStability,
@@ -43,6 +43,7 @@ import {
 import type { FetchError, FetchResponse, SpanData } from './types';
 import {
   getFetchBodyLength,
+  getResource,
   normalizeHttpRequestMethod,
   serverPortFromUrl,
 } from './utils';
@@ -296,7 +297,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   private _findResourceAndAddNetworkEvents(
     span: Span,
     resourcesObserver: SpanData,
-    endTime: HrTime
+    endTime: number
   ): void {
     let resources: PerformanceResourceTiming[] = resourcesObserver.entries;
     if (!resources.length) {
@@ -310,7 +311,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         'resource'
       ) as PerformanceResourceTiming[];
     }
-    const resource = web.getResource(
+    const resource = getResource(
       resourcesObserver.spanUrl,
       resourcesObserver.startTime,
       endTime,
@@ -358,8 +359,8 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
    * @param response
    */
   private _endSpan(span: Span, spanData: SpanData, response: FetchResponse) {
-    const endTime = core.millisToHrTime(Date.now());
-    const performanceEndTime = core.hrTime();
+    const endTime = Date.now();
+    const performanceEndTime = performance.now();
     this._addFinalSpanAttributes(span, response);
 
     if (this._semconvStability & SemconvStability.STABLE) {
@@ -592,7 +593,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
    * @param spanUrl
    */
   private _prepareSpanData(spanUrl: string): SpanData {
-    const startTime = core.hrTime();
+    const startTime = performance.now();
     const entries: PerformanceResourceTiming[] = [];
     if (typeof PerformanceObserver !== 'function') {
       return { entries, startTime, spanUrl };
