@@ -18,7 +18,7 @@ export interface WritableMetricStorage {
     value: number,
     attributes: Attributes,
     context: Context,
-    recordTime: HrTime
+    recordTime: number
   ): void;
 }
 
