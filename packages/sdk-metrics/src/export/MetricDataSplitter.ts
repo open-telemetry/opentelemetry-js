@@ -37,14 +37,11 @@ export function splitMetricData(
   // Iterate through all scopes in the input metrics
   for (const scopeMetric of resourceMetrics.scopeMetrics) {
     let scopeMetricCopy: ScopeMetrics | null = null;
-
     // Iterate through all metrics within the current scope
     for (const metric of scopeMetric.metrics) {
-      let dataPointsRemaining = metric.dataPoints;
-      let metricCopy: typeof metric | undefined = undefined;
-
+      const dataPoints = metric.dataPoints;
       // If a metric has no data points, add it directly to the current batch
-      if (dataPointsRemaining.length === 0) {
+      if (dataPoints.length === 0) {
         if (!scopeMetricCopy) {
           scopeMetricCopy = { scope: scopeMetric.scope, metrics: [] };
           currentScopeMetrics.push(scopeMetricCopy);
@@ -52,32 +49,32 @@ export function splitMetricData(
         scopeMetricCopy.metrics.push(metric);
         continue;
       }
-
-      // Chunk the data points of the current metric across batches
-      while (dataPointsRemaining.length > 0) {
+      // Chunk the data points of the current metric across batches. We iterate
+      // with an offset instead of repeatedly slicing the remaining tail, which
+      // keeps the overall work linear in the number of data points.
+      let offset = 0;
+      while (offset < dataPoints.length) {
         const spaceLeft = maxExportBatchSize - currentBatchPoints;
-        const take = Math.min(spaceLeft, dataPointsRemaining.length);
-        const chunk = dataPointsRemaining.slice(0, take);
-        dataPointsRemaining = dataPointsRemaining.slice(take);
-
+        const take = Math.min(spaceLeft, dataPoints.length - offset);
         // Ensure we have a ScopeMetrics object in the current batch
         if (!scopeMetricCopy) {
           scopeMetricCopy = { scope: scopeMetric.scope, metrics: [] };
           currentScopeMetrics.push(scopeMetricCopy);
-          metricCopy = undefined; // Reset because we are starting a new batch
         }
-
-        // Ensure we have a MetricData object for this specific metric in the current batch.
-        if (!metricCopy) {
-          metricCopy = { ...metric, dataPoints: [] };
-          scopeMetricCopy.metrics.push(metricCopy);
-        }
-
-        (metricCopy.dataPoints as DataPoint<unknown>[]).push(
-          ...(chunk as DataPoint<unknown>[])
-        );
+        // A metric receives exactly one contiguous chunk per batch (after
+        // appending, the batch is either full and flushed, or the metric is
+        // exhausted), so we can slice the data points directly rather than
+        // copying them incrementally.
+        const metricCopy = {
+          ...metric,
+          dataPoints: dataPoints.slice(
+            offset,
+            offset + take
+          ) as DataPoint<unknown>[],
+        } as typeof metric;
+        scopeMetricCopy.metrics.push(metricCopy);
+        offset += take;
         currentBatchPoints += take;
-
         // If the current batch is full, flush it and start a new one
         if (currentBatchPoints === maxExportBatchSize) {
           flush();
