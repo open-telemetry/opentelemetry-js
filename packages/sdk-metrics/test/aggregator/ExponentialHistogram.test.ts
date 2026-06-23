@@ -712,6 +712,7 @@ describe('ExponentialHistogramAggregation', () => {
               scale: 1,
               zeroCount: 0,
             },
+            exemplars: undefined,
           },
         ],
       };
@@ -763,6 +764,7 @@ describe('ExponentialHistogramAggregation', () => {
               scale: 1,
               zeroCount: 0,
             },
+            exemplars: undefined,
           },
         ],
       };

@@ -8,6 +8,7 @@ import type { InstrumentationScope } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import type { AggregationTemporality } from './AggregationTemporality';
 import type { Histogram, ExponentialHistogram } from '../aggregator/types';
+import type { Exemplar } from '../exemplar/Exemplar';
 
 /**
  * Supported types of metric instruments.
@@ -161,4 +162,8 @@ export interface DataPoint<T> {
    * {@link DataPointType}.
    */
   readonly value: T;
+  /**
+   * @experimental Exemplars associated with this DataPoint.
+   */
+  readonly exemplars?: Exemplar[];
 }

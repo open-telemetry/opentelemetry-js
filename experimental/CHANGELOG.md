@@ -48,6 +48,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(sdk-node): wire up metric producers from declarative config [#6712](https://github.com/open-telemetry/opentelemetry-js/pull/6712) @MikeGoldsmith
 * feat(sdk-logs)!: add support for attributes in LoggerOptions [#6573](https://github.com/open-telemetry/opentelemetry-js/pull/6573) @pichlermarc
 * feat(propagator-env-carrier): add environment variable carrier helpers for context propagation [#6774](https://github.com/open-telemetry/opentelemetry-js/pull/6774) @pellared
+* feat(otlp-transformer): serialize exemplars on all metric data point types [#6830](https://github.com/open-telemetry/opentelemetry-js/pull/6830) @CharlieTLe @rnavarro
 
 ### :bug: Bug Fixes
 
