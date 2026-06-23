@@ -220,15 +220,5 @@ export default tseslint.config(
     languageOptions: {
       globals: { Zone: 'readonly' },
     },
-  },
-
-  // shim-opencensus carries an upstream OpenCensus header for one file.
-  {
-    files: [
-      'experimental/packages/shim-opencensus/src/OpenCensusMetricProducer.ts',
-    ],
-    rules: {
-      'yet-another-license-header/header': 'off',
-    },
   }
 );
