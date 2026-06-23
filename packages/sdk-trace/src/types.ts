@@ -79,6 +79,8 @@ export interface SpanLimits {
 
 /**
  * Common options for SDK span processors.
+ *
+ * @experimental This interface is experimental and is subject to breaking changes in minor releases.
  */
 export interface SpanProcessorOptions {
   /**
