@@ -3,7 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ContextManager, TextMapPropagator } from '@opentelemetry/api';
+import type {
+  ContextManager,
+  MeterProvider,
+  TextMapPropagator,
+} from '@opentelemetry/api';
 import { context, diag, propagation } from '@opentelemetry/api';
 import {
   CompositePropagator,
@@ -215,7 +219,9 @@ function getOtlpExporterFromEnv(): SpanExporter {
   }
 }
 
-export function getSpanProcessorsFromEnv(): SpanProcessor[] {
+export function getSpanProcessorsFromEnv(
+  selfObsMeterProvider: MeterProvider | undefined
+): SpanProcessor[] {
   const exportersMap = new Map<string, () => SpanExporter>([
     ['otlp', () => getOtlpExporterFromEnv()],
     ['zipkin', () => new ZipkinExporter()],
@@ -258,9 +264,13 @@ export function getSpanProcessorsFromEnv(): SpanProcessor[] {
 
   for (const exp of exporters) {
     if (exp instanceof ConsoleSpanExporter) {
-      processors.push(new SimpleSpanProcessor(exp));
+      processors.push(
+        new SimpleSpanProcessor({ exporter: exp, selfObsMeterProvider })
+      );
     } else {
-      processors.push(createBatchSpanProcessorFromEnv(exp));
+      processors.push(
+        createBatchSpanProcessorFromEnv(exp, selfObsMeterProvider)
+      );
     }
   }
 
@@ -951,7 +961,7 @@ export function getSpanProcessorsFromConfiguration(
     if (processor.simple) {
       const exporter = getSpanExporter(processor.simple.exporter);
       if (exporter) {
-        spanProcessors.push(new SimpleSpanProcessor(exporter));
+        spanProcessors.push(new SimpleSpanProcessor({ exporter }));
       }
     }
   });
