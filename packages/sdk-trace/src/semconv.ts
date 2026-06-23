@@ -127,33 +127,3 @@ export const OTEL_COMPONENT_TYPE_VALUE_BATCHING_SPAN_PROCESSOR =
  */
 export const OTEL_COMPONENT_TYPE_VALUE_SIMPLE_SPAN_PROCESSOR =
   'simple_span_processor' as const;
-
-/**
- * Describes a class of error the operation ended with.
- *
- * @example timeout
- * @example java.net.UnknownHostException
- * @example server_certificate_invalid
- * @example 500
- *
- * @note The `error.type` **SHOULD** be predictable, and **SHOULD** have low cardinality.
- *
- * When `error.type` is set to a type (e.g., an exception type), its
- * canonical class name identifying the type within the artifact **SHOULD** be used.
- *
- * Instrumentations **SHOULD** document the list of errors they report.
- *
- * The cardinality of `error.type` within one instrumentation library **SHOULD** be low.
- * Telemetry consumers that aggregate data from multiple instrumentation libraries and applications
- * should be prepared for `error.type` to have high cardinality at query time when no
- * additional filters are applied.
- *
- * If the operation has completed successfully, instrumentations **SHOULD NOT** set `error.type`.
- *
- * If a specific domain defines its own set of error identifiers (such as HTTP or RPC status codes),
- * it's **RECOMMENDED** to:
- *
- *   - Use a domain-specific attribute
- *   - Set `error.type` to capture all errors, regardless of whether they are defined within the domain-specific set or not.
- */
-export const ATTR_ERROR_TYPE = 'error.type' as const;

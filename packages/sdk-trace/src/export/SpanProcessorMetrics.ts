@@ -10,8 +10,8 @@ import type {
   ObservableCallback,
   ObservableUpDownCounter,
 } from '@opentelemetry/api';
+import { ATTR_ERROR_TYPE } from '@opentelemetry/semantic-conventions';
 import {
-  ATTR_ERROR_TYPE,
   ATTR_OTEL_COMPONENT_NAME,
   ATTR_OTEL_COMPONENT_TYPE,
   METRIC_OTEL_SDK_PROCESSOR_SPAN_PROCESSED,
