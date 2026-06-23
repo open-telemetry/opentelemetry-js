@@ -126,7 +126,7 @@ export function mergeResourceAttributesConfig(
   const mergedAttrs = attributes ? attributes.slice() : [];
   const existingNames = new Set(mergedAttrs.map(a => a.name));
 
-  // TODO: handle attribute limits, if any
+  // TODO(6842): handle attribute limits, if any
   let discard = false;
   const listAttrs: Record<string, string> = {};
   for (const pair of attributes_list.split(',')) {
