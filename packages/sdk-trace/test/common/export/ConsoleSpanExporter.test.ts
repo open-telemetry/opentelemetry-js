@@ -1,0 +1,109 @@
+/*
+ * Copyright The OpenTelemetry Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import type { SpanContext } from '@opentelemetry/api';
+import { TraceFlags } from '@opentelemetry/api';
+import { TraceState } from '@opentelemetry/core';
+import * as assert from 'assert';
+import * as sinon from 'sinon';
+import {
+  AlwaysOnSampler,
+  ConsoleSpanExporter,
+  SimpleSpanProcessor,
+  TracerProvider,
+} from '../../../src';
+
+/* eslint-disable no-console */
+describe('ConsoleSpanExporter', () => {
+  let consoleExporter: ConsoleSpanExporter;
+  let previousConsoleDir: any;
+
+  beforeEach(() => {
+    previousConsoleDir = console.dir;
+    console.dir = () => {};
+    consoleExporter = new ConsoleSpanExporter();
+  });
+
+  afterEach(() => {
+    console.dir = previousConsoleDir;
+  });
+
+  describe('.export()', () => {
+    it('should export information about span', () => {
+      assert.doesNotThrow(() => {
+        consoleExporter = new ConsoleSpanExporter();
+        const basicTracerProvider = new TracerProvider({
+          sampler: new AlwaysOnSampler(),
+          spanProcessors: [new SimpleSpanProcessor(consoleExporter)],
+        });
+
+        const spyConsole = sinon.spy(console, 'dir');
+        const spyExport = sinon.spy(consoleExporter, 'export');
+
+        const instrumentationScopeName = '@opentelemetry/sdk-trace-base/test';
+        const instrumentationScopeVersion = '1.2.3';
+        const tracer = basicTracerProvider.getTracer(
+          instrumentationScopeName,
+          instrumentationScopeVersion
+        );
+        const context: SpanContext = {
+          traceId: 'a3cda95b652f4a1592b449d5929fda1b',
+          spanId: '5e0c63257de34c92',
+          traceFlags: TraceFlags.SAMPLED,
+        };
+        const span = tracer.startSpan('foo', {
+          links: [{ context, attributes: { anAttr: 'aValue' } }],
+        });
+        span.spanContext().traceState = new TraceState('trace=state');
+        span.addEvent('foobar');
+        span.end();
+
+        const spans = spyExport.args[0];
+        const firstSpan = spans[0][0];
+        const firstEvent = firstSpan.events[0];
+        const consoleArgs = spyConsole.args[0];
+        const consoleSpan = consoleArgs[0];
+        const keys = Object.keys(consoleSpan).sort().join(',');
+
+        const expectedKeys = [
+          'attributes',
+          'duration',
+          'events',
+          'id',
+          'instrumentationScope',
+          'kind',
+          'links',
+          'name',
+          'parentSpanContext',
+          'resource',
+          'status',
+          'timestamp',
+          'traceId',
+          'traceState',
+        ].join(',');
+
+        assert.ok(firstSpan.name === 'foo');
+        assert.ok(firstEvent.name === 'foobar');
+        assert.ok(consoleSpan.id === firstSpan.spanContext().spanId);
+        assert.ok(keys === expectedKeys, 'expectedKeys');
+        assert.ok(
+          firstSpan.instrumentationScope.name === instrumentationScopeName
+        );
+        assert.ok(
+          firstSpan.instrumentationScope.version === instrumentationScopeVersion
+        );
+
+        assert.ok(spyExport.calledOnce);
+      });
+    });
+  });
+
+  describe('force flush', () => {
+    it('forceFlush should flush spans and return', async () => {
+      consoleExporter = new ConsoleSpanExporter();
+      await consoleExporter.forceFlush();
+    });
+  });
+});

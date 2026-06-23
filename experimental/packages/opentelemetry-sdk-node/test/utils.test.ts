@@ -15,7 +15,6 @@ import {
   getResourceDetectorsFromConfiguration,
   getHeadersFromConfiguration,
   getMeterViewsFromConfiguration,
-  getSpanLimitsFromConfiguration,
   getHttpAgentOptionsFromTls,
 } from '../src/utils';
 import * as assert from 'assert';
@@ -40,7 +39,6 @@ import {
   AggregationType,
   InstrumentType,
 } from '@opentelemetry/sdk-metrics';
-import type { SpanLimits } from '@opentelemetry/sdk-trace-node';
 
 interface OtlpHttpTransportParameters {
   url: string;
@@ -70,14 +68,10 @@ interface OtlpMetricExporterInternals {
   ): AggregationTemporality;
 }
 
-interface PeriodicMetricReaderInternals {
-  _exporter: OtlpMetricExporterInternals;
-}
-
 function getMetricExporterInternals(
   reader: unknown
 ): OtlpMetricExporterInternals {
-  return (reader as PeriodicMetricReaderInternals)._exporter;
+  return (reader as any)._exporter;
 }
 
 function getHttpTransportParameters(
@@ -347,6 +341,95 @@ describe('getLoggerProviderConfigFromEnv', function () {
   });
 });
 
+describe('getPeriodicMetricReaderFromConfiguration', function () {
+  afterEach(function () {
+    sinon.restore();
+  });
+
+  it('should return warning message for invalid compression type for meter provider', function () {
+    const warnStub = sinon.stub(diag, 'warn');
+    getPeriodicMetricReaderFromConfiguration({
+      exporter: { otlp_http: { encoding: 'invalid' } },
+    } as any);
+    sinon.assert.calledWithExactly(
+      warnStub,
+      'Unsupported OTLP metrics encoding: invalid.'
+    );
+  });
+
+  it('passes OTLP HTTP metric exporter connection options from configuration', async function () {
+    const reader = getPeriodicMetricReaderFromConfiguration({
+      interval: 7000,
+      timeout: 5000,
+      exporter: {
+        otlp_http: {
+          endpoint: 'https://collector.example/v1/metrics',
+          tls: {
+            ca_file: 'test/fixtures/ca.pem',
+            key_file: 'test/fixtures/ca-key.pem',
+            cert_file: 'test/fixtures/cert.pem',
+          },
+          headers_list: 'x-list=list-value,x-overridden=list-value',
+          headers: [
+            { name: 'x-test-header', value: 'test-value' },
+            { name: 'x-overridden', value: 'header-value' },
+          ],
+          compression: 'gzip',
+          timeout: 1234,
+        },
+      },
+    });
+
+    assert.ok(reader);
+    const exporter = getMetricExporterInternals(reader);
+    const parameters = getHttpTransportParameters(exporter);
+
+    assert.strictEqual(parameters.url, 'https://collector.example/v1/metrics');
+    assert.strictEqual(parameters.compression, 'gzip');
+    assert.strictEqual(exporter._delegate._timeout, 1234);
+    assert.deepStrictEqual(await parameters.headers(), {
+      'x-list': 'list-value',
+      'x-overridden': 'header-value',
+      'x-test-header': 'test-value',
+      'Content-Type': 'application/x-protobuf',
+    });
+
+    const agent = await parameters.agentFactory('https:');
+    assert.ok(agent.options.ca);
+    assert.ok(agent.options.key);
+    assert.ok(agent.options.cert);
+  });
+
+  it('passes OTLP HTTP metric exporter aggregation options from configuration', function () {
+    const reader = getPeriodicMetricReaderFromConfiguration({
+      exporter: {
+        otlp_http: {
+          encoding: 'json',
+          temporality_preference: 'delta',
+          default_histogram_aggregation: 'base2_exponential_bucket_histogram',
+        },
+      },
+    });
+
+    assert.ok(reader);
+    const exporter = getMetricExporterInternals(reader);
+
+    assert.strictEqual(
+      exporter.selectAggregationTemporality(InstrumentType.COUNTER),
+      AggregationTemporality.DELTA
+    );
+    assert.deepStrictEqual(
+      exporter.selectAggregation(InstrumentType.HISTOGRAM),
+      {
+        type: AggregationType.EXPONENTIAL_HISTOGRAM,
+      }
+    );
+    assert.deepStrictEqual(exporter.selectAggregation(InstrumentType.COUNTER), {
+      type: AggregationType.DEFAULT,
+    });
+  });
+});
+
 describe('getBatchLogRecordProcessorConfigFromEnv', function () {
   afterEach(function () {
     delete process.env.OTEL_BLRP_MAX_QUEUE_SIZE;
@@ -469,89 +552,6 @@ describe('getBatchLogRecordProcessorConfigFromEnv', function () {
       maxExportBatchSize: undefined,
     });
     sinon.assert.callCount(warnStub, 4);
-  });
-
-  it('should return warning message for invalid compression type for meter provider', function () {
-    const warnStub = sinon.stub(diag, 'warn');
-    getPeriodicMetricReaderFromConfiguration({
-      exporter: { otlp_http: { encoding: 'invalid' } },
-    } as any);
-    sinon.assert.calledWithExactly(
-      warnStub,
-      'Unsupported OTLP metrics encoding: invalid.'
-    );
-  });
-
-  it('passes OTLP HTTP metric exporter connection options from configuration', async function () {
-    const reader = getPeriodicMetricReaderFromConfiguration({
-      interval: 7000,
-      timeout: 5000,
-      exporter: {
-        otlp_http: {
-          endpoint: 'https://collector.example/v1/metrics',
-          tls: {
-            ca_file: 'test/fixtures/ca.pem',
-            key_file: 'test/fixtures/ca-key.pem',
-            cert_file: 'test/fixtures/cert.pem',
-          },
-          headers_list: 'x-list=list-value,x-overridden=list-value',
-          headers: [
-            { name: 'x-test-header', value: 'test-value' },
-            { name: 'x-overridden', value: 'header-value' },
-          ],
-          compression: 'gzip',
-          timeout: 1234,
-        },
-      },
-    });
-
-    assert.ok(reader);
-    const exporter = getMetricExporterInternals(reader);
-    const parameters = getHttpTransportParameters(exporter);
-
-    assert.strictEqual(parameters.url, 'https://collector.example/v1/metrics');
-    assert.strictEqual(parameters.compression, 'gzip');
-    assert.strictEqual(exporter._delegate._timeout, 1234);
-    assert.deepStrictEqual(await parameters.headers(), {
-      'x-list': 'list-value',
-      'x-overridden': 'header-value',
-      'x-test-header': 'test-value',
-      'Content-Type': 'application/x-protobuf',
-    });
-
-    const agent = await parameters.agentFactory('https:');
-    assert.ok(agent.options.ca);
-    assert.ok(agent.options.key);
-    assert.ok(agent.options.cert);
-  });
-
-  it('passes OTLP HTTP metric exporter aggregation options from configuration', function () {
-    const reader = getPeriodicMetricReaderFromConfiguration({
-      exporter: {
-        otlp_http: {
-          encoding: 'json',
-          temporality_preference: 'delta',
-          default_histogram_aggregation: 'base2_exponential_bucket_histogram',
-        },
-      },
-    });
-
-    assert.ok(reader);
-    const exporter = getMetricExporterInternals(reader);
-
-    assert.strictEqual(
-      exporter.selectAggregationTemporality(InstrumentType.COUNTER),
-      AggregationTemporality.DELTA
-    );
-    assert.deepStrictEqual(
-      exporter.selectAggregation(InstrumentType.HISTOGRAM),
-      {
-        type: AggregationType.EXPONENTIAL_HISTOGRAM,
-      }
-    );
-    assert.deepStrictEqual(exporter.selectAggregation(InstrumentType.COUNTER), {
-      type: AggregationType.DEFAULT,
-    });
   });
 
   it('should return values for getInstrumentType', function () {
@@ -906,42 +906,6 @@ describe('getMeterViewsFromConfiguration', function () {
     assert.ok(result);
     assert.strictEqual(result.length, 1);
     assert.strictEqual(result[0].attributesProcessors, undefined);
-  });
-});
-
-describe('getSpanLimitsFromConfiguration', function () {
-  it('return undefined with no config for tracer limits', async () => {
-    assert.equal(
-      getSpanLimitsFromConfiguration({} as ConfigurationModel),
-      undefined
-    );
-  });
-
-  it('return span limits', async () => {
-    const config: ConfigurationModel = {
-      tracer_provider: {
-        processors: [],
-        limits: {
-          attribute_count_limit: 10,
-          event_count_limit: 20,
-          link_count_limit: 30,
-          attribute_value_length_limit: 40,
-          event_attribute_count_limit: 50,
-          link_attribute_count_limit: 60,
-        },
-      },
-    } as ConfigurationModel;
-    const expectedSpanLimits: SpanLimits = {
-      attributeCountLimit: 10,
-      eventCountLimit: 20,
-      linkCountLimit: 30,
-      attributeValueLengthLimit: 40,
-      attributePerEventCountLimit: 50,
-      attributePerLinkCountLimit: 60,
-    };
-
-    const spanLimits = getSpanLimitsFromConfiguration(config);
-    assert.deepEqual(spanLimits, expectedSpanLimits);
   });
 });
 

@@ -5,12 +5,14 @@
 
 import * as assert from 'assert';
 import * as Sinon from 'sinon';
+import { diag } from '@opentelemetry/api';
 import type { ConfigurationModel } from '../src';
 import { createConfigFactory } from '../src/ConfigFactory';
 import { parseConfigFile } from '../src/FileConfigFactory';
 
 const defaultConfig: ConfigurationModel = {
   disabled: false,
+  log_level: 'info',
   resource: {},
   attribute_limits: {
     attribute_count_limit: 128,
@@ -151,9 +153,9 @@ const ksCardinality = {
 const ksPromExporter = (strategy: string) => ({
   host: 'localhost',
   port: 9464,
-  without_scope_info: false,
-  'without_target_info/development': false,
-  with_resource_constant_labels: {
+  scope_info_enabled: true,
+  'target_info_enabled/development': true,
+  resource_constant_labels: {
     included: ['service*'],
     excluded: ['service.attr1'],
   },
@@ -835,6 +837,33 @@ describe('FileConfigFactory', function () {
     assert.throws(() => createConfigFactory(), /Unsupported file_format/);
   });
 
+  it('should accept file_format 1.0 for backward compatibility', function () {
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/file-format-1.0.yaml';
+    assert.doesNotThrow(() => createConfigFactory());
+  });
+
+  it('should accept file_format 1.1', function () {
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/short-config.yml';
+    assert.doesNotThrow(() => createConfigFactory());
+  });
+
+  it('should accept a newer minor file_format with a warning', function () {
+    const warnStub = Sinon.stub(diag, 'warn');
+    process.env.OTEL_CONFIG_FILE =
+      'test/fixtures/file-format-future-minor.yaml';
+    assert.doesNotThrow(() => createConfigFactory());
+    Sinon.assert.calledWith(warnStub, Sinon.match(/newer minor version/));
+    warnStub.restore();
+  });
+
+  it('should throw for an unsupported major file_format version', function () {
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/file-format-unsupported.yaml';
+    assert.throws(
+      () => createConfigFactory(),
+      /Unsupported file_format.*supports schema version 1\.x/
+    );
+  });
+
   it('should show multiple validation errors for invalid config', function () {
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid-multiple-errors.yaml';
     assert.throws(
@@ -1149,6 +1178,45 @@ describe('FileConfigFactory', function () {
       },
     };
     assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+  });
+
+  it('decodes percent-encoded keys and values in attributes_list', function () {
+    process.env.OTEL_CONFIG_FILE =
+      'test/fixtures/attributes-list-percent-encoded.yaml';
+    const configFactory = createConfigFactory();
+    const config = configFactory.getConfigModel();
+    assert.deepStrictEqual(config.resource?.attributes, [
+      { name: 'my,key', value: 'value=with=equals', type: 'string' },
+      { name: 'unicode', value: 'café', type: 'string' },
+    ]);
+  });
+
+  it('discards all entries when attributes_list has invalid percent-encoding', function () {
+    const warnStub = Sinon.stub(diag, 'warn');
+    process.env.OTEL_CONFIG_FILE =
+      'test/fixtures/attributes-list-invalid-encoding.yaml';
+    const configFactory = createConfigFactory();
+    const config = configFactory.getConfigModel();
+    assert.strictEqual(config.resource?.attributes, undefined);
+    assert.ok(
+      warnStub.args.some(args =>
+        String(args[0]).includes('Failed to percent-decode')
+      )
+    );
+    warnStub.restore();
+  });
+
+  it('discards all entries when attributes_list has unencoded `=` in value', function () {
+    const warnStub = Sinon.stub(diag, 'warn');
+    process.env.OTEL_CONFIG_FILE =
+      'test/fixtures/attributes-list-unencoded-equals.yaml';
+    const configFactory = createConfigFactory();
+    const config = configFactory.getConfigModel();
+    assert.strictEqual(config.resource?.attributes, undefined);
+    assert.ok(
+      warnStub.args.some(args => String(args[0]).includes('Invalid format'))
+    );
+    warnStub.restore();
   });
 
   it('leaves attribute type undefined when omitted in YAML', function () {

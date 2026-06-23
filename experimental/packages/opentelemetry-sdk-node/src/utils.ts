@@ -34,9 +34,8 @@ import {
 import type {
   Sampler,
   SpanExporter,
-  SpanLimits,
   SpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
+} from '@opentelemetry/sdk-trace';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,
@@ -45,7 +44,7 @@ import {
   ParentBasedSampler,
   SimpleSpanProcessor,
   TraceIdRatioBasedSampler,
-} from '@opentelemetry/sdk-trace-base';
+} from '@opentelemetry/sdk-trace';
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
@@ -70,6 +69,16 @@ import type {
   NameStringValuePairConfigModel,
   HttpTlsConfigModel,
   GrpcTlsConfigModel,
+  AttributeLimitsConfigModel,
+  BatchLogRecordProcessorConfigModel,
+  LoggerProviderConfigModel,
+  LogRecordProcessorConfigModel,
+  OtlpGrpcExporterConfigModel,
+  OtlpHttpExporterConfigModel,
+  OtlpHttpMetricExporterConfigModel,
+  ExporterTemporalityPreferenceConfigModel,
+  SimpleLogRecordProcessorConfigModel,
+  LogRecordLimitsConfigModel,
 } from '@opentelemetry/configuration';
 import type {
   AggregationOption,
@@ -94,18 +103,21 @@ import {
 } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
 import type {
-  BufferConfig,
+  BatchLogRecordProcessorOptions,
   LogRecordExporter,
   LoggerProviderOptions,
   LogRecordProcessor,
+  LogRecordLimits,
 } from '@opentelemetry/sdk-logs';
 import type { MetricProducer } from '@opentelemetry/sdk-metrics';
 import {
   BatchLogRecordProcessor,
   ConsoleLogRecordExporter,
   SimpleLogRecordProcessor,
+  LoggerProvider,
 } from '@opentelemetry/sdk-logs';
 import * as fs from 'fs';
+import { createBatchSpanProcessorFromEnv } from './create-from-env';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';
@@ -253,7 +265,7 @@ export function getSpanProcessorsFromEnv(): SpanProcessor[] {
     if (exp instanceof ConsoleSpanExporter) {
       processors.push(new SimpleSpanProcessor(exp));
     } else {
-      processors.push(new BatchSpanProcessor(exp));
+      processors.push(createBatchSpanProcessorFromEnv(exp));
     }
   }
 
@@ -526,10 +538,6 @@ export function getOtlpMetricExporterFromEnv(): PushMetricExporter {
   return new OTLPProtoMetricExporter();
 }
 
-type OtlpHttpMetricExporterConfigModel = NonNullable<
-  PeriodicMetricReaderConfigModel['exporter']['otlp_http']
->;
-
 function getMetricExporterCompression(
   compression: string | null | undefined
 ): CompressionAlgorithm {
@@ -539,7 +547,7 @@ function getMetricExporterCompression(
 }
 
 function getMetricExporterTemporalityPreference(
-  temporalityPreference: OtlpHttpMetricExporterConfigModel['temporality_preference']
+  temporalityPreference: ExporterTemporalityPreferenceConfigModel | undefined
 ): AggregationTemporalityPreference | undefined {
   switch (temporalityPreference) {
     case 'delta':
@@ -554,7 +562,7 @@ function getMetricExporterTemporalityPreference(
 }
 
 function getMetricExporterDefaultHistogramAggregation(
-  defaultHistogramAggregation: OtlpHttpMetricExporterConfigModel['default_histogram_aggregation']
+  defaultHistogramAggregation: NonNullable<OtlpHttpMetricExporterConfigModel>['default_histogram_aggregation']
 ): AggregationSelector | undefined {
   if (defaultHistogramAggregation !== 'base2_exponential_bucket_histogram') {
     return undefined;
@@ -569,7 +577,7 @@ function getMetricExporterDefaultHistogramAggregation(
 }
 
 function getOtlpHttpMetricExporterConfig(
-  config: OtlpHttpMetricExporterConfigModel
+  config: NonNullable<OtlpHttpMetricExporterConfigModel>
 ) {
   return {
     compression: getMetricExporterCompression(config.compression),
@@ -684,7 +692,10 @@ export function getLoggerProviderConfigFromEnv(): LoggerProviderOptions {
 /**
  * Get configuration for BatchLogRecordProcessor from environment variables.
  */
-export function getBatchLogRecordProcessorConfigFromEnv(): BufferConfig {
+export function getBatchLogRecordProcessorConfigFromEnv(): Omit<
+  BatchLogRecordProcessorOptions,
+  'exporter'
+> {
   return {
     maxQueueSize: getNonNegativeNumberFromEnv('OTEL_BLRP_MAX_QUEUE_SIZE'),
     scheduledDelayMillis: getNonNegativeNumberFromEnv(
@@ -702,87 +713,134 @@ export function getBatchLogRecordProcessorConfigFromEnv(): BufferConfig {
 export function getBatchLogRecordProcessorFromEnv(
   exporter: LogRecordExporter
 ): BatchLogRecordProcessor {
-  return new BatchLogRecordProcessor(
+  return new BatchLogRecordProcessor({
     exporter,
-    getBatchLogRecordProcessorConfigFromEnv()
-  );
-}
-
-export function getLogRecordExporter(
-  exporter: LogRecordExporterConfigModel
-): LogRecordExporter | undefined {
-  if (exporter.otlp_http !== undefined) {
-    const cfg = exporter.otlp_http;
-    const commonOpts = {
-      compression:
-        cfg?.compression === 'gzip'
-          ? CompressionAlgorithm.GZIP
-          : CompressionAlgorithm.NONE,
-      url: cfg?.endpoint ?? undefined,
-      headers: getHeadersFromConfiguration(cfg?.headers),
-      timeoutMillis: validateExporterTimeout(cfg?.timeout),
-      httpAgentOptions: getHttpAgentOptionsFromTls(cfg?.tls),
-    };
-    const encoding = cfg?.encoding ?? 'protobuf';
-    if (encoding === 'json') {
-      return new OTLPHttpLogExporter(commonOpts);
-    }
-    if (encoding === 'protobuf') {
-      return new OTLPProtoLogExporter(commonOpts);
-    }
-    diag.warn(
-      `Unsupported OTLP logs encoding: ${encoding}. Using http/protobuf.`
-    );
-    return new OTLPProtoLogExporter(commonOpts);
-  } else if (exporter.otlp_grpc !== undefined) {
-    const cfg = exporter.otlp_grpc;
-    return new OTLPGrpcLogExporter({
-      compression:
-        cfg?.compression === 'gzip'
-          ? CompressionAlgorithm.GZIP
-          : CompressionAlgorithm.NONE,
-      url: cfg?.endpoint ?? undefined,
-      timeoutMillis: validateExporterTimeout(cfg?.timeout),
-      credentials: getGrpcCredentialsFromTls(cfg?.tls),
-      metadata: getGrpcMetadataFromHeaders(cfg?.headers),
-    });
-  } else if (exporter.console !== undefined) {
-    return new ConsoleLogRecordExporter();
-  }
-  diag.warn('Unsupported Exporter value. No Log Record Exporter registered');
-  return undefined;
-}
-
-export function getLogRecordProcessorsFromConfiguration(
-  config: ConfigurationModel
-): LogRecordProcessor[] | undefined {
-  const logRecordProcessors: LogRecordProcessor[] = [];
-  config.logger_provider?.processors?.forEach(processor => {
-    if (processor.batch) {
-      const exporter = getLogRecordExporter(processor.batch.exporter);
-      if (exporter) {
-        logRecordProcessors.push(
-          new BatchLogRecordProcessor(exporter, {
-            maxQueueSize: processor.batch.max_queue_size ?? undefined,
-            maxExportBatchSize:
-              processor.batch.max_export_batch_size ?? undefined,
-            scheduledDelayMillis: processor.batch.schedule_delay ?? undefined,
-            exportTimeoutMillis: processor.batch.export_timeout ?? undefined,
-          })
-        );
-      }
-    }
-    if (processor.simple) {
-      const exporter = getLogRecordExporter(processor.simple.exporter);
-      if (exporter) {
-        logRecordProcessors.push(new SimpleLogRecordProcessor(exporter));
-      }
-    }
+    ...getBatchLogRecordProcessorConfigFromEnv(),
   });
-  if (logRecordProcessors.length > 0) {
-    return logRecordProcessors;
+}
+
+function createLogRecordLimitsFromConfig(
+  limits?: LogRecordLimitsConfigModel,
+  attribute_limits?: AttributeLimitsConfigModel
+): LogRecordLimits {
+  return {
+    attributeValueLengthLimit:
+      limits?.attribute_value_length_limit ??
+      attribute_limits?.attribute_value_length_limit ??
+      undefined,
+    attributeCountLimit:
+      limits?.attribute_count_limit ??
+      attribute_limits?.attribute_count_limit ??
+      undefined,
+  };
+}
+
+export function createLoggerProviderFromConfig(
+  resource: Resource,
+  logger_provider: LoggerProviderConfigModel,
+  attribute_limits?: AttributeLimitsConfigModel
+): LoggerProvider {
+  const processors = logger_provider.processors.map(p =>
+    createLogRecordProcessorFromConfig(p)
+  );
+  const logRecordLimits = createLogRecordLimitsFromConfig(
+    logger_provider.limits,
+    attribute_limits
+  );
+  checkConfigUse('LoggerProvider', logger_provider, ['processors', 'limits']);
+
+  return new LoggerProvider({
+    resource,
+    processors,
+    logRecordLimits,
+    // TODO: loggerConfigurator
+    // TODO: meterProvider
+    // Note: forceFlushTimeoutMillis not configurable via decl conf.
+  });
+}
+
+export function createLogRecordExporterFromConfig(
+  exporter: LogRecordExporterConfigModel
+): LogRecordExporter {
+  const [name, properties] = mustSingleEntry(exporter, 'LogRecordExporter');
+
+  switch (name) {
+    case 'otlp_http': {
+      const props = properties as OtlpHttpExporterConfigModel;
+      const commonOpts = {
+        compression:
+          props?.compression === 'gzip'
+            ? CompressionAlgorithm.GZIP
+            : CompressionAlgorithm.NONE,
+        url: props?.endpoint ?? undefined,
+        headers: getHeadersFromConfiguration(props?.headers),
+        timeoutMillis: validateExporterTimeout(props?.timeout),
+        httpAgentOptions: getHttpAgentOptionsFromTls(props?.tls),
+      };
+      const encoding = props?.encoding ?? 'protobuf';
+      switch (encoding) {
+        case 'json':
+          return new OTLPHttpLogExporter(commonOpts);
+        case 'protobuf':
+          return new OTLPProtoLogExporter(commonOpts);
+        default:
+          throw new Error(
+            `unknown OtlpHttpExporter encoding in configuration: "${encoding}"`
+          );
+      }
+    }
+
+    case 'otlp_grpc': {
+      const props = properties as OtlpGrpcExporterConfigModel;
+      return new OTLPGrpcLogExporter({
+        compression:
+          props?.compression === 'gzip'
+            ? CompressionAlgorithm.GZIP
+            : CompressionAlgorithm.NONE,
+        url: props?.endpoint ?? undefined,
+        timeoutMillis: validateExporterTimeout(props?.timeout),
+        credentials: getGrpcCredentialsFromTls(props?.tls),
+        metadata: getGrpcMetadataFromHeaders(props?.headers),
+      });
+    }
+
+    case 'console':
+      return new ConsoleLogRecordExporter();
+
+    default:
+      throw new Error(
+        `unknown LogRecordExporter name in configuration: "${name}"`
+      );
   }
-  return undefined;
+}
+
+export function createLogRecordProcessorFromConfig(
+  processor: LogRecordProcessorConfigModel
+): LogRecordProcessor {
+  const [name, properties] = mustSingleEntry(processor, 'LogRecordProcessor');
+
+  switch (name) {
+    case 'batch': {
+      const props = properties as BatchLogRecordProcessorConfigModel;
+      const exporter = createLogRecordExporterFromConfig(props.exporter);
+      return new BatchLogRecordProcessor({
+        exporter,
+        maxQueueSize: props.max_queue_size ?? undefined,
+        maxExportBatchSize: props.max_export_batch_size ?? undefined,
+        scheduledDelayMillis: props.schedule_delay ?? undefined,
+        exportTimeoutMillis: props.export_timeout ?? undefined,
+      });
+    }
+
+    case 'simple': {
+      const props = properties as SimpleLogRecordProcessorConfigModel;
+      const exporter = createLogRecordExporterFromConfig(props.exporter);
+      return new SimpleLogRecordProcessor({ exporter });
+    }
+
+    default:
+      throw new Error(`unknown LogRecordProcessor name: "${name}"`);
+  }
 }
 
 export function getHeadersFromConfiguration(
@@ -934,7 +992,8 @@ export function getSpanProcessorsFromConfiguration(
       const exporter = getSpanExporter(processor.batch.exporter);
       if (exporter) {
         spanProcessors.push(
-          new BatchSpanProcessor(exporter, {
+          new BatchSpanProcessor({
+            exporter,
             maxQueueSize: processor.batch.max_queue_size ?? undefined,
             maxExportBatchSize:
               processor.batch.max_export_batch_size ?? undefined,
@@ -953,30 +1012,6 @@ export function getSpanProcessorsFromConfiguration(
   });
   if (spanProcessors.length > 0) {
     return spanProcessors;
-  }
-  return undefined;
-}
-
-export function getSpanLimitsFromConfiguration(
-  config: ConfigurationModel
-): SpanLimits | undefined {
-  if (config.tracer_provider?.limits) {
-    const limitsConfig = config.tracer_provider.limits;
-    const spanLimits: SpanLimits = {};
-    spanLimits.attributeCountLimit = limitsConfig.attribute_count_limit ?? 128;
-    spanLimits.eventCountLimit = limitsConfig.event_count_limit ?? 128;
-    spanLimits.linkCountLimit = limitsConfig.link_count_limit ?? 128;
-    spanLimits.attributePerLinkCountLimit =
-      limitsConfig.link_attribute_count_limit ?? 128;
-    spanLimits.attributePerEventCountLimit =
-      limitsConfig.event_attribute_count_limit ?? 128;
-
-    if (limitsConfig.attribute_value_length_limit != null) {
-      spanLimits.attributeValueLengthLimit =
-        limitsConfig.attribute_value_length_limit;
-    }
-
-    return spanLimits;
   }
   return undefined;
 }
@@ -1213,4 +1248,70 @@ export function buildSamplerFromConfig(
   }
   diag.error('Unknown sampler config, defaulting to ParentBased(AlwaysOn).');
   return new ParentBasedSampler({ root: new AlwaysOnSampler() });
+}
+
+/**
+ * Warn if some props from a declarative config object have not been handled.
+ *
+ * This is intended to be used by `create*FromConfig()` functions. It is a low
+ * tech mechanism to add awareness when a given valid config is not being
+ * completely handled. This could help when properties are added to the
+ * configuration schema. (A higher tech mechanism that wraps the parsed
+ * configuration during `create()` and watches for untouched properties
+ * might be nice.)
+ */
+function checkConfigUse(
+  name: string,
+  props: object | undefined,
+  handledProps: string[]
+) {
+  if (!props) return;
+  // Dev note: I'd use Set#difference, but that requires Node.js v22.
+  const unhandledProps = Object.keys(props).filter(
+    k => !handledProps.includes(k)
+  );
+
+  if (unhandledProps.length > 0) {
+    diag.warn(
+      `Config warning: some specified ${name} configuration properties were not handled by SDK setup: ${JSON.stringify(unhandledProps)}`
+    );
+  }
+}
+
+/**
+ * Return the single non-undefined entry in the given config object, or throw.
+ *
+ * It is common for Declarative Configuration to have config objects with
+ * a single entry, e.g.
+ *
+ *    "LogRecordProcessor": {
+ *      "type": "object",
+ *      "additionalProperties": {
+ *        "type": [
+ *          "object",
+ *          "null"
+ *        ]
+ *      },
+ *      "minProperties": 1,
+ *      "maxProperties": 1,
+ *
+ * The TypeScript types cannot express the minProperties/maxProperties from the
+ * JSON schema. We guard against that here.
+ */
+function mustSingleEntry(
+  configObj: Record<string, unknown>,
+  configTypeName: string
+): [string, unknown] {
+  const entries = Object.entries(configObj).filter(
+    ([_name, properties]) => properties !== undefined
+  );
+
+  if (entries.length !== 1) {
+    const entryNames = entries.map(e => e[0]);
+    throw Error(
+      `invalid ${configTypeName} in configuration: must have exactly one entry: entries=${JSON.stringify(entryNames)}`
+    );
+  }
+
+  return entries[0];
 }

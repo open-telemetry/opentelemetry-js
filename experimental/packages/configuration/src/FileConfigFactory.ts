@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { diag } from '@opentelemetry/api';
 import { getStringFromEnv } from '@opentelemetry/core';
 import * as fs from 'fs';
 import * as yaml from 'yaml';
@@ -31,8 +32,46 @@ export class FileConfigFactory implements ConfigFactory {
   }
 }
 
+// The schema version this SDK targets. Per the configuration versioning spec,
+// an implementation MUST reject a config file whose MAJOR version differs (a
+// breaking-change boundary), accepts any MINOR version within that major, and
+// SHOULD warn when the MINOR version is newer than it targets since unknown
+// settings may be ignored. See
+// https://github.com/open-telemetry/opentelemetry-configuration/blob/main/VERSIONING.md
+const SUPPORTED_FILE_FORMAT_MAJOR = 1;
+const SUPPORTED_FILE_FORMAT_MINOR = 1;
+
+function validateFileFormat(configFile: string, fileFormat: unknown): void {
+  if (typeof fileFormat !== 'string' || fileFormat.length === 0) {
+    throw new Error(
+      `${configFile}: Unsupported file_format: "${fileFormat}". Expected a "MAJOR.MINOR" version string.`
+    );
+  }
+
+  // Drop any pre-release / meta tag, e.g. "1.0-rc.2" -> "1.0".
+  const parts = fileFormat.split('-', 1)[0].split('.');
+  const major = Number(parts[0]);
+  const minor = parts.length > 1 ? Number(parts[1]) : 0;
+  if (!Number.isInteger(major) || !Number.isInteger(minor)) {
+    throw new Error(
+      `${configFile}: Unsupported file_format: "${fileFormat}". Expected "MAJOR.MINOR" version numbers.`
+    );
+  }
+
+  if (major !== SUPPORTED_FILE_FORMAT_MAJOR) {
+    throw new Error(
+      `${configFile}: Unsupported file_format: "${fileFormat}". This SDK supports schema version ${SUPPORTED_FILE_FORMAT_MAJOR}.x.`
+    );
+  }
+
+  if (minor > SUPPORTED_FILE_FORMAT_MINOR) {
+    diag.warn(
+      `${configFile}: Configuration file_format "${fileFormat}" has a newer minor version than this SDK supports (${SUPPORTED_FILE_FORMAT_MAJOR}.${SUPPORTED_FILE_FORMAT_MINOR}); some settings may be ignored.`
+    );
+  }
+}
+
 export function parseConfigFile(): ConfigurationModel {
-  const supportedFileVersionPattern = /^1\.0$/;
   const configFile = getStringFromEnv('OTEL_CONFIG_FILE') || '';
   const file = fs.readFileSync(configFile, 'utf8');
 
@@ -40,12 +79,7 @@ export function parseConfigFile(): ConfigurationModel {
   substituteEnvVars(doc);
   const processed = doc.toJS() as Record<string, unknown>;
 
-  const fileFormat = processed?.file_format;
-  if (!fileFormat || !supportedFileVersionPattern.test(String(fileFormat))) {
-    throw new Error(
-      `${configFile}: Unsupported file_format: "${fileFormat}". Must match ${supportedFileVersionPattern}.`
-    );
-  }
+  validateFileFormat(configFile, processed?.file_format);
 
   const valid = validateConfig(processed);
   if (!valid) {
@@ -115,11 +149,52 @@ function applyOtlpHttpEncodingDefaults(data: ConfigurationModel): void {
 /**
  * Merge resource.attributes_list (comma-separated key=value pairs) into
  * resource.attributes, with entries already in attributes taking precedence.
+ *
+ * Per the spec, `,` and `=` in keys and values MUST be percent-encoded, and
+ * other characters MAY be percent-encoded. On any parse or decode error, the
+ * entire attributes_list is discarded and a warning is emitted.
+ * See https://opentelemetry.io/docs/specs/otel/resource/sdk/#specifying-resource-information-via-an-environment-variable
  */
 function mergeAttributesList(data: ConfigurationModel): void {
   const resource = data.resource;
   const list = resource?.attributes_list;
   if (typeof list !== 'string' || !list.trim()) return;
+
+  const decoded: Array<{ key: string; value: string }> = [];
+  for (const pair of list.split(',')) {
+    if (pair.trim() === '') continue;
+
+    // Per spec, `=` must be percent-encoded in keys/values, so a valid entry
+    // splits into exactly two parts.
+    const parts = pair.split('=');
+    if (parts.length !== 2) {
+      diag.warn(
+        `Invalid format for resource.attributes_list entry "${pair}": expected key=value with '=' percent-encoded in keys/values. Discarding all entries.`
+      );
+      return;
+    }
+
+    const rawKey = parts[0].trim();
+    const rawValue = parts[1].trim();
+    if (rawKey === '') {
+      diag.warn(
+        `Empty attribute key in resource.attributes_list entry "${pair}". Discarding all entries.`
+      );
+      return;
+    }
+
+    try {
+      decoded.push({
+        key: decodeURIComponent(rawKey),
+        value: decodeURIComponent(rawValue),
+      });
+    } catch (e) {
+      diag.warn(
+        `Failed to percent-decode resource.attributes_list entry "${pair}", discarding all entries: ${e}`
+      );
+      return;
+    }
+  }
 
   if (resource!.attributes == null) {
     resource!.attributes = [];
@@ -129,14 +204,9 @@ function mergeAttributesList(data: ConfigurationModel): void {
     resource!.attributes.map((a: { name: string }) => a.name)
   );
 
-  for (const pair of list.split(',')) {
-    const eqIdx = pair.indexOf('=');
-    if (eqIdx > 0) {
-      const key = pair.slice(0, eqIdx).trim();
-      const value = pair.slice(eqIdx + 1).trim();
-      if (key && !existingKeys.has(key)) {
-        resource!.attributes.push({ name: key, value, type: 'string' });
-      }
+  for (const { key, value } of decoded) {
+    if (!existingKeys.has(key)) {
+      resource!.attributes.push({ name: key, value, type: 'string' });
     }
   }
 }

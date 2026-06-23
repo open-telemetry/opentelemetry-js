@@ -52,7 +52,9 @@ describe('OTLPLogExporter', () => {
       });
 
       const loggerProvider = new LoggerProvider({
-        processors: [new SimpleLogRecordProcessor(new OTLPLogExporter())],
+        processors: [
+          new SimpleLogRecordProcessor({ exporter: new OTLPLogExporter() }),
+        ],
       });
 
       loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });

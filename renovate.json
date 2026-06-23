@@ -22,12 +22,18 @@
     },
     {
       "groupName": "typedoc packages",
-      "matchUpdateTypes": ["minor", "major"],
-      "matchPackageNames": ["/^typedoc(-|$)/"]
+      "matchPackageNames": ["/^typedoc(-|$)/"],
+      "separateMajorMinor": false
     },
     {
       "matchUpdateTypes": ["minor"],
+      "matchManagers": ["js"],
       "dependencyDashboardApproval": true
+    },
+    {
+      "matchUpdateTypes": ["minor"],
+      "matchManagers": ["!js"],
+      "schedule": ["before 3am on Monday"]
     },
     {
       "matchUpdateTypes": ["major"],
@@ -55,5 +61,5 @@
   "labels": ["dependencies"],
   "ignorePaths": ["**/bundler-tests/**"],
   "postUpdateOptions": ["npmDedupe"],
-  "minimumReleaseAge": "1 week"
+  "minimumReleaseAge": "3 days"
 }

@@ -9,8 +9,8 @@ export type {
   LoggerConfig,
   LoggerConfigurator,
   LogRecordLimits,
-  BufferConfig,
-  BatchLogRecordProcessorBrowserConfig,
+  BatchLogRecordProcessorOptions,
+  BatchLogRecordProcessorBrowserOptions,
 } from './types';
 export { LoggerProvider } from './LoggerProvider';
 export type { SdkLogRecord } from './export/SdkLogRecord';

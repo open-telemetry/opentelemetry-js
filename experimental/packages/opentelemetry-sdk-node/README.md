@@ -174,11 +174,11 @@ An array of span processors to register to the tracer provider.
 
 ### traceExporter
 
-Configure a trace exporter. If an exporter is configured, it will be used with a [BatchSpanProcessor](../../../packages/opentelemetry-sdk-trace-base/src/platform/node/export/BatchSpanProcessor.ts). If an exporter OR span processor is not configured programmatically, this package will auto setup the default `otlp` exporter  with `http/protobuf` protocol with a `BatchSpanProcessor`.
+Configure a trace exporter. If an exporter is configured, it will be used with a [BatchSpanProcessor](../../../packages/sdk-trace/src/platform/node/export/BatchSpanProcessor.ts). If an exporter OR span processor is not configured programmatically, this package will auto setup the default `otlp` exporter  with `http/protobuf` protocol with a `BatchSpanProcessor`.
 
 ### spanLimits
 
-Configure tracing parameters. These are the same trace parameters used to [configure a tracer](../../../packages/opentelemetry-sdk-trace-base/src/types.ts#L71).
+Configure tracing parameters. These are the same trace parameters used to [configure a tracer](../../../packages/sdk-trace/src/types.ts#L20).
 
 ### serviceName
 
@@ -243,8 +243,9 @@ OTEL_NODE_EXPERIMENTAL_SDK_METRICS=true
 Currently a subset of the specified metrics are implemented. See the following
 linkes for details:
 
+- Metric reader metrics: [MetricReaderMetrics](../../../packages//sdk-metrics/src/export/MetricReaderMetrics.ts)
 - Logger metrics: [LoggerMetrics.ts](../sdk-logs/src/LoggerMetrics.ts)
-- Span metrics: [TracerMetrics.ts](../../../packages/opentelemetry-sdk-trace-base/src/TracerMetrics.ts)
+- Span metrics: [TracerMetrics.ts](../../../packages/sdk-trace/src/TracerMetrics.ts)
 
 ## Useful links
 

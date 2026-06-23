@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/configuration",
-  "version": "0.218.0",
+  "version": "0.219.0",
   "description": "OpenTelemetry Configuration",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -39,8 +39,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/core": "2.7.1",
-    "yaml": "^2.0.0"
+    "@opentelemetry/core": "2.8.0",
+    "yaml": "^2.8.3"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.9.0"
@@ -52,7 +52,7 @@
     "@types/sinon": "17.0.4",
     "ajv": "^8.0.0",
     "json-schema-to-typescript": "^15.0.0",
-    "mocha": "11.7.5",
+    "mocha": "11.7.6",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
     "ts-loader": "9.5.7",
