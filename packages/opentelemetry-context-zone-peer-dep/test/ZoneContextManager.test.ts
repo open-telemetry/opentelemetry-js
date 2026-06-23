@@ -453,4 +453,129 @@ describe('ZoneContextManager', () => {
       });
     });
   });
+
+  describe('.attach()/.detach()', () => {
+    it('should set the attached context as active and restore on detach', () => {
+      const ctx = ROOT_CONTEXT.setValue(key1, 1);
+      const token = contextManager.attach(ctx);
+      assert.strictEqual(
+        contextManager.active(),
+        ctx,
+        'attached context should be active'
+      );
+      contextManager.detach(token);
+      assert.strictEqual(
+        contextManager.active(),
+        ROOT_CONTEXT,
+        'previous context should be restored'
+      );
+    });
+
+    it('should prefer a context attached inside with() over the with() context', () => {
+      const withCtx = ROOT_CONTEXT.setValue(key1, 'with');
+      const attachedCtx = ROOT_CONTEXT.setValue(key1, 'attached');
+      contextManager.with(withCtx, () => {
+        const token = contextManager.attach(attachedCtx);
+        assert.strictEqual(
+          contextManager.active(),
+          attachedCtx,
+          'the more recently attached context wins'
+        );
+        contextManager.detach(token);
+        assert.strictEqual(
+          contextManager.active(),
+          withCtx,
+          'with() context should be restored after detach'
+        );
+      });
+    });
+
+    it('should prefer a with() context entered after attach()', () => {
+      const attachedCtx = ROOT_CONTEXT.setValue(key1, 'attached');
+      const withCtx = ROOT_CONTEXT.setValue(key1, 'with');
+      const token = contextManager.attach(attachedCtx);
+      contextManager.with(withCtx, () => {
+        assert.strictEqual(
+          contextManager.active(),
+          withCtx,
+          'the more recently entered with() context wins'
+        );
+      });
+      assert.strictEqual(
+        contextManager.active(),
+        attachedCtx,
+        'attached context is active again after with() returns'
+      );
+      contextManager.detach(token);
+      assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+    });
+
+    it('should support detaching in non-LIFO order', () => {
+      const ctx1 = ROOT_CONTEXT.setValue(key1, 1);
+      const ctx2 = ROOT_CONTEXT.setValue(key2, 2);
+      const token1 = contextManager.attach(ctx1);
+      const token2 = contextManager.attach(ctx2);
+      assert.strictEqual(contextManager.active(), ctx2);
+      // detach the first token first (non-LIFO)
+      contextManager.detach(token1);
+      assert.strictEqual(
+        contextManager.active(),
+        ctx2,
+        'the still-attached context remains active'
+      );
+      contextManager.detach(token2);
+      assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+    });
+
+    it('should ignore detaching an unknown or already-detached token', () => {
+      const ctx = ROOT_CONTEXT.setValue(key1, 1);
+      const token = contextManager.attach(ctx);
+      contextManager.detach(token);
+      assert.doesNotThrow(() => {
+        contextManager.detach(token);
+        contextManager.detach({} as any);
+      });
+      assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+    });
+
+    it('should clear attached contexts on disable()', () => {
+      const ctx = ROOT_CONTEXT.setValue(key1, 1);
+      contextManager.attach(ctx);
+      contextManager.disable();
+      assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+    });
+
+    it('should not leak an attached context from one zone into a concurrent sibling zone', () => {
+      // This test verifies per-zone isolation: Zone B calling attach() must not
+      // affect what Zone A sees as its active context.
+      // The previous global-array implementation failed this: attach() pushed to a
+      // manager-global stack whose seq number was higher than Zone A's zone seq, so
+      // active() in Zone A returned Zone B's attached context instead of ctxA.
+      const ctxA = ROOT_CONTEXT.setValue(key1, 'A');
+      const ctxB = ROOT_CONTEXT.setValue(key1, 'B');
+      const attachedInB = ROOT_CONTEXT.setValue(key1, 'attached-in-B');
+
+      // Capture Zone A's zone reference (the zone created by with())
+      let zoneA!: Zone;
+      contextManager.with(ctxA, () => {
+        zoneA = Zone.current;
+      });
+
+      // In Zone B, attach a context and then run code explicitly in Zone A.
+      // This simulates Zone A's async callback firing while Zone B's attach is live.
+      contextManager.with(ctxB, () => {
+        const token = contextManager.attach(attachedInB);
+
+        zoneA.run(() => {
+          assert.strictEqual(
+            contextManager.active(),
+            ctxA,
+            'Zone A should not see the context attached by Zone B'
+          );
+        });
+
+        contextManager.detach(token);
+      });
+    });
+  });
 });

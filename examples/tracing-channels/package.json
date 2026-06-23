@@ -1,0 +1,22 @@
+{
+  "name": "tracing-channels",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Example of bridging Node.js diagnostics_channel tracing channels into OpenTelemetry context via context.attach/detach",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node --import ./opentelemetry.ts ./index.ts"
+  },
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "0.219.0",
+    "@opentelemetry/sdk-node": "0.219.0",
+    "@opentelemetry/sdk-trace-base": "2.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "24"
+  }
+}

@@ -4,13 +4,18 @@
  */
 
 /// <reference types="zone.js" />
-import type { Context, ContextManager } from '@opentelemetry/api';
+import type { Context, ContextManager, Token } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
 import type { TargetWithEvents } from './types';
 import { isListenerObject } from './util';
 
 /* Key name to be used to save a context reference in Zone */
 const ZONE_CONTEXT_KEY = 'OT_ZONE_CONTEXT';
+
+/* Wrapper object whose identity serves as the opaque Token. */
+interface AttachedContext {
+  context: Context;
+}
 
 /**
  * ZoneContextManager
@@ -26,6 +31,14 @@ export class ZoneContextManager implements ContextManager {
    * whether the context manager is enabled or not
    */
   private _enabled = false;
+
+  /**
+   * Per-zone stacks of contexts attached imperatively via `attach()`.
+   * Using a WeakMap keyed by Zone isolates concurrent async Zones from each
+   * other, avoiding the cross-zone interference that a manager-global array
+   * would cause.
+   */
+  private _attachedContextsByZone = new WeakMap<Zone, AttachedContext[]>();
 
   /**
    * @param context A context (span) to be executed within target function
@@ -84,7 +97,7 @@ export class ZoneContextManager implements ContextManager {
     return Zone.current.fork({
       name: zoneName,
       properties: {
-        [ZONE_CONTEXT_KEY]: context,
+        [ZONE_CONTEXT_KEY]: context ?? ROOT_CONTEXT,
       },
       onCancelTask(
         parentZoneDelegate: ZoneDelegate,
@@ -153,13 +166,30 @@ export class ZoneContextManager implements ContextManager {
   }
 
   /**
-   * Returns the active context
+   * Returns the active context by walking up the zone hierarchy. For each zone,
+   * the per-zone attached-context stack is checked first (set via `attach()`),
+   * then the zone property set by `with()`. This ensures that a context
+   * attached inside a `with()` zone overrides the zone's own context, while a
+   * `with()` entered after an `attach()` overrides the attached context (because
+   * `with()` creates a child zone that is checked before its parent).
    */
   active(): Context {
     if (!this._enabled || !Zone.current) {
       return ROOT_CONTEXT;
     }
-    return Zone.current.get(ZONE_CONTEXT_KEY) || ROOT_CONTEXT;
+    let zone: Zone | null | undefined = Zone.current;
+    while (zone) {
+      const stack = this._attachedContextsByZone.get(zone);
+      if (stack?.length) {
+        return stack[stack.length - 1].context;
+      }
+      const zoneCtx = zone.get(ZONE_CONTEXT_KEY) as Context | undefined;
+      if (zoneCtx != null) {
+        return zoneCtx;
+      }
+      zone = zone.parent;
+    }
+    return ROOT_CONTEXT;
   }
 
   /**
@@ -182,7 +212,51 @@ export class ZoneContextManager implements ContextManager {
    */
   disable(): this {
     this._enabled = false;
+    this._attachedContextsByZone = new WeakMap();
     return this;
+  }
+
+  /**
+   * Imperatively sets `context` as active and returns a token for {@link detach}.
+   * Best-effort: the context is stored on the current Zone's stack (Zones are
+   * isolated, so sibling async Zones do not interfere), but unlike {@link with}
+   * it is not propagated across async boundaries by Zone.js. See the contract on
+   * {@link ContextManager.attach} (prefer `with()`/`bind()`; pair every `attach`
+   * with a LIFO `detach`). This manager tolerates out-of-order `detach`, but
+   * other managers do not, so portable code must not rely on it.
+   *
+   * @experimental This API is experimental and may change in minor releases without prior notice.
+   */
+  attach(context: Context): Token {
+    const attached: AttachedContext = { context };
+    if (Zone.current) {
+      let stack = this._attachedContextsByZone.get(Zone.current);
+      if (!stack) {
+        stack = [];
+        this._attachedContextsByZone.set(Zone.current, stack);
+      }
+      stack.push(attached);
+    }
+    return attached as unknown as Token;
+  }
+
+  /**
+   * Restores the active context to the value it had before the corresponding
+   * {@link attach} call. Tokens that were never attached (or were already
+   * detached) are ignored.
+   *
+   * @param token a token returned by a previous call to {@link attach}
+   * @experimental This API is experimental and may change in minor releases without prior notice.
+   */
+  detach(token: Token): void {
+    if (!Zone.current) return;
+    const attached = token as unknown as AttachedContext;
+    const stack = this._attachedContextsByZone.get(Zone.current);
+    if (!stack) return;
+    const index = stack.lastIndexOf(attached);
+    if (index !== -1) {
+      stack.splice(index, 1);
+    }
   }
 
   /**

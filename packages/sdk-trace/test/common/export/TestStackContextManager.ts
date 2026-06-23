@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ContextManager, Context } from '@opentelemetry/api';
+import type { ContextManager, Context, Token } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
 
 /**
@@ -43,5 +43,15 @@ export class TestStackContextManager implements ContextManager {
 
   disable(): this {
     return this;
+  }
+
+  attach(context: Context): Token {
+    const previousContext = this.active();
+    this._contextStack.push(context);
+    return previousContext as unknown as Token;
+  }
+
+  detach(_token: Token): void {
+    this._contextStack.pop();
   }
 }

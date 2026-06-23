@@ -33,6 +33,15 @@ export interface Context {
 }
 
 /**
+ * An opaque token returned by attach() that can be used to restore the previous Context.
+ * This is an opaque type to prevent misuse and ensure type safety.
+ *
+ * @since 1.10.0
+ * @experimental This API is experimental and may change in minor releases without prior notice.
+ */
+export type Token = { readonly __brand: 'Token' };
+
+/**
  * @since 1.0.0
  */
 export interface ContextManager {
@@ -71,4 +80,36 @@ export interface ContextManager {
    * Disable context management
    */
   disable(): this;
+
+  /**
+   * Imperatively sets `context` as active, returning a {@link Token} for {@link detach}.
+   *
+   * This is a delicate, low-level API - prefer {@link with}/{@link bind}, which
+   * restore context automatically. `attach`/`detach` exist mainly to bridge
+   * callback boundaries that `with` cannot wrap (e.g. Node.js
+   * `diagnostics_channel` tracing-channel subscribers), and the caller is
+   * responsible for the bookkeeping that `with` would otherwise handle:
+   * - Calls must be LIFO-nested: pair every `attach` with a `detach` in reverse
+   *   order. Unpaired or out-of-order calls leak or mis-restore context.
+   * - Support is optional and best-effort, varying by ContextManager (some
+   *   propagate across async boundaries, some are synchronous-only, some no-op).
+   *   When omitted, {@link ContextAPI.attach} logs a warning and no-ops.
+   *
+   * @param context The Context to attach
+   * @returns A Token that can be used to restore the previous Context
+   * @since 1.10.0
+   * @experimental This API is experimental and may change in minor releases without prior notice.
+   */
+  attach?(context: Context): Token;
+
+  /**
+   * Restores the Context to the value it had before the corresponding
+   * {@link attach} call. Optional and best-effort; implement if and only if
+   * {@link attach} is implemented, and see {@link attach} for the usage contract.
+   *
+   * @param token A Token returned by a previous call to attach()
+   * @since 1.10.0
+   * @experimental This API is experimental and may change in minor releases without prior notice.
+   */
+  detach?(token: Token): void;
 }

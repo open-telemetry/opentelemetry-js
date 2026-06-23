@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ContextManager, Context } from '@opentelemetry/api';
+import type { ContextManager, Context, Token } from '@opentelemetry/api';
 import { EventEmitter } from 'events';
 
 type Func<T> = (...args: unknown[]) => T;
@@ -40,6 +40,12 @@ export abstract class AbstractAsyncHooksContextManager
   abstract enable(): this;
 
   abstract disable(): this;
+
+  /** @experimental This API is experimental and may change in minor releases without prior notice. */
+  abstract attach(context: Context): Token;
+
+  /** @experimental This API is experimental and may change in minor releases without prior notice. */
+  abstract detach(token: Token): void;
 
   /**
    * Binds a the certain context or the active one to the target function and then returns the target
