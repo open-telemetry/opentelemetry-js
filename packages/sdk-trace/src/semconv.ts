@@ -10,68 +10,6 @@
  */
 
 /**
- * Determines whether the span has a parent span, and if so, [whether it is a remote parent](https://opentelemetry.io/docs/specs/otel/trace/api/#isremote)
- *
- * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const ATTR_OTEL_SPAN_PARENT_ORIGIN = 'otel.span.parent.origin' as const;
-
-/**
- * The result value of the sampler for this span
- *
- * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const ATTR_OTEL_SPAN_SAMPLING_RESULT =
-  'otel.span.sampling_result' as const;
-
-/**
- * The number of created spans with `recording=true` for which the end operation has not been called yet.
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_OTEL_SDK_SPAN_LIVE = 'otel.sdk.span.live' as const;
-
-/**
- * The number of created spans.
- *
- * @note Implementations **MUST** record this metric for all spans, even for non-recording ones.
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_OTEL_SDK_SPAN_STARTED = 'otel.sdk.span.started' as const;
-
-/**
- * The number of spans for which the processing has finished, either successful or failed.
- *
- * @note For successful processing, `error.type` **MUST NOT** be set. For failed processing, `error.type` **MUST** contain the failure cause.
- * For the SDK Simple and Batching Span Processor a span is considered to be processed already when it has been submitted to the exporter, not when the corresponding export call has finished.
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_OTEL_SDK_PROCESSOR_SPAN_PROCESSED =
-  'otel.sdk.processor.span.processed' as const;
-
-/**
- * The maximum number of spans the queue of a given instance of an SDK span processor can hold.
- *
- * @note Only applies to span processors which use a queue, e.g. the SDK Batching Span Processor.
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_OTEL_SDK_PROCESSOR_SPAN_QUEUE_CAPACITY =
-  'otel.sdk.processor.span.queue.capacity' as const;
-
-/**
- * The number of spans in the queue of a given instance of an SDK span processor.
- *
- * @note Only applies to span processors which use a queue, e.g. the SDK Batching Span Processor.
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_OTEL_SDK_PROCESSOR_SPAN_QUEUE_SIZE =
-  'otel.sdk.processor.span.queue.size' as const;
-
-/**
  * A name uniquely identifying the instance of the OpenTelemetry component within its containing SDK instance.
  *
  * @example otlp_grpc_span_exporter/0
@@ -107,6 +45,68 @@ export const ATTR_OTEL_COMPONENT_NAME = 'otel.component.name' as const;
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const ATTR_OTEL_COMPONENT_TYPE = 'otel.component.type' as const;
+
+/**
+ * Determines whether the span has a parent span, and if so, [whether it is a remote parent](https://opentelemetry.io/docs/specs/otel/trace/api/#isremote)
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_OTEL_SPAN_PARENT_ORIGIN = 'otel.span.parent.origin' as const;
+
+/**
+ * The result value of the sampler for this span
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_OTEL_SPAN_SAMPLING_RESULT =
+  'otel.span.sampling_result' as const;
+
+/**
+ * The number of spans for which the processing has finished, either successful or failed.
+ *
+ * @note For successful processing, `error.type` **MUST NOT** be set. For failed processing, `error.type` **MUST** contain the failure cause.
+ * For the SDK Simple and Batching Span Processor a span is considered to be processed already when it has been submitted to the exporter, not when the corresponding export call has finished.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_PROCESSOR_SPAN_PROCESSED =
+  'otel.sdk.processor.span.processed' as const;
+
+/**
+ * The maximum number of spans the queue of a given instance of an SDK span processor can hold.
+ *
+ * @note Only applies to span processors which use a queue, e.g. the SDK Batching Span Processor.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_PROCESSOR_SPAN_QUEUE_CAPACITY =
+  'otel.sdk.processor.span.queue.capacity' as const;
+
+/**
+ * The number of spans in the queue of a given instance of an SDK span processor.
+ *
+ * @note Only applies to span processors which use a queue, e.g. the SDK Batching Span Processor.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_PROCESSOR_SPAN_QUEUE_SIZE =
+  'otel.sdk.processor.span.queue.size' as const;
+
+/**
+ * The number of created spans with `recording=true` for which the end operation has not been called yet.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_SPAN_LIVE = 'otel.sdk.span.live' as const;
+
+/**
+ * The number of created spans.
+ *
+ * @note Implementations **MUST** record this metric for all spans, even for non-recording ones.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_OTEL_SDK_SPAN_STARTED = 'otel.sdk.span.started' as const;
 
 /**
  * Enum value "batching_span_processor" for attribute {@link ATTR_OTEL_COMPONENT_TYPE}.
