@@ -16,6 +16,7 @@ import {
   getHeadersFromConfiguration,
   getMeterViewsFromConfiguration,
   getHttpAgentOptionsFromTls,
+  getIdGeneratorFromConfiguration,
 } from '../src/utils';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -783,6 +784,53 @@ describe('getMeterViewsFromConfiguration', function () {
     assert.ok(result);
     assert.strictEqual(result.length, 1);
     assert.strictEqual(result[0].attributesProcessors, undefined);
+  });
+});
+
+describe('getIdGeneratorFromConfiguration', function () {
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  it('returns undefined when no tracer_provider is set', function () {
+    assert.equal(
+      getIdGeneratorFromConfiguration({} as ConfigurationModel),
+      undefined
+    );
+  });
+
+  it('returns undefined when no id_generator is set', function () {
+    const config = {
+      tracer_provider: { processors: [] },
+    } as ConfigurationModel;
+    assert.equal(getIdGeneratorFromConfiguration(config), undefined);
+  });
+
+  it('returns a RandomIdGenerator when random is set', function () {
+    const config = {
+      tracer_provider: { processors: [], id_generator: { random: {} } },
+    } as ConfigurationModel;
+    const idGenerator = getIdGeneratorFromConfiguration(config);
+    assert.ok(idGenerator);
+    assert.strictEqual(idGenerator.constructor.name, 'RandomIdGenerator');
+  });
+
+  it('warns and returns undefined for unsupported id_generator type', function () {
+    const warnStub = sinon.stub(diag, 'warn');
+    const config = {
+      tracer_provider: {
+        processors: [],
+        id_generator: { custom_generator: {} },
+      },
+    } as ConfigurationModel;
+    assert.equal(getIdGeneratorFromConfiguration(config), undefined);
+    assert.ok(
+      warnStub.args.some(args =>
+        String(args[0]).includes(
+          'Unsupported id_generator type(s): custom_generator'
+        )
+      )
+    );
   });
 });
 
