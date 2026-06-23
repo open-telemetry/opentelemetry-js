@@ -24,12 +24,12 @@ import {
   getPropagatorFromConfiguration,
   getResourceDetectorsFromConfiguration,
   getResourceFromConfiguration,
-  getSpanLimitsFromConfiguration,
   getSpanProcessorsFromConfiguration,
 } from './utils';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import type { SDKComponents, SDKOptions } from './types';
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
+import { TracerProvider } from '@opentelemetry/sdk-trace';
 import { logs } from '@opentelemetry/api-logs';
 import type {
   Resource,
@@ -43,8 +43,8 @@ import {
 } from '@opentelemetry/resources';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
-import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
 import { diagLogLevelFromSeverityNumberConfig } from './diag';
+import { createSpanLimitsFromConfig } from './create-from-config';
 
 // Exported for testing.
 export const NOOP_SDK = {
@@ -167,20 +167,16 @@ function create(
 
     const spanProcessors = getSpanProcessorsFromConfiguration(config);
     if (spanProcessors) {
-      const spanLimits = getSpanLimitsFromConfiguration(config);
       const idGenerator = getIdGeneratorFromConfiguration(config);
       // TODO (6506): support sampler configuration from config
-      const tracerProvider = new BasicTracerProvider({
+      const tracerProvider = new TracerProvider({
         resource,
         spanProcessors,
-        spanLimits,
         idGenerator,
-        generalLimits: {
-          attributeValueLengthLimit:
-            config.attribute_limits?.attribute_value_length_limit ?? undefined,
-          attributeCountLimit:
-            config.attribute_limits?.attribute_count_limit ?? undefined,
-        },
+        spanLimits: createSpanLimitsFromConfig(
+          config.tracer_provider?.limits,
+          config.attribute_limits
+        ),
         // TODO (6624): support for `meterProvider: components.meterProvider`
       });
       components.tracerProvider = tracerProvider;
