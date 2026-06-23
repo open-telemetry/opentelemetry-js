@@ -8,6 +8,7 @@ import type { Resource } from '@opentelemetry/resources';
 import type { IdGenerator } from './IdGenerator';
 import type { Sampler } from './Sampler';
 import type { SpanProcessor } from './SpanProcessor';
+import type { SpanExporter } from './export/SpanExporter';
 
 export interface TracerProviderOptions {
   /**
@@ -76,8 +77,9 @@ export interface SpanLimits {
   attributePerLinkCountLimit?: number;
 }
 
-/** Interface configuration for a buffer. */
-export interface BufferConfig {
+export interface BatchSpanProcessorOptions {
+  exporter: SpanExporter;
+
   /** The maximum batch size of every export. It must be smaller or equal to
    * maxQueueSize. The default value is 512. */
   maxExportBatchSize?: number;
@@ -96,7 +98,8 @@ export interface BufferConfig {
 }
 
 /** Interface configuration for BatchSpanProcessor on browser */
-export interface BatchSpanProcessorBrowserConfig extends BufferConfig {
+export interface BatchSpanProcessorBrowserOptions
+  extends BatchSpanProcessorOptions {
   /** Disable flush when a user navigates to a new page, closes the tab or the browser, or,
    * on mobile, switches to a different app. Auto flush is enabled by default. */
   disableAutoFlushOnDocumentHide?: boolean;
