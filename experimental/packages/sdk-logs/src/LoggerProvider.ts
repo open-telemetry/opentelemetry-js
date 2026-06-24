@@ -121,6 +121,7 @@ export class LoggerProvider implements ILoggerProvider {
   }
 
   private _shutdown(): Promise<void> {
+    this._sharedState.hasShutdown = true;
     return this._sharedState.activeProcessor.shutdown();
   }
 }

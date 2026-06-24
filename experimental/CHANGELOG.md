@@ -22,6 +22,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(sdk-logs): stop `Logger.emit()` doing work (record construction, metrics, processor `onEmit`) after the `LoggerProvider` has shut down [#6826](https://github.com/open-telemetry/opentelemetry-js/pull/6826) @anneheartrecord
 * fix(sdk-node): pass all config properties (endpoint, headers, timeout, TLS, compression, temporality preference, default histogram aggregation) to OTLP metric exporters in declarative config [#6814](https://github.com/open-telemetry/opentelemetry-js/pull/6814) @MikeGoldsmith
 * fix(sdk-logs): default BatchLogRecordProcessor `scheduleDelayMillis` is 1000 [#6796](https://github.com/open-telemetry/opentelemetry-js/pull/6796) @trentm
 * fix(configuration): percent-decode keys and values in `resource.attributes_list` per spec [#6787](https://github.com/open-telemetry/opentelemetry-js/pull/6787) @MikeGoldsmith
