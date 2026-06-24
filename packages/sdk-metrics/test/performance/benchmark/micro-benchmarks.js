@@ -3,4 +3,4 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-require('../benchmarks/otel-sdk-metrics-paths');
+require('./otel-sdk-metrics-paths');
