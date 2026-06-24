@@ -31,4 +31,12 @@ export class NoopContextManager implements types.ContextManager {
   disable(): this {
     return this;
   }
+
+  /** @experimental This API is experimental and may change in minor releases without prior notice. */
+  attach(_context: types.Context): types.Token {
+    return ROOT_CONTEXT as unknown as types.Token;
+  }
+
+  /** @experimental This API is experimental and may change in minor releases without prior notice. */
+  detach(_token: types.Token): void {}
 }

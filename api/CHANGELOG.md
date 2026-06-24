@@ -9,6 +9,9 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: Features
 
+* feat(api): add imperative `context.attach`/`context.detach` for setting context across callback boundaries that `with()` cannot wrap. [#6845](https://github.com/open-telemetry/opentelemetry-js/pull/6845) @pichlermarc
+  * `attach`/`detach` are optional methods on the `ContextManager` interface; when the active context manager does not implement them, `context.attach`/`context.detach` log a warning and act as a no-op.
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
