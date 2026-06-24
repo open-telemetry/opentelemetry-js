@@ -53,7 +53,7 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>>
     value: number,
     attributes: Attributes,
     context: Context,
-    recordTime: HrTime
+    recordTime: number
   ) {
     attributes = this._attributesProcessor.process(attributes, context);
     this._deltaMetricStorage.record(value, attributes, context, recordTime);

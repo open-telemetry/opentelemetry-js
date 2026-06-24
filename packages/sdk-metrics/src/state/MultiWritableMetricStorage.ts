@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Context, HrTime, Attributes } from '@opentelemetry/api';
+import type { Context, Attributes } from '@opentelemetry/api';
 import type { WritableMetricStorage } from './WritableMetricStorage';
 
 /**
@@ -19,7 +19,7 @@ export class MultiMetricStorage implements WritableMetricStorage {
     value: number,
     attributes: Attributes,
     context: Context,
-    recordTime: HrTime
+    recordTime: number
   ) {
     const storages = this._backingStorages;
     for (let i = 0; i < storages.length; i++) {

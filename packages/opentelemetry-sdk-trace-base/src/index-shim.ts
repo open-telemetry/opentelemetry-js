@@ -12,12 +12,12 @@ export type {
   SDKRegistrationConfig,
 } from './types-shim';
 export { BatchSpanProcessor } from './BatchSpanProcessor-shim';
+export { SimpleSpanProcessor } from './SimpleSpanProcessor-shim';
 
 export {
   ConsoleSpanExporter,
   RandomIdGenerator,
   InMemorySpanExporter,
-  SimpleSpanProcessor,
   NoopSpanProcessor,
   AlwaysOffSampler,
   AlwaysOnSampler,

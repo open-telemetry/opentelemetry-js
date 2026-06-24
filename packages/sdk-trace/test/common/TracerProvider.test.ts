@@ -66,8 +66,8 @@ describe('TracerProvider', () => {
 
     describe('when user sets span processors', () => {
       it('should use the span processors defined in the config', () => {
-        const traceExporter = new ConsoleSpanExporter();
-        const spanProcessor = new SimpleSpanProcessor(traceExporter);
+        const exporter = new ConsoleSpanExporter();
+        const spanProcessor = new SimpleSpanProcessor({ exporter });
         const tracer = new TracerProvider({
           spanProcessors: [spanProcessor],
         });

@@ -4,7 +4,7 @@
  */
 
 import type { Context } from '@opentelemetry/api';
-import { context, diag, TraceFlags } from '@opentelemetry/api';
+import { context, createNoopMeter, diag, TraceFlags } from '@opentelemetry/api';
 import {
   BindOnceFuture,
   ExportResultCode,
@@ -16,6 +16,8 @@ import type { SpanProcessor } from '../SpanProcessor';
 import type { BatchSpanProcessorOptions } from '../types';
 import type { ReadableSpan } from './ReadableSpan';
 import type { SpanExporter } from './SpanExporter';
+import { SpanProcessorMetrics } from './SpanProcessorMetrics';
+import { OTEL_COMPONENT_TYPE_VALUE_BATCHING_SPAN_PROCESSOR } from '../semconv';
 
 /**
  * Implementation of the {@link SpanProcessor} that batches spans exported by
@@ -30,6 +32,7 @@ export abstract class BatchSpanProcessorBase<
   private readonly _scheduledDelayMillis: number;
   private readonly _exportTimeoutMillis: number;
   private readonly _exporter: SpanExporter;
+  private readonly _metrics: SpanProcessorMetrics;
 
   private _isExporting = false;
   private _finishedSpans: ReadableSpan[] = [];
@@ -52,6 +55,18 @@ export abstract class BatchSpanProcessorBase<
       );
       this._maxExportBatchSize = this._maxQueueSize;
     }
+
+    const meter = options.selfObsMeterProvider
+      ? options.selfObsMeterProvider.getMeter('@opentelemetry/sdk-trace')
+      : createNoopMeter();
+    this._metrics = new SpanProcessorMetrics(
+      OTEL_COMPONENT_TYPE_VALUE_BATCHING_SPAN_PROCESSOR,
+      meter,
+      {
+        capacity: this._maxQueueSize,
+        getQueueSize: () => this._finishedSpans.length,
+      }
+    );
   }
 
   forceFlush(): Promise<void> {
@@ -89,6 +104,7 @@ export abstract class BatchSpanProcessorBase<
         return this._flushAll();
       })
       .then(() => {
+        this._metrics.shutdown();
         return this._exporter.shutdown();
       });
   }
@@ -102,6 +118,7 @@ export abstract class BatchSpanProcessorBase<
         diag.debug('maxQueueSize reached, dropping spans');
       }
       this._droppedSpansCount++;
+      this._metrics.dropSpans(1);
 
       return;
     }
@@ -167,6 +184,7 @@ export abstract class BatchSpanProcessorBase<
         const doExport = () =>
           this._exporter.export(spans, result => {
             clearTimeout(timer);
+            this._metrics.finishSpans(spans.length, result.error);
             if (result.code === ExportResultCode.SUCCESS) {
               resolve();
             } else {
