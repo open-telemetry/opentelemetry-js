@@ -3,6 +3,10 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
+> [!IMPORTANT]
+> As of June 2026, OpenCensus compatibility requirements in the OpenTelemetry specification [were deprecated](https://opentelemetry.io/blog/2026/deprecating-opencensus-compatibility/).
+> This package (`@opentelemetry/shim-opencensus`) will be removed in the upcoming [SDK 3.0 milestone](https://github.com/open-telemetry/opentelemetry-js/milestone/20), planned for approximately September 2026.
+
 OpenCensus shim allows existing OpenCensus instrumentation to report to OpenTelemetry. This
 allows you to incrementally migrate your existing OpenCensus instrumentation to OpenTelemetry.
 More details are available in the [OpenCensus Compatibility Specification](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/compatibility/opencensus.md).
@@ -63,7 +67,7 @@ After:
 ```js
 const { trace } = require('@opentelemetry/api');
 const { ShimTracer } = require('@opentelemetry/shim-opencensus');
-const tracer = new ShimTracer(trace.getTracer('my-module'));  
+const tracer = new ShimTracer(trace.getTracer('my-module'));
 
 // ...
 
