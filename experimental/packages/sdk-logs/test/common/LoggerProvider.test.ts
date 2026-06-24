@@ -543,9 +543,9 @@ describe('LoggerProvider', () => {
       });
 
       const logRecordExporter = new InMemoryLogRecordExporter();
-      const logRecordProcessor = new SimpleLogRecordProcessor(
-        logRecordExporter
-      );
+      const logRecordProcessor = new SimpleLogRecordProcessor({
+        exporter: logRecordExporter,
+      });
       const provider = new LoggerProvider({
         processors: [logRecordProcessor],
         meterProvider,

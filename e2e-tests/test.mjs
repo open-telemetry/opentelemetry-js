@@ -43,7 +43,9 @@ const metricReader = new PeriodicExportingMetricReader({
 const logExporter = new OTLPLogExporter({
   url: `${collectorUrl}/logs`,
 });
-const logRecordProcessors = [new SimpleLogRecordProcessor(logExporter)];
+const logRecordProcessors = [
+  new SimpleLogRecordProcessor({ exporter: logExporter }),
+];
 
 // Set up OpenTelemetry SDK
 const sdk = new NodeSDK({

@@ -25,7 +25,7 @@ function setupLoggerProvider(
   const logExporter = new InMemoryLogRecordExporter();
   const logProcessor = isNoop
     ? new NoopLogRecordProcessor()
-    : new SimpleLogRecordProcessor(logExporter);
+    : new SimpleLogRecordProcessor({ exporter: logExporter });
   const loggerProvider = new LoggerProvider({
     processors: [logProcessor],
     loggerConfigurator: patterns && createLoggerConfigurator(patterns),

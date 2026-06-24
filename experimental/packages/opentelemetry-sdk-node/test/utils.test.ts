@@ -10,13 +10,14 @@ import {
   getLoggerProviderConfigFromEnv,
   getBatchLogRecordProcessorConfigFromEnv,
   getPeriodicMetricReaderFromConfiguration,
+  getMetricExporter,
   getInstrumentType,
   getAggregationType,
   getResourceDetectorsFromConfiguration,
   getHeadersFromConfiguration,
   getMeterViewsFromConfiguration,
-  getSpanLimitsFromConfiguration,
   getHttpAgentOptionsFromTls,
+  getIdGeneratorFromConfiguration,
 } from '../src/utils';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -25,7 +26,11 @@ import type {
   InstrumentTypeConfigModel,
   ConfigurationModel,
   HttpTlsConfigModel,
+  PushMetricExporterConfigModel,
 } from '@opentelemetry/configuration';
+import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
+import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
+import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
 import {
   envDetector,
   hostDetector,
@@ -34,8 +39,12 @@ import {
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 import type { LoggerProviderOptions } from '@opentelemetry/sdk-logs';
-import { AggregationType, InstrumentType } from '@opentelemetry/sdk-metrics';
-import type { SpanLimits } from '@opentelemetry/sdk-trace-node';
+import {
+  AggregationTemporality,
+  AggregationType,
+  ConsoleMetricExporter,
+  InstrumentType,
+} from '@opentelemetry/sdk-metrics';
 
 describe('getPropagatorFromEnv', function () {
   afterEach(() => {
@@ -518,6 +527,127 @@ describe('getBatchLogRecordProcessorConfigFromEnv', function () {
   });
 });
 
+describe('getMetricExporter', function () {
+  afterEach(function () {
+    sinon.restore();
+  });
+
+  it('creates an OTLP http/protobuf exporter by default', function () {
+    const exporter = getMetricExporter({ otlp_http: {} });
+    assert.ok(exporter instanceof OTLPProtoMetricExporter);
+  });
+
+  it('creates an OTLP http/json exporter when encoding is json', function () {
+    const exporter = getMetricExporter({
+      otlp_http: { encoding: 'json' },
+    });
+    assert.ok(exporter instanceof OTLPHttpMetricExporter);
+  });
+
+  it('creates an OTLP gRPC exporter', function () {
+    const exporter = getMetricExporter({ otlp_grpc: {} });
+    assert.ok(exporter instanceof OTLPGrpcMetricExporter);
+  });
+
+  it('creates a console exporter', function () {
+    const exporter = getMetricExporter({ console: {} });
+    assert.ok(exporter instanceof ConsoleMetricExporter);
+  });
+
+  it('warns and returns undefined for an unsupported exporter', function () {
+    const warnStub = sinon.stub(diag, 'warn');
+    const exporter = getMetricExporter(
+      {} as unknown as PushMetricExporterConfigModel
+    );
+    assert.strictEqual(exporter, undefined);
+    sinon.assert.calledWithExactly(warnStub, 'Unsupported Metric Exporter.');
+  });
+
+  it('warns and returns undefined for an unsupported encoding', function () {
+    const warnStub = sinon.stub(diag, 'warn');
+    const exporter = getMetricExporter({
+      otlp_http: { encoding: 'invalid' },
+    } as unknown as PushMetricExporterConfigModel);
+    assert.strictEqual(exporter, undefined);
+    sinon.assert.calledWithExactly(
+      warnStub,
+      'Unsupported OTLP metrics encoding: invalid.'
+    );
+  });
+
+  it('maps temporality_preference onto the OTLP http exporter', function () {
+    const exporter = getMetricExporter({
+      otlp_http: { temporality_preference: 'delta' },
+    }) as OTLPProtoMetricExporter;
+    // delta uses DELTA temporality for counters
+    assert.strictEqual(
+      exporter.selectAggregationTemporality(InstrumentType.COUNTER),
+      AggregationTemporality.DELTA
+    );
+    // ...but cumulative for up-down counters
+    assert.strictEqual(
+      exporter.selectAggregationTemporality(InstrumentType.UP_DOWN_COUNTER),
+      AggregationTemporality.CUMULATIVE
+    );
+  });
+
+  it('maps the cumulative temporality_preference', function () {
+    const exporter = getMetricExporter({
+      otlp_http: { temporality_preference: 'cumulative' },
+    }) as OTLPProtoMetricExporter;
+    assert.strictEqual(
+      exporter.selectAggregationTemporality(InstrumentType.COUNTER),
+      AggregationTemporality.CUMULATIVE
+    );
+    assert.strictEqual(
+      exporter.selectAggregationTemporality(InstrumentType.HISTOGRAM),
+      AggregationTemporality.CUMULATIVE
+    );
+  });
+
+  it('maps temporality_preference onto the OTLP gRPC exporter', function () {
+    const exporter = getMetricExporter({
+      otlp_grpc: { temporality_preference: 'low_memory' },
+    }) as OTLPGrpcMetricExporter;
+    // low_memory uses DELTA for counters and histograms
+    assert.strictEqual(
+      exporter.selectAggregationTemporality(InstrumentType.COUNTER),
+      AggregationTemporality.DELTA
+    );
+    assert.strictEqual(
+      exporter.selectAggregationTemporality(InstrumentType.OBSERVABLE_GAUGE),
+      AggregationTemporality.CUMULATIVE
+    );
+  });
+
+  it('maps default_histogram_aggregation to exponential for histograms only', function () {
+    const exporter = getMetricExporter({
+      otlp_http: {
+        default_histogram_aggregation: 'base2_exponential_bucket_histogram',
+      },
+    }) as OTLPProtoMetricExporter;
+    assert.deepStrictEqual(
+      exporter.selectAggregation(InstrumentType.HISTOGRAM),
+      { type: AggregationType.EXPONENTIAL_HISTOGRAM }
+    );
+    assert.deepStrictEqual(exporter.selectAggregation(InstrumentType.COUNTER), {
+      type: AggregationType.DEFAULT,
+    });
+  });
+
+  it('maps default_histogram_aggregation explicit_bucket_histogram', function () {
+    const exporter = getMetricExporter({
+      otlp_grpc: {
+        default_histogram_aggregation: 'explicit_bucket_histogram',
+      },
+    }) as OTLPGrpcMetricExporter;
+    assert.deepStrictEqual(
+      exporter.selectAggregation(InstrumentType.HISTOGRAM),
+      { type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM }
+    );
+  });
+});
+
 describe('getResourceDetectorsFromConfiguration', function () {
   it('returns empty array when detection/development is not set', function () {
     const config: ConfigurationModel = {};
@@ -788,39 +918,50 @@ describe('getMeterViewsFromConfiguration', function () {
   });
 });
 
-describe('getSpanLimitsFromConfiguration', function () {
-  it('return undefined with no config for tracer limits', async () => {
+describe('getIdGeneratorFromConfiguration', function () {
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  it('returns undefined when no tracer_provider is set', function () {
     assert.equal(
-      getSpanLimitsFromConfiguration({} as ConfigurationModel),
+      getIdGeneratorFromConfiguration({} as ConfigurationModel),
       undefined
     );
   });
 
-  it('return span limits', async () => {
-    const config: ConfigurationModel = {
+  it('returns undefined when no id_generator is set', function () {
+    const config = {
+      tracer_provider: { processors: [] },
+    } as ConfigurationModel;
+    assert.equal(getIdGeneratorFromConfiguration(config), undefined);
+  });
+
+  it('returns a RandomIdGenerator when random is set', function () {
+    const config = {
+      tracer_provider: { processors: [], id_generator: { random: {} } },
+    } as ConfigurationModel;
+    const idGenerator = getIdGeneratorFromConfiguration(config);
+    assert.ok(idGenerator);
+    assert.strictEqual(idGenerator.constructor.name, 'RandomIdGenerator');
+  });
+
+  it('warns and returns undefined for unsupported id_generator type', function () {
+    const warnStub = sinon.stub(diag, 'warn');
+    const config = {
       tracer_provider: {
         processors: [],
-        limits: {
-          attribute_count_limit: 10,
-          event_count_limit: 20,
-          link_count_limit: 30,
-          attribute_value_length_limit: 40,
-          event_attribute_count_limit: 50,
-          link_attribute_count_limit: 60,
-        },
+        id_generator: { custom_generator: {} },
       },
     } as ConfigurationModel;
-    const expectedSpanLimits: SpanLimits = {
-      attributeCountLimit: 10,
-      eventCountLimit: 20,
-      linkCountLimit: 30,
-      attributeValueLengthLimit: 40,
-      attributePerEventCountLimit: 50,
-      attributePerLinkCountLimit: 60,
-    };
-
-    const spanLimits = getSpanLimitsFromConfiguration(config);
-    assert.deepEqual(spanLimits, expectedSpanLimits);
+    assert.equal(getIdGeneratorFromConfiguration(config), undefined);
+    assert.ok(
+      warnStub.args.some(args =>
+        String(args[0]).includes(
+          'Unsupported id_generator type(s): custom_generator'
+        )
+      )
+    );
   });
 });
 
