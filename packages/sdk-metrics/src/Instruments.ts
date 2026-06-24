@@ -17,7 +17,6 @@ import type {
   ObservableUpDownCounter,
 } from '@opentelemetry/api';
 import { context as contextApi, diag, ValueType } from '@opentelemetry/api';
-import { millisToHrTime } from '@opentelemetry/core';
 import type { InstrumentDescriptor } from './InstrumentDescriptor';
 import type { ObservableRegistry } from './state/ObservableRegistry';
 import type {
@@ -61,12 +60,7 @@ export class SyncInstrument {
         return;
       }
     }
-    this._writableMetricStorage.record(
-      value,
-      attributes,
-      context,
-      millisToHrTime(Date.now())
-    );
+    this._writableMetricStorage.record(value, attributes, context, Date.now());
   }
 }
 

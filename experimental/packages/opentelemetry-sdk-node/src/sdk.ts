@@ -39,6 +39,7 @@ import {
   ConsoleMetricExporter,
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
+import type { SpanProcessor } from '@opentelemetry/sdk-trace';
 import { TracerProvider } from '@opentelemetry/sdk-trace';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import type { NodeSDKConfiguration } from './types';
@@ -307,17 +308,22 @@ export class NodeSDK {
     }
 
     // Determine `spanProcessors` from multiple possible options.
-    let spanProcessors;
+    let spanProcessors: SpanProcessor[];
     if (this._configuration?.spanProcessors) {
       spanProcessors = this._configuration.spanProcessors;
     } else if (this._configuration?.spanProcessor) {
       spanProcessors = [this._configuration.spanProcessor];
     } else if (this._configuration?.traceExporter) {
       spanProcessors = [
-        createBatchSpanProcessorFromEnv(this._configuration.traceExporter!),
+        createBatchSpanProcessorFromEnv(
+          this._configuration.traceExporter!,
+          sdkMetricsEnabled ? this._meterProvider : undefined
+        ),
       ];
     } else {
-      spanProcessors = getSpanProcessorsFromEnv();
+      spanProcessors = getSpanProcessorsFromEnv(
+        sdkMetricsEnabled ? this._meterProvider : undefined
+      );
     }
 
     // Only register if there is a span processor
