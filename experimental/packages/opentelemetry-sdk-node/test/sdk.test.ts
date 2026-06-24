@@ -234,7 +234,7 @@ describe('NodeSDK', () => {
       const sdk = new NodeSDK({
         spanProcessors: [
           new NoopSpanProcessor(),
-          new SimpleSpanProcessor(exporter),
+          new SimpleSpanProcessor({ exporter }),
           new BatchSpanProcessor({ exporter }),
         ],
         autoDetectResources: false,
@@ -447,6 +447,11 @@ describe('NodeSDK', () => {
       assert.ok(
         (tracerProvider as any)._tracerOptions.meterProvider instanceof
           MeterProvider
+      );
+      assert.notDeepEqual(
+        (tracerProvider as any)._activeSpanProcessor._spanProcessors[0]._metrics
+          .processedSpans,
+        NOOP_COUNTER_METRIC
       );
 
       const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
@@ -1210,7 +1215,9 @@ describe('NodeSDK', () => {
 
     it('should configure IdGenerator via config', async () => {
       const idGenerator = new CustomIdGenerator();
-      const spanProcessor = new SimpleSpanProcessor(new ConsoleSpanExporter());
+      const spanProcessor = new SimpleSpanProcessor({
+        exporter: new ConsoleSpanExporter(),
+      });
       const sdk = new NodeSDK({
         idGenerator,
         spanProcessor,
@@ -1798,8 +1805,8 @@ describe('NodeSDK', () => {
     });
 
     it('should ignore default env exporter when user provides span processor in sdk config', async () => {
-      const traceExporter = new ConsoleSpanExporter();
-      const spanProcessor = new SimpleSpanProcessor(traceExporter);
+      const exporter = new ConsoleSpanExporter();
+      const spanProcessor = new SimpleSpanProcessor({ exporter });
       const sdk = new NodeSDK({
         spanProcessor,
       });
