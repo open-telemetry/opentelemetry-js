@@ -69,6 +69,9 @@ import type {
   AggregationConfigModel,
   MetricProducerConfigModel,
   PeriodicMetricReaderConfigModel,
+  PushMetricExporterConfigModel,
+  OtlpHttpMetricExporterConfigModel,
+  OtlpGrpcMetricExporterConfigModel,
   SpanExporterConfigModel,
   SamplerConfigModel,
   NameStringValuePairConfigModel,
@@ -85,6 +88,7 @@ import type {
 } from '@opentelemetry/configuration';
 import type {
   AggregationOption,
+  AggregationSelector,
   IAttributesProcessor,
   IMetricReader,
   PushMetricExporter,
@@ -100,6 +104,7 @@ import {
 } from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
 import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
+import { AggregationTemporalityPreference } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
 import type {
   BatchLogRecordProcessorOptions,
@@ -570,62 +575,144 @@ function getMetricProducersFromConfiguration(
   return result.length > 0 ? result : undefined;
 }
 
-export function getPeriodicMetricReaderFromConfiguration(
-  periodic: PeriodicMetricReaderConfigModel
-): IMetricReader | undefined {
-  if (periodic.exporter) {
-    let exporter;
-    if (periodic.exporter.otlp_http !== undefined) {
-      const encoding = periodic.exporter.otlp_http?.encoding ?? 'protobuf';
-      if (encoding === 'json') {
-        exporter = new OTLPHttpMetricExporter({
-          compression:
-            periodic.exporter.otlp_http?.compression === 'gzip'
-              ? CompressionAlgorithm.GZIP
-              : CompressionAlgorithm.NONE,
-        });
-      } else if (encoding === 'protobuf') {
-        exporter = new OTLPProtoMetricExporter({
-          compression:
-            periodic.exporter.otlp_http?.compression === 'gzip'
-              ? CompressionAlgorithm.GZIP
-              : CompressionAlgorithm.NONE,
-        });
-      } else {
-        diag.warn(`Unsupported OTLP metrics encoding: ${encoding}.`);
-      }
-    }
-    if (periodic.exporter.otlp_grpc !== undefined) {
-      exporter = new OTLPGrpcMetricExporter({
-        compression:
-          periodic.exporter.otlp_grpc?.compression === 'gzip'
-            ? CompressionAlgorithm.GZIP
-            : CompressionAlgorithm.NONE,
-      });
-    }
+/**
+ * Map a declarative-config `temporality_preference` value to the enum the OTLP
+ * metric exporters expect. Returns undefined for an unspecified preference so
+ * the exporter falls back to its own default (cumulative).
+ */
+function getMetricTemporalityPreference(
+  preference: string | null | undefined
+): AggregationTemporalityPreference | undefined {
+  switch (preference) {
+    case 'delta':
+      return AggregationTemporalityPreference.DELTA;
+    case 'low_memory':
+      return AggregationTemporalityPreference.LOWMEMORY;
+    case 'cumulative':
+      return AggregationTemporalityPreference.CUMULATIVE;
+    default:
+      return undefined;
+  }
+}
 
-    const metricProducers = getMetricProducersFromConfiguration(
-      periodic.producers
-    );
+/**
+ * Map a declarative-config `default_histogram_aggregation` value to an
+ * AggregationSelector that applies the requested aggregation to histogram
+ * instruments and leaves all other instrument types at their default. Returns
+ * undefined for an unspecified value so the exporter uses its own default.
+ */
+function getMetricAggregationPreference(
+  aggregation: string | null | undefined
+): AggregationSelector | undefined {
+  let histogramAggregation: AggregationOption;
+  switch (aggregation) {
+    case 'base2_exponential_bucket_histogram':
+      histogramAggregation = { type: AggregationType.EXPONENTIAL_HISTOGRAM };
+      break;
+    case 'explicit_bucket_histogram':
+      histogramAggregation = {
+        type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+      };
+      break;
+    default:
+      return undefined;
+  }
+  return (instrumentType: InstrumentType): AggregationOption =>
+    instrumentType === InstrumentType.HISTOGRAM
+      ? histogramAggregation
+      : { type: AggregationType.DEFAULT };
+}
 
-    if (exporter) {
-      // TODO(6425): add cardinality_limits
-      return new PeriodicExportingMetricReader({
-        exportIntervalMillis: periodic.interval ?? 60_000,
-        exportTimeoutMillis: periodic.timeout ?? 30_000,
-        exporter,
-        metricProducers,
-      });
-    }
-    if (periodic.exporter.console !== undefined) {
-      return new PeriodicExportingMetricReader({
-        exporter: new ConsoleMetricExporter(),
-        metricProducers,
-      });
-    }
+function getOtlpHttpMetricExporter(
+  otlpHttp: OtlpHttpMetricExporterConfigModel
+): PushMetricExporter | undefined {
+  const encoding = otlpHttp?.encoding ?? 'protobuf';
+  const options = {
+    compression:
+      otlpHttp?.compression === 'gzip'
+        ? CompressionAlgorithm.GZIP
+        : CompressionAlgorithm.NONE,
+    url: otlpHttp?.endpoint ?? undefined,
+    headers: getHeadersFromConfiguration(otlpHttp?.headers),
+    timeoutMillis: validateExporterTimeout(otlpHttp?.timeout),
+    httpAgentOptions: getHttpAgentOptionsFromTls(otlpHttp?.tls),
+    temporalityPreference: getMetricTemporalityPreference(
+      otlpHttp?.temporality_preference
+    ),
+    aggregationPreference: getMetricAggregationPreference(
+      otlpHttp?.default_histogram_aggregation
+    ),
+  };
+  if (encoding === 'json') {
+    return new OTLPHttpMetricExporter(options);
+  } else if (encoding === 'protobuf') {
+    return new OTLPProtoMetricExporter(options);
+  }
+  diag.warn(`Unsupported OTLP metrics encoding: ${encoding}.`);
+  return undefined;
+}
+
+function getOtlpGrpcMetricExporter(
+  otlpGrpc: OtlpGrpcMetricExporterConfigModel
+): PushMetricExporter {
+  return new OTLPGrpcMetricExporter({
+    compression:
+      otlpGrpc?.compression === 'gzip'
+        ? CompressionAlgorithm.GZIP
+        : CompressionAlgorithm.NONE,
+    url: otlpGrpc?.endpoint ?? undefined,
+    timeoutMillis: validateExporterTimeout(otlpGrpc?.timeout),
+    credentials: getGrpcCredentialsFromTls(otlpGrpc?.tls),
+    metadata: getGrpcMetadataFromHeaders(otlpGrpc?.headers),
+    temporalityPreference: getMetricTemporalityPreference(
+      otlpGrpc?.temporality_preference
+    ),
+    aggregationPreference: getMetricAggregationPreference(
+      otlpGrpc?.default_histogram_aggregation
+    ),
+  });
+}
+
+export function getMetricExporter(
+  exporter: PushMetricExporterConfigModel
+): PushMetricExporter | undefined {
+  if (exporter.otlp_http !== undefined) {
+    return getOtlpHttpMetricExporter(exporter.otlp_http);
+  }
+  if (exporter.otlp_grpc !== undefined) {
+    return getOtlpGrpcMetricExporter(exporter.otlp_grpc);
+  }
+  if (exporter.console !== undefined) {
+    return new ConsoleMetricExporter();
   }
   diag.warn('Unsupported Metric Exporter.');
   return undefined;
+}
+
+export function getPeriodicMetricReaderFromConfiguration(
+  periodic: PeriodicMetricReaderConfigModel
+): IMetricReader | undefined {
+  if (!periodic.exporter) {
+    diag.warn('Unsupported Metric Exporter.');
+    return undefined;
+  }
+
+  const exporter = getMetricExporter(periodic.exporter);
+  if (!exporter) {
+    return undefined;
+  }
+
+  const metricProducers = getMetricProducersFromConfiguration(
+    periodic.producers
+  );
+
+  // TODO(6425): add cardinality_limits
+  return new PeriodicExportingMetricReader({
+    exportIntervalMillis: periodic.interval ?? 60_000,
+    exportTimeoutMillis: periodic.timeout ?? 30_000,
+    exporter,
+    metricProducers,
+  });
 }
 
 /**
