@@ -21,10 +21,13 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :rocket: Features
 
 * feat(configuration): bump config schema to v1.1.0; rename `without_scope_info` → `scope_info_enabled` and `without_target_info/development` → `target_info_enabled/development` on the Prometheus pull exporter (semantics inverted), rename `with_resource_constant_labels` → `resource_constant_labels`. Validate `file_format` per the configuration versioning spec: accept any minor version of major `1` (e.g. `1.0`, `1.1`), warn when the minor version is newer than supported, and reject other major versions. [#6781](https://github.com/open-telemetry/opentelemetry-js/pull/6781) @MikeGoldsmith
+* feat(sdk-node): wire up `id_generator` from declarative config [#6782](https://github.com/open-telemetry/opentelemetry-js/pull/6782) @MikeGoldsmith
 * feat(propagator-env-carrier): empty name normalization [#6827](https://github.com/open-telemetry/opentelemetry-js/pull/6827) @pellared
 
 ### :bug: Bug Fixes
 
+* fix(sdk-logs): stop `Logger.emit()` doing work (record construction, metrics, processor `onEmit`) after the `LoggerProvider` has shut down [#6826](https://github.com/open-telemetry/opentelemetry-js/pull/6826) @anneheartrecord
+* fix(sdk-node): pass all config properties (endpoint, headers, timeout, TLS, compression, temporality preference, default histogram aggregation) to OTLP metric exporters in declarative config [#6814](https://github.com/open-telemetry/opentelemetry-js/pull/6814) @MikeGoldsmith
 * fix(sdk-logs): default BatchLogRecordProcessor `scheduleDelayMillis` is 1000 [#6796](https://github.com/open-telemetry/opentelemetry-js/pull/6796) @trentm
 * fix(configuration): percent-decode keys and values in `resource.attributes_list` per spec [#6787](https://github.com/open-telemetry/opentelemetry-js/pull/6787) @MikeGoldsmith
 * fix(configuration): default `log_level` to `info` in env-based config initialization for consistency with file-based config [#6788](https://github.com/open-telemetry/opentelemetry-js/pull/6788) @MikeGoldsmith

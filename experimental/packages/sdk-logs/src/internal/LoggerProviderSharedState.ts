@@ -42,6 +42,7 @@ export class LoggerProviderSharedState {
   readonly logRecordLimits: Required<LogRecordLimits>;
   readonly processors: LogRecordProcessor[];
   readonly loggerMetrics: LoggerMetrics;
+  hasShutdown = false;
   private _loggerConfigurator: LoggerConfigurator;
   private _loggerConfigs: Map<string, Required<LoggerConfig>> = new Map();
 
