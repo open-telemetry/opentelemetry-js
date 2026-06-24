@@ -4,11 +4,27 @@
  */
 
 const Benchmark = require('benchmark');
-const { MeterProvider } = require('../../../build/src');
+const {
+  MeterProvider,
+  createAllowListAttributesProcessor,
+} = require('../../../build/src');
 
 const provider = new MeterProvider();
 const meter = provider.getMeter('bench');
 const counter = meter.createCounter('bench.counter');
+
+const viewProvider = new MeterProvider({
+  views: [
+    {
+      instrumentName: 'bench.counter.view',
+      attributesProcessors: [
+        createAllowListAttributesProcessor(['service', 'route']),
+      ],
+    },
+  ],
+});
+const viewMeter = viewProvider.getMeter('bench');
+const viewCounter = viewMeter.createCounter('bench.counter.view');
 
 const fixedAttributes = {
   service: 'checkout',
@@ -40,6 +56,10 @@ suite.add('Counter.add (fixed attributes)', () => {
 
 suite.add('Counter.add (varied attributes, 100 combos)', () => {
   counter.add(1, variedAttributes[variedIdx++ % 100]);
+});
+
+suite.add('Counter.add (with view attribute processor)', () => {
+  viewCounter.add(1, fixedAttributes);
 });
 
 suite.run();
