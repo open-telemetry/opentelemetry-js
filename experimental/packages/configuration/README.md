@@ -188,6 +188,9 @@ One intentional exception in both paths: `AttributeNameValue.type` is **not** de
 - `1.0`
 - `1.1`
 
+For a per-field view of which schema fields the SDK currently applies, see
+[`doc/spec-conformance.md`](doc/spec-conformance.md).
+
 ## Useful links
 
 - [OpenTelemetry Declarative Configuration Specification](https://github.com/open-telemetry/opentelemetry-configuration)
