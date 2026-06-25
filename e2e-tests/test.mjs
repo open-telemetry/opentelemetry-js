@@ -27,7 +27,7 @@ const collectorUrl = 'http://localhost:4318/v1';
 const traceExporter = new OTLPTraceExporter({
   url: `${collectorUrl}/traces`,
 });
-const spanProcessors = [new SimpleSpanProcessor(traceExporter)];
+const spanProcessors = [new SimpleSpanProcessor({ exporter: traceExporter })];
 
 // Set up metric exporter
 const metricExporter = new OTLPMetricExporter({

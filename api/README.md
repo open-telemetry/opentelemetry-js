@@ -46,7 +46,7 @@ const { TracerProvider, ConsoleSpanExporter, SimpleSpanProcessor }  = require("@
 
 // Create and register an SDK
 const provider = new TracerProvider({
-  spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
+  spanProcessors: [new SimpleSpanProcessor({ exporter: new ConsoleSpanExporter() })]
 });
 trace.setGlobalTracerProvider(provider);
 

@@ -375,7 +375,9 @@ describe('xhr', () => {
         });
         dummySpanExporter = new DummySpanExporter();
         webTracerProviderWithZone = new WebTracerProvider({
-          spanProcessors: [new tracing.SimpleSpanProcessor(dummySpanExporter)],
+          spanProcessors: [
+            new tracing.SimpleSpanProcessor({ exporter: dummySpanExporter }),
+          ],
         });
         registerInstrumentations({
           instrumentations: [xmlHttpRequestInstrumentation],

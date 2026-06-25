@@ -26,7 +26,7 @@ const { HttpInstrumentation } = require('../../build/src/index.js');
 
 const memoryExporter = new InMemorySpanExporter();
 const provider = new TracerProvider({
-  spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+  spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
 });
 const instrumentation = new HttpInstrumentation();
 instrumentation.setTracerProvider(provider);

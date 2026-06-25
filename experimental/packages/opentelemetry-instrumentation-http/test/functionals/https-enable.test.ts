@@ -56,7 +56,7 @@ const serverName = 'my.server.name';
 const pathname = '/test';
 const memoryExporter = new InMemorySpanExporter();
 const provider = new TracerProvider({
-  spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+  spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
 });
 instrumentation.setTracerProvider(provider);
 const tracer = provider.getTracer('test-https');

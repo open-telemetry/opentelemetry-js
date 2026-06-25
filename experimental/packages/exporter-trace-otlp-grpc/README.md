@@ -30,7 +30,7 @@ const collectorOptions = {
 
 const exporter = new OTLPTraceExporter(collectorOptions);
 const tracerProvider = new TracerProvider({
-  spanProcessors: [new SimpleSpanProcessor(exporter)]
+  spanProcessors: [new SimpleSpanProcessor({ exporter })]
 });
 trace.setGlobalTracerProvider(traceProvider);
 ```

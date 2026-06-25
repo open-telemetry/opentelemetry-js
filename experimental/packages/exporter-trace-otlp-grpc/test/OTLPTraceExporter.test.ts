@@ -67,11 +67,11 @@ describe('OTLPTraceExporter', function () {
     // arrange
     const tracerProvider = new TracerProvider({
       spanProcessors: [
-        new SimpleSpanProcessor(
-          new OTLPTraceExporter({
+        new SimpleSpanProcessor({
+          exporter: new OTLPTraceExporter({
             url: 'http://localhost:1501',
-          })
-        ),
+          }),
+        }),
       ],
     });
 

@@ -35,7 +35,7 @@ export async function withTestTracerProvider(
   const inMemExporter = new InMemorySpanExporter();
   const tracerProvider = new TracerProvider({
     sampler: new AlwaysOnSampler(),
-    spanProcessors: [new SimpleSpanProcessor(inMemExporter)],
+    spanProcessors: [new SimpleSpanProcessor({ exporter: inMemExporter })],
   });
 
   await func(tracerProvider);

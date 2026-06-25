@@ -28,7 +28,9 @@ describe('OTLPTraceExporter', () => {
         .stub(window, 'fetch')
         .resolves(new Response('', { status: 200 }));
       const tracerProvider = new TracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(new OTLPTraceExporter())],
+        spanProcessors: [
+          new SimpleSpanProcessor({ exporter: new OTLPTraceExporter() }),
+        ],
       });
 
       // act

@@ -820,7 +820,7 @@ export const runTests = (
 
     describe('enable()', () => {
       const provider = new TracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+        spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
       });
       beforeEach(() => {
         memoryExporter.reset();
@@ -865,7 +865,7 @@ export const runTests = (
 
     describe('disable()', () => {
       const provider = new TracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+        spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
       });
       beforeEach(() => {
         memoryExporter.reset();
@@ -897,7 +897,7 @@ export const runTests = (
 
     describe('Test filtering requests using metadata', () => {
       const provider = new TracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+        spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
       });
       beforeEach(() => {
         memoryExporter.reset();
@@ -927,7 +927,7 @@ export const runTests = (
 
     describe('Test filtering requests using options', () => {
       const provider = new TracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+        spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
       });
       const checkSpans: { [key: string]: boolean } = {
         unaryMethod: false,
@@ -1005,7 +1005,7 @@ export const runTests = (
 
     describe('Test capturing metadata', () => {
       const provider = new TracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+        spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
       });
 
       const clientMetadata = new Metadata();

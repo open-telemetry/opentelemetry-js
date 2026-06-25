@@ -58,7 +58,7 @@ import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 const memoryExporter = new InMemorySpanExporter();
 const provider = new TracerProvider({
   sampler,
-  spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+  spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
 });
 instrumentation.setTracerProvider(provider);
 

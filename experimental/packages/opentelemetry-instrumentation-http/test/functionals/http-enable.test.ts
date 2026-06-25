@@ -91,7 +91,7 @@ const pathname = '/test';
 const serverName = 'my.server.name';
 const memoryExporter = new InMemorySpanExporter();
 const provider = new TracerProvider({
-  spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+  spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
 });
 instrumentation.setTracerProvider(provider);
 

@@ -139,7 +139,7 @@ describe('#grpc-protobuf', () => {
   let server: grpc.Server;
   let contextManager: ContextManager;
   const provider = new TracerProvider({
-    spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+    spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
   });
 
   before(() => {

@@ -42,7 +42,7 @@ describe('Packages', () => {
   });
   describe('get', () => {
     const provider = new TracerProvider({
-      spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
     });
     instrumentation.setTracerProvider(provider);
     beforeEach(() => {

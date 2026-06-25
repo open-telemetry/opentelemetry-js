@@ -30,7 +30,9 @@ const { GrpcInstrumentation } = require('@opentelemetry/instrumentation-grpc');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 
 const tracerProvider = new TracerProvider({
-  spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
+  spanProcessors: [
+    new SimpleSpanProcessor({ exporter: new ConsoleSpanExporter() })
+  ]
 });
 trace.setGlobalTracerProvider(tracerProvider);
 // See https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-trace/

@@ -49,7 +49,9 @@ describe('OTLPTraceExporter', () => {
       });
 
       new TracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(new OTLPTraceExporter())],
+        spanProcessors: [
+          new SimpleSpanProcessor({ exporter: new OTLPTraceExporter() }),
+        ],
       })
         .getTracer('test-tracer')
         .startSpan('test-span')
