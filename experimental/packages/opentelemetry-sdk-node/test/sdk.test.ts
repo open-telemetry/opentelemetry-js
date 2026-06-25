@@ -234,7 +234,7 @@ describe('NodeSDK', () => {
       const sdk = new NodeSDK({
         spanProcessors: [
           new NoopSpanProcessor(),
-          new SimpleSpanProcessor(exporter),
+          new SimpleSpanProcessor({ exporter }),
           new BatchSpanProcessor({ exporter }),
         ],
         autoDetectResources: false,
@@ -429,7 +429,9 @@ describe('NodeSDK', () => {
         metricReaders: [metricReader],
         traceExporter: new ConsoleSpanExporter(),
         logRecordProcessors: [
-          new SimpleLogRecordProcessor(new InMemoryLogRecordExporter()),
+          new SimpleLogRecordProcessor({
+            exporter: new InMemoryLogRecordExporter(),
+          }),
         ],
         autoDetectResources: false,
       });
@@ -445,6 +447,11 @@ describe('NodeSDK', () => {
       assert.ok(
         (tracerProvider as any)._tracerOptions.meterProvider instanceof
           MeterProvider
+      );
+      assert.notDeepEqual(
+        (tracerProvider as any)._activeSpanProcessor._spanProcessors[0]._metrics
+          .processedSpans,
+        NOOP_COUNTER_METRIC
       );
 
       const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
@@ -474,7 +481,9 @@ describe('NodeSDK', () => {
         metricReaders: [metricReader],
         traceExporter: new ConsoleSpanExporter(),
         logRecordProcessors: [
-          new SimpleLogRecordProcessor(new InMemoryLogRecordExporter()),
+          new SimpleLogRecordProcessor({
+            exporter: new InMemoryLogRecordExporter(),
+          }),
         ],
         autoDetectResources: false,
       });
@@ -509,9 +518,9 @@ describe('NodeSDK', () => {
 
     it('should register a logger provider if a log record processor is provided', async () => {
       const logRecordExporter = new InMemoryLogRecordExporter();
-      const logRecordProcessor = new SimpleLogRecordProcessor(
-        logRecordExporter
-      );
+      const logRecordProcessor = new SimpleLogRecordProcessor({
+        exporter: logRecordExporter,
+      });
       const sdk = new NodeSDK({
         logRecordProcessor: logRecordProcessor,
         autoDetectResources: false,
@@ -536,9 +545,9 @@ describe('NodeSDK', () => {
 
     it('should register a logger provider if multiple log record processors are provided', async () => {
       const logRecordExporter = new InMemoryLogRecordExporter();
-      const simpleLogRecordProcessor = new SimpleLogRecordProcessor(
-        logRecordExporter
-      );
+      const simpleLogRecordProcessor = new SimpleLogRecordProcessor({
+        exporter: logRecordExporter,
+      });
       const batchLogRecordProcessor = new BatchLogRecordProcessor({
         exporter: logRecordExporter,
       });
@@ -1206,7 +1215,9 @@ describe('NodeSDK', () => {
 
     it('should configure IdGenerator via config', async () => {
       const idGenerator = new CustomIdGenerator();
-      const spanProcessor = new SimpleSpanProcessor(new ConsoleSpanExporter());
+      const spanProcessor = new SimpleSpanProcessor({
+        exporter: new ConsoleSpanExporter(),
+      });
       const sdk = new NodeSDK({
         idGenerator,
         spanProcessor,
@@ -1374,9 +1385,9 @@ describe('NodeSDK', () => {
       process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = '10';
 
       const logRecordExporter = new InMemoryLogRecordExporter();
-      const logRecordProcessor = new SimpleLogRecordProcessor(
-        logRecordExporter
-      );
+      const logRecordProcessor = new SimpleLogRecordProcessor({
+        exporter: logRecordExporter,
+      });
       const sdk = new NodeSDK({
         logRecordProcessors: [logRecordProcessor],
         autoDetectResources: false,
@@ -1794,8 +1805,8 @@ describe('NodeSDK', () => {
     });
 
     it('should ignore default env exporter when user provides span processor in sdk config', async () => {
-      const traceExporter = new ConsoleSpanExporter();
-      const spanProcessor = new SimpleSpanProcessor(traceExporter);
+      const exporter = new ConsoleSpanExporter();
+      const spanProcessor = new SimpleSpanProcessor({ exporter });
       const sdk = new NodeSDK({
         spanProcessor,
       });

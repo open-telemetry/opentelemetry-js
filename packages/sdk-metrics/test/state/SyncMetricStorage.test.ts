@@ -42,7 +42,7 @@ describe('SyncMetricStorage', () => {
 
       for (const value of commonValues) {
         for (const attributes of commonAttributes) {
-          metricStorage.record(value, attributes, api.context.active(), [0, 0]);
+          metricStorage.record(value, attributes, api.context.active(), 0);
         }
       }
     });
@@ -58,9 +58,9 @@ describe('SyncMetricStorage', () => {
           [deltaCollector]
         );
 
-        metricStorage.record(1, {}, api.context.active(), [0, 0]);
-        metricStorage.record(2, {}, api.context.active(), [1, 1]);
-        metricStorage.record(3, {}, api.context.active(), [2, 2]);
+        metricStorage.record(1, {}, api.context.active(), 0);
+        metricStorage.record(2, {}, api.context.active(), 1000);
+        metricStorage.record(3, {}, api.context.active(), 2000);
         {
           const metric = metricStorage.collect(deltaCollector, [3, 3]);
 
@@ -76,13 +76,13 @@ describe('SyncMetricStorage', () => {
           assert.strictEqual(metric, undefined);
         }
 
-        metricStorage.record(1, {}, api.context.active(), [5, 5]);
+        metricStorage.record(1, {}, api.context.active(), 5000);
         {
           const metric = metricStorage.collect(deltaCollector, [6, 6]);
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 1, [5, 5], [6, 6]);
+          assertDataPoint(metric.dataPoints[0], {}, 1, [5, 0], [6, 6]);
         }
       });
     });
@@ -95,9 +95,9 @@ describe('SyncMetricStorage', () => {
           createNoopAttributesProcessor(),
           [cumulativeCollector]
         );
-        metricStorage.record(1, {}, api.context.active(), [0, 0]);
-        metricStorage.record(2, {}, api.context.active(), [1, 1]);
-        metricStorage.record(3, {}, api.context.active(), [2, 2]);
+        metricStorage.record(1, {}, api.context.active(), 0);
+        metricStorage.record(2, {}, api.context.active(), 1000);
+        metricStorage.record(3, {}, api.context.active(), 2000);
         {
           const metric = metricStorage.collect(cumulativeCollector, [3, 3]);
 
@@ -115,7 +115,7 @@ describe('SyncMetricStorage', () => {
           assertDataPoint(metric.dataPoints[0], {}, 6, [0, 0], [4, 4]);
         }
 
-        metricStorage.record(1, {}, api.context.active(), [5, 5]);
+        metricStorage.record(1, {}, api.context.active(), 5000);
         {
           const metric = metricStorage.collect(cumulativeCollector, [6, 6]);
 
