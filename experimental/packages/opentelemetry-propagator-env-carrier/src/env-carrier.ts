@@ -108,14 +108,7 @@ function normalizeKey(key: string): string {
 export class EnvironmentGetter implements TextMapGetter<void> {
   get(_carrier: void, key: string): string | undefined {
     const normalizedKey = normalizeKey(key);
-
-    for (const [envKey, value] of Object.entries(process.env)) {
-      if (value !== undefined && envKey === normalizedKey) {
-        return value;
-      }
-    }
-
-    return undefined;
+    return process.env[normalizedKey];
   }
 
   keys(_carrier: void): string[] {
