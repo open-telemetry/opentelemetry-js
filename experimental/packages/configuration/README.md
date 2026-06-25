@@ -189,7 +189,11 @@ One intentional exception in both paths: `AttributeNameValue.type` is **not** de
 - `1.1`
 
 For a per-field view of which schema fields the SDK currently applies, see
-[`doc/spec-conformance.md`](doc/spec-conformance.md).
+the JS row in the cross-SDK [language support status][lss] doc maintained in
+the `opentelemetry-configuration` repo. That doc is the source of truth for
+declarative-config conformance across all SDKs.
+
+[lss]: https://github.com/open-telemetry/opentelemetry-configuration/blob/main/language-support-status.md#js-
 
 ## Useful links
 
