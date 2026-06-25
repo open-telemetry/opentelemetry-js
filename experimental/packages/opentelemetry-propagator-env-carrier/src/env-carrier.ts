@@ -94,35 +94,40 @@ function normalizeKey(key: string): string {
 }
 
 /**
- * TextMapGetter that reads propagation values from a process environment
- * snapshot.
+ * TextMapGetter that reads propagation values from the process environment.
  *
- * `EnvironmentGetter` snapshots `process.env` when it is constructed and
- * ignores the carrier passed to `get()` and `keys()`. Pass `undefined` as the
- * carrier when using this getter with a `TextMapPropagator`.
+ * `EnvironmentGetter` reads the current `process.env` and ignores the carrier
+ * passed to `get()` and `keys()`. Pass `undefined` as the carrier when using
+ * this getter with a `TextMapPropagator`.
  *
- * Only environment variables whose names are already normalized are stored in
- * the snapshot. The requested propagator key is normalized before lookup.
+ * `keys()` returns only environment variables whose names are already
+ * normalized. The requested propagator key is normalized before lookup.
  *
  * @see https://opentelemetry.io/docs/specs/otel/context/env-carriers/
  */
 export class EnvironmentGetter implements TextMapGetter<void> {
-  private readonly _carrier: Record<string, string> = {};
+  get(_carrier: void, key: string): string | undefined {
+    const normalizedKey = normalizeKey(key);
 
-  constructor() {
-    for (const [key, value] of Object.entries(process.env)) {
-      if (value !== undefined && isNormalizedKey(key)) {
-        this._carrier[key] = value;
+    for (const [envKey, value] of Object.entries(process.env)) {
+      if (value !== undefined && envKey === normalizedKey) {
+        return value;
       }
     }
-  }
 
-  get(_carrier: void, key: string): string | undefined {
-    return this._carrier[normalizeKey(key)];
+    return undefined;
   }
 
   keys(_carrier: void): string[] {
-    return Object.keys(this._carrier);
+    const keys: string[] = [];
+
+    for (const [key, value] of Object.entries(process.env)) {
+      if (value !== undefined && isNormalizedKey(key)) {
+        keys.push(key);
+      }
+    }
+
+    return keys;
   }
 }
 

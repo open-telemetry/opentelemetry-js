@@ -50,8 +50,8 @@ console.log(output);
 ```
 
 Use `EnvironmentGetter` during process startup to extract context that was
-provided through environment variables. It reads from its own snapshot, so pass
-`undefined` as the carrier when extracting.
+provided through environment variables. It reads from the current `process.env`,
+so pass `undefined` as the carrier when extracting.
 
 ```javascript
 const { ROOT_CONTEXT, trace } = require('@opentelemetry/api');
@@ -72,9 +72,9 @@ console.log(spanContext.traceId);
 // 0102030405060708090a0b0c0d0e0f10
 ```
 
-`EnvironmentGetter` snapshots `process.env` when it is constructed. Later
-changes to `process.env` are not reflected in that getter. Only environment
-variables whose names are already normalized are included in the snapshot.
+`EnvironmentGetter` reads `process.env` each time `get()` or `keys()` is called.
+Later changes to `process.env` are reflected in the same getter. Its `keys()`
+method returns only environment variables whose names are already normalized.
 
 ## Key Normalization
 
@@ -92,10 +92,10 @@ For example, `traceparent` becomes `TRACEPARENT`, `trace-state` becomes
 
 `EnvironmentSetter` always writes normalized key names to its environment map.
 `EnvironmentGetter` normalizes the requested propagator key and reads the
-corresponding normalized environment variable name from its snapshot. Its
-`keys()` method returns only environment variable names that are already
-normalized. For example, a propagator request for `x-b3-traceid` matches
-`X_B3_TRACEID` from `process.env`, but does not match `x-b3-traceid`.
+corresponding normalized environment variable name from the current
+`process.env`. Its `keys()` method returns only environment variable names that
+are already normalized. For example, a propagator request for `x-b3-traceid`
+matches `X_B3_TRACEID` from `process.env`, but does not match `x-b3-traceid`.
 
 Name collisions after normalization should be avoided. For example,
 `trace-state` and `TRACE_STATE` both normalize to `TRACE_STATE`. When injecting,
