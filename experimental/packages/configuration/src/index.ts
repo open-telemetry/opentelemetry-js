@@ -23,6 +23,7 @@ export type {
   GrpcTls as GrpcTlsConfigModel,
   IdGenerator as IdGeneratorConfigModel,
   SeverityNumber as SeverityNumberConfigModel,
+  TextMapPropagator as TextMapPropagatorConfigModel,
   LoggerProvider as LoggerProviderConfigModel,
   AttributeLimits as AttributeLimitsConfigModel,
   LogRecordProcessor as LogRecordProcessorConfigModel,
@@ -33,3 +34,7 @@ export type {
   LogRecordLimits as LogRecordLimitsConfigModel,
 } from './generated/types';
 export { createConfigFactory } from './ConfigFactory';
+export {
+  mergeResourceAttributesConfig,
+  mergePropagatorCompositeConfig,
+} from './FileConfigFactory';
