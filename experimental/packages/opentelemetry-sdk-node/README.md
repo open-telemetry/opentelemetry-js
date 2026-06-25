@@ -128,7 +128,6 @@ or configure each instrumentation individually.
 
 ### resource
 
-Configure a resource. Resources may also be detected by using the `autoDetectResources` method of the SDK.
 A [Resource](https://opentelemetry.io/docs/specs/otel/resource/sdk/) to associate with generated telemetry.
 This resource will be use as the basis for additional resource attributes determined by [resource detectors](#resourcedetectors).
 See also the [`autoDetectResources` setting](#autodetectresources).
