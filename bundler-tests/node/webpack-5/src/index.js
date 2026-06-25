@@ -27,7 +27,7 @@ diag.setLogger({
 
 logs.setGlobalLoggerProvider(
   new LoggerProvider({
-    processors: [new SimpleLogRecordProcessor(new OTLPLogExporter())],
+    processors: [new SimpleLogRecordProcessor({ exporter: new OTLPLogExporter() })],
   })
 );
 

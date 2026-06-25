@@ -74,6 +74,10 @@ export class Logger implements ILogger {
     severityNumber?: SeverityNumber;
     eventName?: string;
   }): boolean {
+    if (this._sharedState.hasShutdown) {
+      return false;
+    }
+
     const loggerConfig = this._loggerConfig;
 
     if (loggerConfig.disabled) {
