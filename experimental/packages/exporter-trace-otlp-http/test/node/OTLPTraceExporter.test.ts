@@ -8,10 +8,7 @@ import * as http from 'http';
 import * as sinon from 'sinon';
 import { Stream } from 'stream';
 
-import {
-  BasicTracerProvider,
-  SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
+import { TracerProvider, SimpleSpanProcessor } from '@opentelemetry/sdk-trace';
 import { OTLPTraceExporter } from '../../src/platform/node';
 
 /*
@@ -51,7 +48,7 @@ describe('OTLPTraceExporter', () => {
         buff = Buffer.concat([buff, chunk]);
       });
 
-      new BasicTracerProvider({
+      new TracerProvider({
         spanProcessors: [new SimpleSpanProcessor(new OTLPTraceExporter())],
       })
         .getTracer('test-tracer')

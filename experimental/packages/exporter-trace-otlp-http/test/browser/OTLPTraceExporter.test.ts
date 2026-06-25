@@ -3,10 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  BasicTracerProvider,
-  SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
+import { TracerProvider, SimpleSpanProcessor } from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPTraceExporter } from '../../src/platform/browser/index';
@@ -30,7 +27,7 @@ describe('OTLPTraceExporter', () => {
       const stubFetch = sinon
         .stub(window, 'fetch')
         .resolves(new Response('', { status: 200 }));
-      const tracerProvider = new BasicTracerProvider({
+      const tracerProvider = new TracerProvider({
         spanProcessors: [new SimpleSpanProcessor(new OTLPTraceExporter())],
       });
 

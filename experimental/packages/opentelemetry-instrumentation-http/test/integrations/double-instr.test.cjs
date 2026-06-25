@@ -16,16 +16,16 @@ const path = require('path');
 const fs = require('fs');
 
 const { SpanKind } = require('@opentelemetry/api');
-const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
 const {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} = require('@opentelemetry/sdk-trace-base');
+  TracerProvider,
+} = require('@opentelemetry/sdk-trace');
 
 const { HttpInstrumentation } = require('../../build/src/index.js');
 
 const memoryExporter = new InMemorySpanExporter();
-const provider = new NodeTracerProvider({
+const provider = new TracerProvider({
   spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
 });
 const instrumentation = new HttpInstrumentation();

@@ -71,7 +71,7 @@ node --experimental-loader=@opentelemetry/instrumentation/hook.mjs --import @ope
 ```javascript
 /*telemetry.cjs*/
 const { NodeSDK } = require('@opentelemetry/sdk-node');
-const { ConsoleSpanExporter } = require('@opentelemetry/sdk-trace-node');
+const { ConsoleSpanExporter } = require('@opentelemetry/sdk-trace');
 const {
   getNodeAutoInstrumentations,
 } = require('@opentelemetry/auto-instrumentations-node');

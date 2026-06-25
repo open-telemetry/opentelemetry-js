@@ -7,9 +7,6 @@
 
 This module provides automatic instrumentation for [`@grpc/grpc-js`](https://grpc.io/blog/grpc-js-1.0/). Currently, version [`1.x`](https://www.npmjs.com/package/@grpc/grpc-js?activeTab=versions) of `@grpc/grpc-js` is supported.
 
-For automatic instrumentation see the
-[@opentelemetry/sdk-trace-node](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node) package.
-
 ## Installation
 
 ```sh
@@ -27,20 +24,21 @@ OpenTelemetry gRPC Instrumentation allows the user to automatically collect trac
 To load a specific instrumentation (**gRPC** in this case), specify it in the Node Tracer's configuration.
 
 ```javascript
-const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
+const { trace } = require('@opentelemetry/api');
+const { ConsoleSpanExporter, TracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace');
 const { GrpcInstrumentation } = require('@opentelemetry/instrumentation-grpc');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 
-const provider = new NodeTracerProvider({
+const tracerProvider = new TracerProvider({
   spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
 });
-
-provider.register();
+trace.setGlobalTracerProvider(tracerProvider);
+// See https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-trace/
+// for a more complete example setting up a *context manager* and *propagators*.
 
 registerInstrumentations({
   instrumentations: [new GrpcInstrumentation()]
 });
-
 ```
 
 See [examples/grpc-js](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/grpc-js) for examples.

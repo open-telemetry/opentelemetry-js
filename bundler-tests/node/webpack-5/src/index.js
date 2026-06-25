@@ -16,7 +16,7 @@ const {
 const { B3Propagator } = require('@opentelemetry/propagator-b3');
 const { defaultServiceName } = require('@opentelemetry/resources');
 const { MeterProvider } = require('@opentelemetry/sdk-metrics');
-const { BasicTracerProvider } = require('@opentelemetry/sdk-trace-base');
+const { TracerProvider } = require('@opentelemetry/sdk-trace');
 
 diag.setLogger({
   logger: new DiagConsoleLogger(),
@@ -44,7 +44,7 @@ class TestInstrumentation extends InstrumentationBase {
 }
 
 new TestInstrumentation('test', '0.0.0');
-new BasicTracerProvider();
+new TracerProvider();
 new MeterProvider();
 new OTLPTraceExporter();
 new OTLPMetricExporter();

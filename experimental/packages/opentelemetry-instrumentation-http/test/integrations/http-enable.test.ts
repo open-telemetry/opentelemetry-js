@@ -17,11 +17,11 @@ import { urlToHttpOptions } from 'url';
 import { HttpInstrumentation } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
 import * as utils from '../utils/utils';
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
+  TracerProvider,
+} from '@opentelemetry/sdk-trace';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 
 const instrumentation = new HttpInstrumentation();
@@ -119,7 +119,7 @@ describe('HttpInstrumentation Integration tests', () => {
       });
     });
 
-    const provider = new NodeTracerProvider({
+    const provider = new TracerProvider({
       spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
     });
     instrumentation.setTracerProvider(provider);

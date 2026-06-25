@@ -14,10 +14,10 @@ import {
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import type { ContextManager } from '@opentelemetry/api';
 import {
-  BasicTracerProvider,
+  TracerProvider,
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
+} from '@opentelemetry/sdk-trace';
 import {
   ATTR_HTTP_CLIENT_IP,
   ATTR_HTTP_FLAVOR,
@@ -55,7 +55,7 @@ const hostname = 'localhost';
 const serverName = 'my.server.name';
 const pathname = '/test';
 const memoryExporter = new InMemorySpanExporter();
-const provider = new BasicTracerProvider({
+const provider = new TracerProvider({
   spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
 });
 instrumentation.setTracerProvider(provider);

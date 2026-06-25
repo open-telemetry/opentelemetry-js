@@ -59,7 +59,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "2.8.0",
-    "@opentelemetry/sdk-trace-base": "2.8.0",
+    "@opentelemetry/sdk-trace": "2.8.0",
     "@opentelemetry/semantic-conventions": "^1.29.0",
     "jaeger-client": "^3.15.0"
   },

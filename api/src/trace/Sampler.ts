@@ -10,7 +10,7 @@ import type { SamplingResult } from './SamplingResult';
 import type { SpanKind } from './span_kind';
 
 /**
- * @deprecated use the one declared in @opentelemetry/sdk-trace-base instead.
+ * @deprecated use the one declared in @opentelemetry/sdk-trace instead.
  * This interface represent a sampler. Sampling is a mechanism to control the
  * noise and overhead introduced by OpenTelemetry by reducing the number of
  * samples of traces collected and sent to the backend.

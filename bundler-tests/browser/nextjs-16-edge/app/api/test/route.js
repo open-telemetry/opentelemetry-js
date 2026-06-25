@@ -15,7 +15,7 @@ import {
   SimpleLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
-import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
+import { TracerProvider } from '@opentelemetry/sdk-trace';
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
 
 export const runtime = 'edge';
@@ -39,7 +39,7 @@ export function GET(request) {
   const logger = logs.getLogger('bundle-test-nextjs-edge');
   logger.emit({ body: 'test-event-body', eventName: 'custom.event' });
   new TestInstrumentation('test', '0.0.0');
-  new BasicTracerProvider();
+  new TracerProvider();
   new MeterProvider();
   new OTLPTraceExporter();
   new OTLPMetricExporter();

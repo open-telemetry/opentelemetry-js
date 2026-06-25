@@ -41,7 +41,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/sdk-trace-base": "2.8.0",
+    "@opentelemetry/sdk-trace": "2.8.0",
     "axios": "^1.15.0"
   },
   "peerDependencies": {

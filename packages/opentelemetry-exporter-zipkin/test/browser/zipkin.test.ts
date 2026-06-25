@@ -8,7 +8,7 @@ import {
   setGlobalErrorHandler,
   loggingErrorHandler,
 } from '@opentelemetry/core';
-import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { ZipkinExporter } from '../../src';
