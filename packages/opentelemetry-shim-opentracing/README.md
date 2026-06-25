@@ -3,6 +3,11 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
+> [!IMPORTANT]
+> As of April 2026, OpenTracing compatibility requirements in the OpenTelemetry specification [were deprecated](https://opentelemetry.io/blog/2026/deprecating-opentracing-compatibility/).
+> This package (`@opentelemetry/shim-opentracing`) will be removed in the upcoming [SDK 3.0 milestone](https://github.com/open-telemetry/opentelemetry-js/milestone/20), planned for approximately September 2026.
+> Version 2.x will be maintained for one year, per the [OpenTelemetry stability policy](https://opentelemetry.io/docs/specs/otel/versioning-and-stability/#sdk-support).
+
 OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry
 
 ## Installation
