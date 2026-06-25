@@ -157,7 +157,6 @@ If not specified, the [default resource](https://opentelemetry.io/docs/specs/sem
 > [`OTEL_RESOURCE_ATTRIBUTES`](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#general-sdk-configuration)
 > environment variable.
 
-
 ### resourceDetectors
 
 Configure resource detectors. By default, the resource detectors are [envDetector, processDetector, hostDetector].
