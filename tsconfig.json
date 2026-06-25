@@ -31,7 +31,6 @@
       "experimental/packages/sampler-composite",
       "experimental/packages/sampler-jaeger-remote",
       "experimental/packages/sdk-logs",
-      "experimental/packages/shim-opencensus",
       "experimental/packages/web-common",
       "packages/opentelemetry-context-async-hooks",
       "packages/opentelemetry-context-zone",
@@ -141,9 +140,6 @@
     },
     {
       "path": "experimental/packages/sdk-logs"
-    },
-    {
-      "path": "experimental/packages/shim-opencensus"
     },
     {
       "path": "experimental/packages/web-common"
