@@ -17,6 +17,10 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(instrumentation-fetch)!: emit only stable HTTP semantic conventions. The `semconvStabilityOptIn` instrumentation config option has been removed; old (v1.7.0) and duplicate semconv outputs are no longer emitted. [#6819](https://github.com/open-telemetry/opentelemetry-js/pull/6819) @maryliag
 * feat(instrumentation-xml-http-request)!: emit only stable HTTP semantic conventions. The `semconvStabilityOptIn` instrumentation config option has been removed; old (v1.7.0) and duplicate semconv outputs are no longer emitted. [#6819](https://github.com/open-telemetry/opentelemetry-js/pull/6819) @maryliag
 * feat(instrumentation-grpc)!: emit only stable network semantic conventions. The `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable no longer changes attribute emission — `net.peer.name` and `net.peer.port` (old) are no longer set; only `server.address` and `server.port` (stable). [#6819](https://github.com/open-telemetry/opentelemetry-js/pull/6819) @maryliag
+* refactor(configuration)!: change config file parsing to *not* add default values, nor merge `*_list` fields [#6765](https://github.com/open-telemetry/opentelemetry-js/pull/6765) @trentm
+  * Responsibility for handling [declarative config "nullBehavior" and "defaultBehavior"](https://opentelemetry.io/docs/specs/otel/configuration/sdk/#create) belongs in the "create" handling, currently in the "sdk-node" package.
+* docs(shim-opencensus): *Notice*: The `@opentracing/shim-opencensus` package will be removed in SDK 3.x, planned for approximately September 2026.
+  * The [OpenCensus](https://opentelemetry.io/blog/2026/deprecating-opencensus-compatibility/) and [OpenTracing](https://opentelemetry.io/blog/2026/deprecating-opentracing-compatibility/) compatibility requirements in the OpenTelemetry specification have been deprecated.
 
 ### :rocket: Features
 
@@ -34,6 +38,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(sdk-node): fail-fast on LoggerProvider creation with startNodeSDK() and declarative config [#6785](https://github.com/open-telemetry/opentelemetry-js/pull/6785) @trentm
 
 ### :books: Documentation
+
+* docs(configuration): link the configuration README to the cross-SDK declarative config language support status doc [#6809](https://github.com/open-telemetry/opentelemetry-js/issues/6809) @MikeGoldsmith
 
 ### :house: Internal
 

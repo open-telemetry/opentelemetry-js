@@ -1,5 +1,0 @@
-file_format: "1.0"
-resource:
-  # Values include percent-encoded `,` (%2C) and `=` (%3D) in keys and values,
-  # plus a non-ASCII value encoded as UTF-8 (%C3%A9 = é).
-  attributes_list: "my%2Ckey=value%3Dwith%3Dequals,unicode=caf%C3%A9"
