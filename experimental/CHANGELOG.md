@@ -35,6 +35,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :books: Documentation
 
+* docs(configuration): link the configuration README to the cross-SDK declarative config language support status doc [#6809](https://github.com/open-telemetry/opentelemetry-js/issues/6809) @MikeGoldsmith
+
 ### :house: Internal
 
 * chore(sdk-node): migrate to use the new sdk-trace package [#6828](https://github.com/open-telemetry/opentelemetry-js/pull/6828/) @trentm
