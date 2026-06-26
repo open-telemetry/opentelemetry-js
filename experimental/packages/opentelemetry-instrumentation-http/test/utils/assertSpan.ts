@@ -5,7 +5,7 @@
 import type { SpanStatus, Exception } from '@opentelemetry/api';
 import { isValidSpanId, SpanKind } from '@opentelemetry/api';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
-import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace';
 import {
   ATTR_HTTP_METHOD,
   ATTR_HTTP_REQUEST_CONTENT_LENGTH,

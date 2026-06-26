@@ -62,12 +62,10 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.14.3",
-    "@opentelemetry/core": "2.8.0",
     "@opentelemetry/otlp-exporter-base": "0.219.0",
     "@opentelemetry/otlp-grpc-exporter-base": "0.219.0",
     "@opentelemetry/otlp-transformer": "0.219.0",
-    "@opentelemetry/resources": "2.8.0",
-    "@opentelemetry/sdk-trace-base": "2.8.0"
+    "@opentelemetry/sdk-trace": "2.8.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-trace-otlp-grpc",
   "sideEffects": false

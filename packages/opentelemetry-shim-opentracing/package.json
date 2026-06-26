@@ -44,7 +44,7 @@
     "@opentelemetry/api": ">=1.0.0 <1.10.0",
     "@opentelemetry/propagator-b3": "2.8.0",
     "@opentelemetry/propagator-jaeger": "2.8.0",
-    "@opentelemetry/sdk-trace-base": "2.8.0",
+    "@opentelemetry/sdk-trace": "2.8.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "mocha": "11.7.6",
