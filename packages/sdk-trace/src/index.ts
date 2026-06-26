@@ -24,7 +24,9 @@ export type { TimedEvent } from './TimedEvent';
 export type {
   BatchSpanProcessorOptions,
   BatchSpanProcessorBrowserOptions,
+  SimpleSpanProcessorOptions,
   SpanLimits,
+  SpanProcessorOptions,
   TracerProviderOptions,
 } from './types';
 export type { IdGenerator } from './IdGenerator';

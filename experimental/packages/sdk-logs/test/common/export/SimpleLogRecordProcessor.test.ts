@@ -46,7 +46,7 @@ const setup = (exporter: LogRecordExporter, resource?: Resource) => {
       body: 'body',
     }
   );
-  const processor = new SimpleLogRecordProcessor(exporter);
+  const processor = new SimpleLogRecordProcessor({ exporter });
   return { exporter, processor, logRecord };
 };
 
@@ -142,7 +142,9 @@ describe('SimpleLogRecordProcessor', () => {
           setTimeout(() => resolve('fromasync'), 1)
         ),
       });
-      const processor = new SimpleLogRecordProcessor(testExporterWithDelay);
+      const processor = new SimpleLogRecordProcessor({
+        exporter: testExporterWithDelay,
+      });
       const { logRecord } = setup(testExporterWithDelay, asyncResource);
 
       processor.onEmit(logRecord);

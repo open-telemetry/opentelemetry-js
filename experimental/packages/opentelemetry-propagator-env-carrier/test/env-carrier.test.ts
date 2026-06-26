@@ -64,6 +64,17 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
       });
     });
 
+    it('should normalize empty keys to a single underscore', () => {
+      const carrier: Record<string, string> = {};
+      const setter = new EnvironmentSetter(carrier);
+
+      setter.set(undefined, '', 'value');
+
+      assert.deepStrictEqual(carrier, {
+        _: 'value',
+      });
+    });
+
     it('should overwrite values with the same normalized key', () => {
       const carrier: Record<string, string> = {};
       const setter = new EnvironmentSetter(carrier);
@@ -108,6 +119,7 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
       process.env.MIXED_CASE = 'mixed-value';
       process.env.H_LLO = 'non-ascii-value';
       process.env._1ABC = 'leading-digit-value';
+      process.env._ = 'empty-key-value';
       process.env.X_B3_TRACEID = 'b3-value';
 
       const getter = new EnvironmentGetter();
@@ -127,6 +139,7 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
         'non-ascii-value'
       );
       assert.strictEqual(getter.get(undefined, '1abc'), 'leading-digit-value');
+      assert.strictEqual(getter.get(undefined, ''), 'empty-key-value');
       assert.strictEqual(getter.get(undefined, 'X_B3_TRACEID'), 'b3-value');
       assert.strictEqual(getter.get(undefined, 'x-b3-traceid'), 'b3-value');
     });
