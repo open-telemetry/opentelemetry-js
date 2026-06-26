@@ -10,13 +10,13 @@ import type { Sampler } from '../../../src';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,
-  AlwaysRecordSampler,
+  createAlwaysRecordSampler,
   SamplingDecision,
 } from '../../../src';
 
 describe('AlwaysRecordSampler', function () {
   it('should reflect delegate name in toString()', function () {
-    const sampler = new AlwaysRecordSampler({ delegate: new AlwaysOffSampler() });
+    const sampler = createAlwaysRecordSampler(new AlwaysOffSampler());
     assert.strictEqual(
       sampler.toString(),
       'AlwaysRecordSampler{AlwaysOffSampler}'
@@ -25,23 +25,20 @@ describe('AlwaysRecordSampler', function () {
 
   it('should throw when delegate is null', function () {
     assert.throws(
-      () => new AlwaysRecordSampler({ delegate: null as unknown as Sampler }),
+      () => createAlwaysRecordSampler(null as unknown as Sampler),
       /AlwaysRecordSampler requires a delegate sampler/
     );
   });
 
   it('should throw when delegate is undefined', function () {
     assert.throws(
-      () =>
-        new AlwaysRecordSampler({
-          delegate: undefined as unknown as Sampler,
-        }),
+      () => createAlwaysRecordSampler(undefined as unknown as Sampler),
       /AlwaysRecordSampler requires a delegate sampler/
     );
   });
 
   it('should pass through RECORD_AND_SAMPLED unchanged', function () {
-    const sampler = new AlwaysRecordSampler({ delegate: new AlwaysOnSampler() });
+    const sampler = createAlwaysRecordSampler(new AlwaysOnSampler());
     const result = sampler.shouldSample(
       context.active(),
       '0af7651916cd43dd8448eb211c80319c',
@@ -58,7 +55,7 @@ describe('AlwaysRecordSampler', function () {
       shouldSample: () => ({ decision: SamplingDecision.RECORD }),
       toString: () => 'RecordSampler',
     };
-    const sampler = new AlwaysRecordSampler({ delegate });
+    const sampler = createAlwaysRecordSampler(delegate);
     const result = sampler.shouldSample(
       context.active(),
       '0af7651916cd43dd8448eb211c80319c',
@@ -81,7 +78,7 @@ describe('AlwaysRecordSampler', function () {
       }),
       toString: () => 'DropSampler',
     };
-    const sampler = new AlwaysRecordSampler({ delegate });
+    const sampler = createAlwaysRecordSampler(delegate);
     const result = sampler.shouldSample(
       context.active(),
       '0af7651916cd43dd8448eb211c80319c',
