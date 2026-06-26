@@ -16,9 +16,7 @@ import {
 
 describe('AlwaysRecordSampler', function () {
   it('should reflect delegate name in toString()', function () {
-    const sampler = new AlwaysRecordSampler({
-      delegate: new AlwaysOffSampler(),
-    });
+    const sampler = new AlwaysRecordSampler({ delegate: new AlwaysOffSampler() });
     assert.strictEqual(
       sampler.toString(),
       'AlwaysRecordSampler{AlwaysOffSampler}'
@@ -43,9 +41,7 @@ describe('AlwaysRecordSampler', function () {
   });
 
   it('should pass through RECORD_AND_SAMPLED unchanged', function () {
-    const sampler = new AlwaysRecordSampler({
-      delegate: new AlwaysOnSampler(),
-    });
+    const sampler = new AlwaysRecordSampler({ delegate: new AlwaysOnSampler() });
     const result = sampler.shouldSample(
       context.active(),
       '0af7651916cd43dd8448eb211c80319c',
