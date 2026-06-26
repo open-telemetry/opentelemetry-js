@@ -146,6 +146,27 @@ const tracerProvider = new TracerProvider({
 });
 ```
 
+### AlwaysRecord Sampler
+
+Wraps a delegate sampler and upgrades any `NOT_RECORD` (drop) decision to `RECORD`, ensuring all spans are recorded
+without changing the sampling rate. This is useful when you want to count or measure all spans (e.g. via a processor)
+while still controlling export costs through the delegate sampler.
+
+```js
+const {
+  TracerProvider,
+  ParentBasedSampler,
+  TraceIdRatioBasedSampler,
+  createAlwaysRecordSampler,
+} = require("@opentelemetry/sdk-trace");
+
+const tracerProvider = new TracerProvider({
+  // Wraps a 50% TraceIdRatioBased sampler so that dropped spans are still
+  // recorded (but not exported by a sampling exporter).
+  sampler: createAlwaysRecordSampler(new TraceIdRatioBasedSampler(0.5))
+});
+```
+
 ## Example
 
 See [examples/basic-tracer-node](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/basic-tracer-node) for an end-to-end example, including exporting created spans.
