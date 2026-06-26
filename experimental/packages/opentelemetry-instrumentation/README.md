@@ -168,10 +168,10 @@ myInstrumentation.enable();
 const { trace } = require('@opentelemetry/api');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
-const { NodeTracerProvider } = require('@opentelemetry/sdk-trace');
+const { TracerProvider } = require('@opentelemetry/sdk-trace');
 
 const tracerProvider = new TracerProvider();
-trace.setGlobalTracerProvider(traceProvider);
+trace.setGlobalTracerProvider(tracerProvider);
 // See https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-trace/
 // for a more complete example setting up a *context manager* and *propagators*.
 

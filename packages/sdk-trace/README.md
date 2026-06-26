@@ -65,6 +65,7 @@ for Node.js. (Which context manager, and sometimes which propagators, to use
 depends on the JavaScript runtime.)
 
 ```js
+const os = require('os');
 const { context, propagation, trace } = require('@opentelemetry/api');
 const { TracerProvider } = require('@opentelemetry/sdk-trace');
 const { AsyncLocalStorageContextManager } = require('@opentelemetry/context-async-hooks');
@@ -79,11 +80,11 @@ context.setGlobalContextManager(contextManager);
 
 const propagator = new CompositePropagator({
   propagators: [ new W3CTraceContextPropagator(), new W3CBaggagePropagator() ],
-);
+});
 propagation.setGlobalPropagator(propagator);
 
 const tracerProvider = new TracerProvider(/* ... */);
-trace.setGlobalTracerProvider(traceProvider);
+trace.setGlobalTracerProvider(tracerProvider);
 
 process.on('SIGTERM', async () => {
   await tracerProvider.shutdown().catch(console.error);
