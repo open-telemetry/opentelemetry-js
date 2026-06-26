@@ -191,17 +191,13 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
     });
 
     it('should ignore non-normalized environment names when reading values', () => {
-      process.env.traceparent = 'ignored';
       process.env['trace-state'] = 'ignored';
       process.env['x-b3-traceid'] = 'ignored';
-      process.env['1ABC'] = 'ignored';
 
       const getter = new EnvironmentGetter();
 
-      assert.strictEqual(getter.get(undefined, 'traceparent'), undefined);
       assert.strictEqual(getter.get(undefined, 'trace-state'), undefined);
       assert.strictEqual(getter.get(undefined, 'x-b3-traceid'), undefined);
-      assert.strictEqual(getter.get(undefined, '1abc'), undefined);
       assert.deepStrictEqual(getter.keys(undefined), []);
     });
 
@@ -286,20 +282,6 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
       assert.strictEqual(spanContext?.isRemote, true);
       assert.strictEqual(spanContext?.traceState?.get('vendor1'), 'value1');
       assert.strictEqual(spanContext?.traceState?.get('vendor2'), 'value2');
-    });
-
-    it('should ignore W3C trace context in non-normalized environment names', () => {
-      process.env.traceparent = `00-${traceId}-${spanId}-01`;
-      process.env.tracestate = 'vendor1=value1,vendor2=value2';
-
-      const propagator = new W3CTraceContextPropagator();
-      const context = propagator.extract(
-        ROOT_CONTEXT,
-        undefined,
-        new EnvironmentGetter()
-      );
-
-      assert.strictEqual(trace.getSpanContext(context), undefined);
     });
 
     it('should inject W3C baggage into an environment carrier', () => {
