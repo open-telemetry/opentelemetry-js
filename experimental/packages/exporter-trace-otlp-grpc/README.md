@@ -32,7 +32,7 @@ const exporter = new OTLPTraceExporter(collectorOptions);
 const tracerProvider = new TracerProvider({
   spanProcessors: [new SimpleSpanProcessor({ exporter })]
 });
-trace.setGlobalTracerProvider(traceProvider);
+trace.setGlobalTracerProvider(tracerProvider);
 ```
 
 By default, the exporter creates a secure (TLS) connection. When connecting to a local development collector without TLS, you can use an insecure connection by specifying the `http://` scheme in the URL:

@@ -37,7 +37,7 @@ const exporter = new OTLPTraceExporter(collectorOptions);
 const tracerProvider = new TracerProvider({
   spanProcessors: [new SimpleSpanProcessor({ exporter })]
 });
-trace.setGlobalTracerProvider(traceProvider);
+trace.setGlobalTracerProvider(tracerProvider);
 ```
 
 ## Exporter Timeout Configuration

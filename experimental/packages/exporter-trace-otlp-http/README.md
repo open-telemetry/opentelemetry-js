@@ -83,7 +83,7 @@ const tracerProvider = new TracerProvider({
     })
   ]
 });
-trace.setGlobalTracerProvider(traceProvider);
+trace.setGlobalTracerProvider(tracerProvider);
 ```
 
 ## GRPC
