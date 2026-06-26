@@ -12,7 +12,7 @@
     "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "test": "nyc mocha 'test/**/*.test.ts'",
-    "test:bench": "node test/performance/benchmark/index.js | tee .benchmark-results.txt",
+    "test:bench": "node test/performance/benchmark/internal-benchmarks.js && node test/performance/benchmark/public-benchmarks.js | tee .benchmark-results.txt",
     "test:browser": "karma start --single-run",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",

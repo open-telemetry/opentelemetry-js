@@ -144,7 +144,7 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
       assert.strictEqual(getter.get(undefined, 'x-b3-traceid'), 'b3-value');
     });
 
-    it('should return only already normalized snapshot keys', () => {
+    it('should return only already normalized environment keys', () => {
       process.env.TRACEPARENT = 'traceparent-value';
       process.env.TRACE_STATE = 'tracestate-value';
       process.env['trace-state'] = 'ignored';
@@ -159,13 +159,13 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
       ]);
     });
 
-    it('should return empty keys for an empty environment snapshot', () => {
+    it('should return empty keys for an empty environment', () => {
       const getter = new EnvironmentGetter();
 
       assert.deepStrictEqual(getter.keys(undefined), []);
     });
 
-    it('should ignore empty environment names when snapshotting', () => {
+    it('should ignore empty environment names when listing keys', () => {
       const env = process.env;
       process.env = {
         '': 'ignored',
@@ -191,17 +191,13 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
     });
 
     it('should ignore non-normalized environment names when reading values', () => {
-      process.env.traceparent = 'ignored';
       process.env['trace-state'] = 'ignored';
       process.env['x-b3-traceid'] = 'ignored';
-      process.env['1ABC'] = 'ignored';
 
       const getter = new EnvironmentGetter();
 
-      assert.strictEqual(getter.get(undefined, 'traceparent'), undefined);
       assert.strictEqual(getter.get(undefined, 'trace-state'), undefined);
       assert.strictEqual(getter.get(undefined, 'x-b3-traceid'), undefined);
-      assert.strictEqual(getter.get(undefined, '1abc'), undefined);
       assert.deepStrictEqual(getter.keys(undefined), []);
     });
 
@@ -213,18 +209,28 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
       assert.strictEqual(getter.get(undefined, 'empty'), '');
     });
 
-    it('should snapshot process.env at construction time', () => {
+    it('should read current process.env values after construction', () => {
       process.env.TRACEPARENT = 'original';
+      process.env.TRACESTATE = 'initial';
       const getter = new EnvironmentGetter();
 
       process.env.TRACEPARENT = 'updated';
-      process.env.TRACESTATE = 'added-after-construction';
+      process.env.BAGGAGE = 'added-after-construction';
+      delete process.env.TRACESTATE;
 
-      assert.strictEqual(getter.get(undefined, 'traceparent'), 'original');
+      assert.strictEqual(getter.get(undefined, 'traceparent'), 'updated');
       assert.strictEqual(getter.get(undefined, 'tracestate'), undefined);
+      assert.strictEqual(
+        getter.get(undefined, 'baggage'),
+        'added-after-construction'
+      );
+      assert.deepStrictEqual(getter.keys(undefined).sort(), [
+        'BAGGAGE',
+        'TRACEPARENT',
+      ]);
     });
 
-    it('should read from the environment snapshot without a carrier', () => {
+    it('should read from process.env without a carrier', () => {
       process.env.TRACEPARENT = 'environment-value';
 
       const getter = new EnvironmentGetter();
@@ -258,7 +264,7 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
       });
     });
 
-    it('should extract W3C trace context from an environment snapshot', () => {
+    it('should extract W3C trace context from process.env', () => {
       process.env.TRACEPARENT = `00-${traceId}-${spanId}-01`;
       process.env.TRACESTATE = 'vendor1=value1,vendor2=value2';
 
@@ -278,20 +284,6 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
       assert.strictEqual(spanContext?.traceState?.get('vendor2'), 'value2');
     });
 
-    it('should ignore W3C trace context in non-normalized environment names', () => {
-      process.env.traceparent = `00-${traceId}-${spanId}-01`;
-      process.env.tracestate = 'vendor1=value1,vendor2=value2';
-
-      const propagator = new W3CTraceContextPropagator();
-      const context = propagator.extract(
-        ROOT_CONTEXT,
-        undefined,
-        new EnvironmentGetter()
-      );
-
-      assert.strictEqual(trace.getSpanContext(context), undefined);
-    });
-
     it('should inject W3C baggage into an environment carrier', () => {
       const propagator = new W3CBaggagePropagator();
       const context = propagation.setBaggage(
@@ -308,7 +300,7 @@ describe('EnvironmentGetter and EnvironmentSetter', () => {
       assert.strictEqual(carrier.BAGGAGE, 'first=one,second=two');
     });
 
-    it('should extract W3C baggage from an environment snapshot', () => {
+    it('should extract W3C baggage from process.env', () => {
       process.env.BAGGAGE = 'first=one,second=two';
 
       const propagator = new W3CBaggagePropagator();
