@@ -33,6 +33,15 @@ export interface Context {
 }
 
 /**
+ * An opaque token returned by attach() that can be used to restore the previous Context.
+ * This is an opaque type to prevent misuse and ensure type safety.
+ *
+ * @since 1.10.0
+ * @experimental This API is experimental and may change in minor releases without prior notice.
+ */
+export type Token = { readonly __brand: 'Token' };
+
+/**
  * @since 1.0.0
  */
 export interface ContextManager {
@@ -71,4 +80,33 @@ export interface ContextManager {
    * Disable context management
    */
   disable(): this;
+
+  /**
+   * Imperatively sets `context` as active, returning a {@link Token} for {@link detach}.
+   *
+   * This is a delicate, low-level API - prefer {@link with}/{@link bind}, which
+   * restore context automatically. `attach`/`detach` exist only to bridge
+   * callback boundaries that `with` cannot wrap. The caller is
+   * responsible for the bookkeeping that `with` would otherwise handle:
+   * - Pair every `attach` with a `detach`
+   * - Support is optional and best-effort, varying by ContextManager.
+   *   When omitted, {@link ContextAPI.attach} logs a warning and no-ops.
+   *
+   * @param context The Context to attach
+   * @returns A Token that can be used to restore the previous Context
+   * @since 1.10.0
+   * @experimental This API is experimental and may change in minor releases without prior notice.
+   */
+  attach?(context: Context): Token;
+
+  /**
+   * Restores the Context to the value it had before the corresponding
+   * {@link attach} call. Optional and best-effort; implement if and only if
+   * {@link attach} is implemented, and see {@link attach} for the usage contract.
+   *
+   * @param token A Token returned by a previous call to attach()
+   * @since 1.10.0
+   * @experimental This API is experimental and may change in minor releases without prior notice.
+   */
+  detach?(token: Token): void;
 }
