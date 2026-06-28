@@ -3,7 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { MetricProducer } from '@opentelemetry/sdk-metrics';
+import type {
+  AggregationSelector,
+  MetricProducer,
+} from '@opentelemetry/sdk-metrics';
 
 /**
  * Configuration interface for prometheus exporter
@@ -75,4 +78,11 @@ export interface ExporterConfig {
    * @default false (target_info metric is included)
    */
   withoutTargetInfo?: boolean;
+
+  /**
+   * Selects the default aggregation as a function of instrument kind for the
+   * underlying {@link https://opentelemetry.io/docs/specs/otel/metrics/sdk/#metricreader | MetricReader}.
+   * @default the SDK's {@link https://opentelemetry.io/docs/specs/otel/metrics/sdk/#default-aggregation | default aggregation}
+   */
+  aggregationSelector?: AggregationSelector;
 }

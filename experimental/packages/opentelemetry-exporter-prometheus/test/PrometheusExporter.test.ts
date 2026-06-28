@@ -4,7 +4,7 @@
  */
 
 import type { Counter, Meter, ObservableResult } from '@opentelemetry/api';
-import { MeterProvider } from '@opentelemetry/sdk-metrics';
+import { AggregationType, MeterProvider } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as http from 'http';
@@ -596,6 +596,35 @@ describe('PrometheusExporter', () => {
         '# HELP counter_total description missing',
         '# TYPE counter_total counter',
         'counter_total{key1="attributeValue1"} 10',
+        '',
+      ]);
+    });
+
+    it('should use a configured aggregationSelector', async () => {
+      exporter = new PrometheusExporter({
+        aggregationSelector: _instrumentType => ({
+          type: AggregationType.SUM,
+        }),
+      });
+      meterProvider = new MeterProvider({
+        readers: [exporter],
+      });
+      meter = meterProvider.getMeter('test-prometheus');
+      const histogram = meter.createHistogram('test_histogram', {
+        description: 'a test description',
+      });
+      histogram.record(20, { key1: 'attributeValue1' });
+
+      const body = await request('http://localhost:9464/metrics');
+      const lines = body.split('\n');
+
+      // With a SUM aggregation selector, the histogram instrument is exported
+      // as a single summed counter instead of histogram buckets.
+      assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
+        '# HELP test_histogram_total a test description',
+        '# TYPE test_histogram_total counter',
+        'test_histogram_total{key1="attributeValue1",otel_scope_name="test-prometheus"} 20',
         '',
       ]);
     });

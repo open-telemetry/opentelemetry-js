@@ -54,11 +54,13 @@ export class PrometheusExporter extends MetricReader {
     callback: (error: Error | void) => void = () => {}
   ) {
     super({
-      aggregationSelector: _instrumentType => {
-        return {
-          type: AggregationType.DEFAULT,
-        };
-      },
+      aggregationSelector:
+        config.aggregationSelector ??
+        (_instrumentType => {
+          return {
+            type: AggregationType.DEFAULT,
+          };
+        }),
       aggregationTemporalitySelector: _instrumentType =>
         AggregationTemporality.CUMULATIVE,
       otelComponentType:
