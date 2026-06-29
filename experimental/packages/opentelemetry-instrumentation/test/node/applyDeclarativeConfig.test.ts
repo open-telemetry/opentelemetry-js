@@ -1,0 +1,137 @@
+/*
+ * Copyright The OpenTelemetry Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import * as assert from 'assert';
+import * as sinon from 'sinon';
+import { diag, DiagLogLevel } from '@opentelemetry/api';
+import { InstrumentationBase } from '../../src';
+import type { InstrumentationConfig } from '../../src';
+
+interface TestConfig extends InstrumentationConfig {
+  maxQueryLength?: number;
+  redactedQueryParams?: string[];
+}
+
+class TestInstrumentation extends InstrumentationBase<TestConfig> {
+  constructor(config: TestConfig = {}) {
+    super('test-instrumentation', '1.0.0', config);
+  }
+  init() {}
+}
+
+// Overrides the reader to map two snake_case keys, ignoring the wrapper here to
+// keep the base test free of a @opentelemetry/configuration dependency.
+class ReaderInstrumentation extends InstrumentationBase<TestConfig> {
+  constructor(config: TestConfig = {}) {
+    super('reader-instrumentation', '1.0.0', config);
+  }
+  init() {}
+  protected override readDeclarativeConfig(
+    block: Record<string, unknown>
+  ): Partial<TestConfig> {
+    return {
+      enabled: typeof block.enabled === 'boolean' ? block.enabled : undefined,
+      maxQueryLength:
+        typeof block.max_query_length === 'number'
+          ? block.max_query_length
+          : undefined,
+    };
+  }
+}
+
+describe('InstrumentationBase declarative config', function () {
+  let warn: sinon.SinonStub;
+
+  beforeEach(function () {
+    warn = sinon.stub();
+    diag.setLogger(
+      {
+        verbose: () => {},
+        debug: () => {},
+        info: () => {},
+        warn,
+        error: () => {},
+      },
+      DiagLogLevel.WARN
+    );
+  });
+
+  afterEach(function () {
+    diag.disable();
+    sinon.restore();
+  });
+
+  describe('default reader', function () {
+    it('applies enabled from the block', function () {
+      const instr = new TestInstrumentation({ enabled: true });
+      instr.applyDeclarativeConfig({ enabled: false });
+      assert.strictEqual(instr.getConfig().enabled, false);
+    });
+
+    it('keeps the existing value when enabled is absent', function () {
+      const instr = new TestInstrumentation({ enabled: false });
+      instr.applyDeclarativeConfig({});
+      assert.strictEqual(instr.getConfig().enabled, false);
+    });
+
+    it('ignores a non-boolean enabled and keeps the existing value', function () {
+      const instr = new TestInstrumentation({ enabled: true });
+      instr.applyDeclarativeConfig({ enabled: 'yes' as unknown as boolean });
+      assert.strictEqual(instr.getConfig().enabled, true);
+    });
+
+    it('warns about keys it has no reader for', function () {
+      const instr = new TestInstrumentation();
+      instr.applyDeclarativeConfig({ enabled: true, max_query_length: 100 });
+      sinon.assert.calledOnce(warn);
+      assert.match(
+        warn.firstCall.args.join(' '),
+        /no reader.*max_query_length/
+      );
+    });
+
+    it('does not warn when only enabled is present', function () {
+      const instr = new TestInstrumentation();
+      instr.applyDeclarativeConfig({ enabled: true });
+      sinon.assert.notCalled(warn);
+    });
+
+    it('does not clobber other config fields', function () {
+      const instr = new TestInstrumentation({
+        enabled: true,
+        maxQueryLength: 50,
+      });
+      instr.applyDeclarativeConfig({ enabled: false });
+      assert.strictEqual(instr.getConfig().enabled, false);
+      assert.strictEqual(instr.getConfig().maxQueryLength, 50);
+    });
+  });
+
+  describe('overridden reader', function () {
+    it('applies mapped fields and leaves unset fields at their default', function () {
+      const instr = new ReaderInstrumentation({
+        enabled: true,
+        redactedQueryParams: ['token'],
+      });
+      instr.applyDeclarativeConfig({ enabled: false, max_query_length: 200 });
+      const config = instr.getConfig();
+      assert.strictEqual(config.enabled, false);
+      assert.strictEqual(config.maxQueryLength, 200);
+      assert.deepStrictEqual(config.redactedQueryParams, ['token']);
+    });
+
+    it('keeps the default when the mapped key is absent', function () {
+      const instr = new ReaderInstrumentation({ maxQueryLength: 50 });
+      instr.applyDeclarativeConfig({ enabled: true });
+      assert.strictEqual(instr.getConfig().maxQueryLength, 50);
+    });
+
+    it('does not warn for keys the override consumes', function () {
+      const instr = new ReaderInstrumentation();
+      instr.applyDeclarativeConfig({ max_query_length: 200 });
+      sinon.assert.notCalled(warn);
+    });
+  });
+});

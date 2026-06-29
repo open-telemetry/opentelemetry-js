@@ -36,6 +36,20 @@ export interface Instrumentation<
 
   /** Method to get instrumentation config  */
   getConfig(): ConfigType;
+
+  /**
+   * @experimental This feature is in development as per the OpenTelemetry specification.
+   *
+   * Apply a declarative config block to this instrumentation, overriding the
+   * matching config fields. `block` is the instrumentation's own
+   * `instrumentation/development` block; `general` is the shared config that
+   * applies across instrumentations. Reads `enabled` by default; an
+   * instrumentation may map further keys.
+   */
+  applyDeclarativeConfig?(
+    block: Record<string, unknown>,
+    general?: Record<string, unknown>
+  ): void;
 }
 
 /**

@@ -144,6 +144,59 @@ export abstract class InstrumentationAbstract<
   }
 
   /**
+   * @experimental This feature is in development as per the OpenTelemetry specification.
+   *
+   * Apply a declarative config block to this instrumentation. Calls
+   * {@link readDeclarativeConfig} to turn the block into config fields, drops the
+   * undefined ones so unset keys keep their constructor default, then merges what
+   * remains over the current config.
+   *
+   * @param block the instrumentation's own `instrumentation/development` block
+   * @param general the shared `general` block (cross-cutting semconv config)
+   */
+  public applyDeclarativeConfig(
+    block: Record<string, unknown>,
+    general: Record<string, unknown> = {}
+  ): void {
+    const partial = this.readDeclarativeConfig(block, general);
+    const defined: Partial<ConfigType> = {};
+    for (const key of Object.keys(partial) as (keyof ConfigType)[]) {
+      if (partial[key] !== undefined) {
+        defined[key] = partial[key];
+      }
+    }
+    this.setConfig({ ...this.getConfig(), ...defined });
+  }
+
+  /**
+   * @experimental This feature is in development as per the OpenTelemetry specification.
+   *
+   * Map a declarative config block to a partial config. Override this per
+   * instrumentation to read keys with the typed-reader API in
+   * `@opentelemetry/configuration` and return the fields to apply. The default
+   * implementation reads `enabled` and warns that it ignores every other key,
+   * since nothing reads them.
+   *
+   * @param block the instrumentation's own config block
+   * @param _general the shared `general` block
+   * @returns the config fields to apply; undefined values keep the default
+   */
+  protected readDeclarativeConfig(
+    block: Record<string, unknown>,
+    _general: Record<string, unknown>
+  ): Partial<ConfigType> {
+    const extra = Object.keys(block).filter(k => k !== 'enabled');
+    if (extra.length > 0) {
+      this._diag.warn(
+        `ignoring declarative config (no reader): ${extra.join(', ')}`
+      );
+    }
+    const enabled =
+      typeof block.enabled === 'boolean' ? block.enabled : undefined;
+    return { enabled } as Partial<ConfigType>;
+  }
+
+  /**
    * Sets TracerProvider to this plugin
    * @param tracerProvider
    */
