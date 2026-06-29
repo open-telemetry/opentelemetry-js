@@ -17,6 +17,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
   * Responsibility for handling [declarative config "nullBehavior" and "defaultBehavior"](https://opentelemetry.io/docs/specs/otel/configuration/sdk/#create) belongs in the "create" handling, currently in the "sdk-node" package.
 * docs(shim-opencensus): *Notice*: The `@opentracing/shim-opencensus` package will be removed in SDK 3.x, planned for approximately September 2026.
   * The [OpenCensus](https://opentelemetry.io/blog/2026/deprecating-opencensus-compatibility/) and [OpenTracing](https://opentelemetry.io/blog/2026/deprecating-opentracing-compatibility/) compatibility requirements in the OpenTelemetry specification have been deprecated.
+* chore(sdk-node)!: Drop support for deprecated OpenCensusMetricProducer from declarative config
 
 ### :rocket: Features
 
