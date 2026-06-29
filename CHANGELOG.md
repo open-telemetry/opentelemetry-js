@@ -24,6 +24,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
   * "sdk-trace" will eventually replace all of "sdk-trace-base", "sdk-trace-node", and "sdk-trace-web".
   * The `BatchSpanProcessor` constructor call signature has changed in "sdk-trace".  For example, before `new BatchSpanProcessor(exporter, { maxQueueSize: 1000 })`, after `new BatchSpanProcessor({ exporter, maxQueueSize: 1000 })`. [#6817](https://github.com/open-telemetry/opentelemetry-js/pull/6817)
   * The `SimpleSpanProcessor` constructor call signature has changed in "sdk-trace".  For example, before `new SimpleSpanProcessor(exporter)`, after `new SimpleSpanProcessor({ exporter, selfObsMeterProvider: ... })`. [#6504](https://github.com/open-telemetry/opentelemetry-js/pull/6504)
+* feat(sdk-trace): add AlwaysRecordSampler [#6188](https://github.com/open-telemetry/opentelemetry-js/pull/6188) @majanjua-amzn
 
 ### :bug: Bug Fixes
 
