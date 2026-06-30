@@ -25,6 +25,9 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(sdk-node): wire up `id_generator` from declarative config [#6782](https://github.com/open-telemetry/opentelemetry-js/pull/6782) @MikeGoldsmith
 * feat(propagator-env-carrier): empty name normalization [#6827](https://github.com/open-telemetry/opentelemetry-js/pull/6827) @pellared
 * feat(propagator-env-carrier): make `EnvironmentGetter` read the current `process.env` [#6853](https://github.com/open-telemetry/opentelemetry-js/pull/6853) @pellared
+* feat(instrumentation): add experimental declarative config reader API: `applyDeclarativeConfig()` and overridable `readDeclarativeConfig()` on `InstrumentationBase`, plus a `declarativeConfigProperties()` typed accessor (snake_case keys, type-checked, warns on unrecognized keys) [#6864](https://github.com/open-telemetry/opentelemetry-js/pull/6864) @mwear
+* feat(sdk-node): `startNodeSDK()` applies `instrumentation/development` config to instrumentations, gating registration on `enabled` and tolerating instrumentations built against a base that predates this API [#6864](https://github.com/open-telemetry/opentelemetry-js/pull/6864) @mwear
+* feat(instrumentation-http): read supported config fields from declarative config [#6864](https://github.com/open-telemetry/opentelemetry-js/pull/6864) @mwear
 
 ### :bug: Bug Fixes
 
