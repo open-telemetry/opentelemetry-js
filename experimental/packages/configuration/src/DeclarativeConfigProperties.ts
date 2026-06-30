@@ -118,3 +118,23 @@ export function declarativeConfigProperties(
     isObject ? (block as Record<string, unknown>) : EMPTY_BLOCK
   );
 }
+
+/**
+ * Read a config block through a typed accessor, then warn about keys `read` did
+ * not touch. Wraps `block`, runs `read`, calls `warnUnreadKeys()`, and returns
+ * the result, so a reader gets unread-key warnings without a separate call.
+ *
+ * Annotate the `read` callback's return type (e.g. `(own): Partial<Config> =>
+ * ({...})`) to get a compile error on a misspelled config field. An explicit
+ * type argument does not, since the object then flows through inference and
+ * skips the excess-property check.
+ */
+export function readConfig<T>(
+  block: unknown,
+  read: (properties: DeclarativeConfigProperties) => T
+): T {
+  const properties = declarativeConfigProperties(block);
+  const result = read(properties);
+  properties.warnUnreadKeys();
+  return result;
+}

@@ -6,7 +6,10 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag, DiagLogLevel } from '@opentelemetry/api';
-import { declarativeConfigProperties } from '../src/DeclarativeConfigProperties';
+import {
+  declarativeConfigProperties,
+  readConfig,
+} from '../src/DeclarativeConfigProperties';
 
 describe('declarativeConfigProperties', function () {
   let warn: sinon.SinonStub;
@@ -240,6 +243,33 @@ describe('declarativeConfigProperties', function () {
       http?.warnUnreadKeys();
       sinon.assert.calledOnce(warn);
       assert.match(warn.firstCall.args[0], /unrecognized.*stray/);
+    });
+  });
+
+  describe('readConfig', function () {
+    it('returns the reader result and warns about unread keys', function () {
+      const result = readConfig({ enabled: true, stray: 1 }, p => ({
+        enabled: p.getBoolean('enabled'),
+      }));
+      assert.deepStrictEqual(result, { enabled: true });
+      sinon.assert.calledOnce(warn);
+      assert.match(warn.firstCall.args[0], /unrecognized.*stray/);
+    });
+
+    it('is silent when the reader touches every key', function () {
+      const result = readConfig({ enabled: false }, p => ({
+        enabled: p.getBoolean('enabled'),
+      }));
+      assert.deepStrictEqual(result, { enabled: false });
+      sinon.assert.notCalled(warn);
+    });
+
+    it('is null-safe for a nullish block', function () {
+      const result = readConfig(undefined, p => ({
+        enabled: p.getBoolean('enabled'),
+      }));
+      assert.deepStrictEqual(result, { enabled: undefined });
+      sinon.assert.notCalled(warn);
     });
   });
 });
