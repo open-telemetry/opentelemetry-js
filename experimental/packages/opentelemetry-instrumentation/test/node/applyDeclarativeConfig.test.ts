@@ -87,7 +87,7 @@ describe('InstrumentationBase declarative config', function () {
       sinon.assert.calledOnce(warn);
       assert.match(
         warn.firstCall.args.join(' '),
-        /no reader.*max_query_length/
+        /not supported.*max_query_length/
       );
     });
 
@@ -139,7 +139,7 @@ describe('InstrumentationBase declarative config', function () {
       sinon.assert.calledOnce(warn);
       const message = warn.firstCall.args.join(' ');
       assert.match(message, /unrecognized.*bogus_key/);
-      assert.doesNotMatch(message, /no reader/);
+      assert.doesNotMatch(message, /not supported/);
     });
   });
 });

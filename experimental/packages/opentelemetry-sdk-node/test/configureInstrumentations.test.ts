@@ -126,7 +126,7 @@ describe('configureInstrumentations', function () {
     ]);
     assert.strictEqual(inst.getConfig().serverName, undefined);
     sinon.assert.calledOnce(warn);
-    assert.match(warn.firstCall.args.join(' '), /no reader.*server_name/);
+    assert.match(warn.firstCall.args.join(' '), /not supported.*server_name/);
   });
 
   it('applies fields mapped by an overridden reader', function () {

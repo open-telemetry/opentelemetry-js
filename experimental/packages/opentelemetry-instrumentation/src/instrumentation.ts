@@ -172,7 +172,7 @@ export abstract class InstrumentationAbstract<
       this._diag.warn(
         this._hasDeclarativeConfigReader()
           ? `ignoring unrecognized declarative config keys: ${unread.join(', ')}`
-          : `ignoring declarative config (no reader): ${unread.join(', ')}`
+          : `declarative config not supported by this instrumentation (except "enabled"); these keys had no effect: ${unread.join(', ')}`
       );
     }
     const defined: Partial<ConfigType> = {};
