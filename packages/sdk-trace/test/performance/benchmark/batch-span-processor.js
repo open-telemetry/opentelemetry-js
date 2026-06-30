@@ -3,25 +3,20 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as Benchmark from 'benchmark';
-import type { SpanExporter, ReadableSpan } from '../../../src';
-import { BatchSpanProcessor, TracerProvider } from '../../../src';
-import type { ExportResult } from '@opentelemetry/core';
-import { ExportResultCode } from '@opentelemetry/core';
+const Benchmark = require('benchmark');
+const { BatchSpanProcessor, TracerProvider } = require('../../../build/src');
+const { ExportResultCode } = require('@opentelemetry/core');
 
-class NoopExporter implements SpanExporter {
-  export(
-    spans: ReadableSpan[],
-    resultCallback: (result: ExportResult) => void
-  ): void {
+class NoopExporter {
+  export(spans, resultCallback) {
     setTimeout(() => resultCallback({ code: ExportResultCode.SUCCESS }), 0);
   }
 
-  shutdown(): Promise<void> {
+  shutdown() {
     return this.forceFlush();
   }
 
-  forceFlush(): Promise<void> {
+  forceFlush() {
     return Promise.resolve();
   }
 }
@@ -31,7 +26,7 @@ const tracerProvider = new TracerProvider({
 });
 const tracer = tracerProvider.getTracer('test');
 
-function createSpan(): void {
+function createSpan() {
   const span = tracer.startSpan('span');
   span.setAttribute('aaaaaaaaaaaaaaaaaaaa', 'aaaaaaaaaaaaaaaaaaaa');
   span.setAttribute('bbbbbbbbbbbbbbbbbbbb', 'aaaaaaaaaaaaaaaaaaaa');
@@ -46,19 +41,14 @@ function createSpan(): void {
   span.end();
 }
 
-describe('BatchSpanProcessor benchmark', function () {
-  this.timeout(60000);
+const suite = new Benchmark.Suite();
 
-  it('process span', done => {
-    const suite = new Benchmark.Suite();
-    suite
-      .add('BatchSpanProcessor process span', () => {
-        createSpan();
-      })
-      .on('cycle', (event: Benchmark.Event) =>
-        console.log(String(event.target))
-      )
-      .on('complete', () => done())
-      .run({ async: true });
-  });
+suite.on('cycle', event => {
+  console.log(String(event.target));
 });
+
+suite.add('BatchSpanProcessor process span', () => {
+  createSpan();
+});
+
+suite.run();

@@ -16,7 +16,7 @@ function cheatSpanLimitsFromTracer(tracer: ApiTracer): SpanLimits {
 
 describe('BasicTracerProvider - Node', () => {
   beforeEach(() => {
-    // to avoid actually registering the TraceProvider and leaking env to other tests
+    // to avoid actually registering the TracerProvider and leaking env to other tests
     sinon.stub(trace, 'setGlobalTracerProvider');
     context.disable();
   });

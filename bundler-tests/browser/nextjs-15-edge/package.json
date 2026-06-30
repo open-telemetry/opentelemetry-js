@@ -21,7 +21,7 @@
     "@opentelemetry/resources": "file:../../../packages/opentelemetry-resources",
     "@opentelemetry/sdk-logs": "file:../../../experimental/packages/sdk-logs",
     "@opentelemetry/sdk-metrics": "file:../../../packages/sdk-metrics",
-    "@opentelemetry/sdk-trace-base": "file:../../../packages/opentelemetry-sdk-trace-base",
+    "@opentelemetry/sdk-trace": "file:../../../packages/sdk-trace",
     "@opentelemetry/sdk-trace-web": "file:../../../packages/opentelemetry-sdk-trace-web",
     "next": "^15",
     "react": "^18",
