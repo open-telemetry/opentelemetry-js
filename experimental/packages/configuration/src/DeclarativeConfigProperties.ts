@@ -19,10 +19,18 @@ export interface DeclarativeConfigProperties {
   getStringArray(key: string): string[] | undefined;
   /** Returns a nested accessor for an object-valued key. */
   getStructured(key: string): DeclarativeConfigProperties | undefined;
+  /**
+   * Warn about keys at this level that no getter has read. Call after reading a
+   * block to surface keys a reader does not recognize, such as typos or
+   * unsupported options. Checks only this accessor's level; a nested accessor
+   * from {@link getStructured} tracks its own keys.
+   */
+  warnUnreadKeys(): void;
 }
 
 class DeclarativeConfigPropertiesImpl implements DeclarativeConfigProperties {
   private readonly _block: Record<string, unknown>;
+  private readonly _read = new Set<string>();
 
   constructor(block: Record<string, unknown>) {
     this._block = block;
@@ -63,14 +71,24 @@ class DeclarativeConfigPropertiesImpl implements DeclarativeConfigProperties {
       : new DeclarativeConfigPropertiesImpl(block as Record<string, unknown>);
   }
 
+  warnUnreadKeys(): void {
+    const unread = Object.keys(this._block).filter(k => !this._read.has(k));
+    if (unread.length > 0) {
+      diag.warn(
+        `ignoring unrecognized declarative config keys: ${unread.join(', ')}`
+      );
+    }
+  }
+
   // Returns the value when the predicate accepts it. A missing key gives
   // undefined and no warning; a present value of the wrong type gives undefined
-  // and a warning.
+  // and a warning. Records the key as read either way.
   private _typed<T>(
     key: string,
     expected: string,
     predicate: (v: unknown) => boolean
   ): T | undefined {
+    this._read.add(key);
     const value = this._block[key];
     if (value === undefined || value === null) {
       return undefined;

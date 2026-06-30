@@ -191,4 +191,55 @@ describe('declarativeConfigProperties', function () {
     assert.strictEqual(properties.getBoolean('enabled'), undefined);
     sinon.assert.notCalled(warn);
   });
+
+  describe('warnUnreadKeys', function () {
+    it('warns about keys no getter read', function () {
+      const properties = declarativeConfigProperties({
+        enabled: true,
+        server_name: 'x',
+        typo_key: 1,
+      });
+      properties.getBoolean('enabled');
+      properties.getString('server_name');
+      properties.warnUnreadKeys();
+      sinon.assert.calledOnce(warn);
+      assert.match(warn.firstCall.args[0], /unrecognized.*typo_key/);
+      assert.doesNotMatch(warn.firstCall.args[0], /enabled|server_name/);
+    });
+
+    it('is silent when every key was read', function () {
+      const properties = declarativeConfigProperties({ enabled: true });
+      properties.getBoolean('enabled');
+      properties.warnUnreadKeys();
+      sinon.assert.notCalled(warn);
+    });
+
+    it('counts a key as read even when it is absent or the wrong type', function () {
+      const properties = declarativeConfigProperties({ enabled: 'x' });
+      // Wrong type: warns once for the mismatch and marks the key read.
+      assert.strictEqual(properties.getBoolean('enabled'), undefined);
+      properties.warnUnreadKeys();
+      sinon.assert.calledOnce(warn);
+    });
+
+    it('is silent on an empty accessor', function () {
+      declarativeConfigProperties(undefined).warnUnreadKeys();
+      sinon.assert.notCalled(warn);
+    });
+
+    it('tracks reads per accessor level', function () {
+      const properties = declarativeConfigProperties({
+        http: { client: {}, stray: 1 },
+      });
+      const http = properties.getStructured('http');
+      http?.getStructured('client');
+      // Parent level: `http` was read, so the parent is clean.
+      properties.warnUnreadKeys();
+      sinon.assert.notCalled(warn);
+      // Nested level: `stray` was never read.
+      http?.warnUnreadKeys();
+      sinon.assert.calledOnce(warn);
+      assert.match(warn.firstCall.args[0], /unrecognized.*stray/);
+    });
+  });
 });
