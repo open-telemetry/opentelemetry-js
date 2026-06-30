@@ -8,6 +8,7 @@ import * as sinon from 'sinon';
 import { diag, DiagLogLevel } from '@opentelemetry/api';
 import { InstrumentationBase } from '../../src';
 import type { InstrumentationConfig } from '../../src';
+import type { DeclarativeConfigProperties } from '@opentelemetry/configuration';
 
 interface TestConfig extends InstrumentationConfig {
   maxQueryLength?: number;
@@ -21,22 +22,18 @@ class TestInstrumentation extends InstrumentationBase<TestConfig> {
   init() {}
 }
 
-// Overrides the reader to map two snake_case keys, ignoring the wrapper here to
-// keep the base test free of a @opentelemetry/configuration dependency.
+// Overrides the reader to map a snake_case key through the typed accessor.
 class ReaderInstrumentation extends InstrumentationBase<TestConfig> {
   constructor(config: TestConfig = {}) {
     super('reader-instrumentation', '1.0.0', config);
   }
   init() {}
   protected override readDeclarativeConfig(
-    block: Record<string, unknown>
+    own: DeclarativeConfigProperties
   ): Partial<TestConfig> {
     return {
-      enabled: typeof block.enabled === 'boolean' ? block.enabled : undefined,
-      maxQueryLength:
-        typeof block.max_query_length === 'number'
-          ? block.max_query_length
-          : undefined,
+      enabled: own.getBoolean('enabled'),
+      maxQueryLength: own.getNumber('max_query_length'),
     };
   }
 }
@@ -132,6 +129,15 @@ describe('InstrumentationBase declarative config', function () {
       const instr = new ReaderInstrumentation();
       instr.applyDeclarativeConfig({ max_query_length: 200 });
       sinon.assert.notCalled(warn);
+    });
+
+    it('warns "unrecognized" for a key the reader skips', function () {
+      const instr = new ReaderInstrumentation();
+      instr.applyDeclarativeConfig({ bogus_key: 1 });
+      sinon.assert.calledOnce(warn);
+      const message = warn.firstCall.args.join(' ');
+      assert.match(message, /unrecognized.*bogus_key/);
+      assert.doesNotMatch(message, /no reader/);
     });
   });
 });

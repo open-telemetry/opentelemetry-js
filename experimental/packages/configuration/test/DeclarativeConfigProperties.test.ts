@@ -195,6 +195,19 @@ describe('declarativeConfigProperties', function () {
     sinon.assert.notCalled(warn);
   });
 
+  describe('unreadKeys', function () {
+    it('returns only the keys no getter read', function () {
+      const properties = declarativeConfigProperties({
+        enabled: true,
+        a: 1,
+        b: 2,
+      });
+      properties.getBoolean('enabled');
+      assert.deepStrictEqual(properties.unreadKeys().sort(), ['a', 'b']);
+      sinon.assert.notCalled(warn);
+    });
+  });
+
   describe('warnUnreadKeys', function () {
     it('warns about keys no getter read', function () {
       const properties = declarativeConfigProperties({

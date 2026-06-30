@@ -8,7 +8,10 @@ import * as sinon from 'sinon';
 import { diag, DiagLogLevel } from '@opentelemetry/api';
 import { InstrumentationBase } from '@opentelemetry/instrumentation';
 import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
-import type { ConfigurationModel } from '@opentelemetry/configuration';
+import type {
+  ConfigurationModel,
+  DeclarativeConfigProperties,
+} from '@opentelemetry/configuration';
 import { configureInstrumentations } from '../src/utils';
 
 interface HttpishConfig extends InstrumentationConfig {
@@ -33,16 +36,13 @@ class ReaderInstrumentation extends InstrumentationBase<HttpishConfig> {
   }
   init() {}
   protected override readDeclarativeConfig(
-    block: Record<string, unknown>,
-    general: Record<string, unknown>
+    own: DeclarativeConfigProperties,
+    general: DeclarativeConfigProperties
   ): Partial<HttpishConfig> {
     return {
-      enabled: typeof block.enabled === 'boolean' ? block.enabled : undefined,
-      serverName:
-        typeof block.server_name === 'string' ? block.server_name : undefined,
-      capturedHeaders: Array.isArray(general.captured_headers)
-        ? (general.captured_headers as string[])
-        : undefined,
+      enabled: own.getBoolean('enabled'),
+      serverName: own.getString('server_name'),
+      capturedHeaders: general.getStringArray('captured_headers'),
     };
   }
 }

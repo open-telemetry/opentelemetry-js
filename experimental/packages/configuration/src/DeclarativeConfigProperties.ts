@@ -20,10 +20,14 @@ export interface DeclarativeConfigProperties {
   /** Returns a nested accessor for an object-valued key. */
   getStructured(key: string): DeclarativeConfigProperties | undefined;
   /**
-   * Warn about keys at this level that no getter has read. Call after reading a
-   * block to surface keys a reader does not recognize, such as typos or
+   * Returns keys at this level that no getter has read, such as typos or
    * unsupported options. Checks only this accessor's level; a nested accessor
    * from {@link getStructured} tracks its own keys.
+   */
+  unreadKeys(): string[];
+  /**
+   * Warn about the keys returned by {@link unreadKeys}. Convenience for callers
+   * that want the default warning rather than their own message.
    */
   warnUnreadKeys(): void;
 }
@@ -71,8 +75,12 @@ class DeclarativeConfigPropertiesImpl implements DeclarativeConfigProperties {
       : new DeclarativeConfigPropertiesImpl(block as Record<string, unknown>);
   }
 
+  unreadKeys(): string[] {
+    return Object.keys(this._block).filter(k => !this._read.has(k));
+  }
+
   warnUnreadKeys(): void {
-    const unread = Object.keys(this._block).filter(k => !this._read.has(k));
+    const unread = this.unreadKeys();
     if (unread.length > 0) {
       diag.warn(
         `ignoring unrecognized declarative config keys: ${unread.join(', ')}`

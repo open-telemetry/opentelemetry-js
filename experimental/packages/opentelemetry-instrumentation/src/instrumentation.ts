@@ -14,6 +14,8 @@ import type {
 import { diag, metrics, trace } from '@opentelemetry/api';
 import type { Logger, LoggerProvider } from '@opentelemetry/api-logs';
 import { logs } from '@opentelemetry/api-logs';
+import type { DeclarativeConfigProperties } from '@opentelemetry/configuration';
+import { declarativeConfigProperties } from '@opentelemetry/configuration';
 import * as shimmer from './shimmer';
 import type {
   InstrumentationModuleDefinition,
@@ -158,7 +160,21 @@ export abstract class InstrumentationAbstract<
     block: Record<string, unknown>,
     general: Record<string, unknown> = {}
   ): void {
-    const partial = this.readDeclarativeConfig(block, general);
+    const own = declarativeConfigProperties(block);
+    const partial = this.readDeclarativeConfig(
+      own,
+      declarativeConfigProperties(general)
+    );
+    const unread = own.unreadKeys();
+    if (unread.length > 0) {
+      // Distinguish "no reader for this instrumentation" from "the reader does
+      // not recognize these keys", since they call for different user action.
+      this._diag.warn(
+        this._hasDeclarativeConfigReader()
+          ? `ignoring unrecognized declarative config keys: ${unread.join(', ')}`
+          : `ignoring declarative config (no reader): ${unread.join(', ')}`
+      );
+    }
     const defined: Partial<ConfigType> = {};
     for (const key of Object.keys(partial) as (keyof ConfigType)[]) {
       if (partial[key] !== undefined) {
@@ -172,28 +188,27 @@ export abstract class InstrumentationAbstract<
    * @experimental This feature is in development as per the OpenTelemetry specification.
    *
    * Map a declarative config block to a partial config. Override this per
-   * instrumentation to read keys with the typed-reader API in
-   * `@opentelemetry/configuration` and return the fields to apply. The default
-   * implementation reads `enabled` and warns that it ignores every other key,
-   * since nothing reads them.
+   * instrumentation to read keys from `own` (and `general` for cross-cutting
+   * config) and return the fields to apply. The caller warns about own-block
+   * keys no getter read, so a reader only reads what it supports.
    *
-   * @param block the instrumentation's own config block
-   * @param _general the shared `general` block
+   * @param own typed accessor over the instrumentation's own config block
+   * @param _general typed accessor over the shared `general` block
    * @returns the config fields to apply; undefined values keep the default
    */
   protected readDeclarativeConfig(
-    block: Record<string, unknown>,
-    _general: Record<string, unknown>
+    own: DeclarativeConfigProperties,
+    _general: DeclarativeConfigProperties
   ): Partial<ConfigType> {
-    const extra = Object.keys(block).filter(k => k !== 'enabled');
-    if (extra.length > 0) {
-      this._diag.warn(
-        `ignoring declarative config (no reader): ${extra.join(', ')}`
-      );
-    }
-    const enabled =
-      typeof block.enabled === 'boolean' ? block.enabled : undefined;
-    return { enabled } as Partial<ConfigType>;
+    return { enabled: own.getBoolean('enabled') } as Partial<ConfigType>;
+  }
+
+  // True when a subclass overrides readDeclarativeConfig, i.e. it has a reader.
+  private _hasDeclarativeConfigReader(): boolean {
+    return (
+      this.readDeclarativeConfig !==
+      InstrumentationAbstract.prototype.readDeclarativeConfig
+    );
   }
 
   /**
