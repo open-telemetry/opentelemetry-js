@@ -17,12 +17,17 @@ export interface DeclarativeConfigProperties {
   getString(key: string): string | undefined;
   getNumber(key: string): number | undefined;
   getStringArray(key: string): string[] | undefined;
-  /** Returns a nested accessor for an object-valued key. */
+  /**
+   * Returns a nested accessor for an object-valued key. Repeated calls for the
+   * same key return the same accessor, so reads and unread-key tracking
+   * accumulate across calls.
+   */
   getStructured(key: string): DeclarativeConfigProperties | undefined;
   /**
-   * Returns keys at this level that no getter has read, such as typos or
-   * unsupported options. Checks only this accessor's level; a nested accessor
-   * from {@link getStructured} tracks its own keys.
+   * Returns keys that no getter has read, such as typos or unsupported options.
+   * Recurses into structured children that were read via {@link getStructured},
+   * reporting their unread keys with a dotted path (e.g. `http.client.foo`). A
+   * key whose nested block was never read is reported on its own.
    */
   unreadKeys(): string[];
   /**
@@ -35,6 +40,10 @@ export interface DeclarativeConfigProperties {
 class DeclarativeConfigPropertiesImpl implements DeclarativeConfigProperties {
   private readonly _block: Record<string, unknown>;
   private readonly _read = new Set<string>();
+  private readonly _children = new Map<
+    string,
+    DeclarativeConfigPropertiesImpl
+  >();
 
   constructor(block: Record<string, unknown>) {
     this._block = block;
@@ -70,13 +79,29 @@ class DeclarativeConfigPropertiesImpl implements DeclarativeConfigProperties {
       'object',
       v => typeof v === 'object' && v !== null && !Array.isArray(v)
     );
-    return block === undefined
-      ? undefined
-      : new DeclarativeConfigPropertiesImpl(block as Record<string, unknown>);
+    if (block === undefined) {
+      return undefined;
+    }
+    let child = this._children.get(key);
+    if (child === undefined) {
+      child = new DeclarativeConfigPropertiesImpl(
+        block as Record<string, unknown>
+      );
+      this._children.set(key, child);
+    }
+    return child;
   }
 
   unreadKeys(): string[] {
-    return Object.keys(this._block).filter(k => !this._read.has(k));
+    const unread = Object.keys(this._block).filter(k => !this._read.has(k));
+    // A child read via getStructured is itself "read", so recurse into it and
+    // report its unread keys with a dotted path.
+    for (const [key, child] of this._children) {
+      for (const nested of child.unreadKeys()) {
+        unread.push(`${key}.${nested}`);
+      }
+    }
+    return unread;
   }
 
   warnUnreadKeys(): void {

@@ -210,14 +210,36 @@ describe('declarativeConfigProperties', function () {
       assert.deepStrictEqual(properties.unreadKeys(), []);
     });
 
-    it('tracks reads per accessor level', function () {
+    it('reports nested unread keys with a dotted path', function () {
       const properties = declarativeConfigProperties({
         http: { client: {}, stray: 1 },
       });
       const http = properties.getStructured('http');
       http?.getStructured('client');
-      assert.deepStrictEqual(properties.unreadKeys(), []);
+      assert.deepStrictEqual(properties.unreadKeys(), ['http.stray']);
       assert.deepStrictEqual(http?.unreadKeys(), ['stray']);
+    });
+
+    it('recurses more than one level deep', function () {
+      const properties = declarativeConfigProperties({
+        http: { client: { bad: 1 } },
+      });
+      properties.getStructured('http')?.getStructured('client');
+      assert.deepStrictEqual(properties.unreadKeys(), ['http.client.bad']);
+    });
+
+    it('reports a never-read nested block as a single key', function () {
+      const properties = declarativeConfigProperties({ http: { client: {} } });
+      // never descend into `http`
+      assert.deepStrictEqual(properties.unreadKeys(), ['http']);
+    });
+
+    it('returns the same accessor for repeated getStructured calls', function () {
+      const properties = declarativeConfigProperties({ http: {} });
+      assert.strictEqual(
+        properties.getStructured('http'),
+        properties.getStructured('http')
+      );
     });
   });
 

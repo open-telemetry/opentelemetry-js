@@ -51,6 +51,20 @@ class ThrowingReaderInstrumentation extends InstrumentationBase<TestConfig> {
   }
 }
 
+// Descends into a nested block, so the base's unread-key warning must recurse.
+class NestedReaderInstrumentation extends InstrumentationBase<TestConfig> {
+  constructor(config: TestConfig = {}) {
+    super('nested-instrumentation', '1.0.0', config);
+  }
+  init() {}
+  protected override readDeclarativeConfig(
+    own: DeclarativeConfigProperties
+  ): Partial<TestConfig> {
+    own.getStructured('headers')?.getStringArray('request');
+    return {};
+  }
+}
+
 describe('InstrumentationBase declarative config', function () {
   let warn: sinon.SinonStub;
   let error: sinon.SinonStub;
@@ -153,6 +167,16 @@ describe('InstrumentationBase declarative config', function () {
       const message = warn.firstCall.args.join(' ');
       assert.match(message, /unrecognized.*bogus_key/);
       assert.doesNotMatch(message, /not supported/);
+    });
+
+    it('surfaces a nested unread key', function () {
+      const instr = new NestedReaderInstrumentation();
+      instr.applyDeclarativeConfig({ headers: { request: ['x'], typo: 1 } });
+      sinon.assert.calledOnce(warn);
+      assert.match(
+        warn.firstCall.args.join(' '),
+        /unrecognized.*headers\.typo/
+      );
     });
   });
 
