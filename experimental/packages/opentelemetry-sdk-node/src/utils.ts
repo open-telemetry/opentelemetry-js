@@ -91,6 +91,7 @@ import {
   mergePropagatorCompositeConfig,
   mergeResourceAttributesConfig,
 } from '@opentelemetry/configuration';
+import type { Instrumentation } from '@opentelemetry/instrumentation';
 import type {
   AggregationOption,
   AggregationSelector,
@@ -1381,6 +1382,54 @@ function checkConfigUse(
       `Config warning: some specified ${name} configuration properties were not handled by SDK setup: ${JSON.stringify(unhandledProps)}`
     );
   }
+}
+
+/**
+ * Apply declarative `instrumentation/development` config to the given
+ * instrumentation instances and return the ones to register.
+ *
+ * Each instance is matched to a config block by its npm package name. A matched
+ * instance has `applyDeclarativeConfig` called with its own block and the shared
+ * `general` block; the instrumentation's reader decides which keys it reads.
+ *
+ * `enabled` controls registration. `registerInstrumentations` enables every
+ * instance passed to it, so an instance that resolves to `enabled: false` is
+ * disabled here and left out of the returned list. The rest are enabled and
+ * returned. An instance with no config block passes through untouched.
+ */
+export function configureInstrumentations(
+  config: ConfigurationModel,
+  instrumentations: Instrumentation[]
+): Instrumentation[] {
+  const dev = config['instrumentation/development'];
+  const jsConfig = dev?.js;
+  if (dev === undefined || jsConfig === undefined) {
+    return instrumentations;
+  }
+  const general = (dev.general ?? {}) as Record<string, unknown>;
+
+  const toRegister: Instrumentation[] = [];
+  for (const instrumentation of instrumentations) {
+    const block = jsConfig[instrumentation.instrumentationName] as
+      | Record<string, unknown>
+      | undefined;
+    if (block === undefined) {
+      toRegister.push(instrumentation);
+      continue;
+    }
+
+    instrumentation.applyDeclarativeConfig?.(block, general);
+
+    // Set enabled state from the resolved config; enable()/disable() are idempotent.
+    if (instrumentation.getConfig().enabled === false) {
+      instrumentation.disable();
+    } else {
+      instrumentation.enable();
+      toRegister.push(instrumentation);
+    }
+  }
+
+  return toRegister;
 }
 
 /**

@@ -16,6 +16,7 @@ import {
   propagation,
 } from '@opentelemetry/api';
 import {
+  configureInstrumentations,
   getIdGeneratorFromConfiguration,
   getInstanceID,
   createLoggerProviderFromConfig,
@@ -79,9 +80,11 @@ export function startNodeSDK(sdkOptions?: SDKOptions): {
   const logLevel = diagLogLevelFromSeverityNumberConfig(config.log_level);
   diag.setLogger(new DiagConsoleLogger(), { logLevel });
 
-  registerInstrumentations({
-    instrumentations: sdkOptions?.instrumentations?.flat() ?? [],
-  });
+  const instrumentations = configureInstrumentations(
+    config,
+    sdkOptions?.instrumentations?.flat() ?? []
+  );
+  registerInstrumentations({ instrumentations });
 
   let components: SDKComponents;
   try {
