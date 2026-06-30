@@ -1426,9 +1426,8 @@ export function configureInstrumentations(
       enabled = instrumentation.getConfig().enabled;
     } else {
       // Built against an @opentelemetry/instrumentation base that predates
-      // declarative config. enable/disable is a registration concern handled
-      // here, so honor `enabled` directly; additional config needs an updated
-      // instrumentation.
+      // declarative config. Support `enabled`, but additional config requires
+      // an updated instrumentation.
       const unsupported = Object.keys(block).filter(k => k !== 'enabled');
       if (unsupported.length > 0) {
         diag.warn(

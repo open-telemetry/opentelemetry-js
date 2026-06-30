@@ -154,7 +154,7 @@ export abstract class InstrumentationAbstract<
    * remains over the current config.
    *
    * @param block the instrumentation's own `instrumentation/development` block
-   * @param general the shared `general` block (cross-cutting semconv config)
+   * @param general the shared `general` block
    */
   public applyDeclarativeConfig(
     block: Record<string, unknown>,
@@ -168,7 +168,6 @@ export abstract class InstrumentationAbstract<
         declarativeConfigProperties(general)
       );
     } catch (e) {
-      // A reader is instrumentation-provided; a throw must not abort SDK setup.
       this._diag.error('error reading declarative config', e);
       return;
     }
@@ -195,12 +194,12 @@ export abstract class InstrumentationAbstract<
    * @experimental This feature is in development as per the OpenTelemetry specification.
    *
    * Map a declarative config block to a partial config. Override this per
-   * instrumentation to read keys from `own` (and `general` for cross-cutting
-   * config) and return the fields to apply. The caller warns about own-block
-   * keys no getter read, so a reader only reads what it supports.
+   * instrumentation to read keys from `own` and `general` and return the fields
+   * to apply. The caller warns about own-block keys no getter read, so a reader
+   * only reads what it supports.
    *
    * @param own typed accessor over the instrumentation's own config block
-   * @param _general typed accessor over the shared `general` block
+   * @param general typed accessor over the shared `general` block
    * @returns the config fields to apply; undefined values keep the default
    */
   protected readDeclarativeConfig(
@@ -210,7 +209,7 @@ export abstract class InstrumentationAbstract<
     return { enabled: own.getBoolean('enabled') } as Partial<ConfigType>;
   }
 
-  // True when a subclass overrides readDeclarativeConfig, i.e. it has a reader.
+  // True when a subclass overrides readDeclarativeConfig (it has a reader).
   private _hasDeclarativeConfigReader(): boolean {
     return (
       this.readDeclarativeConfig !==

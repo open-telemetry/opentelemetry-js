@@ -113,8 +113,8 @@ class DeclarativeConfigPropertiesImpl implements DeclarativeConfigProperties {
     }
   }
 
-  // Returns the value when the predicate accepts it. A missing key gives
-  // undefined and no warning; a present value of the wrong type gives undefined
+  // Returns the value when the predicate accepts it. A missing key returns
+  // undefined and no warning; a present value of the wrong type returns undefined
   // and a warning. Records the key as read either way.
   private _typed<T>(
     key: string,
