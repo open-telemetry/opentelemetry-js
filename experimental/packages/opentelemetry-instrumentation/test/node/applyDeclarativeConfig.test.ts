@@ -40,18 +40,31 @@ class ReaderInstrumentation extends InstrumentationBase<TestConfig> {
   }
 }
 
+// A reader that throws, to check the base isolates instrumentation bugs.
+class ThrowingReaderInstrumentation extends InstrumentationBase<TestConfig> {
+  constructor(config: TestConfig = {}) {
+    super('throwing-instrumentation', '1.0.0', config);
+  }
+  init() {}
+  protected override readDeclarativeConfig(): Partial<TestConfig> {
+    throw new Error('boom');
+  }
+}
+
 describe('InstrumentationBase declarative config', function () {
   let warn: sinon.SinonStub;
+  let error: sinon.SinonStub;
 
   beforeEach(function () {
     warn = sinon.stub();
+    error = sinon.stub();
     diag.setLogger(
       {
         verbose: () => {},
         debug: () => {},
         info: () => {},
         warn,
-        error: () => {},
+        error,
       },
       DiagLogLevel.WARN
     );
@@ -140,6 +153,19 @@ describe('InstrumentationBase declarative config', function () {
       const message = warn.firstCall.args.join(' ');
       assert.match(message, /unrecognized.*bogus_key/);
       assert.doesNotMatch(message, /not supported/);
+    });
+  });
+
+  describe('reader that throws', function () {
+    it('is caught and logged, leaving the config unchanged', function () {
+      const instr = new ThrowingReaderInstrumentation({ maxQueryLength: 50 });
+      assert.doesNotThrow(() =>
+        instr.applyDeclarativeConfig({ enabled: false, max_query_length: 200 })
+      );
+      sinon.assert.calledOnce(error);
+      // Config is untouched: the throw aborts before setConfig.
+      assert.strictEqual(instr.getConfig().enabled, true);
+      assert.strictEqual(instr.getConfig().maxQueryLength, 50);
     });
   });
 });

@@ -1389,8 +1389,10 @@ function checkConfigUse(
  * instrumentation instances and return the ones to register.
  *
  * Each instance is matched to a config block by its npm package name. A matched
- * instance has `applyDeclarativeConfig` called with its own block and the shared
- * `general` block; the instrumentation's reader decides which keys it reads.
+ * instance with `applyDeclarativeConfig` has it called with its own block and the
+ * shared `general` block, and its reader decides which keys it reads. An instance
+ * built against an older base, without that method, has only `enabled` honored;
+ * other keys are ignored with a warning.
  *
  * `enabled` controls registration. `registerInstrumentations` enables every
  * instance passed to it, so an instance that resolves to `enabled: false` is
@@ -1418,10 +1420,29 @@ export function configureInstrumentations(
       continue;
     }
 
-    instrumentation.applyDeclarativeConfig?.(block, general);
+    let enabled: boolean | undefined;
+    if (instrumentation.applyDeclarativeConfig) {
+      instrumentation.applyDeclarativeConfig(block, general);
+      enabled = instrumentation.getConfig().enabled;
+    } else {
+      // Built against an @opentelemetry/instrumentation base that predates
+      // declarative config. enable/disable is a registration concern handled
+      // here, so honor `enabled` directly; additional config needs an updated
+      // instrumentation.
+      const unsupported = Object.keys(block).filter(k => k !== 'enabled');
+      if (unsupported.length > 0) {
+        diag.warn(
+          `"${instrumentation.instrumentationName}": update @opentelemetry/instrumentation to apply declarative config; these keys had no effect: ${unsupported.join(', ')}`
+        );
+      }
+      enabled =
+        typeof block.enabled === 'boolean'
+          ? block.enabled
+          : instrumentation.getConfig().enabled;
+    }
 
-    // Set enabled state from the resolved config; enable()/disable() are idempotent.
-    if (instrumentation.getConfig().enabled === false) {
+    // Set enabled state; enable()/disable() are idempotent.
+    if (enabled === false) {
       instrumentation.disable();
     } else {
       instrumentation.enable();

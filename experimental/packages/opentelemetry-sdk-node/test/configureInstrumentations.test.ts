@@ -8,6 +8,7 @@ import * as sinon from 'sinon';
 import { diag, DiagLogLevel } from '@opentelemetry/api';
 import { InstrumentationBase } from '@opentelemetry/instrumentation';
 import type {
+  Instrumentation,
   InstrumentationConfig,
   DeclarativeConfigProperties,
 } from '@opentelemetry/instrumentation';
@@ -26,6 +27,33 @@ class FakeInstrumentation extends InstrumentationBase<HttpishConfig> {
     super(name, '1.0.0', config);
   }
   init() {}
+}
+
+// Stands in for an instrumentation built against an older base: it has no
+// applyDeclarativeConfig method.
+class LegacyInstrumentation implements Instrumentation<HttpishConfig> {
+  instrumentationName: string;
+  instrumentationVersion = '0.1.0';
+  enabledState = true;
+  private _config: HttpishConfig;
+  constructor(name: string, config: HttpishConfig = {}) {
+    this.instrumentationName = name;
+    this._config = { enabled: true, ...config };
+  }
+  enable() {
+    this.enabledState = true;
+  }
+  disable() {
+    this.enabledState = false;
+  }
+  setTracerProvider() {}
+  setMeterProvider() {}
+  setConfig(config: HttpishConfig) {
+    this._config = config;
+  }
+  getConfig() {
+    return this._config;
+  }
 }
 
 // Maps a snake_case key from its own block and one key from general, to exercise
@@ -147,5 +175,42 @@ describe('configureInstrumentations', function () {
       [inst]
     );
     assert.deepStrictEqual(inst.getConfig().capturedHeaders, ['x-req-id']);
+  });
+
+  describe('instrumentation without applyDeclarativeConfig (older base)', function () {
+    it('honors enabled directly', function () {
+      const inst = new LegacyInstrumentation(HTTP);
+      const toRegister = configureInstrumentations(
+        configWith({ [HTTP]: { enabled: false } }),
+        [inst]
+      );
+      assert.deepStrictEqual(toRegister, []);
+      assert.strictEqual(inst.enabledState, false);
+    });
+
+    it('warns that field keys had no effect and keeps the instrumentation', function () {
+      const inst = new LegacyInstrumentation(HTTP);
+      const toRegister = configureInstrumentations(
+        configWith({ [HTTP]: { enabled: true, server_name: 'x' } }),
+        [inst]
+      );
+      assert.deepStrictEqual(toRegister, [inst]);
+      assert.strictEqual(inst.enabledState, true);
+      sinon.assert.calledOnce(warn);
+      const message = warn.firstCall.args.join(' ');
+      assert.match(
+        message,
+        /update @opentelemetry\/instrumentation.*server_name/
+      );
+      assert.doesNotMatch(message, /enabled/);
+    });
+
+    it('does not warn when only enabled is set', function () {
+      const inst = new LegacyInstrumentation(HTTP);
+      configureInstrumentations(configWith({ [HTTP]: { enabled: false } }), [
+        inst,
+      ]);
+      sinon.assert.notCalled(warn);
+    });
   });
 });

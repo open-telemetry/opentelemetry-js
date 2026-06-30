@@ -161,10 +161,17 @@ export abstract class InstrumentationAbstract<
     general: Record<string, unknown> = {}
   ): void {
     const own = declarativeConfigProperties(block);
-    const partial = this.readDeclarativeConfig(
-      own,
-      declarativeConfigProperties(general)
-    );
+    let partial: Partial<ConfigType>;
+    try {
+      partial = this.readDeclarativeConfig(
+        own,
+        declarativeConfigProperties(general)
+      );
+    } catch (e) {
+      // A reader is instrumentation-provided; a throw must not abort SDK setup.
+      this._diag.error('error reading declarative config', e);
+      return;
+    }
     const unread = own.unreadKeys();
     if (unread.length > 0) {
       // Distinguish "no reader for this instrumentation" from "the reader does
