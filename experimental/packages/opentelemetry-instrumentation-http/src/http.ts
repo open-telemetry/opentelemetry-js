@@ -121,6 +121,9 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       ),
       serverName: own.getString('server_name'),
       redactedQueryParams: own.getStringArray('redacted_query_params'),
+      enableSyntheticSourceDetection: own.getBoolean(
+        'enable_synthetic_source_detection'
+      ),
     };
   }
 

@@ -37,12 +37,14 @@ describe('HttpInstrumentation declarative config', function () {
       require_parent_for_outgoing_spans: true,
       server_name: 'my-server',
       redacted_query_params: ['token', 'sig'],
+      enable_synthetic_source_detection: true,
     });
 
     const config = instrumentation.getConfig();
     assert.strictEqual(config.requireParentforOutgoingSpans, true);
     assert.strictEqual(config.serverName, 'my-server');
     assert.deepStrictEqual(config.redactedQueryParams, ['token', 'sig']);
+    assert.strictEqual(config.enableSyntheticSourceDetection, true);
     sinon.assert.notCalled(warn);
   });
 
