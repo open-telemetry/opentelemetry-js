@@ -10,6 +10,14 @@ import { HttpInstrumentation } from '../../src/http';
 
 describe('HttpInstrumentation declarative config', function () {
   let warn: sinon.SinonStub;
+  const created: HttpInstrumentation[] = [];
+  function makeInstrumentation(
+    config?: ConstructorParameters<typeof HttpInstrumentation>[0]
+  ): HttpInstrumentation {
+    const instrumentation = new HttpInstrumentation(config);
+    created.push(instrumentation);
+    return instrumentation;
+  }
 
   beforeEach(function () {
     warn = sinon.stub();
@@ -26,12 +34,14 @@ describe('HttpInstrumentation declarative config', function () {
   });
 
   afterEach(function () {
+    created.forEach(instrumentation => instrumentation.disable());
+    created.length = 0;
     diag.disable();
     sinon.restore();
   });
 
   it('maps snake_case keys to config fields', function () {
-    const instrumentation = new HttpInstrumentation();
+    const instrumentation = makeInstrumentation();
     instrumentation.applyDeclarativeConfig({
       enabled: true,
       require_parent_for_outgoing_spans: true,
@@ -49,7 +59,7 @@ describe('HttpInstrumentation declarative config', function () {
   });
 
   it('leaves unset fields at their existing value', function () {
-    const instrumentation = new HttpInstrumentation({ serverName: 'keep-me' });
+    const instrumentation = makeInstrumentation({ serverName: 'keep-me' });
     instrumentation.applyDeclarativeConfig({
       require_parent_for_incoming_spans: true,
     });
@@ -60,7 +70,7 @@ describe('HttpInstrumentation declarative config', function () {
   });
 
   it('warns about a key it does not read', function () {
-    const instrumentation = new HttpInstrumentation();
+    const instrumentation = makeInstrumentation();
     instrumentation.applyDeclarativeConfig({
       server_name: 'x',
       not_a_real_key: true,
@@ -71,7 +81,7 @@ describe('HttpInstrumentation declarative config', function () {
   });
 
   it('warns on a type mismatch and keeps the default', function () {
-    const instrumentation = new HttpInstrumentation();
+    const instrumentation = makeInstrumentation();
     instrumentation.applyDeclarativeConfig({
       require_parent_for_outgoing_spans: 'yes',
     });
