@@ -43,7 +43,7 @@ import {
   semconvStabilityFromStr,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
-import type { DeclarativeConfigProperties } from '@opentelemetry/configuration';
+import type { DeclarativeConfigProperties } from '@opentelemetry/instrumentation';
 import { errorMonitor } from 'events';
 import {
   ATTR_ERROR_TYPE,

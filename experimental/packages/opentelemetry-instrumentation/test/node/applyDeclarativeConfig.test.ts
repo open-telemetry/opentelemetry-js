@@ -7,8 +7,10 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag, DiagLogLevel } from '@opentelemetry/api';
 import { InstrumentationBase } from '../../src';
-import type { InstrumentationConfig } from '../../src';
-import type { DeclarativeConfigProperties } from '@opentelemetry/configuration';
+import type {
+  InstrumentationConfig,
+  DeclarativeConfigProperties,
+} from '../../src';
 
 interface TestConfig extends InstrumentationConfig {
   maxQueryLength?: number;

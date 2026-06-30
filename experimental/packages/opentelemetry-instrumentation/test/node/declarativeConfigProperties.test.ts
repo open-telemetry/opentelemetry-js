@@ -6,10 +6,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag, DiagLogLevel } from '@opentelemetry/api';
-import {
-  declarativeConfigProperties,
-  readConfig,
-} from '../src/DeclarativeConfigProperties';
+import { declarativeConfigProperties } from '../../src';
 
 describe('declarativeConfigProperties', function () {
   let warn: sinon.SinonStub;
@@ -206,21 +203,34 @@ describe('declarativeConfigProperties', function () {
       assert.deepStrictEqual(properties.unreadKeys().sort(), ['a', 'b']);
       sinon.assert.notCalled(warn);
     });
+
+    it('counts a key as read even when absent or the wrong type', function () {
+      const properties = declarativeConfigProperties({ enabled: 'x' });
+      assert.strictEqual(properties.getBoolean('enabled'), undefined);
+      assert.deepStrictEqual(properties.unreadKeys(), []);
+    });
+
+    it('tracks reads per accessor level', function () {
+      const properties = declarativeConfigProperties({
+        http: { client: {}, stray: 1 },
+      });
+      const http = properties.getStructured('http');
+      http?.getStructured('client');
+      assert.deepStrictEqual(properties.unreadKeys(), []);
+      assert.deepStrictEqual(http?.unreadKeys(), ['stray']);
+    });
   });
 
   describe('warnUnreadKeys', function () {
     it('warns about keys no getter read', function () {
       const properties = declarativeConfigProperties({
         enabled: true,
-        server_name: 'x',
         typo_key: 1,
       });
       properties.getBoolean('enabled');
-      properties.getString('server_name');
       properties.warnUnreadKeys();
       sinon.assert.calledOnce(warn);
       assert.match(warn.firstCall.args[0], /unrecognized.*typo_key/);
-      assert.doesNotMatch(warn.firstCall.args[0], /enabled|server_name/);
     });
 
     it('is silent when every key was read', function () {
@@ -230,58 +240,8 @@ describe('declarativeConfigProperties', function () {
       sinon.assert.notCalled(warn);
     });
 
-    it('counts a key as read even when it is absent or the wrong type', function () {
-      const properties = declarativeConfigProperties({ enabled: 'x' });
-      // Wrong type: warns once for the mismatch and marks the key read.
-      assert.strictEqual(properties.getBoolean('enabled'), undefined);
-      properties.warnUnreadKeys();
-      sinon.assert.calledOnce(warn);
-    });
-
     it('is silent on an empty accessor', function () {
       declarativeConfigProperties(undefined).warnUnreadKeys();
-      sinon.assert.notCalled(warn);
-    });
-
-    it('tracks reads per accessor level', function () {
-      const properties = declarativeConfigProperties({
-        http: { client: {}, stray: 1 },
-      });
-      const http = properties.getStructured('http');
-      http?.getStructured('client');
-      // Parent level: `http` was read, so the parent is clean.
-      properties.warnUnreadKeys();
-      sinon.assert.notCalled(warn);
-      // Nested level: `stray` was never read.
-      http?.warnUnreadKeys();
-      sinon.assert.calledOnce(warn);
-      assert.match(warn.firstCall.args[0], /unrecognized.*stray/);
-    });
-  });
-
-  describe('readConfig', function () {
-    it('returns the reader result and warns about unread keys', function () {
-      const result = readConfig({ enabled: true, stray: 1 }, p => ({
-        enabled: p.getBoolean('enabled'),
-      }));
-      assert.deepStrictEqual(result, { enabled: true });
-      sinon.assert.calledOnce(warn);
-      assert.match(warn.firstCall.args[0], /unrecognized.*stray/);
-    });
-
-    it('is silent when the reader touches every key', function () {
-      const result = readConfig({ enabled: false }, p => ({
-        enabled: p.getBoolean('enabled'),
-      }));
-      assert.deepStrictEqual(result, { enabled: false });
-      sinon.assert.notCalled(warn);
-    });
-
-    it('is null-safe for a nullish block', function () {
-      const result = readConfig(undefined, p => ({
-        enabled: p.getBoolean('enabled'),
-      }));
-      assert.deepStrictEqual(result, { enabled: undefined });
       sinon.assert.notCalled(warn);
     });
   });

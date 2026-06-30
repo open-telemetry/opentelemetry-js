@@ -9,8 +9,8 @@ import { diag } from '@opentelemetry/api';
  * Typed, null-safe accessor over a parsed declarative config block.
  *
  * Each getter returns the typed value, or `undefined` when the key is missing or
- * has the wrong type. A wrong type logs a `diag.warn`; a missing key is silent.
- * Getters never throw.
+ * has the wrong type. A type mismatch is logged via `diag.warn`; a missing key
+ * is silent. Getters never throw.
  */
 export interface DeclarativeConfigProperties {
   getBoolean(key: string): boolean | undefined;
@@ -115,7 +115,7 @@ const EMPTY_BLOCK: Record<string, unknown> = {};
 
 /**
  * Wrap a parsed config block in a typed accessor. A nullish or non-object block
- * gives an empty accessor, so a reader never has to null-check before reading.
+ * yields an empty accessor, so a reader never has to null-check before reading.
  */
 export function declarativeConfigProperties(
   block: unknown
@@ -125,24 +125,4 @@ export function declarativeConfigProperties(
   return new DeclarativeConfigPropertiesImpl(
     isObject ? (block as Record<string, unknown>) : EMPTY_BLOCK
   );
-}
-
-/**
- * Read a config block through a typed accessor, then warn about keys `read` did
- * not touch. Wraps `block`, runs `read`, calls `warnUnreadKeys()`, and returns
- * the result, so a reader gets unread-key warnings without a separate call.
- *
- * Annotate the `read` callback's return type (e.g. `(own): Partial<Config> =>
- * ({...})`) to get a compile error on a misspelled config field. An explicit
- * type argument does not, since the object then flows through inference and
- * skips the excess-property check.
- */
-export function readConfig<T>(
-  block: unknown,
-  read: (properties: DeclarativeConfigProperties) => T
-): T {
-  const properties = declarativeConfigProperties(block);
-  const result = read(properties);
-  properties.warnUnreadKeys();
-  return result;
 }

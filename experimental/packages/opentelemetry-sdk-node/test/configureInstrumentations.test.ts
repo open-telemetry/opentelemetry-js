@@ -7,11 +7,11 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag, DiagLogLevel } from '@opentelemetry/api';
 import { InstrumentationBase } from '@opentelemetry/instrumentation';
-import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import type {
-  ConfigurationModel,
+  InstrumentationConfig,
   DeclarativeConfigProperties,
-} from '@opentelemetry/configuration';
+} from '@opentelemetry/instrumentation';
+import type { ConfigurationModel } from '@opentelemetry/configuration';
 import { configureInstrumentations } from '../src/utils';
 
 interface HttpishConfig extends InstrumentationConfig {

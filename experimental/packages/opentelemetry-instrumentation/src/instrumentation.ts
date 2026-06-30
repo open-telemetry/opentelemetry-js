@@ -14,8 +14,8 @@ import type {
 import { diag, metrics, trace } from '@opentelemetry/api';
 import type { Logger, LoggerProvider } from '@opentelemetry/api-logs';
 import { logs } from '@opentelemetry/api-logs';
-import type { DeclarativeConfigProperties } from '@opentelemetry/configuration';
-import { declarativeConfigProperties } from '@opentelemetry/configuration';
+import type { DeclarativeConfigProperties } from './declarativeConfigProperties';
+import { declarativeConfigProperties } from './declarativeConfigProperties';
 import * as shimmer from './shimmer';
 import type {
   InstrumentationModuleDefinition,

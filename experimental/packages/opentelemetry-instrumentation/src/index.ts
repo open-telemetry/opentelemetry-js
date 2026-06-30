@@ -22,3 +22,5 @@ export {
   safeExecuteInTheMiddleAsync,
 } from './utils';
 export { SemconvStability, semconvStabilityFromStr } from './semconvStability';
+export type { DeclarativeConfigProperties } from './declarativeConfigProperties';
+export { declarativeConfigProperties } from './declarativeConfigProperties';
