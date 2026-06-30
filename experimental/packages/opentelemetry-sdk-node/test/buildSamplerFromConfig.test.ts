@@ -4,8 +4,6 @@
  */
 
 import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { diag } from '@opentelemetry/api';
 import type { ConfigurationModel } from '@opentelemetry/configuration';
 import {
   AlwaysOffSampler,
@@ -111,25 +109,6 @@ describe('buildSamplerFromConfig()', () => {
       sampler.toString(),
       'ParentBased{root=AlwaysOnSampler, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}'
     );
-  });
-
-  it('warns and defaults for experimental sampler variants', () => {
-    const warnStub = sinon.stub(diag, 'warn');
-    try {
-      const sampler = buildSamplerFromConfig({
-        'probability/development': { ratio: 0.1 },
-      });
-      assert.ok(sampler instanceof ParentBasedSampler);
-      assert.ok(
-        warnStub.args.some(args =>
-          String(args[0]).includes(
-            'Experimental sampler type(s) probability/development'
-          )
-        )
-      );
-    } finally {
-      warnStub.restore();
-    }
   });
 });
 

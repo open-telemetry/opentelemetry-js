@@ -1273,12 +1273,6 @@ export function getInstanceID(config: ConfigurationModel): string | undefined {
 
 const DEFAULT_RATIO = 1;
 
-const EXPERIMENTAL_SAMPLER_KEYS = [
-  'jaeger_remote/development',
-  'probability/development',
-  'composite/development',
-];
-
 /**
  * Returns the {@link Sampler} configured under `tracer_provider.sampler` in
  * the declarative configuration, or `undefined` if none is set (in which case
@@ -1330,16 +1324,7 @@ export function buildSamplerFromConfig(
         : undefined,
     });
   }
-  const experimentalKeys = EXPERIMENTAL_SAMPLER_KEYS.filter(
-    k => samplerConfig[k] !== undefined
-  );
-  if (experimentalKeys.length > 0) {
-    diag.warn(
-      `Experimental sampler type(s) ${experimentalKeys.join(', ')} are not yet supported; defaulting to ParentBased(AlwaysOn).`
-    );
-  } else {
-    diag.error('Unknown sampler config, defaulting to ParentBased(AlwaysOn).');
-  }
+  diag.warn('Unknown sampler config, defaulting to ParentBased(AlwaysOn).');
   return new ParentBasedSampler({ root: new AlwaysOnSampler() });
 }
 
