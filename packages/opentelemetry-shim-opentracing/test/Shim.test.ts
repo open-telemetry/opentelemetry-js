@@ -5,8 +5,8 @@
 
 import * as assert from 'assert';
 import * as opentracing from 'opentracing';
-import type { Span } from '@opentelemetry/sdk-trace-base';
-import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
+import type { Span } from '@opentelemetry/sdk-trace';
+import { TracerProvider } from '@opentelemetry/sdk-trace';
 import type { SpanShim } from '../src/shim';
 import { SpanContextShim, TracerShim } from '../src/shim';
 import {
@@ -58,7 +58,7 @@ describe('OpenTracing Shim', () => {
 
     describe('propagation using default propagators', () => {
       before(() => {
-        const provider = new BasicTracerProvider();
+        const provider = new TracerProvider();
         shimTracer = new TracerShim(provider.getTracer('default'));
         opentracing.initGlobalTracer(shimTracer);
       });
@@ -135,7 +135,7 @@ describe('OpenTracing Shim', () => {
       const jaegerPropagator = new JaegerPropagator();
       const b3Propagator = new B3Propagator();
       before(() => {
-        const provider = new BasicTracerProvider();
+        const provider = new TracerProvider();
         shimTracer = new TracerShim(provider.getTracer('default'), {
           textMapPropagator: b3Propagator,
           httpHeadersPropagator: jaegerPropagator,
@@ -213,7 +213,7 @@ describe('OpenTracing Shim', () => {
 
     describe('starting spans', () => {
       before(() => {
-        const provider = new BasicTracerProvider();
+        const provider = new TracerProvider();
         shimTracer = new TracerShim(provider.getTracer('default'));
         opentracing.initGlobalTracer(shimTracer);
       });
@@ -293,7 +293,7 @@ describe('OpenTracing Shim', () => {
     let otSpan: Span;
 
     before(() => {
-      const provider = new BasicTracerProvider();
+      const provider = new TracerProvider();
       shimTracer = new TracerShim(provider.getTracer('default'));
       opentracing.initGlobalTracer(shimTracer);
     });

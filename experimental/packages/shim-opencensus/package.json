@@ -65,11 +65,11 @@
     "@opencensus/core": "0.1.0",
     "@opentelemetry/api": "1.9.1",
     "@opentelemetry/context-async-hooks": "2.8.0",
-    "@opentelemetry/sdk-trace-base": "2.8.0",
+    "@opentelemetry/sdk-trace": "2.8.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
-    "mocha": "11.7.5",
+    "mocha": "11.7.6",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
     "typescript": "5.0.4"

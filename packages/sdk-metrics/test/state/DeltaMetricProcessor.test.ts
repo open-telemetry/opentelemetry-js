@@ -17,12 +17,7 @@ describe('DeltaMetricProcessor', () => {
 
       for (const value of commonValues) {
         for (const attributes of commonAttributes) {
-          metricProcessor.record(
-            value,
-            attributes,
-            api.context.active(),
-            [0, 0]
-          );
+          metricProcessor.record(value, attributes, api.context.active(), 0);
         }
       }
     });
@@ -32,12 +27,7 @@ describe('DeltaMetricProcessor', () => {
 
       for (const value of commonValues) {
         for (const attributes of commonAttributes) {
-          metricProcessor.record(
-            value,
-            attributes,
-            api.context.active(),
-            [0, 0]
-          );
+          metricProcessor.record(value, attributes, api.context.active(), 0);
         }
       }
     });
@@ -144,9 +134,9 @@ describe('DeltaMetricProcessor', () => {
     it('should export', () => {
       const metricProcessor = new DeltaMetricProcessor(new SumAggregator(true));
 
-      metricProcessor.record(1, { attribute: '1' }, api.ROOT_CONTEXT, [0, 0]);
-      metricProcessor.record(2, { attribute: '1' }, api.ROOT_CONTEXT, [1, 1]);
-      metricProcessor.record(1, { attribute: '2' }, api.ROOT_CONTEXT, [2, 2]);
+      metricProcessor.record(1, { attribute: '1' }, api.ROOT_CONTEXT, 0);
+      metricProcessor.record(2, { attribute: '1' }, api.ROOT_CONTEXT, 1000);
+      metricProcessor.record(1, { attribute: '2' }, api.ROOT_CONTEXT, 2000);
 
       let accumulations = metricProcessor.collect();
       assert.strictEqual(accumulations.size, 2);

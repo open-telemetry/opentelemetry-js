@@ -12,10 +12,19 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* docs(shim-opentracing): *Notice*: The `@opentelemetry/shim-opentracing` package will be removed in SDK 3.x, planned for approximately September 2026.
+  * The [OpenCensus](https://opentelemetry.io/blog/2026/deprecating-opencensus-compatibility/) and [OpenTracing](https://opentelemetry.io/blog/2026/deprecating-opentracing-compatibility/) compatibility requirements in the OpenTelemetry specification have been deprecated.
+
 ### :rocket: Features
 
+* feat(sdk-metrics): add maxExportBatchSize option to PeriodicExportingMetricReader [#6655](https://github.com/open-telemetry/opentelemetry-js/pull/6655) @psx95
+  * Optimized `PeriodicExportingMetricReader.forceFlush` to prevent redundant concurrent export cycles. Concurrent calls to forceFlush will now await any ongoing export and reuse a fresh export cycle if one is started concurrently by another caller. This ensures the latest metrics are always exported efficiently without triggering duplicate collection and export cycles.
+* feat(sdk-trace): implement span processor metrics [#6504](https://github.com/open-telemetry/opentelemetry-js/pull/6504) @anuraaga
 * feat(sdk-trace): add a new "sdk-trace" package to hold the Trace SDK, without environment variable configuration handling that belongs elsewhere [#6775](https://github.com/open-telemetry/opentelemetry-js/pull/6775) @trentm
   * "sdk-trace" will eventually replace all of "sdk-trace-base", "sdk-trace-node", and "sdk-trace-web".
+  * The `BatchSpanProcessor` constructor call signature has changed in "sdk-trace".  For example, before `new BatchSpanProcessor(exporter, { maxQueueSize: 1000 })`, after `new BatchSpanProcessor({ exporter, maxQueueSize: 1000 })`. [#6817](https://github.com/open-telemetry/opentelemetry-js/pull/6817)
+  * The `SimpleSpanProcessor` constructor call signature has changed in "sdk-trace".  For example, before `new SimpleSpanProcessor(exporter)`, after `new SimpleSpanProcessor({ exporter, selfObsMeterProvider: ... })`. [#6504](https://github.com/open-telemetry/opentelemetry-js/pull/6504)
+* feat(sdk-trace): add AlwaysRecordSampler [#6188](https://github.com/open-telemetry/opentelemetry-js/pull/6188) @majanjua-amzn
 
 ### :bug: Bug Fixes
 
@@ -24,6 +33,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :house: Internal
 
 * build: migrate package builds from `tsc` to `tsdown`, emitting dual CJS/ESM output in `dist/`; published package contents are unchanged for consumers [#6293](https://github.com/open-telemetry/opentelemetry-js/pull/6293) @overbalance
+* perf(sdk-metrics): defer allocation of HrTime to accumulation creation [#6839](https://github.com/open-telemetry/opentelemetry-js/pull/6839) @legendecas
+* chore(\*): migrate use of sdk-trace-base and sdk-trace-node to sdk-trace [#6851](https://github.com/open-telemetry/opentelemetry-js/pull/6851) @trentm
 
 ## 2.8.0
 

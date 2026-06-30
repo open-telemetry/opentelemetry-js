@@ -38,7 +38,7 @@ describeBrowser('BatchSpanProcessor', () => {
     sinon.replaceGetter(document, 'visibilityState', () => visibilityState);
     visibilityState = 'visible';
     exporter = new TestTracingSpanExporter();
-    processor = new BatchSpanProcessor(exporter, {});
+    processor = new BatchSpanProcessor({ exporter });
     forceFlushSpy = sinon
       .stub(processor, 'forceFlush')
       .returns(Promise.resolve());
@@ -92,7 +92,8 @@ describeBrowser('BatchSpanProcessor', () => {
 
       describe('AND disableAutoFlushOnDocumentHide configuration option', () => {
         it('set to false should force flush spans', () => {
-          processor = new BatchSpanProcessor(exporter, {
+          processor = new BatchSpanProcessor({
+            exporter,
             disableAutoFlushOnDocumentHide: false,
           });
           forceFlushSpy = sinon.stub(processor, 'forceFlush').resolves();
@@ -102,7 +103,8 @@ describeBrowser('BatchSpanProcessor', () => {
         });
 
         it('set to true should NOT force flush spans', () => {
-          processor = new BatchSpanProcessor(exporter, {
+          processor = new BatchSpanProcessor({
+            exporter,
             disableAutoFlushOnDocumentHide: true,
           });
           forceFlushSpy = sinon.stub(processor, 'forceFlush').resolves();
@@ -139,7 +141,7 @@ describeBrowser('BatchSpanProcessor', () => {
 describe('BatchSpanProcessor', () => {
   it('without exception', async () => {
     const exporter = new TestTracingSpanExporter();
-    const spanProcessor = new BatchSpanProcessor(exporter);
+    const spanProcessor = new BatchSpanProcessor({ exporter });
     assert.ok(spanProcessor instanceof BatchSpanProcessor);
 
     await spanProcessor.forceFlush();

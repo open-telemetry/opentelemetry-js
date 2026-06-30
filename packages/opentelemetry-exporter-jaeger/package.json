@@ -57,7 +57,7 @@
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
-    "mocha": "11.7.5",
+    "mocha": "11.7.6",
     "nock": "13.5.6",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
@@ -68,7 +68,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "2.8.0",
-    "@opentelemetry/sdk-trace-base": "2.8.0",
+    "@opentelemetry/sdk-trace": "2.8.0",
     "@opentelemetry/semantic-conventions": "^1.29.0",
     "jaeger-client": "^3.15.0"
   },

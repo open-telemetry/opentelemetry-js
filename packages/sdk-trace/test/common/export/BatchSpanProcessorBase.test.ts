@@ -20,10 +20,12 @@ import {
   TracerProvider,
 } from '../../../src';
 import { context } from '@opentelemetry/api';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { TestRecordOnlySampler } from './TestRecordOnlySampler';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { TestStackContextManager } from './TestStackContextManager';
 import { resourceFromAttributes } from '@opentelemetry/resources';
+import { TestMetricReader, withResolvers } from '../util';
 
 function createSampledSpan(spanName: string): Span {
   const tracer = new TracerProvider({
@@ -45,7 +47,7 @@ function createUnsampledSpan(spanName: string): Span {
 
 describe('BatchSpanProcessorBase', () => {
   const name = 'span-name';
-  const defaultBufferConfig = {
+  const defaultBSPOptions = {
     maxExportBatchSize: 5,
     scheduledDelayMillis: 2500,
   };
@@ -62,19 +64,22 @@ describe('BatchSpanProcessorBase', () => {
 
   describe('constructor', () => {
     it('should create a BatchSpanProcessor instance', () => {
-      const processor = new BatchSpanProcessor(exporter);
+      const processor = new BatchSpanProcessor({ exporter });
       assert.ok(processor instanceof BatchSpanProcessor);
       processor.shutdown();
     });
 
-    it('should create a BatchSpanProcessor instance with config', () => {
-      const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
+    it('should create a BatchSpanProcessor instance with options', () => {
+      const processor = new BatchSpanProcessor({
+        exporter,
+        ...defaultBSPOptions,
+      });
       assert.ok(processor instanceof BatchSpanProcessor);
       processor.shutdown();
     });
 
-    it('should create a BatchSpanProcessor instance with empty config', () => {
-      const processor = new BatchSpanProcessor(exporter, {});
+    it('should create a BatchSpanProcessor instance with default options', () => {
+      const processor = new BatchSpanProcessor({ exporter });
       assert.ok(processor instanceof BatchSpanProcessor);
       processor.shutdown();
     });
@@ -82,10 +87,10 @@ describe('BatchSpanProcessorBase', () => {
 
   describe('.onStart/.onEnd/.shutdown', () => {
     it('should call onShutdown', async () => {
-      const processor = new BatchSpanProcessor(
+      const processor = new BatchSpanProcessor({
         exporter,
-        defaultBufferConfig
-      ) as any;
+        ...defaultBSPOptions,
+      }) as any;
       const onShutdownSpy = sinon.stub(processor, 'onShutdown');
       assert.strictEqual(onShutdownSpy.callCount, 0);
       await processor.shutdown();
@@ -93,7 +98,10 @@ describe('BatchSpanProcessorBase', () => {
     });
 
     it('should do nothing after processor is shutdown', async () => {
-      const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
+      const processor = new BatchSpanProcessor({
+        exporter,
+        ...defaultBSPOptions,
+      });
       const spy: sinon.SinonSpy = sinon.spy(exporter, 'export') as any;
 
       const span = createSampledSpan(`${name}_0`);
@@ -122,7 +130,10 @@ describe('BatchSpanProcessorBase', () => {
     });
 
     it('should not export unsampled spans', async () => {
-      const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
+      const processor = new BatchSpanProcessor({
+        exporter,
+        ...defaultBSPOptions,
+      });
       const spy: sinon.SinonSpy = sinon.spy(exporter, 'export') as any;
 
       const span = createUnsampledSpan(`${name}_0`);
@@ -137,9 +148,12 @@ describe('BatchSpanProcessorBase', () => {
     });
 
     it('should export the sampled spans with buffer size reached', async () => {
-      const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
+      const processor = new BatchSpanProcessor({
+        exporter,
+        ...defaultBSPOptions,
+      });
       const span = createSampledSpan(name);
-      for (let i = 1; i < defaultBufferConfig.maxExportBatchSize; i++) {
+      for (let i = 1; i < defaultBSPOptions.maxExportBatchSize; i++) {
         processor.onStart(span, ROOT_CONTEXT);
         assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
@@ -155,9 +169,12 @@ describe('BatchSpanProcessorBase', () => {
 
     it('should force flush when timeout exceeded', done => {
       const clock = sinon.useFakeTimers();
-      const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
+      const processor = new BatchSpanProcessor({
+        exporter,
+        ...defaultBSPOptions,
+      });
       const span = createSampledSpan(name);
-      for (let i = 1; i < defaultBufferConfig.maxExportBatchSize; i++) {
+      for (let i = 1; i < defaultBSPOptions.maxExportBatchSize; i++) {
         processor.onStart(span, ROOT_CONTEXT);
         processor.onEnd(span);
         assert.strictEqual(exporter.getFinishedSpans().length, 0);
@@ -166,17 +183,20 @@ describe('BatchSpanProcessorBase', () => {
       setTimeout(() => {
         assert.strictEqual(exporter.getFinishedSpans().length, 4);
         done();
-      }, defaultBufferConfig.scheduledDelayMillis + 1000);
+      }, defaultBSPOptions.scheduledDelayMillis + 1000);
 
-      clock.tick(defaultBufferConfig.scheduledDelayMillis + 1000);
+      clock.tick(defaultBSPOptions.scheduledDelayMillis + 1000);
 
       clock.restore();
     });
 
     it('should force flush on demand', () => {
-      const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
+      const processor = new BatchSpanProcessor({
+        exporter,
+        ...defaultBSPOptions,
+      });
       const span = createSampledSpan(name);
-      for (let i = 1; i < defaultBufferConfig.maxExportBatchSize; i++) {
+      for (let i = 1; i < defaultBSPOptions.maxExportBatchSize; i++) {
         processor.onStart(span, ROOT_CONTEXT);
         processor.onEnd(span);
       }
@@ -192,10 +212,13 @@ describe('BatchSpanProcessorBase', () => {
       const tracer = new TracerProvider({
         sampler: new AlwaysOnSampler(),
       }).getTracer('default');
-      const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
+      const processor = new BatchSpanProcessor({
+        exporter,
+        ...defaultBSPOptions,
+      });
 
       // start but do not end spans
-      for (let i = 0; i < defaultBufferConfig.maxExportBatchSize; i++) {
+      for (let i = 0; i < defaultBSPOptions.maxExportBatchSize; i++) {
         const span = tracer.startSpan('spanName');
         processor.onStart(span as Span, ROOT_CONTEXT);
       }
@@ -206,11 +229,11 @@ describe('BatchSpanProcessorBase', () => {
         // because no spans are ended
         sinon.assert.notCalled(spy);
         done();
-      }, defaultBufferConfig.scheduledDelayMillis + 1000);
+      }, defaultBSPOptions.scheduledDelayMillis + 1000);
 
       // no spans have been finished
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
-      clock.tick(defaultBufferConfig.scheduledDelayMillis + 1000);
+      clock.tick(defaultBSPOptions.scheduledDelayMillis + 1000);
 
       clock.restore();
     });
@@ -221,8 +244,11 @@ describe('BatchSpanProcessorBase', () => {
       done => {
         const originalTimeout = setTimeout;
         const clock = sinon.useFakeTimers({ shouldClearNativeTimers: true });
-        const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
-        const totalSpans = defaultBufferConfig.maxExportBatchSize * 2;
+        const processor = new BatchSpanProcessor({
+          exporter,
+          ...defaultBSPOptions,
+        });
+        const totalSpans = defaultBSPOptions.maxExportBatchSize * 2;
         for (let i = 0; i < totalSpans; i++) {
           const span = createSampledSpan(`${name}_${i}`);
           processor.onStart(span, ROOT_CONTEXT);
@@ -231,14 +257,14 @@ describe('BatchSpanProcessorBase', () => {
         const span = createSampledSpan(`${name}_last`);
         processor.onStart(span, ROOT_CONTEXT);
         processor.onEnd(span);
-        clock.tick(defaultBufferConfig.scheduledDelayMillis + 10);
+        clock.tick(defaultBSPOptions.scheduledDelayMillis + 10);
 
         // because there is an async promise that will be trigger original
         // timeout is needed to simulate a real tick to the next
         originalTimeout(() => {
-          clock.tick(defaultBufferConfig.scheduledDelayMillis + 10);
+          clock.tick(defaultBSPOptions.scheduledDelayMillis + 10);
           originalTimeout(async () => {
-            clock.tick(defaultBufferConfig.scheduledDelayMillis + 10);
+            clock.tick(defaultBSPOptions.scheduledDelayMillis + 10);
             clock.restore();
 
             diag.info(
@@ -262,14 +288,14 @@ describe('BatchSpanProcessorBase', () => {
   describe('force flush', () => {
     describe('no waiting spans', () => {
       it('should call an async callback when flushing is complete', done => {
-        const processor = new BatchSpanProcessor(exporter);
+        const processor = new BatchSpanProcessor({ exporter });
         processor.forceFlush().then(() => {
           done();
         });
       });
 
       it('should call an async callback when shutdown is complete', done => {
-        const processor = new BatchSpanProcessor(exporter);
+        const processor = new BatchSpanProcessor({ exporter });
         processor.shutdown().then(() => {
           done();
         });
@@ -280,7 +306,7 @@ describe('BatchSpanProcessorBase', () => {
       let processor: BatchSpanProcessor;
 
       beforeEach(() => {
-        processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
+        processor = new BatchSpanProcessor({ exporter, ...defaultBSPOptions });
       });
 
       it('should call an async callback when flushing is complete', done => {
@@ -324,13 +350,13 @@ describe('BatchSpanProcessorBase', () => {
 
         setGlobalErrorHandler(errorHandlerSpy);
 
-        for (let i = 0; i < defaultBufferConfig.maxExportBatchSize; i++) {
+        for (let i = 0; i < defaultBSPOptions.maxExportBatchSize; i++) {
           const span = createSampledSpan('test');
           processor.onStart(span, ROOT_CONTEXT);
           processor.onEnd(span);
         }
 
-        clock.tick(defaultBufferConfig.scheduledDelayMillis + 1000);
+        clock.tick(defaultBSPOptions.scheduledDelayMillis + 1000);
         clock.restore();
         setTimeout(async () => {
           assert.strictEqual(errorHandlerSpy.callCount, 1);
@@ -429,7 +455,9 @@ describe('BatchSpanProcessorBase', () => {
 
       it('should prevent instrumentation prior to export', done => {
         const testTracingExporter = new TestTracingSpanExporter();
-        const processor = new BatchSpanProcessor(testTracingExporter);
+        const processor = new BatchSpanProcessor({
+          exporter: testTracingExporter,
+        });
 
         const span = createSampledSpan('test');
         processor.onStart(span, ROOT_CONTEXT);
@@ -445,17 +473,17 @@ describe('BatchSpanProcessorBase', () => {
       });
     });
   });
+
   describe('maxQueueSize', () => {
     let processor: BatchSpanProcessor;
 
     describe('when there are more spans then "maxQueueSize"', () => {
       beforeEach(() => {
-        processor = new BatchSpanProcessor(
+        processor = new BatchSpanProcessor({
           exporter,
-          Object.assign({}, defaultBufferConfig, {
-            maxQueueSize: 6,
-          })
-        );
+          ...defaultBSPOptions,
+          maxQueueSize: 6,
+        });
       });
       it('should drop spans', () => {
         const span = createSampledSpan('test');
@@ -500,7 +528,8 @@ describe('BatchSpanProcessorBase', () => {
 
     describe('when "maxExportBatchSize" is greater than "maxQueueSize"', () => {
       beforeEach(() => {
-        processor = new BatchSpanProcessor(exporter, {
+        processor = new BatchSpanProcessor({
+          exporter,
           maxExportBatchSize: 7,
           maxQueueSize: 6,
         });
@@ -528,7 +557,8 @@ describe('BatchSpanProcessorBase', () => {
         },
         shutdown: async () => {},
       };
-      const processor = new BatchSpanProcessor(exporter, {
+      const processor = new BatchSpanProcessor({
+        exporter,
         maxExportBatchSize: 5,
         maxQueueSize: 6,
       });
@@ -552,6 +582,219 @@ describe('BatchSpanProcessorBase', () => {
       await new Promise(resolve => setTimeout(resolve, 0));
       assert.equal(callbacks.length, 2);
       assert.equal(spans.length, 10);
+    });
+  });
+
+  describe('Metrics', () => {
+    it('should record metrics', async () => {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+      const processor = new BatchSpanProcessor({
+        exporter,
+        maxQueueSize: 1,
+        maxExportBatchSize: 1,
+        scheduledDelayMillis: 1_000_000_000, // Manually flush
+        selfObsMeterProvider: meterProvider,
+      });
+
+      const exportStub = sinon.stub(exporter, 'export');
+
+      const { resolve: resolveExport1, promise: export1Promise } =
+        withResolvers<ExportResult>();
+      const { resolve: resolveExport2, promise: export2Promise } =
+        withResolvers<ExportResult>();
+
+      // Signal for when export has started
+      const { resolve: resolveFirstExport, promise: firstExportPromise } =
+        withResolvers<void>();
+
+      exportStub
+        .onFirstCall()
+        .callsFake((_spans, resultCallback: (result: ExportResult) => void) => {
+          resolveFirstExport();
+          export1Promise.then(result => resultCallback(result));
+        })
+        .onSecondCall()
+        .callsFake((_spans, resultCallback: (result: ExportResult) => void) => {
+          export2Promise.then(result => resultCallback(result));
+        });
+
+      const span1 = createSampledSpan('span1');
+      // Immediately processed
+      processor.onStart(span1, ROOT_CONTEXT);
+      processor.onEnd(span1);
+
+      // Wait for span to be sent to exporter.
+      await firstExportPromise;
+
+      // Queue empty, export in progress, this span is queued.
+      const span2 = createSampledSpan('span2');
+      processor.onStart(span2, ROOT_CONTEXT);
+      processor.onEnd(span2);
+
+      // Queue full, this span is dropped.
+      const span3 = createSampledSpan('span3');
+      processor.onStart(span3, ROOT_CONTEXT);
+      processor.onEnd(span3);
+
+      let { resourceMetrics } = await metricReader.collect();
+      let scopeMetrics = resourceMetrics.scopeMetrics.find(
+        sm => sm.scope.name === '@opentelemetry/sdk-trace'
+      );
+      assert.ok(scopeMetrics);
+      let processedSpansMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.span.processed'
+      );
+      assert.ok(processedSpansMetric);
+      assert.strictEqual(processedSpansMetric.dataPoints[0].value, 1);
+      assert.strictEqual(
+        processedSpansMetric.dataPoints[0].attributes['otel.component.type'],
+        'batching_span_processor'
+      );
+      assert.ok(
+        processedSpansMetric.dataPoints[0].attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_span_processor/')
+      );
+      assert.strictEqual(
+        processedSpansMetric.dataPoints[0].attributes['error.type'],
+        'queue_full'
+      );
+      let spanCapacityMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.span.queue.capacity'
+      );
+      assert.ok(spanCapacityMetric);
+      assert.strictEqual(spanCapacityMetric.dataPoints[0].value, 1);
+      assert.strictEqual(
+        spanCapacityMetric.dataPoints[0].attributes['otel.component.type'],
+        'batching_span_processor'
+      );
+      assert.ok(
+        spanCapacityMetric.dataPoints[0].attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_span_processor/')
+      );
+      assert.strictEqual(spanCapacityMetric.dataPoints[0].value, 1);
+      let spanQueueSizeMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.span.queue.size'
+      );
+      assert.ok(spanQueueSizeMetric);
+      assert.strictEqual(spanQueueSizeMetric.dataPoints[0].value, 1);
+      assert.strictEqual(
+        spanQueueSizeMetric.dataPoints[0].attributes['otel.component.type'],
+        'batching_span_processor'
+      );
+      assert.ok(
+        spanQueueSizeMetric.dataPoints[0].attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_span_processor/')
+      );
+      sinon.assert.calledOnce(exportStub);
+
+      resolveExport1({ code: ExportResultCode.SUCCESS });
+      const error = new Error('Export failed');
+      error.name = 'BackendError';
+      resolveExport2({
+        code: ExportResultCode.FAILED,
+        error,
+      });
+
+      await assert.rejects(processor.forceFlush(), err => {
+        assert.strictEqual(err, error);
+        return true;
+      });
+      sinon.assert.calledTwice(exportStub);
+
+      ({ resourceMetrics } = await metricReader.collect());
+      scopeMetrics = resourceMetrics.scopeMetrics.find(
+        sm => sm.scope.name === '@opentelemetry/sdk-trace'
+      );
+      assert.ok(scopeMetrics);
+
+      processedSpansMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.span.processed'
+      );
+      assert.ok(processedSpansMetric);
+      const processedSpansDataPoints =
+        processedSpansMetric.dataPoints as Array<{
+          value: number;
+          attributes: Record<string, unknown>;
+        }>;
+      const queueFullPoint = processedSpansDataPoints.find(
+        dataPoint => dataPoint.attributes['error.type'] === 'queue_full'
+      );
+      assert.ok(queueFullPoint);
+      assert.strictEqual(queueFullPoint.value, 1);
+      assert.strictEqual(
+        queueFullPoint.attributes['otel.component.type'],
+        'batching_span_processor'
+      );
+      assert.ok(
+        queueFullPoint.attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_span_processor/')
+      );
+      const successPoint = processedSpansDataPoints.find(
+        dataPoint => dataPoint.attributes['error.type'] === undefined
+      );
+      assert.ok(successPoint);
+      assert.strictEqual(successPoint.value, 1);
+      assert.strictEqual(
+        successPoint.attributes['otel.component.type'],
+        'batching_span_processor'
+      );
+      assert.ok(
+        successPoint.attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_span_processor/')
+      );
+      const failedPoint = processedSpansDataPoints.find(
+        dataPoint => dataPoint.attributes['error.type'] === 'BackendError'
+      );
+      assert.ok(failedPoint);
+      assert.strictEqual(failedPoint.value, 1);
+      assert.strictEqual(
+        failedPoint.attributes['otel.component.type'],
+        'batching_span_processor'
+      );
+      assert.ok(
+        failedPoint.attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_span_processor/')
+      );
+
+      spanCapacityMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.span.queue.capacity'
+      );
+      assert.ok(spanCapacityMetric);
+      assert.strictEqual(spanCapacityMetric.dataPoints[0].value, 1);
+      assert.strictEqual(
+        spanCapacityMetric.dataPoints[0].attributes['otel.component.type'],
+        'batching_span_processor'
+      );
+      assert.ok(
+        spanCapacityMetric.dataPoints[0].attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_span_processor/')
+      );
+      assert.strictEqual(spanCapacityMetric.dataPoints[0].value, 1);
+
+      spanQueueSizeMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.span.queue.size'
+      );
+      assert.ok(spanQueueSizeMetric);
+      assert.strictEqual(spanQueueSizeMetric.dataPoints[0].value, 0);
+      assert.strictEqual(
+        spanQueueSizeMetric.dataPoints[0].attributes['otel.component.type'],
+        'batching_span_processor'
+      );
+      assert.ok(
+        spanQueueSizeMetric.dataPoints[0].attributes['otel.component.name']
+          ?.toString()
+          .startsWith('batching_span_processor/')
+      );
     });
   });
 });

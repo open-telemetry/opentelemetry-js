@@ -3,12 +3,21 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import * as util from 'util';
 import * as assert from 'assert';
 import * as Sinon from 'sinon';
 import { diag } from '@opentelemetry/api';
 import type { ConfigurationModel } from '../src';
 import { createConfigFactory } from '../src/ConfigFactory';
-import { parseConfigFile } from '../src/FileConfigFactory';
+import {
+  mergeResourceAttributesConfig,
+  mergePropagatorCompositeConfig,
+  parseConfigFile,
+} from '../src/FileConfigFactory';
+import type {
+  AttributeNameValue,
+  TextMapPropagator,
+} from '../src/generated/types';
 
 const defaultConfig: ConfigurationModel = {
   disabled: false,
@@ -57,7 +66,6 @@ const configFromFile = {
               },
               timeout: 10000,
               compression: 'gzip',
-              encoding: 'protobuf',
             },
           },
         },
@@ -99,10 +107,8 @@ const configFromFile = {
               timeout: 10000,
               temporality_preference: 'cumulative',
               default_histogram_aggregation: 'explicit_bucket_histogram',
-              encoding: 'protobuf',
             },
           },
-          cardinality_limits: { default: 2000 },
         },
       },
     ],
@@ -126,7 +132,6 @@ const configFromFile = {
               },
               timeout: 10000,
               compression: 'gzip',
-              encoding: 'protobuf',
             },
           },
         },
@@ -153,9 +158,9 @@ const ksCardinality = {
 const ksPromExporter = (strategy: string) => ({
   host: 'localhost',
   port: 9464,
-  without_scope_info: false,
-  'without_target_info/development': false,
-  with_resource_constant_labels: {
+  scope_info_enabled: true,
+  'target_info_enabled/development': true,
+  resource_constant_labels: {
     included: ['service*'],
     excluded: ['service.attr1'],
   },
@@ -180,8 +185,6 @@ const configFromKitchenSinkFile = {
       { name: 'bool_array_key', value: [true, false], type: 'bool_array' },
       { name: 'int_array_key', value: [1, 2], type: 'int_array' },
       { name: 'double_array_key', value: [1.1, 2.2], type: 'double_array' },
-      { name: 'service.namespace', value: 'my-namespace', type: 'string' },
-      { name: 'service.version', value: '1.0.0', type: 'string' },
     ],
     'detection/development': {
       attributes: {
@@ -212,7 +215,6 @@ const configFromKitchenSinkFile = {
       { b3multi: null },
       { jaeger: null },
       { ottrace: null },
-      { xray: {} },
     ],
     composite_list: 'tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray',
   },
@@ -243,10 +245,6 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
-          schedule_delay: 5000,
-          export_timeout: 30000,
-          max_queue_size: 2048,
-          max_export_batch_size: 512,
           exporter: {
             otlp_grpc: {
               endpoint: 'http://localhost:4317',
@@ -266,10 +264,6 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
-          schedule_delay: 5000,
-          export_timeout: 30000,
-          max_queue_size: 2048,
-          max_export_batch_size: 512,
           exporter: {
             'otlp_file/development': {
               output_stream: 'file:///var/log/traces.jsonl',
@@ -279,10 +273,6 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
-          schedule_delay: 5000,
-          export_timeout: 30000,
-          max_queue_size: 2048,
-          max_export_batch_size: 512,
           exporter: { 'otlp_file/development': { output_stream: 'stdout' } },
         },
       },
@@ -414,8 +404,6 @@ const configFromKitchenSinkFile = {
       },
       {
         periodic: {
-          interval: 60000,
-          timeout: 30000,
           exporter: {
             otlp_grpc: {
               endpoint: 'http://localhost:4317',
@@ -434,13 +422,10 @@ const configFromKitchenSinkFile = {
                 'base2_exponential_bucket_histogram',
             },
           },
-          cardinality_limits: { default: 2000 },
         },
       },
       {
         periodic: {
-          interval: 60000,
-          timeout: 30000,
           exporter: {
             'otlp_file/development': {
               output_stream: 'file:///var/log/metrics.jsonl',
@@ -449,13 +434,10 @@ const configFromKitchenSinkFile = {
                 'base2_exponential_bucket_histogram',
             },
           },
-          cardinality_limits: { default: 2000 },
         },
       },
       {
         periodic: {
-          interval: 60000,
-          timeout: 30000,
           exporter: {
             'otlp_file/development': {
               output_stream: 'stdout',
@@ -464,13 +446,10 @@ const configFromKitchenSinkFile = {
                 'base2_exponential_bucket_histogram',
             },
           },
-          cardinality_limits: { default: 2000 },
         },
       },
       {
         periodic: {
-          interval: 60000,
-          timeout: 30000,
           exporter: {
             console: {
               temporality_preference: 'delta',
@@ -478,7 +457,6 @@ const configFromKitchenSinkFile = {
                 'base2_exponential_bucket_histogram',
             },
           },
-          cardinality_limits: { default: 2000 },
         },
       },
     ],
@@ -538,10 +516,6 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
-          schedule_delay: 5000,
-          export_timeout: 30000,
-          max_queue_size: 2048,
-          max_export_batch_size: 512,
           exporter: {
             otlp_grpc: {
               endpoint: 'http://localhost:4317',
@@ -561,10 +535,6 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
-          schedule_delay: 5000,
-          export_timeout: 30000,
-          max_queue_size: 2048,
-          max_export_batch_size: 512,
           exporter: {
             'otlp_file/development': {
               output_stream: 'file:///var/log/logs.jsonl',
@@ -574,10 +544,6 @@ const configFromKitchenSinkFile = {
       },
       {
         batch: {
-          schedule_delay: 5000,
-          export_timeout: 30000,
-          max_queue_size: 2048,
-          max_export_batch_size: 512,
           exporter: { 'otlp_file/development': { output_stream: 'stdout' } },
         },
       },
@@ -623,7 +589,6 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
     attribute_count_limit: 128,
   },
   propagator: {
-    composite: [{ tracecontext: {} }, { baggage: {} }],
     composite_list: 'tracecontext,baggage',
   },
   tracer_provider: {
@@ -639,7 +604,6 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
               endpoint: 'http://localhost:4318/v1/traces',
               timeout: 10000,
               compression: 'gzip',
-              encoding: 'protobuf',
               headers_list: null,
               tls: {
                 ca_file: null,
@@ -688,10 +652,8 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
                 key_file: null,
               },
               headers_list: null,
-              encoding: 'protobuf',
             },
           },
-          cardinality_limits: { default: 2000 },
         },
       },
     ],
@@ -716,7 +678,6 @@ const defaultConfigFromFileWithEnvVariables: ConfigurationModel = {
                 key_file: null,
               },
               headers_list: null,
-              encoding: 'protobuf',
             },
           },
         },
@@ -837,6 +798,33 @@ describe('FileConfigFactory', function () {
     assert.throws(() => createConfigFactory(), /Unsupported file_format/);
   });
 
+  it('should accept file_format 1.0 for backward compatibility', function () {
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/file-format-1.0.yaml';
+    assert.doesNotThrow(() => createConfigFactory());
+  });
+
+  it('should accept file_format 1.1', function () {
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/short-config.yml';
+    assert.doesNotThrow(() => createConfigFactory());
+  });
+
+  it('should accept a newer minor file_format with a warning', function () {
+    const warnStub = Sinon.stub(diag, 'warn');
+    process.env.OTEL_CONFIG_FILE =
+      'test/fixtures/file-format-future-minor.yaml';
+    assert.doesNotThrow(() => createConfigFactory());
+    Sinon.assert.calledWith(warnStub, Sinon.match(/newer minor version/));
+    warnStub.restore();
+  });
+
+  it('should throw for an unsupported major file_format version', function () {
+    process.env.OTEL_CONFIG_FILE = 'test/fixtures/file-format-unsupported.yaml';
+    assert.throws(
+      () => createConfigFactory(),
+      /Unsupported file_format.*supports schema version 1\.x/
+    );
+  });
+
   it('should show multiple validation errors for invalid config', function () {
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid-multiple-errors.yaml';
     assert.throws(
@@ -862,15 +850,8 @@ describe('FileConfigFactory', function () {
     const configFactory = createConfigFactory();
     const expectedConfig: ConfigurationModel = {
       disabled: false,
-      log_level: 'info',
-      attribute_limits: {
-        attribute_count_limit: 128,
-      },
       resource: {
         attributes_list: 'service.instance.id=123',
-        attributes: [
-          { name: 'service.instance.id', value: '123', type: 'string' },
-        ],
       },
     };
     assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
@@ -946,11 +927,6 @@ describe('FileConfigFactory', function () {
             value: 'custom-name',
             type: 'string',
           },
-          {
-            name: 'att',
-            value: '1',
-            type: 'string',
-          },
         ],
       },
       attribute_limits: {
@@ -958,7 +934,6 @@ describe('FileConfigFactory', function () {
         attribute_value_length_limit: 23,
       },
       propagator: {
-        composite: [{ b3multi: {} }],
         composite_list: 'b3multi',
       },
       tracer_provider: {
@@ -986,7 +961,6 @@ describe('FileConfigFactory', function () {
                     cert_file: 'trace-client-certificate',
                   },
                   compression: 'trace-compression',
-                  encoding: 'protobuf',
                   endpoint: 'http://test.com:4318/v1/traces',
                   headers_list: 'trace-headers',
                   timeout: 1213,
@@ -1016,11 +990,9 @@ describe('FileConfigFactory', function () {
                     cert_file: 'metric-client-certificate',
                   },
                   compression: 'metric-compression',
-                  encoding: 'protobuf',
                   headers_list: 'metric-header',
                 },
               },
-              cardinality_limits: { default: 2000 },
             },
           },
         ],
@@ -1046,7 +1018,6 @@ describe('FileConfigFactory', function () {
                     cert_file: 'logs-client-certificate',
                   },
                   compression: 'logs-compression',
-                  encoding: 'protobuf',
                   endpoint: 'http://test.com:4318/v1/logs',
                   headers_list: 'logs-header',
                   timeout: 27,
@@ -1084,10 +1055,6 @@ describe('FileConfigFactory', function () {
     const configFactory = createConfigFactory();
     const expectedConfig: ConfigurationModel = {
       disabled: false,
-      log_level: 'info',
-      attribute_limits: {
-        attribute_count_limit: 128,
-      },
       resource: {
         schema_url: 'https://opentelemetry.io/schemas/1.16.0',
         attributes_list:
@@ -1142,54 +1109,10 @@ describe('FileConfigFactory', function () {
             value: [1.1, 2.2],
             type: 'double_array',
           },
-          {
-            name: 'service.version',
-            value: '1.0.0',
-            type: 'string',
-          },
         ],
       },
     };
     assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
-  });
-
-  it('decodes percent-encoded keys and values in attributes_list', function () {
-    process.env.OTEL_CONFIG_FILE =
-      'test/fixtures/attributes-list-percent-encoded.yaml';
-    const configFactory = createConfigFactory();
-    const config = configFactory.getConfigModel();
-    assert.deepStrictEqual(config.resource?.attributes, [
-      { name: 'my,key', value: 'value=with=equals', type: 'string' },
-      { name: 'unicode', value: 'café', type: 'string' },
-    ]);
-  });
-
-  it('discards all entries when attributes_list has invalid percent-encoding', function () {
-    const warnStub = Sinon.stub(diag, 'warn');
-    process.env.OTEL_CONFIG_FILE =
-      'test/fixtures/attributes-list-invalid-encoding.yaml';
-    const configFactory = createConfigFactory();
-    const config = configFactory.getConfigModel();
-    assert.strictEqual(config.resource?.attributes, undefined);
-    assert.ok(
-      warnStub.args.some(args =>
-        String(args[0]).includes('Failed to percent-decode')
-      )
-    );
-    warnStub.restore();
-  });
-
-  it('discards all entries when attributes_list has unencoded `=` in value', function () {
-    const warnStub = Sinon.stub(diag, 'warn');
-    process.env.OTEL_CONFIG_FILE =
-      'test/fixtures/attributes-list-unencoded-equals.yaml';
-    const configFactory = createConfigFactory();
-    const config = configFactory.getConfigModel();
-    assert.strictEqual(config.resource?.attributes, undefined);
-    assert.ok(
-      warnStub.args.some(args => String(args[0]).includes('Invalid format'))
-    );
-    warnStub.restore();
   });
 
   it('leaves attribute type undefined when omitted in YAML', function () {
@@ -1216,16 +1139,10 @@ describe('FileConfigFactory', function () {
 
     const config = parseConfigFile();
     assert.deepStrictEqual(config, {
-      disabled: false,
-      log_level: 'info',
-      attribute_limits: {
-        attribute_count_limit: 128,
-      },
       resource: {
         attributes_list: null,
       },
       propagator: {
-        composite: [{ tracecontext: {} }],
         composite_list: 'tracecontext',
       },
       logger_provider: {
@@ -1253,4 +1170,157 @@ describe('FileConfigFactory', function () {
       },
     });
   });
+});
+
+describe('mergeResourceAttributesConfig', function () {
+  const corpus: {
+    attributes?: AttributeNameValue[];
+    attributes_list?: string | null;
+    expected: AttributeNameValue[] | undefined;
+    diagWarn?: string;
+    only?: boolean;
+  }[] = [
+    { expected: undefined },
+    {
+      attributes_list: null,
+      expected: undefined,
+    },
+    {
+      attributes: [{ name: 'spam', value: 'eggs' }],
+      expected: [{ name: 'spam', value: 'eggs' }],
+    },
+    {
+      attributes_list: 'foo=bar',
+      expected: [{ name: 'foo', value: 'bar', type: 'string' }],
+    },
+    {
+      attributes: [{ name: 'spam', value: 'eggs' }],
+      attributes_list: 'foo=bar',
+      expected: [
+        { name: 'spam', value: 'eggs' },
+        { name: 'foo', value: 'bar', type: 'string' },
+      ],
+    },
+    {
+      attributes: [{ name: 'spam', value: 'eggs' }],
+      attributes_list: 'foo=bar,spam=baz',
+      expected: [
+        { name: 'spam', value: 'eggs' },
+        { name: 'foo', value: 'bar', type: 'string' },
+      ],
+    },
+    {
+      attributes: [{ name: 'spam', value: 'eggs' }],
+      attributes_list: 'foo=42',
+      expected: [
+        { name: 'spam', value: 'eggs' },
+        { name: 'foo', value: '42', type: 'string' }, // no type coercion
+      ],
+    },
+    {
+      // Values include percent-encoded `,` (%2C) and `=` (%3D) in keys and
+      // values, plus a non-ASCII value encoded as UTF-8 (%C3%A9 = é).
+      attributes_list: 'my%2Ckey=value%3Dwith%3Dequals,unicode=caf%C3%A9',
+      expected: [
+        { name: 'my,key', value: 'value=with=equals', type: 'string' },
+        { name: 'unicode', value: 'café', type: 'string' },
+      ],
+    },
+    {
+      // `%ZZ` is not a valid percent-encoded sequence — should cause the entire
+      // attributes_list to be discarded per spec.
+      attributes_list: 'good=value,bad=%ZZ',
+      expected: [],
+      diagWarn:
+        'Failed to percent-decode resource.attributes_list entry "bad=%ZZ"',
+    },
+    {
+      // Unencoded `=` in value violates the spec format (must be %3D). Entire
+      // attributes_list should be discarded.
+      attributes_list: 'key=val=ue,other=ok',
+      expected: [],
+      diagWarn: 'Invalid format for resource.attributes_list entry',
+    },
+    {
+      // Discard all attribute_list entries if there is an empty name.
+      attributes_list: '=bar,spam=eggs',
+      expected: [],
+      diagWarn: 'Empty attribute name in resource.attributes_list entry',
+    },
+  ];
+
+  for (const item of corpus) {
+    const testName =
+      util.inspect(item.attributes, { breakLength: Infinity }) +
+      ', ' +
+      util.inspect(item.attributes_list);
+    (item.only ? it.only : it)(testName, function () {
+      const warnStub = Sinon.stub(diag, 'warn');
+      const actual = mergeResourceAttributesConfig(
+        item.attributes,
+        item.attributes_list
+      );
+      assert.deepStrictEqual(actual, item.expected);
+      if (item.diagWarn) {
+        assert.ok(
+          warnStub.args.some(args => String(args[0]).includes(item.diagWarn!)),
+          `a diag.warn() contains "${item.diagWarn}"`
+        );
+      }
+      warnStub.restore();
+    });
+  }
+});
+
+describe('mergePropagatorCompositeConfig', function () {
+  const corpus: {
+    composite?: TextMapPropagator[];
+    composite_list?: string | null;
+    expected: TextMapPropagator[] | undefined;
+    only?: boolean;
+  }[] = [
+    { expected: undefined },
+    {
+      composite_list: null,
+      expected: undefined,
+    },
+    {
+      composite: [{ tracecontext: null }, { baggage: {} }],
+      expected: [{ tracecontext: null }, { baggage: {} }],
+    },
+    {
+      composite_list: 'custom',
+      expected: [{ custom: null }],
+    },
+    {
+      composite: [{ tracecontext: null }, { baggage: {} }],
+      composite_list: ' custom,baggage, b3',
+      expected: [
+        { tracecontext: null },
+        { baggage: {} },
+        { custom: null },
+        { b3: null },
+      ],
+    },
+    {
+      composite: [{ tracecontext: null }, { baggage: {} }],
+      // Duplicates from composite_list are not added.
+      composite_list: 'custom,custom,custom',
+      expected: [{ tracecontext: null }, { baggage: {} }, { custom: null }],
+    },
+  ];
+
+  for (const item of corpus) {
+    const testName =
+      util.inspect(item.composite, { breakLength: Infinity }) +
+      ', ' +
+      util.inspect(item.composite_list);
+    (item.only ? it.only : it)(testName, function () {
+      const actual = mergePropagatorCompositeConfig(
+        item.composite,
+        item.composite_list
+      );
+      assert.deepStrictEqual(actual, item.expected);
+    });
+  }
 });

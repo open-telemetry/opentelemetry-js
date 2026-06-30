@@ -9,7 +9,7 @@ import {
   AlwaysOnSampler,
   ParentBasedSampler,
   TraceIdRatioBasedSampler,
-} from '@opentelemetry/sdk-trace-base';
+} from '@opentelemetry/sdk-trace';
 import { buildSamplerFromConfig } from '../src/utils';
 
 describe('buildSamplerFromConfig()', () => {

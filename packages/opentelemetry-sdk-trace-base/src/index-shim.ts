@@ -5,17 +5,19 @@
 
 export { BasicTracerProvider } from './BasicTracerProvider-shim';
 export type {
+  BufferConfig,
+  BatchSpanProcessorBrowserConfig,
   GeneralLimits,
   TracerConfig,
   SDKRegistrationConfig,
 } from './types-shim';
 export { BatchSpanProcessor } from './BatchSpanProcessor-shim';
+export { SimpleSpanProcessor } from './SimpleSpanProcessor-shim';
 
 export {
   ConsoleSpanExporter,
   RandomIdGenerator,
   InMemorySpanExporter,
-  SimpleSpanProcessor,
   NoopSpanProcessor,
   AlwaysOffSampler,
   AlwaysOnSampler,
@@ -31,8 +33,6 @@ export type {
   Span,
   SpanProcessor,
   TimedEvent,
-  BatchSpanProcessorBrowserConfig,
-  BufferConfig,
   SpanLimits,
   IdGenerator,
 } from '@opentelemetry/sdk-trace';

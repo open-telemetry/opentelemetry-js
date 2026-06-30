@@ -61,7 +61,7 @@
     "lint:fix": "eslint . --fix",
     "version": "node ../../scripts/version-update.js",
     "watch": "tsdown --watch --no-clean",
-    "test:bench": "node test/performance/benchmark/index.js | tee .benchmark-results.txt",
+    "test:bench": "node test/performance/benchmark/public-benchmarks.js | tee .benchmark-results.txt",
     "peer-api-check": "node ../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../scripts/align-api-deps.js"
   },
@@ -101,7 +101,7 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.36",
     "karma-webpack": "5.0.1",
-    "mocha": "11.7.5",
+    "mocha": "11.7.6",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
     "ts-loader": "9.5.7",

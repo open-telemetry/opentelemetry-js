@@ -24,13 +24,11 @@ Format:
 Example of usage:
 
 ```javascript
-const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
+const { propagation } = require('@opentelemetry/api');
 const { JaegerPropagator } = require('@opentelemetry/propagator-jaeger');
 
-const provider = new NodeTracerProvider();
-provider.register({
-  propagator: new JaegerPropagator()
-});
+const propagator = new JaegerPropagator();
+propagation.setGlobalPropagator(propagator);
 ```
 
 ## Baggage Notes
