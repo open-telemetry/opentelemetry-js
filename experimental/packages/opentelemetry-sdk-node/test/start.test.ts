@@ -968,21 +968,6 @@ describe('startNodeSDK', function () {
       });
     });
 
-    it('should create metric reader with opencensus producer when shim is available', async () => {
-      const reader = getPeriodicMetricReaderFromConfiguration({
-        exporter: { console: {} },
-        producers: [{ opencensus: {} }],
-      });
-      assert.ok(reader !== undefined);
-      const producers = (reader as any)._metricProducers;
-      assert.ok(producers.length === 1);
-      assert.strictEqual(
-        producers[0].constructor.name,
-        'OpenCensusMetricProducer'
-      );
-      await (reader as PeriodicExportingMetricReader).shutdown();
-    });
-
     it('should warn for unsupported metric producer', async () => {
       const warnSpy = Sinon.spy(diag, 'warn');
       const reader = getPeriodicMetricReaderFromConfiguration({

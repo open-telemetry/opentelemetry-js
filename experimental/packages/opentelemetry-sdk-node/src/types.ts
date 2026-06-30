@@ -34,6 +34,14 @@ export interface NodeSDKConfiguration {
   metricReaders?: IMetricReader[];
   views: ViewOptions[];
   instrumentations: (Instrumentation | Instrumentation[])[];
+  /**
+   * Custom resource to attach to telemetry.
+   * It is recommended to merge with the default resource via:
+   *
+   *     resource: defaultResource().merge(
+   *       resourceFromAttributes({ foo: 'bar' })
+   *     )
+   */
   resource: Resource;
   resourceDetectors: Array<ResourceDetector>;
   sampler: Sampler;

@@ -42,8 +42,8 @@ To export to your own backend instead, set `OTEL_EXPORTER_OTLP_ENDPOINT` and
 (optionally) `EXAMPLE_API_KEY`:
 
 ```sh
-OTEL_EXPORTER_OTLP_ENDPOINT=https://api.honeycomb.io \
-EXAMPLE_API_KEY=$HONEYCOMB_API_KEY \
+OTEL_EXPORTER_OTLP_ENDPOINT=https://vendor.endpoint \
+EXAMPLE_API_KEY=$VENDOR_API_KEY \
 npm start
 ```
 

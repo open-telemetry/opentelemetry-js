@@ -32,8 +32,6 @@ async function main(): Promise<void> {
     span.end();
   });
 
-  // Give the batch processors a moment to flush before shutdown.
-  await new Promise(resolve => setTimeout(resolve, 1000));
   await sdk.shutdown();
 }
 

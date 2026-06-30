@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace';
 import type { ISerializer } from '../../i-serializer';
 import type { IExportTraceServiceResponse } from '../export-response';
 import { serializeTraceExportRequest } from './trace-serializer';

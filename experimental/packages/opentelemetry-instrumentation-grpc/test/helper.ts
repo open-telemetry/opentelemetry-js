@@ -6,14 +6,14 @@
 import type { Attributes } from '@opentelemetry/api';
 import { context, propagation, SpanKind, trace } from '@opentelemetry/api';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import type { ContextManager } from '@opentelemetry/api';
-import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
+  TracerProvider,
+} from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
 import * as protoLoader from '@grpc/proto-loader';
 import type {
@@ -574,7 +574,7 @@ export const runTests = (
 
     const ClientServerValidationTest = (
       method: (typeof methodList)[0],
-      provider: NodeTracerProvider,
+      provider: TracerProvider,
       checkSpans = true,
       attributesValidation?: {
         serverAttributes?: Attributes;
@@ -618,7 +618,7 @@ export const runTests = (
 
     const ErrorValidationTest = (
       method: (typeof methodList)[0],
-      provider: NodeTracerProvider,
+      provider: TracerProvider,
       checkSpans = true,
       attributesValidation?: {
         serverAttributes?: Attributes;
@@ -674,7 +674,7 @@ export const runTests = (
 
     const runTestWithAttributeValidation = (
       method: (typeof methodList)[0],
-      provider: NodeTracerProvider,
+      provider: TracerProvider,
       checkSpans = true,
       attributesValidation: {
         serverAttributes?: Attributes;
@@ -692,7 +692,7 @@ export const runTests = (
 
     const runTest = (
       method: (typeof methodList)[0],
-      provider: NodeTracerProvider,
+      provider: TracerProvider,
       checkSpans = true
     ) => {
       ClientServerValidationTest(method, provider, checkSpans);
@@ -708,7 +708,7 @@ export const runTests = (
       method: (typeof methodList)[0],
       key: string,
       errorCode: number,
-      provider: NodeTracerProvider
+      provider: TracerProvider
     ) => {
       it(`should raise an error for client/server rootSpans: method=${method.methodName}, status=${key}`, async () => {
         const expectEmpty = memoryExporter.getFinishedSpans();
@@ -819,8 +819,8 @@ export const runTests = (
     };
 
     describe('enable()', () => {
-      const provider = new NodeTracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      const provider = new TracerProvider({
+        spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
       });
       beforeEach(() => {
         memoryExporter.reset();
@@ -864,8 +864,8 @@ export const runTests = (
     });
 
     describe('disable()', () => {
-      const provider = new NodeTracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      const provider = new TracerProvider({
+        spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
       });
       beforeEach(() => {
         memoryExporter.reset();
@@ -896,8 +896,8 @@ export const runTests = (
     });
 
     describe('Test filtering requests using metadata', () => {
-      const provider = new NodeTracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      const provider = new TracerProvider({
+        spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
       });
       beforeEach(() => {
         memoryExporter.reset();
@@ -926,8 +926,8 @@ export const runTests = (
     });
 
     describe('Test filtering requests using options', () => {
-      const provider = new NodeTracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      const provider = new TracerProvider({
+        spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
       });
       const checkSpans: { [key: string]: boolean } = {
         unaryMethod: false,
@@ -1004,8 +1004,8 @@ export const runTests = (
     });
 
     describe('Test capturing metadata', () => {
-      const provider = new NodeTracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      const provider = new TracerProvider({
+        spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
       });
 
       const clientMetadata = new Metadata();

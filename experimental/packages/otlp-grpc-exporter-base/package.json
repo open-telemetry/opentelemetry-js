@@ -46,8 +46,6 @@
   },
   "devDependencies": {
     "@opentelemetry/api": "1.9.1",
-    "@opentelemetry/resources": "2.8.0",
-    "@opentelemetry/sdk-trace-base": "2.8.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",

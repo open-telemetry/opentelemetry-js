@@ -22,6 +22,6 @@
     "@opentelemetry/sdk-logs": "0.219.0",
     "@opentelemetry/sdk-metrics": "2.8.0",
     "@opentelemetry/sdk-node": "0.219.0",
-    "@opentelemetry/sdk-trace-base": "2.8.0"
+    "@opentelemetry/sdk-trace": "2.8.0"
   }
 }

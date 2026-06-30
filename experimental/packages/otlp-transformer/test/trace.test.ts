@@ -8,7 +8,7 @@ import type { InstrumentationScope } from '@opentelemetry/core';
 import { TraceState } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import { resourceFromAttributes } from '@opentelemetry/resources';
-import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { toBase64 } from './utils';

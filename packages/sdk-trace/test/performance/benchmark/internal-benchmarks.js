@@ -4,3 +4,4 @@
  */
 
 require('./sampler');
+require('./setAttributes');

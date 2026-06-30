@@ -13,7 +13,8 @@ resource:
     - name: deployment.environment.name
       value: ${DEPLOYMENT_ENV:-development}
 
-# Comma-separated list of W3C propagators. tracecontext + baggage is the spec default.
+# Configure the W3C propagators explicitly. tracecontext and baggage match the
+# spec default, but the propagator block must be present for any to be applied.
 propagator:
   composite:
     - tracecontext: {}

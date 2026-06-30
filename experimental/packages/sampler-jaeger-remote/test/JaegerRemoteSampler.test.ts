@@ -9,7 +9,7 @@ import {
   ParentBasedSampler,
   SamplingDecision,
   TraceIdRatioBasedSampler,
-} from '@opentelemetry/sdk-trace-base';
+} from '@opentelemetry/sdk-trace';
 import * as api from '@opentelemetry/api';
 import { JaegerRemoteSampler } from '../src';
 import * as sinon from 'sinon';
