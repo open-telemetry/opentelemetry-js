@@ -10,3 +10,5 @@
 
 export { wrapTracer, SugaredTracer } from './trace/SugaredTracer';
 export type { SugaredSpanOptions } from './trace/SugaredOptions';
+
+export { decorators } from './decorators/index';
