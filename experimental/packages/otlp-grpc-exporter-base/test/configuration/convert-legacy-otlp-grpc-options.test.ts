@@ -19,10 +19,10 @@ describe('convertLegacyOtlpGrpcOptions', function () {
       assert.deepStrictEqual(result.channelOptions, channelOptions);
     });
 
-    it('channelOptions is undefined if not provided', function () {
+    it('channelOptions is an empty object if not provided anywhere', function () {
       const result = convertLegacyOtlpGrpcOptions({}, 'TRACES');
 
-      assert.strictEqual(result.channelOptions, undefined);
+      assert.deepStrictEqual(result.channelOptions, {});
     });
   });
 });

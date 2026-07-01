@@ -114,10 +114,11 @@ export function mergeOtlpGrpcConfigurationWithDefaults(
       fallbackConfiguration.credentials?.(rawUrl) ??
       defaultConfiguration.credentials(rawUrl),
     userAgent: userProvidedConfiguration.userAgent,
-    channelOptions:
-      userProvidedConfiguration.channelOptions ??
-      fallbackConfiguration.channelOptions ??
-      defaultConfiguration.channelOptions,
+    channelOptions: {
+      ...defaultConfiguration.channelOptions,
+      ...fallbackConfiguration.channelOptions,
+      ...userProvidedConfiguration.channelOptions,
+    },
   };
 }
 

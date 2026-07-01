@@ -94,6 +94,27 @@ describe('channelOptions', function () {
     assert.deepStrictEqual(config.channelOptions, userChannelOptions);
   });
 
+  it('merges channelOptions from all three levels, user takes precedence on conflicts', function () {
+    const userChannelOptions = {
+      'grpc.keepalive_time_ms': 10000,
+    };
+    const fallbackChannelOptions = {
+      'grpc.keepalive_time_ms': 20000,
+      'grpc.max_receive_message_length': 4194304,
+    };
+
+    const config = mergeOtlpGrpcConfigurationWithDefaults(
+      { channelOptions: userChannelOptions },
+      { channelOptions: fallbackChannelOptions },
+      getOtlpGrpcDefaultConfiguration()
+    );
+
+    assert.deepStrictEqual(config.channelOptions, {
+      'grpc.keepalive_time_ms': 10000,
+      'grpc.max_receive_message_length': 4194304,
+    });
+  });
+
   it('uses fallback channelOptions over default', function () {
     const fallbackChannelOptions = {
       'grpc.initial_reconnect_backoff_ms': 1000,
@@ -115,6 +136,6 @@ describe('channelOptions', function () {
       getOtlpGrpcDefaultConfiguration()
     );
 
-    assert.strictEqual(config.channelOptions, undefined);
+    assert.deepStrictEqual(config.channelOptions, {});
   });
 });
