@@ -1,0 +1,23 @@
+{
+  "name": "declarative-config-example",
+  "version": "0.219.0",
+  "private": true,
+  "description": "Example of configuring the Node SDK from a YAML file via OTEL_CONFIG_FILE + startNodeSDK()",
+  "main": "index.ts",
+  "scripts": {
+    "start": "OTEL_CONFIG_FILE=./otel-config.yaml ts-node index.ts",
+    "align-api-deps": "node ../../../scripts/align-api-deps.js"
+  },
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@opentelemetry/api": "^1.7.0",
+    "@opentelemetry/api-logs": "0.219.0",
+    "@opentelemetry/configuration": "0.219.0",
+    "@opentelemetry/sdk-node": "0.219.0"
+  },
+  "devDependencies": {
+    "@types/node": "18.19.130",
+    "ts-node": "^10.9.1"
+  }
+}
