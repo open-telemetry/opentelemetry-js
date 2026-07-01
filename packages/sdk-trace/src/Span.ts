@@ -75,6 +75,8 @@ type SpanOptions = Omit<APISpanOptions, 'root'> & {
  * This class represents a span.
  */
 export class SpanImpl implements Span {
+  static getTick: () => number = () => Date.now();
+
   // Below properties are included to implement ReadableSpan for export
   // purposes but are not intended to be written-to directly.
   private readonly _spanContext: SpanContext;
@@ -112,7 +114,7 @@ export class SpanImpl implements Span {
    * Constructs a new SpanImpl instance.
    */
   constructor(opts: SpanOptions) {
-    const now = Date.now();
+    const now = SpanImpl.getTick();
 
     this._spanContext = opts.spanContext;
     this._performanceStartTime = otperformance.now();
@@ -413,7 +415,7 @@ export class SpanImpl implements Span {
     if (this._startTimeProvided) {
       // if user provided a time for the start manually
       // we can't use duration to calculate event/end times
-      return millisToHrTime(Date.now());
+      return millisToHrTime(SpanImpl.getTick());
     }
 
     const msDuration = otperformance.now() - this._performanceStartTime;
