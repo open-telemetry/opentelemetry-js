@@ -36,6 +36,32 @@ export interface OtlpNodeHttpConfiguration extends OtlpHttpConfiguration {
   userAgent?: string;
 }
 
+function hasEnvProxyEnvVar(name: string): boolean {
+  return process.env[name] != null && process.env[name] !== '';
+}
+
+function hasEnvProxyConfiguration(): boolean {
+  return (
+    process.env.NODE_USE_ENV_PROXY === '1' ||
+    hasEnvProxyEnvVar('HTTP_PROXY') ||
+    hasEnvProxyEnvVar('http_proxy') ||
+    hasEnvProxyEnvVar('HTTPS_PROXY') ||
+    hasEnvProxyEnvVar('https_proxy')
+  );
+}
+
+function getEnvProxyAgentOptions():
+  | { proxyEnv: NodeJS.ProcessEnv }
+  | undefined {
+  if (hasEnvProxyConfiguration()) {
+    // `proxyEnv` is used by Node.js' HTTP agents to honor HTTP(S)_PROXY
+    // while preserving exporter-specific agent options such as keepAlive.
+    return { proxyEnv: process.env };
+  }
+
+  return undefined;
+}
+
 export function httpAgentFactoryFromOptions(
   options: http.AgentOptions | https.AgentOptions
 ): HttpAgentFactory {
@@ -43,14 +69,21 @@ export function httpAgentFactoryFromOptions(
     const isInsecure = protocol === 'http:';
     const module = isInsecure ? import('http') : import('https');
     const { Agent } = await module;
+    const envProxyAgentOptions = getEnvProxyAgentOptions();
 
     if (isInsecure) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars -- these props should not be used in agent options
       const { ca, cert, key, ...insecureOptions } =
         options as https.AgentOptions;
-      return new Agent(insecureOptions);
+      return new Agent({
+        ...insecureOptions,
+        ...envProxyAgentOptions,
+      } as http.AgentOptions);
     }
-    return new Agent(options);
+    return new Agent({
+      ...options,
+      ...envProxyAgentOptions,
+    } as https.AgentOptions);
   };
 }
 
