@@ -22,3 +22,4 @@ export {
   safeExecuteInTheMiddleAsync,
 } from './utils';
 export { SemconvStability, semconvStabilityFromStr } from './semconvStability';
+export type { ConfigProperties } from '@opentelemetry/api-config';

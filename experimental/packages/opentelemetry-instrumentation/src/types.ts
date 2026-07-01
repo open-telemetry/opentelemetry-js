@@ -36,6 +36,14 @@ export interface Instrumentation<
 
   /** Method to get instrumentation config  */
   getConfig(): ConfigType;
+
+  /**
+   * @experimental This feature is in development as per the OpenTelemetry specification.
+   *
+   * Pull this instrumentation's declarative config from the global
+   * ConfigProvider and apply it. Called at registration time.
+   */
+  applyDeclarativeConfig?(): void;
 }
 
 /**
