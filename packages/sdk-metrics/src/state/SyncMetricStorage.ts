@@ -4,6 +4,7 @@
  */
 
 import type { Context, HrTime, Attributes } from '@opentelemetry/api';
+import { context as contextApi } from '@opentelemetry/api';
 import type { WritableMetricStorage } from './WritableMetricStorage';
 import type { Accumulation, Aggregator } from '../aggregator/types';
 import type { InstrumentDescriptor } from '../InstrumentDescriptor';
@@ -27,12 +28,12 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>>
   private _aggregationCardinalityLimit?: number;
   private _deltaMetricStorage: DeltaMetricProcessor<T>;
   private _temporalMetricStorage: TemporalMetricProcessor<T>;
-  private _attributesProcessor: IAttributesProcessor;
+  private _attributesProcessor?: IAttributesProcessor;
 
   constructor(
     instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<T>,
-    attributesProcessor: IAttributesProcessor,
+    attributesProcessor: IAttributesProcessor | undefined,
     collectorHandles: MetricCollectorHandle[],
     aggregationCardinalityLimit?: number
   ) {
@@ -47,16 +48,24 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>>
       collectorHandles
     );
     this._attributesProcessor = attributesProcessor;
+    this.hasAttributeProcessor = attributesProcessor !== undefined;
   }
+
+  readonly hasAttributeProcessor: boolean;
 
   record(
     value: number,
     attributes: Attributes,
-    context: Context,
+    context: Context | undefined,
     recordTime: number
   ) {
-    attributes = this._attributesProcessor.process(attributes, context);
-    this._deltaMetricStorage.record(value, attributes, context, recordTime);
+    if (this._attributesProcessor !== undefined) {
+      attributes = this._attributesProcessor.process(
+        attributes,
+        context ?? contextApi.active()
+      );
+    }
+    this._deltaMetricStorage.record(value, attributes, recordTime);
   }
 
   /**

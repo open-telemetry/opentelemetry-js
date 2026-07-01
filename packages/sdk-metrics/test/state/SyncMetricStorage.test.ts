@@ -4,6 +4,7 @@
  */
 
 import * as api from '@opentelemetry/api';
+import type { Attributes, Context } from '@opentelemetry/api';
 import * as assert from 'assert';
 
 import { SumAggregator } from '../../src/aggregator';
@@ -124,6 +125,46 @@ describe('SyncMetricStorage', () => {
           assertDataPoint(metric.dataPoints[0], {}, 7, [0, 0], [6, 6]);
         }
       });
+    });
+  });
+
+  describe('attribute processor receives context', () => {
+    it('should pass provided context to attribute processor', () => {
+      const expectedContext = api.ROOT_CONTEXT.setValue(
+        api.createContextKey('test'),
+        'value'
+      );
+      const attributeProcessor = {
+        process(incoming: Attributes, context?: Context) {
+          assert.strictEqual(context, expectedContext);
+          return incoming;
+        },
+      };
+      const metricStorage = new SyncMetricStorage(
+        defaultInstrumentDescriptor,
+        new SumAggregator(true),
+        attributeProcessor,
+        [deltaCollector]
+      );
+
+      metricStorage.record(1, {}, expectedContext, 0);
+    });
+
+    it('should resolve active context when context is undefined', () => {
+      const attributeProcessor = {
+        process(incoming: Attributes, context?: Context) {
+          assert.strictEqual(context, api.context.active());
+          return incoming;
+        },
+      };
+      const metricStorage = new SyncMetricStorage(
+        defaultInstrumentDescriptor,
+        new SumAggregator(true),
+        attributeProcessor,
+        [deltaCollector]
+      );
+
+      metricStorage.record(1, {}, undefined, 0);
     });
   });
 });
