@@ -67,9 +67,8 @@ describe('ConfigProperties', function () {
         undefined
       );
       sinon.assert.calledOnce(warn);
-      assert.match(
-        warn.firstCall.args[0],
-        /enabled.*expected boolean.*got string/
+      assert.ok(
+        /enabled.*expected boolean.*got string/.test(warn.firstCall.args[0])
       );
     });
   });
@@ -314,7 +313,7 @@ describe('ConfigProperties', function () {
       properties.getBoolean('enabled');
       properties.warnUnreadKeys();
       sinon.assert.calledOnce(warn);
-      assert.match(warn.firstCall.args[0], /unrecognized.*typo_key/);
+      assert.ok(/unrecognized.*typo_key/.test(warn.firstCall.args[0]));
     });
 
     it('is silent when every key was read', function () {
