@@ -14,6 +14,8 @@ import type {
 import { diag, metrics, trace } from '@opentelemetry/api';
 import type { Logger, LoggerProvider } from '@opentelemetry/api-logs';
 import { logs } from '@opentelemetry/api-logs';
+import type { ConfigProperties } from '@opentelemetry/api-config';
+import { config as configApi } from '@opentelemetry/api-config';
 import * as shimmer from './shimmer';
 import type {
   InstrumentationModuleDefinition,
@@ -141,6 +143,80 @@ export abstract class InstrumentationAbstract<
       enabled: true,
       ...config,
     };
+  }
+
+  /**
+   * @experimental This feature is in development as per the OpenTelemetry specification.
+   *
+   * Pull this instrumentation's declarative config from the global
+   * {@link ConfigProvider} and apply it. Reads the instrumentation's own
+   * `instrumentation/development` block and the shared `general` block via
+   * {@link readDeclarativeConfig}, drops undefined fields so unset keys keep
+   * their constructor default, then merges the rest over the current config.
+   *
+   * Called at registration time, after an SDK has set the global provider. With
+   * no provider registered the global default is a no-op, so this is a no-op too.
+   */
+  public applyDeclarativeConfig(): void {
+    const provider = configApi.getConfigProvider();
+    const own = provider.getInstrumentationConfig(this.instrumentationName);
+    const general = provider.getGeneralInstrumentationConfig();
+
+    let partial: Partial<ConfigType>;
+    try {
+      partial = this.readDeclarativeConfig(own, general);
+    } catch (e) {
+      this._diag.error('error reading declarative config', e);
+      return;
+    }
+
+    // `enabled` is applied by the registrar, not a reader, so never report it as
+    // an unread key.
+    const unread = own.unreadKeys().filter(k => k !== 'enabled');
+    if (unread.length > 0) {
+      // Distinguish "no reader for this instrumentation" from "the reader does
+      // not recognize these keys", since they call for different user action.
+      this._diag.warn(
+        this._hasDeclarativeConfigReader()
+          ? `ignoring unrecognized declarative config keys: ${unread.join(', ')}`
+          : `declarative config not supported by this instrumentation (except "enabled"); these keys had no effect: ${unread.join(', ')}`
+      );
+    }
+
+    const defined: Partial<ConfigType> = {};
+    for (const key of Object.keys(partial) as (keyof ConfigType)[]) {
+      if (partial[key] !== undefined) {
+        defined[key] = partial[key];
+      }
+    }
+    this.setConfig({ ...this.getConfig(), ...defined });
+  }
+
+  /**
+   * @experimental This feature is in development as per the OpenTelemetry specification.
+   *
+   * Map declarative config to a partial config. Override this per instrumentation
+   * to read keys from `own` and `general` and return the fields to apply. The
+   * caller warns about own-block keys no getter read, so a reader only reads what
+   * it supports.
+   *
+   * @param own typed accessor over the instrumentation's own config block
+   * @param general typed accessor over the shared `general` block
+   * @returns the config fields to apply; undefined values keep the default
+   */
+  protected readDeclarativeConfig(
+    _own: ConfigProperties,
+    _general: ConfigProperties
+  ): Partial<ConfigType> {
+    return {};
+  }
+
+  // True when a subclass overrides readDeclarativeConfig (it has a reader).
+  private _hasDeclarativeConfigReader(): boolean {
+    return (
+      this.readDeclarativeConfig !==
+      InstrumentationAbstract.prototype.readDeclarativeConfig
+    );
   }
 
   /**
