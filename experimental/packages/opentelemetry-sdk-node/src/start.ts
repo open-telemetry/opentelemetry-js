@@ -6,7 +6,11 @@ import type {
   ConfigFactory,
   ConfigurationModel,
 } from '@opentelemetry/configuration';
-import { createConfigFactory } from '@opentelemetry/configuration';
+import {
+  createConfigFactory,
+  createConfigProvider,
+} from '@opentelemetry/configuration';
+import { config as configApi } from '@opentelemetry/api-config';
 import {
   context,
   diag,
@@ -80,6 +84,9 @@ export function startNodeSDK(sdkOptions?: SDKOptions): {
   const logLevel = diagLogLevelFromSeverityNumberConfig(config.log_level);
   diag.setLogger(new DiagConsoleLogger(), { logLevel });
 
+  // Register the global ConfigProvider before enabling instrumentations, so each
+  // instrumentation pulls its declarative config during registration.
+  configApi.setGlobalConfigProvider(createConfigProvider(config));
   registerInstrumentations({
     instrumentations: sdkOptions?.instrumentations?.flat() ?? [],
   });
