@@ -8,7 +8,7 @@ import {
   InstrumentationBase,
   InstrumentationNodeModuleDefinition,
   InstrumentationNodeModuleFile,
-} from '../../build/src/index.js';
+} from '../../dist/index.mjs';
 import * as exported from 'test-esm-module';
 import * as exportedAbsolute from './esm/test.mjs';
 

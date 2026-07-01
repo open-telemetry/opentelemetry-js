@@ -15,13 +15,13 @@ jobs:
       fail-fast: false
       matrix:
         node_version:
-          - "18.19.0"
-          - "18"
-          - "20.6.0"
-          - "20"
-          - "22"
-          - "24"
-          - "26"
+          - 18.19.0
+          - 18
+          - 20.6.0
+          - 20
+          - 22
+          - 24
+          - 26
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -34,24 +34,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: ${{ matrix.node_version }}
-
-      # npm@11.0.0 drops support for Node.js v18
-      # Install the latest npm compatible with this version of Node.js
-      # - npm@11.1.0 supports: {"node":"^20.17.0 || >=22.9.0"}
-      - run: npm install -g npm@"<11.0.0"
-        if: ${{
-          matrix.node_version == '18.19.0' ||
-          matrix.node_version == '18' ||
-          matrix.node_version == '20.6.0'
-          }}
-      - run: npm install -g npm@latest
-        if: ${{
-          matrix.node_version == '20' ||
-          matrix.node_version == '22' ||
-          matrix.node_version == '24' ||
-          matrix.node_version == '26'
-          }}
+          node-version: ^26.3.0
 
       - name: Bootstrap
         run: npm ci --ignore-scripts
@@ -59,10 +42,17 @@ jobs:
       - name: Build 🔧
         run: npm run compile
 
+      # The compile above ran on the repo's build Node (^26.3.0) because tsdown
+      # does not support Node < 22.18. Tests, however, must cover every
+      # supported runtime, so switch to the matrix Node version for them.
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: ${{ matrix.node_version }}
+
       - run: npm test
 
       - name: Report Coverage
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6.0.2
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
@@ -80,9 +70,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: '22'
-
-      - run: npm install -g npm@latest
+          node-version: ^26.3.0
 
       - name: Bootstrap
         run: npm ci --ignore-scripts
@@ -94,6 +82,34 @@ jobs:
 
       - name: Unit tests
         run: npm run test
+  verify-pack:
+    # Unit tests run against TS source via ts-node, so they never exercise
+    # the published dist/ artifact. This job packs every workspace package,
+    # loads the require/import targets of its `exports` map, and existence
+    # checks types/browser/main/module files in the tarball.
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+          node-version: ^26.3.0
+
+      - name: Bootstrap
+        run: npm ci --ignore-scripts
+
+      - name: Build 🔧
+        run: npm run compile
+
+      - name: Verify packed artifacts
+        run: npm run verify-pack
+
   browser-tests:
     runs-on: ubuntu-latest
     steps:
@@ -107,7 +123,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: 22
+          node-version: ^26.3.0
 
       - name: Bootstrap
         run: npm ci --ignore-scripts
@@ -118,7 +134,7 @@ jobs:
       - name: Unit tests
         run: npm run test:browser
       - name: Report Coverage
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6.0.2
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
@@ -135,7 +151,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: 22
+          node-version: ^26.3.0
 
       - name: Bootstrap
         run: npm ci --ignore-scripts
@@ -146,7 +162,7 @@ jobs:
       - name: Unit tests
         run: npm run test:webworker
       - name: Report Coverage
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6.0.2
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:

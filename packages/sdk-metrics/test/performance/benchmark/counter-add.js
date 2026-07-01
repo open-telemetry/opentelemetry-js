@@ -4,7 +4,7 @@
  */
 
 const Benchmark = require('benchmark');
-const { MeterProvider } = require('../../../build/src');
+const { MeterProvider } = require('../../../dist/index.cjs');
 
 const provider = new MeterProvider();
 const meter = provider.getMeter('bench');

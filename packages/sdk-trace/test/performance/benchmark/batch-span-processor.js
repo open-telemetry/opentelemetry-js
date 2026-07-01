@@ -4,7 +4,7 @@
  */
 
 const Benchmark = require('benchmark');
-const { BatchSpanProcessor, TracerProvider } = require('../../../build/src');
+const { BatchSpanProcessor, TracerProvider } = require('../../../dist/index.cjs');
 const { ExportResultCode } = require('@opentelemetry/core');
 
 class NoopExporter {
