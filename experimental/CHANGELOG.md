@@ -26,6 +26,11 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(sdk-node): wire up `tracer_provider.sampler` from declarative config (always_on, always_off, trace_id_ratio_based, parent_based); unrecognized variants warn and fall back to ParentBased(AlwaysOn) [#6506](https://github.com/open-telemetry/opentelemetry-js/issues/6506) @MikeGoldsmith
 * feat(propagator-env-carrier): empty name normalization [#6827](https://github.com/open-telemetry/opentelemetry-js/pull/6827) @pellared
 * feat(propagator-env-carrier): make `EnvironmentGetter` read the current `process.env` [#6853](https://github.com/open-telemetry/opentelemetry-js/pull/6853) @pellared
+* feat(api-config): add `@opentelemetry/api-config`, an experimental package with the declarative-config `ConfigProvider` and `ConfigProperties` API and a global `config` accessor [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear
+* feat(configuration): add `createConfigProvider()` to build a `ConfigProvider` over the parsed configuration model [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear
+* feat(instrumentation): add `InstrumentationRegistry` and constructor-time declarative config; `InstrumentationBase.applyDeclarativeConfig(read)` reads the instrumentation's block from the global `ConfigProvider`, merges the mapped fields over its config, and warns on unrecognized keys [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear
+* feat(instrumentation-http): read declarative config in the constructor, mapping snake_case keys to the http instrumentation options [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear
+* feat(sdk-node): register a global `ConfigProvider` from the config file and construct instrumentations from an `instrumentationRegistry` [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear
 
 ### :bug: Bug Fixes
 
