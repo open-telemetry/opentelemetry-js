@@ -59,6 +59,7 @@ export type {
   Resource as ResourceConfigModel,
 } from './generated/types';
 export { createConfigFactory } from './ConfigFactory';
+export { createConfigProvider } from './SdkConfigProvider';
 export {
   mergeHeadersConfig,
   mergeResourceAttributesConfig,
