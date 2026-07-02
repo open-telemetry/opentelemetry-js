@@ -39,6 +39,11 @@ export interface Instrumentation<
 }
 
 /**
+ * A map of npm package name to a factory that constructs the instrumentation.
+ */
+export type InstrumentationRegistry = Record<string, () => Instrumentation>;
+
+/**
  * Base interface for configuration options common to all instrumentations.
  * This interface can be extended by individual instrumentations to include
  * additional configuration options specific to that instrumentation.

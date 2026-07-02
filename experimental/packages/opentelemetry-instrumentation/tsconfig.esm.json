@@ -16,6 +16,9 @@
       "path": "../../../packages/sdk-metrics"
     },
     {
+      "path": "../api-config"
+    },
+    {
       "path": "../api-logs"
     }
   ]
