@@ -3,27 +3,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type {
-  ContextManager,
-  MeterProvider,
-  TextMapPropagator,
-} from '@opentelemetry/api';
+import type { MeterProvider } from '@opentelemetry/api';
 import type { Resource } from '@opentelemetry/resources';
 import type { IdGenerator } from './IdGenerator';
 import type { Sampler } from './Sampler';
 import type { SpanProcessor } from './SpanProcessor';
+import type { SpanExporter } from './export/SpanExporter';
 
-/**
- * TracerConfig provides an interface for configuring a Basic Tracer.
- */
-export interface TracerConfig {
+export interface TracerProviderOptions {
   /**
    * Sampler determines if a span should be recorded or should be a NoopSpan.
    */
   sampler?: Sampler;
-
-  /** General Limits */
-  generalLimits?: GeneralLimits;
 
   /** Span Limits */
   spanLimits?: SpanLimits;
@@ -50,30 +41,24 @@ export interface TracerConfig {
 
   /**
    * A meter provider to record trace SDK metrics to.
+   * This defaults to a no-op meter provider.
    * @experimental This option is experimental and is subject to breaking changes in minor releases.
    */
   meterProvider?: MeterProvider;
 }
 
 /**
- * Configuration options for registering the API with the SDK.
- * Undefined values may be substituted for defaults, and null
- * values will not be registered.
+ * The constructor options for the internal Tracer implementation.
+ * This is similar to, but not exactly the same exactly the same as
+ * `TracerProviderOptions`.
  */
-export interface SDKRegistrationConfig {
-  /** Propagator to register as the global propagator */
-  propagator?: TextMapPropagator | null;
-
-  /** Context manager to register as the global context manager */
-  contextManager?: ContextManager | null;
-}
-
-/** Global configuration limits of trace service */
-export interface GeneralLimits {
-  /** attributeValueLengthLimit is maximum allowed attribute value size */
-  attributeValueLengthLimit?: number;
-  /** attributeCountLimit is number of attributes per trace */
-  attributeCountLimit?: number;
+export interface TracerOptions {
+  resource: Resource;
+  sampler: Sampler;
+  spanLimits: SpanLimits;
+  idGenerator: IdGenerator;
+  spanProcessor: SpanProcessor;
+  meterProvider: MeterProvider;
 }
 
 /** Global configuration of trace service */
@@ -92,8 +77,26 @@ export interface SpanLimits {
   attributePerLinkCountLimit?: number;
 }
 
-/** Interface configuration for a buffer. */
-export interface BufferConfig {
+/**
+ * Common options for SDK span processors.
+ *
+ * @experimental This interface is experimental and is subject to breaking changes in minor releases.
+ */
+export interface SpanProcessorOptions {
+  /**
+   * A meter provider to which to record self-observability span processor metrics.
+   * @experimental This option is experimental and is subject to breaking changes in minor releases.
+   */
+  selfObsMeterProvider?: MeterProvider;
+}
+
+export interface SimpleSpanProcessorOptions extends SpanProcessorOptions {
+  exporter: SpanExporter;
+}
+
+export interface BatchSpanProcessorOptions extends SpanProcessorOptions {
+  exporter: SpanExporter;
+
   /** The maximum batch size of every export. It must be smaller or equal to
    * maxQueueSize. The default value is 512. */
   maxExportBatchSize?: number;
@@ -112,7 +115,8 @@ export interface BufferConfig {
 }
 
 /** Interface configuration for BatchSpanProcessor on browser */
-export interface BatchSpanProcessorBrowserConfig extends BufferConfig {
+export interface BatchSpanProcessorBrowserOptions
+  extends BatchSpanProcessorOptions {
   /** Disable flush when a user navigates to a new page, closes the tab or the browser, or,
    * on mobile, switches to a different app. Auto flush is enabled by default. */
   disableAutoFlushOnDocumentHide?: boolean;
