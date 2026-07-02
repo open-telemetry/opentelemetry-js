@@ -28,6 +28,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(propagator-jaeger): do not throw on malformed percent-encoded `uber-trace-id` / `uberctx-*` headers during extract @pichlermarc
+
 ### :books: Documentation
 
 ### :house: Internal
