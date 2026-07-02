@@ -94,6 +94,29 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
   constructor(config: HttpInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-http', VERSION, config);
+
+    // Apply declarative config over the constructor config. Unset keys keep their
+    // constructor default, and unrecognized keys are warned about.
+    this.applyDeclarativeConfig(own => ({
+      requireParentforOutgoingSpans: own.getBoolean(
+        'require_parent_for_outgoing_spans'
+      ),
+      requireParentforIncomingSpans: own.getBoolean(
+        'require_parent_for_incoming_spans'
+      ),
+      disableOutgoingRequestInstrumentation: own.getBoolean(
+        'disable_outgoing_request_instrumentation'
+      ),
+      disableIncomingRequestInstrumentation: own.getBoolean(
+        'disable_incoming_request_instrumentation'
+      ),
+      serverName: own.getString('server_name'),
+      redactedQueryParams: own.getStringArray('redacted_query_params'),
+      enableSyntheticSourceDetection: own.getBoolean(
+        'enable_synthetic_source_detection'
+      ),
+    }));
+
     this._semconvStability = semconvStabilityFromStr(
       'http',
       process.env.OTEL_SEMCONV_STABILITY_OPT_IN
