@@ -14,6 +14,8 @@ import type {
 import { diag, metrics, trace } from '@opentelemetry/api';
 import type { Logger, LoggerProvider } from '@opentelemetry/api-logs';
 import { logs } from '@opentelemetry/api-logs';
+import type { ConfigProperties } from '@opentelemetry/api-config';
+import { config as configApi } from '@opentelemetry/api-config';
 import * as shimmer from './shimmer';
 import type {
   InstrumentationModuleDefinition,
@@ -141,6 +143,51 @@ export abstract class InstrumentationAbstract<
       enabled: true,
       ...config,
     };
+  }
+
+  /**
+   * @experimental This feature is in development as per the OpenTelemetry specification.
+   *
+   * Apply declarative config in the constructor. `read` maps this instrumentation's
+   * own config block (`instrumentation/development.js.<name>`) and the shared
+   * `general` block to config fields. The returned fields are merged over the
+   * current config, skipping nullish values so unset keys keep their constructor
+   * default. Own-block keys the reader did not read are warned about as
+   * unrecognized, except `enabled`, which the SDK applies. Call after `super()`.
+   *
+   * With no global ConfigProvider set, the blocks are empty and this is a no-op.
+   */
+  protected applyDeclarativeConfig(
+    read: (
+      own: ConfigProperties,
+      general: ConfigProperties
+    ) => Partial<ConfigType>
+  ): void {
+    const provider = configApi.getConfigProvider();
+    const own = provider.getInstrumentationConfig(this.instrumentationName);
+
+    let partial: Partial<ConfigType>;
+    try {
+      partial = read(own, provider.getGeneralInstrumentationConfig());
+    } catch (e) {
+      this._diag.error('error reading declarative config', e);
+      return;
+    }
+
+    const defined: Partial<ConfigType> = {};
+    for (const key of Object.keys(partial) as (keyof ConfigType)[]) {
+      if (partial[key] != null) {
+        defined[key] = partial[key];
+      }
+    }
+    this.setConfig({ ...this.getConfig(), ...defined });
+
+    const unread = own.unreadKeys().filter(key => key !== 'enabled');
+    if (unread.length > 0) {
+      this._diag.warn(
+        `ignoring unrecognized declarative config keys: ${unread.join(', ')}`
+      );
+    }
   }
 
   /**

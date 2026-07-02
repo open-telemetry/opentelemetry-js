@@ -12,6 +12,7 @@ export type {
   InstrumentationConfig,
   InstrumentationModuleDefinition,
   InstrumentationModuleFile,
+  InstrumentationRegistry,
   ShimWrapped,
   SpanCustomizationHook,
 } from './types';
@@ -22,3 +23,4 @@ export {
   safeExecuteInTheMiddleAsync,
 } from './utils';
 export { SemconvStability, semconvStabilityFromStr } from './semconvStability';
+export type { ConfigProperties } from '@opentelemetry/api-config';
