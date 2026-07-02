@@ -46,6 +46,9 @@
       "path": "../../../semantic-conventions"
     },
     {
+      "path": "../api-config"
+    },
+    {
       "path": "../api-logs"
     },
     {
