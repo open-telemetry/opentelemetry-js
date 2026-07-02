@@ -1,0 +1,13 @@
+file_format: "1.1"
+disabled: false
+instrumentation/development:
+  general:
+    http:
+      client:
+        request_captured_headers:
+          - content-type
+  js:
+    "@otel/enabled-false":
+      enabled: false
+    "@otel/with-config":
+      server_name: from-file

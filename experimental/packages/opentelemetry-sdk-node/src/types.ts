@@ -5,7 +5,10 @@
 
 import type { ContextManager } from '@opentelemetry/api';
 import type { TextMapPropagator } from '@opentelemetry/api';
-import type { Instrumentation } from '@opentelemetry/instrumentation';
+import type {
+  Instrumentation,
+  InstrumentationRegistry,
+} from '@opentelemetry/instrumentation';
 import type { Resource, ResourceDetector } from '@opentelemetry/resources';
 import type {
   LoggerProvider,
@@ -57,7 +60,16 @@ export interface NodeSDKConfiguration {
  * @experimental Options for new experimental SDK setup
  */
 export interface SDKOptions {
+  /**
+   * Pre-built instrumentation instances (in-code config only). Mutually
+   * exclusive with {@link instrumentationRegistry}.
+   */
   instrumentations?: (Instrumentation | Instrumentation[])[];
+  /**
+   * @experimental A registry of instrumentation factories keyed by npm package
+   * name. Mutually exclusive with {@link instrumentations}.
+   */
+  instrumentationRegistry?: InstrumentationRegistry;
   resourceDetectors?: ResourceDetector[];
   textMapPropagator?: TextMapPropagator | null;
 }
