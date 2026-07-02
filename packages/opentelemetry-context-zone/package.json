@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-zone",
-  "version": "2.8.0",
+  "version": "2.9.0",
   "description": "OpenTelemetry Context Zone",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -55,7 +55,7 @@
     "typescript": "5.0.4"
   },
   "dependencies": {
-    "@opentelemetry/context-zone-peer-dep": "2.8.0",
+    "@opentelemetry/context-zone-peer-dep": "2.9.0",
     "zone.js": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^0.14.0 || ^0.15.0 || ^0.16.0"
   },
   "sideEffects": true,

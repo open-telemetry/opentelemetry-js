@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-trace-otlp-grpc",
-  "version": "0.219.0",
+  "version": "0.220.0",
   "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -70,10 +70,10 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.14.3",
-    "@opentelemetry/otlp-exporter-base": "0.219.0",
-    "@opentelemetry/otlp-grpc-exporter-base": "0.219.0",
-    "@opentelemetry/otlp-transformer": "0.219.0",
-    "@opentelemetry/sdk-trace": "2.8.0"
+    "@opentelemetry/otlp-exporter-base": "0.220.0",
+    "@opentelemetry/otlp-grpc-exporter-base": "0.220.0",
+    "@opentelemetry/otlp-transformer": "0.220.0",
+    "@opentelemetry/sdk-trace": "2.9.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-trace-otlp-grpc",
   "sideEffects": false

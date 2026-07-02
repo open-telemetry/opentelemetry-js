@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/configuration",
-  "version": "0.219.0",
+  "version": "0.220.0",
   "description": "OpenTelemetry Configuration",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -48,7 +48,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/core": "2.8.0",
+    "@opentelemetry/core": "2.9.0",
     "yaml": "^2.8.3"
   },
   "peerDependencies": {

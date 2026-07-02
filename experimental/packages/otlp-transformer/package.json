@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/otlp-transformer",
-  "version": "0.219.0",
+  "version": "0.220.0",
   "description": "Transform OpenTelemetry SDK data into OTLP",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -89,12 +89,12 @@
     "webpack": "5.104.1"
   },
   "dependencies": {
-    "@opentelemetry/api-logs": "0.219.0",
-    "@opentelemetry/core": "2.8.0",
-    "@opentelemetry/resources": "2.8.0",
-    "@opentelemetry/sdk-logs": "0.219.0",
-    "@opentelemetry/sdk-metrics": "2.8.0",
-    "@opentelemetry/sdk-trace": "2.8.0"
+    "@opentelemetry/api-logs": "0.220.0",
+    "@opentelemetry/core": "2.9.0",
+    "@opentelemetry/resources": "2.9.0",
+    "@opentelemetry/sdk-logs": "0.220.0",
+    "@opentelemetry/sdk-metrics": "2.9.0",
+    "@opentelemetry/sdk-trace": "2.9.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-transformer",
   "sideEffects": false

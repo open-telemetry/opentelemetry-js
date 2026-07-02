@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sampler-composite",
-  "version": "0.219.0",
+  "version": "0.220.0",
   "description": "Composite samplers for OpenTelemetry tracing",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -62,8 +62,8 @@
     "nyc": "17.1.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "2.8.0",
-    "@opentelemetry/sdk-trace": "2.8.0"
+    "@opentelemetry/core": "2.9.0",
+    "@opentelemetry/sdk-trace": "2.9.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/sampler-composite",
   "sideEffects": false

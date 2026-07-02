@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/core",
-  "version": "2.8.0",
+  "version": "2.9.0",
   "description": "OpenTelemetry Core provides constants and utilities shared by all OpenTelemetry SDK packages.",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",

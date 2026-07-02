@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sampler-jaeger-remote",
-  "version": "0.219.0",
+  "version": "0.220.0",
   "description": "Jaeger Remote Sampler",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -50,7 +50,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/sdk-trace": "2.8.0",
+    "@opentelemetry/sdk-trace": "2.9.0",
     "axios": "^1.15.0"
   },
   "peerDependencies": {

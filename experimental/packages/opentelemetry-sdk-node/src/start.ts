@@ -17,6 +17,7 @@ import {
 } from '@opentelemetry/api';
 import {
   getIdGeneratorFromConfiguration,
+  getSamplerFromConfiguration,
   getInstanceID,
   createLoggerProviderFromConfig,
   getMeterReadersFromConfiguration,
@@ -168,11 +169,12 @@ function create(
     const spanProcessors = getSpanProcessorsFromConfiguration(config);
     if (spanProcessors) {
       const idGenerator = getIdGeneratorFromConfiguration(config);
-      // TODO (6506): support sampler configuration from config
+      const sampler = getSamplerFromConfiguration(config);
       const tracerProvider = new TracerProvider({
         resource,
         spanProcessors,
         idGenerator,
+        sampler,
         spanLimits: createSpanLimitsFromConfig(
           config.tracer_provider?.limits,
           config.attribute_limits
