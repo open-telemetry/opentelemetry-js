@@ -34,6 +34,7 @@ export type {
   LogRecordLimits as LogRecordLimitsConfigModel,
 } from './generated/types';
 export { createConfigFactory } from './ConfigFactory';
+export { createConfigProvider } from './SdkConfigProvider';
 export {
   mergeResourceAttributesConfig,
   mergePropagatorCompositeConfig,
