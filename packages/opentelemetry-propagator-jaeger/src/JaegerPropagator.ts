@@ -107,8 +107,14 @@ export class JaegerPropagator implements TextMapPropagator {
       propagation.getBaggage(context) ?? propagation.createBaggage();
     for (const baggageEntry of baggageValues) {
       if (baggageEntry.value === undefined) continue;
+      let decodedValue: string;
+      try {
+        decodedValue = decodeURIComponent(baggageEntry.value);
+      } catch {
+        continue;
+      }
       currentBaggage = currentBaggage.setEntry(baggageEntry.key, {
-        value: decodeURIComponent(baggageEntry.value),
+        value: decodedValue,
       });
     }
     newContext = propagation.setBaggage(newContext, currentBaggage);
@@ -128,7 +134,13 @@ const VALID_HEX_RE = /^[0-9a-f]{1,2}$/i;
  * @return {SpanContext} - returns a span context represented by the serializedString.
  **/
 function deserializeSpanContext(serializedString: string): SpanContext | null {
-  const headers = decodeURIComponent(serializedString).split(':');
+  let decoded: string;
+  try {
+    decoded = decodeURIComponent(serializedString);
+  } catch {
+    return null;
+  }
+  const headers = decoded.split(':');
   if (headers.length !== 4) {
     return null;
   }

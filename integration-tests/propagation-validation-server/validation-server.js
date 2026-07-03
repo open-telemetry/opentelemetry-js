@@ -1,6 +1,6 @@
 const axios = require("axios");
 const { W3CTraceContextPropagator } = require("@opentelemetry/core");
-const { BasicTracerProvider } = require("@opentelemetry/sdk-trace-base");
+const { TracerProvider } = require("@opentelemetry/sdk-trace");
 const { context, propagation, trace, ROOT_CONTEXT } = require("@opentelemetry/api");
 const {
   AsyncHooksContextManager,
@@ -14,7 +14,7 @@ propagation.setGlobalPropagator(new W3CTraceContextPropagator());
 context.setGlobalContextManager(new AsyncHooksContextManager());
 
 // set global tracer provider
-trace.setGlobalTracerProvider(new BasicTracerProvider());
+trace.setGlobalTracerProvider(new TracerProvider());
 
 // Get a tracer
 const tracer = trace.getTracer("w3c-tests");

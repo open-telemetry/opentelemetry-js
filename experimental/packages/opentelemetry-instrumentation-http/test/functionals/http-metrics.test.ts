@@ -8,7 +8,7 @@ import {
   InMemoryMetricExporter,
   MeterProvider,
 } from '@opentelemetry/sdk-metrics';
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+import { TracerProvider } from '@opentelemetry/sdk-trace';
 import {
   ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
@@ -39,7 +39,7 @@ const serverPort = 22346;
 const protocol = 'http';
 const hostname = 'localhost';
 const pathname = '/test';
-const tracerProvider = new NodeTracerProvider();
+const tracerProvider = new TracerProvider();
 const metricsMemoryExporter = new InMemoryMetricExporter(
   AggregationTemporality.DELTA
 );

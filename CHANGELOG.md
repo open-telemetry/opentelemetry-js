@@ -12,6 +12,18 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 2.9.0
+
+### :boom: Breaking Changes
+
 * docs(shim-opentracing): *Notice*: The `@opentelemetry/shim-opentracing` package will be removed in SDK 3.x, planned for approximately September 2026.
   * The [OpenCensus](https://opentelemetry.io/blog/2026/deprecating-opencensus-compatibility/) and [OpenTracing](https://opentelemetry.io/blog/2026/deprecating-opentracing-compatibility/) compatibility requirements in the OpenTelemetry specification have been deprecated.
 
@@ -24,14 +36,17 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
   * "sdk-trace" will eventually replace all of "sdk-trace-base", "sdk-trace-node", and "sdk-trace-web".
   * The `BatchSpanProcessor` constructor call signature has changed in "sdk-trace".  For example, before `new BatchSpanProcessor(exporter, { maxQueueSize: 1000 })`, after `new BatchSpanProcessor({ exporter, maxQueueSize: 1000 })`. [#6817](https://github.com/open-telemetry/opentelemetry-js/pull/6817)
   * The `SimpleSpanProcessor` constructor call signature has changed in "sdk-trace".  For example, before `new SimpleSpanProcessor(exporter)`, after `new SimpleSpanProcessor({ exporter, selfObsMeterProvider: ... })`. [#6504](https://github.com/open-telemetry/opentelemetry-js/pull/6504)
+* feat(sdk-trace): add AlwaysRecordSampler [#6188](https://github.com/open-telemetry/opentelemetry-js/pull/6188) @majanjua-amzn
 
 ### :bug: Bug Fixes
 
-### :books: Documentation
+* fix(propagator-jaeger): do not throw on malformed percent-encoded `uber-trace-id` / `uberctx-*` headers during extract @pichlermarc
 
 ### :house: Internal
 
 * perf(sdk-metrics): defer allocation of HrTime to accumulation creation [#6839](https://github.com/open-telemetry/opentelemetry-js/pull/6839) @legendecas
+* chore(\*): migrate use of sdk-trace-base and sdk-trace-node to sdk-trace [#6851](https://github.com/open-telemetry/opentelemetry-js/pull/6851) @trentm
+* perf(sdk-metrics): optionally capture active context for sync instruments [#6848](https://github.com/open-telemetry/opentelemetry-js/pull/6848) @legendecas
 
 ## 2.8.0
 

@@ -7,9 +7,6 @@
 
 This module provides automatic instrumentation for [`http`](https://nodejs.org/api/http.html) and [`https`](https://nodejs.org/api/https.html).
 
-For automatic instrumentation see the
-[@opentelemetry/sdk-trace-node](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node) package.
-
 ## Installation
 
 ```bash
@@ -27,24 +24,23 @@ OpenTelemetry HTTP Instrumentation allows the user to automatically collect tele
 To load a specific instrumentation (HTTP in this case), specify it in the Node Tracer's configuration.
 
 ```js
+const { trace } = require('@opentelemetry/api');
 const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
-const {
-  ConsoleSpanExporter,
-  NodeTracerProvider,
-  SimpleSpanProcessor,
-} = require('@opentelemetry/sdk-trace-node');
+const { ConsoleSpanExporter, TracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 
-const provider = new NodeTracerProvider({
-  spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
+const tracerProvider = new TracerProvider({
+  spanProcessors: [
+    new SimpleSpanProcessor({ exporter: new ConsoleSpanExporter() })
+  ]
 });
-
-provider.register();
+trace.setGlobalTracerProvider(tracerProvider);
+// See https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-trace/
+// for a more complete example setting up a *context manager* and *propagators*.
 
 registerInstrumentations({
   instrumentations: [new HttpInstrumentation()],
 });
-
 ```
 
 See [examples/http](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/http) for a short example.

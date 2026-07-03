@@ -13,11 +13,11 @@ import {
   DiagConsoleLogger,
   INVALID_SPAN_CONTEXT,
 } from '@opentelemetry/api';
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
+  TracerProvider,
+} from '@opentelemetry/sdk-trace';
 import {
   ATTR_CLIENT_ADDRESS,
   ATTR_HTTP_REQUEST_METHOD,
@@ -70,8 +70,8 @@ const hostname = 'localhost';
 const pathname = '/test';
 const serverName = 'my.server.name';
 const memoryExporter = new InMemorySpanExporter();
-const provider = new NodeTracerProvider({
-  spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+const provider = new TracerProvider({
+  spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
 });
 instrumentation.setTracerProvider(provider);
 

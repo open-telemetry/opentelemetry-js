@@ -18,7 +18,7 @@
       "path": "../../../api"
     },
     {
-      "path": "../../../packages/opentelemetry-sdk-trace-base"
+      "path": "../../../packages/sdk-trace"
     },
     {
       "path": "../../../semantic-conventions"

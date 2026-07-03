@@ -28,12 +28,12 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>>
   private _aggregationCardinalityLimit?: number;
   private _deltaMetricStorage: DeltaMetricProcessor<T>;
   private _temporalMetricStorage: TemporalMetricProcessor<T>;
-  private _attributesProcessor: IAttributesProcessor;
+  private _attributesProcessor?: IAttributesProcessor;
 
   constructor(
     _instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<T>,
-    attributesProcessor: IAttributesProcessor,
+    attributesProcessor: IAttributesProcessor | undefined,
     collectorHandles: MetricCollectorHandle[],
     aggregationCardinalityLimit?: number
   ) {
@@ -51,6 +51,10 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>>
   }
 
   record(measurements: AttributeHashMap<number>, observationTime: HrTime) {
+    if (this._attributesProcessor === undefined) {
+      this._deltaMetricStorage.batchCumulate(measurements, observationTime);
+      return;
+    }
     const processed = new AttributeHashMap<number>();
     for (const [attributes, value] of measurements.entries()) {
       processed.set(this._attributesProcessor.process(attributes), value);

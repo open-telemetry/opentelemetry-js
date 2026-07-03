@@ -608,21 +608,11 @@ function getMetricProducersFromConfiguration(
   }
   const result: MetricProducer[] = [];
   for (const producer of producers) {
-    if (producer.opencensus) {
-      try {
-        const {
-          OpenCensusMetricProducer,
-          // eslint-disable-next-line @typescript-eslint/no-require-imports
-        } = require('@opentelemetry/shim-opencensus');
-        result.push(new OpenCensusMetricProducer());
-      } catch {
-        diag.warn(
-          'OpenCensus metric producer configured but @opentelemetry/shim-opencensus is not installed.'
-        );
-      }
-    } else {
-      diag.warn('Unsupported metric producer configured.');
-    }
+    // Note: The "opencensus" MetricProducer is intentionally not supported.
+    // It is deprecated in OpenTelemetry Configuration v1.2.0.
+    diag.warn(
+      `Unsupported metric producer in configuration: "${producer}". Skipping.`
+    );
   }
   return result.length > 0 ? result : undefined;
 }
@@ -1326,6 +1316,21 @@ export function getInstanceID(config: ConfigurationModel): string | undefined {
 const DEFAULT_RATIO = 1;
 
 /**
+ * Returns the {@link Sampler} configured under `tracer_provider.sampler` in
+ * the declarative configuration, or `undefined` if none is set (in which case
+ * the SDK applies its default sampler).
+ */
+export function getSamplerFromConfiguration(
+  config: ConfigurationModel
+): Sampler | undefined {
+  const samplerConfig = config.tracer_provider?.sampler;
+  if (!samplerConfig) {
+    return undefined;
+  }
+  return buildSamplerFromConfig(samplerConfig);
+}
+
+/**
  * Builds a {@link Sampler} from a {@link SamplerConfigModel} data model.
  * This allows sampler construction from declarative configuration.
  */
@@ -1361,7 +1366,7 @@ export function buildSamplerFromConfig(
         : undefined,
     });
   }
-  diag.error('Unknown sampler config, defaulting to ParentBased(AlwaysOn).');
+  diag.warn('Unknown sampler config, defaulting to ParentBased(AlwaysOn).');
   return new ParentBasedSampler({ root: new AlwaysOnSampler() });
 }
 

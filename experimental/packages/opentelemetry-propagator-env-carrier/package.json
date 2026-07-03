@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/propagator-env-carrier",
-  "version": "0.219.0",
+  "version": "0.220.0",
   "description": "OpenTelemetry environment variable carrier helpers for context propagation",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -52,7 +52,7 @@
   },
   "devDependencies": {
     "@opentelemetry/api": "1.9.1",
-    "@opentelemetry/core": "2.8.0",
+    "@opentelemetry/core": "2.9.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "mocha": "11.7.6",
