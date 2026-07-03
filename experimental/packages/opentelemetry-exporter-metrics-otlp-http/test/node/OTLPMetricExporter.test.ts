@@ -7,6 +7,7 @@ import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';
 
+import { diag } from '@opentelemetry/api';
 import { AggregationTemporalityPreference } from '../../src';
 import { OTLPMetricExporter } from '../../src/platform/node';
 import type { AggregationOption } from '@opentelemetry/sdk-metrics';
@@ -138,6 +139,103 @@ describe('OTLPMetricExporter', () => {
   });
 
   describe('aggregation', () => {
+    describe('from environment', () => {
+      const ENV_KEY =
+        'OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION';
+
+      afterEach(() => {
+        delete process.env[ENV_KEY];
+        sinon.restore();
+      });
+
+      it('uses explicit_bucket_histogram by default', () => {
+        const exporter = new OTLPMetricExporter();
+        assert.deepStrictEqual(
+          exporter.selectAggregation(InstrumentType.HISTOGRAM),
+          {
+            type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+          }
+        );
+        assert.deepStrictEqual(
+          exporter.selectAggregation(InstrumentType.COUNTER),
+          {
+            type: AggregationType.DEFAULT,
+          }
+        );
+      });
+
+      it('uses explicit_bucket_histogram when configured', () => {
+        process.env[ENV_KEY] = 'explicit_bucket_histogram';
+        const exporter = new OTLPMetricExporter();
+        assert.deepStrictEqual(
+          exporter.selectAggregation(InstrumentType.HISTOGRAM),
+          {
+            type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+          }
+        );
+        assert.deepStrictEqual(
+          exporter.selectAggregation(InstrumentType.COUNTER),
+          {
+            type: AggregationType.DEFAULT,
+          }
+        );
+      });
+
+      it('uses base2_exponential_bucket_histogram when configured', () => {
+        process.env[ENV_KEY] = 'base2_exponential_bucket_histogram';
+        const exporter = new OTLPMetricExporter();
+        assert.deepStrictEqual(
+          exporter.selectAggregation(InstrumentType.HISTOGRAM),
+          {
+            type: AggregationType.EXPONENTIAL_HISTOGRAM,
+          }
+        );
+        assert.deepStrictEqual(
+          exporter.selectAggregation(InstrumentType.COUNTER),
+          {
+            type: AggregationType.DEFAULT,
+          }
+        );
+      });
+
+      it('is case-insensitive', () => {
+        process.env[ENV_KEY] = 'BASE2_EXPONENTIAL_BUCKET_HISTOGRAM';
+        const exporter = new OTLPMetricExporter();
+        assert.deepStrictEqual(
+          exporter.selectAggregation(InstrumentType.HISTOGRAM),
+          {
+            type: AggregationType.EXPONENTIAL_HISTOGRAM,
+          }
+        );
+      });
+
+      it('warns and uses default aggregation on invalid value', () => {
+        process.env[ENV_KEY] = 'invalid_value';
+        const warnStub = sinon.stub(diag, 'warn');
+        const exporter = new OTLPMetricExporter();
+        assert.deepStrictEqual(
+          exporter.selectAggregation(InstrumentType.HISTOGRAM),
+          {
+            type: AggregationType.DEFAULT,
+          }
+        );
+        sinon.assert.calledWithMatch(warnStub, sinon.match('invalid_value'));
+      });
+
+      it('explicit aggregationPreference overrides environment', () => {
+        process.env[ENV_KEY] = 'base2_exponential_bucket_histogram';
+        const exporter = new OTLPMetricExporter({
+          aggregationPreference: () => ({ type: AggregationType.DEFAULT }),
+        });
+        assert.deepStrictEqual(
+          exporter.selectAggregation(InstrumentType.HISTOGRAM),
+          {
+            type: AggregationType.DEFAULT,
+          }
+        );
+      });
+    });
+
     it('aggregationSelector calls the selector supplied to the constructor', () => {
       const aggregation: AggregationOption = {
         type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
