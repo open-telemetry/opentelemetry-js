@@ -17,13 +17,7 @@ import {
   ATTR_SERVER_PORT,
 } from '@opentelemetry/semantic-conventions';
 
-import {
-  ATTR_NET_PEER_NAME,
-  ATTR_NET_PEER_PORT,
-  ATTR_RPC_GRPC_STATUS_CODE,
-} from '../../src/semconv';
-
-import { SemconvStability } from '@opentelemetry/instrumentation';
+import { ATTR_RPC_GRPC_STATUS_CODE } from '../../src/semconv';
 
 export const grpcStatusCodeToOpenTelemetryStatusCode = (
   status: GrpcStatus
@@ -43,8 +37,7 @@ export const assertSpan = (
     status: GrpcStatus;
     host?: string;
     port?: number;
-  },
-  semconvStability: SemconvStability = SemconvStability.OLD
+  }
 ) => {
   assert.strictEqual(span.spanContext().traceId.length, 32);
   assert.strictEqual(span.spanContext().spanId.length, 16);
@@ -67,41 +60,8 @@ export const assertSpan = (
     validations.host !== undefined &&
     validations.port !== undefined
   ) {
-    switch (semconvStability) {
-      case SemconvStability.STABLE:
-        assert.strictEqual(
-          span.attributes[ATTR_SERVER_ADDRESS],
-          validations.host
-        );
-        assert.strictEqual(span.attributes[ATTR_SERVER_PORT], validations.port);
-        break;
-      case SemconvStability.DUPLICATE:
-        assert.strictEqual(
-          span.attributes[ATTR_SERVER_ADDRESS],
-          validations.host
-        );
-        assert.strictEqual(span.attributes[ATTR_SERVER_PORT], validations.port);
-        assert.strictEqual(
-          span.attributes[ATTR_NET_PEER_NAME],
-          validations.host
-        );
-        assert.strictEqual(
-          span.attributes[ATTR_NET_PEER_PORT],
-          validations.port
-        );
-        break;
-      case SemconvStability.OLD:
-      default:
-        assert.strictEqual(
-          span.attributes[ATTR_NET_PEER_NAME],
-          validations.host
-        );
-        assert.strictEqual(
-          span.attributes[ATTR_NET_PEER_PORT],
-          validations.port
-        );
-        break;
-    }
+    assert.strictEqual(span.attributes[ATTR_SERVER_ADDRESS], validations.host);
+    assert.strictEqual(span.attributes[ATTR_SERVER_PORT], validations.port);
   }
 
   // validations
