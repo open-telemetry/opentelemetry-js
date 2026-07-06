@@ -7,9 +7,9 @@ ROOT_DIR="${SCRIPT_DIR}/../../"
 
 # Get latest version by running `git tag -l --sort=version:refname | tail -1`
 # ... in git@github.com:open-telemetry/semantic-conventions.git
-SPEC_VERSION=v1.41.1
+SPEC_VERSION=v1.42.0
 # ... in git@github.com:open-telemetry/weaver.git
-GENERATOR_VERSION=v0.23.0
+GENERATOR_VERSION=v0.24.2
 
 # When running on windows and you are getting references to ";C" (like Telemetry;C)
 # then this is an issue with the bash shell, so first run the following in your shell:
