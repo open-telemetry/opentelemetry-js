@@ -1,0 +1,28 @@
+/*
+ * Copyright The OpenTelemetry Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+export type { ResourceDetectionConfig } from './config';
+export { detectResources } from './detect-resources';
+export { envDetector } from './detectors/EnvDetector';
+export {
+  hostDetector,
+  osDetector,
+  processDetector,
+  serviceInstanceIdDetector,
+} from './detectors/platform/browser';
+export type { Resource } from './Resource';
+export {
+  resourceFromAttributes,
+  defaultResource,
+  emptyResource,
+} from './ResourceImpl';
+export { defaultServiceName } from './default-service-name';
+export type {
+  ResourceDetector,
+  DetectedResource,
+  DetectedResourceAttributes,
+  RawResourceAttribute,
+  MaybePromise,
+} from './types';

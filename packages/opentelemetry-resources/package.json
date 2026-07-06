@@ -5,13 +5,75 @@
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
   "esnext": "build/esnext/index.js",
-  "browser": {
-    "./src/detectors/platform/index.ts": "./src/detectors/platform/browser/index.ts",
-    "./build/esm/detectors/platform/index.js": "./build/esm/detectors/platform/browser/index.js",
-    "./build/esnext/detectors/platform/index.js": "./build/esnext/detectors/platform/browser/index.js",
-    "./build/src/detectors/platform/index.js": "./build/src/detectors/platform/browser/index.js"
-  },
   "types": "build/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/src/index.d.ts",
+      "browser": {
+        "esnext": "./build/esnext/index.browser.js",
+        "module": "./build/esm/index.browser.js",
+        "default": "./build/src/index.browser.js"
+      },
+      "esnext": "./build/esnext/index.js",
+      "module": "./build/esm/index.js",
+      "default": "./build/src/index.js"
+    },
+    "./build/src/index.js": {
+      "types": "./build/src/index.d.ts",
+      "browser": "./build/src/index.browser.js",
+      "default": "./build/src/index.js"
+    },
+    "./build/esm/index.js": {
+      "types": "./build/esm/index.d.ts",
+      "browser": "./build/esm/index.browser.js",
+      "default": "./build/esm/index.js"
+    },
+    "./build/esnext/index.js": {
+      "types": "./build/esnext/index.d.ts",
+      "browser": "./build/esnext/index.browser.js",
+      "default": "./build/esnext/index.js"
+    },
+    "./build/src/detectors/index.js": {
+      "types": "./build/src/detectors/index.d.ts",
+      "browser": "./build/src/detectors/index.browser.js",
+      "default": "./build/src/detectors/index.js"
+    },
+    "./build/esm/detectors/index.js": {
+      "types": "./build/esm/detectors/index.d.ts",
+      "browser": "./build/esm/detectors/index.browser.js",
+      "default": "./build/esm/detectors/index.js"
+    },
+    "./build/esnext/detectors/index.js": {
+      "types": "./build/esnext/detectors/index.d.ts",
+      "browser": "./build/esnext/detectors/index.browser.js",
+      "default": "./build/esnext/detectors/index.js"
+    },
+    "./build/src/detectors/platform/index.js": {
+      "types": "./build/src/detectors/platform/index.d.ts",
+      "browser": "./build/src/detectors/platform/browser/index.js",
+      "default": "./build/src/detectors/platform/index.js"
+    },
+    "./build/esm/detectors/platform/index.js": {
+      "types": "./build/esm/detectors/platform/index.d.ts",
+      "browser": "./build/esm/detectors/platform/browser/index.js",
+      "default": "./build/esm/detectors/platform/index.js"
+    },
+    "./build/esnext/detectors/platform/index.js": {
+      "types": "./build/esnext/detectors/platform/index.d.ts",
+      "browser": "./build/esnext/detectors/platform/browser/index.js",
+      "default": "./build/esnext/detectors/platform/index.js"
+    },
+    "./build/src/*": "./build/src/*",
+    "./build/esm/*": "./build/esm/*",
+    "./build/esnext/*": "./build/esnext/*",
+    "./src/detectors/platform/index.ts": {
+      "browser": "./src/detectors/platform/browser/index.ts",
+      "default": "./src/detectors/platform/index.ts"
+    },
+    "./src/semconv": "./src/semconv.ts",
+    "./src/*": "./src/*",
+    "./package.json": "./package.json"
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",

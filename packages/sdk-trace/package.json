@@ -5,13 +5,74 @@
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
   "esnext": "build/esnext/index.js",
-  "browser": {
-    "./src/platform/index.ts": "./src/platform/browser/index.ts",
-    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
-    "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
-    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
-  },
   "types": "build/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/src/index.d.ts",
+      "browser": {
+        "esnext": "./build/esnext/index.browser.js",
+        "module": "./build/esm/index.browser.js",
+        "default": "./build/src/index.browser.js"
+      },
+      "esnext": "./build/esnext/index.js",
+      "module": "./build/esm/index.js",
+      "default": "./build/src/index.js"
+    },
+    "./build/src/index.js": {
+      "types": "./build/src/index.d.ts",
+      "browser": "./build/src/index.browser.js",
+      "default": "./build/src/index.js"
+    },
+    "./build/esm/index.js": {
+      "types": "./build/esm/index.d.ts",
+      "browser": "./build/esm/index.browser.js",
+      "default": "./build/esm/index.js"
+    },
+    "./build/esnext/index.js": {
+      "types": "./build/esnext/index.d.ts",
+      "browser": "./build/esnext/index.browser.js",
+      "default": "./build/esnext/index.js"
+    },
+    "./build/src/TracerProvider.js": {
+      "types": "./build/src/TracerProvider.d.ts",
+      "browser": "./build/src/TracerProvider.browser.js",
+      "default": "./build/src/TracerProvider.js"
+    },
+    "./build/esm/TracerProvider.js": {
+      "types": "./build/esm/TracerProvider.d.ts",
+      "browser": "./build/esm/TracerProvider.browser.js",
+      "default": "./build/esm/TracerProvider.js"
+    },
+    "./build/esnext/TracerProvider.js": {
+      "types": "./build/esnext/TracerProvider.d.ts",
+      "browser": "./build/esnext/TracerProvider.browser.js",
+      "default": "./build/esnext/TracerProvider.js"
+    },
+    "./build/src/platform/index.js": {
+      "types": "./build/src/platform/index.d.ts",
+      "browser": "./build/src/platform/browser/index.js",
+      "default": "./build/src/platform/index.js"
+    },
+    "./build/esm/platform/index.js": {
+      "types": "./build/esm/platform/index.d.ts",
+      "browser": "./build/esm/platform/browser/index.js",
+      "default": "./build/esm/platform/index.js"
+    },
+    "./build/esnext/platform/index.js": {
+      "types": "./build/esnext/platform/index.d.ts",
+      "browser": "./build/esnext/platform/browser/index.js",
+      "default": "./build/esnext/platform/index.js"
+    },
+    "./build/src/*": "./build/src/*",
+    "./build/esm/*": "./build/esm/*",
+    "./build/esnext/*": "./build/esnext/*",
+    "./src/platform/index.ts": {
+      "browser": "./src/platform/browser/index.ts",
+      "default": "./src/platform/index.ts"
+    },
+    "./src/*": "./src/*",
+    "./package.json": "./package.json"
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",

@@ -5,13 +5,37 @@
   "main": "build/src/index-shim.js",
   "module": "build/esm/index-shim.js",
   "esnext": "build/esnext/index-shim.js",
-  "browser": {
-    "./src/platform/index.ts": "./src/platform/browser/index.ts",
-    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
-    "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
-    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
-  },
   "types": "build/src/index-shim.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/src/index-shim.d.ts",
+      "browser": {
+        "esnext": "./build/esnext/index-shim.js",
+        "module": "./build/esm/index-shim.js",
+        "default": "./build/src/index-shim.js"
+      },
+      "esnext": "./build/esnext/index-shim.js",
+      "module": "./build/esm/index-shim.js",
+      "default": "./build/src/index-shim.js"
+    },
+    "./build/src/index-shim.js": {
+      "types": "./build/src/index-shim.d.ts",
+      "default": "./build/src/index-shim.js"
+    },
+    "./build/esm/index-shim.js": {
+      "types": "./build/esm/index-shim.d.ts",
+      "default": "./build/esm/index-shim.js"
+    },
+    "./build/esnext/index-shim.js": {
+      "types": "./build/esnext/index-shim.d.ts",
+      "default": "./build/esnext/index-shim.js"
+    },
+    "./build/src/*": "./build/src/*",
+    "./build/esm/*": "./build/esm/*",
+    "./build/esnext/*": "./build/esnext/*",
+    "./src/*": "./src/*",
+    "./package.json": "./package.json"
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
