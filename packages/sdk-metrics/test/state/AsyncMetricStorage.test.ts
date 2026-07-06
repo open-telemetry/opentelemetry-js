@@ -17,6 +17,7 @@ import {
   assertDataPoint,
   defaultInstrumentDescriptor,
   ObservableCallbackDelegate,
+  BatchObservableCallbackDelegate,
 } from '../util';
 import { ObservableInstrument } from '../../src/Instruments';
 import type { HrTime } from '@opentelemetry/api';
@@ -363,7 +364,8 @@ describe('AsyncMetricStorage', () => {
         }
 
         delegate.setDelegate(observableResult => {});
-        // The attributes should be memorized even if no measurement was reported.
+        // Stale attributes should not be exported when a successful callback
+        // reports no measurement for the current collection.
         {
           const collectionTime: HrTime = [1, 1];
           await observableRegistry.observe(collectionTime);
@@ -372,29 +374,7 @@ describe('AsyncMetricStorage', () => {
             collectionTime
           );
 
-          assertMetricData(metric, DataPointType.SUM);
-          assert.strictEqual(metric.dataPoints.length, 3);
-          assertDataPoint(
-            metric.dataPoints[0],
-            { key: '1' },
-            1,
-            startTime,
-            collectionTime
-          );
-          assertDataPoint(
-            metric.dataPoints[1],
-            { key: '2' },
-            2,
-            startTime,
-            collectionTime
-          );
-          assertDataPoint(
-            metric.dataPoints[2],
-            { key: '3' },
-            3,
-            startTime,
-            collectionTime
-          );
+          assert.equal(metric, undefined);
         }
 
         delegate.setDelegate(observableResult => {
@@ -434,6 +414,149 @@ describe('AsyncMetricStorage', () => {
             collectionTime
           );
         }
+      });
+
+      it('should collect only attribute sets observed in the current callback', async () => {
+        const delegate = new ObservableCallbackDelegate();
+        const observableRegistry = new ObservableRegistry();
+        const metricStorage = new AsyncMetricStorage(
+          defaultInstrumentDescriptor,
+          new SumAggregator(true),
+          createNoopAttributesProcessor(),
+          [cumulativeCollector]
+        );
+
+        const observable = new ObservableInstrument(
+          defaultInstrumentDescriptor,
+          [metricStorage],
+          observableRegistry
+        );
+
+        observableRegistry.addCallback(delegate.getCallback(), observable);
+
+        delegate.setDelegate(observableResult => {
+          observableResult.observe(1, { key: '1' });
+          observableResult.observe(2, { key: '2' });
+        });
+        const startTime: HrTime = [0, 0];
+        await observableRegistry.observe(startTime);
+        metricStorage.collect(cumulativeCollector, startTime);
+
+        delegate.setDelegate(observableResult => {
+          observableResult.observe(4, { key: '1' });
+        });
+        const collectionTime: HrTime = [1, 1];
+        await observableRegistry.observe(collectionTime);
+        const metric = metricStorage.collect(
+          cumulativeCollector,
+          collectionTime
+        );
+
+        assertMetricData(metric, DataPointType.SUM);
+        assert.strictEqual(metric.dataPoints.length, 1);
+        assertDataPoint(
+          metric.dataPoints[0],
+          { key: '1' },
+          4,
+          startTime,
+          collectionTime
+        );
+      });
+
+      it('should collect only attribute sets observed in the current batch callback', async () => {
+        const delegate = new BatchObservableCallbackDelegate();
+        const observableRegistry = new ObservableRegistry();
+        const metricStorage = new AsyncMetricStorage(
+          defaultInstrumentDescriptor,
+          new SumAggregator(true),
+          createNoopAttributesProcessor(),
+          [cumulativeCollector]
+        );
+
+        const observable = new ObservableInstrument(
+          defaultInstrumentDescriptor,
+          [metricStorage],
+          observableRegistry
+        );
+
+        observableRegistry.addBatchCallback(delegate.getCallback(), [
+          observable,
+        ]);
+
+        delegate.setDelegate(observableResult => {
+          observableResult.observe(observable, 1, { key: '1' });
+          observableResult.observe(observable, 2, { key: '2' });
+        });
+        const startTime: HrTime = [0, 0];
+        await observableRegistry.observe(startTime);
+        metricStorage.collect(cumulativeCollector, startTime);
+
+        delegate.setDelegate(observableResult => {
+          observableResult.observe(observable, 4, { key: '1' });
+        });
+        const collectionTime: HrTime = [1, 1];
+        await observableRegistry.observe(collectionTime);
+        const metric = metricStorage.collect(
+          cumulativeCollector,
+          collectionTime
+        );
+
+        assertMetricData(metric, DataPointType.SUM);
+        assert.strictEqual(metric.dataPoints.length, 1);
+        assertDataPoint(
+          metric.dataPoints[0],
+          { key: '1' },
+          4,
+          startTime,
+          collectionTime
+        );
+      });
+
+      it('should preserve previous cumulative data when a callback fails', async () => {
+        const delegate = new ObservableCallbackDelegate();
+        const observableRegistry = new ObservableRegistry();
+        const metricStorage = new AsyncMetricStorage(
+          defaultInstrumentDescriptor,
+          new SumAggregator(true),
+          createNoopAttributesProcessor(),
+          [cumulativeCollector]
+        );
+
+        const observable = new ObservableInstrument(
+          defaultInstrumentDescriptor,
+          [metricStorage],
+          observableRegistry
+        );
+
+        observableRegistry.addCallback(delegate.getCallback(), observable);
+
+        delegate.setDelegate(observableResult => {
+          observableResult.observe(1, { key: '1' });
+        });
+        const startTime: HrTime = [0, 0];
+        await observableRegistry.observe(startTime);
+        metricStorage.collect(cumulativeCollector, startTime);
+
+        delegate.setDelegate(() => {
+          throw new Error('expected failure');
+        });
+        const collectionTime: HrTime = [1, 1];
+        const errors = await observableRegistry.observe(collectionTime);
+        assert.strictEqual(errors.length, 1);
+        const metric = metricStorage.collect(
+          cumulativeCollector,
+          collectionTime
+        );
+
+        assertMetricData(metric, DataPointType.SUM);
+        assert.strictEqual(metric.dataPoints.length, 1);
+        assertDataPoint(
+          metric.dataPoints[0],
+          { key: '1' },
+          1,
+          startTime,
+          collectionTime
+        );
       });
 
       it('should collect monotonic metrics with resets and gaps', async () => {
