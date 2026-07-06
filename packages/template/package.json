@@ -1,19 +1,33 @@
 {
   "name": "@opentelemetry/template",
   "version": "2.9.0",
+  "description": "> TODO: description",
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
   "private": true,
   "publishConfig": {
     "access": "restricted"
   },
-  "description": "> TODO: description",
   "author": "OpenTelemetry Authors",
   "Update homepage location": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/template",
   "license": "Apache-2.0",
-  "main": "build/src/index.js",
-  "types": "build/src/index.d.ts",
-  "Add these entries if browser is supported": {
-    "module": "build/esm/index.js",
-    "esnext": "build/esnext/index.js"
+  "Add these only if the package has platform-conditional code (see @opentelemetry/core for a real example)": {
+    "browser": {
+      "./dist/platform/node/index.mjs": "./dist/platform/browser/index.mjs",
+      "./dist/platform/node/index.cjs": "./dist/platform/browser/index.cjs"
+    }
   },
   "repository": {
     "type": "git",
@@ -27,27 +41,21 @@
   },
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build",
+    "compile": "tsdown",
     "version": "node ../../scripts/version-update.js",
-    "clean": "tsc --build --clean",
-    "prewatch": "npm run precompile",
+    "clean": "rimraf dist build",
     "peer-api-check": "node ../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../scripts/align-api-deps.js"
   },
   "Add these to scripts": {
-    "compile": "tsc --build",
-    "clean": "tsc --build --clean",
-    "test": "nyc mocha test/**/*.test.ts",
+    "test": "nyc mocha 'test/**/*.test.ts'",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "version": "node ../../scripts/version-update.js",
-    "watch": "tsc --build --watch"
+    "watch": "tsdown --watch --no-clean"
   },
-  "Add/change these to scripts if browser is supported": {
-    "compile": "tsc --build tsconfig.json",
-    "clean": "tsc --build --clean tsconfig.json",
-    "test:browser": "karma start --single-run",
-    "watch": "tsc --build --watch tsconfig.json"
+  "Add these to scripts if browser is supported": {
+    "tdd": "karma start",
+    "test:browser": "karma start --single-run"
   },
   "keywords": [
     "opentelemetry",
@@ -60,42 +68,32 @@
     "monitoring"
   ],
   "files": [
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "dist"
   ],
   "sideEffects": false,
-  "Add these to files if browser is supported": [
-    "build/esm/**/*.js",
-    "build/esm/**/*.js.map",
-    "build/esm/**/*.d.ts",
-    "build/esnext/**/*.js",
-    "build/esnext/**/*.js.map",
-    "build/esnext/**/*.d.ts"
-  ],
   "devDependencies": {
     "@types/node": "18.19.130",
     "typescript": "5.0.4"
   },
   "Add these to devDependencies for testing": {
-    "@types/mocha": "9.1.1",
-    "@types/sinon": "10.0.13",
-    "mocha": "10.7.3",
-    "nyc": "15.1.0",
-    "sinon": "15.0.0"
+    "@types/mocha": "10.0.10",
+    "@types/sinon": "17.0.4",
+    "mocha": "11.7.5",
+    "nyc": "17.1.0",
+    "sinon": "18.0.1"
   },
   "Add these to devDependencies if browser is targeted": {
-    "@types/webpack-env": "1.16.0",
-    "babel-plugin-istanbul": "6.1.1",
-    "karma": "6.4.2",
+    "@types/webpack-env": "1.16.3",
+    "babel-plugin-istanbul": "8.0.0",
+    "karma": "6.4.4",
     "karma-chrome-launcher": "3.1.0",
-    "karma-coverage": "2.2.0",
+    "karma-coverage": "2.2.1",
     "karma-mocha": "2.0.1",
-    "karma-spec-reporter": "0.0.32",
-    "karma-webpack": "4.0.2",
-    "ts-loader": "8.4.0",
-    "webpack": "5.89.0"
+    "karma-spec-reporter": "0.0.36",
+    "karma-webpack": "5.0.1",
+    "ts-loader": "9.5.7",
+    "webpack": "5.104.1"
   }
 }
