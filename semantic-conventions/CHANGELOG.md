@@ -9,7 +9,7 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
-* feat: update semantic conventions to v1.43.0 [#NNNN] @trentm
+* feat: update semantic conventions to v1.43.0 [#6883](https://github.com/open-telemetry/opentelemetry-js/pull/6883)
   * Semantic Conventions v1.43.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1430) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
   * `@opentelemetry/semantic-conventions` (stable) changes: *1 added export*
   * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *1 added export*
