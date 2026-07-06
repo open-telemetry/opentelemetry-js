@@ -19,7 +19,9 @@ const context1 = ROOT_CONTEXT.setValue(key, 'value1');
 const context2 = ROOT_CONTEXT.setValue(key, 'value2');
 const context3 = ROOT_CONTEXT.setValue(key, 'value3');
 
-const suite = new Benchmark.Suite();
+Benchmark.options.minSamples = 1000;
+
+const suite = new Benchmark.Suite('AsyncLocalStorage');
 
 suite.on('cycle', event => {
   console.log(String(event.target));
