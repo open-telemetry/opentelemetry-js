@@ -9,6 +9,16 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 1.42.0
+
+### :rocket: Features
+
 * feat: update semantic conventions to v1.42.0 [#6871](https://github.com/open-telemetry/opentelemetry-js/pull/6871) @trentm
   * Semantic Conventions v1.42.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1420) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
   * `@opentelemetry/semantic-conventions` (stable) changes: *46 added exports*
@@ -188,12 +198,6 @@ PROFILE_FRAME_TYPE_VALUE_LUAJIT                      // "luajit"
 ```
 
 </details>
-
-### :bug: Bug Fixes
-
-### :books: Documentation
-
-### :house: Internal
 
 ## 1.41.1
 
