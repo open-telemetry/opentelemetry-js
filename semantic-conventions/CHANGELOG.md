@@ -9,6 +9,33 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
+* feat: update semantic conventions to v1.43.0 [#NNNN] @trentm
+  * Semantic Conventions v1.43.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1430) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *1 added export*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *1 added export*
+
+#### Stable changes in v1.43.0
+
+<details open>
+<summary>1 added export</summary>
+
+```js
+TELEMETRY_SDK_LANGUAGE_VALUE_KOTLIN // "kotlin"
+```
+
+</details>
+
+#### Unstable changes in v1.43.0
+
+<details>
+<summary>1 added export</summary>
+
+```js
+ATTR_AZURE_RESOURCE_GROUP_NAME // azure.resource_group.name
+```
+
+</details>
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
