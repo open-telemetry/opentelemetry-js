@@ -13,6 +13,7 @@ All notable changes to the semantic-conventions package will be documented in th
   * Semantic Conventions v1.42.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1420) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
   * `@opentelemetry/semantic-conventions` (stable) changes: *46 added exports*
   * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *74 newly deprecated exports, 16 added exports*
+    * Notably: This deprecates a number of GenAI-related exports. GenAI Semantic Conventions have been [federated to a new semantic-conventions-genai repository](https://github.com/open-telemetry/semantic-conventions-genai). The eventual plan is to [publish a separate `@opentelemetry/semantic-conventions-genai` package](https://github.com/open-telemetry/opentelemetry-js/issues/6783) with these exports.
 
 #### Stable changes in v1.42.0
 
