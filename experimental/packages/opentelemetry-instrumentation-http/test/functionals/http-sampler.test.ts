@@ -98,7 +98,7 @@ describe('HttpInstrumentation sampler integration', () => {
     });
 
     assert.deepStrictEqual(
-      sampler.capturedAttributes?.['http.request.header.x_custom_header'],
+      sampler.capturedAttributes?.['http.request.header.x-custom-header'],
       ['test-value']
     );
   });
