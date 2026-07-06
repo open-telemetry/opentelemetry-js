@@ -78,7 +78,7 @@ You can set the following:</p>
 <tr>
 <td><code>serverName</code></td>
 <td><code>string</code></td>
-<td>The primary server name of the matched virtual host.</td>
+<td><strong>Deprecated.</strong> No longer used. Stable HTTP semantic conventions do not include the <code>http.server_name</code> attribute; this option has no effect.</td>
 </tr>
 <tr>
 <td><code>requireParentforOutgoingSpans</code></td>
@@ -147,7 +147,7 @@ You can set the following:</p>
 <h2 id="semantic-conventions" class="tsd-anchor-link">Semantic Conventions<a href="#semantic-conventions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
 <p>Prior to version <code>0.54.0</code>, this instrumentation created spans targeting an experimental semantic convention <a href="https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md">Version 1.7.0</a>.</p>
 <p>HTTP semantic conventions (semconv) were stabilized in v1.23.0, and a <a href="https://github.com/open-telemetry/semantic-conventions/blob/main/docs/non-normative/http-migration.md#http-semantic-convention-stability-migration">migration process</a> was defined.
-<code>instrumentation-http</code> versions 0.54.0 and later include support for migrating to stable HTTP semantic conventions, as described below.
+<code>instrumentation-http</code> versions 0.54.0 - XXXX include support for migrating to stable HTTP semantic conventions, as described below.
 The intent is to provide an approximate 6 month time window for users of this instrumentation to migrate to the new HTTP semconv, after which a new minor version will use the <em>new</em> semconv by default and drop support for the old semconv.
 See the <a href="https://github.com/open-telemetry/opentelemetry-js/issues/5646">HTTP semconv migration plan for OpenTelemetry JS instrumentations</a>.</p>
 <p>To select which semconv version(s) is emitted from this instrumentation, use the <code>OTEL_SEMCONV_STABILITY_OPT_IN</code> environment variable.</p>
@@ -156,6 +156,7 @@ See the <a href="https://github.com/open-telemetry/opentelemetry-js/issues/5646"
 <li><code>http/dup</code>: emit <strong>both</strong> the old v1.7.0 and the new (stable) v1.23.0+ semantics</li>
 <li>By default, if <code>OTEL_SEMCONV_STABILITY_OPT_IN</code> includes neither of the above tokens, the old v1.7.0 semconv is used.</li>
 </ul>
+<p><code>instrumentation-http</code> versions XXX and later emit the stable v1.23.0+ semantics only.</p>
 <h3 id="attributes-collected" class="tsd-anchor-link">Attributes collected<a href="#attributes-collected" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <table>
 <thead>
