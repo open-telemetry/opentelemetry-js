@@ -27,16 +27,16 @@ suite.on('cycle', event => {
 
 suite.add('attach + dispose (single)', function () {
   const token = contextManager.attach(context1);
-  contextManager.detach(context1);
+  contextManager.detach(token);
 });
 
 suite.add('attach + dispose (nested 3 levels)', function () {
   const token1 = contextManager.attach(context1);
   const token2 = contextManager.attach(context2);
   const token3 = contextManager.attach(context3);
-  contextManager.detach(context3);
-  contextManager.detach(context2);
-  contextManager.detach(context1);
+  contextManager.detach(token3);
+  contextManager.detach(token2);
+  contextManager.detach(token1);
 });
 
 suite.add('with() (baseline, single)', function () {
