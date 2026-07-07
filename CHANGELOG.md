@@ -20,6 +20,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+* chore: build on Node 26 and verify packed artifacts in CI [#6887](https://github.com/open-telemetry/opentelemetry-js/pull/6887) @overbalance
+
 ## 2.9.0
 
 ### :boom: Breaking Changes
