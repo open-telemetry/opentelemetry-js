@@ -504,7 +504,7 @@ for (const contextManagerClass of [
           ).attach(context1);
           assert.strictEqual(contextManager.active(), context1);
 
-          (contextManager as AsyncLocalStorageContextManager).detach(token1);
+          token1.dispose();
           assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
         });
 
@@ -530,13 +530,13 @@ for (const contextManagerClass of [
           ).attach(context3);
           assert.strictEqual(contextManager.active(), context3);
 
-          (contextManager as AsyncLocalStorageContextManager).detach(token3);
+          token3.dispose();
           assert.strictEqual(contextManager.active(), context2);
 
-          (contextManager as AsyncLocalStorageContextManager).detach(token2);
+          token2.dispose();
           assert.strictEqual(contextManager.active(), context1);
 
-          (contextManager as AsyncLocalStorageContextManager).detach(token1);
+          token1.dispose();
           assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
         });
 
@@ -576,7 +576,7 @@ for (const contextManagerClass of [
 
           assert.strictEqual(contextManager.active(), context1);
 
-          (contextManager as AsyncLocalStorageContextManager).detach(token1);
+          token1.dispose();
           assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
         });
 
@@ -598,7 +598,7 @@ for (const contextManagerClass of [
             ).attach(context3);
             assert.strictEqual(contextManager.active(), context3);
 
-            (contextManager as AsyncLocalStorageContextManager).detach(token3);
+            token3.dispose();
             // After detach within with(), we should be back to context2
             assert.strictEqual(contextManager.active(), context2);
           });
@@ -606,7 +606,7 @@ for (const contextManagerClass of [
           // After exiting with(), we should be back to context1
           assert.strictEqual(contextManager.active(), context1);
 
-          (contextManager as AsyncLocalStorageContextManager).detach(token1);
+          token1.dispose();
           assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
         });
 
@@ -629,7 +629,7 @@ for (const contextManagerClass of [
           // After bound function executes, we should be back to context1
           assert.strictEqual(contextManager.active(), context1);
 
-          (contextManager as AsyncLocalStorageContextManager).detach(token1);
+          token1.dispose();
           assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
         });
 
@@ -669,7 +669,7 @@ for (const contextManagerClass of [
           assert.strictEqual(result, context1);
           assert.strictEqual(contextManager.active(), context1);
 
-          (contextManager as AsyncLocalStorageContextManager).detach(token1);
+          token1.dispose();
           assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
         });
 
@@ -694,7 +694,7 @@ for (const contextManagerClass of [
                     ctx,
                     'concurrent sibling chain must not pollute this context'
                   );
-                  cm.detach(token);
+                  token.dispose();
                   resolve();
                 }, ms);
               }, ms);
@@ -718,7 +718,7 @@ for (const contextManagerClass of [
           // Context should be set even when disabled
           assert.strictEqual(contextManager.active(), context1);
 
-          (contextManager as AsyncLocalStorageContextManager).detach(token1);
+          token1.dispose();
           assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
 
           contextManager.enable();

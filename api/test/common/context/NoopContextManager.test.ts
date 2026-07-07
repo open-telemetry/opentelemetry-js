@@ -131,7 +131,7 @@ describe('NoopContextManager', function () {
         ROOT_CONTEXT,
         'attach should not change the active context'
       );
-      assert.doesNotThrow(() => contextManager.detach(token));
+      assert.doesNotThrow(() => token.dispose());
       assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
     });
   });

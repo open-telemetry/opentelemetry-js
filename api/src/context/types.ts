@@ -33,13 +33,17 @@ export interface Context {
 }
 
 /**
- * An opaque token returned by attach() that can be used to restore the previous Context.
- * This is an opaque type to prevent misuse and ensure type safety.
+ * A scope token returned by {@link ContextManager.attach} that restores the previous
+ * {@link Context} when {@link Token.dispose} is called. Use with `context.detach(token)`
+ * or call `token.dispose()` directly. On environments that support it (Node.js 25.9+
+ * with TypeScript 5.2+), tokens also implement `[Symbol.dispose]` for use with `using`.
  *
  * @since 1.10.0
  * @experimental This API is experimental and may change in minor releases without prior notice.
  */
-export type Token = { readonly __brand: 'Token' };
+export interface Token {
+  dispose(): void;
+}
 
 /**
  * @since 1.0.0
@@ -82,31 +86,20 @@ export interface ContextManager {
   disable(): this;
 
   /**
-   * Imperatively sets `context` as active, returning a {@link Token} for {@link detach}.
+   * Imperatively sets `context` as active, returning a {@link Token} whose
+   * {@link Token.dispose} method restores the previous context.
    *
    * This is a delicate, low-level API - prefer {@link with}/{@link bind}, which
-   * restore context automatically. `attach`/`detach` exist only to bridge
-   * callback boundaries that `with` cannot wrap. The caller is
-   * responsible for the bookkeeping that `with` would otherwise handle:
-   * - Pair every `attach` with a `detach`
-   * - Support is optional and best-effort, varying by ContextManager.
-   *   When omitted, {@link ContextAPI.attach} logs a warning and no-ops.
+   * restore context automatically. `attach` exists only to bridge callback
+   * boundaries that `with` cannot wrap. The caller is responsible for calling
+   * `token.dispose()` (or `context.detach(token)`) when the operation is complete.
+   * Support is optional and best-effort; when omitted, {@link ContextAPI.attach}
+   * logs a warning and returns a no-op token.
    *
    * @param context The Context to attach
-   * @returns A Token that can be used to restore the previous Context
+   * @returns A Token whose dispose() restores the previous Context
    * @since 1.10.0
    * @experimental This API is experimental and may change in minor releases without prior notice.
    */
   attach?(context: Context): Token;
-
-  /**
-   * Restores the Context to the value it had before the corresponding
-   * {@link attach} call. Optional and best-effort; implement if and only if
-   * {@link attach} is implemented, and see {@link attach} for the usage contract.
-   *
-   * @param token A Token returned by a previous call to attach()
-   * @since 1.10.0
-   * @experimental This API is experimental and may change in minor releases without prior notice.
-   */
-  detach?(token: Token): void;
 }

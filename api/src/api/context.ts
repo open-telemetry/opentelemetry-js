@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ROOT_CONTEXT } from '../context/context';
 import { NoopContextManager } from '../context/NoopContextManager';
 import type { Context, ContextManager, Token } from '../context/types';
 import {
@@ -26,11 +25,9 @@ export class ContextAPI {
 
   /**
    * Tracks whether we have already warned that the active ContextManager does
-   * not implement attach()/detach(), so we warn at most once per operation
-   * instead of on every call.
+   * not implement attach(), so we warn at most once instead of on every call.
    */
   private _attachUnsupportedWarned = false;
-  private _detachUnsupportedWarned = false;
 
   /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
@@ -88,19 +85,20 @@ export class ContextAPI {
   }
 
   /**
-   * Imperatively sets `context` as active, returning a {@link Token} for {@link detach}.
+   * Imperatively sets `context` as active, returning a {@link Token} whose
+   * {@link Token.dispose} restores the previous context.
    *
    * This is a delicate, low-level API - prefer {@link with}/{@link bind}, which
-   * restore context automatically. Use `attach`/`detach` only to bridge callback
-   * boundaries that `with` cannot wrap. You then own the bookkeeping `with` handles:
-   * pair every `attach` with a `detach`; unpaired calls leak or mis-restore context.
+   * restore context automatically. Use `attach` only to bridge callback
+   * boundaries that `with` cannot wrap. Call `token.dispose()` when the
+   * operation is done.
    *
    * Support is best-effort and varies by the active ContextManager (see
    * {@link ContextManager.attach}); if it does not implement `attach`, this logs
-   * a warning and returns a token that has no effect when passed to detach().
+   * a warning and returns a no-op token.
    *
    * @param context The Context to attach
-   * @returns A Token that can be used to restore the previous Context
+   * @returns A Token whose dispose() restores the previous Context
    * @since 1.10.0
    * @experimental This API is experimental and may change in minor releases without prior notice.
    */
@@ -112,35 +110,10 @@ export class ContextAPI {
     if (!this._attachUnsupportedWarned) {
       this._attachUnsupportedWarned = true;
       DiagAPI.instance().warn(
-        'The current ContextManager does not implement attach(). The context will not be attached. Use a ContextManager that supports attach()/detach() (e.g. AsyncLocalStorageContextManager) or use with()/bind() instead.'
+        'The current ContextManager does not implement attach(). The context will not be attached. Use a ContextManager that supports attach() (e.g. AsyncLocalStorageContextManager) or use with()/bind() instead.'
       );
     }
-    return ROOT_CONTEXT as unknown as Token;
-  }
-
-  /**
-   * Restores the Context to the value it had before the corresponding
-   * {@link attach} call. Best-effort and varies by the active ContextManager;
-   * see {@link attach} for the usage contract.
-   *
-   * Only call {@link detach} once with any given token. Multiple calls with the same
-   * token will result in unspecified behavior and may leak context.
-   *
-   * @param token A Token returned by a previous call to attach()
-   * @since 1.10.0
-   * @experimental This API is experimental and may change in minor releases without prior notice.
-   */
-  public detach(token: Token): void {
-    const contextManager = this._getContextManager();
-    if (contextManager.detach) {
-      return contextManager.detach(token);
-    }
-    if (!this._detachUnsupportedWarned) {
-      this._detachUnsupportedWarned = true;
-      DiagAPI.instance().warn(
-        'The current ContextManager does not implement detach(). The context will not be restored.'
-      );
-    }
+    return { dispose() {} };
   }
 
   private _getContextManager(): ContextManager {

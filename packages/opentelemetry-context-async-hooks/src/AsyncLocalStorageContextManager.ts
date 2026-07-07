@@ -41,26 +41,41 @@ export class AsyncLocalStorageContextManager extends AbstractAsyncHooksContextMa
 
   /**
    * Imperatively sets `context` as active for the current async execution chain
-   * and operations spawned from it. Propagates across async boundaries, but does
-   * not auto-restore - see the contract on {@link ContextManager.attach} (prefer
-   * `with()`/`bind()`; pair every `attach` with a `detach`).
+   * and operations spawned from it. Returns a {@link Token} whose `dispose()`
+   * restores the previous context (see {@link ContextManager.attach}).
+   *
+   * On Node.js 25.9+, delegates to `AsyncLocalStorage.withScope()` which returns
+   * a native `RunScope` that also implements `[Symbol.dispose]` for use with the
+   * `using` keyword. On older Node.js versions, falls back to `enterWith()` and
+   * returns a manual wrapper with a `dispose()` method.
    *
    * @experimental This API is experimental and may change in minor releases without prior notice.
    */
   attach(context: Context): Token {
+    // Node.js 25.9+: withScope() returns a RunScope with dispose() + [Symbol.dispose]()
+    const withScope = (
+      this._asyncLocalStorage as AsyncLocalStorage<Context> & {
+        withScope?: (value: Context) => Token;
+      }
+    ).withScope;
+    if (withScope) {
+      return withScope.call(this._asyncLocalStorage, context);
+    }
+
+    // Fallback for older Node.js: enterWith() + manual disposable wrapper
     const previousContext = this.active();
     this._asyncLocalStorage.enterWith(context);
-    return previousContext as unknown as Token;
-  }
-
-  /**
-   * Restores the context captured by the {@link attach} call that produced
-   * `token`. See {@link ContextManager.detach}. Calling detach twice will
-   * result in unspecified behavior.
-   *
-   * @experimental This API is experimental and may change in minor releases without prior notice.
-   */
-  detach(token: Token): void {
-    this._asyncLocalStorage.enterWith(token as unknown as Context);
+    const token: Token = {
+      dispose: () => {
+        this._asyncLocalStorage.enterWith(previousContext);
+      },
+    };
+    // Forward compat: add [Symbol.dispose] for TypeScript 5.2+ `using` keyword
+    const symbolDispose = (Symbol as { dispose?: symbol }).dispose;
+    if (symbolDispose !== undefined) {
+      (token as unknown as Record<symbol, () => void>)[symbolDispose] =
+        token.dispose;
+    }
+    return token;
   }
 }

@@ -101,7 +101,7 @@ describe('API', function () {
           DiagLogLevel.ALL
         );
 
-        // a minimal ContextManager that omits the optional attach()/detach()
+        // a minimal ContextManager that omits the optional attach()
         context.setGlobalContextManager({
           active: () => ROOT_CONTEXT,
           with: (_ctx: Context, fn: () => unknown) => fn(),
@@ -114,23 +114,21 @@ describe('API', function () {
           },
         } as any);
 
-        // Call each operation multiple times to verify we warn at most once
-        // per operation rather than on every call.
+        // Call attach multiple times to verify we warn at most once.
         const token = context.attach(ROOT_CONTEXT);
         context.attach(ROOT_CONTEXT);
-        assert.ok(token, 'attach() still returns a token');
+        assert.ok(token, 'attach() still returns a no-op token');
         assert.doesNotThrow(() => {
-          context.detach(token);
-          context.detach(token);
+          token.dispose();
+          token.dispose();
         });
 
         assert.strictEqual(
           warnings.length,
-          2,
-          'should warn once per operation'
+          1,
+          'should warn once for unsupported attach()'
         );
         assert.ok(/attach\(\)/.test(warnings[0]));
-        assert.ok(/detach\(\)/.test(warnings[1]));
       });
     });
   });
