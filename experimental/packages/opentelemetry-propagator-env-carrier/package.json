@@ -57,7 +57,7 @@
     "@types/node": "18.19.130",
     "mocha": "11.7.6",
     "nyc": "17.1.0",
-    "typescript": "5.0.4"
+    "typescript": "5.2.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-propagator-env-carrier",
   "sideEffects": false

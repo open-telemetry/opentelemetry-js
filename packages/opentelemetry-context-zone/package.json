@@ -50,7 +50,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "typescript": "5.0.4"
+    "typescript": "5.2.2"
   },
   "dependencies": {
     "@opentelemetry/context-zone-peer-dep": "2.9.0",
