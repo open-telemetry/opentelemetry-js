@@ -50,6 +50,16 @@ describe('TraceIdRatioBasedSampler', () => {
         decision: api.SamplingDecision.RECORD_AND_SAMPLED,
       }
     );
+
+    assert.deepStrictEqual(
+      sampler.shouldSample(
+        spanContext(traceId('ffffffff')),
+        traceId('ffffffff')
+      ),
+      {
+        decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+      }
+    );
   });
 
   it('should return a always sampler for >1', () => {

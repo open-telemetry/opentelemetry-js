@@ -34,11 +34,7 @@ describe('unmocked xhr', () => {
       spanProcessors: [testSpans],
     });
     registerInstrumentations({
-      instrumentations: [
-        new XMLHttpRequestInstrumentation({
-          semconvStabilityOptIn: 'http',
-        }),
-      ],
+      instrumentations: [new XMLHttpRequestInstrumentation({})],
       tracerProvider: provider,
     });
   });

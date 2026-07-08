@@ -48,7 +48,7 @@
     "@types/node": "18.19.130",
     "mocha": "11.7.6",
     "nyc": "17.1.0",
-    "typescript": "5.0.4"
+    "typescript": "5.2.2"
   },
   "peerDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.10.0"

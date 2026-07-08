@@ -36,7 +36,7 @@
     "@babel/preset-env": "^7.22.20",
     "babel-loader": "^10.0.0",
     "ts-loader": "^9.2.6",
-    "typescript": "5.0.4",
+    "typescript": "5.2.2",
     "webpack": "^5.89.0",
     "webpack-cli": "^7.0.0",
     "webpack-dev-server": "^5.2.0",
