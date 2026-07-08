@@ -10,9 +10,34 @@ import { AlwaysOffSampler } from './AlwaysOffSampler';
 import { AlwaysOnSampler } from './AlwaysOnSampler';
 import type { Sampler, SamplingResult } from '../Sampler';
 
+export interface ParentBasedSamplerConfig {
+  /** Sampler called for spans with no parent */
+  root: Sampler;
+  /** Sampler called for spans with a remote parent which was sampled. Default AlwaysOn */
+  remoteParentSampled?: Sampler;
+  /** Sampler called for spans with a remote parent which was not sampled. Default AlwaysOff */
+  remoteParentNotSampled?: Sampler;
+  /** Sampler called for spans with a local parent which was sampled. Default AlwaysOn */
+  localParentSampled?: Sampler;
+  /** Sampler called for spans with a local parent which was not sampled. Default AlwaysOff */
+  localParentNotSampled?: Sampler;
+}
+
+/**
+ * Creates a composite sampler that either respects the parent span's sampling
+ * decision or delegates to `root` for root spans.
+ */
+export function createParentBasedSampler(
+  config: ParentBasedSamplerConfig
+): Sampler {
+  return new ParentBasedSampler(config);
+}
+
 /**
  * A composite sampler that either respects the parent span's sampling decision
- * or delegates to `delegateSampler` for root spans.
+ * or delegates to `root` for root spans.
+ *
+ * @deprecated Use {@link createParentBasedSampler} instead.
  */
 export class ParentBasedSampler implements Sampler {
   private _root: Sampler;
@@ -107,17 +132,4 @@ export class ParentBasedSampler implements Sampler {
   toString(): string {
     return `ParentBased{root=${this._root.toString()}, remoteParentSampled=${this._remoteParentSampled.toString()}, remoteParentNotSampled=${this._remoteParentNotSampled.toString()}, localParentSampled=${this._localParentSampled.toString()}, localParentNotSampled=${this._localParentNotSampled.toString()}}`;
   }
-}
-
-interface ParentBasedSamplerConfig {
-  /** Sampler called for spans with no parent */
-  root: Sampler;
-  /** Sampler called for spans with a remote parent which was sampled. Default AlwaysOn */
-  remoteParentSampled?: Sampler;
-  /** Sampler called for spans with a remote parent which was not sampled. Default AlwaysOff */
-  remoteParentNotSampled?: Sampler;
-  /** Sampler called for spans with a local parent which was sampled. Default AlwaysOn */
-  localParentSampled?: Sampler;
-  /** Sampler called for spans with a local parent which was not sampled. Default AlwaysOff */
-  localParentNotSampled?: Sampler;
 }

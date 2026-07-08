@@ -11,11 +11,24 @@ export type { ReadableSpan } from './export/ReadableSpan';
 export { SimpleSpanProcessor } from './export/SimpleSpanProcessor';
 export type { SpanExporter } from './export/SpanExporter';
 export { NoopSpanProcessor } from './export/NoopSpanProcessor';
-export { AlwaysOffSampler } from './sampler/AlwaysOffSampler';
-export { AlwaysOnSampler } from './sampler/AlwaysOnSampler';
+export {
+  AlwaysOffSampler,
+  createAlwaysOffSampler,
+} from './sampler/AlwaysOffSampler';
+export {
+  AlwaysOnSampler,
+  createAlwaysOnSampler,
+} from './sampler/AlwaysOnSampler';
 export { createAlwaysRecordSampler } from './sampler/AlwaysRecordSampler';
-export { ParentBasedSampler } from './sampler/ParentBasedSampler';
-export { TraceIdRatioBasedSampler } from './sampler/TraceIdRatioBasedSampler';
+export {
+  ParentBasedSampler,
+  createParentBasedSampler,
+  type ParentBasedSamplerConfig,
+} from './sampler/ParentBasedSampler';
+export {
+  TraceIdRatioBasedSampler,
+  createTraceIdRatioBasedSampler,
+} from './sampler/TraceIdRatioBasedSampler';
 export { SamplingDecision } from './Sampler';
 export type { Sampler, SamplingResult } from './Sampler';
 export type { Span } from './Span';

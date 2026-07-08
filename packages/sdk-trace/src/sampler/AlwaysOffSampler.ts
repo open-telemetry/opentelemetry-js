@@ -6,7 +6,18 @@
 import type { Sampler, SamplingResult } from '../Sampler';
 import { SamplingDecision } from '../Sampler';
 
-/** Sampler that samples no traces. */
+/**
+ * Creates a sampler that samples no traces.
+ */
+export function createAlwaysOffSampler(): Sampler {
+  return new AlwaysOffSampler();
+}
+
+/**
+ * Sampler that samples no traces.
+ *
+ * @deprecated Use {@link createAlwaysOffSampler} instead.
+ */
 export class AlwaysOffSampler implements Sampler {
   shouldSample(): SamplingResult {
     return {

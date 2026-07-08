@@ -6,7 +6,18 @@
 import type { Sampler, SamplingResult } from '../Sampler';
 import { SamplingDecision } from '../Sampler';
 
-/** Sampler that samples all traces. */
+/**
+ * Creates a sampler that samples all traces.
+ */
+export function createAlwaysOnSampler(): Sampler {
+  return new AlwaysOnSampler();
+}
+
+/**
+ * Sampler that samples all traces.
+ *
+ * @deprecated Use {@link createAlwaysOnSampler} instead.
+ */
 export class AlwaysOnSampler implements Sampler {
   shouldSample(): SamplingResult {
     return {
