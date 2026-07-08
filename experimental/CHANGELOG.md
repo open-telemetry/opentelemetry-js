@@ -15,6 +15,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(exporter-metrics-otlp-http): respect `OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION` in OTLP metric exporters [#6874](https://github.com/open-telemetry/opentelemetry-js/pull/6874) @buzztaiki
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
