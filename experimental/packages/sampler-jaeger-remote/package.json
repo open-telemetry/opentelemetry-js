@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sampler-jaeger-remote",
-  "version": "0.219.0",
+  "version": "0.220.0",
   "description": "Jaeger Remote Sampler",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -41,7 +41,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/sdk-trace-base": "2.8.0",
+    "@opentelemetry/sdk-trace": "2.9.0",
     "axios": "^1.15.0"
   },
   "peerDependencies": {
@@ -59,7 +59,7 @@
     "nyc": "17.1.0",
     "sinon": "18.0.1",
     "ts-loader": "9.5.7",
-    "typescript": "5.0.4"
+    "typescript": "5.2.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/sampler-jaeger-remote",
   "sideEffects": false

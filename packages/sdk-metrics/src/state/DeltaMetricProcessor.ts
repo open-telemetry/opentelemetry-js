@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Context, HrTime, Attributes } from '@opentelemetry/api';
+import type { HrTime, Attributes } from '@opentelemetry/api';
 import { millisToHrTime } from '@opentelemetry/core';
 import type { Maybe } from '../utils';
 import { hashAttributes } from '../utils';
@@ -33,12 +33,7 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
     this._overflowHashCode = hashAttributes(this._overflowAttributes);
   }
 
-  record(
-    value: number,
-    attributes: Attributes,
-    _context: Context,
-    collectionTime: number
-  ) {
+  record(value: number, attributes: Attributes, collectionTime: number) {
     let accumulation = this._activeCollectionStorage.get(attributes);
 
     if (!accumulation) {

@@ -16,7 +16,7 @@ import type {
   ObservableGauge,
   ObservableUpDownCounter,
 } from '@opentelemetry/api';
-import { context as contextApi, diag, ValueType } from '@opentelemetry/api';
+import { diag, ValueType } from '@opentelemetry/api';
 import type { InstrumentDescriptor } from './InstrumentDescriptor';
 import type { ObservableRegistry } from './state/ObservableRegistry';
 import type {
@@ -39,7 +39,7 @@ export class SyncInstrument {
   protected _record(
     value: number,
     attributes: Attributes = {},
-    context: Context = contextApi.active()
+    context?: Context
   ) {
     if (typeof value !== 'number') {
       diag.warn(

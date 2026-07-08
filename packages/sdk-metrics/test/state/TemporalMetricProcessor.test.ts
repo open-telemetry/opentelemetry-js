@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as api from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { SumAggregator } from '../../src/aggregator';
@@ -48,7 +47,7 @@ describe('TemporalMetricProcessor', () => {
         const temporalMetricStorage = new TemporalMetricProcessor(aggregator, [
           deltaCollector1,
         ]);
-        deltaMetricStorage.record(1, {}, api.context.active(), 1000);
+        deltaMetricStorage.record(1, {}, 1000);
         {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,
@@ -67,7 +66,7 @@ describe('TemporalMetricProcessor', () => {
           assertDataPoint(metric.dataPoints[0], {}, 1, [1, 0], [2, 2]);
         }
 
-        deltaMetricStorage.record(2, {}, api.context.active(), 3000);
+        deltaMetricStorage.record(2, {}, 3000);
         {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,
@@ -113,7 +112,7 @@ describe('TemporalMetricProcessor', () => {
           deltaCollector2,
         ]);
 
-        deltaMetricStorage.record(1, {}, api.context.active(), 1000);
+        deltaMetricStorage.record(1, {}, 1000);
         {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,
@@ -165,7 +164,7 @@ describe('TemporalMetricProcessor', () => {
           cumulativeCollector1,
         ]);
 
-        deltaMetricStorage.record(1, {}, api.context.active(), 1000);
+        deltaMetricStorage.record(1, {}, 1000);
         {
           const metric = temporalMetricStorage.buildMetrics(
             cumulativeCollector1,
@@ -184,7 +183,7 @@ describe('TemporalMetricProcessor', () => {
           assertDataPoint(metric.dataPoints[0], {}, 1, [1, 0], [2, 2]);
         }
 
-        deltaMetricStorage.record(2, {}, api.context.active(), 3000);
+        deltaMetricStorage.record(2, {}, 3000);
         {
           const metric = temporalMetricStorage.buildMetrics(
             cumulativeCollector1,
@@ -217,7 +216,7 @@ describe('TemporalMetricProcessor', () => {
           deltaCollector1,
         ]);
 
-        deltaMetricStorage.record(1, {}, api.context.active(), 1000);
+        deltaMetricStorage.record(1, {}, 1000);
         {
           const metric = temporalMetricStorage.buildMetrics(
             cumulativeCollector1,
@@ -236,7 +235,7 @@ describe('TemporalMetricProcessor', () => {
           assertDataPoint(metric.dataPoints[0], {}, 1, [1, 0], [2, 2]);
         }
 
-        deltaMetricStorage.record(2, {}, api.context.active(), 3000);
+        deltaMetricStorage.record(2, {}, 3000);
         {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,

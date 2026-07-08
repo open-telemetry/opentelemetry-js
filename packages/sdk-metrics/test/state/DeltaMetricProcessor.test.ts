@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as api from '@opentelemetry/api';
 import * as assert from 'assert';
 import { DropAggregator, SumAggregator } from '../../src/aggregator';
 import { DeltaMetricProcessor } from '../../src/state/DeltaMetricProcessor';
@@ -17,7 +16,7 @@ describe('DeltaMetricProcessor', () => {
 
       for (const value of commonValues) {
         for (const attributes of commonAttributes) {
-          metricProcessor.record(value, attributes, api.context.active(), 0);
+          metricProcessor.record(value, attributes, 0);
         }
       }
     });
@@ -27,7 +26,7 @@ describe('DeltaMetricProcessor', () => {
 
       for (const value of commonValues) {
         for (const attributes of commonAttributes) {
-          metricProcessor.record(value, attributes, api.context.active(), 0);
+          metricProcessor.record(value, attributes, 0);
         }
       }
     });
@@ -134,9 +133,9 @@ describe('DeltaMetricProcessor', () => {
     it('should export', () => {
       const metricProcessor = new DeltaMetricProcessor(new SumAggregator(true));
 
-      metricProcessor.record(1, { attribute: '1' }, api.ROOT_CONTEXT, 0);
-      metricProcessor.record(2, { attribute: '1' }, api.ROOT_CONTEXT, 1000);
-      metricProcessor.record(1, { attribute: '2' }, api.ROOT_CONTEXT, 2000);
+      metricProcessor.record(1, { attribute: '1' }, 0);
+      metricProcessor.record(2, { attribute: '1' }, 1000);
+      metricProcessor.record(1, { attribute: '2' }, 2000);
 
       let accumulations = metricProcessor.collect();
       assert.strictEqual(accumulations.size, 2);

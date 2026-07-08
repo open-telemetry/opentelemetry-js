@@ -13,6 +13,7 @@ export type { SpanExporter } from './export/SpanExporter';
 export { NoopSpanProcessor } from './export/NoopSpanProcessor';
 export { AlwaysOffSampler } from './sampler/AlwaysOffSampler';
 export { AlwaysOnSampler } from './sampler/AlwaysOnSampler';
+export { createAlwaysRecordSampler } from './sampler/AlwaysRecordSampler';
 export { ParentBasedSampler } from './sampler/ParentBasedSampler';
 export { TraceIdRatioBasedSampler } from './sampler/TraceIdRatioBasedSampler';
 export { SamplingDecision } from './Sampler';

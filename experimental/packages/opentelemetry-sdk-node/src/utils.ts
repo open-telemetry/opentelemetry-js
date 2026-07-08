@@ -77,6 +77,7 @@ import type {
   NameStringValuePairConfigModel,
   HttpTlsConfigModel,
   GrpcTlsConfigModel,
+  TextMapPropagatorConfigModel,
   AttributeLimitsConfigModel,
   BatchLogRecordProcessorConfigModel,
   LoggerProviderConfigModel,
@@ -85,6 +86,10 @@ import type {
   OtlpHttpExporterConfigModel,
   SimpleLogRecordProcessorConfigModel,
   LogRecordLimitsConfigModel,
+} from '@opentelemetry/configuration';
+import {
+  mergePropagatorCompositeConfig,
+  mergeResourceAttributesConfig,
 } from '@opentelemetry/configuration';
 import type {
   AggregationOption,
@@ -121,6 +126,7 @@ import {
   LoggerProvider,
 } from '@opentelemetry/sdk-logs';
 import * as fs from 'fs';
+import { inspect } from 'util';
 import { createBatchSpanProcessorFromEnv } from './create-from-env';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
@@ -132,21 +138,28 @@ const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
 export function getResourceFromConfiguration(
   config: ConfigurationModel
 ): Resource | undefined {
-  if (config.resource && config.resource.attributes) {
-    const attrs: DetectedResourceAttributes = {};
-    for (let i = 0; i < config.resource.attributes.length; i++) {
-      const a = config.resource.attributes[i];
-      // https://github.com/open-telemetry/opentelemetry-configuration/issues/613
-      // will likely clarify that entries with a `null` value should be ignored.
-      if (a.value !== null) {
-        attrs[a.name] = a.value;
-      }
-    }
-    return resourceFromAttributes(attrs, {
-      schemaUrl: config.resource.schema_url ?? undefined,
-    });
+  if (!config.resource) {
+    return undefined;
   }
-  return undefined;
+
+  const configAttrs = mergeResourceAttributesConfig(
+    config.resource.attributes,
+    config.resource.attributes_list
+  );
+  if (!configAttrs) {
+    return undefined;
+  }
+
+  const attrs: DetectedResourceAttributes = {};
+  for (let i = 0; i < configAttrs.length; i++) {
+    const a = configAttrs[i];
+    if (a.value !== null) {
+      attrs[a.name] = a.value;
+    }
+  }
+  return resourceFromAttributes(attrs, {
+    schemaUrl: config.resource.schema_url ?? undefined,
+  });
 }
 
 export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
@@ -349,17 +362,61 @@ export function getPropagatorFromEnv(): TextMapPropagator | null | undefined {
  */
 export function getPropagatorFromConfiguration(
   config: ConfigurationModel
-): TextMapPropagator | null | undefined {
-  const propagatorsValue = getKeyListFromObjectArray(
-    config.propagator?.composite
-  );
-  if (propagatorsValue == null) {
-    // return undefined to fall back to default
+): TextMapPropagator | undefined {
+  if (!config.propagator) {
     return undefined;
   }
 
-  if (propagatorsValue.includes('none')) {
-    return null;
+  const configComposite = mergePropagatorCompositeConfig(
+    config.propagator.composite,
+    config.propagator.composite_list
+  );
+  if (!configComposite) {
+    return undefined;
+  }
+
+  // TextMapPropagator config items are objects with a single key (the name).
+  // Transform this into a more convenient `(name, value)` 2-tuple.
+  //
+  // As well, guard against two cases where the TypeScript type
+  // `TextMapPropagatorConfigModel` does not exactly represent the JSON schema:
+  // 1. `"minProperties": 1, "maxProperties": 1,`
+  // 2. The type allows keys with an `undefined` value, but the JSON schema
+  //    does not.
+  const kvFromItem = (
+    item: TextMapPropagatorConfigModel
+  ): [string, object | null] => {
+    const keys = [];
+    let value = undefined;
+    for (const key of Object.keys(item)) {
+      value = item[key];
+      if (value === undefined) {
+        continue;
+      }
+      keys.push(key);
+    }
+    if (keys.length !== 1) {
+      throw new Error(
+        `invalid "propagator" entry in configuration, there must be exactly one key (with a non-undefined value): ${inspect(item)}`
+      );
+    }
+    return [keys[0], value as object | null];
+  };
+
+  // First pass: handle 'none', remove dupes.
+  const names = new Set();
+  const kvs = [];
+  for (const item of configComposite) {
+    const kv = kvFromItem(item);
+    const k = kv[0];
+    if (names.has(k)) {
+      continue;
+    }
+    names.add(k);
+    kvs.push(kv);
+    if (k === 'none') {
+      return undefined;
+    }
   }
 
   // Implementation note: this only contains specification required propagators that are actually hosted in this repo.
@@ -375,26 +432,21 @@ export function getPropagatorFromConfiguration(
     ['jaeger', () => new JaegerPropagator()],
   ]);
 
-  // Values MUST be deduplicated in order to register a Propagator only once.
-  const uniquePropagatorNames = Array.from(new Set(propagatorsValue));
   const validPropagators: TextMapPropagator[] = [];
-
-  uniquePropagatorNames.forEach(name => {
+  for (const [name] of kvs) {
     const propagator = propagatorsFactory.get(name)?.();
     if (!propagator) {
       diag.warn(
         `Propagator "${name}" requested through configuration is unavailable.`
       );
-      return;
+      continue;
     }
-
     validPropagators.push(propagator);
-  });
+  }
 
   if (validPropagators.length === 0) {
-    // null to signal that the default should **not** be used in its place.
-    return null;
-  } else if (uniquePropagatorNames.length === 1) {
+    return undefined;
+  } else if (validPropagators.length === 1) {
     return validPropagators[0];
   } else {
     return new CompositePropagator({
@@ -556,21 +608,11 @@ function getMetricProducersFromConfiguration(
   }
   const result: MetricProducer[] = [];
   for (const producer of producers) {
-    if (producer.opencensus) {
-      try {
-        const {
-          OpenCensusMetricProducer,
-          // eslint-disable-next-line @typescript-eslint/no-require-imports
-        } = require('@opentelemetry/shim-opencensus');
-        result.push(new OpenCensusMetricProducer());
-      } catch {
-        diag.warn(
-          'OpenCensus metric producer configured but @opentelemetry/shim-opencensus is not installed.'
-        );
-      }
-    } else {
-      diag.warn('Unsupported metric producer configured.');
-    }
+    // Note: The "opencensus" MetricProducer is intentionally not supported.
+    // It is deprecated in OpenTelemetry Configuration v1.2.0.
+    diag.warn(
+      `Unsupported metric producer in configuration: "${producer}". Skipping.`
+    );
   }
   return result.length > 0 ? result : undefined;
 }
@@ -1274,6 +1316,21 @@ export function getInstanceID(config: ConfigurationModel): string | undefined {
 const DEFAULT_RATIO = 1;
 
 /**
+ * Returns the {@link Sampler} configured under `tracer_provider.sampler` in
+ * the declarative configuration, or `undefined` if none is set (in which case
+ * the SDK applies its default sampler).
+ */
+export function getSamplerFromConfiguration(
+  config: ConfigurationModel
+): Sampler | undefined {
+  const samplerConfig = config.tracer_provider?.sampler;
+  if (!samplerConfig) {
+    return undefined;
+  }
+  return buildSamplerFromConfig(samplerConfig);
+}
+
+/**
  * Builds a {@link Sampler} from a {@link SamplerConfigModel} data model.
  * This allows sampler construction from declarative configuration.
  */
@@ -1309,7 +1366,7 @@ export function buildSamplerFromConfig(
         : undefined,
     });
   }
-  diag.error('Unknown sampler config, defaulting to ParentBased(AlwaysOn).');
+  diag.warn('Unknown sampler config, defaulting to ParentBased(AlwaysOn).');
   return new ParentBasedSampler({ root: new AlwaysOnSampler() });
 }
 

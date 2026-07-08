@@ -7,8 +7,6 @@ import { otperformance as performance } from '@opentelemetry/core';
 import {
   registerInstrumentations,
   isWrapped,
-  semconvStabilityFromStr,
-  SemconvStability,
 } from '@opentelemetry/instrumentation';
 import {
   B3Propagator,
@@ -18,7 +16,7 @@ import {
   X_B3_TRACE_ID,
 } from '@opentelemetry/propagator-b3';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
-import * as tracing from '@opentelemetry/sdk-trace-base';
+import * as tracing from '@opentelemetry/sdk-trace';
 import {
   PerformanceTimingNames as PTN,
   WebTracerProvider,
@@ -26,21 +24,10 @@ import {
 } from '@opentelemetry/sdk-trace-web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
-  ATTR_HTTP_HOST,
-  ATTR_HTTP_METHOD,
-  ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
-  ATTR_HTTP_SCHEME,
-  ATTR_HTTP_STATUS_CODE,
-  ATTR_HTTP_URL,
-  ATTR_HTTP_USER_AGENT,
-  ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-  ATTR_HTTP_REQUEST_BODY_SIZE,
-} from '../src/semconv';
+import { ATTR_HTTP_REQUEST_BODY_SIZE } from '../src/semconv';
 import { EventNames } from '../src/enums/EventNames';
 import type { XMLHttpRequestInstrumentationConfig } from '../src/xhr';
 import { XMLHttpRequestInstrumentation } from '../src/xhr';
-import { AttributeNames } from '../src/enums/AttributeNames';
 import {
   ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
@@ -233,14 +220,7 @@ function testForCorrectEvents(
 }
 
 describe('xhr', () => {
-  const asyncTests = [
-    { async: true, semconvStabilityOptIn: undefined },
-    { async: true, semconvStabilityOptIn: 'http' },
-    { async: true, semconvStabilityOptIn: 'http/dup' },
-    { async: false, semconvStabilityOptIn: undefined },
-    { async: false, semconvStabilityOptIn: 'http' },
-    { async: false, semconvStabilityOptIn: 'http/dup' },
-  ];
+  const asyncTests = [{ async: true }, { async: false }];
 
   let timer: sinon.SinonFakeTimers;
 
@@ -310,7 +290,7 @@ describe('xhr', () => {
 
   asyncTests.forEach(test => {
     const testAsync = test.async;
-    describe(`when async='${testAsync}', semconvStabilityOptIn=${test.semconvStabilityOptIn}`, () => {
+    describe(`when async='${testAsync}'`, () => {
       let requests: any[] = [];
       let contextManager: ZoneContextManager;
       let webTracerWithZone: api.Tracer;
@@ -370,12 +350,13 @@ describe('xhr', () => {
           .value(createFakePerformanceObs(fileUrl));
 
         xmlHttpRequestInstrumentation = new XMLHttpRequestInstrumentation({
-          semconvStabilityOptIn: test.semconvStabilityOptIn,
           ...config,
         });
         dummySpanExporter = new DummySpanExporter();
         webTracerProviderWithZone = new WebTracerProvider({
-          spanProcessors: [new tracing.SimpleSpanProcessor(dummySpanExporter)],
+          spanProcessors: [
+            new tracing.SimpleSpanProcessor({ exporter: dummySpanExporter }),
+          ],
         });
         registerInstrumentations({
           instrumentations: [xmlHttpRequestInstrumentation],
@@ -496,86 +477,19 @@ describe('xhr', () => {
             const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
             const attributes = span.attributes;
             let expectedNumAttrs = 0;
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            expectedNumAttrs += 5;
+
+            assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
+            assert.strictEqual(attributes[ATTR_URL_FULL], url);
+            assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 200);
+            assert.strictEqual(
+              attributes[ATTR_SERVER_ADDRESS],
+              parseUrl(url).hostname
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              expectedNumAttrs += 8;
-
-              assert.strictEqual(
-                attributes[ATTR_HTTP_METHOD],
-                'GET',
-                `attributes ${ATTR_HTTP_METHOD} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                url,
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-              const requestContentLength = attributes[
-                ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-              ] as number;
-              assert.strictEqual(
-                requestContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
-              );
-              const responseContentLength = attributes[
-                ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-              ] as number;
-              assert.strictEqual(
-                responseContentLength,
-                60,
-                `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_STATUS_CODE],
-                200,
-                `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-              );
-              assert.strictEqual(
-                attributes[AttributeNames.HTTP_STATUS_TEXT],
-                'OK',
-                `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_HOST],
-                parseUrl(url).host,
-                `attributes ${ATTR_HTTP_HOST} is wrong`
-              );
-
-              const httpScheme = attributes[ATTR_HTTP_SCHEME];
-              assert.ok(
-                httpScheme === 'http' || httpScheme === 'https',
-                `attributes ${ATTR_HTTP_SCHEME} is wrong`
-              );
-              assert.notStrictEqual(
-                attributes[ATTR_HTTP_USER_AGENT],
-                '',
-                `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-              );
-            }
-
-            if (semconvStability & SemconvStability.STABLE) {
-              expectedNumAttrs += 5;
-
-              assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
-              assert.strictEqual(attributes[ATTR_URL_FULL], url);
-              assert.strictEqual(
-                attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-                200
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_ADDRESS],
-                parseUrl(url).hostname
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_PORT],
-                Number(parseUrl(url).port)
-              );
-            }
+            assert.strictEqual(
+              attributes[ATTR_SERVER_PORT],
+              Number(parseUrl(url).port)
+            );
 
             assert.strictEqual(
               Object.keys(attributes).length,
@@ -889,7 +803,7 @@ describe('xhr', () => {
             assert.strictEqual(
               attributes[keys[1]],
               secondUrl,
-              `attribute ${ATTR_HTTP_URL} is wrong`
+              'attribute url.full is wrong'
             );
           });
         });
@@ -953,26 +867,11 @@ describe('xhr', () => {
           it('should have an absolute url attribute', () => {
             const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const attributes = span.attributes;
-
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            assert.strictEqual(
+              attributes[ATTR_URL_FULL],
+              location.origin + '/get',
+              `attributes ${ATTR_URL_FULL} is wrong`
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                location.origin + '/get',
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-            }
-            if (semconvStability & SemconvStability.STABLE) {
-              assert.strictEqual(
-                attributes[ATTR_URL_FULL],
-                location.origin + '/get',
-                `attributes ${ATTR_URL_FULL} is wrong`
-              );
-            }
           });
         });
 
@@ -986,26 +885,6 @@ describe('xhr', () => {
             const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
             const events = span.events;
             assert.strictEqual(events.length, 3, 'number of events is wrong');
-          });
-
-          it('should still add the CONTENT_LENGTH attribute', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-            const attributes = span.attributes;
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
-            );
-
-            if (semconvStability & SemconvStability.OLD) {
-              const responseContentLength = attributes[
-                ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-              ] as number;
-              assert.strictEqual(
-                responseContentLength,
-                60,
-                `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
-              );
-            }
           });
         });
       });
@@ -1110,90 +989,23 @@ describe('xhr', () => {
             const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
             const attributes = span.attributes;
             let expectedNumAttrs = 0;
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
+
+            expectedNumAttrs += 6;
+            assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
+            assert.strictEqual(attributes[ATTR_URL_FULL], url);
+            assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 400);
+            assert.strictEqual(
+              attributes[ATTR_SERVER_ADDRESS],
+              'raw.githubusercontent.com',
+              'server.address'
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              expectedNumAttrs += 8;
-
-              assert.strictEqual(
-                attributes[ATTR_HTTP_METHOD],
-                'GET',
-                `attributes ${ATTR_HTTP_METHOD} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                url,
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-              const requestContentLength = attributes[
-                ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-              ] as number;
-              assert.strictEqual(
-                requestContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
-              );
-              const responseContentLength = attributes[
-                ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-              ] as number;
-              assert.strictEqual(
-                responseContentLength,
-                60,
-                `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_STATUS_CODE],
-                400,
-                `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-              );
-              assert.strictEqual(
-                attributes[AttributeNames.HTTP_STATUS_TEXT],
-                'Bad Request',
-                `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_HOST],
-                'raw.githubusercontent.com',
-                `attributes ${ATTR_HTTP_HOST} is wrong`
-              );
-
-              const httpScheme = attributes[ATTR_HTTP_SCHEME];
-              assert.ok(
-                httpScheme === 'http' || httpScheme === 'https',
-                `attributes ${ATTR_HTTP_SCHEME} is wrong`
-              );
-              assert.notStrictEqual(
-                attributes[ATTR_HTTP_USER_AGENT],
-                '',
-                `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-              );
-            }
-
-            if (semconvStability & SemconvStability.STABLE) {
-              assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
-
-              expectedNumAttrs += 6;
-              assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
-              assert.strictEqual(attributes[ATTR_URL_FULL], url);
-              assert.strictEqual(
-                attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-                400
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_ADDRESS],
-                'raw.githubusercontent.com',
-                'server.address'
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_PORT],
-                443,
-                'server.port'
-              );
-              assert.strictEqual(attributes[ATTR_ERROR_TYPE], '400');
-            }
+            assert.strictEqual(
+              attributes[ATTR_SERVER_PORT],
+              443,
+              'server.port'
+            );
+            assert.strictEqual(attributes[ATTR_ERROR_TYPE], '400');
 
             assert.strictEqual(
               Object.keys(attributes).length,
@@ -1234,90 +1046,26 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
+
+            expectedNumAttrs += 5;
+            assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
+            assert.strictEqual(attributes[ATTR_URL_FULL], url);
+            assert.strictEqual(
+              attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
+              undefined
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              expectedNumAttrs += 7;
-
-              assert.strictEqual(
-                attributes[ATTR_HTTP_METHOD],
-                'GET',
-                `attributes ${ATTR_HTTP_METHOD} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                url,
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_STATUS_CODE],
-                0,
-                `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-              );
-              assert.strictEqual(
-                attributes[AttributeNames.HTTP_STATUS_TEXT],
-                '',
-                `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_HOST],
-                'raw.githubusercontent.com',
-                `attributes ${ATTR_HTTP_HOST} is wrong`
-              );
-
-              const httpScheme = attributes[ATTR_HTTP_SCHEME];
-              assert.ok(
-                httpScheme === 'http' || httpScheme === 'https',
-                `attributes ${ATTR_HTTP_SCHEME} is wrong`
-              );
-              assert.notStrictEqual(
-                attributes[ATTR_HTTP_USER_AGENT],
-                '',
-                `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-              );
-              const requestContentLength = attributes[
-                ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-              ] as number;
-              assert.strictEqual(
-                requestContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
-              );
-              const responseContentLength = attributes[
-                ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-              ] as number;
-              assert.strictEqual(
-                responseContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
-              );
-            }
-
-            if (semconvStability & SemconvStability.STABLE) {
-              assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
-
-              expectedNumAttrs += 5;
-              assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
-              assert.strictEqual(attributes[ATTR_URL_FULL], url);
-              assert.strictEqual(
-                attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-                undefined
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_ADDRESS],
-                'raw.githubusercontent.com',
-                'server.address'
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_PORT],
-                443,
-                'server.port'
-              );
-              assert.strictEqual(attributes[ATTR_ERROR_TYPE], 'error');
-            }
+            assert.strictEqual(
+              attributes[ATTR_SERVER_ADDRESS],
+              'raw.githubusercontent.com',
+              'server.address'
+            );
+            assert.strictEqual(
+              attributes[ATTR_SERVER_PORT],
+              443,
+              'server.port'
+            );
+            assert.strictEqual(attributes[ATTR_ERROR_TYPE], 'error');
 
             assert.strictEqual(
               Object.keys(attributes).length,
@@ -1355,88 +1103,25 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            assert.strictEqual(span.status.code, api.SpanStatusCode.UNSET);
+
+            expectedNumAttrs += 4;
+            assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
+            assert.strictEqual(attributes[ATTR_URL_FULL], url);
+            assert.strictEqual(
+              attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
+              undefined
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              expectedNumAttrs += 7;
-              assert.strictEqual(
-                attributes[ATTR_HTTP_METHOD],
-                'GET',
-                `attributes ${ATTR_HTTP_METHOD} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                url,
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_STATUS_CODE],
-                0,
-                `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-              );
-              assert.strictEqual(
-                attributes[AttributeNames.HTTP_STATUS_TEXT],
-                '',
-                `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_HOST],
-                'raw.githubusercontent.com',
-                `attributes ${ATTR_HTTP_HOST} is wrong`
-              );
-
-              const httpScheme = attributes[ATTR_HTTP_SCHEME];
-              assert.ok(
-                httpScheme === 'http' || httpScheme === 'https',
-                `attributes ${ATTR_HTTP_SCHEME} is wrong`
-              );
-              assert.notStrictEqual(
-                attributes[ATTR_HTTP_USER_AGENT],
-                '',
-                `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-              );
-              const requestContentLength = attributes[
-                ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-              ] as number;
-              assert.strictEqual(
-                requestContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
-              );
-              const responseContentLength = attributes[
-                ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-              ] as number;
-              assert.strictEqual(
-                responseContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
-              );
-            }
-
-            if (semconvStability & SemconvStability.STABLE) {
-              assert.strictEqual(span.status.code, api.SpanStatusCode.UNSET);
-
-              expectedNumAttrs += 4;
-              assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
-              assert.strictEqual(attributes[ATTR_URL_FULL], url);
-              assert.strictEqual(
-                attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-                undefined
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_ADDRESS],
-                'raw.githubusercontent.com',
-                'server.address'
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_PORT],
-                443,
-                'server.port'
-              );
-            }
+            assert.strictEqual(
+              attributes[ATTR_SERVER_ADDRESS],
+              'raw.githubusercontent.com',
+              'server.address'
+            );
+            assert.strictEqual(
+              attributes[ATTR_SERVER_PORT],
+              443,
+              'server.port'
+            );
 
             assert.strictEqual(
               Object.keys(attributes).length,
@@ -1474,89 +1159,26 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
+
+            expectedNumAttrs += 5;
+            assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
+            assert.strictEqual(attributes[ATTR_URL_FULL], url);
+            assert.strictEqual(
+              attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
+              undefined
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              expectedNumAttrs += 7;
-              assert.strictEqual(
-                attributes[ATTR_HTTP_METHOD],
-                'GET',
-                `attributes ${ATTR_HTTP_METHOD} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                url,
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_STATUS_CODE],
-                0,
-                `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-              );
-              assert.strictEqual(
-                attributes[AttributeNames.HTTP_STATUS_TEXT],
-                '',
-                `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_HOST],
-                'raw.githubusercontent.com',
-                `attributes ${ATTR_HTTP_HOST} is wrong`
-              );
-
-              const httpScheme = attributes[ATTR_HTTP_SCHEME];
-              assert.ok(
-                httpScheme === 'http' || httpScheme === 'https',
-                `attributes ${ATTR_HTTP_SCHEME} is wrong`
-              );
-              assert.notStrictEqual(
-                attributes[ATTR_HTTP_USER_AGENT],
-                '',
-                `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-              );
-              const requestContentLength = attributes[
-                ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-              ] as number;
-              assert.strictEqual(
-                requestContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
-              );
-              const responseContentLength = attributes[
-                ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-              ] as number;
-              assert.strictEqual(
-                responseContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
-              );
-            }
-
-            if (semconvStability & SemconvStability.STABLE) {
-              assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
-
-              expectedNumAttrs += 5;
-              assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
-              assert.strictEqual(attributes[ATTR_URL_FULL], url);
-              assert.strictEqual(
-                attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-                undefined
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_ADDRESS],
-                'raw.githubusercontent.com',
-                'server.address'
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_PORT],
-                443,
-                'server.port'
-              );
-              assert.strictEqual(attributes[ATTR_ERROR_TYPE], 'timeout');
-            }
+            assert.strictEqual(
+              attributes[ATTR_SERVER_ADDRESS],
+              'raw.githubusercontent.com',
+              'server.address'
+            );
+            assert.strictEqual(
+              attributes[ATTR_SERVER_PORT],
+              443,
+              'server.port'
+            );
+            assert.strictEqual(attributes[ATTR_ERROR_TYPE], 'timeout');
 
             assert.strictEqual(
               Object.keys(attributes).length,
@@ -1755,88 +1377,23 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            assert.strictEqual(span.status.code, api.SpanStatusCode.UNSET);
+
+            expectedNumAttrs += 6;
+            assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'POST');
+            assert.strictEqual(attributes[ATTR_URL_FULL], url);
+            assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 200);
+            assert.strictEqual(
+              attributes[ATTR_SERVER_ADDRESS],
+              parseUrl(url).hostname,
+              'server.address'
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              expectedNumAttrs += 9;
-              assert.strictEqual(
-                attributes[ATTR_HTTP_METHOD],
-                'POST',
-                `attributes ${ATTR_HTTP_METHOD} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                url,
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-              const requestContentLength = attributes[
-                ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-              ] as number;
-              assert.strictEqual(
-                requestContentLength,
-                19,
-                `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} !== 19`
-              );
-              const responseContentLength = attributes[
-                ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-              ] as number;
-              assert.strictEqual(
-                responseContentLength,
-                60,
-                `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_STATUS_CODE],
-                200,
-                `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-              );
-              assert.strictEqual(
-                attributes[AttributeNames.HTTP_STATUS_TEXT],
-                'OK',
-                `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_HOST],
-                parseUrl(url).host,
-                `attributes ${ATTR_HTTP_HOST} is wrong`
-              );
-              const httpScheme = attributes[ATTR_HTTP_SCHEME];
-              assert.ok(
-                httpScheme === 'http' || httpScheme === 'https',
-                `attributes ${ATTR_HTTP_SCHEME} is wrong`
-              );
-              assert.notStrictEqual(
-                attributes[ATTR_HTTP_USER_AGENT],
-                '',
-                `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-              );
-            }
-
-            if (semconvStability & SemconvStability.STABLE) {
-              assert.strictEqual(span.status.code, api.SpanStatusCode.UNSET);
-
-              expectedNumAttrs += 6;
-              assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'POST');
-              assert.strictEqual(attributes[ATTR_URL_FULL], url);
-              assert.strictEqual(
-                attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-                200
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_ADDRESS],
-                parseUrl(url).hostname,
-                'server.address'
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_PORT],
-                Number(parseUrl(url).port),
-                'server.port'
-              );
-              assert.strictEqual(attributes[ATTR_HTTP_REQUEST_BODY_SIZE], 19);
-            }
+            assert.strictEqual(
+              attributes[ATTR_SERVER_PORT],
+              Number(parseUrl(url).port),
+              'server.port'
+            );
+            assert.strictEqual(attributes[ATTR_HTTP_REQUEST_BODY_SIZE], 19);
 
             assert.strictEqual(
               Object.keys(attributes).length,
@@ -2141,7 +1698,7 @@ describe('xhr', () => {
             assert.strictEqual(
               attributes[keys[1]],
               secondUrl,
-              `attribute ${ATTR_HTTP_URL} is wrong`
+              'attribute url.full is wrong'
             );
           });
         });
@@ -2206,26 +1763,11 @@ describe('xhr', () => {
           it('should have an absolute url attribute', () => {
             const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const attributes = span.attributes;
-
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            assert.strictEqual(
+              attributes[ATTR_URL_FULL],
+              location.origin + '/get',
+              `attributes ${ATTR_URL_FULL} is wrong`
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                location.origin + '/get',
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-            }
-            if (semconvStability & SemconvStability.STABLE) {
-              assert.strictEqual(
-                attributes[ATTR_URL_FULL],
-                location.origin + '/get',
-                `attributes ${ATTR_URL_FULL} is wrong`
-              );
-            }
           });
         });
       });
@@ -2341,89 +1883,23 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
+
+            expectedNumAttrs += 6;
+            assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'POST');
+            assert.strictEqual(attributes[ATTR_URL_FULL], url);
+            assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 400);
+            assert.strictEqual(
+              attributes[ATTR_SERVER_ADDRESS],
+              'raw.githubusercontent.com',
+              'server.address'
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              expectedNumAttrs += 8;
-
-              assert.strictEqual(
-                attributes[ATTR_HTTP_METHOD],
-                'POST',
-                `attributes ${ATTR_HTTP_METHOD} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                url,
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-              const requestContentLength = attributes[
-                ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-              ] as number;
-              assert.strictEqual(
-                requestContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
-              );
-              const responseContentLength = attributes[
-                ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-              ] as number;
-              assert.strictEqual(
-                responseContentLength,
-                60,
-                `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_STATUS_CODE],
-                400,
-                `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-              );
-              assert.strictEqual(
-                attributes[AttributeNames.HTTP_STATUS_TEXT],
-                'Bad Request',
-                `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_HOST],
-                'raw.githubusercontent.com',
-                `attributes ${ATTR_HTTP_HOST} is wrong`
-              );
-              const httpScheme = attributes[ATTR_HTTP_SCHEME];
-              assert.ok(
-                httpScheme === 'http' || httpScheme === 'https',
-                `attributes ${ATTR_HTTP_SCHEME} is wrong`
-              );
-              assert.notStrictEqual(
-                attributes[ATTR_HTTP_USER_AGENT],
-                '',
-                `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-              );
-            }
-
-            if (semconvStability & SemconvStability.STABLE) {
-              assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
-
-              expectedNumAttrs += 6;
-              assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'POST');
-              assert.strictEqual(attributes[ATTR_URL_FULL], url);
-              assert.strictEqual(
-                attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-                400
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_ADDRESS],
-                'raw.githubusercontent.com',
-                'server.address'
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_PORT],
-                443,
-                'server.port'
-              );
-              assert.strictEqual(attributes[ATTR_ERROR_TYPE], '400');
-            }
+            assert.strictEqual(
+              attributes[ATTR_SERVER_PORT],
+              443,
+              'server.port'
+            );
+            assert.strictEqual(attributes[ATTR_ERROR_TYPE], '400');
 
             assert.strictEqual(
               Object.keys(attributes).length,
@@ -2465,88 +1941,26 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
+
+            expectedNumAttrs += 5;
+            assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'POST');
+            assert.strictEqual(attributes[ATTR_URL_FULL], url);
+            assert.strictEqual(
+              attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
+              undefined
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              expectedNumAttrs += 7;
-              assert.strictEqual(
-                attributes[ATTR_HTTP_METHOD],
-                'POST',
-                `attributes ${ATTR_HTTP_METHOD} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                url,
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_STATUS_CODE],
-                0,
-                `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-              );
-              assert.strictEqual(
-                attributes[AttributeNames.HTTP_STATUS_TEXT],
-                '',
-                `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_HOST],
-                'raw.githubusercontent.com',
-                `attributes ${ATTR_HTTP_HOST} is wrong`
-              );
-              const httpScheme = attributes[ATTR_HTTP_SCHEME];
-              assert.ok(
-                httpScheme === 'http' || httpScheme === 'https',
-                `attributes ${ATTR_HTTP_SCHEME} is wrong`
-              );
-              assert.notStrictEqual(
-                attributes[ATTR_HTTP_USER_AGENT],
-                '',
-                `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-              );
-              const requestContentLength = attributes[
-                ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-              ] as number;
-              assert.strictEqual(
-                requestContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
-              );
-              const responseContentLength = attributes[
-                ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-              ] as number;
-              assert.strictEqual(
-                responseContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
-              );
-            }
-
-            if (semconvStability & SemconvStability.STABLE) {
-              assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
-
-              expectedNumAttrs += 5;
-              assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'POST');
-              assert.strictEqual(attributes[ATTR_URL_FULL], url);
-              assert.strictEqual(
-                attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-                undefined
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_ADDRESS],
-                'raw.githubusercontent.com',
-                'server.address'
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_PORT],
-                443,
-                'server.port'
-              );
-              assert.strictEqual(attributes[ATTR_ERROR_TYPE], 'error');
-            }
+            assert.strictEqual(
+              attributes[ATTR_SERVER_ADDRESS],
+              'raw.githubusercontent.com',
+              'server.address'
+            );
+            assert.strictEqual(
+              attributes[ATTR_SERVER_PORT],
+              443,
+              'server.port'
+            );
+            assert.strictEqual(attributes[ATTR_ERROR_TYPE], 'error');
 
             assert.strictEqual(
               Object.keys(attributes).length,
@@ -2585,88 +1999,25 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            assert.strictEqual(span.status.code, api.SpanStatusCode.UNSET);
+
+            expectedNumAttrs += 4;
+            assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'POST');
+            assert.strictEqual(attributes[ATTR_URL_FULL], url);
+            assert.strictEqual(
+              attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
+              undefined
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              expectedNumAttrs += 7;
-
-              assert.strictEqual(
-                attributes[ATTR_HTTP_METHOD],
-                'POST',
-                `attributes ${ATTR_HTTP_METHOD} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                url,
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_STATUS_CODE],
-                0,
-                `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-              );
-              assert.strictEqual(
-                attributes[AttributeNames.HTTP_STATUS_TEXT],
-                '',
-                `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_HOST],
-                'raw.githubusercontent.com',
-                `attributes ${ATTR_HTTP_HOST} is wrong`
-              );
-              const httpScheme = attributes[ATTR_HTTP_SCHEME];
-              assert.ok(
-                httpScheme === 'http' || httpScheme === 'https',
-                `attributes ${ATTR_HTTP_SCHEME} is wrong`
-              );
-              assert.notStrictEqual(
-                attributes[ATTR_HTTP_USER_AGENT],
-                '',
-                `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-              );
-              const requestContentLength = attributes[
-                ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-              ] as number;
-              assert.strictEqual(
-                requestContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
-              );
-              const responseContentLength = attributes[
-                ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-              ] as number;
-              assert.strictEqual(
-                responseContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
-              );
-            }
-
-            if (semconvStability & SemconvStability.STABLE) {
-              assert.strictEqual(span.status.code, api.SpanStatusCode.UNSET);
-
-              expectedNumAttrs += 4;
-              assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'POST');
-              assert.strictEqual(attributes[ATTR_URL_FULL], url);
-              assert.strictEqual(
-                attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-                undefined
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_ADDRESS],
-                'raw.githubusercontent.com',
-                'server.address'
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_PORT],
-                443,
-                'server.port'
-              );
-            }
+            assert.strictEqual(
+              attributes[ATTR_SERVER_ADDRESS],
+              'raw.githubusercontent.com',
+              'server.address'
+            );
+            assert.strictEqual(
+              attributes[ATTR_SERVER_PORT],
+              443,
+              'server.port'
+            );
 
             assert.strictEqual(
               Object.keys(attributes).length,
@@ -2705,88 +2056,26 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
+
+            expectedNumAttrs += 5;
+            assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'POST');
+            assert.strictEqual(attributes[ATTR_URL_FULL], url);
+            assert.strictEqual(
+              attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
+              undefined
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              expectedNumAttrs += 7;
-              assert.strictEqual(
-                attributes[ATTR_HTTP_METHOD],
-                'POST',
-                `attributes ${ATTR_HTTP_METHOD} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                url,
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_STATUS_CODE],
-                0,
-                `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-              );
-              assert.strictEqual(
-                attributes[AttributeNames.HTTP_STATUS_TEXT],
-                '',
-                `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_HOST],
-                'raw.githubusercontent.com',
-                `attributes ${ATTR_HTTP_HOST} is wrong`
-              );
-              const httpScheme = attributes[ATTR_HTTP_SCHEME];
-              assert.ok(
-                httpScheme === 'http' || httpScheme === 'https',
-                `attributes ${ATTR_HTTP_SCHEME} is wrong`
-              );
-              assert.notStrictEqual(
-                attributes[ATTR_HTTP_USER_AGENT],
-                '',
-                `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-              );
-              const requestContentLength = attributes[
-                ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-              ] as number;
-              assert.strictEqual(
-                requestContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
-              );
-              const responseContentLength = attributes[
-                ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-              ] as number;
-              assert.strictEqual(
-                responseContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
-              );
-            }
-
-            if (semconvStability & SemconvStability.STABLE) {
-              assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
-
-              expectedNumAttrs += 5;
-              assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'POST');
-              assert.strictEqual(attributes[ATTR_URL_FULL], url);
-              assert.strictEqual(
-                attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-                undefined
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_ADDRESS],
-                'raw.githubusercontent.com',
-                'server.address'
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_PORT],
-                443,
-                'server.port'
-              );
-              assert.strictEqual(attributes[ATTR_ERROR_TYPE], 'timeout');
-            }
+            assert.strictEqual(
+              attributes[ATTR_SERVER_ADDRESS],
+              'raw.githubusercontent.com',
+              'server.address'
+            );
+            assert.strictEqual(
+              attributes[ATTR_SERVER_PORT],
+              443,
+              'server.port'
+            );
+            assert.strictEqual(attributes[ATTR_ERROR_TYPE], 'timeout');
 
             assert.strictEqual(
               Object.keys(attributes).length,

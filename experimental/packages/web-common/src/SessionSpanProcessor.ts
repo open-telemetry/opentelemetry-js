@@ -8,7 +8,7 @@ import type {
   SpanProcessor,
   Span,
   ReadableSpan,
-} from '@opentelemetry/sdk-trace-base';
+} from '@opentelemetry/sdk-trace';
 import { ATTR_SESSION_ID } from './semconv';
 import type { SessionProvider } from './types/SessionProvider';
 

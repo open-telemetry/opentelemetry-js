@@ -5,7 +5,7 @@
 
 import * as assert from 'assert';
 import { spanToThrift } from '../src/transform';
-import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace';
 import {
   emptyResource,
   resourceFromAttributes,

@@ -7,10 +7,7 @@ import { OTLPTraceExporter } from '../src';
 import type { ServerTestContext } from './utils';
 import { startServer } from './utils';
 import * as assert from 'assert';
-import {
-  SimpleSpanProcessor,
-  BasicTracerProvider,
-} from '@opentelemetry/sdk-trace-base';
+import { SimpleSpanProcessor, TracerProvider } from '@opentelemetry/sdk-trace';
 
 const testServiceDefinition = {
   export: {
@@ -68,13 +65,13 @@ describe('OTLPTraceExporter', function () {
 
   it('successfully exports data', async () => {
     // arrange
-    const tracerProvider = new BasicTracerProvider({
+    const tracerProvider = new TracerProvider({
       spanProcessors: [
-        new SimpleSpanProcessor(
-          new OTLPTraceExporter({
+        new SimpleSpanProcessor({
+          exporter: new OTLPTraceExporter({
             url: 'http://localhost:1501',
-          })
-        ),
+          }),
+        }),
       ],
     });
 

@@ -87,7 +87,11 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
   startIncomingSpanHook?: StartIncomingSpanCustomAttributeFunction;
   /** Function for adding custom attributes before a span is started in outgoingRequest */
   startOutgoingSpanHook?: StartOutgoingSpanCustomAttributeFunction;
-  /** The primary server name of the matched virtual host. */
+  /**
+   * The primary server name of the matched virtual host.
+   * @deprecated No longer used. Stable HTTP semantic conventions do not include
+   * the `http.server_name` attribute; this option has no effect.
+   */
   serverName?: string;
   /** Require parent to create span for outgoing requests */
   requireParentforOutgoingSpans?: boolean;

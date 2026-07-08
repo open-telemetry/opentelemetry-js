@@ -32,7 +32,7 @@ describe('Node Globals Foolproofing', function () {
     sinon.restore();
   });
 
-  it('Can get TraceProvider without node globals such as process', function () {
+  it('Can get TracerProvider without node globals such as process', function () {
     const propagator = propagation['_getGlobalPropagator']();
     const tracerProvider = new WebTracerProvider();
     tracerProvider.register({
@@ -52,7 +52,7 @@ describe('Node Globals Foolproofing', function () {
     );
   });
 
-  it('Can get TraceProvider with custom id generator and without node globals such as process', function () {
+  it('Can get TracerProvider with custom id generator and without node globals such as process', function () {
     const getRandomString = (length: number) => {
       const alphanumericsList = 'abcdefghijklmnopqrstuvwxyz0123456789'.split(
         ''
