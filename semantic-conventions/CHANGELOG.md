@@ -9,6 +9,16 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 1.43.0
+
+### :rocket: Features
+
 * feat: update semantic conventions to v1.43.0 [#6883](https://github.com/open-telemetry/opentelemetry-js/pull/6883)
   * Semantic Conventions v1.43.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1430) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
   * `@opentelemetry/semantic-conventions` (stable) changes: *1 added export*
@@ -35,12 +45,6 @@ ATTR_AZURE_RESOURCE_GROUP_NAME // azure.resource_group.name
 ```
 
 </details>
-
-### :bug: Bug Fixes
-
-### :books: Documentation
-
-### :house: Internal
 
 ## 1.42.0
 
