@@ -105,7 +105,7 @@ export class PropagationAPI {
   public extract<Carrier>(
     context: Context,
     carrier: Carrier,
-    getter: TextMapGetter<Carrier> = defaultTextMapGetter
+    getter: TextMapGetter<Carrier> = defaultTextMapGetter as TextMapGetter<Carrier>
   ): Context {
     return this._getGlobalPropagator().extract(context, carrier, getter);
   }

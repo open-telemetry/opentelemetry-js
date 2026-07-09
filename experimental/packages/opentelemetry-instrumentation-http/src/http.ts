@@ -64,6 +64,7 @@ import {
   getOutgoingStableRequestMetricAttributesOnResponse,
   getRequestInfo,
   headerCapture,
+  headersTextMapSetter,
   isValidOptionsType,
   parseResponseStatus,
   setSpanWithError,
@@ -737,9 +738,15 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       } else {
         // Make a copy of the headers object to avoid mutating an object the
         // caller might have a reference to.
-        optionsParsed.headers = Object.assign({}, optionsParsed.headers);
+        optionsParsed.headers = Array.isArray(optionsParsed.headers)
+          ? optionsParsed.headers.slice()
+          : Object.assign({}, optionsParsed.headers);
       }
-      propagation.inject(requestContext, optionsParsed.headers);
+      propagation.inject(
+        requestContext,
+        optionsParsed.headers,
+        headersTextMapSetter
+      );
 
       return context.with(requestContext, () => {
         /*

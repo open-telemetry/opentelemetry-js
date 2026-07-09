@@ -7,8 +7,14 @@ import type {
   Span,
   DiagLogger,
   AttributeValue,
+  TextMapSetter,
 } from '@opentelemetry/api';
-import { SpanStatusCode, context, SpanKind } from '@opentelemetry/api';
+import {
+  SpanStatusCode,
+  context,
+  SpanKind,
+  defaultTextMapSetter,
+} from '@opentelemetry/api';
 import {
   ATTR_CLIENT_ADDRESS,
   ATTR_ERROR_TYPE,
@@ -54,6 +60,28 @@ import {
 } from './internal-types';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import forwardedParse = require('forwarded-parse');
+
+export const headersTextMapSetter: TextMapSetter<
+  // headers <Object> | <Array> An object or an array of strings containing
+  // request headers. The array is in the same format as message.rawHeaders.
+  Record<string, undefined | string | string[]> | string[]
+> = {
+  set(carrier, key, value) {
+    if (Array.isArray(carrier)) {
+      const keyLower = key.toLowerCase();
+      for (let i = 0; i < carrier.length; i += 2) {
+        if (carrier[i].toLowerCase() === keyLower) {
+          carrier[i + 1] = value;
+          return;
+        }
+      }
+
+      carrier.push(key, value);
+    } else {
+      defaultTextMapSetter.set(carrier, key, value);
+    }
+  },
+};
 
 /**
  * Get an absolute url
