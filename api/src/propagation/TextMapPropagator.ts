@@ -18,8 +18,7 @@ import type { Context } from '../context/types';
  *
  * @since 1.0.0
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface TextMapPropagator<Carrier = any> {
+export interface TextMapPropagator<TCarrier = unknown> {
   /**
    * Injects values from a given `Context` into a carrier.
    *
@@ -33,7 +32,7 @@ export interface TextMapPropagator<Carrier = any> {
    * @param setter an optional {@link TextMapSetter}. If undefined, values will be
    *     set by direct object assignment.
    */
-  inject(
+  inject<Carrier extends TCarrier>(
     context: Context,
     carrier: Carrier,
     setter: TextMapSetter<Carrier>
@@ -51,7 +50,7 @@ export interface TextMapPropagator<Carrier = any> {
    * @param getter an optional {@link TextMapGetter}. If undefined, keys will be all
    *     own properties, and keys will be accessed by direct object access.
    */
-  extract(
+  extract<Carrier extends TCarrier>(
     context: Context,
     carrier: Carrier,
     getter: TextMapGetter<Carrier>
