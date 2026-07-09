@@ -23,7 +23,7 @@ export { createAlwaysRecordSampler } from './sampler/AlwaysRecordSampler';
 export {
   ParentBasedSampler,
   createParentBasedSampler,
-  type ParentBasedSamplerConfig,
+  type ParentBasedSamplerOptions,
 } from './sampler/ParentBasedSampler';
 export {
   TraceIdRatioBasedSampler,

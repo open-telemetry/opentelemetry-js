@@ -10,7 +10,7 @@ import { AlwaysOffSampler } from './AlwaysOffSampler';
 import { AlwaysOnSampler } from './AlwaysOnSampler';
 import type { Sampler, SamplingResult } from '../Sampler';
 
-export interface ParentBasedSamplerConfig {
+export interface ParentBasedSamplerOptions {
   /** Sampler called for spans with no parent */
   root: Sampler;
   /** Sampler called for spans with a remote parent which was sampled. Default AlwaysOn */
@@ -28,9 +28,9 @@ export interface ParentBasedSamplerConfig {
  * decision or delegates to `root` for root spans.
  */
 export function createParentBasedSampler(
-  config: ParentBasedSamplerConfig
+  options: ParentBasedSamplerOptions
 ): Sampler {
-  return new ParentBasedSampler(config);
+  return new ParentBasedSampler(options);
 }
 
 /**
@@ -46,7 +46,7 @@ export class ParentBasedSampler implements Sampler {
   private _localParentSampled: Sampler;
   private _localParentNotSampled: Sampler;
 
-  constructor(config: ParentBasedSamplerConfig) {
+  constructor(config: ParentBasedSamplerOptions) {
     this._root = config.root;
 
     if (!this._root) {
