@@ -15,12 +15,19 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :rocket: Features
 
 * feat(metrics): add experimental advisory attributes support
+* feat(propagator-jaeger):  *Notice*: The `@opentelemetry/propagator-jaeger` package will be removed in SDK 3.x, planned for approximately September 2026. @pichlermarc
+  * The Jaeger propagator has been deprecated by the OpenTelemetry specification in favor of `W3CTraceContextPropagator`. This package will be removed in a future release.
 
 ### :bug: Bug Fixes
+
+* fix(sdk-trace): include trace IDs at the ratio 1 upper bound in `TraceIdRatioBasedSampler` [#6890](https://github.com/open-telemetry/opentelemetry-js/pull/6890) @LarryHu0217
 
 ### :books: Documentation
 
 ### :house: Internal
+
+* chore: build on Node 26 in CI [#6887](https://github.com/open-telemetry/opentelemetry-js/pull/6887) @overbalance
+* chore: bump to typescript@5.2.2 @pichlermarc
 
 ## 2.9.0
 

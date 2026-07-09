@@ -1,0 +1,17 @@
+name: First time contributor
+
+on:
+  pull_request_target: # zizmor: ignore[dangerous-triggers] Only code from the main branch is executed
+    types: [opened]
+
+permissions: {}
+
+jobs:
+  welcome:
+    permissions:
+      pull-requests: write # required by the shared workflow to add a label and post the welcome comment
+    uses: open-telemetry/shared-workflows/.github/workflows/first-time-pr.yml@a4036f5b7201b7f6dc609cc7200d0648a254413b # v0.1.1
+    with:
+      custom_message: |
+
+        - Add an entry describing your change to the appropriate changelog file: [Stable packages](https://github.com/open-telemetry/opentelemetry-js/blob/main/CHANGELOG.md), [Experimental packages](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/CHANGELOG.md), [API](https://github.com/open-telemetry/opentelemetry-js/blob/main/api/CHANGELOG.md) or [Semantic Conventions](https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/CHANGELOG.md). Add your entry under the `## Unreleased` section.
