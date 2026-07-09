@@ -110,7 +110,9 @@ export interface TextMapGetter<Carrier = any> {
 /**
  * @since 1.0.0
  */
-export const defaultTextMapGetter: TextMapGetter = {
+export const defaultTextMapGetter: TextMapGetter<
+  Record<string, undefined | string | string[]>
+> = {
   get(carrier, key) {
     if (carrier == null) {
       return undefined;
@@ -129,7 +131,9 @@ export const defaultTextMapGetter: TextMapGetter = {
 /**
  * @since 1.0.0
  */
-export const defaultTextMapSetter: TextMapSetter = {
+export const defaultTextMapSetter: TextMapSetter<
+  Record<string, undefined | string | string[]>
+> = {
   set(carrier, key, value) {
     if (carrier == null) {
       return;
