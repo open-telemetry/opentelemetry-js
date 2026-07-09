@@ -15,6 +15,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
   * The browser base no longer tracks `enable()` and `disable()` calls. Browser subclasses set `_enabled` themselves; one that never sets it reports `isEnabled()` as false.
   * A browser subclass that declares its own `private _enabled` fails to compile; rename it or declare it `protected`.
 
+* feat(instrumentation-http): add `ignoreIncomingPropagationHook` config option to skip extracting the propagation context from incoming requests, e.g. based on the request's IP address [#6901](https://github.com/open-telemetry/opentelemetry-js/pull/6901) @matthieusieben
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
