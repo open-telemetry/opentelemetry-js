@@ -1367,6 +1367,87 @@ describe('HttpInstrumentation', () => {
         assert.strictEqual(spans[0].attributes.key, 'value');
       });
     });
+
+    describe('with ignoreIncomingPropagationHook', () => {
+      beforeEach(() => {
+        memoryExporter.reset();
+      });
+
+      afterEach(() => {
+        server.close();
+        instrumentation.disable();
+      });
+
+      const startServer = async () => {
+        server = http.createServer((request, response) => {
+          response.end('Test Server Response');
+        });
+        await new Promise<void>(resolve => server.listen(serverPort, resolve));
+      };
+
+      it('should not extract propagation context when hook returns true', async () => {
+        instrumentation.setConfig({
+          // e.g. only trust propagation headers from requests coming from
+          // known IP addresses
+          ignoreIncomingPropagationHook: request => {
+            return request.socket.remoteAddress !== '10.1.2.3';
+          },
+        });
+        instrumentation.enable();
+        await startServer();
+
+        await httpRequest.get(`${protocol}://${hostname}:${serverPort}`);
+        const spans = memoryExporter.getFinishedSpans();
+        const [incomingSpan, outgoingSpan] = spans;
+        assert.strictEqual(spans.length, 2);
+        assert.strictEqual(incomingSpan.kind, SpanKind.SERVER);
+        assert.strictEqual(outgoingSpan.kind, SpanKind.CLIENT);
+        // The server span should not be part of the client's trace.
+        assert.notStrictEqual(
+          incomingSpan.spanContext().traceId,
+          outgoingSpan.spanContext().traceId
+        );
+        assert.strictEqual(incomingSpan.parentSpanContext, undefined);
+      });
+
+      it('should extract propagation context when hook returns false', async () => {
+        instrumentation.setConfig({
+          ignoreIncomingPropagationHook: () => false,
+        });
+        instrumentation.enable();
+        await startServer();
+
+        await httpRequest.get(`${protocol}://${hostname}:${serverPort}`);
+        const spans = memoryExporter.getFinishedSpans();
+        const [incomingSpan, outgoingSpan] = spans;
+        assert.strictEqual(spans.length, 2);
+        assert.strictEqual(incomingSpan.kind, SpanKind.SERVER);
+        assert.strictEqual(outgoingSpan.kind, SpanKind.CLIENT);
+        assert.strictEqual(
+          incomingSpan.spanContext().traceId,
+          outgoingSpan.spanContext().traceId
+        );
+      });
+
+      it('should extract propagation context when hook throws', async () => {
+        instrumentation.setConfig({
+          ignoreIncomingPropagationHook: () => {
+            throw new Error('bad ignoreIncomingPropagationHook function');
+          },
+        });
+        instrumentation.enable();
+        await startServer();
+
+        await httpRequest.get(`${protocol}://${hostname}:${serverPort}`);
+        const spans = memoryExporter.getFinishedSpans();
+        const [incomingSpan, outgoingSpan] = spans;
+        assert.strictEqual(spans.length, 2);
+        assert.strictEqual(
+          incomingSpan.spanContext().traceId,
+          outgoingSpan.spanContext().traceId
+        );
+      });
+    });
   });
 
   describe('capturing headers as span attributes', () => {

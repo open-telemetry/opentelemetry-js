@@ -579,7 +579,23 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           spanAttributes[ATTR_NETWORK_PROTOCOL_VERSION];
       }
 
-      const ctx = propagation.extract(ROOT_CONTEXT, headers);
+      const ignorePropagation = safeExecuteInTheMiddle(
+        () =>
+          instrumentation.getConfig().ignoreIncomingPropagationHook?.(request),
+        (e: unknown) => {
+          if (e != null) {
+            instrumentation._diag.error(
+              'caught ignoreIncomingPropagationHook error: ',
+              e
+            );
+          }
+        },
+        true
+      );
+
+      const ctx = ignorePropagation
+        ? ROOT_CONTEXT
+        : propagation.extract(ROOT_CONTEXT, headers);
       const span = instrumentation._startHttpSpan(method, spanOptions, ctx);
       const rpcMetadata: RPCMetadata = {
         type: RPCType.HTTP,
