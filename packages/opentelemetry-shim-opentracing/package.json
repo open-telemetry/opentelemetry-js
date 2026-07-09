@@ -43,7 +43,6 @@
   "devDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.10.0",
     "@opentelemetry/propagator-b3": "2.9.0",
-    "@opentelemetry/propagator-jaeger": "2.9.0",
     "@opentelemetry/sdk-trace": "2.9.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
