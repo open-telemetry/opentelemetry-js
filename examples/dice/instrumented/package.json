@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "compile": "tsc",
-    "start": "tsc && node --import ./build/instrumentation.js build/app.js",
+    "start": "node init && tsc && node --import ./build/instrumentation.js build/app.js",
     "test": "tsc && node --test build/test.js"
   },
   "repository": {

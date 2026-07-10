@@ -138,13 +138,15 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
       aggregationTemporality = collector.selectAggregationTemporality(
         instrumentDescriptor.type
       );
-      if (options?.attributeSetsToEmit !== undefined) {
+      if (
+        aggregationTemporality === AggregationTemporality.CUMULATIVE &&
+        options?.attributeSetsToEmit !== undefined
+      ) {
         result = TemporalMetricProcessor.selectAttributes(
           accumulationHistory,
           options.attributeSetsToEmit
         );
       }
-    }
 
     // Update last reported (cumulative) accumulation.
     this._reportHistory.set(collector, {

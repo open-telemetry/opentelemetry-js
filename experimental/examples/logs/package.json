@@ -3,7 +3,7 @@
   "version": "0.211.0",
   "private": true,
   "scripts": {
-    "start": "ts-node index.ts",
+    "start": "node init && ts-node index.ts",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
   },
   "dependencies": {

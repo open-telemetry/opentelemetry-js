@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "test:bundle": "npm i && node test-bundle.mjs",
-    "start": "npm i && webpack serve --config webpack.config.mjs --open"
+    "start": "node init && npm i && webpack serve --config webpack.config.mjs --open"
   },
   "dependencies": {
     "@opentelemetry/api": "file:../../../api",
