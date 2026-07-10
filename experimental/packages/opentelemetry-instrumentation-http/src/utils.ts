@@ -9,12 +9,7 @@ import type {
   AttributeValue,
   TextMapSetter,
 } from '@opentelemetry/api';
-import {
-  SpanStatusCode,
-  context,
-  SpanKind,
-  defaultTextMapSetter,
-} from '@opentelemetry/api';
+import { SpanStatusCode, context, SpanKind } from '@opentelemetry/api';
 import {
   ATTR_CLIENT_ADDRESS,
   ATTR_ERROR_TYPE,
@@ -61,24 +56,45 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import forwardedParse = require('forwarded-parse');
 
-export const headersTextMapSetter: TextMapSetter<
-  // headers <Object> | <Array> An object or an array of strings containing
-  // request headers. The array is in the same format as message.rawHeaders.
-  Record<string, undefined | string | string[]> | string[]
-> = {
+const isReadOnlyArray = <T>(value: unknown): value is readonly T[] =>
+  Array.isArray(value);
+
+export const requestTextMapSetter: TextMapSetter<RequestOptions> = {
   set(carrier, key, value) {
-    if (Array.isArray(carrier)) {
-      const keyLower = key.toLowerCase();
-      for (let i = 0; i < carrier.length; i += 2) {
-        if (carrier[i].toLowerCase() === keyLower) {
-          carrier[i + 1] = value;
+    const keyLower = key.toLowerCase();
+
+    // headers <Object> | <Array> An object or an array of strings containing
+    // request headers. The array is in the same format as message.rawHeaders.
+    if (!carrier.headers) {
+      carrier.headers = { [keyLower]: value };
+    } else if (isReadOnlyArray(carrier.headers)) {
+      // Make a copy of the headers object to avoid mutating an object the
+      // caller might have a reference to.
+      const headers = carrier.headers.slice();
+      carrier.headers = headers;
+
+      for (let i = 0; i < headers.length; i += 2) {
+        if (headers[i].toLowerCase() === keyLower) {
+          headers[i + 1] = value;
           return;
         }
       }
 
-      carrier.push(key, value);
+      headers.push(keyLower, value);
     } else {
-      defaultTextMapSetter.set(carrier, key, value);
+      // Make a copy of the headers object to avoid mutating an object the
+      // caller might have a reference to.
+      const headers = Object.assign({}, carrier.headers);
+      carrier.headers = headers;
+
+      for (const headerKey in headers) {
+        if (headerKey.toLowerCase() === keyLower) {
+          headers[headerKey as keyof typeof headers] = value;
+          return;
+        }
+      }
+
+      headers[keyLower] = value;
     }
   },
 };

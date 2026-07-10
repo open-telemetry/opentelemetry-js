@@ -64,7 +64,7 @@ import {
   getOutgoingStableRequestMetricAttributesOnResponse,
   getRequestInfo,
   headerCapture,
-  headersTextMapSetter,
+  requestTextMapSetter,
   isValidOptionsType,
   parseResponseStatus,
   setSpanWithError,
@@ -733,20 +733,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       const parentContext = context.active();
       const requestContext = trace.setSpan(parentContext, span);
 
-      if (!optionsParsed.headers) {
-        optionsParsed.headers = {};
-      } else {
-        // Make a copy of the headers object to avoid mutating an object the
-        // caller might have a reference to.
-        optionsParsed.headers = Array.isArray(optionsParsed.headers)
-          ? optionsParsed.headers.slice()
-          : Object.assign({}, optionsParsed.headers);
-      }
-      propagation.inject(
-        requestContext,
-        optionsParsed.headers,
-        headersTextMapSetter
-      );
+      propagation.inject(requestContext, optionsParsed, requestTextMapSetter);
 
       return context.with(requestContext, () => {
         /*

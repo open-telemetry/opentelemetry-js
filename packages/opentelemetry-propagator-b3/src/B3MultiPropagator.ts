@@ -84,7 +84,11 @@ function getTraceFlags(
  * Based on: https://github.com/openzipkin/b3-propagation
  */
 export class B3MultiPropagator implements TextMapPropagator {
-  inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
+  inject<Carrier>(
+    context: Context,
+    carrier: Carrier,
+    setter: TextMapSetter<Carrier>
+  ): void {
     const spanContext = trace.getSpanContext(context);
     if (
       !spanContext ||
@@ -113,7 +117,11 @@ export class B3MultiPropagator implements TextMapPropagator {
     }
   }
 
-  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
+  extract<Carrier>(
+    context: Context,
+    carrier: Carrier,
+    getter: TextMapGetter<Carrier>
+  ): Context {
     const traceId = getTraceId(carrier, getter);
     const spanId = getSpanId(carrier, getter);
     const traceFlags = getTraceFlags(carrier, getter) as TraceFlags;
