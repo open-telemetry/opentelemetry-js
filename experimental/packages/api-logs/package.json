@@ -13,7 +13,7 @@
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "test": "nyc mocha test/**/*.test.ts",
     "test:browser": "karma start --single-run",
-    "build": "npm run compile",
+    "build": "node init && npm run compile",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "version": "node ../../../scripts/version-update.js",
