@@ -8,6 +8,25 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* feat(instrumentation-http)!: emit only stable HTTP semantic conventions. The `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable no longer changes HTTP attribute or metric emission — old (v1.7.0) and duplicate (`http`/`http/dup`) semconv outputs have been removed. [#6819](https://github.com/open-telemetry/opentelemetry-js/pull/6819) @maryliag
+* feat(instrumentation-fetch)!: emit only stable HTTP semantic conventions. The `semconvStabilityOptIn` instrumentation config option has been removed; old (v1.7.0) and duplicate semconv outputs are no longer emitted. [#6819](https://github.com/open-telemetry/opentelemetry-js/pull/6819) @maryliag
+* feat(instrumentation-xml-http-request)!: emit only stable HTTP semantic conventions. The `semconvStabilityOptIn` instrumentation config option has been removed; old (v1.7.0) and duplicate semconv outputs are no longer emitted. [#6819](https://github.com/open-telemetry/opentelemetry-js/pull/6819) @maryliag
+* feat(instrumentation-grpc)!: emit only stable network semantic conventions. The `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable no longer changes attribute emission — `net.peer.name` and `net.peer.port` (old) are no longer set; only `server.address` and `server.port` (stable). [#6819](https://github.com/open-telemetry/opentelemetry-js/pull/6819) @maryliag
+
+### :rocket: Features
+
+* feat(sdk-node): emit a deprecation warning when the `JaegerPropagator` is selected via `OTEL_PROPAGATORS` or declarative config; use `tracecontext` instead. @pichlermarc
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 0.220.0
+
+### :boom: Breaking Changes
+
 * refactor(sdk-logs)!: refactor BatchLogRecordProcessor constructor signature [#6817](https://github.com/open-telemetry/opentelemetry-js/pull/6817) @trentm
   * (user-facing): `BatchLogRecordProcessor` now takes a single `options` object with all possible properties, instead of two separate arguments. For example, before `new BatchLogRecordProcessor(exporter, { maxQueueSize: 1000 })`, after `new BatchLogRecordProcessor({ exporter, maxQueueSize: 1000 })`.
   * `interface BufferConfig` -> `interface BatchLogRecordProcessorOptions`, and now includes the `exporter` property
@@ -23,6 +42,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * feat(configuration): bump config schema to v1.1.0; rename `without_scope_info` → `scope_info_enabled` and `without_target_info/development` → `target_info_enabled/development` on the Prometheus pull exporter (semantics inverted), rename `with_resource_constant_labels` → `resource_constant_labels`. Validate `file_format` per the configuration versioning spec: accept any minor version of major `1` (e.g. `1.0`, `1.1`), warn when the minor version is newer than supported, and reject other major versions. [#6781](https://github.com/open-telemetry/opentelemetry-js/pull/6781) @MikeGoldsmith
 * feat(sdk-node): wire up `id_generator` from declarative config [#6782](https://github.com/open-telemetry/opentelemetry-js/pull/6782) @MikeGoldsmith
+* feat(sdk-node): wire up `tracer_provider.sampler` from declarative config (always_on, always_off, trace_id_ratio_based, parent_based); unrecognized variants warn and fall back to ParentBased(AlwaysOn) [#6506](https://github.com/open-telemetry/opentelemetry-js/issues/6506) @MikeGoldsmith
 * feat(propagator-env-carrier): empty name normalization [#6827](https://github.com/open-telemetry/opentelemetry-js/pull/6827) @pellared
 * feat(propagator-env-carrier): make `EnvironmentGetter` read the current `process.env` [#6853](https://github.com/open-telemetry/opentelemetry-js/pull/6853) @pellared
 
@@ -45,6 +65,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * chore(sdk-node): migrate to use the new sdk-trace package [#6828](https://github.com/open-telemetry/opentelemetry-js/pull/6828/) @trentm
   * The `node` re-export of `@opentelemetry/sdk-trace-node` and `tracing` re-export of `@opentelemetry/sdk-trace-base` have been deprecated. (Historically the `@opentelemetry/sdk-node` package has [re-exported from a number of core packages](https://github.com/open-telemetry/opentelemetry-js/blob/3db60e7cb46608e68258c489b2f610c1e1540248/experimental/packages/opentelemetry-sdk-node/src/index.ts#L12-L19). It is now recommended that users directly import from those other packages.)
 * chore(\*): migrate use of sdk-trace-base and sdk-trace-node to sdk-trace [#6851](https://github.com/open-telemetry/opentelemetry-js/pull/6851) @trentm
+* fix(instrumentation,instrumentation-http): fix codecov coverage under-reporting by merging coverage across CJS/ESM test runs [#6867](https://github.com/open-telemetry/opentelemetry-js/pull/6867) @mwear
 
 ## 0.219.0
 

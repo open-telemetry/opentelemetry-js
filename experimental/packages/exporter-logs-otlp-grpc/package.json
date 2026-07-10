@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-logs-otlp-grpc",
-  "version": "0.219.0",
+  "version": "0.220.0",
   "description": "OpenTelemetry Collector Exporter allows user to send collected log records to the OpenTelemetry Collector",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -47,10 +47,11 @@
     "access": "public"
   },
   "devDependencies": {
+    "@grpc/grpc-js": "^1.14.3",
     "@grpc/proto-loader": "^0.8.0",
     "@opentelemetry/api": "1.9.1",
-    "@opentelemetry/api-logs": "0.219.0",
-    "@opentelemetry/resources": "2.8.0",
+    "@opentelemetry/api-logs": "0.220.0",
+    "@opentelemetry/resources": "2.9.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
@@ -58,18 +59,16 @@
     "nyc": "17.1.0",
     "sinon": "18.0.1",
     "ts-loader": "9.5.7",
-    "typescript": "5.0.4"
+    "typescript": "5.2.2"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.3.0"
   },
   "dependencies": {
-    "@grpc/grpc-js": "^1.14.3",
-    "@opentelemetry/core": "2.8.0",
-    "@opentelemetry/otlp-exporter-base": "0.219.0",
-    "@opentelemetry/otlp-grpc-exporter-base": "0.219.0",
-    "@opentelemetry/otlp-transformer": "0.219.0",
-    "@opentelemetry/sdk-logs": "0.219.0"
+    "@opentelemetry/otlp-exporter-base": "0.220.0",
+    "@opentelemetry/otlp-grpc-exporter-base": "0.220.0",
+    "@opentelemetry/otlp-transformer": "0.220.0",
+    "@opentelemetry/sdk-logs": "0.220.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-logs-otlp-grpc",
   "sideEffects": false
