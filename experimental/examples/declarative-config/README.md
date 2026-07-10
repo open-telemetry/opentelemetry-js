@@ -3,7 +3,7 @@
 End-to-end example of configuring the Node SDK from a YAML file via
 `OTEL_CONFIG_FILE` and `startNodeSDK()`. No programmatic provider construction:
 the YAML drives traces, metrics, logs, resource attributes, propagators, and
-the (planned) sampler.
+the sampler.
 
 ## What this demonstrates
 
@@ -11,9 +11,7 @@ the (planned) sampler.
 - Environment variable substitution (`${OTEL_EXPORTER_OTLP_ENDPOINT:-...}`,
   `${EXAMPLE_API_KEY:-}`) so secrets and per-environment values stay out of the
   YAML.
-- A `parent_based` sampler config (parsed today, applied once
-  [#6506](https://github.com/open-telemetry/opentelemetry-js/issues/6506) lands).
-- W3C `tracecontext` + `baggage` propagators.
+- A `parent_based` sampler config.
 
 See [`../../packages/configuration/README.md`](../../packages/configuration/README.md)
 for the full list of supported fields and current limitations.

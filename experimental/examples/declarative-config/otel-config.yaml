@@ -1,7 +1,6 @@
 file_format: "1.1"
 
-# Set OTEL_SDK_DISABLED=true to disable the SDK without code changes.
-disabled: false
+disabled: ${OTEL_SDK_DISABLED:-false}
 log_level: info
 
 resource:
@@ -17,8 +16,8 @@ resource:
 # spec default, but the propagator block must be present for any to be applied.
 propagator:
   composite:
-    - tracecontext: {}
-    - baggage: {}
+    - tracecontext:
+    - baggage:
 
 tracer_provider:
   processors:
@@ -32,21 +31,11 @@ tracer_provider:
                 value: ${EXAMPLE_API_KEY:-}
             compression: gzip
             timeout: 10000
-  # Sampler is parsed but not yet applied to the SDK (see #6506). The YAML is
-  # spec-conformant so it will start sampling once that lands.
   sampler:
     parent_based:
       root:
         trace_id_ratio_based:
           ratio: 1.0
-      remote_parent_sampled:
-        always_on: {}
-      remote_parent_not_sampled:
-        always_off: {}
-      local_parent_sampled:
-        always_on: {}
-      local_parent_not_sampled:
-        always_off: {}
 
 meter_provider:
   readers:
@@ -58,7 +47,6 @@ meter_provider:
             endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://localhost:4318}/v1/metrics
             compression: gzip
             timeout: 10000
-            temporality_preference: cumulative
 
 logger_provider:
   processors:
