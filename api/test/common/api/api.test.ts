@@ -128,24 +128,24 @@ describe('API', function () {
     describe('should use the global propagation', function () {
       const testKey = Symbol('kTestKey');
 
-      interface Carrier {
-        context?: Context;
-        setter?: TextMapSetter;
-      }
+      class TestTextMapPropagation implements TextMapPropagator {
+        injectedWith?: {
+          context: Context;
+          carrier: unknown;
+          setter: TextMapSetter;
+        };
 
-      class TestTextMapPropagation implements TextMapPropagator<Carrier> {
         inject(
           context: Context,
-          carrier: Carrier,
+          carrier: unknown,
           setter: TextMapSetter
         ): void {
-          carrier.context = context;
-          carrier.setter = setter;
+          this.injectedWith = { context, carrier, setter };
         }
 
         extract(
           context: Context,
-          carrier: Carrier,
+          carrier: unknown,
           getter: TextMapGetter
         ): Context {
           return context.setValue(testKey, {
@@ -161,26 +161,47 @@ describe('API', function () {
       }
 
       it('inject', function () {
-        api.propagation.setGlobalPropagator(new TestTextMapPropagation());
+        const propagator = new TestTextMapPropagation();
+        api.propagation.setGlobalPropagator(propagator);
 
         const context = ROOT_CONTEXT.setValue(testKey, 15);
-        const carrier: Carrier = {};
+        const carrier: Record<string, string> = {};
         api.propagation.inject(context, carrier);
-        assert.strictEqual(carrier.context, context);
-        assert.strictEqual(carrier.setter, defaultTextMapSetter);
+        assert.strictEqual(propagator.injectedWith?.context, context);
+        assert.strictEqual(propagator.injectedWith?.carrier, carrier);
+        assert.strictEqual(
+          propagator.injectedWith?.setter,
+          defaultTextMapSetter
+        );
 
         const setter: TextMapSetter = {
           set: () => {},
         };
         api.propagation.inject(context, carrier, setter);
-        assert.strictEqual(carrier.context, context);
-        assert.strictEqual(carrier.setter, setter);
+        assert.strictEqual(propagator.injectedWith?.context, context);
+        assert.strictEqual(propagator.injectedWith?.carrier, carrier);
+        assert.strictEqual(propagator.injectedWith?.setter, setter);
+      });
+
+      it('inject with a non-record carrier and an explicit setter', function () {
+        const propagator = new TestTextMapPropagation();
+        api.propagation.setGlobalPropagator(propagator);
+
+        const context = ROOT_CONTEXT.setValue(testKey, 15);
+        const carrier: string[] = [];
+        const setter: TextMapSetter<string[]> = {
+          set: () => {},
+        };
+        api.propagation.inject(context, carrier, setter);
+        assert.strictEqual(propagator.injectedWith?.context, context);
+        assert.strictEqual(propagator.injectedWith?.carrier, carrier);
+        assert.strictEqual(propagator.injectedWith?.setter, setter);
       });
 
       it('extract', function () {
         api.propagation.setGlobalPropagator(new TestTextMapPropagation());
 
-        const carrier: Carrier = {};
+        const carrier: Record<string, string> = {};
         let context = api.propagation.extract(ROOT_CONTEXT, carrier);
         let data: any = context.getValue(testKey);
         assert.ok(data != null);
@@ -194,6 +215,22 @@ describe('API', function () {
         };
         context = api.propagation.extract(ROOT_CONTEXT, carrier, getter);
         data = context.getValue(testKey);
+        assert.ok(data != null);
+        assert.strictEqual(data.context, ROOT_CONTEXT);
+        assert.strictEqual(data.carrier, carrier);
+        assert.strictEqual(data.getter, getter);
+      });
+
+      it('extract with a non-record carrier and an explicit getter', function () {
+        api.propagation.setGlobalPropagator(new TestTextMapPropagation());
+
+        const carrier: string[] = [];
+        const getter: TextMapGetter<string[]> = {
+          keys: () => [],
+          get: () => undefined,
+        };
+        const context = api.propagation.extract(ROOT_CONTEXT, carrier, getter);
+        const data: any = context.getValue(testKey);
         assert.ok(data != null);
         assert.strictEqual(data.context, ROOT_CONTEXT);
         assert.strictEqual(data.carrier, carrier);

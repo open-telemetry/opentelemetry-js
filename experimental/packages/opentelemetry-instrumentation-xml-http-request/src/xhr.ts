@@ -122,14 +122,14 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         this.getConfig().propagateTraceHeaderCorsUrls
       )
     ) {
-      const headers: Partial<Record<string, unknown>> = {};
+      const headers: Record<string, undefined | string | string[]> = {};
       api.propagation.inject(api.context.active(), headers);
       if (Object.keys(headers).length > 0) {
         this._diag.debug('headers inject skipped due to CORS policy');
       }
       return;
     }
-    const headers: { [key: string]: unknown } = {};
+    const headers: Record<string, undefined | string | string[]> = {};
     api.propagation.inject(api.context.active(), headers);
     Object.keys(headers).forEach(key => {
       xhr.setRequestHeader(key, String(headers[key]));
