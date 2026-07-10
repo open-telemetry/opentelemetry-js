@@ -19,15 +19,15 @@ import {
   ATTR_EXCEPTION_STACKTRACE,
   ATTR_EXCEPTION_TYPE,
 } from '@opentelemetry/semantic-conventions';
-import type { ReadableLogRecord } from './export/ReadableLogRecord';
+import type { SdkLogRecord } from './export/SdkLogRecord';
 import type { LogRecordLimits } from './types';
 import type { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 import { addAttribute, AddAttributeDecision } from './utils/validation';
 
-export class LogRecordImpl implements ReadableLogRecord {
-  readonly hrTime: api.HrTime;
-  readonly hrTimeObserved: api.HrTime;
-  readonly spanContext?: api.SpanContext;
+export class LogRecordImpl implements SdkLogRecord {
+  private _hrTime!: api.HrTime;
+  private _hrTimeObserved!: api.HrTime;
+  private _spanContext?: api.SpanContext;
   readonly resource: Resource;
   readonly instrumentationScope: InstrumentationScope & {
     attributes?: LogAttributes;
@@ -43,6 +43,36 @@ export class LogRecordImpl implements ReadableLogRecord {
 
   private _isReadonly: boolean = false;
   private readonly _logRecordLimits: Required<LogRecordLimits>;
+
+  set hrTime(hrTime: api.HrTime) {
+    if (this._isLogRecordReadonly()) {
+      return;
+    }
+    this._hrTime = hrTime;
+  }
+  get hrTime(): api.HrTime {
+    return this._hrTime;
+  }
+
+  set hrTimeObserved(hrTimeObserved: api.HrTime) {
+    if (this._isLogRecordReadonly()) {
+      return;
+    }
+    this._hrTimeObserved = hrTimeObserved;
+  }
+  get hrTimeObserved(): api.HrTime {
+    return this._hrTimeObserved;
+  }
+
+  set spanContext(spanContext: api.SpanContext | undefined) {
+    if (this._isLogRecordReadonly()) {
+      return;
+    }
+    this._spanContext = spanContext;
+  }
+  get spanContext(): api.SpanContext | undefined {
+    return this._spanContext;
+  }
 
   set severityText(severityText: string | undefined) {
     if (this._isLogRecordReadonly()) {

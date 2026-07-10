@@ -411,15 +411,28 @@ describe('LogRecord', () => {
     const newSeverityNumber = logsAPI.SeverityNumber.INFO;
     const newSeverityText = 'INFO';
     const newName = 'new name';
+    const newHrTime: HrTime = [123, 456];
+    const newHrTimeObserved: HrTime = [789, 12];
+    const newSpanContext = {
+      traceId: '11111111111111111111111111111111',
+      spanId: '2222222222222222',
+      traceFlags: TraceFlags.NONE,
+    };
 
     it('should rewrite directly through the property method', () => {
       const { logRecord } = setup(undefined, logRecordData);
 
+      logRecord.hrTime = newHrTime;
+      logRecord.hrTimeObserved = newHrTimeObserved;
+      logRecord.spanContext = newSpanContext;
       logRecord.body = newBody;
       logRecord.severityNumber = newSeverityNumber;
       logRecord.severityText = newSeverityText;
       logRecord.eventName = newName;
 
+      assert.deepStrictEqual(logRecord.hrTime, newHrTime);
+      assert.deepStrictEqual(logRecord.hrTimeObserved, newHrTimeObserved);
+      assert.deepStrictEqual(logRecord.spanContext, newSpanContext);
       assert.deepStrictEqual(logRecord.body, newBody);
       assert.deepStrictEqual(logRecord.severityNumber, newSeverityNumber);
       assert.deepStrictEqual(logRecord.severityText, newSeverityText);
@@ -457,17 +470,39 @@ describe('LogRecord', () => {
     const newSeverityNumber = logsAPI.SeverityNumber.INFO;
     const newSeverityText = 'INFO';
     const newName = 'new name';
+    const newHrTime: HrTime = [123, 456];
+    const newHrTimeObserved: HrTime = [789, 12];
+    const newSpanContext = {
+      traceId: '11111111111111111111111111111111',
+      spanId: '2222222222222222',
+      traceFlags: TraceFlags.NONE,
+    };
 
     it('should not rewrite directly through the property method', () => {
       const warnStub = sinon.spy(diag, 'warn');
       const { logRecord } = setup(undefined, logRecordData);
+      const originalHrTime = logRecord.hrTime;
+      const originalHrTimeObserved = logRecord.hrTimeObserved;
+      const originalSpanContext = logRecord.spanContext;
       logRecord._makeReadonly();
 
+      logRecord.hrTime = newHrTime;
+      logRecord.hrTimeObserved = newHrTimeObserved;
+      logRecord.spanContext = newSpanContext;
       logRecord.body = newBody;
       logRecord.severityNumber = newSeverityNumber;
       logRecord.severityText = newSeverityText;
       logRecord.eventName = newName;
 
+      assert.deepStrictEqual(
+        logRecord.hrTime,
+        originalHrTime
+      );
+      assert.deepStrictEqual(
+        logRecord.hrTimeObserved,
+        originalHrTimeObserved
+      );
+      assert.strictEqual(logRecord.spanContext, originalSpanContext);
       assert.deepStrictEqual(logRecord.body, logRecordData.body);
       assert.deepStrictEqual(logRecord.eventName, logRecordData.eventName);
       assert.deepStrictEqual(
@@ -478,7 +513,7 @@ describe('LogRecord', () => {
         logRecord.severityText,
         logRecordData.severityText
       );
-      sinon.assert.callCount(warnStub, 4);
+      sinon.assert.callCount(warnStub, 7);
       sinon.assert.alwaysCalledWith(
         warnStub,
         'Can not execute the operation on emitted log record'
