@@ -62,7 +62,6 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
 
 # next.js build output
 .next
@@ -87,7 +86,6 @@ package.json.lerna_backup
 *.iml
 .idea/
 .vs/
-.vscode/
 .zed/
 
 # non-aggregated benchmark results
@@ -95,3 +93,4 @@ package.json.lerna_backup
 
 # release notes for release creation
 .tmp/
+config.bat
