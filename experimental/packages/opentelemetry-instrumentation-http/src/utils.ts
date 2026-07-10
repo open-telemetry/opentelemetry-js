@@ -59,7 +59,7 @@ import forwardedParse = require('forwarded-parse');
 const isReadOnlyArray = <T>(value: unknown): value is readonly T[] =>
   Array.isArray(value);
 
-export const requestTextMapSetter: TextMapSetter<RequestOptions> = {
+export const requestOptionsTextMapSetter: TextMapSetter<RequestOptions> = {
   set(carrier, key, value) {
     const keyLower = key.toLowerCase();
 

@@ -64,7 +64,7 @@ import {
   getOutgoingStableRequestMetricAttributesOnResponse,
   getRequestInfo,
   headerCapture,
-  requestTextMapSetter,
+  requestOptionsTextMapSetter,
   isValidOptionsType,
   parseResponseStatus,
   setSpanWithError,
@@ -733,7 +733,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       const parentContext = context.active();
       const requestContext = trace.setSpan(parentContext, span);
 
-      propagation.inject(requestContext, optionsParsed, requestTextMapSetter);
+      propagation.inject(
+        requestContext,
+        optionsParsed,
+        requestOptionsTextMapSetter
+      );
 
       return context.with(requestContext, () => {
         /*
