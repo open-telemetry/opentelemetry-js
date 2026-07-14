@@ -25,7 +25,7 @@ function setupLoggerProvider(
   const logExporter = new InMemoryLogRecordExporter();
   const logProcessor = isNoop
     ? new NoopLogRecordProcessor()
-    : new SimpleLogRecordProcessor(logExporter);
+    : new SimpleLogRecordProcessor({ exporter: logExporter });
   const loggerProvider = new LoggerProvider({
     processors: [logProcessor],
     loggerConfigurator: patterns && createLoggerConfigurator(patterns),
@@ -95,6 +95,49 @@ describe('Logger', () => {
         body: 'test log body',
       });
       assert.ok(callSpy.called);
+    });
+
+    it('should not do any work when emitting after the LoggerProvider has shut down', async () => {
+      const { logger, loggerProvider, logProcessor } =
+        setupLoggerProvider('simple');
+      const onEmitSpy = sinon.spy(logProcessor, 'onEmit');
+      const makeReadonlySpy = sinon.spy(
+        LogRecordImpl.prototype,
+        '_makeReadonly'
+      );
+
+      try {
+        assert.strictEqual(
+          logger.enabled(),
+          true,
+          'sanity: logger should be enabled before shutdown'
+        );
+
+        await loggerProvider.shutdown();
+
+        assert.strictEqual(
+          logger.enabled(),
+          false,
+          'enabled() should report false after the provider has shut down'
+        );
+
+        logger.emit({
+          body: 'log body emitted after shutdown',
+        });
+
+        assert.strictEqual(
+          onEmitSpy.called,
+          false,
+          'processor.onEmit should not be called after the provider has shut down'
+        );
+        assert.strictEqual(
+          makeReadonlySpy.called,
+          false,
+          'no LogRecord should be constructed after the provider has shut down'
+        );
+      } finally {
+        makeReadonlySpy.restore();
+      }
     });
 
     it('should make log record instance readonly after emit it', () => {

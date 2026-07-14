@@ -8,10 +8,7 @@ import type { ServerTestContext } from './utils';
 import { startServer, TestMetricReader } from './utils';
 import * as assert from 'assert';
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
-import {
-  SimpleSpanProcessor,
-  BasicTracerProvider,
-} from '@opentelemetry/sdk-trace-base';
+import { SimpleSpanProcessor, TracerProvider } from '@opentelemetry/sdk-trace';
 
 const testServiceDefinition = {
   export: {
@@ -73,14 +70,14 @@ describe('OTLPTraceExporter', function () {
     const meterProvider = new MeterProvider({
       readers: [metricReader],
     });
-    const tracerProvider = new BasicTracerProvider({
+    const tracerProvider = new TracerProvider({
       spanProcessors: [
-        new SimpleSpanProcessor(
-          new OTLPTraceExporter({
+        new SimpleSpanProcessor({
+          exporter: new OTLPTraceExporter({
             url: 'http://localhost:1501',
             selfObsMeterProvider: meterProvider,
-          })
-        ),
+          }),
+        }),
       ],
     });
 

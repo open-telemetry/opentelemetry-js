@@ -183,7 +183,28 @@ describe('OTLPMetricExporter', () => {
         value: function (_timeout: number) {},
       });
 
-      sinon.stub(http, 'request').returns(fakeRequest as any);
+      // callsFake so the response callback is invoked after the request body is
+      // sent, which resolves the sendWithHttp promise and lets the process exit
+      // without waiting for the 30 s export timeout to fire.
+      (sinon.stub(http, 'request') as sinon.SinonStub).callsFake(
+        (...args: unknown[]) => {
+          const callback =
+            typeof args[args.length - 1] === 'function'
+              ? (args[args.length - 1] as (res: unknown) => void)
+              : null;
+          fakeRequest.on('finish', () => {
+            if (callback) {
+              const fakeResponse = new Stream.PassThrough() as any;
+              fakeResponse.statusCode = 200;
+              fakeResponse.statusMessage = 'OK';
+              fakeResponse.headers = {};
+              callback(fakeResponse);
+              fakeResponse.end();
+            }
+          });
+          return fakeRequest as any;
+        }
+      );
       let buff = Buffer.from('');
       fakeRequest.on('finish', async () => {
         try {

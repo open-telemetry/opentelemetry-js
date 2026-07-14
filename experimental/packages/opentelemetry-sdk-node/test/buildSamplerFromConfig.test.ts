@@ -4,13 +4,17 @@
  */
 
 import * as assert from 'assert';
+import type { ConfigurationModel } from '@opentelemetry/configuration';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,
   ParentBasedSampler,
   TraceIdRatioBasedSampler,
-} from '@opentelemetry/sdk-trace-base';
-import { buildSamplerFromConfig } from '../src/utils';
+} from '@opentelemetry/sdk-trace';
+import {
+  buildSamplerFromConfig,
+  getSamplerFromConfiguration,
+} from '../src/utils';
 
 describe('buildSamplerFromConfig()', () => {
   it('should return AlwaysOnSampler for always_on config', () => {
@@ -104,6 +108,46 @@ describe('buildSamplerFromConfig()', () => {
     assert.strictEqual(
       sampler.toString(),
       'ParentBased{root=AlwaysOnSampler, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}'
+    );
+  });
+});
+
+describe('getSamplerFromConfiguration()', () => {
+  it('returns undefined when tracer_provider.sampler is omitted', () => {
+    assert.strictEqual(
+      getSamplerFromConfiguration({} as ConfigurationModel),
+      undefined
+    );
+    assert.strictEqual(
+      getSamplerFromConfiguration({
+        tracer_provider: { processors: [] },
+      } as ConfigurationModel),
+      undefined
+    );
+  });
+
+  it('returns the sampler defined under tracer_provider.sampler', () => {
+    const sampler = getSamplerFromConfiguration({
+      tracer_provider: {
+        processors: [],
+        sampler: { always_off: {} },
+      },
+    } as ConfigurationModel);
+    assert.ok(sampler instanceof AlwaysOffSampler);
+  });
+
+  it('builds a parent_based sampler from configuration', () => {
+    const sampler = getSamplerFromConfiguration({
+      tracer_provider: {
+        processors: [],
+        sampler: {
+          parent_based: { root: { trace_id_ratio_based: { ratio: 0.25 } } },
+        },
+      },
+    } as ConfigurationModel);
+    assert.ok(sampler instanceof ParentBasedSampler);
+    assert.ok(
+      sampler.toString().startsWith('ParentBased{root=TraceIdRatioBased{0.25}')
     );
   });
 });

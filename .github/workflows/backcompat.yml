@@ -35,15 +35,15 @@ jobs:
       SCRIPT: ${{ matrix.script }}
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           persist-credentials: false
 
       # Use a modern Node.js to install dependencies and compile TypeScript.
       - name: Setup Node.js (compile)
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
-          node-version: '22'
+          node-version: ^26.3.0
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
@@ -56,7 +56,7 @@ jobs:
       # Switch to the target old Node.js and run the standalone plain-JS smoke
       # test. Package is already compiled and dependencies are already installed.
       - name: Setup Node.js ${{ env.NODE_VERSION }} (test)
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: ${{ env.NODE_VERSION }}
 

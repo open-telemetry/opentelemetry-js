@@ -3,11 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  BasicTracerProvider,
-  SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
+import { TracerProvider, SimpleSpanProcessor } from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPTraceExporter } from '../../src/platform/browser/index';
@@ -36,11 +33,11 @@ describe('OTLPTraceExporter', () => {
       const meterProvider = new MeterProvider({
         readers: [metricReader],
       });
-      const tracerProvider = new BasicTracerProvider({
+      const tracerProvider = new TracerProvider({
         spanProcessors: [
-          new SimpleSpanProcessor(
-            new OTLPTraceExporter({ selfObsMeterProvider: meterProvider })
-          ),
+          new SimpleSpanProcessor({
+            exporter: new OTLPTraceExporter({ selfObsMeterProvider: meterProvider })
+          }),
         ],
       });
 

@@ -5,7 +5,7 @@
 import * as assert from 'assert';
 
 import { context, SpanKind } from '@opentelemetry/api';
-import { SamplingDecision } from '@opentelemetry/sdk-trace-base';
+import { SamplingDecision } from '@opentelemetry/sdk-trace';
 
 import {
   createCompositeSampler,
