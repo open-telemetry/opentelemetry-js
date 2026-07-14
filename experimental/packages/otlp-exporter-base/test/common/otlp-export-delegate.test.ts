@@ -38,7 +38,7 @@ const noopMetrics = new ExporterMetrics({
   metricsHelper: { name: 'span', countItems: () => 1 },
   url: 'http://example.com',
   meterProvider: undefined,
-  responseAttributes: () => ({}),
+  responseAttributesFromError: () => ({}),
 });
 
 describe('OTLPExportDelegate', function () {
@@ -792,7 +792,7 @@ describe('OTLPExportDelegate', function () {
             metricsHelper: { name: 'span', countItems: () => 5 },
             url: 'http://localhost:12234',
             meterProvider,
-            responseAttributes: () => ({}),
+            responseAttributesFromError: () => ({}),
           }),
         },
         {
@@ -909,7 +909,7 @@ describe('OTLPExportDelegate', function () {
             metricsHelper: { name: 'span', countItems: () => 5 },
             url: 'http://localhost:12234',
             meterProvider,
-            responseAttributes: (e: unknown) => {
+            responseAttributesFromError: (e: Error | string | undefined) => {
               if (e instanceof TypeError) {
                 return { code: e.message.split(' ')[1] };
               }

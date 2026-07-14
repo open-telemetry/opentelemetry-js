@@ -33,7 +33,9 @@ export interface ExporterMetricsOptions<Internal> {
   metricsHelper: IExporterMetricsHelper<Internal>;
   url: string | undefined;
   meterProvider: MeterProvider | undefined;
-  responseAttributes: (error: unknown) => Attributes;
+  responseAttributesFromError: (
+    error: Error | string | undefined
+  ) => Attributes;
 }
 
 /**
@@ -45,7 +47,9 @@ export class ExporterMetrics<Internal> {
   private readonly exported: Counter;
   private readonly duration: Histogram;
   private readonly standardAttrs: Attributes;
-  private readonly responseAttributes: (error: unknown) => Attributes;
+  private readonly responseAttributesFromError: (
+    error: Error | string | undefined
+  ) => Attributes;
 
   private readonly helper: IExporterMetricsHelper<Internal>;
 
@@ -55,9 +59,9 @@ export class ExporterMetrics<Internal> {
       metricsHelper,
       meterProvider,
       url,
-      responseAttributes,
+      responseAttributesFromError,
     } = options;
-    this.responseAttributes = responseAttributes;
+    this.responseAttributesFromError = responseAttributesFromError;
     const meter = meterProvider
       ? meterProvider.getMeter('@opentelemetry/otlp-exporter', VERSION)
       : createNoopMeter();
@@ -126,11 +130,11 @@ export class ExporterMetrics<Internal> {
     );
   }
 
-  startExport(request: Internal): (error: unknown) => void {
+  startExport(request: Internal): (error: Error | string | undefined) => void {
     const numItems = this.helper.countItems(request);
     const startTime = hrTime();
     this.inflight.add(numItems, this.standardAttrs);
-    return (error: unknown) => {
+    return (error: Error | string | undefined) => {
       const endTime = hrTime();
       this.inflight.add(-numItems, this.standardAttrs);
       const exportedAttrs = error
@@ -143,7 +147,7 @@ export class ExporterMetrics<Internal> {
       this.exported.add(numItems, exportedAttrs);
       const durationAttrs = {
         ...exportedAttrs,
-        ...this.responseAttributes(error),
+        ...this.responseAttributesFromError(error),
       };
       const duration =
         hrTimeToMilliseconds(hrTimeDuration(startTime, endTime)) / 1000;

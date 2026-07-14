@@ -30,7 +30,7 @@ export function createOtlpGrpcExporterMetrics<Internal>(
     metricsHelper: exporterMetricsHelper,
     url,
     meterProvider,
-    responseAttributes: (error: unknown) => {
+    responseAttributesFromError: (error: Error | string | undefined) => {
       if (!error) {
         return {
           [ATTR_RPC_RESPONSE_STATUS_CODE]: 'OK',
