@@ -16,7 +16,7 @@ Performance benchmark tests can be run from the root for all modules or from a s
 npm run test:bench
 
 # benchmark a single module
-cd packages/opentelemetry-sdk-trace-base
+cd packages/opentelemetry-sdk-trace
 npm run test:bench
 ```
 

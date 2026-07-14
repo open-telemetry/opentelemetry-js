@@ -20,7 +20,7 @@ describe('InMemorySpanExporter', () => {
   beforeEach(() => {
     memoryExporter = new InMemorySpanExporter();
     provider = new TracerProvider({
-      spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
     });
   });
 

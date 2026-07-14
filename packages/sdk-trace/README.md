@@ -3,7 +3,7 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-This module contains the Trace SDK of [opentelemetry-js](https://github.com/open-telemetry/opentelemetry-js).
+This module contains the [Trace SDK](https://opentelemetry.io/docs/specs/otel/trace/sdk/) for [opentelemetry-js](https://github.com/open-telemetry/opentelemetry-js).
 
 Used standalone, this module provides methods for manual instrumentation of code, offering full control over span creation for client-side JavaScript (browser) and Node.js.
 
@@ -22,23 +22,77 @@ npm install --save @opentelemetry/sdk-trace
 const { trace } = require('@opentelemetry/api');
 const { TracerProvider } = require('@opentelemetry/sdk-trace');
 
-// To start a trace, you first need to initialize the Tracer provider.
-// NOTE: The default OpenTelemetry tracer provider does not record any tracing information.
-//       Registering a working tracer provider allows the API methods to record traces.
+// A trace is a collection of *spans*. Spans are created with a *Tracer*.
+// Tracers are retrieved from a *TracerProvider*. Typically a global
+// TracerProvider is registered with the OpenTelemetry API, so that subsequent
+// api.trace.getTracer() calls can use it.
 trace.setGlobalTracerProvider(new TracerProvider(/* ... */));
 
-// Important: requires a context manager and propagator to be registered manually.
-// propagation.setGlobalPropagator(propagator);     // replace `propagator` with your `TextMapPropagator`, for example: `W3CTraceContextPropagator` from `@openetelemetry/core`
-// context.setGlobalContextManager(contextManager); // replace `contextManager` with your `ContextManager`: `AsyncLocalStorageContextManager` from `@openetelemetry/async-hooks`
+// Important: for tracing to track parent/child relationships between spans
+// within a process and across services (distributed tracing), requires that
+// a *context manager* and a *propagator* be registered. These are handled
+// by separate packages. See section below.
 
-// To create a span in a trace, we used the global singleton tracer to start a new span.
-const span = trace.getTracer('default').startSpan('foo');
+// Now retrieve a tracer, and create a span with it.
+const tracer = trace.getTracer('default');
+const span = tracer.startSpan('a-span-name');
 
 // Set a span attribute
 span.setAttribute('key', 'value');
 
 // We must end the spans so they become available for exporting.
 span.end();
+```
+
+### More complete tracing setup
+
+As mentioned above, a full tracing setup typically requires a *context manager*
+for tracing parent/child relationships within a process and *propagators* for
+propagating tracing data across processes (distributed tracing).
+Context managers and propagators are provided by packages *other* than
+`@opentelemetry/sdk-trace`.
+
+Most users should use one of the higher-level packages that provide a more
+convenient and complete setup of an OpenTelemetry SDK:
+
+- [`@opentelemetry/sdk-node`](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-sdk-node/#readme) for OpenTelemetry SDK setup for Node.js
+- [`@opentelemetry/auto-instrumentation-node`](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/packages/auto-instrumentations-node/#readme) for automatic SDK setup
+  for Node.js, including instrumentations, etc.
+- See [the OpenTelemetry Browser repository](https://github.com/open-telemetry/opentelemetry-browser#readme) for using OpenTelemetry in the browser.
+
+However, as a quick overview, the following shows roughly how tracing is setup
+for Node.js. (Which context manager, and sometimes which propagators, to use
+depends on the JavaScript runtime.)
+
+```js
+const os = require('os');
+const { context, propagation, trace } = require('@opentelemetry/api');
+const { TracerProvider } = require('@opentelemetry/sdk-trace');
+const { AsyncLocalStorageContextManager } = require('@opentelemetry/context-async-hooks');
+const {
+  CompositePropagator,
+  W3CBaggagePropagator,
+  W3CTraceContextPropagator,
+} = require('@opentelemetry/core');
+
+const contextManager = new AsyncLocalStorageContextManager();
+context.setGlobalContextManager(contextManager);
+
+const propagator = new CompositePropagator({
+  propagators: [ new W3CTraceContextPropagator(), new W3CBaggagePropagator() ],
+});
+propagation.setGlobalPropagator(propagator);
+
+const tracerProvider = new TracerProvider(/* ... */);
+trace.setGlobalTracerProvider(tracerProvider);
+
+process.on('SIGTERM', async () => {
+  await tracerProvider.shutdown().catch(console.error);
+  process.exit(128 + os.constants.signals.SIGTERM);
+});
+process.once('beforeExit', async () => {
+  await tracerProvider.shutdown().catch(console.error);
+});
 ```
 
 ## Built-in Samplers
@@ -146,6 +200,27 @@ const tracerProvider = new TracerProvider({
 });
 ```
 
+### AlwaysRecord Sampler
+
+Wraps a delegate sampler and upgrades any `NOT_RECORD` (drop) decision to `RECORD`, ensuring all spans are recorded
+without changing the sampling rate. This is useful when you want to count or measure all spans (e.g. via a processor)
+while still controlling export costs through the delegate sampler.
+
+```js
+const {
+  TracerProvider,
+  ParentBasedSampler,
+  TraceIdRatioBasedSampler,
+  createAlwaysRecordSampler,
+} = require("@opentelemetry/sdk-trace");
+
+const tracerProvider = new TracerProvider({
+  // Wraps a 50% TraceIdRatioBased sampler so that dropped spans are still
+  // recorded (but not exported by a sampling exporter).
+  sampler: createAlwaysRecordSampler(new TraceIdRatioBasedSampler(0.5))
+});
+```
+
 ## Example
 
 See [examples/basic-tracer-node](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/basic-tracer-node) for an end-to-end example, including exporting created spans.
@@ -225,12 +300,8 @@ import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-ho
 context.setGlobalContextManager(new AsyncLocalStorageContextManager());
 
 const propagator = new CompositePropagator({
-    propagators: [
-      new W3CTraceContextPropagator(),
-      new W3CBaggagePropagator(),
-    ],
-  })
-);
+  propagators: [new W3CTraceContextPropagator(), new W3CBaggagePropagator()],
+});
 propagation.setGlobalPropagator(propagator);
 ```
 

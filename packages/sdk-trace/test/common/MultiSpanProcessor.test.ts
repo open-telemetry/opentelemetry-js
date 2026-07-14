@@ -164,8 +164,12 @@ describe('MultiSpanProcessor', () => {
 
   it('should wait for all span processors to finish flushing', done => {
     let flushed = 0;
-    const processor1 = new SimpleSpanProcessor(new InMemorySpanExporter());
-    const processor2 = new SimpleSpanProcessor(new InMemorySpanExporter());
+    const processor1 = new SimpleSpanProcessor({
+      exporter: new InMemorySpanExporter(),
+    });
+    const processor2 = new SimpleSpanProcessor({
+      exporter: new InMemorySpanExporter(),
+    });
 
     const spy1 = Sinon.stub(processor1, 'forceFlush').callsFake(() => {
       flushed++;

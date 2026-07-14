@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation",
-  "version": "0.219.0",
+  "version": "0.220.0",
   "description": "Base class for node which OpenTelemetry instrumentation modules extend",
   "author": "OpenTelemetry Authors",
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation",
@@ -47,9 +47,9 @@
     "tdd": "npm run tdd:node",
     "tdd:node": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
-    "test:cjs": "nyc mocha 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
-    "test:esm": "nyc node --experimental-loader=./hook.mjs ../../../node_modules/mocha/bin/mocha 'test/node/*.test.mjs'",
-    "test": "npm run test:cjs && npm run test:esm",
+    "test:cjs": "nyc --silent mocha 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
+    "test:esm": "nyc --silent --no-clean node --experimental-loader=./hook.mjs ../../../node_modules/mocha/bin/mocha 'test/node/*.test.mjs'",
+    "test": "npm run test:cjs && npm run test:esm && nyc report",
     "test:browser": "karma start --single-run",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
@@ -70,7 +70,7 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/api-logs": "0.219.0",
+    "@opentelemetry/api-logs": "0.220.0",
     "import-in-the-middle": "^3.0.0",
     "require-in-the-middle": "^8.0.0"
   },
@@ -81,12 +81,12 @@
     "@babel/core": "7.29.7",
     "@babel/preset-env": "7.29.7",
     "@opentelemetry/api": "1.9.1",
-    "@opentelemetry/sdk-metrics": "2.8.0",
+    "@opentelemetry/sdk-metrics": "2.9.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
     "@types/webpack-env": "1.16.3",
-    "babel-loader": "10.0.0",
+    "babel-loader": "10.1.1",
     "babel-plugin-istanbul": "8.0.0",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.1.0",
@@ -98,7 +98,7 @@
     "nyc": "17.1.0",
     "sinon": "18.0.1",
     "ts-loader": "9.5.7",
-    "typescript": "5.0.4",
+    "typescript": "5.2.2",
     "webpack": "5.104.1",
     "webpack-cli": "7.0.3"
   },

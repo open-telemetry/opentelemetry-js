@@ -8,7 +8,7 @@ import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
 import { SimpleLogRecordProcessor } from '@opentelemetry/sdk-logs';
-import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
+import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace';
 import {
   diag,
   DiagConsoleLogger,
@@ -27,7 +27,7 @@ const collectorUrl = 'http://localhost:4318/v1';
 const traceExporter = new OTLPTraceExporter({
   url: `${collectorUrl}/traces`,
 });
-const spanProcessors = [new SimpleSpanProcessor(traceExporter)];
+const spanProcessors = [new SimpleSpanProcessor({ exporter: traceExporter })];
 
 // Set up metric exporter
 const metricExporter = new OTLPMetricExporter({
@@ -43,7 +43,9 @@ const metricReader = new PeriodicExportingMetricReader({
 const logExporter = new OTLPLogExporter({
   url: `${collectorUrl}/logs`,
 });
-const logRecordProcessors = [new SimpleLogRecordProcessor(logExporter)];
+const logRecordProcessors = [
+  new SimpleLogRecordProcessor({ exporter: logExporter }),
+];
 
 // Set up OpenTelemetry SDK
 const sdk = new NodeSDK({

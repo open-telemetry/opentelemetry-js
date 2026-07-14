@@ -13,24 +13,12 @@ import {
 import type { Attributes, HrTime, Span } from '@opentelemetry/api';
 import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import {
-  SemconvStability,
-  semconvStabilityFromStr,
   InstrumentationBase,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import * as core from '@opentelemetry/core';
 import * as web from '@opentelemetry/sdk-trace-web';
-import { AttributeNames } from './enums/AttributeNames';
-import {
-  ATTR_HTTP_STATUS_CODE,
-  ATTR_HTTP_HOST,
-  ATTR_HTTP_USER_AGENT,
-  ATTR_HTTP_SCHEME,
-  ATTR_HTTP_URL,
-  ATTR_HTTP_METHOD,
-  ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-  ATTR_HTTP_REQUEST_BODY_SIZE,
-} from './semconv';
+import { ATTR_HTTP_REQUEST_BODY_SIZE } from './semconv';
 import {
   ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
@@ -94,8 +82,6 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
   ignoreNetworkEvents?: boolean;
   /** Measure outgoing request size */
   measureRequestSize?: boolean;
-  /** Select the HTTP semantic conventions version(s) used. */
-  semconvStabilityOptIn?: string;
 }
 
 /**
@@ -108,8 +94,6 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
   private _tasksCount = 0;
 
-  private _semconvStability: SemconvStability;
-
   // Note: Intentionally *not* using `_enabled` as the field name to avoid
   // any possible confusion with the `_enabled` field used on the *Node.js*
   // InstrumentationBase class.
@@ -121,10 +105,6 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
 
   constructor(config: FetchInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-fetch', VERSION, config);
-    this._semconvStability = semconvStabilityFromStr(
-      'http',
-      config?.semconvStabilityOptIn
-    );
   }
 
   init(): void {}
@@ -145,15 +125,12 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       },
       trace.setSpan(context.active(), span)
     );
-    const skipOldSemconvContentLengthAttrs = !(
-      this._semconvStability & SemconvStability.OLD
-    );
     web.addSpanNetworkEvents(
       childSpan,
       corsPreFlightRequest,
       this.getConfig().ignoreNetworkEvents,
       undefined,
-      skipOldSemconvContentLengthAttrs
+      true
     );
     childSpan.end(
       corsPreFlightRequest[web.PerformanceTimingNames.RESPONSE_END]
@@ -167,28 +144,13 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
    */
   private _addFinalSpanAttributes(span: Span, response: FetchResponse): void {
     const parsedUrl = web.parseUrl(response.url);
-
-    if (this._semconvStability & SemconvStability.OLD) {
-      span.setAttribute(ATTR_HTTP_STATUS_CODE, response.status);
-      if (response.statusText != null) {
-        span.setAttribute(AttributeNames.HTTP_STATUS_TEXT, response.statusText);
-      }
-      span.setAttribute(ATTR_HTTP_HOST, parsedUrl.host);
-      span.setAttribute(ATTR_HTTP_SCHEME, parsedUrl.protocol.replace(':', ''));
-      if (typeof navigator !== 'undefined') {
-        span.setAttribute(ATTR_HTTP_USER_AGENT, navigator.userAgent);
-      }
-    }
-
-    if (this._semconvStability & SemconvStability.STABLE) {
-      span.setAttribute(ATTR_HTTP_RESPONSE_STATUS_CODE, response.status);
-      // TODO: Set server.{address,port} at span creation for sampling decisions
-      // (a "SHOULD" requirement in semconv).
-      span.setAttribute(ATTR_SERVER_ADDRESS, parsedUrl.hostname);
-      const serverPort = serverPortFromUrl(parsedUrl);
-      if (serverPort) {
-        span.setAttribute(ATTR_SERVER_PORT, serverPort);
-      }
+    span.setAttribute(ATTR_HTTP_RESPONSE_STATUS_CODE, response.status);
+    // TODO: Set server.{address,port} at span creation for sampling decisions
+    // (a "SHOULD" requirement in semconv).
+    span.setAttribute(ATTR_SERVER_ADDRESS, parsedUrl.hostname);
+    const serverPort = serverPortFromUrl(parsedUrl);
+    if (serverPort) {
+      span.setAttribute(ATTR_SERVER_PORT, serverPort);
     }
   }
 
@@ -257,29 +219,16 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       return;
     }
 
-    let name = '';
     const attributes = {} as Attributes;
-    if (this._semconvStability & SemconvStability.OLD) {
-      const method = (options.method || 'GET').toUpperCase();
-      name = `HTTP ${method}`;
-      attributes[AttributeNames.COMPONENT] = this.moduleName;
-      attributes[ATTR_HTTP_METHOD] = method;
-      attributes[ATTR_HTTP_URL] = url;
+    const origMethod = options.method;
+    const normMethod = normalizeHttpRequestMethod(options.method || 'GET');
+    const name = normMethod;
+
+    attributes[ATTR_HTTP_REQUEST_METHOD] = normMethod;
+    if (normMethod !== origMethod) {
+      attributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = origMethod;
     }
-    if (this._semconvStability & SemconvStability.STABLE) {
-      const origMethod = options.method;
-      const normMethod = normalizeHttpRequestMethod(options.method || 'GET');
-      if (!name) {
-        // The "old" span name wins if emitting both old and stable semconv
-        // ('http/dup').
-        name = normMethod;
-      }
-      attributes[ATTR_HTTP_REQUEST_METHOD] = normMethod;
-      if (normMethod !== origMethod) {
-        attributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = origMethod;
-      }
-      attributes[ATTR_URL_FULL] = url;
-    }
+    attributes[ATTR_URL_FULL] = url;
 
     return this.tracer.startSpan(name, {
       kind: SpanKind.CLIENT,
@@ -328,15 +277,12 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         this._addChildSpan(span, corsPreFlightRequest);
         this._markResourceAsUsed(corsPreFlightRequest);
       }
-      const skipOldSemconvContentLengthAttrs = !(
-        this._semconvStability & SemconvStability.OLD
-      );
       web.addSpanNetworkEvents(
         span,
         mainRequest,
         this.getConfig().ignoreNetworkEvents,
         undefined,
-        skipOldSemconvContentLengthAttrs
+        true
       );
     }
   }
@@ -362,12 +308,10 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     const performanceEndTime = core.hrTime();
     this._addFinalSpanAttributes(span, response);
 
-    if (this._semconvStability & SemconvStability.STABLE) {
-      // https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#status
-      if (response.status >= 400) {
-        span.setStatus({ code: SpanStatusCode.ERROR });
-        span.setAttribute(ATTR_ERROR_TYPE, String(response.status));
-      }
+    // https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#status
+    if (response.status >= 400) {
+      span.setStatus({ code: SpanStatusCode.ERROR });
+      span.setAttribute(ATTR_ERROR_TYPE, String(response.status));
     }
 
     setTimeout(() => {
@@ -420,18 +364,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           getFetchBodyLength(...args)
             .then(bodyLength => {
               if (!bodyLength) return;
-              if (plugin._semconvStability & SemconvStability.OLD) {
-                createdSpan.setAttribute(
-                  ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-                  bodyLength
-                );
-              }
-              if (plugin._semconvStability & SemconvStability.STABLE) {
-                createdSpan.setAttribute(
-                  ATTR_HTTP_REQUEST_BODY_SIZE,
-                  bodyLength
-                );
-              }
+              createdSpan.setAttribute(ATTR_HTTP_REQUEST_BODY_SIZE, bodyLength);
             })
             .catch(error => {
               plugin._diag.warn('getFetchBodyLength', error);

@@ -117,6 +117,10 @@ export interface LogRecordProcessorOptions {
   selfObsMeterProvider?: MeterProvider;
 }
 
+export interface SimpleLogRecordProcessorOptions extends LogRecordProcessorOptions {
+  exporter: LogRecordExporter;
+}
+
 export interface BatchLogRecordProcessorOptions extends LogRecordProcessorOptions {
   exporter: LogRecordExporter;
 

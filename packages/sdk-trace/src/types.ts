@@ -77,7 +77,24 @@ export interface SpanLimits {
   attributePerLinkCountLimit?: number;
 }
 
-export interface BatchSpanProcessorOptions {
+/**
+ * Common options for SDK span processors.
+ *
+ * @experimental This interface is experimental and is subject to breaking changes in minor releases.
+ */
+export interface SpanProcessorOptions {
+  /**
+   * A meter provider to which to record self-observability span processor metrics.
+   * @experimental This option is experimental and is subject to breaking changes in minor releases.
+   */
+  selfObsMeterProvider?: MeterProvider;
+}
+
+export interface SimpleSpanProcessorOptions extends SpanProcessorOptions {
+  exporter: SpanExporter;
+}
+
+export interface BatchSpanProcessorOptions extends SpanProcessorOptions {
   exporter: SpanExporter;
 
   /** The maximum batch size of every export. It must be smaller or equal to

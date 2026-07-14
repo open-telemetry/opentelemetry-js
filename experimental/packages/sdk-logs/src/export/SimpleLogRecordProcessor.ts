@@ -14,10 +14,10 @@ import {
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
 import type { SdkLogRecord } from './SdkLogRecord';
-import type { LogRecordProcessorOptions } from '../types';
 import { OTEL_COMPONENT_TYPE_VALUE_SIMPLE_LOG_PROCESSOR } from '../semconv';
 import { LogRecordProcessorMetrics } from './LogRecordProcessorMetrics';
 import type { Context } from '@opentelemetry/api';
+import type { SimpleLogRecordProcessorOptions } from '../types';
 
 /**
  * An implementation of the {@link LogRecordProcessor} interface that exports
@@ -34,13 +34,13 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
   private _shutdownOnce: BindOnceFuture<void>;
   private _unresolvedExports: Set<Promise<void>>;
 
-  constructor(exporter: LogRecordExporter, config?: LogRecordProcessorOptions) {
-    this._exporter = exporter;
+  constructor(options: SimpleLogRecordProcessorOptions) {
+    this._exporter = options.exporter;
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
     this._unresolvedExports = new Set<Promise<void>>();
 
-    const meter = config?.selfObsMeterProvider
-      ? config.selfObsMeterProvider.getMeter('@opentelemetry/sdk-logs')
+    const meter = options?.selfObsMeterProvider
+      ? options.selfObsMeterProvider.getMeter('@opentelemetry/sdk-logs')
       : createNoopMeter();
     this._metrics = new LogRecordProcessorMetrics(
       OTEL_COMPONENT_TYPE_VALUE_SIMPLE_LOG_PROCESSOR,

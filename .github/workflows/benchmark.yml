@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         node_version:
-          - "22"
+          - ^26.3.0
     runs-on: oracle-bare-metal-64cpu-1024gb-x86-64-ubuntu-24
     container:
       image: ubuntu:24.04@sha256:c4a8d5503dfb2a3eb8ab5f807da5bc69a85730fb49b5cfca2330194ebcc41c7b
@@ -43,8 +43,6 @@ jobs:
             package-lock.json
           node-version: ${{ matrix.node_version }}
 
-      - run: npm install -g npm@latest
-
       - name: Bootstrap
         run: npm ci --ignore-scripts
 
@@ -57,7 +55,7 @@ jobs:
           find . -name .benchmark-results.txt -exec cat {} + > combined_benchmarks.txt
 
       - name: Store benchmark results
-        uses: benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba # v1
+        uses: benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba # v1.22.1
         with:
           tool: 'benchmarkjs'
           output-file-path: combined_benchmarks.txt

@@ -144,7 +144,7 @@ export abstract class InstrumentationAbstract<
   }
 
   /**
-   * Sets TraceProvider to this plugin
+   * Sets TracerProvider to this plugin
    * @param tracerProvider
    */
   public setTracerProvider(tracerProvider: TracerProvider): void {

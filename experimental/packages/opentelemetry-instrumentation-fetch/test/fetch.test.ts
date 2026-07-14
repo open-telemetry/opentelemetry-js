@@ -5,8 +5,6 @@
 
 import * as api from '@opentelemetry/api';
 import {
-  SemconvStability,
-  semconvStabilityFromStr,
   isWrapped,
   registerInstrumentations,
 } from '@opentelemetry/instrumentation';
@@ -19,7 +17,7 @@ import {
   X_B3_SAMPLED,
 } from '@opentelemetry/propagator-b3';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
-import * as tracing from '@opentelemetry/sdk-trace-base';
+import * as tracing from '@opentelemetry/sdk-trace';
 import {
   PerformanceTimingNames as PTN,
   WebTracerProvider,
@@ -31,18 +29,7 @@ import type {
   FetchInstrumentationConfig,
 } from '../src';
 import { FetchInstrumentation } from '../src';
-import { AttributeNames } from '../src/enums/AttributeNames';
-import {
-  ATTR_HTTP_HOST,
-  ATTR_HTTP_METHOD,
-  ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
-  ATTR_HTTP_SCHEME,
-  ATTR_HTTP_STATUS_CODE,
-  ATTR_HTTP_URL,
-  ATTR_HTTP_USER_AGENT,
-  ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-  ATTR_HTTP_REQUEST_BODY_SIZE,
-} from '../src/semconv';
+import { ATTR_HTTP_REQUEST_BODY_SIZE } from '../src/semconv';
 import {
   ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
@@ -91,7 +78,6 @@ function testForCorrectEvents(
 
 const ORIGIN = location.origin; // "http://localhost:9876"
 const ORIGIN_URL = new URL(ORIGIN);
-const ORIGIN_HOST = ORIGIN_URL.host; // "localhost:9876"
 
 interface Resolvers<T> {
   promise: Promise<T>;
@@ -323,7 +309,9 @@ describe('fetch', () => {
           new FetchInstrumentation(config);
         const dummySpanExporter = new DummySpanExporter();
         const webTracerProviderWithZone = new WebTracerProvider({
-          spanProcessors: [new tracing.SimpleSpanProcessor(dummySpanExporter)],
+          spanProcessors: [
+            new tracing.SimpleSpanProcessor({ exporter: dummySpanExporter }),
+          ],
         });
         registerInstrumentations({
           tracerProvider: webTracerProviderWithZone,
@@ -466,7 +454,7 @@ describe('fetch', () => {
           });
           assert.strictEqual(exportedSpans.length, 1);
           assert.strictEqual(
-            exportedSpans[0].attributes[ATTR_HTTP_STATUS_CODE],
+            exportedSpans[0].attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
             204
           );
         });
@@ -476,7 +464,7 @@ describe('fetch', () => {
           });
           assert.strictEqual(exportedSpans.length, 1);
           assert.strictEqual(
-            exportedSpans[0].attributes[ATTR_HTTP_STATUS_CODE],
+            exportedSpans[0].attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
             205
           );
         });
@@ -486,7 +474,7 @@ describe('fetch', () => {
           });
           assert.strictEqual(exportedSpans.length, 1);
           assert.strictEqual(
-            exportedSpans[0].attributes[ATTR_HTTP_STATUS_CODE],
+            exportedSpans[0].attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
             304
           );
         });
@@ -494,17 +482,14 @@ describe('fetch', () => {
 
       describe('simple request', () => {
         let rootSpan: api.Span | undefined;
-        let response: Response | undefined;
 
         beforeEach(async () => {
           const result = await tracedFetch();
           rootSpan = result.rootSpan;
-          response = result.response;
         });
 
         afterEach(() => {
           rootSpan = undefined;
-          response = undefined;
         });
 
         it('should create a span with correct root span', () => {
@@ -525,7 +510,7 @@ describe('fetch', () => {
 
         it('span should have correct name', () => {
           const span: tracing.ReadableSpan = exportedSpans[0];
-          assert.strictEqual(span.name, 'HTTP GET', 'span has wrong name');
+          assert.strictEqual(span.name, 'GET', 'span has wrong name');
         });
 
         it('span should have correct kind', () => {
@@ -541,59 +526,23 @@ describe('fetch', () => {
           const span: tracing.ReadableSpan = exportedSpans[0];
           const attributes = span.attributes;
           const keys = Object.keys(attributes);
-          assert.notStrictEqual(
-            attributes[AttributeNames.COMPONENT],
-            '',
-            `attributes ${AttributeNames.COMPONENT} is not defined`
+
+          assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
+          assert.strictEqual(
+            attributes[ATTR_URL_FULL],
+            `${ORIGIN}/api/status.json`
+          );
+          assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 200);
+          assert.strictEqual(
+            attributes[ATTR_SERVER_ADDRESS],
+            ORIGIN_URL.hostname
+          );
+          assert.strictEqual(
+            attributes[ATTR_SERVER_PORT],
+            Number(ORIGIN_URL.port)
           );
 
-          assert.strictEqual(
-            attributes[ATTR_HTTP_METHOD],
-            'GET',
-            `attributes ${ATTR_HTTP_METHOD} is wrong`
-          );
-          assert.strictEqual(
-            attributes[ATTR_HTTP_URL],
-            `${ORIGIN}/api/status.json`,
-            `attributes ${ATTR_HTTP_URL} is wrong`
-          );
-          assert.strictEqual(
-            attributes[ATTR_HTTP_STATUS_CODE],
-            200,
-            `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-          );
-          assert.strictEqual(
-            attributes[AttributeNames.HTTP_STATUS_TEXT],
-            'OK',
-            `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-          );
-          assert.strictEqual(
-            attributes[ATTR_HTTP_HOST],
-            ORIGIN_HOST,
-            `attributes ${ATTR_HTTP_HOST} is wrong`
-          );
-
-          assert.ok(
-            attributes[ATTR_HTTP_SCHEME] === 'http',
-            `attributes ${ATTR_HTTP_SCHEME} is wrong`
-          );
-          assert.notStrictEqual(
-            attributes[ATTR_HTTP_USER_AGENT],
-            '',
-            `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-          );
-          assert.strictEqual(
-            attributes[ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
-            undefined,
-            `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
-          );
-          assert.strictEqual(
-            attributes[ATTR_HTTP_RESPONSE_CONTENT_LENGTH],
-            parseInt(response!.headers.get('content-length')!),
-            `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is incorrect`
-          );
-
-          assert.strictEqual(keys.length, 9, 'number of attributes is wrong');
+          assert.strictEqual(keys.length, 5, 'number of attributes is wrong');
         });
 
         it('span should have correct events', () => {
@@ -613,151 +562,11 @@ describe('fetch', () => {
         });
       });
 
-      describe('simple request (semconvStabilityOptIn=http/dup)', () => {
-        let response: Response | undefined;
-
-        beforeEach(async () => {
-          const result = await tracedFetch({
-            config: {
-              semconvStabilityOptIn: 'http/dup',
-            },
-          });
-          response = result.response;
-        });
-
-        afterEach(() => {
-          response = undefined;
-        });
-
-        it('span should have correct name', () => {
-          const span: tracing.ReadableSpan = exportedSpans[0];
-          // With *both* semconv versions being used the span name for the
-          // *old* semconv wins.
-          assert.strictEqual(span.name, 'HTTP GET', 'span has wrong name');
-        });
-
-        it('span should have correct attributes (old and stable semconv)', () => {
-          const span: tracing.ReadableSpan = exportedSpans[0];
-          const attributes = span.attributes;
-          const keys = Object.keys(attributes);
-          assert.notStrictEqual(
-            attributes[AttributeNames.COMPONENT],
-            '',
-            `attributes ${AttributeNames.COMPONENT} is not defined`
-          );
-
-          assert.strictEqual(
-            attributes[ATTR_HTTP_METHOD],
-            'GET',
-            `attributes ${ATTR_HTTP_METHOD} is wrong`
-          );
-          assert.strictEqual(
-            attributes[ATTR_HTTP_URL],
-            `${ORIGIN}/api/status.json`,
-            `attributes ${ATTR_HTTP_URL} is wrong`
-          );
-          assert.strictEqual(
-            attributes[ATTR_HTTP_STATUS_CODE],
-            200,
-            `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-          );
-          assert.strictEqual(
-            attributes[AttributeNames.HTTP_STATUS_TEXT],
-            'OK',
-            `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-          );
-          assert.strictEqual(
-            attributes[ATTR_HTTP_HOST],
-            ORIGIN_HOST,
-            `attributes ${ATTR_HTTP_HOST} is wrong`
-          );
-
-          assert.ok(
-            attributes[ATTR_HTTP_SCHEME] === 'http',
-            `attributes ${ATTR_HTTP_SCHEME} is wrong`
-          );
-          assert.notStrictEqual(
-            attributes[ATTR_HTTP_USER_AGENT],
-            '',
-            `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-          );
-          assert.strictEqual(
-            attributes[ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
-            undefined,
-            `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
-          );
-          assert.strictEqual(
-            attributes[ATTR_HTTP_RESPONSE_CONTENT_LENGTH],
-            parseInt(response!.headers.get('content-length')!),
-            `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is incorrect`
-          );
-
-          // Stable semconv attributes.
-          assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
-          assert.strictEqual(
-            attributes[ATTR_URL_FULL],
-            `${ORIGIN}/api/status.json`
-          );
-          assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 200);
-          assert.strictEqual(
-            attributes[ATTR_SERVER_ADDRESS],
-            ORIGIN_URL.hostname
-          );
-          assert.strictEqual(
-            attributes[ATTR_SERVER_PORT],
-            Number(ORIGIN_URL.port)
-          );
-
-          assert.strictEqual(keys.length, 14, 'number of attributes is wrong');
-        });
-      });
-
-      describe('simple request (semconvStabilityOptIn=http)', () => {
-        beforeEach(async () => {
-          await tracedFetch({
-            config: {
-              semconvStabilityOptIn: 'http',
-            },
-          });
-        });
-
-        it('span should have correct name', () => {
-          const span: tracing.ReadableSpan = exportedSpans[0];
-          assert.strictEqual(span.name, 'GET', 'span has wrong name');
-        });
-
-        it('span should have correct attributes (stable semconv)', () => {
-          const span: tracing.ReadableSpan = exportedSpans[0];
-          const attributes = span.attributes;
-          const keys = Object.keys(attributes);
-
-          // Stable semconv attributes.
-          assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
-          assert.strictEqual(
-            attributes[ATTR_URL_FULL],
-            `${ORIGIN}/api/status.json`
-          );
-          assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 200);
-          assert.strictEqual(
-            attributes[ATTR_SERVER_ADDRESS],
-            ORIGIN_URL.hostname
-          );
-          assert.strictEqual(
-            attributes[ATTR_SERVER_PORT],
-            Number(ORIGIN_URL.port)
-          );
-
-          assert.strictEqual(keys.length, 5, 'number of attributes is wrong');
-        });
-      });
-
-      describe('404 request (semconvStabilityOptIn=http)', () => {
+      describe('404 request', () => {
         beforeEach(async () => {
           await tracedFetch({
             callback: () => fetch('/no-such-path'),
-            config: {
-              semconvStabilityOptIn: 'http',
-            },
+            config: {},
           });
         });
 
@@ -777,13 +586,11 @@ describe('fetch', () => {
         });
       });
 
-      describe('500 request (semconvStabilityOptIn=http)', () => {
+      describe('500 request', () => {
         beforeEach(async () => {
           await tracedFetch({
             callback: () => fetch('/boom'),
-            config: {
-              semconvStabilityOptIn: 'http',
-            },
+            config: {},
           });
         });
 
@@ -800,13 +607,11 @@ describe('fetch', () => {
         });
       });
 
-      describe('QUERY method (semconvStabilityOptIn=http)', () => {
+      describe('QUERY method', () => {
         beforeEach(async () => {
           await tracedFetch({
             callback: () => fetch('/api/status.json', { method: 'QUERY' }),
-            config: {
-              semconvStabilityOptIn: 'http',
-            },
+            config: {},
           });
         });
 
@@ -1176,17 +981,14 @@ describe('fetch', () => {
       // Smoke test to ensure nothing breaks when the request is CORS
       describe('simple request', () => {
         let rootSpan: api.Span | undefined;
-        let response: Response | undefined;
 
         beforeEach(async () => {
           const result = await tracedFetch();
           rootSpan = result.rootSpan;
-          response = result.response;
         });
 
         afterEach(() => {
           rootSpan = undefined;
-          response = undefined;
         });
 
         it('should create a span with correct root span', () => {
@@ -1207,7 +1009,7 @@ describe('fetch', () => {
 
         it('span should have correct name', () => {
           const span: tracing.ReadableSpan = exportedSpans[0];
-          assert.strictEqual(span.name, 'HTTP GET', 'span has wrong name');
+          assert.strictEqual(span.name, 'GET', 'span has wrong name');
         });
 
         it('span should have correct kind', () => {
@@ -1223,59 +1025,17 @@ describe('fetch', () => {
           const span: tracing.ReadableSpan = exportedSpans[0];
           const attributes = span.attributes;
           const keys = Object.keys(attributes);
-          assert.notStrictEqual(
-            attributes[AttributeNames.COMPONENT],
-            '',
-            `attributes ${AttributeNames.COMPONENT} is not defined`
-          );
 
+          assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
           assert.strictEqual(
-            attributes[ATTR_HTTP_METHOD],
-            'GET',
-            `attributes ${ATTR_HTTP_METHOD} is wrong`
+            attributes[ATTR_URL_FULL],
+            'http://example.com/api/status.json'
           );
-          assert.strictEqual(
-            attributes[ATTR_HTTP_URL],
-            'http://example.com/api/status.json',
-            `attributes ${ATTR_HTTP_URL} is wrong`
-          );
-          assert.strictEqual(
-            attributes[ATTR_HTTP_STATUS_CODE],
-            200,
-            `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-          );
-          assert.strictEqual(
-            attributes[AttributeNames.HTTP_STATUS_TEXT],
-            'OK',
-            `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-          );
-          assert.strictEqual(
-            attributes[ATTR_HTTP_HOST],
-            'example.com',
-            `attributes ${ATTR_HTTP_HOST} is wrong`
-          );
+          assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 200);
+          assert.strictEqual(attributes[ATTR_SERVER_ADDRESS], 'example.com');
+          assert.strictEqual(attributes[ATTR_SERVER_PORT], 80);
 
-          assert.ok(
-            attributes[ATTR_HTTP_SCHEME] === 'http',
-            `attributes ${ATTR_HTTP_SCHEME} is wrong`
-          );
-          assert.notStrictEqual(
-            attributes[ATTR_HTTP_USER_AGENT],
-            '',
-            `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-          );
-          assert.strictEqual(
-            attributes[ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
-            undefined,
-            `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
-          );
-          assert.strictEqual(
-            attributes[ATTR_HTTP_RESPONSE_CONTENT_LENGTH],
-            parseInt(response!.headers.get('content-length')!),
-            `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is incorrect`
-          );
-
-          assert.strictEqual(keys.length, 9, 'number of attributes is wrong');
+          assert.strictEqual(keys.length, 5, 'number of attributes is wrong');
         });
 
         it('span should have correct events', () => {
@@ -1456,10 +1216,6 @@ describe('fetch', () => {
           const span: tracing.ReadableSpan = exportedSpans[0];
 
           assert.strictEqual(
-            span.attributes[ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
-            undefined
-          );
-          assert.strictEqual(
             span.attributes[ATTR_HTTP_REQUEST_BODY_SIZE],
             undefined
           );
@@ -1470,23 +1226,10 @@ describe('fetch', () => {
           body = JSON.stringify(DEFAULT_BODY)
         ) => {
           const span: tracing.ReadableSpan = exportedSpans[0];
-
-          const semconvStability = semconvStabilityFromStr(
-            'http',
-            config.semconvStabilityOptIn
+          assert.strictEqual(
+            span.attributes[ATTR_HTTP_REQUEST_BODY_SIZE],
+            body.length
           );
-          if (semconvStability & SemconvStability.OLD) {
-            assert.strictEqual(
-              span.attributes[ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
-              body.length
-            );
-          }
-          if (semconvStability & SemconvStability.STABLE) {
-            assert.strictEqual(
-              span.attributes[ATTR_HTTP_REQUEST_BODY_SIZE],
-              body.length
-            );
-          }
         };
 
         describe('when `measureRequestSize` is not set', () => {
@@ -1517,11 +1260,10 @@ describe('fetch', () => {
             });
           });
 
-          describe('with url and init object (semconvStabilityOptIn=http)', () => {
+          describe('with url and init object', () => {
             it('should measure request body size', async () => {
               const config = {
                 measureRequestSize: true,
-                semconvStabilityOptIn: 'http',
               };
               const { response } = await tracedFetch({ config });
               assertJSONBody(response);
@@ -1529,11 +1271,10 @@ describe('fetch', () => {
             });
           });
 
-          describe('with url and init object (semconvStabilityOptIn=http/dup)', () => {
+          describe('with url and init object', () => {
             it('should measure request body size', async () => {
               const config = {
                 measureRequestSize: true,
-                semconvStabilityOptIn: 'http/dup',
               };
               const { response } = await tracedFetch({ config });
               assertJSONBody(response);
@@ -2211,7 +1952,7 @@ describe('fetch', () => {
             .throws();
 
           const result = await tracedFetch({
-            config: { semconvStabilityOptIn: 'http/dup' },
+            config: {},
           });
           rootSpan = result.rootSpan;
         });
@@ -2261,13 +2002,6 @@ describe('fetch', () => {
 
         it('span should have correct (absolute) url attribute(s)', () => {
           const span: tracing.ReadableSpan = exportedSpans[0];
-          // SemconvStability.OLD
-          assert.strictEqual(
-            span.attributes[ATTR_HTTP_URL],
-            `${ORIGIN}/api/status.json`,
-            `attributes ${ATTR_HTTP_URL} is wrong`
-          );
-          // SemconvStability.STABLE
           assert.strictEqual(
             span.attributes[ATTR_URL_FULL],
             `${ORIGIN}/api/status.json`,
@@ -2319,9 +2053,7 @@ describe('fetch', () => {
             getEntriesByTypeSpy = sinon.spy(performance, 'getEntriesByType');
 
             const result = await tracedFetch({
-              config: {
-                semconvStabilityOptIn: 'http/dup',
-              },
+              config: {},
             });
             rootSpan = result.rootSpan;
           });
@@ -2369,13 +2101,8 @@ describe('fetch', () => {
             ]);
           });
 
-          it('span should have correct (absolute) http.url attribute', () => {
+          it('span should have correct (absolute) url.full attribute', () => {
             const span: tracing.ReadableSpan = exportedSpans[0];
-            assert.strictEqual(
-              span.attributes[ATTR_HTTP_URL],
-              `${ORIGIN}/api/status.json`,
-              `attributes ${ATTR_HTTP_URL} is wrong`
-            );
             assert.strictEqual(
               span.attributes[ATTR_URL_FULL],
               `${ORIGIN}/api/status.json`
@@ -2392,9 +2119,7 @@ describe('fetch', () => {
             sinon.stub(performance, 'getEntriesByType').value(undefined);
 
             const result = await tracedFetch({
-              config: {
-                semconvStabilityOptIn: 'http/dup',
-              },
+              config: {},
             });
             rootSpan = result.rootSpan;
           });
@@ -2431,26 +2156,16 @@ describe('fetch', () => {
           it('span should have correct basic attributes', () => {
             const span: tracing.ReadableSpan = exportedSpans[0];
 
-            assert.strictEqual(span.name, 'HTTP GET', 'wrong span name');
+            assert.strictEqual(span.name, 'GET', 'wrong span name');
 
-            assert.strictEqual(
-              span.attributes[ATTR_HTTP_STATUS_CODE],
-              200,
-              `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-            );
             assert.strictEqual(
               span.attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
               200
             );
           });
 
-          it('span should have correct (absolute) http.url attribute', () => {
+          it('span should have correct (absolute) url.full attribute', () => {
             const span: tracing.ReadableSpan = exportedSpans[0];
-            assert.strictEqual(
-              span.attributes[ATTR_HTTP_URL],
-              `${ORIGIN}/api/status.json`,
-              `attributes ${ATTR_HTTP_URL} is wrong`
-            );
             assert.strictEqual(
               span.attributes[ATTR_URL_FULL],
               `${ORIGIN}/api/status.json`
@@ -2489,15 +2204,8 @@ describe('fetch', () => {
       };
 
       describe('when `ignoreNetworkEvents` is not set', function () {
-        let response: Response | undefined;
-
         beforeEach(async () => {
-          const result = await tracedFetch();
-          response = result.response;
-        });
-
-        afterEach(() => {
-          response = undefined;
+          await tracedFetch();
         });
 
         it('span should have correct events', async () => {
@@ -2514,30 +2222,14 @@ describe('fetch', () => {
             PTN.RESPONSE_START,
             PTN.RESPONSE_END,
           ]);
-        });
-
-        it('span should have http.response_content_length attribute', () => {
-          const span: tracing.ReadableSpan = exportedSpans[0];
-          assert.strictEqual(
-            span.attributes[ATTR_HTTP_RESPONSE_CONTENT_LENGTH],
-            parseInt(response!.headers.get('content-length')!),
-            `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
-          );
         });
       });
 
       describe('when `ignoreNetworkEvents` is `false`', function () {
-        let response: Response | undefined;
-
         beforeEach(async () => {
-          const result = await tracedFetch({
+          await tracedFetch({
             config: { ignoreNetworkEvents: false },
           });
-          response = result.response;
-        });
-
-        afterEach(() => {
-          response = undefined;
         });
 
         it('span should have correct events', async () => {
@@ -2555,32 +2247,15 @@ describe('fetch', () => {
             PTN.RESPONSE_END,
           ]);
         });
-
-        it('span should have http.response_content_length attribute', () => {
-          const span: tracing.ReadableSpan = exportedSpans[0];
-          assert.strictEqual(
-            span.attributes[ATTR_HTTP_RESPONSE_CONTENT_LENGTH],
-            parseInt(response!.headers.get('content-length')!),
-            `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
-          );
-        });
       });
 
       describe('when `ignoreNetworkEvents` is `true`', function () {
-        let response: Response | undefined;
-
         beforeEach(async () => {
-          const result = await tracedFetch({
+          await tracedFetch({
             config: {
               ignoreNetworkEvents: true,
-              semconvStabilityOptIn: 'http/dup',
             },
           });
-          response = result.response;
-        });
-
-        afterEach(() => {
-          response = undefined;
         });
 
         it('span should have no events', async () => {
@@ -2590,22 +2265,6 @@ describe('fetch', () => {
             0,
             'should not have any events'
           );
-        });
-
-        it('span should have http.response_content_length attribute', () => {
-          const span: tracing.ReadableSpan = exportedSpans[0];
-          assert.strictEqual(
-            span.attributes[ATTR_HTTP_RESPONSE_CONTENT_LENGTH],
-            parseInt(response!.headers.get('content-length')!),
-            `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
-          );
-          assert.strictEqual(
-            span.attributes[ATTR_HTTP_RESPONSE_CONTENT_LENGTH],
-            parseInt(response!.headers.get('content-length')!),
-            `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
-          );
-          // Using 'http/dup', but should *not* have `http.response.body.size`
-          // attribute, because it is Opt-In.
         });
       });
     });

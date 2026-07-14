@@ -8,6 +8,8 @@ export type {
   ConfigurationModel,
   LogRecordExporter as LogRecordExporterConfigModel,
   PushMetricExporter as PushMetricExporterConfigModel,
+  OtlpHttpMetricExporter as OtlpHttpMetricExporterConfigModel,
+  OtlpGrpcMetricExporter as OtlpGrpcMetricExporterConfigModel,
   InstrumentType as InstrumentTypeConfigModel,
   Aggregation as AggregationConfigModel,
   PeriodicMetricReader as PeriodicMetricReaderConfigModel,
@@ -19,7 +21,9 @@ export type {
   NameStringValuePair as NameStringValuePairConfigModel,
   HttpTls as HttpTlsConfigModel,
   GrpcTls as GrpcTlsConfigModel,
+  IdGenerator as IdGeneratorConfigModel,
   SeverityNumber as SeverityNumberConfigModel,
+  TextMapPropagator as TextMapPropagatorConfigModel,
   LoggerProvider as LoggerProviderConfigModel,
   AttributeLimits as AttributeLimitsConfigModel,
   LogRecordProcessor as LogRecordProcessorConfigModel,
@@ -30,3 +34,7 @@ export type {
   LogRecordLimits as LogRecordLimitsConfigModel,
 } from './generated/types';
 export { createConfigFactory } from './ConfigFactory';
+export {
+  mergeResourceAttributesConfig,
+  mergePropagatorCompositeConfig,
+} from './FileConfigFactory';

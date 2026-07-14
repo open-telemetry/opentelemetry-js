@@ -31,7 +31,7 @@ The methods in this package perform no operations by default. This means they ca
 ### Install Dependencies
 
 ```sh
-npm install @opentelemetry/api @opentelemetry/sdk-trace-base
+npm install @opentelemetry/api @opentelemetry/sdk-trace
 ```
 
 ### Trace Your Application
@@ -42,11 +42,11 @@ Once you have registered an SDK, you can start and end spans. A simple example o
 
 ```javascript
 const { trace }  = require("@opentelemetry/api");
-const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor }  = require("@opentelemetry/sdk-trace-base");
+const { TracerProvider, ConsoleSpanExporter, SimpleSpanProcessor }  = require("@opentelemetry/sdk-trace");
 
 // Create and register an SDK
-const provider = new BasicTracerProvider({
-  spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
+const provider = new TracerProvider({
+  spanProcessors: [new SimpleSpanProcessor({ exporter: new ConsoleSpanExporter() })]
 });
 trace.setGlobalTracerProvider(provider);
 
