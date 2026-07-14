@@ -96,7 +96,6 @@ import type {
   AggregationSelector,
   IAttributesProcessor,
   IMetricReader,
-  MeterProvider,
   PushMetricExporter,
   ViewOptions,
 } from '@opentelemetry/sdk-metrics';

@@ -167,7 +167,8 @@ describe('SimpleLogRecordProcessor', () => {
       });
       const exporter = new InMemoryLogRecordExporter();
       const { logRecord } = setup(exporter);
-      const processor = new SimpleLogRecordProcessor(exporter, {
+      const processor = new SimpleLogRecordProcessor({
+        exporter,
         selfObsMeterProvider: meterProvider,
       });
 
