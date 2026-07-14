@@ -9,6 +9,7 @@ import * as sinon from 'sinon';
 import { Stream } from 'stream';
 
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
+import { TracerProvider, SimpleSpanProcessor } from '@opentelemetry/sdk-trace';
 import { OTLPTraceExporter } from '../../src/platform/node';
 import { TestMetricReader } from '../utils';
 
@@ -64,7 +65,9 @@ describe('OTLPTraceExporter', () => {
       const tracerProvider = new TracerProvider({
         spanProcessors: [
           new SimpleSpanProcessor({
-            exporter: new OTLPTraceExporter({ selfObsMeterProvider: meterProvider })
+            exporter: new OTLPTraceExporter({
+              selfObsMeterProvider: meterProvider,
+            }),
           }),
         ],
       });

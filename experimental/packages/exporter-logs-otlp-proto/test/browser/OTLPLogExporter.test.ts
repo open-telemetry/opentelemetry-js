@@ -38,7 +38,9 @@ describe('OTLPLogExporter', function () {
       const loggerProvider = new LoggerProvider({
         processors: [
           new SimpleLogRecordProcessor({
-            exporter: new OTLPLogExporter({ selfObsMeterProvider: meterProvider })
+            exporter: new OTLPLogExporter({
+              selfObsMeterProvider: meterProvider,
+            }),
           }),
         ],
       });
