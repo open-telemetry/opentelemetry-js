@@ -9,6 +9,7 @@ export type {
   LoggerConfig,
   LoggerConfigurator,
   LogRecordLimits,
+  LogRecordProcessorOptions,
   BatchLogRecordProcessorOptions,
   BatchLogRecordProcessorBrowserOptions,
 } from './types';
