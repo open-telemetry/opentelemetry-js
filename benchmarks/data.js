@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784127288195,
+  "lastUpdate": 1784128287061,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -89277,6 +89277,170 @@ window.BENCHMARK_DATA = {
             "range": "±0.68%",
             "unit": "ops/sec",
             "extra": "88 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "29139614+renovate[bot]@users.noreply.github.com",
+            "name": "renovate[bot]",
+            "username": "renovate[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "67cb854d42a4fa30d4f2450a91e304d827306b5b",
+          "message": "chore(deps): update dependency nx to v22.7.7 (#6914)\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
+          "timestamp": "2026-07-15T15:01:49Z",
+          "tree_id": "79c7dca82dbbcf5fe2915c5d69ce4e61dd1d941b",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/67cb854d42a4fa30d4f2450a91e304d827306b5b"
+        },
+        "date": 1784128285743,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "generateTraceId",
+            "value": 6263347,
+            "range": "±2.60%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "generateSpanId",
+            "value": 8026059,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 632619,
+            "range": "±0.95%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes w/ setAttributes)",
+            "value": 623799,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "addEvent (128 attributes)",
+            "value": 43577,
+            "range": "±1.12%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "addLink (128 attributes)",
+            "value": 44287,
+            "range": "±0.70%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 550730,
+            "range": "±0.78%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "parsePairKeyValue simple",
+            "value": 3867111,
+            "range": "±2.87%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "parsePairKeyValue with metadata",
+            "value": 3920110,
+            "range": "±0.62%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "parsePairKeyValue URI encoded",
+            "value": 3913603,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "parsePairKeyValue complex",
+            "value": 3416473,
+            "range": "±0.76%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "Counter.add (fixed attributes)",
+            "value": 13805755,
+            "range": "±2.99%",
+            "unit": "ops/sec",
+            "extra": "86 samples"
+          },
+          {
+            "name": "Counter.add (varied attributes, 100 combos)",
+            "value": 14976540,
+            "range": "±0.94%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "Counter.add (with view attribute processor)",
+            "value": 1461144,
+            "range": "±0.68%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 512 spans (protobuf)",
+            "value": 396,
+            "range": "±2.74%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "transform 512 spans (json)",
+            "value": 700,
+            "range": "±0.64%",
+            "unit": "ops/sec",
+            "extra": "88 samples"
+          },
+          {
+            "name": "transform 512 logs (protobuf)",
+            "value": 424,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "transform 512 logs (json)",
+            "value": 759,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 512 metrics (protobuf)",
+            "value": 459,
+            "range": "±0.57%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "transform 512 metrics (json)",
+            "value": 420,
+            "range": "±0.41%",
+            "unit": "ops/sec",
+            "extra": "89 samples"
           }
         ]
       }
