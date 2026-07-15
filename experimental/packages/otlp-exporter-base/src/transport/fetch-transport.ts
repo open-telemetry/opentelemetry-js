@@ -54,7 +54,10 @@ class FetchTransport implements IExporterTransport {
 
   async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
     const abortController = new AbortController();
-    const timeout = timeoutMillis > 0 ? setTimeout(() => abortController.abort(), timeoutMillis) : undefined;
+    const timeout =
+      timeoutMillis > 0
+        ? setTimeout(() => abortController.abort(), timeoutMillis)
+        : undefined;
     // Fetch API may be wrapped by an instrumentation like `@opentelemetry/instrumentation-fetch`.
     // In that case the instrumentation would create a new Span for this request
     // because the context manager cannot keep the context after `await` calls.
