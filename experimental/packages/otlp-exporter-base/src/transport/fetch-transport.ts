@@ -92,9 +92,17 @@ class FetchTransport implements IExporterTransport {
 
     try {
       const url = new URL(this._parameters.url);
+      const headers = await this._parameters.headers();
+
+      if (abortController.signal.aborted) {
+        const abortError = new Error('The operation was aborted.');
+        abortError.name = 'AbortError';
+        throw abortError;
+      }
+
       const response = await fetchApi(url.href, {
         method: 'POST',
-        headers: await this._parameters.headers(),
+        headers,
         body: data,
         signal: abortController.signal,
         keepalive: useKeepalive,
