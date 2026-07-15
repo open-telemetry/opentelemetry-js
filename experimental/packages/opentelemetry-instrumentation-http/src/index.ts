@@ -9,6 +9,7 @@ export type {
   HttpInstrumentationConfig,
   HttpRequestCustomAttributeFunction,
   HttpResponseCustomAttributeFunction,
+  IgnoreIncomingPropagationFunction,
   IgnoreIncomingRequestFunction,
   IgnoreOutgoingRequestFunction,
   StartIncomingSpanCustomAttributeFunction,
