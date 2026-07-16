@@ -16,6 +16,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :rocket: Features
 
 * feat(sdk-node): emit a deprecation warning when the `JaegerPropagator` is selected via `OTEL_PROPAGATORS` or declarative config; use `tracecontext` instead. @pichlermarc
+* feat(instrumentation-http): set `error.type` to status code in metrics for error requests. [#6919](https://github.com/open-telemetry/opentelemetry-js/pull/6919) @raphael-theriault-swi
 
 ### :bug: Bug Fixes
 
