@@ -25,9 +25,9 @@ import type { LoggerProviderSharedState } from './internal/LoggerProviderSharedS
 import { addAttribute, AddAttributeDecision } from './utils/validation';
 
 export class LogRecordImpl implements ReadableLogRecord {
-  readonly hrTime: api.HrTime;
-  readonly hrTimeObserved: api.HrTime;
-  readonly spanContext?: api.SpanContext;
+  hrTime: api.HrTime;
+  hrTimeObserved: api.HrTime;
+  spanContext?: api.SpanContext;
   readonly resource: Resource;
   readonly instrumentationScope: InstrumentationScope & {
     attributes?: LogAttributes;

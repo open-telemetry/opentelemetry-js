@@ -804,4 +804,26 @@ describe('LogRecord', () => {
       assert.ok(emitted);
     });
   });
+
+  describe('ReadWriteLogRecord mutability', () => {
+    it('should allow modifying hrTime, hrTimeObserved, and spanContext', () => {
+      const { logRecord } = setup();
+
+      const newHrTime: HrTime = [123, 456];
+      const newHrTimeObserved: HrTime = [789, 101112];
+      const newSpanContext = {
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: '6e0c63257de34c92',
+        traceFlags: TraceFlags.SAMPLED,
+      };
+
+      logRecord.hrTime = newHrTime;
+      logRecord.hrTimeObserved = newHrTimeObserved;
+      logRecord.spanContext = newSpanContext;
+
+      assert.deepStrictEqual(logRecord.hrTime, newHrTime);
+      assert.deepStrictEqual(logRecord.hrTimeObserved, newHrTimeObserved);
+      assert.deepStrictEqual(logRecord.spanContext, newSpanContext);
+    });
+  });
 });
