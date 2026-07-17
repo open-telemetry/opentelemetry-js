@@ -25,15 +25,15 @@ import type { LoggerProviderSharedState } from './internal/LoggerProviderSharedS
 import { addAttribute, AddAttributeDecision } from './utils/validation';
 
 export class LogRecordImpl implements ReadableLogRecord {
-  hrTime: api.HrTime;
-  hrTimeObserved: api.HrTime;
-  spanContext?: api.SpanContext;
   readonly resource: Resource;
   readonly instrumentationScope: InstrumentationScope & {
     attributes?: LogAttributes;
     droppedAttributesCount?: number;
   };
   readonly attributes: LogAttributes = {};
+  private _hrTime: api.HrTime;
+  private _hrTimeObserved: api.HrTime;
+  private _spanContext?: api.SpanContext;
   private _severityText?: string;
   private _severityNumber?: SeverityNumber;
   private _body?: LogBody;
@@ -43,6 +43,36 @@ export class LogRecordImpl implements ReadableLogRecord {
 
   private _isReadonly: boolean = false;
   private readonly _logRecordLimits: Required<LogRecordLimits>;
+
+  get hrTime(): api.HrTime {
+    return this._hrTime;
+  }
+  set hrTime(hrTime: api.HrTime) {
+    if (this._isLogRecordReadonly()) {
+      return;
+    }
+    this._hrTime = hrTime;
+  }
+
+  get hrTimeObserved(): api.HrTime {
+    return this._hrTimeObserved;
+  }
+  set hrTimeObserved(hrTimeObserved: api.HrTime) {
+    if (this._isLogRecordReadonly()) {
+      return;
+    }
+    this._hrTimeObserved = hrTimeObserved;
+  }
+
+  get spanContext(): api.SpanContext | undefined {
+    return this._spanContext;
+  }
+  set spanContext(spanContext: api.SpanContext | undefined) {
+    if (this._isLogRecordReadonly()) {
+      return;
+    }
+    this._spanContext = spanContext;
+  }
 
   set severityText(severityText: string | undefined) {
     if (this._isLogRecordReadonly()) {
@@ -106,13 +136,13 @@ export class LogRecordImpl implements ReadableLogRecord {
     } = logRecord;
 
     const now = Date.now();
-    this.hrTime = timeInputToHrTime(timestamp ?? now);
-    this.hrTimeObserved = timeInputToHrTime(observedTimestamp ?? now);
+    this._hrTime = timeInputToHrTime(timestamp ?? now);
+    this._hrTimeObserved = timeInputToHrTime(observedTimestamp ?? now);
 
     if (context) {
       const spanContext = api.trace.getSpanContext(context);
       if (spanContext && api.isSpanContextValid(spanContext)) {
-        this.spanContext = spanContext;
+        this._spanContext = spanContext;
       }
     }
     this.severityNumber = severityNumber;
