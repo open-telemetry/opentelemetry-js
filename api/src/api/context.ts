@@ -14,6 +14,10 @@ import { DiagAPI } from './diag';
 
 const API_NAME = 'context';
 const NOOP_CONTEXT_MANAGER = new NoopContextManager();
+const NOOP_TOKEN: Token = Object.freeze({
+  dispose: () => {},
+  [Symbol.dispose]: () => {},
+});
 
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Context API
@@ -113,7 +117,7 @@ export class ContextAPI {
         'The current ContextManager does not implement attach(). The context will not be attached. Use a ContextManager that supports attach() (e.g. AsyncLocalStorageContextManager) or use with()/bind() instead.'
       );
     }
-    return { dispose() {} };
+    return NOOP_TOKEN;
   }
 
   private _getContextManager(): ContextManager {

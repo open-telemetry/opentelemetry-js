@@ -29,7 +29,8 @@
     "types": ["node", "mocha", "webpack-env"],
     "useUnknownInCatchVariables": false,
     "lib": [
-      "es2022"
+      "es2022",
+      "esnext.disposable"
     ]
   },
   "exclude": [

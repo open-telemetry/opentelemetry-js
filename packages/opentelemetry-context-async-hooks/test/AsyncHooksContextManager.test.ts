@@ -557,7 +557,7 @@ for (const contextManagerClass of [
 
           assert.strictEqual(contextManager.active(), context1);
 
-          (contextManager as AsyncLocalStorageContextManager).detach(token1);
+          token1.dispose();
           assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
         });
 
@@ -642,7 +642,7 @@ for (const contextManagerClass of [
             contextManager as AsyncLocalStorageContextManager
           ).attach(context1);
           assert.strictEqual(contextManager.active(), context1);
-          (contextManager as AsyncLocalStorageContextManager).detach(token1);
+          token1.dispose();
           assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
 
           // Second sequence
@@ -650,7 +650,7 @@ for (const contextManagerClass of [
             contextManager as AsyncLocalStorageContextManager
           ).attach(context2);
           assert.strictEqual(contextManager.active(), context2);
-          (contextManager as AsyncLocalStorageContextManager).detach(token2);
+          token2.dispose();
           assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
         });
 

@@ -8,6 +8,39 @@ import { ROOT_CONTEXT } from '@opentelemetry/api';
 import { AsyncLocalStorage } from 'async_hooks';
 import { AbstractAsyncHooksContextManager } from './AbstractAsyncHooksContextManager';
 
+/**
+ * Wrapper around a token and _asyncLocalStorage to mirror the behavior of
+ * a Node.js RunScope
+ *
+ * @internal not intended for direct public consumption. Will be removed once
+ * withScope is available on all supported Node.js versions
+ */
+class DisposeOnceToken implements Token {
+  private _isDisposed = false;
+  private readonly _previousContext: Context;
+  private readonly _asyncLocalStorage: AsyncLocalStorage<Context>;
+
+  constructor(
+    previousContext: Context,
+    asyncLocalStorage: AsyncLocalStorage<Context>
+  ) {
+    this._previousContext = previousContext;
+    this._asyncLocalStorage = asyncLocalStorage;
+  }
+
+  dispose() {
+    if (this._isDisposed) {
+      return;
+    }
+
+    this._asyncLocalStorage.enterWith(this._previousContext);
+    this._isDisposed = true;
+  }
+  [Symbol.dispose]() {
+    this.dispose();
+  }
+}
+
 export class AsyncLocalStorageContextManager extends AbstractAsyncHooksContextManager {
   private _asyncLocalStorage: AsyncLocalStorage<Context>;
 
@@ -45,9 +78,8 @@ export class AsyncLocalStorageContextManager extends AbstractAsyncHooksContextMa
    * restores the previous context (see {@link ContextManager.attach}).
    *
    * On Node.js 25.9+, delegates to `AsyncLocalStorage.withScope()` which returns
-   * a native `RunScope` that also implements `[Symbol.dispose]` for use with the
-   * `using` keyword. On older Node.js versions, falls back to `enterWith()` and
-   * returns a manual wrapper with a `dispose()` method.
+   * a native `RunScope` implementing both `dispose()` and `[Symbol.dispose]()`.
+   * On older Node.js versions, falls back to `enterWith()` with a manual token.
    *
    * @experimental This API is experimental and may change in minor releases without prior notice.
    */
@@ -62,20 +94,10 @@ export class AsyncLocalStorageContextManager extends AbstractAsyncHooksContextMa
       return withScope.call(this._asyncLocalStorage, context);
     }
 
-    // Fallback for older Node.js: enterWith() + manual disposable wrapper
+    // Fallback for older Node.js - this can be dropped when the minimum supported
+    // Node.js version of this package is 25.9 or higher.
     const previousContext = this.active();
     this._asyncLocalStorage.enterWith(context);
-    const token: Token = {
-      dispose: () => {
-        this._asyncLocalStorage.enterWith(previousContext);
-      },
-    };
-    // Forward compat: add [Symbol.dispose] for TypeScript 5.2+ `using` keyword
-    const symbolDispose = (Symbol as { dispose?: symbol }).dispose;
-    if (symbolDispose !== undefined) {
-      (token as unknown as Record<symbol, () => void>)[symbolDispose] =
-        token.dispose;
-    }
-    return token;
+    return new DisposeOnceToken(previousContext, this._asyncLocalStorage);
   }
 }
