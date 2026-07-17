@@ -80,7 +80,7 @@ describe('API', function () {
       );
     });
 
-    describe('attach/detach when the ContextManager does not implement them', function () {
+    describe('attach when the ContextManager does not implement it', function () {
       afterEach(() => {
         context.disable();
         diag.disable();

@@ -34,8 +34,8 @@ export interface Context {
 
 /**
  * A scope token returned by {@link ContextManager.attach} that restores the previous
- * {@link Context} when disposed. Call `token.dispose()` directly, use with
- * `context.detach(token)`, or use the `using` keyword (TypeScript 5.2+).
+ * {@link Context} when disposed. Call `token.dispose()` directly or use the
+ * `using` keyword (TypeScript 5.2+).
  *
  * @since 1.10.0
  * @experimental This API is experimental and may change in minor releases without prior notice.
@@ -92,7 +92,7 @@ export interface ContextManager {
    * This is a delicate, low-level API - prefer {@link with}/{@link bind}, which
    * restore context automatically. `attach` exists only to bridge callback
    * boundaries that `with` cannot wrap. The caller is responsible for disposing
-   * the token (via `token.dispose()`, `context.detach(token)`, or `using`) when
+   * the token (via `token.dispose()` or `using`) when
    * the operation is complete. Support is optional and best-effort; when omitted,
    * {@link ContextAPI.attach} logs a warning and returns a no-op token.
    *

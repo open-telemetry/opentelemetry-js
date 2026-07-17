@@ -495,7 +495,7 @@ for (const contextManagerClass of [
 
     if (contextManagerClass.name === 'AsyncLocalStorageContextManager') {
       describe('.attach()', function () {
-        it('should attach and detach context', () => {
+        it('should attach and restore context via token.dispose()', () => {
           const context1 = ROOT_CONTEXT.setValue(key1, 1);
           assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
 
@@ -508,7 +508,7 @@ for (const contextManagerClass of [
           assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
         });
 
-        it('should support nested attach/detach', function () {
+        it('should support nested attach with token.dispose()', function () {
           const context1 = ROOT_CONTEXT.setValue(key1, 1);
           const context2 = ROOT_CONTEXT.setValue(key1, 2);
           const context3 = ROOT_CONTEXT.setValue(key1, 3);
@@ -633,7 +633,7 @@ for (const contextManagerClass of [
           assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
         });
 
-        it('should handle multiple attach/detach sequences', function () {
+        it('should handle multiple attach/dispose sequences', function () {
           const context1 = ROOT_CONTEXT.setValue(key1, 1);
           const context2 = ROOT_CONTEXT.setValue(key1, 2);
 
