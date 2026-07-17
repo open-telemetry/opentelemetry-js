@@ -29,10 +29,83 @@ import {
   createLogRecordExporterFromConfig,
   createLogRecordLimitsFromConfig,
   createLogRecordProcessorFromConfig,
+  createPropagatorFromConfig,
   createSpanLimitsFromConfig,
 } from '../src/create-from-config';
+import { CompositePropagator } from '@opentelemetry/core';
 
 describe('create-from-config', () => {
+  describe('createPropagatorFromConfig', function () {
+    it('single propagator still uses CompositePropagator', function () {
+      const propagator = createPropagatorFromConfig({
+        composite: [{ tracecontext: null }],
+      });
+      assert.ok(propagator instanceof CompositePropagator);
+      assert.deepEqual(propagator.fields(), ['traceparent', 'tracestate']);
+    });
+
+    it('multiple', function () {
+      const propagator = createPropagatorFromConfig({
+        composite: [
+          { tracecontext: null },
+          { baggage: null },
+          { b3: null },
+          { b3multi: null },
+          { jaeger: null },
+        ],
+      });
+      assert.deepEqual(propagator?.fields(), [
+        'traceparent',
+        'tracestate',
+        'baggage',
+        'b3',
+        'x-b3-traceid',
+        'x-b3-spanid',
+        'x-b3-flags',
+        'x-b3-sampled',
+        'x-b3-parentspanid',
+        'uber-trace-id',
+      ]);
+    });
+
+    it('should throw on unknown/unsupported propagators', function () {
+      assert.throws(() => {
+        createPropagatorFromConfig({
+          composite: [{ tracecontext: null }, { my_propagator: null }],
+        });
+      });
+    });
+
+    it('no propagator if "none"', function () {
+      const propagator = createPropagatorFromConfig({
+        composite: [{ tracecontext: null }, { none: null }],
+      });
+      assert.equal(propagator, undefined);
+    });
+
+    it('should throw on invalid composite entry with two keys', function () {
+      assert.throws(() => {
+        createPropagatorFromConfig({
+          composite: [{ tracecontext: null, tracestate: null }],
+        });
+      });
+    });
+
+    it('composite_list usage', function () {
+      const propagator = createPropagatorFromConfig({
+        composite: [{ tracecontext: null }],
+        composite_list: 'tracecontext, \tbaggage',
+      });
+      assert.deepEqual(propagator?.fields(), [
+        'traceparent',
+        'tracestate',
+        'baggage',
+      ]);
+      // Cheat usage of private _propagators to confirm dedupe worked.
+      assert.equal((propagator as any)._propagators.length, 2);
+    });
+  });
+
   describe('createLogRecordExporterFromConfig', () => {
     const corpus: {
       testName: string;
