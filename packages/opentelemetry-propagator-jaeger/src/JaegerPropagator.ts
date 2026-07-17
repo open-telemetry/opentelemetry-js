@@ -31,6 +31,9 @@ export const UBER_BAGGAGE_HEADER_PREFIX = 'uberctx';
  * {flags}
  * One byte bitmap, as two hex digits.
  * Inspired by jaeger-client-node project.
+ * @deprecated Use {@link W3CTraceContextPropagator} from `@opentelemetry/core` instead.
+ * The Jaeger propagator is deprecated by the OpenTelemetry specification.
+ * This package will be removed in a future major release.
  */
 export class JaegerPropagator implements TextMapPropagator {
   private readonly _jaegerTraceHeader: string;

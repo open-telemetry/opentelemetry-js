@@ -16,6 +16,10 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * feat(context-async-hooks): implement `attach()` on `AsyncLocalStorageContextManager` [#6845](https://github.com/open-telemetry/opentelemetry-js/pull/6845) @pichlermarc
   * On Node.js 25.9+, delegates to `AsyncLocalStorage.withScope()` returning a native `RunScope` that supports `[Symbol.dispose]` / `using`. On older Node.js, falls back to `enterWith()` with a manual disposable wrapper.
+* feat(sdk-logs): implement log processor metrics [#6554](https://github.com/open-telemetry/opentelemetry-js/pull/6554) @anuraaga
+* feat(otlp-exporter): implement exporter metrics [#6480](https://github.com/open-telemetry/opentelemetry-js/pull/6480) @anuraaga
+* feat(propagator-jaeger):  *Notice*: The `@opentelemetry/propagator-jaeger` package will be removed in SDK 3.x, planned for approximately September 2026. @pichlermarc
+  * The Jaeger propagator has been deprecated by the OpenTelemetry specification in favor of `W3CTraceContextPropagator`. This package will be removed in a future release.
 
 ### :bug: Bug Fixes
 
