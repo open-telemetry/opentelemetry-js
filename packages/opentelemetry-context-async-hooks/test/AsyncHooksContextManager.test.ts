@@ -494,7 +494,7 @@ for (const contextManagerClass of [
     });
 
     if (contextManagerClass.name === 'AsyncLocalStorageContextManager') {
-      describe('.attach() and .detach()', function () {
+      describe('.attach()', function () {
         it('should attach and detach context', () => {
           const context1 = ROOT_CONTEXT.setValue(key1, 1);
           assert.strictEqual(contextManager.active(), ROOT_CONTEXT);

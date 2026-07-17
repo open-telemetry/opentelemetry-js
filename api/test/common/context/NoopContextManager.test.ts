@@ -121,7 +121,7 @@ describe('NoopContextManager', function () {
     });
   });
 
-  describe('.attach()/.detach()', function () {
+  describe('.attach()', function () {
     it('should be a no-op that keeps ROOT_CONTEXT active', function () {
       const key = createContextKey('test key 1');
       const test = ROOT_CONTEXT.setValue(key, 1);
