@@ -19,7 +19,6 @@ import {
   getIdGeneratorFromConfiguration,
   getSamplerFromConfiguration,
   getInstanceID,
-  createLoggerProviderFromConfig,
   getMeterReadersFromConfiguration,
   getMeterViewsFromConfiguration,
   getPropagatorFromConfiguration,
@@ -45,7 +44,10 @@ import {
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
 import { diagLogLevelFromSeverityNumberConfig } from './diag';
-import { createSpanLimitsFromConfig } from './create-from-config';
+import {
+  createLoggerProviderFromConfig,
+  createSpanLimitsFromConfig,
+} from './create-from-config';
 
 // Exported for testing.
 export const NOOP_SDK = {
