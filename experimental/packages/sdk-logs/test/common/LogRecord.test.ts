@@ -835,6 +835,4 @@ describe('LogRecord', () => {
       assert.ok(emitted);
     });
   });
-
-
 });
