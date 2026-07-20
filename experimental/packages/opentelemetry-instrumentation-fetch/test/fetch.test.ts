@@ -111,14 +111,21 @@ describe('fetch', () => {
   const originalFetch = globalThis.fetch;
   let workerStarted = false;
 
-  const startWorker = async (
-    ...handlers: msw.RequestHandler[]
-  ): Promise<void> => {
-    worker.use(...handlers);
+  before(async () => {
     await worker.start({
       onUnhandledRequest: 'error',
       quiet: true,
     });
+  });
+
+  after(() => {
+    worker.stop();
+  });
+
+  const startWorker = async (
+    ...handlers: msw.RequestHandler[]
+  ): Promise<void> => {
+    worker.use(...handlers);
     workerStarted = true;
   };
 
@@ -173,7 +180,7 @@ describe('fetch', () => {
   afterEach(() => {
     try {
       if (workerStarted) {
-        worker.stop();
+        worker.resetHandlers();
         workerStarted = false;
       }
 
@@ -273,7 +280,7 @@ describe('fetch', () => {
       ]);
 
       await startWorker(
-        msw.http.get(`${ORIGIN}/test.wasm`, () => {
+        msw.http.get('/test.wasm', () => {
           return new msw.HttpResponse(wasmBytes, {
             headers: { 'Content-Type': 'application/wasm' },
           });
@@ -282,6 +289,12 @@ describe('fetch', () => {
 
       fetchInstrumentation = new FetchInstrumentation();
       assert.ok(isWrapped(window.fetch));
+
+      // Synchronize with Chrome's browser-process SW routing. worker.start()
+      // resolves once MOCKING_ENABLED is received, but Chrome may not have
+      // finished wiring the SW into the fetch path yet. This IPC round-trip
+      // acts as a barrier so the next fetch is reliably intercepted.
+      await navigator.serviceWorker.getRegistrations();
 
       // WebAssembly.compileStreaming requires a native Response from fetch.
       const module = await WebAssembly.compileStreaming(
