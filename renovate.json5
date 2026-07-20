@@ -46,7 +46,10 @@
   ],
   "lockFileMaintenance": {
     "enabled": true,
-    "schedule": ["before 3am on Monday"]
+    "schedule": ["before 3am on Monday"],
+    // disable minimumReleaseAge for this rule only as this is not supported for
+    // lockfile updates; the config from .npmrc will be applied instead.
+    "minimumReleaseAge": "0"
   },
   "rebaseWhen": "conflicted",
   "ignoreDeps": [
@@ -55,7 +58,7 @@
     "@types/node"
   ],
   "constraints": {
-    "npm": ">=11.6.3"
+    "npm": ">=11.18.0"
   },
   "assignees": ["@dyladan", "@legendecas", "@pichlermarc", "@trentm"],
   "labels": ["dependencies"],
