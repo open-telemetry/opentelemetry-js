@@ -88,7 +88,7 @@
     "ts-loader": "9.5.7",
     "typescript": "5.2.2",
     "unionfs": "4.5.4",
-    "webpack": "5.104.1"
+    "webpack": "5.108.4"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/api",
   "sideEffects": false
