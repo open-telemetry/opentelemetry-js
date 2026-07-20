@@ -119,6 +119,13 @@ class FetchTransport implements IExporterTransport {
         ),
       };
     } catch (error) {
+      if (abortController.signal.aborted) {
+        diag.error('export request timed out');
+        return {
+          status: 'failure',
+          error: abortController.signal.reason,
+        };
+      }
       if (isFetchNetworkErrorRetryable(error)) {
         diag.warn(`export request retryable (network error: ${error})`);
         return {
