@@ -215,8 +215,6 @@ export class NodeSDK {
       diag.warn(
         "The 'logRecordProcessor' option is deprecated. Please use 'logRecordProcessors' instead."
       );
-    } else {
-      this.configureLoggerProviderFromEnv();
     }
 
     if (configuration.metricReaders) {
@@ -342,6 +340,12 @@ export class NodeSDK {
       trace.setGlobalTracerProvider(this._tracerProvider);
     }
 
+    if (!this._loggerProviderConfig) {
+      this.configureLoggerProviderFromEnv(
+        sdkMetricsEnabled ? this._meterProvider : undefined
+      );
+    }
+
     if (this._loggerProviderConfig) {
       const loggerProvider = new LoggerProvider({
         ...getLoggerProviderConfigFromEnv(),
@@ -375,7 +379,9 @@ export class NodeSDK {
     );
   }
 
-  private configureLoggerProviderFromEnv(): void {
+  private configureLoggerProviderFromEnv(
+    meterProvider: MeterProvider | undefined
+  ): void {
     const enabledExporters = Array.from(
       new Set(getStringListFromEnv('OTEL_LOGS_EXPORTER') ?? [])
     );
@@ -431,9 +437,12 @@ export class NodeSDK {
       this._loggerProviderConfig = {
         logRecordProcessors: exporters.map(exporter => {
           if (exporter instanceof ConsoleLogRecordExporter) {
-            return new SimpleLogRecordProcessor({ exporter });
+            return new SimpleLogRecordProcessor({
+              exporter,
+              selfObsMeterProvider: meterProvider,
+            });
           } else {
-            return getBatchLogRecordProcessorFromEnv(exporter);
+            return getBatchLogRecordProcessorFromEnv(exporter, meterProvider);
           }
         }),
       };

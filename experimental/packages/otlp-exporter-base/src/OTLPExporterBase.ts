@@ -5,6 +5,7 @@
 
 import type { ExportResult } from '@opentelemetry/core';
 import type { IOtlpExportDelegate } from './otlp-export-delegate';
+import { type ExporterMetrics } from './ExporterMetrics';
 
 export class OTLPExporterBase<Internal> {
   private _delegate: IOtlpExportDelegate<Internal>;
@@ -30,5 +31,9 @@ export class OTLPExporterBase<Internal> {
 
   shutdown(): Promise<void> {
     return this._delegate.shutdown();
+  }
+
+  protected setMetrics(metrics: ExporterMetrics<Internal>) {
+    this._delegate.setMetrics(metrics);
   }
 }

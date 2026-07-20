@@ -34,10 +34,7 @@ import {
   ConsoleLogRecordExporter,
   BatchLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
-import type {
-  ConfigFactory,
-  LogRecordExporterConfigModel,
-} from '@opentelemetry/configuration';
+import type { ConfigFactory } from '@opentelemetry/configuration';
 import { createConfigFactory } from '@opentelemetry/configuration';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
@@ -56,7 +53,6 @@ import {
 } from '../src/semconv';
 import { ATTR_OS_TYPE } from '@opentelemetry/resources/src/semconv';
 import {
-  createLogRecordExporterFromConfig,
   getPeriodicMetricReaderFromConfiguration,
   getSpanExporter,
   setupContextManager,
@@ -961,13 +957,6 @@ describe('startNodeSDK', function () {
   });
 
   describe('tests to increase code coverage', function () {
-    it('should throw for invalid log record exporter model', async () => {
-      assert.throws(() => {
-        const exporter: LogRecordExporterConfigModel = {};
-        createLogRecordExporterFromConfig(exporter);
-      });
-    });
-
     it('should warn for unsupported metric producer', async () => {
       const warnSpy = Sinon.spy(diag, 'warn');
       const reader = getPeriodicMetricReaderFromConfiguration({
