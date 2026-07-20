@@ -116,6 +116,25 @@ describe('fetch', () => {
       onUnhandledRequest: 'error',
       quiet: true,
     });
+
+    // `worker.start()` only waits for the service worker to reply with
+    // `MOCKING_ENABLED`; it does not guarantee that request interception is
+    // actually live. In Chrome the freshly activated worker controls the page
+    // (`navigator.serviceWorker.controller` is set), but its `fetch` handler
+    // is not yet wired into the request path, so the very first request
+    // bypasses the worker and hits the real (karma) server. Prime the worker
+    // with throwaway requests against a dedicated handler until one is
+    // actually intercepted, so the real tests reliably hit their mocks.
+    const primeUrl = `${ORIGIN}/__otel_msw_prime__`;
+    worker.use(msw.http.get(primeUrl, () => new msw.HttpResponse('primed')));
+    for (let i = 0; i < 20; i++) {
+      const response = await fetch(primeUrl, { cache: 'no-store' });
+      if (response.ok && (await response.text()) === 'primed') {
+        break;
+      }
+      await waitFor(10);
+    }
+    worker.resetHandlers();
   });
 
   after(() => {
@@ -289,12 +308,6 @@ describe('fetch', () => {
 
       fetchInstrumentation = new FetchInstrumentation();
       assert.ok(isWrapped(window.fetch));
-
-      // Synchronize with Chrome's browser-process SW routing. worker.start()
-      // resolves once MOCKING_ENABLED is received, but Chrome may not have
-      // finished wiring the SW into the fetch path yet. This IPC round-trip
-      // acts as a barrier so the next fetch is reliably intercepted.
-      await navigator.serviceWorker.getRegistrations();
 
       // WebAssembly.compileStreaming requires a native Response from fetch.
       const module = await WebAssembly.compileStreaming(
