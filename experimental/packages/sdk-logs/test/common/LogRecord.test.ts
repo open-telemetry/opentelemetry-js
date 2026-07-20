@@ -34,7 +34,6 @@ const setup = (limits?: LogRecordLimits, data?: logsAPI.LogRecord) => {
   const resource = defaultResource();
   const sharedState = new LoggerProviderSharedState(
     resource,
-    Infinity,
     {
       attributeCountLimit: limits?.attributeCountLimit ?? 128,
       attributeValueLengthLimit: limits?.attributeValueLengthLimit ?? Infinity,

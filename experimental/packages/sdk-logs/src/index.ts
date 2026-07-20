@@ -4,6 +4,7 @@
  */
 
 export type {
+  ForceFlushOptions,
   LoggerProviderConfig,
   LoggerProviderOptions,
   LoggerConfig,
