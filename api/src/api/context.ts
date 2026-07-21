@@ -4,7 +4,7 @@
  */
 
 import { NoopContextManager } from '../context/NoopContextManager';
-import type { Context, ContextManager } from '../context/types';
+import type { Context, ContextManager, Token } from '../context/types';
 import {
   getGlobal,
   registerGlobal,
@@ -14,6 +14,10 @@ import { DiagAPI } from './diag';
 
 const API_NAME = 'context';
 const NOOP_CONTEXT_MANAGER = new NoopContextManager();
+const NOOP_TOKEN: Token = Object.freeze({
+  dispose: () => {},
+  [Symbol.dispose]: () => {},
+});
 
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Context API
@@ -22,6 +26,12 @@ const NOOP_CONTEXT_MANAGER = new NoopContextManager();
  */
 export class ContextAPI {
   private static _instance?: ContextAPI;
+
+  /**
+   * Tracks whether we have already warned that the active ContextManager does
+   * not implement attach(), so we warn at most once instead of on every call.
+   */
+  private _attachUnsupportedWarned = false;
 
   /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
@@ -76,6 +86,38 @@ export class ContextAPI {
    */
   public bind<T>(context: Context, target: T): T {
     return this._getContextManager().bind(context, target);
+  }
+
+  /**
+   * Imperatively sets `context` as active, returning a {@link Token} whose
+   * {@link Token.dispose} restores the previous context.
+   *
+   * This is a delicate, low-level API - prefer {@link with}/{@link bind}, which
+   * restore context automatically. Use `attach` only to bridge callback
+   * boundaries that `with` cannot wrap. Call `token.dispose()` when the
+   * operation is done.
+   *
+   * Support is best-effort and varies by the active ContextManager (see
+   * {@link ContextManager.attach}); if it does not implement `attach`, this logs
+   * a warning and returns a no-op token.
+   *
+   * @param context The Context to attach
+   * @returns A Token whose dispose() restores the previous Context
+   * @since 1.10.0
+   * @experimental This API is experimental and may change in minor releases without prior notice.
+   */
+  public attach(context: Context): Token {
+    const contextManager = this._getContextManager();
+    if (contextManager.attach) {
+      return contextManager.attach(context);
+    }
+    if (!this._attachUnsupportedWarned) {
+      this._attachUnsupportedWarned = true;
+      DiagAPI.instance().warn(
+        'The current ContextManager does not implement attach(). The context will not be attached. Use a ContextManager that supports attach() (e.g. AsyncLocalStorageContextManager) or use with()/bind() instead.'
+      );
+    }
+    return NOOP_TOKEN;
   }
 
   private _getContextManager(): ContextManager {

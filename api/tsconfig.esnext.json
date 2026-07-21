@@ -2,7 +2,8 @@
   "extends": "../tsconfig.base.esnext.json",
   "compilerOptions": {
     "lib": [
-      "es2017"
+      "es2017",
+      "esnext.disposable"
     ],
     "outDir": "build/esnext",
     "rootDir": "src",

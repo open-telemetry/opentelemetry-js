@@ -9,6 +9,10 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: Features
 
+* feat(api): add imperative `context.attach()` for setting context across callback boundaries that `with()` cannot wrap. [#6845](https://github.com/open-telemetry/opentelemetry-js/pull/6845) @pichlermarc
+  * `attach()` returns a `Token` whose `dispose()` method (or `[Symbol.dispose]()` on supported runtimes) restores the previous context. Use `token.dispose()` to detach.
+  * `attach` is an optional method on the `ContextManager` interface; when the active context manager does not implement it, `context.attach()` logs a warning and returns a no-op token.
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
