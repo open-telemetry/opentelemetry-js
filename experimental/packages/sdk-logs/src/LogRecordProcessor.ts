@@ -5,7 +5,7 @@
 
 import type { Context } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
-import type { SdkLogRecord } from './export/SdkLogRecord';
+import type { ReadWriteLogRecord } from './export/ReadWriteLogRecord';
 import type { SeverityNumber } from '@opentelemetry/api-logs';
 import type { ForceFlushOptions } from './types';
 
@@ -20,7 +20,7 @@ export interface LogRecordProcessor {
    * @param logRecord the ReadWriteLogRecord that just emitted.
    * @param context the current Context, or an empty Context if the Logger was obtained with include_trace_context=false
    */
-  onEmit(logRecord: SdkLogRecord, context?: Context): void;
+  onEmit(logRecord: ReadWriteLogRecord, context?: Context): void;
 
   /**
    * Shuts down the processor. Called when SDK is shut down. This is an

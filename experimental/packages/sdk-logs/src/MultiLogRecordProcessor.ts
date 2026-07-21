@@ -7,7 +7,7 @@ import type { InstrumentationScope } from '@opentelemetry/core';
 import { callWithTimeout } from '@opentelemetry/core';
 import type { Context } from '@opentelemetry/api';
 import type { LogRecordProcessor } from './LogRecordProcessor';
-import type { SdkLogRecord } from './export/SdkLogRecord';
+import type { ReadWriteLogRecord } from './export/ReadWriteLogRecord';
 import type { SeverityNumber } from '@opentelemetry/api-logs';
 import type { ForceFlushOptions } from './types';
 
@@ -30,7 +30,7 @@ export class MultiLogRecordProcessor implements LogRecordProcessor {
     );
   }
 
-  public onEmit(logRecord: SdkLogRecord, context?: Context): void {
+  public onEmit(logRecord: ReadWriteLogRecord, context?: Context): void {
     this.processors.forEach(processors =>
       processors.onEmit(logRecord, context)
     );

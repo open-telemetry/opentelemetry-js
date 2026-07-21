@@ -20,9 +20,9 @@ import type { Resource } from '@opentelemetry/resources';
  * @remarks
  * This interface is **not intended to be implemented by users**.
  * To produce logs, use {@link Logger#emit}. To consume logs, implement {@link LogRecordProcessor#onEmit}.
- * SdkLogRecord instances are created and managed by the SDK.
+ * ReadWriteLogRecord instances are created and managed by the SDK.
  */
-export interface SdkLogRecord {
+export interface ReadWriteLogRecord {
   hrTime: HrTime;
   hrTimeObserved: HrTime;
   spanContext?: SpanContext;
@@ -46,42 +46,47 @@ export interface SdkLogRecord {
    * Sets a single attribute on the log record.
    * @param key The attribute key.
    * @param value The attribute value.
-   * @returns The updated SdkLogRecord.
+   * @returns The updated ReadWriteLogRecord.
    */
-  setAttribute(key: string, value?: AnyValue): SdkLogRecord;
+  setAttribute(key: string, value?: AnyValue): ReadWriteLogRecord;
 
   /**
    * Sets multiple attributes on the log record.
    * @param attributes The attributes to set.
-   * @returns The updated SdkLogRecord.
+   * @returns The updated ReadWriteLogRecord.
    */
-  setAttributes(attributes: LogAttributes): SdkLogRecord;
+  setAttributes(attributes: LogAttributes): ReadWriteLogRecord;
 
   /**
    * Sets the body of the log record.
    * @param body The log body.
-   * @returns The updated SdkLogRecord.
+   * @returns The updated ReadWriteLogRecord.
    */
-  setBody(body: LogBody): SdkLogRecord;
+  setBody(body: LogBody): ReadWriteLogRecord;
 
   /**
    * Sets the event name for the log record.
    * @param eventName The event name.
-   * @returns The updated SdkLogRecord.
+   * @returns The updated ReadWriteLogRecord.
    */
-  setEventName(eventName: string): SdkLogRecord;
+  setEventName(eventName: string): ReadWriteLogRecord;
 
   /**
    * Sets the severity number for the log record.
    * @param severityNumber The severity number.
-   * @returns The updated SdkLogRecord.
+   * @returns The updated ReadWriteLogRecord.
    */
-  setSeverityNumber(severityNumber: SeverityNumber): SdkLogRecord;
+  setSeverityNumber(severityNumber: SeverityNumber): ReadWriteLogRecord;
 
   /**
    * Sets the severity text (log level) for the log record.
    * @param severityText The severity text.
-   * @returns The updated SdkLogRecord.
+   * @returns The updated ReadWriteLogRecord.
    */
-  setSeverityText(severityText: string): SdkLogRecord;
+  setSeverityText(severityText: string): ReadWriteLogRecord;
 }
+
+/**
+ * @deprecated - please use {@link ReadWriteLogRecord} instead.
+ */
+export type SdkLogRecord = ReadWriteLogRecord;
