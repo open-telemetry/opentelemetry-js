@@ -33,6 +33,8 @@ opentelemetry.metrics.setGlobalMeterProvider(new MeterProvider());
 const counter = opentelemetry.metrics.getMeter('default').createCounter('foo');
 
 // record a metric event.
+// NOTE: By default, each instrument can track up to 2000 unique time series.
+//       This can be configured using cardinalityLimits. See "Configuring Cardinality Limits" below.
 counter.add(1, { attributeKey: 'attribute-value' });
 ```
 
@@ -40,21 +42,25 @@ In conditions, we may need to setup an async instrument to observe costly events
 
 ```js
 // Creating an async instrument, similar to synchronous instruments
-const observableCounter = opentelemetry.metrics.getMeter('default')
+const observableCounter = opentelemetry.metrics
+  .getMeter('default')
   .createObservableCounter('observable-counter');
 
 // Register a single-instrument callback to the async instrument.
-observableCounter.addCallback(async (observableResult) => {
+observableCounter.addCallback(async observableResult => {
   // ... do async stuff
   observableResult.observe(1, { attributeKey: 'attribute-value' });
 });
 
 // Register a multi-instrument callback and associate it with a set of async instruments.
-opentelemetry.metrics.getMeter('default')
-  .addBatchObservableCallback(batchObservableCallback, [ observableCounter ]);
+opentelemetry.metrics
+  .getMeter('default')
+  .addBatchObservableCallback(batchObservableCallback, [observableCounter]);
 async function batchObservableCallback(batchObservableResult) {
   // ... do async stuff
-  batchObservableResult.observe(observableCounter, 1, { attributeKey: 'attribute-value' });
+  batchObservableResult.observe(observableCounter, 1, {
+    attributeKey: 'attribute-value',
+  });
 }
 ```
 
@@ -68,15 +74,71 @@ const meterProvider = new MeterProvider({
       aggregation: {
         type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
         options: {
-          boundaries: [0, 50, 100]
-        }
+          boundaries: [0, 50, 100],
+        },
       },
-      instrumentName: 'my.histogram'
+      instrumentName: 'my.histogram',
     },
     // rename 'my.counter' to 'my.renamed.counter'
-    { name: 'my.renamed.counter', instrumentName: 'my.counter'}
-  ]
-})
+    { name: 'my.renamed.counter', instrumentName: 'my.counter' },
+  ],
+});
+```
+
+## Configuring Cardinality Limits
+
+The `cardinalityLimits` is an optional property in `PeriodicExportingMetricReader` that allows configuration of the maximum cardinality limits per instrument type (`InstrumentType`). This limit controls the maximum number of unique time series that can be tracked for each metric instrument. If not specified in the property, the limit will default to 2000 (the default value can also be specified).
+
+It is converted to a `cardinalitySelector` function that:
+
+- Takes an `InstrumentType` as input
+- Returns the configured cardinality limit for that instrument type
+- Falls back to the default value if a specific type isn't configured
+- Uses 2000 as the default if the default value is also not specified
+
+If the `cardinalityLimits` property is omitted:
+
+```js
+import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
+import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
+
+const exporter = new OTLPMetricExporter();
+const reader = new PeriodicExportingMetricReader({
+  exporter,
+  exportIntervalMillis: 60000,
+});
+
+// All instruments will use the default limit of 2000 time series
+```
+
+Configuring specific instrument types:
+
+```js
+const reader = new PeriodicExportingMetricReader({
+  exporter,
+  exportIntervalMillis: 60000,
+  cardinalityLimits: {
+    counter: 10000, // Counters can have up to 10,000 time series
+    histogram: 5000, // Histograms limited to 5,000 time series
+    gauge: 3000, // Gauges limited to 3,000 time series
+    default: 2500, // changes the default from 2000 to 2500
+  },
+});
+```
+
+Available configuration options:
+
+```js
+type cardinalityLimits = {
+  counter?: number;
+  gauge?: number;
+  histogram?: number;
+  upDownCounter?: number;
+  observableCounter?: number;
+  observableGauge?: number;
+  observableUpDownCounter?: number;
+  default?: number;
+};
 ```
 
 ## Example

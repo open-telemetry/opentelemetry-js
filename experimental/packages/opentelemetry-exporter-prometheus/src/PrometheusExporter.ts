@@ -14,6 +14,7 @@ import type { IncomingMessage, Server, ServerResponse } from 'http';
 import { createServer } from 'http';
 import type { ExporterConfig } from './export/types';
 import { PrometheusSerializer } from './PrometheusSerializer';
+import { OTEL_COMPONENT_TYPE_VALUE_PROMETHEUS_HTTP_TEXT_METRIC_EXPORTER } from './semconv';
 /** Node.js v8.x compat */
 import { URL } from 'url';
 
@@ -60,6 +61,8 @@ export class PrometheusExporter extends MetricReader {
       },
       aggregationTemporalitySelector: _instrumentType =>
         AggregationTemporality.CUMULATIVE,
+      otelComponentType:
+        OTEL_COMPONENT_TYPE_VALUE_PROMETHEUS_HTTP_TEXT_METRIC_EXPORTER,
       metricProducers: config.metricProducers,
     });
     this._host =
@@ -195,10 +198,17 @@ export class PrometheusExporter extends MetricReader {
     request: IncomingMessage,
     response: ServerResponse
   ) => {
-    if (
-      request.url != null &&
-      new URL(request.url, this._baseUrl).pathname === this._endpoint
-    ) {
+    let pathname: string | undefined;
+    try {
+      if (request.url != null) {
+        pathname = new URL(request.url, this._baseUrl).pathname;
+      }
+    } catch {
+      response.statusCode = 400;
+      response.end('Bad Request');
+      return;
+    }
+    if (pathname === this._endpoint) {
       this._exportMetrics(response);
     } else {
       this._notFound(response);

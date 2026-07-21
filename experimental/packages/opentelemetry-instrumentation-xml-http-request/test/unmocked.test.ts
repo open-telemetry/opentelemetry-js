@@ -4,10 +4,7 @@
  */
 import type { Span } from '@opentelemetry/api';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
-import type {
-  ReadableSpan,
-  SpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan, SpanProcessor } from '@opentelemetry/sdk-trace';
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
 import { XMLHttpRequestInstrumentation } from '../src';
 import * as assert from 'assert';
@@ -37,16 +34,16 @@ describe('unmocked xhr', () => {
       spanProcessors: [testSpans],
     });
     registerInstrumentations({
-      instrumentations: [
-        new XMLHttpRequestInstrumentation({
-          semconvStabilityOptIn: 'http',
-        }),
-      ],
+      instrumentations: [new XMLHttpRequestInstrumentation({})],
       tracerProvider: provider,
     });
   });
   afterEach(() => {
-    // nop
+    // NOTE: need to unwrap here to restore the API for the other test file
+    // @ts-expect-error -- property added by instrumentation.wrap(...)
+    XMLHttpRequest.prototype.send.__unwrap();
+    // @ts-expect-error -- property added by instrumentation.wrap(...)
+    XMLHttpRequest.prototype.open.__unwrap();
   });
 
   it('should find resource with a relative url', done => {

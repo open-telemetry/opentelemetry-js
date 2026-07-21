@@ -38,10 +38,13 @@ export class InMemoryLogRecordExporter implements LogRecordExporter {
     resultCallback({ code: ExportResultCode.SUCCESS });
   }
 
-  public shutdown(): Promise<void> {
+  public async shutdown(): Promise<void> {
     this._stopped = true;
     this.reset();
-    return Promise.resolve();
+  }
+
+  public async forceFlush(): Promise<void> {
+    // nothing to flush
   }
 
   public getFinishedLogRecords(): ReadableLogRecord[] {

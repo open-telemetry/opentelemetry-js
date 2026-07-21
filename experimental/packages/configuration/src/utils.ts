@@ -2,167 +2,108 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { diag } from '@opentelemetry/api';
+
+import * as yaml from 'yaml';
 import { getStringFromEnv } from '@opentelemetry/core';
-import { inspect } from 'util';
-import type { GrpcTls, HttpTls } from './models/commonModel';
+import type { ConfigurationModel, GrpcTls, HttpTls } from './generated/types';
 
 /**
- * Retrieves a boolean value from a configuration file parameter.
- * - Trims leading and trailing whitespace and ignores casing.
- * - Returns `undefined` if the value is empty, unset, or contains only whitespace.
- * - Returns `undefined` and a warning for values that cannot be mapped to a boolean.
+ * Handle (Environment) variable substitution per
+ * https://opentelemetry.io/docs/specs/otel/configuration/data-model/#environment-variable-substitution
  *
- * @param {unknown} value - The value from the config file.
- * @returns {boolean} - The boolean value or `false` if the environment variable is unset empty, unset, or contains only whitespace.
+ * This changes the yaml.Document in-place.
+ * This must work with a yaml.Document, rather than a raw JS object from
+ * `yaml.parse()`, to distinguish between `foo: ${BAR}` and `foo: "${BAR}"`.
+ *
+ * Exported for testing.
  */
-export function getBooleanFromConfigFile(value: unknown): boolean | undefined {
-  const raw = envVariableSubstitution(value)?.trim().toLowerCase();
-  if (raw === 'true') {
-    return true;
-  } else if (raw === 'false') {
-    return false;
-  } else if (raw == null || raw === '') {
-    return undefined;
+export function substituteEnvVars(doc: yaml.Document) {
+  // Visit each scalar string value in the document. These are
+  // the candidates for env var substitution.
+  yaml.visit(doc, {
+    Scalar: (key, node, _path) => {
+      if (key === 'key') return; // skip mapping keys
+      if (typeof node.value !== 'string') return;
+      let subbed: string | null | number | boolean = envVarSubst(node.value);
+      if (subbed !== node.value && node.type === yaml.Scalar.PLAIN) {
+        // "PLAIN" here is a simple YAML value (e.g. 42 in `foo: 42`).
+        // I.e., not quoted (`foo: "42"`) or in a block.
+        subbed = yamlScalarCoerce(subbed);
+      }
+      node.value = subbed;
+    },
+  });
+}
+
+// ENV_SUBSTITUTION_RE *mostly* matches the `ENV-SUBSTITUTION` ABNF from the
+// spec with the exception of the DEFAULT-VALUE: we are using `[^\n}]*`
+// (copying the OTel Java regex) rather than a regex closer to ABNF
+// `*(VCHAR-WSP-NO-RBRACE)` (which is slightly ambiguous on what whitespace is
+// allowed in WSP).
+const ENV_SUBSTITUTION_RE = /^([a-zA-Z_][a-zA-Z0-9_]*)(?::-([^\n}]*))?$/;
+
+/**
+ * Do environment variable substitution for the given string value.
+ */
+function envVarSubst(s: string): string {
+  const ESCAPE_RE = /(\$\$)/;
+  const chunks = s.split(ESCAPE_RE);
+  for (let i = 0; i < chunks.length; ++i) {
+    if (i % 2 === 1) {
+      // Odd chunks are matched escape sequences, i.e. '$$'.
+      chunks[i] = '$';
+      continue;
+    }
+
+    // Even chunks are processed for possible substition matches.
+    const SUBSTITUTION_REF_RE = /\$\{(?:env:)?([^}]+)\}/g;
+    let chunk = '';
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = SUBSTITUTION_REF_RE.exec(chunks[i])) !== null) {
+      chunk += chunks[i].slice(lastIndex, match.index);
+      const envMatch = ENV_SUBSTITUTION_RE.exec(match[1]);
+      if (!envMatch) {
+        // E.g.: `key: ${STRING_VALUE:?error}` test case
+        throw new Error(
+          `parse error: invalid env var substitution: ${match[0]}`
+        );
+      }
+      const envName = envMatch[1];
+      const defaultValue = envMatch[2] ?? '';
+      chunk += getStringFromEnv(envName) || defaultValue;
+      lastIndex = SUBSTITUTION_REF_RE.lastIndex;
+    }
+    chunk += chunks[i].slice(lastIndex);
+    chunks[i] = chunk;
+  }
+
+  const result = chunks.join('');
+  return result;
+}
+
+/**
+ * Re-interpret a string value from env var substitution as a possible
+ * YAML number, boolean, or null value.
+ *
+ * If the interpretted value is any other type, we return the original
+ * string:
+ * - sequences and  mappings may not result from env var substitution, per the spec
+ * - a re-parsed YAML string normalizes whitespace, which we do not want
+ */
+function yamlScalarCoerce(value: string): string | null | number | boolean {
+  let coerced;
+  try {
+    coerced = yaml.parse(value, { version: '1.2' });
+  } catch {
+    return value;
+  }
+  const type = typeof coerced;
+  if (coerced === null || type === 'number' || type === 'boolean') {
+    return coerced;
   } else {
-    diag.warn(`Unknown value ${inspect(raw)}, expected 'true' or 'false'`);
-    return undefined;
+    return value;
   }
-}
-
-/**
- * Retrieves a list of booleans from a configuration file parameter.
- * - Uses ',' as the delimiter.
- * - Trims leading and trailing whitespace from each entry.
- * - Excludes empty entries.
- * - Returns `undefined` if the variable is empty or contains only whitespace.
- * - Returns an empty array if all entries are empty or whitespace.
- *
- * @param {unknown} value - The value from the config file.
- * @returns {boolean[] | undefined} - The list of strings or `undefined`.
- */
-export function getBooleanListFromConfigFile(
-  value: unknown
-): boolean[] | undefined {
-  const list = getStringFromConfigFile(value)?.split(',');
-  if (list) {
-    const filteredList = [];
-    for (let i = 0; i < list.length; i++) {
-      const element = getBooleanFromConfigFile(list[i]);
-      if (element != null) {
-        filteredList.push(element);
-      }
-    }
-    return filteredList;
-  }
-  return list;
-}
-
-/**
- * Retrieves a number from a configuration file parameter.
- * - Returns `undefined` if the environment variable is empty, unset, or contains only whitespace.
- * - Returns `undefined` and a warning if is not a number.
- * - Returns a number in all other cases.
- *
- * @param {unknown} value - The value from the config file.
- * @returns {number | undefined} - The number value or `undefined`.
- */
-export function getNumberFromConfigFile(value: unknown): number | undefined {
-  const raw = envVariableSubstitution(value)?.trim();
-  if (raw == null || raw.trim() === '') {
-    return undefined;
-  }
-
-  const n = Number(raw);
-  if (isNaN(n)) {
-    diag.warn(`Unknown value ${inspect(raw)}, expected a number`);
-    return undefined;
-  }
-
-  return n;
-}
-
-/**
- * Retrieves a list of numbers from a configuration file parameter.
- * - Uses ',' as the delimiter.
- * - Trims leading and trailing whitespace from each entry.
- * - Excludes empty entries.
- * - Returns `undefined` if the variable is empty or contains only whitespace.
- * - Returns an empty array if all entries are empty or whitespace.
- *
- * @param {unknown} value - The value from the config file.
- * @returns {number[] | undefined} - The list of numbers or `undefined`.
- */
-export function getNumberListFromConfigFile(
-  value: unknown
-): number[] | undefined {
-  const list = getStringFromConfigFile(value)?.split(',');
-  if (list) {
-    const filteredList = [];
-    for (let i = 0; i < list.length; i++) {
-      const element = getNumberFromConfigFile(list[i]);
-      if (element || element === 0) {
-        filteredList.push(element);
-      }
-    }
-    return filteredList;
-  }
-  return list;
-}
-
-/**
- * Retrieves a string from a configuration file parameter.
- * - Returns `undefined` if the variable is empty, unset, or contains only whitespace.
- *
- * @param {unknown} value - The value from the config file.
- * @returns {string | undefined} - The string value or `undefined`.
- */
-export function getStringFromConfigFile(value: unknown): string | undefined {
-  const raw = envVariableSubstitution(value)?.trim();
-  if (value == null || raw === '') {
-    return undefined;
-  }
-  return raw;
-}
-
-/**
- * Retrieves a list of strings from a configuration file parameter.
- * - Uses ',' as the delimiter.
- * - Trims leading and trailing whitespace from each entry.
- * - Excludes empty entries.
- * - Returns `undefined` if the variable is empty or contains only whitespace.
- * - Returns an empty array if all entries are empty or whitespace.
- *
- * @param {unknown} value - The value from the config file.
- * @returns {string[] | undefined} - The list of strings or `undefined`.
- */
-export function getStringListFromConfigFile(
-  value: unknown
-): string[] | undefined {
-  value = envVariableSubstitution(value);
-  return getStringFromConfigFile(value)
-    ?.split(',')
-    .map(v => v.trim())
-    .filter(s => s !== '');
-}
-
-export function envVariableSubstitution(value: unknown): string | undefined {
-  if (value == null) {
-    return undefined;
-  }
-
-  const matches = String(value).match(/\$\{[a-zA-Z0-9,=/_:.-]*\}/g);
-  if (matches) {
-    let stringValue = String(value);
-    for (const match of matches) {
-      const v = match.substring(2, match.length - 1).split(':-');
-      const defaultValue = v.length === 2 ? v[1] : '';
-      const replacement = getStringFromEnv(v[0]) || defaultValue;
-      stringValue = stringValue.replace(match, replacement);
-    }
-    return stringValue;
-  }
-  return String(value);
 }
 
 export function getGrpcTlsConfig(
@@ -188,6 +129,61 @@ export function getGrpcTlsConfig(
     return tls;
   }
   return undefined;
+}
+
+export function initializeDefaultConfiguration(): ConfigurationModel {
+  return {
+    disabled: false,
+    log_level: 'info',
+    resource: {},
+    attribute_limits: {
+      attribute_count_limit: 128,
+    },
+  };
+}
+
+export function initializeDefaultTracerProviderConfiguration(): NonNullable<
+  ConfigurationModel['tracer_provider']
+> {
+  return {
+    processors: [],
+    limits: {
+      attribute_count_limit: 128,
+      event_count_limit: 128,
+      link_count_limit: 128,
+      event_attribute_count_limit: 128,
+      link_attribute_count_limit: 128,
+    },
+    sampler: {
+      parent_based: {
+        root: { always_on: undefined },
+        remote_parent_sampled: { always_on: undefined },
+        remote_parent_not_sampled: { always_off: undefined },
+        local_parent_sampled: { always_on: undefined },
+        local_parent_not_sampled: { always_off: undefined },
+      },
+    },
+  };
+}
+
+export function initializeDefaultMeterProviderConfiguration(): NonNullable<
+  ConfigurationModel['meter_provider']
+> {
+  return {
+    readers: [],
+    views: [],
+    exemplar_filter: 'trace_based',
+  };
+}
+
+export function initializeDefaultLoggerProviderConfiguration(): NonNullable<
+  ConfigurationModel['logger_provider']
+> {
+  return {
+    processors: [],
+    limits: { attribute_count_limit: 128 },
+    'logger_configurator/development': {},
+  };
 }
 
 export function getHttpTlsConfig(

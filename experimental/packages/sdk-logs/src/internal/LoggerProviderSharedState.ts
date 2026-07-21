@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { type MeterProvider, createNoopMeter } from '@opentelemetry/api';
 import type { Logger } from '@opentelemetry/api-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 import type { Resource } from '@opentelemetry/resources';
@@ -16,6 +17,8 @@ import type {
 import { NoopLogRecordProcessor } from '../export/NoopLogRecordProcessor';
 import { MultiLogRecordProcessor } from '../MultiLogRecordProcessor';
 import { getInstrumentationScopeKey } from './utils';
+import { LoggerMetrics } from '../LoggerMetrics';
+import { VERSION } from '../version';
 
 const DEFAULT_LOGGER_CONFIG: Required<LoggerConfig> = {
   disabled: false,
@@ -35,28 +38,27 @@ export class LoggerProviderSharedState {
   activeProcessor: LogRecordProcessor;
   readonly registeredLogRecordProcessors: LogRecordProcessor[] = [];
   readonly resource: Resource;
-  readonly forceFlushTimeoutMillis: number;
   readonly logRecordLimits: Required<LogRecordLimits>;
   readonly processors: LogRecordProcessor[];
+  readonly loggerMetrics: LoggerMetrics;
+  hasShutdown = false;
   private _loggerConfigurator: LoggerConfigurator;
   private _loggerConfigs: Map<string, Required<LoggerConfig>> = new Map();
 
   constructor(
     resource: Resource,
-    forceFlushTimeoutMillis: number,
     logRecordLimits: Required<LogRecordLimits>,
     processors: LogRecordProcessor[],
-    loggerConfigurator?: LoggerConfigurator
+    loggerConfigurator?: LoggerConfigurator,
+    meterProvider?: MeterProvider
   ) {
     this.resource = resource;
-    this.forceFlushTimeoutMillis = forceFlushTimeoutMillis;
     this.logRecordLimits = logRecordLimits;
     this.processors = processors;
     if (processors.length > 0) {
       this.registeredLogRecordProcessors = processors;
       this.activeProcessor = new MultiLogRecordProcessor(
-        this.registeredLogRecordProcessors,
-        this.forceFlushTimeoutMillis
+        this.registeredLogRecordProcessors
       );
     } else {
       this.activeProcessor = new NoopLogRecordProcessor();
@@ -64,6 +66,11 @@ export class LoggerProviderSharedState {
 
     this._loggerConfigurator =
       loggerConfigurator ?? DEFAULT_LOGGER_CONFIGURATOR;
+
+    const meter = meterProvider
+      ? meterProvider.getMeter('@opentelemetry/sdk-logs', VERSION)
+      : createNoopMeter();
+    this.loggerMetrics = new LoggerMetrics(meter);
   }
 
   /**

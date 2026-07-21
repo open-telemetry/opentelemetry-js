@@ -5,11 +5,11 @@
 
 import type { Link, SpanKind, Attributes, Context } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
-import type { Sampler, SamplingResult } from '@opentelemetry/sdk-trace-base';
+import type { Sampler, SamplingResult } from '@opentelemetry/sdk-trace';
 import {
   ParentBasedSampler,
   TraceIdRatioBasedSampler,
-} from '@opentelemetry/sdk-trace-base';
+} from '@opentelemetry/sdk-trace';
 import * as axios from 'axios';
 import { PerOperationSampler } from './PerOperationSampler';
 import type { SamplingStrategyResponse } from './types';

@@ -27,6 +27,7 @@ const {
 const packageJsonDependencyFields = ['dependencies', 'peerDependencies', 'devDependencies'];
 const tsConfigMergeKeys = [
   'compilerOptions',
+  'exclude',
   'include',
   'files',
 ];
@@ -41,6 +42,7 @@ const ignoredLernaProjects = [
   'examples/http',
   'examples/https',
   'examples/esm-http-ts',
+  'examples/dice/*',
   'bundler-tests/browser/*'
 ];
 

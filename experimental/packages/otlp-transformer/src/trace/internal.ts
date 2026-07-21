@@ -4,7 +4,7 @@
  */
 import type { Link } from '@opentelemetry/api';
 import type { Resource } from '@opentelemetry/resources';
-import type { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace';
 import type { Encoder } from '../common/utils';
 import {
   createInstrumentationScope,
@@ -152,7 +152,10 @@ function spanRecordsToResourceSpans(
         );
 
         scopeResourceSpans.push({
-          scope: createInstrumentationScope(scopeSpans[0].instrumentationScope),
+          scope: createInstrumentationScope(
+            scopeSpans[0].instrumentationScope,
+            encoder
+          ),
           spans: spans,
           schemaUrl: scopeSpans[0].instrumentationScope.schemaUrl,
         });

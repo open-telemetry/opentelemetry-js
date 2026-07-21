@@ -17,7 +17,7 @@ import {
 const setup = () => {
   const memoryExporter = new InMemoryLogRecordExporter();
   const provider = new LoggerProvider({
-    processors: [new SimpleLogRecordProcessor(memoryExporter)],
+    processors: [new SimpleLogRecordProcessor({ exporter: memoryExporter })],
   });
   return { provider, memoryExporter };
 };
@@ -83,6 +83,13 @@ describe('InMemoryLogRecordExporter', () => {
       assert.ok(memoryExporter.getFinishedLogRecords().length === 1);
       memoryExporter.reset();
       assert.strictEqual(memoryExporter.getFinishedLogRecords().length, 0);
+    });
+  });
+
+  describe('forceFlush', function () {
+    it('should forceFlush without error', async function () {
+      const exporter = new InMemoryLogRecordExporter();
+      await exporter.forceFlush();
     });
   });
 });

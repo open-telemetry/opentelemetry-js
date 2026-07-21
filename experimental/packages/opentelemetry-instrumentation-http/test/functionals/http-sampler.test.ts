@@ -11,13 +11,13 @@ import type {
   SpanKind,
 } from '@opentelemetry/api';
 import { context } from '@opentelemetry/api';
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
-import type { Sampler, SamplingResult } from '@opentelemetry/sdk-trace-base';
+import type { Sampler, SamplingResult } from '@opentelemetry/sdk-trace';
 import {
   InMemorySpanExporter,
   SamplingDecision,
   SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
+  TracerProvider,
+} from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
 import { HttpInstrumentation } from '../../src/http';
 import { httpRequest } from '../utils/httpRequest';
@@ -56,9 +56,9 @@ import * as http from 'http';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 
 const memoryExporter = new InMemorySpanExporter();
-const provider = new NodeTracerProvider({
+const provider = new TracerProvider({
   sampler,
-  spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+  spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
 });
 instrumentation.setTracerProvider(provider);
 
@@ -98,7 +98,7 @@ describe('HttpInstrumentation sampler integration', () => {
     });
 
     assert.deepStrictEqual(
-      sampler.capturedAttributes?.['http.request.header.x_custom_header'],
+      sampler.capturedAttributes?.['http.request.header.x-custom-header'],
       ['test-value']
     );
   });

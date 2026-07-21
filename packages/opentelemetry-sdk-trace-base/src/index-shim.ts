@@ -1,0 +1,38 @@
+/*
+ * Copyright The OpenTelemetry Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+export { BasicTracerProvider } from './BasicTracerProvider-shim';
+export type {
+  BufferConfig,
+  BatchSpanProcessorBrowserConfig,
+  GeneralLimits,
+  TracerConfig,
+  SDKRegistrationConfig,
+} from './types-shim';
+export { BatchSpanProcessor } from './BatchSpanProcessor-shim';
+export { SimpleSpanProcessor } from './SimpleSpanProcessor-shim';
+
+export {
+  ConsoleSpanExporter,
+  RandomIdGenerator,
+  InMemorySpanExporter,
+  NoopSpanProcessor,
+  AlwaysOffSampler,
+  AlwaysOnSampler,
+  ParentBasedSampler,
+  TraceIdRatioBasedSampler,
+  SamplingDecision,
+} from '@opentelemetry/sdk-trace';
+export type {
+  ReadableSpan,
+  SpanExporter,
+  Sampler,
+  SamplingResult,
+  Span,
+  SpanProcessor,
+  TimedEvent,
+  SpanLimits,
+  IdGenerator,
+} from '@opentelemetry/sdk-trace';

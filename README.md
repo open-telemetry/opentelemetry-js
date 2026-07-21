@@ -70,7 +70,7 @@ npm install --save @opentelemetry/auto-instrumentations-node
 const process = require('process');
 const opentelemetry = require('@opentelemetry/sdk-node');
 const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
-const { ConsoleSpanExporter } = require('@opentelemetry/sdk-trace-base');
+const { ConsoleSpanExporter } = require('@opentelemetry/sdk-trace');
 const { resourceFromAttributes } = require('@opentelemetry/resources');
 const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 
@@ -104,7 +104,7 @@ process.on('SIGTERM', () => {
 node -r ./tracing.js app.js
 ```
 
-The above example will emit auto-instrumented telemetry about your Node.js application to the console. For a more in-depth example, see the [Getting Started Guide](https://opentelemetry.io/docs/languages/js/getting-started/). For more information about automatic instrumentation see [@opentelemetry/sdk-trace-node][otel-node], which provides auto-instrumentation for Node.js applications. If the automatic instrumentation does not suit your needs, or you would like to create manual traces, see [@opentelemetry/sdk-trace-base][otel-tracing]
+The above example will emit auto-instrumented telemetry about your Node.js application to the console. For a more in-depth example, see the [Getting Started Guide](https://opentelemetry.io/docs/languages/js/getting-started/).
 
 #### Debugging The Setup
 
@@ -163,7 +163,7 @@ This minimum support level is subject to change as the project evolves and as th
 
 ## TypeScript Support
 
-OpenTelemetry JavaScript is built with TypeScript `v5.0.4`. If you have a TypeScript project (app, library, instrumentation, etc.)
+OpenTelemetry JavaScript is built with TypeScript `v5.2.2`. If you have a TypeScript project (app, library, instrumentation, etc.)
 that depends on it, we recommend using same or higher version to compile the project.
 
 OpenTelemetry JavaScript will follow DefinitelyType's [support policy for TypeScript](https://github.com/DefinitelyTyped/DefinitelyTyped#support-window) which sets a support window of 2 years. Support for TypeScript versions older than 2 years will be dropped in minor releases of OpenTelemetry JavaScript.
@@ -256,13 +256,11 @@ For more information about the maintainer role, see the [community repository](h
 
 ### Approvers
 
-- [Amir Blum](https://github.com/blumamir), Odigos
 - [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
 - [Jackson Weber](https://github.com/JacksonWeber), Microsoft
 - [Martin Kuba](https://github.com/martinkuba), Grafana Labs
 - [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
 - [Raphaël Thériault](https://github.com/raphael-theriault-swi), SolarWinds
-- [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
 
 In addition, [Browser SIG Maintainers](https://github.com/orgs/open-telemetry/teams/browser-maintainers) are granted the
 Approver role for browser-targeted packages as defined in this repository's [CODEOWNERS](./.github/CODEOWNERS) file.
@@ -312,8 +310,9 @@ Typically, members of this are [component owners](https://github.com/open-teleme
 
 For more information about the triager role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#triager).
 
-### Emeriti
+### Emeritus
 
+- [Amir Blum](https://github.com/blumamir), Maintainer
 - [Bartlomiej Obecny](https://github.com/obecny), Maintainer
 - [Brandon Gonzalez](https://github.com/bg451), Approver
 - [Daniel Khan](https://github.com/dkhan), Maintainer
@@ -321,15 +320,16 @@ For more information about the triager role, see the [community repository](http
 - [Haddas Bronfman](https://github.com/haddasbronfman), Approver
 - [John Bley](https://github.com/johnbley), Approver
 - [Mark Wolff](https://github.com/markwolff), Approver
+- [Matthew Wear](https://github.com/mwear), Approver
 - [Mayur Kale](https://github.com/mayurkale22), Maintainer
 - [Naseem K. Ullah](https://github.com/naseemkullah), Approver
+- [Neville Wylie](https://github.com/MSNev), Approver
 - [Olivier Albertini](https://github.com/OlivierAlbertini), Approver
+- [Purvi Kanal](https://github.com/pkanal), Approver
 - [Rauno Viskus](https://github.com/rauno56), Maintainer
 - [Roch Devost](https://github.com/rochdev), Approver
+- [Svetlana Brennan](https://github.com/svetlanabrennan), Approver
 - [Valentin Marchaud](https://github.com/vmarchaud), Maintainer
-- [Matthew Wear](https://github.com/mwear), Approver
-- [Neville Wylie](https://github.com/MSNev), Approver
-- [Purvi Kanal](https://github.com/pkanal), Approver
 
 For more information about the emeritus role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#emeritus-maintainerapprovertriager).
 
@@ -352,10 +352,8 @@ For more information about the emeritus role, see the [community repository](htt
 
 | Package                                       | Description                                                                                                                                                                                                                                           |
 | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [@opentelemetry/sdk-trace-base][otel-tracing] | This module provides a full control over instrumentation and span creation. It doesn't load [`async_hooks`](https://nodejs.org/api/async_hooks.html) or any instrumentation by default. It is intended for use both on the server and in the browser. |
+| [@opentelemetry/sdk-trace][otel-tracing]      | This module provides a full control over instrumentation and span creation. It doesn't load [`async_hooks`](https://nodejs.org/api/async_hooks.html) or any instrumentation by default. It is intended for use both on the server and in the browser. |
 | [@opentelemetry/sdk-metrics][otel-metrics]    | This module provides instruments and meters for reporting of time series data.                                                                                                                                                                        |
-| [@opentelemetry/sdk-trace-node][otel-node]    | This module provides automatic tracing for Node.js applications. It is intended for use on the server only.                                                                                                                                           |
-| [@opentelemetry/sdk-trace-web][otel-web]      | This module provides automated instrumentation and tracing for Web applications. It is intended for use in the browser only.                                                                                                                          |
 
 ### Compatible Exporters
 
@@ -421,7 +419,6 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [CONTRIBUTING]: https://github.com/open-telemetry/opentelemetry-js/blob/main/CONTRIBUTING.md
 
 [otel-metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-metrics
-[otel-node]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node
 
 [otel-instrumentation-fetch]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-fetch
 [otel-instrumentation-grpc]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-grpc
@@ -429,8 +426,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-instrumentation-xml-http-request]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-xml-http-request
 
 [otel-shim-opentracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-shim-opentracing
-[otel-tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base
-[otel-web]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-web
+[otel-tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-trace
 [otel-api]: https://github.com/open-telemetry/opentelemetry-js/tree/main/api
 [otel-core]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-core
 

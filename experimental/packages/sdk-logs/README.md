@@ -33,11 +33,18 @@ const {
 // To start a logger, you first need to initialize the Logger provider.
 // and add a processor to export log record
 const loggerProvider = new LoggerProvider({
-  processors: [new SimpleLogRecordProcessor(new ConsoleLogRecordExporter())]
+  processors: [
+    new SimpleLogRecordProcessor({
+      exporter: new ConsoleLogRecordExporter()
+    })
+  ]
 });
 
 //  To create a log record, you first need to get a Logger instance
 const logger = loggerProvider.getLogger('default');
+
+// Reuse loggers where possible. getLogger() may be expensive, especially when
+// scopeAttributes are provided, so avoid calling it on hot paths.
 
 // You can also use global singleton
 logsAPI.logs.setGlobalLoggerProvider(loggerProvider);
@@ -82,7 +89,7 @@ const loggerProvider = new LoggerProvider({
       }
     }
   ]),
-  processors: [new SimpleLogRecordProcessor(exporter)]
+  processors: [new SimpleLogRecordProcessor({ exporter })]
 });
 ```
 
@@ -106,7 +113,7 @@ const loggerProvider = new LoggerProvider({
       }
     }
   ]),
-  processors: [new SimpleLogRecordProcessor(exporter)]
+  processors: [new SimpleLogRecordProcessor({ exporter })]
 });
 ```
 
@@ -132,7 +139,7 @@ const loggerProvider = new LoggerProvider({
       }
     }
   ]),
-  processors: [new SimpleLogRecordProcessor(exporter)]
+  processors: [new SimpleLogRecordProcessor({ exporter })]
 });
 ```
 
@@ -170,10 +177,10 @@ const defaultLogger = loggerProvider.getLogger('my-service'); // WARN+
 interface LoggerConfig {
   /** Drop logs with severity below this level (default: UNSPECIFIED = no filtering) */
   minimumSeverity?: SeverityNumber;
-  
+
   /** Drop logs from unsampled traces (default: false) */
   traceBased?: boolean;
-  
+
   /** Disable this logger completely (default: false) */
   disabled?: boolean;
 }

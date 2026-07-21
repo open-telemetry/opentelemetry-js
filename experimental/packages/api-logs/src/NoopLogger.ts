@@ -8,6 +8,16 @@ import type { LogRecord } from './types/LogRecord';
 
 export class NoopLogger implements Logger {
   emit(_logRecord: LogRecord): void {}
+  enabled(): boolean {
+    return false;
+  }
 }
 
 export const NOOP_LOGGER = new NoopLogger();
+
+/**
+ * Create a no-op Logger
+ */
+export function createNoopLogger(): Logger {
+  return NOOP_LOGGER;
+}

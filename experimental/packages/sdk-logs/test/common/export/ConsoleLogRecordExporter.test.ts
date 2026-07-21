@@ -35,7 +35,9 @@ describe('ConsoleLogRecordExporter', () => {
         const spyConsole = sinon.spy(console, 'dir');
         const spyExport = sinon.spy(consoleExporter, 'export');
         const provider = new LoggerProvider({
-          processors: [new SimpleLogRecordProcessor(consoleExporter)],
+          processors: [
+            new SimpleLogRecordProcessor({ exporter: consoleExporter }),
+          ],
         });
 
         provider
@@ -82,6 +84,13 @@ describe('ConsoleLogRecordExporter', () => {
 
         assert.ok(spyExport.calledOnce);
       });
+    });
+  });
+
+  describe('forceFlush', function () {
+    it('should forceFlush without error', async function () {
+      const consoleExporter = new ConsoleLogRecordExporter();
+      await consoleExporter.forceFlush();
     });
   });
 });

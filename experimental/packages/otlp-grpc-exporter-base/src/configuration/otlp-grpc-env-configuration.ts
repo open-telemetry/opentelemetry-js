@@ -91,7 +91,7 @@ function getUrlFromEnv(signalIdentifier: string) {
   const specificEndpoint =
     process.env[`OTEL_EXPORTER_OTLP_${signalIdentifier}_ENDPOINT`]?.trim();
   const nonSpecificEndpoint =
-    process.env[`OTEL_EXPORTER_OTLP_ENDPOINT`]?.trim();
+    process.env['OTEL_EXPORTER_OTLP_ENDPOINT']?.trim();
 
   return fallbackIfNullishOrBlank(specificEndpoint, nonSpecificEndpoint);
 }
@@ -123,7 +123,7 @@ function getInsecureSettingFromEnv(signalIdentifier: string): boolean {
     ?.toLowerCase()
     .trim();
   const nonSignalSpecificInsecureValue = process.env[
-    `OTEL_EXPORTER_OTLP_INSECURE`
+    'OTEL_EXPORTER_OTLP_INSECURE'
   ]
     ?.toLowerCase()
     .trim();

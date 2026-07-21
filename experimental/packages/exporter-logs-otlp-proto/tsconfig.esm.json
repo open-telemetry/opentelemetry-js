@@ -18,18 +18,6 @@
       "path": "../../../api"
     },
     {
-      "path": "../../../packages/opentelemetry-core"
-    },
-    {
-      "path": "../../../packages/opentelemetry-resources"
-    },
-    {
-      "path": "../../../packages/opentelemetry-sdk-trace-base"
-    },
-    {
-      "path": "../api-logs"
-    },
-    {
       "path": "../otlp-exporter-base"
     },
     {

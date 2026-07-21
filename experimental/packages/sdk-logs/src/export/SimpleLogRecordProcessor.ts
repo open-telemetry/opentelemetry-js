@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { createNoopMeter } from '@opentelemetry/api';
 import type { ExportResult } from '@opentelemetry/core';
 import {
   BindOnceFuture,
@@ -13,6 +14,10 @@ import {
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
 import type { SdkLogRecord } from './SdkLogRecord';
+import { OTEL_COMPONENT_TYPE_VALUE_SIMPLE_LOG_PROCESSOR } from '../semconv';
+import { LogRecordProcessorMetrics } from './LogRecordProcessorMetrics';
+import type { Context } from '@opentelemetry/api';
+import type { SimpleLogRecordProcessorOptions } from '../types';
 
 /**
  * An implementation of the {@link LogRecordProcessor} interface that exports
@@ -25,16 +30,25 @@ import type { SdkLogRecord } from './SdkLogRecord';
  */
 export class SimpleLogRecordProcessor implements LogRecordProcessor {
   private readonly _exporter: LogRecordExporter;
+  private readonly _metrics: LogRecordProcessorMetrics;
   private _shutdownOnce: BindOnceFuture<void>;
   private _unresolvedExports: Set<Promise<void>>;
 
-  constructor(exporter: LogRecordExporter) {
-    this._exporter = exporter;
+  constructor(options: SimpleLogRecordProcessorOptions) {
+    this._exporter = options.exporter;
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
     this._unresolvedExports = new Set<Promise<void>>();
+
+    const meter = options?.selfObsMeterProvider
+      ? options.selfObsMeterProvider.getMeter('@opentelemetry/sdk-logs')
+      : createNoopMeter();
+    this._metrics = new LogRecordProcessorMetrics(
+      OTEL_COMPONENT_TYPE_VALUE_SIMPLE_LOG_PROCESSOR,
+      meter
+    );
   }
 
-  public onEmit(logRecord: SdkLogRecord): void {
+  public onEmit(logRecord: SdkLogRecord, _context?: Context): void {
     if (this._shutdownOnce.isCalled) {
       return;
     }
@@ -43,6 +57,7 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
       internal
         ._export(this._exporter, [logRecord])
         .then((result: ExportResult) => {
+          this._metrics.finishLogs(1, result.error);
           if (result.code !== ExportResultCode.SUCCESS) {
             globalErrorHandler(
               result.error ??
@@ -61,7 +76,6 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
         .then(() => {
           // Using TS Non-null assertion operator because exportPromise could not be null in here
           // if waitForAsyncAttributes is not present this code will never be reached
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           this._unresolvedExports.delete(exportPromise!);
           return doExport();
         }, globalErrorHandler);
@@ -85,6 +99,7 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
   }
 
   private _shutdown(): Promise<void> {
+    this._metrics.shutdown();
     return this._exporter.shutdown();
   }
 }

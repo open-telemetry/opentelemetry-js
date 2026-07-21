@@ -21,16 +21,19 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
-import { isLogAttributeValue } from './utils/validation';
 import type { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
+import { addAttribute, AddAttributeDecision } from './utils/validation';
 
 export class LogRecordImpl implements ReadableLogRecord {
-  readonly hrTime: api.HrTime;
-  readonly hrTimeObserved: api.HrTime;
-  readonly spanContext?: api.SpanContext;
   readonly resource: Resource;
-  readonly instrumentationScope: InstrumentationScope;
+  readonly instrumentationScope: InstrumentationScope & {
+    attributes?: LogAttributes;
+    droppedAttributesCount?: number;
+  };
   readonly attributes: LogAttributes = {};
+  private _hrTime: api.HrTime;
+  private _hrTimeObserved: api.HrTime;
+  private _spanContext?: api.SpanContext;
   private _severityText?: string;
   private _severityNumber?: SeverityNumber;
   private _body?: LogBody;
@@ -40,6 +43,36 @@ export class LogRecordImpl implements ReadableLogRecord {
 
   private _isReadonly: boolean = false;
   private readonly _logRecordLimits: Required<LogRecordLimits>;
+
+  get hrTime(): api.HrTime {
+    return this._hrTime;
+  }
+  set hrTime(hrTime: api.HrTime) {
+    if (this._isLogRecordReadonly()) {
+      return;
+    }
+    this._hrTime = hrTime;
+  }
+
+  get hrTimeObserved(): api.HrTime {
+    return this._hrTimeObserved;
+  }
+  set hrTimeObserved(hrTimeObserved: api.HrTime) {
+    if (this._isLogRecordReadonly()) {
+      return;
+    }
+    this._hrTimeObserved = hrTimeObserved;
+  }
+
+  get spanContext(): api.SpanContext | undefined {
+    return this._spanContext;
+  }
+  set spanContext(spanContext: api.SpanContext | undefined) {
+    if (this._isLogRecordReadonly()) {
+      return;
+    }
+    this._spanContext = spanContext;
+  }
 
   set severityText(severityText: string | undefined) {
     if (this._isLogRecordReadonly()) {
@@ -103,13 +136,13 @@ export class LogRecordImpl implements ReadableLogRecord {
     } = logRecord;
 
     const now = Date.now();
-    this.hrTime = timeInputToHrTime(timestamp ?? now);
-    this.hrTimeObserved = timeInputToHrTime(observedTimestamp ?? now);
+    this._hrTime = timeInputToHrTime(timestamp ?? now);
+    this._hrTimeObserved = timeInputToHrTime(observedTimestamp ?? now);
 
     if (context) {
       const spanContext = api.trace.getSpanContext(context);
       if (spanContext && api.isSpanContextValid(spanContext)) {
-        this.spanContext = spanContext;
+        this._spanContext = spanContext;
       }
     }
     this.severityNumber = severityNumber;
@@ -129,33 +162,25 @@ export class LogRecordImpl implements ReadableLogRecord {
     if (this._isLogRecordReadonly()) {
       return this;
     }
-    if (key.length === 0) {
-      api.diag.warn(`Invalid attribute key: ${key}`);
-      return this;
-    }
-    if (!isLogAttributeValue(value)) {
-      api.diag.warn(`Invalid attribute value set for key: ${key}`);
-      return this;
-    }
-    const isNewKey = !Object.prototype.hasOwnProperty.call(
+
+    const decision = addAttribute(
       this.attributes,
-      key
+      this._logRecordLimits,
+      this._attributesCount,
+      key,
+      value
     );
-    if (
-      isNewKey &&
-      this._attributesCount >= this._logRecordLimits.attributeCountLimit
-    ) {
+
+    if (decision === AddAttributeDecision.DROP_LIMIT_REACHED) {
       this._droppedAttributesCount++;
-      // Only warn once per LogRecord to avoid log spam
       if (this._droppedAttributesCount === 1) {
+        // Only warn once per LogRecord to avoid log spam
         api.diag.warn('Dropping extra attributes.');
       }
-      return this;
-    }
-    this.attributes[key] = this._truncateToSize(value);
-    if (isNewKey) {
+    } else if (decision === AddAttributeDecision.ADD_NEW) {
       this._attributesCount++;
     }
+
     return this;
   }
 
@@ -193,48 +218,6 @@ export class LogRecordImpl implements ReadableLogRecord {
    */
   _makeReadonly() {
     this._isReadonly = true;
-  }
-
-  private _truncateToSize(value: AnyValue): AnyValue {
-    const limit = this._logRecordLimits.attributeValueLengthLimit;
-    // Check limit
-    if (limit <= 0) {
-      // Negative values are invalid, so do not truncate
-      api.diag.warn(`Attribute value limit must be positive, got ${limit}`);
-      return value;
-    }
-
-    // null/undefined - no truncation needed
-    if (value == null) {
-      return value;
-    }
-
-    // String
-    if (typeof value === 'string') {
-      return this._truncateToLimitUtil(value, limit);
-    }
-
-    // Byte arrays - no truncation needed
-    if (value instanceof Uint8Array) {
-      return value;
-    }
-
-    // Arrays (can contain any AnyValue types)
-    if (Array.isArray(value)) {
-      return value.map(val => this._truncateToSize(val));
-    }
-
-    // Objects/Maps - recursively truncate nested values
-    if (typeof value === 'object') {
-      const truncatedObj: Record<string, AnyValue> = {};
-      for (const [k, v] of Object.entries(value as Record<string, AnyValue>)) {
-        truncatedObj[k] = this._truncateToSize(v);
-      }
-      return truncatedObj;
-    }
-
-    // Other types (number, boolean), no need to apply value length limit
-    return value;
   }
 
   private _setException(exception: unknown): void {
@@ -283,13 +266,6 @@ export class LogRecordImpl implements ReadableLogRecord {
     if (!hasMinimumAttributes) {
       api.diag.warn(`Failed to record an exception ${exception}`);
     }
-  }
-
-  private _truncateToLimitUtil(value: string, limit: number): string {
-    if (value.length <= limit) {
-      return value;
-    }
-    return value.substring(0, limit);
   }
 
   private _isLogRecordReadonly(): boolean {

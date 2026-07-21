@@ -11,6 +11,7 @@ import type {
   LoggerProvider,
   LogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
+import type { MeterProvider } from '@opentelemetry/sdk-metrics';
 import type { IMetricReader, ViewOptions } from '@opentelemetry/sdk-metrics';
 import type {
   Sampler,
@@ -18,7 +19,8 @@ import type {
   SpanLimits,
   SpanProcessor,
   IdGenerator,
-} from '@opentelemetry/sdk-trace-base';
+} from '@opentelemetry/sdk-trace';
+import type { TracerProvider } from '@opentelemetry/sdk-trace';
 
 export interface NodeSDKConfiguration {
   autoDetectResources: boolean;
@@ -32,6 +34,14 @@ export interface NodeSDKConfiguration {
   metricReaders?: IMetricReader[];
   views: ViewOptions[];
   instrumentations: (Instrumentation | Instrumentation[])[];
+  /**
+   * Custom resource to attach to telemetry.
+   * It is recommended to merge with the default resource via:
+   *
+   *     resource: defaultResource().merge(
+   *       resourceFromAttributes({ foo: 'bar' })
+   *     )
+   */
   resource: Resource;
   resourceDetectors: Array<ResourceDetector>;
   sampler: Sampler;
@@ -53,7 +63,9 @@ export interface SDKOptions {
 }
 
 export interface SDKComponents {
-  contextManager: ContextManager;
+  contextManager?: ContextManager;
   loggerProvider?: LoggerProvider;
+  meterProvider?: MeterProvider;
+  tracerProvider?: TracerProvider;
   propagator?: TextMapPropagator;
 }

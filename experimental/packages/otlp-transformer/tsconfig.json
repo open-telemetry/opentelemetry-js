@@ -8,8 +8,8 @@
   "files": [],
   "include": [
     "src/**/*.ts",
-    "src/generated/*.js",
-    "src/generated/*.ts",
+    "test/generated/*.js",
+    "test/generated/*.ts",
     "test/**/*.ts"
   ],
   "references": [
@@ -23,10 +23,10 @@
       "path": "../../../packages/opentelemetry-resources"
     },
     {
-      "path": "../../../packages/opentelemetry-sdk-trace-base"
+      "path": "../../../packages/sdk-metrics"
     },
     {
-      "path": "../../../packages/sdk-metrics"
+      "path": "../../../packages/sdk-trace"
     },
     {
       "path": "../api-logs"

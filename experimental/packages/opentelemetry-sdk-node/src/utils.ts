@@ -3,7 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ContextManager, TextMapPropagator } from '@opentelemetry/api';
+import type {
+  ContextManager,
+  MeterProvider,
+  TextMapPropagator,
+} from '@opentelemetry/api';
 import { context, diag, propagation } from '@opentelemetry/api';
 import {
   CompositePropagator,
@@ -31,44 +35,80 @@ import {
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 import type {
+  IdGenerator,
+  Sampler,
   SpanExporter,
   SpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
+} from '@opentelemetry/sdk-trace';
 import {
+  AlwaysOffSampler,
+  AlwaysOnSampler,
   BatchSpanProcessor,
   ConsoleSpanExporter,
+  ParentBasedSampler,
+  RandomIdGenerator,
   SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
+  TraceIdRatioBasedSampler,
+} from '@opentelemetry/sdk-trace';
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
-import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
-import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
-import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
+import {
+  createEmptyMetadata,
+  createInsecureCredentials,
+  createSslCredentials,
+} from '@opentelemetry/otlp-grpc-exporter-base';
 import type {
   ConfigurationModel,
-  LogRecordExporterModel,
+  InstrumentTypeConfigModel,
+  AggregationConfigModel,
+  MetricProducerConfigModel,
+  PeriodicMetricReaderConfigModel,
+  PushMetricExporterConfigModel,
+  OtlpHttpMetricExporterConfigModel,
+  OtlpGrpcMetricExporterConfigModel,
+  SpanExporterConfigModel,
+  SamplerConfigModel,
+  NameStringValuePairConfigModel,
+  HttpTlsConfigModel,
+  GrpcTlsConfigModel,
+  TextMapPropagatorConfigModel,
+} from '@opentelemetry/configuration';
+import {
+  mergePropagatorCompositeConfig,
+  mergeResourceAttributesConfig,
 } from '@opentelemetry/configuration';
 import type {
+  AggregationOption,
+  AggregationSelector,
+  IAttributesProcessor,
   IMetricReader,
   PushMetricExporter,
+  ViewOptions,
 } from '@opentelemetry/sdk-metrics';
-import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
+import {
+  AggregationType,
+  ConsoleMetricExporter,
+  createAllowListAttributesProcessor,
+  createDenyListAttributesProcessor,
+  InstrumentType,
+  PeriodicExportingMetricReader,
+} from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
 import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
+import { AggregationTemporalityPreference } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
 import type {
-  BufferConfig,
+  BatchLogRecordProcessorOptions,
   LogRecordExporter,
-  LoggerProviderConfig,
-  LogRecordProcessor,
+  LoggerProviderOptions,
 } from '@opentelemetry/sdk-logs';
-import {
-  BatchLogRecordProcessor,
-  ConsoleLogRecordExporter,
-  SimpleLogRecordProcessor,
-} from '@opentelemetry/sdk-logs';
+import type { MetricProducer } from '@opentelemetry/sdk-metrics';
+import { BatchLogRecordProcessor } from '@opentelemetry/sdk-logs';
+import * as fs from 'fs';
+import { inspect } from 'util';
+import { createBatchSpanProcessorFromEnv } from './create-from-env';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';
@@ -79,17 +119,28 @@ const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
 export function getResourceFromConfiguration(
   config: ConfigurationModel
 ): Resource | undefined {
-  if (config.resource && config.resource.attributes) {
-    const attr: DetectedResourceAttributes = {};
-    for (let i = 0; i < config.resource.attributes.length; i++) {
-      const a = config.resource.attributes[i];
-      attr[a.name] = a.value;
-    }
-    return resourceFromAttributes(attr, {
-      schemaUrl: config.resource.schema_url,
-    });
+  if (!config.resource) {
+    return undefined;
   }
-  return undefined;
+
+  const configAttrs = mergeResourceAttributesConfig(
+    config.resource.attributes,
+    config.resource.attributes_list
+  );
+  if (!configAttrs) {
+    return undefined;
+  }
+
+  const attrs: DetectedResourceAttributes = {};
+  for (let i = 0; i < configAttrs.length; i++) {
+    const a = configAttrs[i];
+    if (a.value !== null) {
+      attrs[a.name] = a.value;
+    }
+  }
+  return resourceFromAttributes(attrs, {
+    schemaUrl: config.resource.schema_url ?? undefined,
+  });
 }
 
 export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
@@ -132,11 +183,11 @@ export function getResourceDetectorsFromConfiguration(
 
   return detectors.flatMap(detector => {
     const result: ResourceDetector[] = [];
-    if (detector.host != null) result.push(hostDetector);
-    if (detector.os != null) result.push(osDetector);
-    if (detector.process != null) result.push(processDetector);
-    if (detector.service != null) result.push(serviceInstanceIdDetector);
-    if (detector.env != null) result.push(envDetector);
+    if (detector.host !== undefined) result.push(hostDetector);
+    if (detector.os !== undefined) result.push(osDetector);
+    if (detector.process !== undefined) result.push(processDetector);
+    if (detector.service !== undefined) result.push(serviceInstanceIdDetector);
+    if (detector.env !== undefined) result.push(envDetector);
     return result;
   });
 }
@@ -167,7 +218,9 @@ function getOtlpExporterFromEnv(): SpanExporter {
   }
 }
 
-export function getSpanProcessorsFromEnv(): SpanProcessor[] {
+export function getSpanProcessorsFromEnv(
+  selfObsMeterProvider: MeterProvider | undefined
+): SpanProcessor[] {
   const exportersMap = new Map<string, () => SpanExporter>([
     ['otlp', () => getOtlpExporterFromEnv()],
     ['zipkin', () => new ZipkinExporter()],
@@ -210,9 +263,13 @@ export function getSpanProcessorsFromEnv(): SpanProcessor[] {
 
   for (const exp of exporters) {
     if (exp instanceof ConsoleSpanExporter) {
-      processors.push(new SimpleSpanProcessor(exp));
+      processors.push(
+        new SimpleSpanProcessor({ exporter: exp, selfObsMeterProvider })
+      );
     } else {
-      processors.push(new BatchSpanProcessor(exp));
+      processors.push(
+        createBatchSpanProcessorFromEnv(exp, selfObsMeterProvider)
+      );
     }
   }
 
@@ -250,7 +307,15 @@ export function getPropagatorFromEnv(): TextMapPropagator | null | undefined {
       'b3multi',
       () => new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
     ],
-    ['jaeger', () => new JaegerPropagator()],
+    [
+      'jaeger',
+      () => {
+        diag.warn(
+          'The Jaeger propagator is deprecated and will be removed in a future release. Use the W3C TraceContext propagator ("tracecontext") instead.'
+        );
+        return new JaegerPropagator();
+      },
+    ],
   ]);
 
   // Values MUST be deduplicated in order to register a Propagator only once.
@@ -286,17 +351,61 @@ export function getPropagatorFromEnv(): TextMapPropagator | null | undefined {
  */
 export function getPropagatorFromConfiguration(
   config: ConfigurationModel
-): TextMapPropagator | null | undefined {
-  const propagatorsValue = getKeyListFromObjectArray(
-    config.propagator?.composite
-  );
-  if (propagatorsValue == null) {
-    // return undefined to fall back to default
+): TextMapPropagator | undefined {
+  if (!config.propagator) {
     return undefined;
   }
 
-  if (propagatorsValue.includes('none')) {
-    return null;
+  const configComposite = mergePropagatorCompositeConfig(
+    config.propagator.composite,
+    config.propagator.composite_list
+  );
+  if (!configComposite) {
+    return undefined;
+  }
+
+  // TextMapPropagator config items are objects with a single key (the name).
+  // Transform this into a more convenient `(name, value)` 2-tuple.
+  //
+  // As well, guard against two cases where the TypeScript type
+  // `TextMapPropagatorConfigModel` does not exactly represent the JSON schema:
+  // 1. `"minProperties": 1, "maxProperties": 1,`
+  // 2. The type allows keys with an `undefined` value, but the JSON schema
+  //    does not.
+  const kvFromItem = (
+    item: TextMapPropagatorConfigModel
+  ): [string, object | null] => {
+    const keys = [];
+    let value = undefined;
+    for (const key of Object.keys(item)) {
+      value = item[key];
+      if (value === undefined) {
+        continue;
+      }
+      keys.push(key);
+    }
+    if (keys.length !== 1) {
+      throw new Error(
+        `invalid "propagator" entry in configuration, there must be exactly one key (with a non-undefined value): ${inspect(item)}`
+      );
+    }
+    return [keys[0], value as object | null];
+  };
+
+  // First pass: handle 'none', remove dupes.
+  const names = new Set();
+  const kvs = [];
+  for (const item of configComposite) {
+    const kv = kvFromItem(item);
+    const k = kv[0];
+    if (names.has(k)) {
+      continue;
+    }
+    names.add(k);
+    kvs.push(kv);
+    if (k === 'none') {
+      return undefined;
+    }
   }
 
   // Implementation note: this only contains specification required propagators that are actually hosted in this repo.
@@ -309,29 +418,32 @@ export function getPropagatorFromConfiguration(
       'b3multi',
       () => new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
     ],
-    ['jaeger', () => new JaegerPropagator()],
+    [
+      'jaeger',
+      () => {
+        diag.warn(
+          'The Jaeger propagator is deprecated and will be removed in a future release. Use the W3C TraceContext propagator ("tracecontext") instead.'
+        );
+        return new JaegerPropagator();
+      },
+    ],
   ]);
 
-  // Values MUST be deduplicated in order to register a Propagator only once.
-  const uniquePropagatorNames = Array.from(new Set(propagatorsValue));
   const validPropagators: TextMapPropagator[] = [];
-
-  uniquePropagatorNames.forEach(name => {
+  for (const [name] of kvs) {
     const propagator = propagatorsFactory.get(name)?.();
     if (!propagator) {
       diag.warn(
         `Propagator "${name}" requested through configuration is unavailable.`
       );
-      return;
+      continue;
     }
-
     validPropagators.push(propagator);
-  });
+  }
 
   if (validPropagators.length === 0) {
-    // null to signal that the default should **not** be used in its place.
-    return null;
-  } else if (uniquePropagatorNames.length === 1) {
+    return undefined;
+  } else if (validPropagators.length === 1) {
     return validPropagators[0];
   } else {
     return new CompositePropagator({
@@ -390,9 +502,14 @@ export function getKeyListFromObjectArray(
   if (!obj || obj.length === 0) {
     return undefined;
   }
-  return obj
-    .map(item => Object.keys(item))
-    .reduce((prev, curr) => prev.concat(curr), []);
+
+  const keys: string[] = [];
+  for (const item of obj) {
+    for (const key of Object.keys(item)) {
+      keys.push(key);
+    }
+  }
+  return keys;
 }
 
 export function getNonNegativeNumberFromEnv(
@@ -480,10 +597,167 @@ export function getOtlpMetricExporterFromEnv(): PushMetricExporter {
   return new OTLPProtoMetricExporter();
 }
 
+function getMetricProducersFromConfiguration(
+  producers: MetricProducerConfigModel[] | undefined
+): MetricProducer[] | undefined {
+  if (!producers || producers.length === 0) {
+    return undefined;
+  }
+  const result: MetricProducer[] = [];
+  for (const producer of producers) {
+    // Note: The "opencensus" MetricProducer is intentionally not supported.
+    // It is deprecated in OpenTelemetry Configuration v1.2.0.
+    diag.warn(
+      `Unsupported metric producer in configuration: "${producer}". Skipping.`
+    );
+  }
+  return result.length > 0 ? result : undefined;
+}
+
+/**
+ * Map a declarative-config `temporality_preference` value to the enum the OTLP
+ * metric exporters expect. Returns undefined for an unspecified preference so
+ * the exporter falls back to its own default (cumulative).
+ */
+function getMetricTemporalityPreference(
+  preference: string | null | undefined
+): AggregationTemporalityPreference | undefined {
+  switch (preference) {
+    case 'delta':
+      return AggregationTemporalityPreference.DELTA;
+    case 'low_memory':
+      return AggregationTemporalityPreference.LOWMEMORY;
+    case 'cumulative':
+      return AggregationTemporalityPreference.CUMULATIVE;
+    default:
+      return undefined;
+  }
+}
+
+/**
+ * Map a declarative-config `default_histogram_aggregation` value to an
+ * AggregationSelector that applies the requested aggregation to histogram
+ * instruments and leaves all other instrument types at their default. Returns
+ * undefined for an unspecified value so the exporter uses its own default.
+ */
+function getMetricAggregationPreference(
+  aggregation: string | null | undefined
+): AggregationSelector | undefined {
+  let histogramAggregation: AggregationOption;
+  switch (aggregation) {
+    case 'base2_exponential_bucket_histogram':
+      histogramAggregation = { type: AggregationType.EXPONENTIAL_HISTOGRAM };
+      break;
+    case 'explicit_bucket_histogram':
+      histogramAggregation = {
+        type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+      };
+      break;
+    default:
+      return undefined;
+  }
+  return (instrumentType: InstrumentType): AggregationOption =>
+    instrumentType === InstrumentType.HISTOGRAM
+      ? histogramAggregation
+      : { type: AggregationType.DEFAULT };
+}
+
+function getOtlpHttpMetricExporter(
+  otlpHttp: OtlpHttpMetricExporterConfigModel
+): PushMetricExporter | undefined {
+  const encoding = otlpHttp?.encoding ?? 'protobuf';
+  const options = {
+    compression:
+      otlpHttp?.compression === 'gzip'
+        ? CompressionAlgorithm.GZIP
+        : CompressionAlgorithm.NONE,
+    url: otlpHttp?.endpoint ?? undefined,
+    headers: getHeadersFromConfiguration(otlpHttp?.headers),
+    timeoutMillis: validateExporterTimeout(otlpHttp?.timeout),
+    httpAgentOptions: getHttpAgentOptionsFromTls(otlpHttp?.tls),
+    temporalityPreference: getMetricTemporalityPreference(
+      otlpHttp?.temporality_preference
+    ),
+    aggregationPreference: getMetricAggregationPreference(
+      otlpHttp?.default_histogram_aggregation
+    ),
+  };
+  if (encoding === 'json') {
+    return new OTLPHttpMetricExporter(options);
+  } else if (encoding === 'protobuf') {
+    return new OTLPProtoMetricExporter(options);
+  }
+  diag.warn(`Unsupported OTLP metrics encoding: ${encoding}.`);
+  return undefined;
+}
+
+function getOtlpGrpcMetricExporter(
+  otlpGrpc: OtlpGrpcMetricExporterConfigModel
+): PushMetricExporter {
+  return new OTLPGrpcMetricExporter({
+    compression:
+      otlpGrpc?.compression === 'gzip'
+        ? CompressionAlgorithm.GZIP
+        : CompressionAlgorithm.NONE,
+    url: otlpGrpc?.endpoint ?? undefined,
+    timeoutMillis: validateExporterTimeout(otlpGrpc?.timeout),
+    credentials: getGrpcCredentialsFromTls(otlpGrpc?.tls),
+    metadata: getGrpcMetadataFromHeaders(otlpGrpc?.headers),
+    temporalityPreference: getMetricTemporalityPreference(
+      otlpGrpc?.temporality_preference
+    ),
+    aggregationPreference: getMetricAggregationPreference(
+      otlpGrpc?.default_histogram_aggregation
+    ),
+  });
+}
+
+export function getMetricExporter(
+  exporter: PushMetricExporterConfigModel
+): PushMetricExporter | undefined {
+  if (exporter.otlp_http !== undefined) {
+    return getOtlpHttpMetricExporter(exporter.otlp_http);
+  }
+  if (exporter.otlp_grpc !== undefined) {
+    return getOtlpGrpcMetricExporter(exporter.otlp_grpc);
+  }
+  if (exporter.console !== undefined) {
+    return new ConsoleMetricExporter();
+  }
+  diag.warn('Unsupported Metric Exporter.');
+  return undefined;
+}
+
+export function getPeriodicMetricReaderFromConfiguration(
+  periodic: PeriodicMetricReaderConfigModel
+): IMetricReader | undefined {
+  if (!periodic.exporter) {
+    diag.warn('Unsupported Metric Exporter.');
+    return undefined;
+  }
+
+  const exporter = getMetricExporter(periodic.exporter);
+  if (!exporter) {
+    return undefined;
+  }
+
+  const metricProducers = getMetricProducersFromConfiguration(
+    periodic.producers
+  );
+
+  // TODO(6425): add cardinality_limits
+  return new PeriodicExportingMetricReader({
+    exportIntervalMillis: periodic.interval ?? 60_000,
+    exportTimeoutMillis: periodic.timeout ?? 30_000,
+    exporter,
+    metricProducers,
+  });
+}
+
 /**
  * Get LoggerProviderConfig from environment variables.
  */
-export function getLoggerProviderConfigFromEnv(): LoggerProviderConfig {
+export function getLoggerProviderConfigFromEnv(): LoggerProviderOptions {
   return {
     logRecordLimits: {
       attributeCountLimit:
@@ -500,7 +774,10 @@ export function getLoggerProviderConfigFromEnv(): LoggerProviderConfig {
 /**
  * Get configuration for BatchLogRecordProcessor from environment variables.
  */
-export function getBatchLogRecordProcessorConfigFromEnv(): BufferConfig {
+export function getBatchLogRecordProcessorConfigFromEnv(): Omit<
+  BatchLogRecordProcessorOptions,
+  'exporter'
+> {
   return {
     maxQueueSize: getNonNegativeNumberFromEnv('OTEL_BLRP_MAX_QUEUE_SIZE'),
     scheduledDelayMillis: getNonNegativeNumberFromEnv(
@@ -516,85 +793,385 @@ export function getBatchLogRecordProcessorConfigFromEnv(): BufferConfig {
 }
 
 export function getBatchLogRecordProcessorFromEnv(
-  exporter: LogRecordExporter
+  exporter: LogRecordExporter,
+  selfObsMeterProvider: MeterProvider | undefined
 ): BatchLogRecordProcessor {
-  return new BatchLogRecordProcessor(
+  return new BatchLogRecordProcessor({
     exporter,
-    getBatchLogRecordProcessorConfigFromEnv()
-  );
+    selfObsMeterProvider,
+    ...getBatchLogRecordProcessorConfigFromEnv(),
+  });
 }
 
-export function getLogRecordExporter(
-  exporter: LogRecordExporterModel
-): LogRecordExporter | undefined {
-  if (exporter.otlp_http) {
-    const encoding = exporter.otlp_http.encoding;
-    if (encoding === 'json') {
-      return new OTLPHttpLogExporter({
-        compression:
-          exporter.otlp_http.compression === 'gzip'
-            ? CompressionAlgorithm.GZIP
-            : CompressionAlgorithm.NONE,
-      });
-    }
-    if (encoding === 'protobuf') {
-      return new OTLPProtoLogExporter({
-        compression:
-          exporter.otlp_http.compression === 'gzip'
-            ? CompressionAlgorithm.GZIP
-            : CompressionAlgorithm.NONE,
-      });
-    }
-    diag.warn(
-      `Unsupported OTLP logs encoding: ${encoding}. Using http/protobuf.`
-    );
-    return new OTLPProtoLogExporter({
-      compression:
-        exporter.otlp_http.compression === 'gzip'
-          ? CompressionAlgorithm.GZIP
-          : CompressionAlgorithm.NONE,
-    });
-  } else if (exporter.otlp_grpc) {
-    return new OTLPGrpcLogExporter({
-      compression:
-        exporter.otlp_grpc.compression === 'gzip'
-          ? CompressionAlgorithm.GZIP
-          : CompressionAlgorithm.NONE,
-    });
-  } else if (exporter.console) {
-    return new ConsoleLogRecordExporter();
+export function getHeadersFromConfiguration(
+  headers: NameStringValuePairConfigModel[] | undefined
+): Record<string, string> | undefined {
+  if (!headers) {
+    return undefined;
   }
-  diag.warn(`Unsupported Exporter value. No Log Record Exporter registered`);
+  const result: Record<string, string> = {};
+  headers.forEach(header => {
+    if (header.value !== null) {
+      result[header.name] = header.value;
+    }
+  });
+  return result;
+}
+
+/**
+ * Validate an exporter timeout value. The spec says 0 means "no limit
+ * (infinity)" but the JS exporters don't support that yet (see #6617).
+ * Warn and return undefined so the exporter falls back to its default.
+ */
+export function validateExporterTimeout(
+  timeout: number | null | undefined
+): number | undefined {
+  if (timeout === null) {
+    return undefined;
+  } else if (timeout === 0) {
+    diag.warn(
+      'Exporter timeout of 0 (infinite) is not supported. Using default timeout.'
+    );
+    return undefined;
+  }
+  return timeout;
+}
+
+export function getHttpAgentOptionsFromTls(
+  tls: HttpTlsConfigModel | undefined
+): { ca?: Buffer; cert?: Buffer; key?: Buffer } | undefined {
+  if (tls && (tls.ca_file || tls.cert_file || tls.key_file)) {
+    return {
+      ca: readFileOrWarn(tls.ca_file, 'TLS CA'),
+      cert: readFileOrWarn(tls.cert_file, 'TLS cert'),
+      key: readFileOrWarn(tls.key_file, 'TLS key'),
+    };
+  }
   return undefined;
 }
 
-export function getLogRecordProcessorsFromConfiguration(
+export function getGrpcCredentialsFromTls(tls?: GrpcTlsConfigModel) {
+  if (tls?.insecure) {
+    return createInsecureCredentials();
+  }
+  const rootCert = readFileOrWarn(tls?.ca_file, 'TLS CA');
+  const privateKey = readFileOrWarn(tls?.key_file, 'TLS key');
+  const certChain = readFileOrWarn(tls?.cert_file, 'TLS cert');
+  if (rootCert || privateKey || certChain) {
+    try {
+      return createSslCredentials(rootCert, privateKey, certChain);
+    } catch (e) {
+      diag.warn(`Failed to create gRPC SSL credentials: ${e}`);
+      return undefined;
+    }
+  }
+  return undefined;
+}
+
+export function getGrpcMetadataFromHeaders(
+  headers: NameStringValuePairConfigModel[] | undefined
+) {
+  if (!headers || headers.length === 0) {
+    return undefined;
+  }
+  const metadata = createEmptyMetadata();
+  for (const header of headers) {
+    if (header.value !== null) {
+      metadata.set(header.name, header.value);
+    }
+  }
+  return metadata;
+}
+
+function readFileOrWarn(
+  filePath: string | null | undefined,
+  label: string
+): Buffer | undefined {
+  if (!filePath) return undefined;
+  try {
+    return fs.readFileSync(filePath);
+  } catch (e) {
+    diag.warn(`Failed to read ${label} file at ${filePath}: ${e}`);
+    return undefined;
+  }
+}
+
+export function getSpanExporter(
+  exporter: SpanExporterConfigModel
+): SpanExporter | undefined {
+  if (exporter.otlp_http !== undefined) {
+    const encoding = exporter.otlp_http?.encoding ?? 'protobuf';
+    if (encoding === 'json') {
+      return new OTLPHttpTraceExporter({
+        compression:
+          exporter.otlp_http?.compression === 'gzip'
+            ? CompressionAlgorithm.GZIP
+            : CompressionAlgorithm.NONE,
+        url: exporter.otlp_http?.endpoint ?? undefined,
+        headers: getHeadersFromConfiguration(exporter.otlp_http?.headers),
+        timeoutMillis: validateExporterTimeout(exporter.otlp_http?.timeout),
+        httpAgentOptions: getHttpAgentOptionsFromTls(exporter.otlp_http?.tls),
+      });
+    } else {
+      return new OTLPProtoTraceExporter({
+        compression:
+          exporter.otlp_http?.compression === 'gzip'
+            ? CompressionAlgorithm.GZIP
+            : CompressionAlgorithm.NONE,
+        url: exporter.otlp_http?.endpoint ?? undefined,
+        headers: getHeadersFromConfiguration(exporter.otlp_http?.headers),
+        timeoutMillis: validateExporterTimeout(exporter.otlp_http?.timeout),
+        httpAgentOptions: getHttpAgentOptionsFromTls(exporter.otlp_http?.tls),
+      });
+    }
+  } else if (exporter.otlp_grpc !== undefined) {
+    return new OTLPGrpcTraceExporter({
+      compression:
+        exporter.otlp_grpc?.compression === 'gzip'
+          ? CompressionAlgorithm.GZIP
+          : CompressionAlgorithm.NONE,
+      url: exporter.otlp_grpc?.endpoint ?? undefined,
+      timeoutMillis: validateExporterTimeout(exporter.otlp_grpc?.timeout),
+      credentials: getGrpcCredentialsFromTls(exporter.otlp_grpc?.tls),
+      metadata: getGrpcMetadataFromHeaders(exporter.otlp_grpc?.headers),
+    });
+  } else if (exporter.console !== undefined) {
+    return new ConsoleSpanExporter();
+  }
+  diag.warn('Unsupported Exporter value. No Span Exporter registered');
+  return undefined;
+}
+
+export function getSpanProcessorsFromConfiguration(
   config: ConfigurationModel
-): LogRecordProcessor[] | undefined {
-  const logRecordProcessors: LogRecordProcessor[] = [];
-  config.logger_provider?.processors?.forEach(processor => {
+): SpanProcessor[] | undefined {
+  const spanProcessors: SpanProcessor[] = [];
+  config.tracer_provider?.processors?.forEach(processor => {
     if (processor.batch) {
-      const exporter = getLogRecordExporter(processor.batch.exporter);
+      const exporter = getSpanExporter(processor.batch.exporter);
       if (exporter) {
-        logRecordProcessors.push(
-          new BatchLogRecordProcessor(exporter, {
-            maxQueueSize: processor.batch.max_queue_size,
-            maxExportBatchSize: processor.batch.max_export_batch_size,
-            scheduledDelayMillis: processor.batch.schedule_delay,
-            exportTimeoutMillis: processor.batch.export_timeout,
+        spanProcessors.push(
+          new BatchSpanProcessor({
+            exporter,
+            maxQueueSize: processor.batch.max_queue_size ?? undefined,
+            maxExportBatchSize:
+              processor.batch.max_export_batch_size ?? undefined,
+            scheduledDelayMillis: processor.batch.schedule_delay ?? undefined,
+            exportTimeoutMillis: processor.batch.export_timeout ?? undefined,
           })
         );
       }
     }
     if (processor.simple) {
-      const exporter = getLogRecordExporter(processor.simple.exporter);
+      const exporter = getSpanExporter(processor.simple.exporter);
       if (exporter) {
-        logRecordProcessors.push(new SimpleLogRecordProcessor(exporter));
+        spanProcessors.push(new SimpleSpanProcessor({ exporter }));
       }
     }
   });
-  if (logRecordProcessors.length > 0) {
-    return logRecordProcessors;
+  if (spanProcessors.length > 0) {
+    return spanProcessors;
+  }
+  return undefined;
+}
+
+export function getIdGeneratorFromConfiguration(
+  config: ConfigurationModel
+): IdGenerator | undefined {
+  const idGenerator = config.tracer_provider?.id_generator;
+  if (!idGenerator) {
+    return undefined;
+  }
+  if (idGenerator.random !== undefined) {
+    return new RandomIdGenerator();
+  }
+  // Any other key is a third-party / custom id_generator type which we
+  // don't currently support. Warn and fall back to SDK default.
+  const unknownKeys = Object.keys(idGenerator).filter(k => k !== 'random');
+  if (unknownKeys.length > 0) {
+    diag.warn(
+      `Unsupported id_generator type(s): ${unknownKeys.join(', ')}. Using default.`
+    );
+  }
+  return undefined;
+}
+
+export function getMeterReadersFromConfiguration(
+  config: ConfigurationModel
+): IMetricReader[] | undefined {
+  const metricReaders: IMetricReader[] = [];
+  config.meter_provider?.readers?.forEach(reader => {
+    if (reader.periodic) {
+      const periodicReader = getPeriodicMetricReaderFromConfiguration(
+        reader.periodic
+      );
+      if (periodicReader) {
+        metricReaders.push(periodicReader);
+      }
+    }
+  });
+  if (metricReaders.length > 0) {
+    return metricReaders;
+  }
+  return undefined;
+}
+
+export function getInstrumentType(
+  instrument: InstrumentTypeConfigModel
+): InstrumentType | undefined {
+  switch (instrument) {
+    case 'counter':
+      return InstrumentType.COUNTER;
+    case 'gauge':
+      return InstrumentType.GAUGE;
+    case 'histogram':
+      return InstrumentType.HISTOGRAM;
+    case 'observable_counter':
+      return InstrumentType.OBSERVABLE_COUNTER;
+    case 'observable_gauge':
+      return InstrumentType.OBSERVABLE_GAUGE;
+    case 'observable_up_down_counter':
+      return InstrumentType.OBSERVABLE_UP_DOWN_COUNTER;
+    case 'up_down_counter':
+      return InstrumentType.UP_DOWN_COUNTER;
+    default:
+      diag.warn(`Unsupported instrument type: ${instrument}`);
+      return undefined;
+  }
+}
+
+export function getAggregationType(
+  aggregation: AggregationConfigModel
+): AggregationOption | undefined {
+  if (aggregation.default) {
+    return {
+      type: AggregationType.DEFAULT,
+    };
+  }
+  if (aggregation.drop) {
+    return {
+      type: AggregationType.DROP,
+    };
+  }
+  if (aggregation.explicit_bucket_histogram) {
+    return {
+      type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+      options: {
+        recordMinMax:
+          aggregation.explicit_bucket_histogram.record_min_max ?? true,
+        boundaries: aggregation.explicit_bucket_histogram.boundaries ?? [
+          0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500,
+          10000,
+        ],
+      },
+    };
+  }
+
+  if (aggregation.base2_exponential_bucket_histogram) {
+    return {
+      type: AggregationType.EXPONENTIAL_HISTOGRAM,
+      options: {
+        recordMinMax:
+          aggregation.base2_exponential_bucket_histogram.record_min_max ??
+          undefined,
+        maxSize:
+          aggregation.base2_exponential_bucket_histogram.max_size ?? undefined,
+      },
+    };
+  }
+  if (aggregation.last_value) {
+    return {
+      type: AggregationType.LAST_VALUE,
+    };
+  }
+  if (aggregation.sum) {
+    return {
+      type: AggregationType.SUM,
+    };
+  }
+
+  diag.warn('Unsupported aggregation type');
+  return undefined;
+}
+
+export function getMeterViewsFromConfiguration(
+  config: ConfigurationModel
+): ViewOptions[] | undefined {
+  const metricViews: ViewOptions[] = [];
+  config.meter_provider?.views?.forEach(view => {
+    const viewOption: ViewOptions = {};
+    if (view.selector) {
+      if (view.selector.instrument_name) {
+        viewOption.instrumentName = view.selector.instrument_name;
+      }
+      if (view.selector.instrument_type) {
+        const instrumentType = getInstrumentType(view.selector.instrument_type);
+        if (instrumentType) {
+          viewOption.instrumentType = instrumentType;
+        }
+      }
+      if (view.selector.unit) {
+        viewOption.instrumentUnit = view.selector.unit;
+      }
+      if (view.selector.meter_name) {
+        viewOption.meterName = view.selector.meter_name;
+      }
+      if (view.selector.meter_version) {
+        viewOption.meterVersion = view.selector.meter_version;
+      }
+      if (view.selector.meter_schema_url) {
+        viewOption.meterSchemaUrl = view.selector.meter_schema_url;
+      }
+    }
+    if (view.stream) {
+      if (view.stream.name) {
+        viewOption.name = view.stream.name;
+      }
+      viewOption.aggregationCardinalityLimit =
+        view.stream.aggregation_cardinality_limit ?? 2_000;
+      if (view.stream.description) {
+        viewOption.description = view.stream.description;
+      }
+      if (view.stream.aggregation) {
+        const aggregationType = getAggregationType(view.stream.aggregation);
+        if (aggregationType) {
+          viewOption.aggregation = aggregationType;
+        }
+      }
+      if (view.stream.attribute_keys) {
+        const processors: IAttributesProcessor[] = [];
+        if (
+          view.stream.attribute_keys.included &&
+          view.stream.attribute_keys.included.length > 0
+        ) {
+          processors.push(
+            createAllowListAttributesProcessor(
+              view.stream.attribute_keys.included
+            )
+          );
+        }
+        if (
+          view.stream.attribute_keys.excluded &&
+          view.stream.attribute_keys.excluded.length > 0
+        ) {
+          processors.push(
+            createDenyListAttributesProcessor(
+              view.stream.attribute_keys.excluded
+            )
+          );
+        }
+        if (processors.length > 0) {
+          viewOption.attributesProcessors = processors;
+        }
+      }
+    }
+
+    if (Object.keys(viewOption).length > 0) {
+      metricViews.push(viewOption);
+    }
+  });
+  if (metricViews.length > 0) {
+    return metricViews;
   }
   return undefined;
 }
@@ -609,4 +1186,61 @@ export function getInstanceID(config: ConfigurationModel): string | undefined {
     }
   }
   return undefined;
+}
+
+const DEFAULT_RATIO = 1;
+
+/**
+ * Returns the {@link Sampler} configured under `tracer_provider.sampler` in
+ * the declarative configuration, or `undefined` if none is set (in which case
+ * the SDK applies its default sampler).
+ */
+export function getSamplerFromConfiguration(
+  config: ConfigurationModel
+): Sampler | undefined {
+  const samplerConfig = config.tracer_provider?.sampler;
+  if (!samplerConfig) {
+    return undefined;
+  }
+  return buildSamplerFromConfig(samplerConfig);
+}
+
+/**
+ * Builds a {@link Sampler} from a {@link SamplerConfigModel} data model.
+ * This allows sampler construction from declarative configuration.
+ */
+export function buildSamplerFromConfig(
+  samplerConfig: SamplerConfigModel
+): Sampler {
+  if (samplerConfig.always_on !== undefined) {
+    return new AlwaysOnSampler();
+  }
+  if (samplerConfig.always_off !== undefined) {
+    return new AlwaysOffSampler();
+  }
+  if (samplerConfig.trace_id_ratio_based !== undefined) {
+    return new TraceIdRatioBasedSampler(
+      samplerConfig.trace_id_ratio_based?.ratio ?? DEFAULT_RATIO
+    );
+  }
+  if (samplerConfig.parent_based !== undefined) {
+    const pb = samplerConfig.parent_based ?? {};
+    return new ParentBasedSampler({
+      root: pb.root ? buildSamplerFromConfig(pb.root) : new AlwaysOnSampler(),
+      remoteParentSampled: pb.remote_parent_sampled
+        ? buildSamplerFromConfig(pb.remote_parent_sampled)
+        : undefined,
+      remoteParentNotSampled: pb.remote_parent_not_sampled
+        ? buildSamplerFromConfig(pb.remote_parent_not_sampled)
+        : undefined,
+      localParentSampled: pb.local_parent_sampled
+        ? buildSamplerFromConfig(pb.local_parent_sampled)
+        : undefined,
+      localParentNotSampled: pb.local_parent_not_sampled
+        ? buildSamplerFromConfig(pb.local_parent_not_sampled)
+        : undefined,
+    });
+  }
+  diag.warn('Unknown sampler config, defaulting to ParentBased(AlwaysOn).');
+  return new ParentBasedSampler({ root: new AlwaysOnSampler() });
 }

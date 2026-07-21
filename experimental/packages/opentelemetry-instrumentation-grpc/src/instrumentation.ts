@@ -42,8 +42,6 @@ import {
 import {
   InstrumentationNodeModuleDefinition,
   InstrumentationBase,
-  SemconvStability,
-  semconvStabilityFromStr,
 } from '@opentelemetry/instrumentation';
 
 import {
@@ -51,13 +49,7 @@ import {
   ATTR_SERVER_PORT,
 } from '@opentelemetry/semantic-conventions';
 
-import {
-  ATTR_NET_PEER_NAME,
-  ATTR_NET_PEER_PORT,
-  ATTR_RPC_METHOD,
-  ATTR_RPC_SERVICE,
-  ATTR_RPC_SYSTEM,
-} from './semconv';
+import { ATTR_RPC_METHOD, ATTR_RPC_SERVICE, ATTR_RPC_SYSTEM } from './semconv';
 
 import {
   shouldNotTraceServerCall,
@@ -85,16 +77,10 @@ import { VERSION } from './version';
 
 export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentationConfig> {
   private _metadataCapture: metadataCaptureType;
-  private _semconvStability: SemconvStability;
 
   constructor(config: GrpcInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-grpc', VERSION, config);
     this._metadataCapture = this._createMetadataCapture();
-
-    this._semconvStability = semconvStabilityFromStr(
-      'http',
-      process.env.OTEL_SEMCONV_STABILITY_OPT_IN
-    );
   }
 
   init() {
@@ -343,11 +329,7 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
           service,
           metadata
         );
-        instrumentation.extractNetMetadata(
-          this,
-          span,
-          instrumentation._semconvStability
-        );
+        instrumentation.extractNetMetadata(this, span);
 
         // Callback is only present when there is no responseStream
         if (!hasResponseStream) {
@@ -460,11 +442,7 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
             [ATTR_RPC_METHOD]: method,
             [ATTR_RPC_SERVICE]: service,
           });
-        instrumentation.extractNetMetadata(
-          this,
-          span,
-          instrumentation._semconvStability
-        );
+        instrumentation.extractNetMetadata(this, span);
 
         instrumentation._metadataCapture.client.captureRequestMetadata(
           span,
@@ -516,38 +494,17 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
     return span;
   }
 
-  private extractNetMetadata(
-    client: grpcJs.Client,
-    span: Span,
-    semconvStability: SemconvStability
-  ) {
+  private extractNetMetadata(client: grpcJs.Client, span: Span) {
     // set net.peer.* from target (e.g., "dns:otel-productcatalogservice:8080") as a hint to APMs
     const parsedUri = URI_REGEX.exec(client.getChannel().getTarget());
     const hostname = parsedUri?.groups?.name;
     const port = parseInt(parsedUri?.groups?.port ?? '');
 
-    const oldAttributes: Attributes = {
-      [ATTR_NET_PEER_NAME]: hostname,
-      [ATTR_NET_PEER_PORT]: port,
-    };
-    const newAttributes: Attributes = {
+    const attributes: Attributes = {
       [ATTR_SERVER_ADDRESS]: hostname,
       [ATTR_SERVER_PORT]: port,
     };
-
-    switch (semconvStability) {
-      case SemconvStability.STABLE:
-        span.setAttributes(newAttributes);
-        break;
-      case SemconvStability.OLD:
-        span.setAttributes(oldAttributes);
-        break;
-      case SemconvStability.DUPLICATE:
-        span.setAttributes({ ...oldAttributes, ...newAttributes });
-        break;
-      default:
-        span.setAttributes(oldAttributes);
-    }
+    span.setAttributes(attributes);
   }
 
   /**
