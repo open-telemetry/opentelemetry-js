@@ -155,10 +155,10 @@ describe('FetchTransport', function () {
         // assert
         try {
           assert.strictEqual(response.status, 'failure');
-          assert.strictEqual(
-            (response as ExportResponseFailure).error.message,
-            'Fetch request errored'
-          );
+          const error = (response as ExportResponseFailure).error;
+          // When the abort controller fires (timeout), signal.reason is
+          // re-thrown directly — a DOMException with name 'AbortError'.
+          assert.strictEqual(error.name, 'AbortError');
         } catch (e) {
           done(e);
         }
@@ -187,7 +187,9 @@ describe('FetchTransport', function () {
         }
         done();
       }, done /* catch any rejections */);
-      clock.tick(requestTimeout + 100);
+      // Tick enough to flush the microtask queue, but NOT past the
+      // request timeout so the abort controller does not fire.
+      clock.tick(10);
     });
 
     it('returns retryable when browser fetch throws network error', function (done) {
