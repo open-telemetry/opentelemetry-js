@@ -78,12 +78,6 @@ describe('LoggerProvider', () => {
         const { resource } = provider['_sharedState'];
         assert.deepStrictEqual(resource, passedInResource);
       });
-
-      it('should have default forceFlushTimeoutMillis if not pass', () => {
-        const provider = new LoggerProvider();
-        const sharedState = provider['_sharedState'];
-        assert.ok(sharedState.forceFlushTimeoutMillis === 30_000);
-      });
     });
 
     describe('logRecordLimits', () => {
@@ -486,6 +480,22 @@ describe('LoggerProvider', () => {
           sinon.assert.calledTwice(forceFlushStub);
           done();
         });
+    });
+
+    it('should use the timeout passed to forceFlush', async () => {
+      const clock = sinon.useFakeTimers();
+      const processor = new NoopLogRecordProcessor();
+      sinon.stub(processor, 'forceFlush').returns(new Promise(() => {}));
+      const provider = new LoggerProvider({ processors: [processor] });
+
+      const flush = provider
+        .forceFlush({ timeoutMillis: 10 })
+        .catch(error => error);
+      await clock.tickAsync(10);
+
+      const rejection: unknown = await flush;
+      assert.ok(rejection instanceof Error);
+      assert.match(rejection.message, /Operation timed out/);
     });
   });
 

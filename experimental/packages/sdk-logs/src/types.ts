@@ -62,15 +62,17 @@ export type LoggerConfigurator = (
   loggerScope: InstrumentationScope
 ) => Required<LoggerConfig>;
 
+export interface ForceFlushOptions {
+  /**
+   * How long the force flush can run before it is cancelled.
+   * The default value is 30000ms.
+   */
+  timeoutMillis?: number;
+}
+
 export interface LoggerProviderOptions {
   /** Resource associated with trace telemetry  */
   resource?: Resource;
-
-  /**
-   * How long the forceFlush can run before it is cancelled.
-   * The default value is 30000ms
-   */
-  forceFlushTimeoutMillis?: number;
 
   /** Log Record Limits*/
   logRecordLimits?: LogRecordLimits;
