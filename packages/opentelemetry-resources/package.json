@@ -62,7 +62,7 @@
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
-    "@types/webpack-env": "1.16.3",
+    "@types/webpack-env": "1.18.8",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "2.2.1",
@@ -75,7 +75,7 @@
     "nyc": "17.1.0",
     "sinon": "18.0.1",
     "typescript": "5.2.2",
-    "webpack": "5.104.1",
+    "webpack": "5.108.4",
     "webpack-cli": "7.0.3"
   },
   "peerDependencies": {
