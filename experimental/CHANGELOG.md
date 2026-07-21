@@ -8,6 +8,18 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 0.221.0
+
+### :boom: Breaking Changes
+
 * feat(sdk-logs)!: configure the force flush timeout per call [#6931](https://github.com/open-telemetry/opentelemetry-js/pull/6931) @LarryHu0217
   * (user-facing): `LoggerProviderOptions.forceFlushTimeoutMillis` has been removed; pass `timeoutMillis` to `LoggerProvider.forceFlush()` instead.
 * feat(instrumentation-http)!: emit only stable HTTP semantic conventions. The `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable no longer changes HTTP attribute or metric emission — old (v1.7.0) and duplicate (`http`/`http/dup`) semconv outputs have been removed. [#6819](https://github.com/open-telemetry/opentelemetry-js/pull/6819) @maryliag
@@ -20,12 +32,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(sdk-logs): allow modifying ReadWriteLogRecord properties (including hrTime, hrTimeObserved, and spanContext) in accordance with the OpenTelemetry Logs specification [#6923](https://github.com/open-telemetry/opentelemetry-js/pull/6923) @Babul422
 * feat(sdk-node): emit a deprecation warning when the `JaegerPropagator` is selected via `OTEL_PROPAGATORS` or declarative config; use `tracecontext` instead. @pichlermarc
 * feat(instrumentation-http): set `error.type` to status code in metrics for error requests. [#6919](https://github.com/open-telemetry/opentelemetry-js/pull/6919) @raphael-theriault-swi
-
-### :bug: Bug Fixes
-
-### :books: Documentation
-
-### :house: Internal
 
 ## 0.220.0
 
