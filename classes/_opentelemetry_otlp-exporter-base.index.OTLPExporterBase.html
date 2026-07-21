@@ -16,7 +16,7 @@
 <h4>Type Parameters</h4>
 <ul class="tsd-type-parameter-list">
 <li><span id="internal"><span class="tsd-kind-type-parameter">Internal</span></span></li></ul></section>
-<section class="tsd-panel tsd-hierarchy" data-refl="14957">
+<section class="tsd-panel tsd-hierarchy" data-refl="15148">
 <h4>Hierarchy (<a href="../hierarchy.html#@opentelemetry/otlp-exporter-base.index.OTLPExporterBase">View Summary</a>)</h4>
 <ul class="tsd-hierarchy">
 <li class="tsd-hierarchy-item"><span class="tsd-hierarchy-target">OTLPExporterBase</span>
@@ -29,7 +29,7 @@
 <li class="tsd-hierarchy-item"><a href="_opentelemetry_exporter-trace-otlp-proto.OTLPTraceExporter.html" class="tsd-signature-type tsd-kind-class">OTLPTraceExporter</a></li>
 <li class="tsd-hierarchy-item"><a href="_opentelemetry_exporter-metrics-otlp-http.OTLPMetricExporterBase.html" class="tsd-signature-type tsd-kind-class">OTLPMetricExporterBase</a></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts#L9">experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts:9</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts#L10">experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts:10</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
@@ -43,6 +43,7 @@
 <h3 class="tsd-index-heading tsd-anchor-link" id="methods">Methods<a href="#methods" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-index-list"><a href="#export" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>export</span></a>
 <a href="#forceflush" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>force<wbr/>Flush</span></a>
+<a href="#setmetrics" class="tsd-index-link tsd-is-protected"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>set<wbr/>Metrics</span></a>
 <a href="#shutdown" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>shutdown</span></a>
 </div></section></div></details></section></section>
 <details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Constructors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
@@ -64,7 +65,7 @@
 <li><span><span class="tsd-kind-parameter">delegate</span>: <a href="../interfaces/_opentelemetry_otlp-exporter-base.index.IOtlpExportDelegate.html" class="tsd-signature-type tsd-kind-interface">IOtlpExportDelegate</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#internal">Internal</a><span class="tsd-signature-symbol">&gt;</span></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">OTLPExporterBase</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#internal">Internal</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts#L11">experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts:11</a></li></ul></aside></div></li></ul></section></section></details>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts#L12">experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts:12</a></li></ul></aside></div></li></ul></section></section></details>
 <details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
 <h2 class="tsd-anchor-link" id="methods-1">Methods<a href="#methods-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
 <section>
@@ -83,7 +84,7 @@
 <li><span><span class="tsd-kind-parameter">resultCallback</span>: <span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">result</span><span class="tsd-signature-symbol">:</span> <a href="../modules/_opentelemetry_sdk-node.core.html" class="tsd-signature-type tsd-kind-namespace">core</a><span class="tsd-signature-symbol">.</span><a href="../interfaces/_opentelemetry_sdk-node.core.ExportResult.html" class="tsd-signature-type tsd-kind-interface">ExportResult</a><span class="tsd-signature-symbol">)</span> <span class="tsd-signature-symbol">=&gt;</span> <span class="tsd-signature-type">void</span></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts#L20">experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts:20</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts#L21">experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts:21</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="forceflush"><span>force<wbr/>Flush</span><a href="#forceflush" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -92,7 +93,20 @@
 <div class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts#L27">experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts:27</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts#L28">experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts:28</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-protected">
+<h3 class="tsd-anchor-link" id="setmetrics"><code class="tsd-tag">Protected</code><span>set<wbr/>Metrics</span><a href="#setmetrics" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-protected">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="setmetrics-1"><span class="tsd-kind-call-signature">setMetrics</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">metrics</span><span class="tsd-signature-symbol">:</span> <a href="_opentelemetry_otlp-exporter-base.index.ExporterMetrics.html" class="tsd-signature-type tsd-kind-class">ExporterMetrics</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#internal">Internal</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><a href="#setmetrics-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">metrics</span>: <a href="_opentelemetry_otlp-exporter-base.index.ExporterMetrics.html" class="tsd-signature-type tsd-kind-class">ExporterMetrics</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#internal">Internal</a><span class="tsd-signature-symbol">&gt;</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts#L36">experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts:36</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="shutdown"><span>shutdown</span><a href="#shutdown" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -101,7 +115,7 @@
 <div class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts#L31">experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts:31</a></li></ul></aside></div></li></ul></section></section></details></div>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts#L32">experimental/packages/otlp-exporter-base/src/OTLPExporterBase.ts:32</a></li></ul></aside></div></li></ul></section></section></details></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -120,7 +134,7 @@
 <details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Constructors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Constructors</summary>
 <div><a href="#constructor"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Constructor"><use href="../assets/icons.svg#icon-512"></use></svg><span>constructor</span></a></div></details>
 <details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Methods</summary>
-<div><a href="#export"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>export</span></a><a href="#forceflush"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>force<wbr/>Flush</span></a><a href="#shutdown"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>shutdown</span></a></div></details></div></details></div>
+<div><a href="#export"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>export</span></a><a href="#forceflush"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>force<wbr/>Flush</span></a><a href="#setmetrics" class="tsd-is-protected"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>set<wbr/>Metrics</span></a><a href="#shutdown"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>shutdown</span></a></div></details></div></details></div>
 <div class="site-menu">
 <nav class="tsd-navigation"><a href="../index.html">OpenTelemetry SDK</a>
 <ul class="tsd-small-nested-navigation" id="tsd-nav-container">

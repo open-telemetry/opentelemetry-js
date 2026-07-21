@@ -17,7 +17,7 @@ to <a href="../interfaces/_opentelemetry_sdk-trace.ReadableSpan.html" class="tsd
 <p>Only spans that are sampled are converted.</p>
 <p>NOTE: This <a href="../interfaces/_opentelemetry_sdk-trace.SpanProcessor.html" class="tsd-kind-interface">SpanProcessor</a> exports every ended span individually instead of batching spans together, which causes significant performance overhead with most exporters. For production use, please consider using the <a href="_opentelemetry_sdk-trace.BatchSpanProcessor.html" class="tsd-kind-class">BatchSpanProcessor</a> instead.</p>
 </div></section>
-<section class="tsd-panel tsd-hierarchy" data-refl="17520">
+<section class="tsd-panel tsd-hierarchy" data-refl="17769">
 <h4>Hierarchy (<a href="../hierarchy.html#@opentelemetry/sdk-trace.SimpleSpanProcessor">View Summary</a>)</h4>
 <ul class="tsd-hierarchy">
 <li class="tsd-hierarchy-item"><span class="tsd-hierarchy-target">SimpleSpanProcessor</span>
@@ -31,7 +31,7 @@ to <a href="../interfaces/_opentelemetry_sdk-trace.ReadableSpan.html" class="tsd
 <ul class="tsd-hierarchy">
 <li><a href="../interfaces/_opentelemetry_sdk-trace.SpanProcessor.html" class="tsd-signature-type tsd-kind-interface">SpanProcessor</a></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-trace/src/export/SimpleSpanProcessor.ts#L30">export/SimpleSpanProcessor.ts:30</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-trace/src/export/SimpleSpanProcessor.ts#L30">export/SimpleSpanProcessor.ts:30</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
@@ -63,7 +63,7 @@ to <a href="../interfaces/_opentelemetry_sdk-trace.ReadableSpan.html" class="tsd
 <li><span><span class="tsd-kind-parameter">options</span>: <a href="../interfaces/_opentelemetry_sdk-trace.SimpleSpanProcessorOptions.html" class="tsd-signature-type tsd-kind-interface">SimpleSpanProcessorOptions</a></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">SimpleSpanProcessor</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-trace/src/export/SimpleSpanProcessor.ts#L36">export/SimpleSpanProcessor.ts:36</a></li></ul></aside></div></li></ul></section></section></details>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-trace/src/export/SimpleSpanProcessor.ts#L36">export/SimpleSpanProcessor.ts:36</a></li></ul></aside></div></li></ul></section></section></details>
 <details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
 <h2 class="tsd-anchor-link" id="methods-1">Methods<a href="#methods-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
 <section>
@@ -78,7 +78,7 @@ to <a href="../interfaces/_opentelemetry_sdk-trace.ReadableSpan.html" class="tsd
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/_opentelemetry_sdk-trace.SpanProcessor.html">SpanProcessor</a>.<a href="../interfaces/_opentelemetry_sdk-trace.SpanProcessor.html#forceflush">forceFlush</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-trace/src/export/SimpleSpanProcessor.ts#L50">export/SimpleSpanProcessor.ts:50</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-trace/src/export/SimpleSpanProcessor.ts#L50">export/SimpleSpanProcessor.ts:50</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="onend"><span>on<wbr/>End</span><a href="#onend" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -97,7 +97,7 @@ returns true.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/_opentelemetry_sdk-trace.SpanProcessor.html">SpanProcessor</a>.<a href="../interfaces/_opentelemetry_sdk-trace.SpanProcessor.html#onend">onEnd</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-trace/src/export/SimpleSpanProcessor.ts#L59">export/SimpleSpanProcessor.ts:59</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-trace/src/export/SimpleSpanProcessor.ts#L69">export/SimpleSpanProcessor.ts:69</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="onstart"><span>on<wbr/>Start</span><a href="#onstart" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -117,7 +117,7 @@ returns true.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/_opentelemetry_sdk-trace.SpanProcessor.html">SpanProcessor</a>.<a href="../interfaces/_opentelemetry_sdk-trace.SpanProcessor.html#onstart">onStart</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-trace/src/export/SimpleSpanProcessor.ts#L57">export/SimpleSpanProcessor.ts:57</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-trace/src/export/SimpleSpanProcessor.ts#L67">export/SimpleSpanProcessor.ts:67</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="shutdown"><span>shutdown</span><a href="#shutdown" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -130,7 +130,7 @@ opportunity for processor to do any cleanup required.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/_opentelemetry_sdk-trace.SpanProcessor.html">SpanProcessor</a>.<a href="../interfaces/_opentelemetry_sdk-trace.SpanProcessor.html#shutdown">shutdown</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-trace/src/export/SimpleSpanProcessor.ts#L94">export/SimpleSpanProcessor.ts:94</a></li></ul></aside></div></li></ul></section></section></details></div>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-trace/src/export/SimpleSpanProcessor.ts#L108">export/SimpleSpanProcessor.ts:108</a></li></ul></aside></div></li></ul></section></section></details></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">

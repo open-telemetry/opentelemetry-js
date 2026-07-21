@@ -21,7 +21,7 @@
 </div></div></section>
 <div class="tsd-signature"><span class="tsd-signature-keyword">interface</span> <span class="tsd-kind-interface">ContextAPI</span> <span class="tsd-signature-symbol">{</span><br/>    <a class="tsd-kind-call-signature" href="#active-1">active</a><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <a href="_opentelemetry_api._opentelemetry_api.Context.html" class="tsd-signature-type tsd-kind-interface">Context</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#bind-1">bind</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#bindt">T</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">context</span><span class="tsd-signature-symbol">:</span> <a href="_opentelemetry_api._opentelemetry_api.Context.html" class="tsd-signature-type tsd-kind-interface">Context</a><span class="tsd-signature-symbol">,</span> <span class="tsd-kind-parameter">target</span><span class="tsd-signature-symbol">:</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#bindt">T</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#bindt">T</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#disable-1">disable</a><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#setglobalcontextmanager-1">setGlobalContextManager</a><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">contextManager</span><span class="tsd-signature-symbol">:</span> <a href="_opentelemetry_api._opentelemetry_api.ContextManager.html" class="tsd-signature-type tsd-kind-interface">ContextManager</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#with-1">with</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#witha">A</a> <span class="tsd-signature-keyword">extends</span> <span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">,</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#withf">F</a> <span class="tsd-signature-keyword">extends</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">:</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#witha">A</a><span class="tsd-signature-symbol">)</span> <span class="tsd-signature-symbol">=&gt;</span> <span class="tsd-signature-type">ReturnType</span><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#withf">F</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span><br/>        <span class="tsd-kind-parameter">context</span><span class="tsd-signature-symbol">:</span> <a href="_opentelemetry_api._opentelemetry_api.Context.html" class="tsd-signature-type tsd-kind-interface">Context</a><span class="tsd-signature-symbol">,</span><br/>        <span class="tsd-kind-parameter">fn</span><span class="tsd-signature-symbol">:</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#withf">F</a><span class="tsd-signature-symbol">,</span><br/>        <span class="tsd-kind-parameter">thisArg</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">ThisParameterType</span><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#withf">F</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">,</span><br/>        <span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">:</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#witha">A</a><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ReturnType</span><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#withf">F</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">;</span><br/><span class="tsd-signature-symbol">}</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/api/src/api/context.ts#L23">api/context.ts:23</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/api/src/api/context.ts#L23">api/context.ts:23</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
@@ -48,7 +48,7 @@
 </div>
 <h4 class="tsd-returns-title">Returns <a href="_opentelemetry_api._opentelemetry_api.Context.html" class="tsd-signature-type tsd-kind-interface">Context</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/api/src/api/context.ts#L50">api/context.ts:50</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/api/src/api/context.ts#L50">api/context.ts:50</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="bind"><span>bind</span><a href="#bind" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -72,7 +72,7 @@
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a class="tsd-signature-type tsd-kind-type-parameter" href="#bindt">T</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/api/src/api/context.ts#L77">api/context.ts:77</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/api/src/api/context.ts#L77">api/context.ts:77</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="disable"><span>disable</span><a href="#disable" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -83,7 +83,7 @@
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/api/src/api/context.ts#L86">api/context.ts:86</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/api/src/api/context.ts#L86">api/context.ts:86</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="setglobalcontextmanager"><span>set<wbr/>Global<wbr/>Context<wbr/>Manager</span><a href="#setglobalcontextmanager" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -99,7 +99,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><p>true if the context manager was successfully registered, else false</p>
 <aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/api/src/api/context.ts#L43">api/context.ts:43</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/api/src/api/context.ts#L43">api/context.ts:43</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="with"><span>with</span><a href="#with" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -130,7 +130,7 @@
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ReturnType</span><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#withf">F</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/api/src/api/context.ts#L62">api/context.ts:62</a></li></ul></aside></div></li></ul></section></section></details></div>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/api/src/api/context.ts#L62">api/context.ts:62</a></li></ul></aside></div></li></ul></section></section></details></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">

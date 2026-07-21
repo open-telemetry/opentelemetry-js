@@ -15,14 +15,14 @@
 <div class="tsd-comment tsd-typography"><p>XMLHttpRequest config</p>
 </div></section>
 <div class="tsd-signature"><span class="tsd-signature-keyword">interface</span> <span class="tsd-kind-interface">XMLHttpRequestInstrumentationConfig</span> <span class="tsd-signature-symbol">{</span><br/>    <a class="tsd-kind-property" href="#applycustomattributesonspan">applyCustomAttributesOnSpan</a><span class="tsd-signature-symbol">?:</span> <a href="../types/_opentelemetry_instrumentation-xml-http-request.XHRCustomAttributeFunction.html" class="tsd-signature-type tsd-kind-type-alias">XHRCustomAttributeFunction</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#cleartimingresources">clearTimingResources</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#enabled">enabled</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#ignorenetworkevents">ignoreNetworkEvents</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#ignoreurls">ignoreUrls</a><span class="tsd-signature-symbol">?:</span> (<span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">RegExp</span>)<span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#measurerequestsize">measureRequestSize</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#propagatetraceheadercorsurls">propagateTraceHeaderCorsUrls</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">PropagateTraceHeaderCorsUrls</span><span class="tsd-signature-symbol">;</span><br/><span class="tsd-signature-symbol">}</span></div>
-<section class="tsd-panel tsd-hierarchy" data-refl="13092">
+<section class="tsd-panel tsd-hierarchy" data-refl="13264">
 <h4>Hierarchy (<a href="../hierarchy.html#@opentelemetry/instrumentation-xml-http-request.XMLHttpRequestInstrumentationConfig">View Summary</a>)</h4>
 <ul class="tsd-hierarchy">
 <li class="tsd-hierarchy-item"><a href="_opentelemetry_instrumentation.InstrumentationConfig.html" class="tsd-signature-type tsd-kind-interface">InstrumentationConfig</a>
 <ul class="tsd-hierarchy">
 <li class="tsd-hierarchy-item"><span class="tsd-hierarchy-target">XMLHttpRequestInstrumentationConfig</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L58">opentelemetry-instrumentation-xml-http-request/src/xhr.ts:58</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L58">opentelemetry-instrumentation-xml-http-request/src/xhr.ts:58</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
@@ -47,7 +47,7 @@
 <div class="tsd-comment tsd-typography"><p>Function for adding custom attributes on the span</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L77">opentelemetry-instrumentation-xml-http-request/src/xhr.ts:77</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L77">opentelemetry-instrumentation-xml-http-request/src/xhr.ts:77</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="cleartimingresources"><code class="tsd-tag">Optional</code><span>clear<wbr/>Timing<wbr/>Resources</span><a href="#cleartimingresources" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">clearTimingResources</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
@@ -58,7 +58,7 @@ whenever it is possible. This is needed only when PerformanceObserver
 is not available</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L67">opentelemetry-instrumentation-xml-http-request/src/xhr.ts:67</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L67">opentelemetry-instrumentation-xml-http-request/src/xhr.ts:67</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited">
 <h3 class="tsd-anchor-link" id="enabled"><code class="tsd-tag">Optional</code><span>enabled</span><a href="#enabled" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">enabled</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
@@ -79,7 +79,7 @@ is not available</p>
 <div class="tsd-comment tsd-typography"><p>Ignore adding network events as span events</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L79">opentelemetry-instrumentation-xml-http-request/src/xhr.ts:79</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L79">opentelemetry-instrumentation-xml-http-request/src/xhr.ts:79</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="ignoreurls"><code class="tsd-tag">Optional</code><span>ignore<wbr/>Urls</span><a href="#ignoreurls" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">ignoreUrls</span><span class="tsd-signature-symbol">?:</span> (<span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">RegExp</span>)<span class="tsd-signature-symbol">[]</span></div>
@@ -88,21 +88,21 @@ In addition, URLs that are <em>exact matches</em> of strings in ignoreUrls will
 also not be traced.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L75">opentelemetry-instrumentation-xml-http-request/src/xhr.ts:75</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L75">opentelemetry-instrumentation-xml-http-request/src/xhr.ts:75</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="measurerequestsize"><code class="tsd-tag">Optional</code><span>measure<wbr/>Request<wbr/>Size</span><a href="#measurerequestsize" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">measureRequestSize</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
 <div class="tsd-comment tsd-typography"><p>Measure outgoing request size</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L81">opentelemetry-instrumentation-xml-http-request/src/xhr.ts:81</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L81">opentelemetry-instrumentation-xml-http-request/src/xhr.ts:81</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="propagatetraceheadercorsurls"><code class="tsd-tag">Optional</code><span>propagate<wbr/>Trace<wbr/>Header<wbr/>Cors<wbr/>Urls</span><a href="#propagatetraceheadercorsurls" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">propagateTraceHeaderCorsUrls</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">PropagateTraceHeaderCorsUrls</span></div>
 <div class="tsd-comment tsd-typography"><p>URLs which should include trace headers when origin doesn't match</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L69">opentelemetry-instrumentation-xml-http-request/src/xhr.ts:69</a></li></ul></aside></section></section></details></div>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L69">opentelemetry-instrumentation-xml-http-request/src/xhr.ts:69</a></li></ul></aside></section></section></details></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">

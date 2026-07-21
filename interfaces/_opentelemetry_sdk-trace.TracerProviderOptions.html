@@ -12,7 +12,7 @@
 <li><a href="" aria-current="page">TracerProviderOptions</a></li></ul>
 <h1>Interface TracerProviderOptions</h1></div>
 <div class="tsd-signature"><span class="tsd-signature-keyword">interface</span> <span class="tsd-kind-interface">TracerProviderOptions</span> <span class="tsd-signature-symbol">{</span><br/>    <a class="tsd-kind-property" href="#forceflushtimeoutmillis">forceFlushTimeoutMillis</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#idgenerator">idGenerator</a><span class="tsd-signature-symbol">?:</span> <a href="_opentelemetry_sdk-trace.IdGenerator.html" class="tsd-signature-type tsd-kind-interface">IdGenerator</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#meterprovider">meterProvider</a><span class="tsd-signature-symbol">?:</span> <a href="_opentelemetry_api._opentelemetry_api.MeterProvider.html" class="tsd-signature-type tsd-kind-interface">MeterProvider</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#resource">resource</a><span class="tsd-signature-symbol">?:</span> <a href="../modules/_opentelemetry_sdk-node.resources.html" class="tsd-signature-type tsd-kind-namespace">resources</a><span class="tsd-signature-symbol">.</span><a href="_opentelemetry_sdk-node.resources.Resource.html" class="tsd-signature-type tsd-kind-interface">Resource</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#sampler">sampler</a><span class="tsd-signature-symbol">?:</span> <a href="_opentelemetry_sdk-trace.Sampler.html" class="tsd-signature-type tsd-kind-interface">Sampler</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#spanlimits">spanLimits</a><span class="tsd-signature-symbol">?:</span> <a href="_opentelemetry_sdk-trace.SpanLimits.html" class="tsd-signature-type tsd-kind-interface">SpanLimits</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#spanprocessors">spanProcessors</a><span class="tsd-signature-symbol">?:</span> <a href="_opentelemetry_sdk-trace.SpanProcessor.html" class="tsd-signature-type tsd-kind-interface">SpanProcessor</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">;</span><br/><span class="tsd-signature-symbol">}</span></div>
-<section class="tsd-panel tsd-hierarchy" data-refl="17664">
+<section class="tsd-panel tsd-hierarchy" data-refl="17913">
 <h4>Hierarchy (<a href="../hierarchy.html#@opentelemetry/sdk-trace.TracerProviderOptions">View Summary</a>)</h4>
 <ul class="tsd-hierarchy">
 <li class="tsd-hierarchy-item"><span class="tsd-hierarchy-target">TracerProviderOptions</span>
@@ -22,7 +22,7 @@
 <li class="tsd-hierarchy-item"><a href="_opentelemetry_sdk-trace-node.TracerConfig.html" class="tsd-signature-type tsd-kind-interface">TracerConfig</a></li>
 <li class="tsd-hierarchy-item"><a href="_opentelemetry_sdk-trace-web.TracerConfig.html" class="tsd-signature-type tsd-kind-interface">TracerConfig</a></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-trace/src/types.ts#L13">types.ts:13</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-trace/src/types.ts#L13">types.ts:13</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
@@ -48,7 +48,7 @@
 The default value is 30000ms</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-trace/src/types.ts#L35">types.ts:35</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-trace/src/types.ts#L35">types.ts:35</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="idgenerator"><code class="tsd-tag">Optional</code><span>id<wbr/>Generator</span><a href="#idgenerator" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">idGenerator</span><span class="tsd-signature-symbol">?:</span> <a href="_opentelemetry_sdk-trace.IdGenerator.html" class="tsd-signature-type tsd-kind-interface">IdGenerator</a></div>
@@ -56,7 +56,7 @@ The default value is 30000ms</p>
 The default idGenerator generates random ids</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-trace/src/types.ts#L29">types.ts:29</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-trace/src/types.ts#L29">types.ts:29</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="meterprovider"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Experimental</code><span>meter<wbr/>Provider</span><a href="#meterprovider" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">meterProvider</span><span class="tsd-signature-symbol">?:</span> <a href="_opentelemetry_api._opentelemetry_api.MeterProvider.html" class="tsd-signature-type tsd-kind-interface">MeterProvider</a></div>
@@ -65,35 +65,35 @@ This defaults to a no-op meter provider.
 This option is experimental and is subject to breaking changes in minor releases.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-trace/src/types.ts#L47">types.ts:47</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-trace/src/types.ts#L47">types.ts:47</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="resource"><code class="tsd-tag">Optional</code><span>resource</span><a href="#resource" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">resource</span><span class="tsd-signature-symbol">?:</span> <a href="../modules/_opentelemetry_sdk-node.resources.html" class="tsd-signature-type tsd-kind-namespace">resources</a><span class="tsd-signature-symbol">.</span><a href="_opentelemetry_sdk-node.resources.Resource.html" class="tsd-signature-type tsd-kind-interface">Resource</a></div>
 <div class="tsd-comment tsd-typography"><p>Resource associated with trace telemetry</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-trace/src/types.ts#L23">types.ts:23</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-trace/src/types.ts#L23">types.ts:23</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="sampler"><code class="tsd-tag">Optional</code><span>sampler</span><a href="#sampler" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">sampler</span><span class="tsd-signature-symbol">?:</span> <a href="_opentelemetry_sdk-trace.Sampler.html" class="tsd-signature-type tsd-kind-interface">Sampler</a></div>
 <div class="tsd-comment tsd-typography"><p>Sampler determines if a span should be recorded or should be a NoopSpan.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-trace/src/types.ts#L17">types.ts:17</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-trace/src/types.ts#L17">types.ts:17</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="spanlimits"><code class="tsd-tag">Optional</code><span>span<wbr/>Limits</span><a href="#spanlimits" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">spanLimits</span><span class="tsd-signature-symbol">?:</span> <a href="_opentelemetry_sdk-trace.SpanLimits.html" class="tsd-signature-type tsd-kind-interface">SpanLimits</a></div>
 <div class="tsd-comment tsd-typography"><p>Span Limits</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-trace/src/types.ts#L20">types.ts:20</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-trace/src/types.ts#L20">types.ts:20</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="spanprocessors"><code class="tsd-tag">Optional</code><span>span<wbr/>Processors</span><a href="#spanprocessors" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">spanProcessors</span><span class="tsd-signature-symbol">?:</span> <a href="_opentelemetry_sdk-trace.SpanProcessor.html" class="tsd-signature-type tsd-kind-interface">SpanProcessor</a><span class="tsd-signature-symbol">[]</span></div>
 <div class="tsd-comment tsd-typography"><p>List of SpanProcessor for the tracer</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-trace/src/types.ts#L40">types.ts:40</a></li></ul></aside></section></section></details></div>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-trace/src/types.ts#L40">types.ts:40</a></li></ul></aside></section></section></details></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">

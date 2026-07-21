@@ -13,7 +13,7 @@
 <h1>Interface MetricReaderOptions</h1></div>
 <div class="tsd-signature"><span class="tsd-signature-keyword">interface</span> <span class="tsd-kind-interface">MetricReaderOptions</span> <span class="tsd-signature-symbol">{</span><br/>    <a class="tsd-kind-property" href="#aggregationselector">aggregationSelector</a><span class="tsd-signature-symbol">?:</span> <a href="../types/_opentelemetry_sdk-metrics.AggregationSelector.html" class="tsd-signature-type tsd-kind-type-alias">AggregationSelector</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#aggregationtemporalityselector">aggregationTemporalitySelector</a><span class="tsd-signature-symbol">?:</span> <a href="../types/_opentelemetry_sdk-metrics.AggregationTemporalitySelector.html" class="tsd-signature-type tsd-kind-type-alias">AggregationTemporalitySelector</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#cardinalityselector">cardinalitySelector</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">CardinalitySelector</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#metricproducers">metricProducers</a><span class="tsd-signature-symbol">?:</span> <a href="_opentelemetry_sdk-metrics.MetricProducer.html" class="tsd-signature-type tsd-kind-interface">MetricProducer</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#otelcomponenttype">otelComponentType</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/><span class="tsd-signature-symbol">}</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-metrics/src/export/MetricReader.ts#L30">packages/sdk-metrics/src/export/MetricReader.ts:30</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-metrics/src/export/MetricReader.ts#L30">packages/sdk-metrics/src/export/MetricReader.ts:30</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
@@ -38,7 +38,7 @@ configured for a metric instrument, a per-metric-reader aggregation is
 selected with this selector.</p>
 <p> NOTE: the provided function MUST be pure</div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-metrics/src/export/MetricReader.ts#L38">packages/sdk-metrics/src/export/MetricReader.ts:38</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-metrics/src/export/MetricReader.ts#L38">packages/sdk-metrics/src/export/MetricReader.ts:38</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="aggregationtemporalityselector"><code class="tsd-tag">Optional</code><span>aggregation<wbr/>Temporality<wbr/>Selector</span><a href="#aggregationtemporalityselector" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">aggregationTemporalitySelector</span><span class="tsd-signature-symbol">?:</span> <a href="../types/_opentelemetry_sdk-metrics.AggregationTemporalitySelector.html" class="tsd-signature-type tsd-kind-type-alias">AggregationTemporalitySelector</a></div>
@@ -46,7 +46,7 @@ selected with this selector.</p>
 not configured, cumulative is used for all instruments.</p>
 <p> NOTE: the provided function MUST be pure</div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-metrics/src/export/MetricReader.ts#L45">packages/sdk-metrics/src/export/MetricReader.ts:45</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-metrics/src/export/MetricReader.ts#L45">packages/sdk-metrics/src/export/MetricReader.ts:45</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="cardinalityselector"><code class="tsd-tag">Optional</code><span>cardinality<wbr/>Selector</span><a href="#cardinalityselector" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">cardinalitySelector</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">CardinalitySelector</span></div>
@@ -54,7 +54,7 @@ not configured, cumulative is used for all instruments.</p>
 a default value is used.</p>
 <p> NOTE: the provided function MUST be pure</div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-metrics/src/export/MetricReader.ts#L52">packages/sdk-metrics/src/export/MetricReader.ts:52</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-metrics/src/export/MetricReader.ts#L52">packages/sdk-metrics/src/export/MetricReader.ts:52</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="metricproducers"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Experimental</code><span>metric<wbr/>Producers</span><a href="#metricproducers" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">metricProducers</span><span class="tsd-signature-symbol">?:</span> <a href="_opentelemetry_sdk-metrics.MetricProducer.html" class="tsd-signature-type tsd-kind-interface">MetricProducer</a><span class="tsd-signature-symbol">[]</span></div>
@@ -63,7 +63,7 @@ aggregated metric data in addition to the SDK's metric data. The resource return
 these MetricProducers is ignored; the SDK's resource will be used instead.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-metrics/src/export/MetricReader.ts#L59">packages/sdk-metrics/src/export/MetricReader.ts:59</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-metrics/src/export/MetricReader.ts#L59">packages/sdk-metrics/src/export/MetricReader.ts:59</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="otelcomponenttype"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Experimental</code><span>otel<wbr/>Component<wbr/>Type</span><a href="#otelcomponenttype" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">otelComponentType</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
@@ -71,7 +71,7 @@ these MetricProducers is ignored; the SDK's resource will be used instead.</p>
 This option is experimental and is subject to breaking changes in minor releases.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-metrics/src/export/MetricReader.ts#L64">packages/sdk-metrics/src/export/MetricReader.ts:64</a></li></ul></aside></section></section></details></div>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-metrics/src/export/MetricReader.ts#L64">packages/sdk-metrics/src/export/MetricReader.ts:64</a></li></ul></aside></section></section></details></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">

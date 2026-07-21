@@ -26,7 +26,7 @@ may have children.</p>
 </div></div></section>
 <div class="tsd-signature"><span class="tsd-signature-keyword">interface</span> <span class="tsd-kind-interface">Span</span> <span class="tsd-signature-symbol">{</span><br/>    <a class="tsd-kind-call-signature" href="#addevent-1">addEvent</a><span class="tsd-signature-symbol">(</span><br/>        <span class="tsd-kind-parameter">name</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>        <span class="tsd-kind-parameter">attributesOrStartTime</span><span class="tsd-signature-symbol">?:</span> <a href="_opentelemetry_api._opentelemetry_api.Attributes.html" class="tsd-signature-type tsd-kind-interface">Attributes</a> <span class="tsd-signature-symbol">|</span> <a href="../types/_opentelemetry_api._opentelemetry_api.TimeInput.html" class="tsd-signature-type tsd-kind-type-alias">TimeInput</a><span class="tsd-signature-symbol">,</span><br/>        <span class="tsd-kind-parameter">startTime</span><span class="tsd-signature-symbol">?:</span> <a href="../types/_opentelemetry_api._opentelemetry_api.TimeInput.html" class="tsd-signature-type tsd-kind-type-alias">TimeInput</a><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">this</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#addlink-1">addLink</a><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">link</span><span class="tsd-signature-symbol">:</span> <a href="_opentelemetry_api._opentelemetry_api.Link.html" class="tsd-signature-type tsd-kind-interface">Link</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">this</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#addlinks-1">addLinks</a><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">links</span><span class="tsd-signature-symbol">:</span> <a href="_opentelemetry_api._opentelemetry_api.Link.html" class="tsd-signature-type tsd-kind-interface">Link</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">this</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#end-1">end</a><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">endTime</span><span class="tsd-signature-symbol">?:</span> <a href="../types/_opentelemetry_api._opentelemetry_api.TimeInput.html" class="tsd-signature-type tsd-kind-type-alias">TimeInput</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#isrecording-1">isRecording</a><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#recordexception-1">recordException</a><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">exception</span><span class="tsd-signature-symbol">:</span> <a href="../types/_opentelemetry_api._opentelemetry_api.Exception.html" class="tsd-signature-type tsd-kind-type-alias">Exception</a><span class="tsd-signature-symbol">,</span> <span class="tsd-kind-parameter">time</span><span class="tsd-signature-symbol">?:</span> <a href="../types/_opentelemetry_api._opentelemetry_api.TimeInput.html" class="tsd-signature-type tsd-kind-type-alias">TimeInput</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#setattribute-1">setAttribute</a><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">key</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-kind-parameter">value</span><span class="tsd-signature-symbol">:</span> <a href="../types/_opentelemetry_api._opentelemetry_api.AttributeValue.html" class="tsd-signature-type tsd-kind-type-alias">AttributeValue</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">this</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#setattributes-1">setAttributes</a><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">attributes</span><span class="tsd-signature-symbol">:</span> <a href="_opentelemetry_api._opentelemetry_api.Attributes.html" class="tsd-signature-type tsd-kind-interface">Attributes</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">this</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#setstatus-1">setStatus</a><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">status</span><span class="tsd-signature-symbol">:</span> <a href="_opentelemetry_api._opentelemetry_api.SpanStatus.html" class="tsd-signature-type tsd-kind-interface">SpanStatus</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">this</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#spancontext-1">spanContext</a><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <a href="_opentelemetry_api._opentelemetry_api.SpanContext.html" class="tsd-signature-type tsd-kind-interface">SpanContext</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#updatename-1">updateName</a><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">name</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">this</span><span class="tsd-signature-symbol">;</span><br/><span class="tsd-signature-symbol">}</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/api/src/trace/span.ts#L24">trace/span.ts:24</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/api/src/trace/span.ts#L24">trace/span.ts:24</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
@@ -73,7 +73,7 @@ if type is {@type TimeInput} and 3rd param is undefined</p>
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/api/src/trace/span.ts#L65">trace/span.ts:65</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/api/src/trace/span.ts#L65">trace/span.ts:65</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="addlink"><span>add<wbr/>Link</span><a href="#addlink" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -92,7 +92,7 @@ It is preferred span links be added at span creation.</p>
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/api/src/trace/span.ts#L79">trace/span.ts:79</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/api/src/trace/span.ts#L79">trace/span.ts:79</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="addlinks"><span>add<wbr/>Links</span><a href="#addlinks" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -111,7 +111,7 @@ It is preferred span links be added at span creation.</p>
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/api/src/trace/span.ts#L89">trace/span.ts:89</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/api/src/trace/span.ts#L89">trace/span.ts:89</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="end"><span>end</span><a href="#end" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -133,7 +133,7 @@ use the current time as the span's end time.</p>
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/api/src/trace/span.ts#L134">trace/span.ts:134</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/api/src/trace/span.ts#L134">trace/span.ts:134</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="isrecording"><span>is<wbr/>Recording</span><a href="#isrecording" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -146,7 +146,7 @@ use the current time as the span's end time.</p>
 with the <code>AddEvent</code> operation and attributes using <code>setAttributes</code>.</p>
 <aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/api/src/trace/span.ts#L142">trace/span.ts:142</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/api/src/trace/span.ts#L142">trace/span.ts:142</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="recordexception"><span>record<wbr/>Exception</span><a href="#recordexception" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -167,7 +167,7 @@ use the current time.</p>
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/api/src/trace/span.ts#L150">trace/span.ts:150</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/api/src/trace/span.ts#L150">trace/span.ts:150</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="setattribute"><span>set<wbr/>Attribute</span><a href="#setattribute" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -189,7 +189,7 @@ undefined is invalid and will result in undefined behavior.</p>
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/api/src/trace/span.ts#L45">trace/span.ts:45</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/api/src/trace/span.ts#L45">trace/span.ts:45</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="setattributes"><span>set<wbr/>Attributes</span><a href="#setattributes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -208,7 +208,7 @@ are invalid and will result in undefined behavior.</p>
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/api/src/trace/span.ts#L54">trace/span.ts:54</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/api/src/trace/span.ts#L54">trace/span.ts:54</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="setstatus"><span>set<wbr/>Status</span><a href="#setstatus" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -235,7 +235,7 @@ For all other status codes, <code>message</code> is ignored.</p>
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/api/src/trace/span.ts#L108">trace/span.ts:108</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/api/src/trace/span.ts#L108">trace/span.ts:108</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="spancontext"><span>span<wbr/>Context</span><a href="#spancontext" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -250,7 +250,7 @@ span ends.</p>
 <h4 class="tsd-returns-title">Returns <a href="_opentelemetry_api._opentelemetry_api.SpanContext.html" class="tsd-signature-type tsd-kind-interface">SpanContext</a></h4><p>the SpanContext object associated with this Span.</p>
 <aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/api/src/trace/span.ts#L34">trace/span.ts:34</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/api/src/trace/span.ts#L34">trace/span.ts:34</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="updatename"><span>update<wbr/>Name</span><a href="#updatename" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -270,7 +270,7 @@ the implementation.</p>
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/api/src/trace/span.ts#L120">trace/span.ts:120</a></li></ul></aside></div></li></ul></section></section></details></div>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/api/src/trace/span.ts#L120">trace/span.ts:120</a></li></ul></aside></div></li></ul></section></section></details></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">

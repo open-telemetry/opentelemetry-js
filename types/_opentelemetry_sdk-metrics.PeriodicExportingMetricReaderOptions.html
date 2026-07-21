@@ -13,7 +13,7 @@
 <h1>Type Alias PeriodicExportingMetricReaderOptions</h1></div>
 <div class="tsd-signature"><span class="tsd-signature-keyword">type</span> <span class="tsd-kind-type-alias">PeriodicExportingMetricReaderOptions</span> <span class="tsd-signature-symbol">=</span> <span class="tsd-signature-symbol">{</span><br/>    <a class="tsd-kind-property" href="#cardinalitylimits">cardinalityLimits</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">{</span><br/>        <span class="tsd-kind-property">counter</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">default</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">gauge</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">histogram</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">observableCounter</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">observableGauge</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">observableUpDownCounter</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">upDownCounter</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#exporter">exporter</a><span class="tsd-signature-symbol">:</span> <a href="../interfaces/_opentelemetry_sdk-metrics.PushMetricExporter.html" class="tsd-signature-type tsd-kind-interface">PushMetricExporter</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#exportintervalmillis">exportIntervalMillis</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#exporttimeoutmillis">exportTimeoutMillis</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#maxexportbatchsize">maxExportBatchSize</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#metricproducers">metricProducers</a><span class="tsd-signature-symbol">?:</span> <a href="../interfaces/_opentelemetry_sdk-metrics.MetricProducer.html" class="tsd-signature-type tsd-kind-interface">MetricProducer</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">;</span><br/><span class="tsd-signature-symbol">}</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts#L20">packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts:20</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts#L20">packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts:20</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
@@ -37,14 +37,14 @@
 <div class="tsd-comment tsd-typography"><p>Cardinality limits for the metric reader, applied per instrument. If not configured, defaults to 2000 time series per instrument. These are wrapped in a cardinalitySelector function that returns limits based on the instrument type, so they can be configured differently per type if desired.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts#L45">packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts:45</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts#L45">packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts:45</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="exporter"><span>exporter</span><a href="#exporter" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">exporter</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/_opentelemetry_sdk-metrics.PushMetricExporter.html" class="tsd-signature-type tsd-kind-interface">PushMetricExporter</a></div>
 <div class="tsd-comment tsd-typography"><p>The backing exporter for the metric reader.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts#L24">packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts:24</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts#L24">packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts:24</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="exportintervalmillis"><code class="tsd-tag">Optional</code><span>export<wbr/>Interval<wbr/>Millis</span><a href="#exportintervalmillis" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">exportIntervalMillis</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
@@ -52,14 +52,14 @@
 collection.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts#L29">packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts:29</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts#L29">packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts:29</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="exporttimeoutmillis"><code class="tsd-tag">Optional</code><span>export<wbr/>Timeout<wbr/>Millis</span><a href="#exporttimeoutmillis" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">exportTimeoutMillis</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
 <div class="tsd-comment tsd-typography"><p>Milliseconds for the async observable callback to timeout.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts#L33">packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts:33</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts#L33">packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts:33</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="maxexportbatchsize"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Experimental</code><span>max<wbr/>Export<wbr/>Batch<wbr/>Size</span><a href="#maxexportbatchsize" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">maxExportBatchSize</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
@@ -67,7 +67,7 @@ collection.</p>
 batches larger than this size into smaller batches.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts#L60">packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts:60</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts#L60">packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts:60</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="metricproducers"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Experimental</code><span>metric<wbr/>Producers</span><a href="#metricproducers" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">metricProducers</span><span class="tsd-signature-symbol">?:</span> <a href="../interfaces/_opentelemetry_sdk-metrics.MetricProducer.html" class="tsd-signature-type tsd-kind-interface">MetricProducer</a><span class="tsd-signature-symbol">[]</span></div>
@@ -76,7 +76,7 @@ aggregated metric data in addition to the SDK's metric data. The resource return
 these MetricProducers is ignored; the SDK's resource will be used instead.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/9b05f668ee7ab884a44b04b504e0baaff6c6d2b2/packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts#L40">packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts:40</a></li></ul></aside></section></section></details></div>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts#L40">packages/sdk-metrics/src/export/PeriodicExportingMetricReader.ts:40</a></li></ul></aside></section></section></details></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
