@@ -48,9 +48,19 @@ export class SimpleSpanProcessor implements SpanProcessor {
   }
 
   async forceFlush(): Promise<void> {
-    await Promise.all(Array.from(this._pendingExports));
+    let pendingExportError: unknown;
+    let pendingExportRejected = false;
+    try {
+      await Promise.all(Array.from(this._pendingExports));
+    } catch (err) {
+      pendingExportError = err;
+      pendingExportRejected = true;
+    }
     if (this._exporter.forceFlush) {
       await this._exporter.forceFlush();
+    }
+    if (pendingExportRejected) {
+      throw pendingExportError;
     }
   }
 
@@ -65,13 +75,17 @@ export class SimpleSpanProcessor implements SpanProcessor {
       return;
     }
 
-    const pendingExport = this._doExport(span).catch(err =>
-      globalErrorHandler(err)
-    );
+    const pendingExport = this._doExport(span);
     // Enqueue this export to the pending list so it can be flushed by the user.
     this._pendingExports.add(pendingExport);
-    void pendingExport.finally(() =>
-      this._pendingExports.delete(pendingExport)
+    void pendingExport.then(
+      () => {
+        this._pendingExports.delete(pendingExport);
+      },
+      err => {
+        globalErrorHandler(err);
+        this._pendingExports.delete(pendingExport);
+      }
     );
   }
 
