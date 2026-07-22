@@ -115,7 +115,7 @@ node --require ./telemetry.js app.js
 Startup command for compiled ESM:
 
 ```sh
-node --experimental-loader=@opentelemetry/instrumentation/hook.mjs --import ./telemetry.js app.js
+node --import @opentelemetry/instrumentation/hook.mjs --import ./telemetry.js app.js
 ```
 
 ### ESM Options for Different Versions of Node.js
@@ -129,3 +129,4 @@ The entire startup command should include the following `NODE_OPTIONS`:
 | ^18.19.0          | `--import ./telemetry.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
 | 20.x              | `--import ./telemetry.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
 | 22.x              | `--import ./telemetry.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
+| 24.x              | `--import ./telemetry.mjs --import @opentelemetry/instrumentation/hook.mjs`               |
