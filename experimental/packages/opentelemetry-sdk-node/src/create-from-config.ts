@@ -12,6 +12,9 @@
  * be used by the "create" step of `startNodeSDK()`.
  */
 
+import { inspect } from 'util';
+
+import type { TextMapPropagator } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
 import type { SpanLimits } from '@opentelemetry/sdk-trace';
 import type { Resource } from '@opentelemetry/resources';
@@ -28,9 +31,12 @@ import type {
   LogRecordProcessorConfigModel,
   OtlpGrpcExporterConfigModel,
   OtlpHttpExporterConfigModel,
+  PropagatorConfigModel,
   SimpleLogRecordProcessorConfigModel,
   SpanLimitsConfigModel,
+  TextMapPropagatorConfigModel,
 } from '@opentelemetry/configuration';
+import { mergePropagatorCompositeConfig } from '@opentelemetry/configuration';
 import type {
   LogRecordExporter,
   LogRecordProcessor,
@@ -42,6 +48,13 @@ import {
   SimpleLogRecordProcessor,
   LoggerProvider,
 } from '@opentelemetry/sdk-logs';
+import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
+import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
+import {
+  CompositePropagator,
+  W3CBaggagePropagator,
+  W3CTraceContextPropagator,
+} from '@opentelemetry/core';
 
 import {
   getGrpcCredentialsFromTls,
@@ -120,6 +133,101 @@ function mustSingleEntry(
 }
 
 // ---- create<SDKThing>FromConfig functions
+
+export function createPropagatorFromConfig(
+  propagatorConfig: PropagatorConfigModel
+): TextMapPropagator | undefined {
+  const configComposite = mergePropagatorCompositeConfig(
+    propagatorConfig.composite,
+    propagatorConfig.composite_list
+  );
+  if (!configComposite) {
+    return undefined;
+  }
+
+  // TextMapPropagator config items are objects with a single key (the name).
+  // Transform this into a more convenient `(name, value)` 2-tuple.
+  //
+  // As well, guard against two cases where the TypeScript type
+  // `TextMapPropagatorConfigModel` does not exactly represent the JSON schema:
+  // 1. `"minProperties": 1, "maxProperties": 1,`
+  // 2. The type allows keys with an `undefined` value, but the JSON schema
+  //    does not.
+  const kvFromItem = (
+    item: TextMapPropagatorConfigModel
+  ): [string, object | null] => {
+    const keys = [];
+    let value = undefined;
+    for (const key of Object.keys(item)) {
+      value = item[key];
+      if (value === undefined) {
+        continue;
+      }
+      keys.push(key);
+    }
+    if (keys.length !== 1) {
+      throw new Error(
+        `invalid "propagator" entry in configuration, there must be exactly one key (with a non-undefined value): ${inspect(item)}`
+      );
+    }
+    return [keys[0], value as object | null];
+  };
+
+  // First pass: handle 'none', remove dupes.
+  const names = new Set();
+  const kvs = [];
+  for (const item of configComposite) {
+    const kv = kvFromItem(item);
+    const k = kv[0];
+    if (names.has(k)) {
+      continue;
+    }
+    names.add(k);
+    kvs.push(kv);
+    if (k === 'none') {
+      return undefined;
+    }
+  }
+
+  // Implementation note: this only contains specification required propagators that are actually hosted in this repo.
+  // Any other propagators (like aws, aws-lambda, should go into `@opentelemetry/auto-configuration-propagators` instead).
+  const propagatorsFactory = new Map<string, () => TextMapPropagator>([
+    ['tracecontext', () => new W3CTraceContextPropagator()],
+    ['baggage', () => new W3CBaggagePropagator()],
+    ['b3', () => new B3Propagator()],
+    [
+      'b3multi',
+      () => new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
+    ],
+    [
+      'jaeger',
+      () => {
+        diag.warn(
+          'The Jaeger propagator is deprecated and will be removed in a future release. Use the W3C TraceContext propagator ("tracecontext") instead.'
+        );
+        return new JaegerPropagator();
+      },
+    ],
+  ]);
+
+  const propagators: TextMapPropagator[] = [];
+  for (const [name] of kvs) {
+    const propagator = propagatorsFactory.get(name)?.();
+    if (!propagator) {
+      throw new Error(`unknown TextMapPropagator in configuration: "${name}"`);
+    }
+    propagators.push(propagator);
+  }
+
+  if (propagators.length === 0) {
+    return undefined;
+  } else {
+    // Always wrap in a composite propagator, even for the rare case of a single
+    // propagator, because `/propagator/composite` in the configuration schema
+    // says "Configure the propagators in the composite text map propagator".
+    return new CompositePropagator({ propagators });
+  }
+}
 
 export function createLogRecordLimitsFromConfig(
   limits?: LogRecordLimitsConfigModel,

@@ -8,6 +8,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* fix(sdk-node)!: fail-fast on Propagator creation from config file [#6930](https://github.com/open-telemetry/opentelemetry-js/pull/6930) @trentm
+
 ### :rocket: Features
 
 ### :bug: Bug Fixes
