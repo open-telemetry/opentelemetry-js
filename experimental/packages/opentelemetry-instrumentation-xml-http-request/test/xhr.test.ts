@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import * as api from '@opentelemetry/api';
-import { otperformance as performance } from '@opentelemetry/core';
 import {
   registerInstrumentations,
   isWrapped,
