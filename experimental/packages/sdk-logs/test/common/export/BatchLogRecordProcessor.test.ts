@@ -40,7 +40,6 @@ const createLogRecord = (
 ): SdkLogRecord => {
   const sharedState = new LoggerProviderSharedState(
     resource || defaultResource(),
-    Infinity,
     {
       attributeCountLimit: limits?.attributeCountLimit ?? 128,
       attributeValueLengthLimit: limits?.attributeValueLengthLimit ?? Infinity,
