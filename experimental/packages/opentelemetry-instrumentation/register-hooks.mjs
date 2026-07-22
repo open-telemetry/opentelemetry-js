@@ -9,7 +9,5 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2021 Datadog, Inc.
 
 export {
-  load,
-  resolve,
-  initialize,
-} from 'import-in-the-middle/hook.mjs';
+  register, supportsSyncHooks
+} from 'import-in-the-middle/register-hooks.mjs';
