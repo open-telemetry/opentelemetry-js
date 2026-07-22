@@ -5,7 +5,10 @@
 
 import * as assert from 'assert';
 import * as api from '@opentelemetry/api';
-import { TraceIdRatioBasedSampler } from '../../../src';
+import {
+  TraceIdRatioBasedSampler,
+  createTraceIdRatioBasedSampler,
+} from '../../../src';
 
 const spanContext = (traceId = '1') => ({
   traceId,
@@ -40,6 +43,24 @@ describe('TraceIdRatioBasedSampler', () => {
 
     sampler = new TraceIdRatioBasedSampler(-Infinity);
     assert.strictEqual(sampler.toString(), 'TraceIdRatioBased{0}');
+  });
+
+  it('should create a trace-id-ratio sampler with the factory function', () => {
+    const sampler = createTraceIdRatioBasedSampler(0.5);
+    assert.strictEqual(sampler.toString(), 'TraceIdRatioBased{0.5}');
+    assert.deepStrictEqual(
+      sampler.shouldSample(
+        api.ROOT_CONTEXT,
+        traceId('1'),
+        'spanName',
+        api.SpanKind.INTERNAL,
+        {},
+        []
+      ),
+      {
+        decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+      }
+    );
   });
 
   it('should return a always sampler for 1', () => {

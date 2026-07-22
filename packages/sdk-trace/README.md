@@ -99,6 +99,10 @@ process.once('beforeExit', async () => {
 
 Sampler is used to make decisions on `Span` sampling.
 
+Factory functions are the preferred way to configure built-in samplers. The
+class constructors remain available for backwards compatibility, but are
+deprecated and will be removed in a future major release.
+
 ### AlwaysOn Sampler
 
 Samples every trace regardless of upstream sampling decisions.
@@ -106,10 +110,13 @@ Samples every trace regardless of upstream sampling decisions.
 > This is used as a default Sampler
 
 ```js
-const { AlwaysOnSampler, TracerProvider } = require("@opentelemetry/sdk-trace");
+const {
+  createAlwaysOnSampler,
+  TracerProvider,
+} = require('@opentelemetry/sdk-trace');
 
 const tracerProvider = new TracerProvider({
-  sampler: new AlwaysOnSampler()
+  sampler: createAlwaysOnSampler(),
 });
 ```
 
@@ -118,10 +125,13 @@ const tracerProvider = new TracerProvider({
 Doesn't sample any trace, regardless of upstream sampling decisions.
 
 ```js
-const { AlwaysOffSampler, TracerProvider } = require("@opentelemetry/sdk-trace");
+const {
+  createAlwaysOffSampler,
+  TracerProvider,
+} = require('@opentelemetry/sdk-trace');
 
 const tracerProvider = new TracerProvider({
-  sampler: new AlwaysOffSampler()
+  sampler: createAlwaysOffSampler(),
 });
 ```
 
@@ -135,24 +145,25 @@ The `TraceIDRatioSampler` may be used with the `ParentBasedSampler` to respect t
 ```js
 const {
   TracerProvider,
-  TraceIdRatioBasedSampler,
-} = require("@opentelemetry/sdk-trace");
+  createParentBasedSampler,
+  createTraceIdRatioBasedSampler,
+} = require('@opentelemetry/sdk-trace');
 
 const tracerProvider = new TracerProvider({
   // See details of ParentBasedSampler below
-  sampler: new ParentBasedSampler({
+  sampler: createParentBasedSampler({
     // Trace ID Ratio Sampler accepts a positional argument
     // which represents the percentage of traces which should
     // be sampled.
-    root: new TraceIdRatioBasedSampler(0.5)
-  });
+    root: createTraceIdRatioBasedSampler(0.5),
+  }),
 });
 ```
 
 ### ParentBased Sampler
 
 - This is a composite sampler. `ParentBased` helps distinguished between the
-following cases:
+  following cases:
   - No parent (root span).
   - Remote parent with `sampled` flag `true`
   - Remote parent with `sampled` flag `false`
@@ -170,24 +181,23 @@ Optional parameters:
 - `localParentSampled(Sampler)` (default: `AlwaysOn`)
 - `localParentNotSampled(Sampler)` (default: `AlwaysOff`)
 
-|Parent|parent.isRemote()|parent.isSampled()|Invoke sampler|
-|---|---|---|---|
-|absent|n/a|n/a|`root()`|
-|present|true|true|`remoteParentSampled()`|
-|present|true|false|`remoteParentNotSampled()`|
-|present|false|true|`localParentSampled()`|
-|present|false|false|`localParentNotSampled()`|
+| Parent  | parent.isRemote() | parent.isSampled() | Invoke sampler             |
+| ------- | ----------------- | ------------------ | -------------------------- |
+| absent  | n/a               | n/a                | `root()`                   |
+| present | true              | true               | `remoteParentSampled()`    |
+| present | true              | false              | `remoteParentNotSampled()` |
+| present | false             | true               | `localParentSampled()`     |
+| present | false             | false              | `localParentNotSampled()`  |
 
 ```js
 const {
-  AlwaysOffSampler,
   TracerProvider,
-  ParentBasedSampler,
-  TraceIdRatioBasedSampler,
-} = require("@opentelemetry/sdk-trace");
+  createParentBasedSampler,
+  createTraceIdRatioBasedSampler,
+} = require('@opentelemetry/sdk-trace');
 
 const tracerProvider = new TracerProvider({
-  sampler: new ParentBasedSampler({
+  sampler: createParentBasedSampler({
     // By default, the ParentBasedSampler will respect the parent span's sampling
     // decision. This is configurable by providing a different sampler to use
     // based on the situation. See configuration details above.
@@ -195,8 +205,8 @@ const tracerProvider = new TracerProvider({
     // This will delegate the sampling decision of all root traces (no parent)
     // to the TraceIdRatioBasedSampler.
     // See details of TraceIdRatioBasedSampler above.
-    root: new TraceIdRatioBasedSampler(0.5)
-  })
+    root: createTraceIdRatioBasedSampler(0.5),
+  }),
 });
 ```
 
@@ -209,15 +219,14 @@ while still controlling export costs through the delegate sampler.
 ```js
 const {
   TracerProvider,
-  ParentBasedSampler,
-  TraceIdRatioBasedSampler,
   createAlwaysRecordSampler,
-} = require("@opentelemetry/sdk-trace");
+  createTraceIdRatioBasedSampler,
+} = require('@opentelemetry/sdk-trace');
 
 const tracerProvider = new TracerProvider({
   // Wraps a 50% TraceIdRatioBased sampler so that dropped spans are still
   // recorded (but not exported by a sampling exporter).
-  sampler: createAlwaysRecordSampler(new TraceIdRatioBasedSampler(0.5))
+  sampler: createAlwaysRecordSampler(createTraceIdRatioBasedSampler(0.5)),
 });
 ```
 
