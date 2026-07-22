@@ -8,6 +8,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* fix(sdk-node)!: fail-fast on Propagator creation from config file [#6930](https://github.com/open-telemetry/opentelemetry-js/pull/6930) @trentm
+
 ### :rocket: Features
 
 ### :bug: Bug Fixes
@@ -26,7 +28,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(instrumentation-fetch)!: emit only stable HTTP semantic conventions. The `semconvStabilityOptIn` instrumentation config option has been removed; old (v1.7.0) and duplicate semconv outputs are no longer emitted. [#6819](https://github.com/open-telemetry/opentelemetry-js/pull/6819) @maryliag
 * feat(instrumentation-xml-http-request)!: emit only stable HTTP semantic conventions. The `semconvStabilityOptIn` instrumentation config option has been removed; old (v1.7.0) and duplicate semconv outputs are no longer emitted. [#6819](https://github.com/open-telemetry/opentelemetry-js/pull/6819) @maryliag
 * feat(instrumentation-grpc)!: emit only stable network semantic conventions. The `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable no longer changes attribute emission — `net.peer.name` and `net.peer.port` (old) are no longer set; only `server.address` and `server.port` (stable). [#6819](https://github.com/open-telemetry/opentelemetry-js/pull/6819) @maryliag
-* fix(sdk-node)!: fail-fast on Propagator creation from config file [#6930](https://github.com/open-telemetry/opentelemetry-js/pull/6930) @trentm
 
 ### :rocket: Features
 
