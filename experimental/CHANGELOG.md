@@ -69,6 +69,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :books: Documentation
 
+* docs(configuration): add declarative config example (`experimental/examples/declarative-config/`) [#6807](https://github.com/open-telemetry/opentelemetry-js/issues/6807) @MikeGoldsmith
 * docs(configuration): link the configuration README to the cross-SDK declarative config language support status doc [#6809](https://github.com/open-telemetry/opentelemetry-js/issues/6809) @MikeGoldsmith
 
 ### :house: Internal
