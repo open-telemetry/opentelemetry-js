@@ -135,13 +135,15 @@ export function sendWithHttp(
       });
     });
 
-    req.setTimeout(timeoutMillis, () => {
-      req.destroy();
-      resolve({
-        status: 'retryable',
-        error: new Error('Request timed out'),
+    if (timeoutMillis > 0) {
+      req.setTimeout(timeoutMillis, () => {
+        req.destroy();
+        resolve({
+          status: 'retryable',
+          error: new Error('Request timed out'),
+        });
       });
-    });
+    }
 
     req.on('error', (error: Error) => {
       if (isHttpTransportNetworkErrorRetryable(error)) {

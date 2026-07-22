@@ -54,7 +54,10 @@ class FetchTransport implements IExporterTransport {
 
   async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
     const abortController = new AbortController();
-    const timeout = setTimeout(() => abortController.abort(), timeoutMillis);
+    const timeout =
+      timeoutMillis > 0
+        ? setTimeout(() => abortController.abort(), timeoutMillis)
+        : undefined;
     // Fetch API may be wrapped by an instrumentation like `@opentelemetry/instrumentation-fetch`.
     // In that case the instrumentation would create a new Span for this request
     // because the context manager cannot keep the context after `await` calls.
@@ -89,9 +92,17 @@ class FetchTransport implements IExporterTransport {
 
     try {
       const url = new URL(this._parameters.url);
+      const headers = await this._parameters.headers();
+
+      if (abortController.signal.aborted) {
+        const abortError = new Error('The operation was aborted.');
+        abortError.name = 'AbortError';
+        throw abortError;
+      }
+
       const response = await fetchApi(url.href, {
         method: 'POST',
-        headers: await this._parameters.headers(),
+        headers,
         body: data,
         signal: abortController.signal,
         keepalive: useKeepalive,
@@ -134,7 +145,9 @@ class FetchTransport implements IExporterTransport {
         error: new Error('Fetch request errored', { cause: error }),
       };
     } finally {
-      clearTimeout(timeout);
+      if (timeout !== undefined) {
+        clearTimeout(timeout);
+      }
       if (useKeepalive) {
         pendingBodySize -= requestSize;
         pendingKeepaliveCount--;
