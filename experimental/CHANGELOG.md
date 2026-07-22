@@ -106,6 +106,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(opentelemetry-exporter-prometheus): handle additional edge cases in metric name conversion [#6727](https://github.com/open-telemetry/opentelemetry-js/pull/6727) @cjihrig
 * fix(sdk-logs): avoid null dereference in `BatchLogRecordProcessor._flushAll` when an in-flight export completes between awaits [#6763](https://github.com/open-telemetry/opentelemetry-js/pull/6763) @Janealter
 * fix(configuration): improve environment variable substitution to handle all the cases shown in the spec [#6757](https://github.com/open-telemetry/opentelemetry-js/pull/6757) @trentm
+* fix(otlp-exporter-base): surface FetchTransport timeout as a clean failure instead of leaking the underlying AbortError via the cause chain [#6751](https://github.com/open-telemetry/opentelemetry-js/pull/6751) @devareddy05
 
 ### :books: Documentation
 

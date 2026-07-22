@@ -142,52 +142,69 @@ describe('FetchTransport', function () {
       }, done /* catch any rejections */);
     });
 
-    it('returns failure when request is aborted', function (done) {
-      // arrange
+    it('returns failure when request is aborted by an external signal', async function () {
+      // arrange: fetch rejects with AbortError unrelated to the transport's own timeout
       const abortError = new Error('aborted request');
       abortError.name = 'AbortError';
       sinon.stub(globalThis, 'fetch').rejects(abortError);
-      const clock = sinon.useFakeTimers();
       const transport = createFetchTransport(testTransportParameters);
 
-      //act
-      transport.send(testPayload, requestTimeout).then(response => {
-        // assert
-        try {
-          assert.strictEqual(response.status, 'failure');
-          assert.strictEqual(
-            (response as ExportResponseFailure).error.message,
-            'Fetch request errored'
-          );
-        } catch (e) {
-          done(e);
-        }
-        done();
-      }, done /* catch any rejections */);
-      clock.tick(requestTimeout + 100);
+      // act
+      const response = await transport.send(testPayload, requestTimeout);
+
+      // assert
+      assert.strictEqual(response.status, 'failure');
+      const error = (response as ExportResponseFailure).error;
+      assert.strictEqual(error.message, 'Fetch request errored');
+      assert.ok(error.cause);
     });
 
-    it('returns failure when fetch throws non-network error', function (done) {
+    it('returns clean failure when send timeout aborts the request', async function () {
+      // arrange: emulate the browser — fetch only rejects when the signal aborts
+      sinon.stub(globalThis, 'fetch').callsFake((_url, init) => {
+        return new Promise<Response>((_, reject) => {
+          const signal = (init as RequestInit | undefined)?.signal;
+          signal?.addEventListener('abort', () => {
+            const err = new Error('signal is aborted without reason');
+            err.name = 'AbortError';
+            reject(err);
+          });
+        });
+      });
+      const transport = createFetchTransport(testTransportParameters);
+      const shortTimeout = 50;
+
+      // act
+      const response = await transport.send(testPayload, shortTimeout);
+
+      // assert
+      assert.strictEqual(response.status, 'failure');
+      const error = (response as ExportResponseFailure).error;
+      assert.strictEqual(
+        error.message,
+        `Fetch request timed out after ${shortTimeout}ms`
+      );
+      assert.strictEqual(
+        (error as Error & { cause?: unknown }).cause,
+        undefined,
+        'timeout failure must not chain AbortError via cause'
+      );
+    });
+
+    it('returns failure when fetch throws non-network error', async function () {
       // arrange
       sinon.stub(globalThis, 'fetch').throws(new Error('fetch failed'));
-      const clock = sinon.useFakeTimers();
       const transport = createFetchTransport(testTransportParameters);
 
-      //act
-      transport.send(testPayload, requestTimeout).then(response => {
-        // assert
-        try {
-          assert.strictEqual(response.status, 'failure');
-          assert.strictEqual(
-            (response as ExportResponseFailure).error.message,
-            'Fetch request errored'
-          );
-        } catch (e) {
-          done(e);
-        }
-        done();
-      }, done /* catch any rejections */);
-      clock.tick(requestTimeout + 100);
+      // act
+      const response = await transport.send(testPayload, requestTimeout);
+
+      // assert
+      assert.strictEqual(response.status, 'failure');
+      assert.strictEqual(
+        (response as ExportResponseFailure).error.message,
+        'Fetch request errored'
+      );
     });
 
     it('returns retryable when browser fetch throws network error', function (done) {
