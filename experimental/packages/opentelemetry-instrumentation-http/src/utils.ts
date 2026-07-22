@@ -2,13 +2,20 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
+import type * as http from 'http';
 import type {
   Attributes,
   Span,
   DiagLogger,
   AttributeValue,
+  TextMapGetter,
 } from '@opentelemetry/api';
-import { SpanStatusCode, context, SpanKind } from '@opentelemetry/api';
+import {
+  SpanStatusCode,
+  context,
+  SpanKind,
+  defaultTextMapGetter,
+} from '@opentelemetry/api';
 import {
   ATTR_CLIENT_ADDRESS,
   ATTR_ERROR_TYPE,
@@ -54,6 +61,15 @@ import {
 } from './internal-types';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import forwardedParse = require('forwarded-parse');
+
+export const requestTextMapGetter: TextMapGetter<http.IncomingMessage> = {
+  keys(carrier) {
+    return defaultTextMapGetter.keys(carrier.headers);
+  },
+  get(carrier, key) {
+    return defaultTextMapGetter.get(carrier.headers, key);
+  },
+};
 
 /**
  * Get an absolute url

@@ -625,4 +625,44 @@ describe('Utility', () => {
       assert.strictEqual(utils.getRemoteClientAddress(request), null);
     });
   });
+
+  describe('requestTextMapGetter', () => {
+    const request = {
+      headers: {
+        traceparent: '00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01',
+        'x-multi-value': ['one', 'two'],
+      },
+      socket: {
+        remoteAddress: '10.1.2.3',
+      },
+    } as unknown as IncomingMessage;
+
+    it('should read header values from the request carrier', () => {
+      assert.strictEqual(
+        utils.requestTextMapGetter.get(request, 'traceparent'),
+        '00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01'
+      );
+    });
+
+    it('should return array header values as-is', () => {
+      assert.deepStrictEqual(
+        utils.requestTextMapGetter.get(request, 'x-multi-value'),
+        ['one', 'two']
+      );
+    });
+
+    it('should return undefined for missing headers', () => {
+      assert.strictEqual(
+        utils.requestTextMapGetter.get(request, 'missing'),
+        undefined
+      );
+    });
+
+    it('should list header keys of the request carrier', () => {
+      assert.deepStrictEqual(utils.requestTextMapGetter.keys(request), [
+        'traceparent',
+        'x-multi-value',
+      ]);
+    });
+  });
 });
