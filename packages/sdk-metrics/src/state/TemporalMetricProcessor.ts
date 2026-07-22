@@ -16,6 +16,14 @@ import type { Maybe } from '../utils';
 import type { MetricCollectorHandle } from './MetricCollector';
 import { AttributeHashMap } from './HashMap';
 
+interface BuildMetricsOptions<T extends Maybe<Accumulation>> {
+  /**
+   * When present, only these attribute sets are emitted for cumulative export.
+   * Full report history is still retained internally.
+   */
+  attributeSetsToEmit?: AttributeHashMap<T>;
+}
+
 /**
  * Remembers what was presented to a specific exporter.
  */
@@ -74,13 +82,15 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
     collector: MetricCollectorHandle,
     instrumentDescriptor: InstrumentDescriptor,
     currentAccumulations: AttributeHashMap<T>,
-    collectionTime: HrTime
+    collectionTime: HrTime,
+    options?: BuildMetricsOptions<T>
   ): Maybe<MetricData> {
     this._stashAccumulations(currentAccumulations);
     const unreportedAccumulations =
       this._getMergedUnreportedAccumulations(collector);
 
     let result = unreportedAccumulations;
+    let accumulationHistory = result;
     let aggregationTemporality: AggregationTemporality;
     // Check our last report time.
     if (this._reportHistory.has(collector)) {
@@ -103,28 +113,44 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
       if (aggregationTemporality === AggregationTemporality.CUMULATIVE) {
         // We need to make sure the current delta recording gets merged into the previous cumulative
         // for the next cumulative recording.
-        result = TemporalMetricProcessor.merge(
+        accumulationHistory = TemporalMetricProcessor.merge(
           last.accumulations,
           unreportedAccumulations,
           this._aggregator
         );
+        result =
+          options?.attributeSetsToEmit === undefined
+            ? accumulationHistory
+            : TemporalMetricProcessor.selectAttributes(
+                accumulationHistory,
+                options.attributeSetsToEmit
+              );
       } else {
         result = TemporalMetricProcessor.calibrateStartTime(
           last.accumulations,
           unreportedAccumulations,
           lastCollectionTime
         );
+        accumulationHistory = result;
       }
     } else {
       // Call into user code to select aggregation temporality for the instrument.
       aggregationTemporality = collector.selectAggregationTemporality(
         instrumentDescriptor.type
       );
-    }
+      if (
+        aggregationTemporality === AggregationTemporality.CUMULATIVE &&
+        options?.attributeSetsToEmit !== undefined
+      ) {
+        result = TemporalMetricProcessor.selectAttributes(
+          accumulationHistory,
+          options.attributeSetsToEmit
+        );
+      }
 
     // Update last reported (cumulative) accumulation.
     this._reportHistory.set(collector, {
-      accumulations: result,
+      accumulations: accumulationHistory,
       collectionTime,
       aggregationTemporality,
     });
@@ -189,6 +215,19 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
       }
 
       next = iterator.next();
+    }
+    return result;
+  }
+
+  static selectAttributes<T extends Maybe<Accumulation>>(
+    source: AttributeHashMap<T>,
+    attributesToSelect: AttributeHashMap<T>
+  ) {
+    const result = new AttributeHashMap<T>();
+    for (const [attributes, , hash] of attributesToSelect.entries()) {
+      if (source.has(attributes, hash)) {
+        result.set(attributes, source.get(attributes, hash)!, hash);
+      }
     }
     return result;
   }
