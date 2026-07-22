@@ -13,6 +13,11 @@ This module provides a metrics-exporter for OTLP (http/json) using protocol vers
 npm install --save @opentelemetry/exporter-metrics-otlp-http
 ```
 
+## Shared HTTP exporter options
+
+This exporter uses the shared HTTP options documented in [`@opentelemetry/otlp-exporter-base`][otlp-exporter-base-config].
+That includes `url`, `headers`, `timeoutMillis`, `concurrencyLimit`, and Node.js options such as `compression`, `keepAlive`, `httpAgentOptions`, and `userAgent`.
+
 ## Service Name
 
 The OpenTelemetry Collector Metrics Exporter does not have a service name configuration.
@@ -112,6 +117,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-metrics-otlp-http
 [npm-url-grpc]: https://www.npmjs.com/package/@opentelemetry/exporter-metrics-otlp-grpc
 [npm-url-proto]: https://www.npmjs.com/package/@opentelemetry/exporter-metrics-otlp-proto
+[otlp-exporter-base-config]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-exporter-base#http-exporter-configuration
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-metrics-otlp-http.svg
 [semconv-resource-service-name]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service
 [trace-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/exporter-trace-otlp-http

@@ -11,9 +11,9 @@ export interface OTLPExporterConfigBase {
    *
    * @remarks
    * Prefer using a plain object over a factory function wherever possible.
-   * If using a factory function (`HttpAgentFactory`), **do not import `http` or `https` at the top of the file**
-   * Instead, use dynamic `import()` or `require()` to load the module. This ensures that the `http` or `https`
-   * module is not loaded before `@opentelemetry/instrumentation-http` can instrument it.
+   * If using a factory function (`HeadersFactory`), **do not import `http` or `https` at the top of the file**.
+   * Instead, use dynamic `import()` or `require()` to load the module. This lets
+   * `@opentelemetry/instrumentation-http` instrument the module first.
    *
    * Functions passed to the exporter MUST NOT throw errors.
    *
@@ -31,10 +31,26 @@ export interface OTLPExporterConfigBase {
    * };
    */
   headers?: Record<string, string> | HeadersFactory;
+  /**
+   * Collector endpoint URL for the exporter.
+   *
+   * @remarks
+   * Defaults to the signal-specific endpoint, such as
+   * `http://localhost:4318/v1/traces`, `http://localhost:4318/v1/metrics`,
+   * or `http://localhost:4318/v1/logs`.
+   */
   url?: string;
+  /**
+   * Maximum number of in-flight export requests.
+   *
+   * @defaultValue 30
+   */
   concurrencyLimit?: number;
-  /** Maximum time the OTLP exporter will wait for each batch export.
-   * The default value is 10000ms. */
+  /**
+   * Maximum time, in milliseconds, the OTLP exporter will wait for each batch export.
+   *
+   * @defaultValue 10000
+   */
   timeoutMillis?: number;
 
   /**
