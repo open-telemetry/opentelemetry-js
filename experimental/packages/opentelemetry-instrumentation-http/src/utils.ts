@@ -7,6 +7,7 @@ import type {
   Span,
   DiagLogger,
   AttributeValue,
+  TextMapSetter,
 } from '@opentelemetry/api';
 import { SpanStatusCode, context, SpanKind } from '@opentelemetry/api';
 import {
@@ -54,6 +55,49 @@ import {
 } from './internal-types';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import forwardedParse = require('forwarded-parse');
+
+const isReadOnlyArray = <T>(value: unknown): value is readonly T[] =>
+  Array.isArray(value);
+
+export const requestOptionsTextMapSetter: TextMapSetter<RequestOptions> = {
+  set(carrier, key, value) {
+    const keyLower = key.toLowerCase();
+
+    // headers <Object> | <Array> An object or an array of strings containing
+    // request headers. The array is in the same format as message.rawHeaders.
+    if (!carrier.headers) {
+      carrier.headers = { [keyLower]: value };
+    } else if (isReadOnlyArray(carrier.headers)) {
+      // Make a copy of the headers object to avoid mutating an object the
+      // caller might have a reference to.
+      const headers = carrier.headers.slice();
+      carrier.headers = headers;
+
+      for (let i = 0; i < headers.length; i += 2) {
+        if (headers[i].toLowerCase() === keyLower) {
+          headers[i + 1] = value;
+          return;
+        }
+      }
+
+      headers.push(keyLower, value);
+    } else {
+      // Make a copy of the headers object to avoid mutating an object the
+      // caller might have a reference to.
+      const headers = Object.assign({}, carrier.headers);
+      carrier.headers = headers;
+
+      for (const headerKey in headers) {
+        if (headerKey.toLowerCase() === keyLower) {
+          headers[headerKey as keyof typeof headers] = value;
+          return;
+        }
+      }
+
+      headers[keyLower] = value;
+    }
+  },
+};
 
 /**
  * Get an absolute url

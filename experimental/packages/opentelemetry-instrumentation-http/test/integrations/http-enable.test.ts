@@ -31,6 +31,7 @@ import { httpRequest } from '../utils/httpRequest';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import type { Socket } from 'net';
 import { sendRequestTwice } from '../utils/rawRequest';
+import type { RequestOptions } from 'https';
 
 const protocol = 'http';
 const hostname = 'localhost';
@@ -56,6 +57,7 @@ describe('HttpInstrumentation Integration tests', () => {
       res.write(
         JSON.stringify({
           success: true,
+          headers: req.headers,
         })
       );
       res.end();
@@ -257,6 +259,48 @@ describe('HttpInstrumentation Integration tests', () => {
       assert.deepStrictEqual(headers, { 'x-foo': 'foo' });
       assert.ok(result.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);
       assert.ok(result.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]);
+    });
+
+    it('should add propagation headers when given headers is an array of raw header strings', async () => {
+      const spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      const headers = ['x-foo', 'foo'];
+      const result = await httpRequest.get(
+        new URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
+        { headers }
+      );
+
+      // We can't use result.reqHeaders here because Node.js does not reflect
+      // raw headers in the getHeaders() result. See
+      // https://github.com/nodejs/node/issues/64405
+      const header = (result.req as any)._header as string;
+
+      assert.ok(header.includes('x-foo: foo'));
+      assert.ok(header.includes(`${DummyPropagation.TRACE_CONTEXT_KEY}:`));
+      assert.ok(header.includes(`${DummyPropagation.SPAN_CONTEXT_KEY}:`));
+    });
+
+    it('should not mutate given raw headers array when adding propagation headers', async () => {
+      const spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      const headers = ['x-foo', 'foo'];
+      const options: RequestOptions = { headers };
+      const result = await httpRequest.get(
+        new URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
+        options
+      );
+
+      // We can't use result.reqHeaders here because Node.js does not reflect
+      // raw headers in the getHeaders() result. See
+      // https://github.com/nodejs/node/issues/64405
+      const header = (result.req as any)._header as string;
+
+      assert.ok(header.includes('x-foo: foo'));
+      assert.ok(header.includes(`${DummyPropagation.TRACE_CONTEXT_KEY}:`));
+      assert.ok(header.includes(`${DummyPropagation.SPAN_CONTEXT_KEY}:`));
+      assert.deepStrictEqual(options, { headers: ['x-foo', 'foo'] });
     });
 
     it('should succeed even with malformed Forwarded header', async () => {

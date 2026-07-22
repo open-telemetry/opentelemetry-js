@@ -18,8 +18,7 @@ import type { Context } from '../context/types';
  *
  * @since 1.0.0
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface TextMapPropagator<Carrier = any> {
+export interface TextMapPropagator {
   /**
    * Injects values from a given `Context` into a carrier.
    *
@@ -33,7 +32,7 @@ export interface TextMapPropagator<Carrier = any> {
    * @param setter an optional {@link TextMapSetter}. If undefined, values will be
    *     set by direct object assignment.
    */
-  inject(
+  inject<Carrier>(
     context: Context,
     carrier: Carrier,
     setter: TextMapSetter<Carrier>
@@ -51,7 +50,7 @@ export interface TextMapPropagator<Carrier = any> {
    * @param getter an optional {@link TextMapGetter}. If undefined, keys will be all
    *     own properties, and keys will be accessed by direct object access.
    */
-  extract(
+  extract<Carrier>(
     context: Context,
     carrier: Carrier,
     getter: TextMapGetter<Carrier>
@@ -69,8 +68,7 @@ export interface TextMapPropagator<Carrier = any> {
  *
  * @since 1.0.0
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface TextMapSetter<Carrier = any> {
+export interface TextMapSetter<Carrier = unknown> {
   /**
    * Callback used to set a key/value pair on an object.
    *
@@ -90,8 +88,7 @@ export interface TextMapSetter<Carrier = any> {
  *
  * @since 1.0.0
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface TextMapGetter<Carrier = any> {
+export interface TextMapGetter<Carrier = unknown> {
   /**
    * Get a list of all keys available on the carrier.
    *
@@ -111,7 +108,9 @@ export interface TextMapGetter<Carrier = any> {
 /**
  * @since 1.0.0
  */
-export const defaultTextMapGetter: TextMapGetter = {
+export const defaultTextMapGetter: TextMapGetter<
+  undefined | null | Record<string, undefined | string | string[]>
+> = {
   get(carrier, key) {
     if (carrier == null) {
       return undefined;
@@ -130,7 +129,9 @@ export const defaultTextMapGetter: TextMapGetter = {
 /**
  * @since 1.0.0
  */
-export const defaultTextMapSetter: TextMapSetter = {
+export const defaultTextMapSetter: TextMapSetter<
+  undefined | null | Record<string, undefined | string | string[]>
+> = {
   set(carrier, key, value) {
     if (carrier == null) {
       return;
