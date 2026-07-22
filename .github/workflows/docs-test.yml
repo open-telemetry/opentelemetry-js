@@ -1,17 +1,15 @@
-name: Lint
+name: Documentation tests
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-  merge_group:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  lint:
+  docs-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,7 +27,10 @@ jobs:
       - name: Bootstrap
         run: npm ci --ignore-scripts
 
-      - name: Lint
+      - name: Build documentation
         run: |
-          npm run lint
-          npm run lint:examples
+          npm run compile
+          NODE_OPTIONS=--max-old-space-size=6144 npm run docs
+
+      - name: Check documentation links
+        run: npm run docs:test
