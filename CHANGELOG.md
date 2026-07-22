@@ -28,6 +28,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(otlp-exporter): implement exporter metrics [#6480](https://github.com/open-telemetry/opentelemetry-js/pull/6480) @anuraaga
 * feat(propagator-jaeger):  *Notice*: The `@opentelemetry/propagator-jaeger` package will be removed in SDK 3.x, planned for approximately September 2026. @pichlermarc
   * The Jaeger propagator has been deprecated by the OpenTelemetry specification in favor of `W3CTraceContextPropagator`. This package will be removed in a future release.
+* feat(sdk-metrics): add `maxScale` option to `ExponentialHistogramAggregation` to allow limiting the scale of exponential histograms. **Breaking:** `ExponentialHistogramAccumulation` constructor parameters reordered — `maxScale` now comes before `recordMinMax`. Any code that passed positional arguments beyond `maxSize` will need to be updated. [#6493](https://github.com/open-telemetry/opentelemetry-js/pull/6493) @andidev
 
 ### :bug: Bug Fixes
 
