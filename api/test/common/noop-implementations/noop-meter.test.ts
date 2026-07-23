@@ -4,6 +4,7 @@
  */
 
 import * as assert from 'assert';
+import type { MetricOptions } from '../../../src';
 import {
   NoopMeter,
   NOOP_COUNTER_METRIC,
@@ -21,6 +22,13 @@ const attributes = {};
 const options = {
   component: 'tests',
   description: 'the testing package',
+};
+const optionsWithAdvice: MetricOptions = {
+  description: 'the testing package',
+  advice: {
+    attributes: ['http.method', 'http.route'],
+    explicitBucketBoundaries: [1, 5, 10],
+  },
 };
 
 describe('NoopMeter', function () {
@@ -41,6 +49,12 @@ describe('NoopMeter', function () {
 
     const counterWithOptions = meter.createCounter('some-name', options);
     assert.strictEqual(counterWithOptions, NOOP_COUNTER_METRIC);
+
+    const counterWithAdvice = meter.createCounter(
+      'some-name',
+      optionsWithAdvice
+    );
+    assert.strictEqual(counterWithAdvice, NOOP_COUNTER_METRIC);
   });
 
   it('histogram should not crash', function () {
@@ -53,6 +67,12 @@ describe('NoopMeter', function () {
 
     const histogramWithOptions = meter.createHistogram('some-name', options);
     assert.strictEqual(histogramWithOptions, NOOP_HISTOGRAM_METRIC);
+
+    const histogramWithAdvice = meter.createHistogram(
+      'some-name',
+      optionsWithAdvice
+    );
+    assert.strictEqual(histogramWithAdvice, NOOP_HISTOGRAM_METRIC);
   });
 
   it('up down counter should not crash', function () {
@@ -68,6 +88,12 @@ describe('NoopMeter', function () {
       options
     );
     assert.strictEqual(upDownCounterWithOptions, NOOP_UP_DOWN_COUNTER_METRIC);
+
+    const upDownCounterWithAdvice = meter.createUpDownCounter(
+      'some-name',
+      optionsWithAdvice
+    );
+    assert.strictEqual(upDownCounterWithAdvice, NOOP_UP_DOWN_COUNTER_METRIC);
   });
 
   it('observable counter should not crash', function () {
@@ -84,6 +110,15 @@ describe('NoopMeter', function () {
     );
     assert.strictEqual(
       observableCounterWithOptions,
+      NOOP_OBSERVABLE_COUNTER_METRIC
+    );
+
+    const observableCounterWithAdvice = meter.createObservableCounter(
+      'some-name',
+      optionsWithAdvice
+    );
+    assert.strictEqual(
+      observableCounterWithAdvice,
       NOOP_OBSERVABLE_COUNTER_METRIC
     );
   });
@@ -104,6 +139,12 @@ describe('NoopMeter', function () {
       observableGaugeWithOptions,
       NOOP_OBSERVABLE_GAUGE_METRIC
     );
+
+    const observableGaugeWithAdvice = meter.createObservableGauge(
+      'some-name',
+      optionsWithAdvice
+    );
+    assert.strictEqual(observableGaugeWithAdvice, NOOP_OBSERVABLE_GAUGE_METRIC);
   });
 
   it('gauge should not crash', function () {
@@ -115,6 +156,9 @@ describe('NoopMeter', function () {
 
     const gaugeWithOptions = meter.createGauge('some-name', options);
     assert.strictEqual(gaugeWithOptions, NOOP_GAUGE_METRIC);
+
+    const gaugeWithAdvice = meter.createGauge('some-name', optionsWithAdvice);
+    assert.strictEqual(gaugeWithAdvice, NOOP_GAUGE_METRIC);
   });
 
   it('observable up down counter should not crash', function () {
@@ -133,6 +177,13 @@ describe('NoopMeter', function () {
       meter.createObservableUpDownCounter('some-name', options);
     assert.strictEqual(
       observableUpDownCounterWithOptions,
+      NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC
+    );
+
+    const observableUpDownCounterWithAdvice =
+      meter.createObservableUpDownCounter('some-name', optionsWithAdvice);
+    assert.strictEqual(
+      observableUpDownCounterWithAdvice,
       NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC
     );
   });

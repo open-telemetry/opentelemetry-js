@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: Features
 
+* feat(metrics): add experimental advisory attributes support
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
