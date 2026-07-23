@@ -272,13 +272,34 @@ export const ATTR_DB_COLLECTION_NAME = 'db.collection.name' as const;
 export const ATTR_DB_NAMESPACE = 'db.namespace' as const;
 
 /**
- * The number of queries included in a batch operation.
+ * The number of database operations included in a batch operation.
  *
  * @example 2
  * @example 3
  * @example 4
  *
- * @note Operations are only considered batches when they contain two or more operations, and so `db.operation.batch.size` **SHOULD** never be `1`.
+ * @note Except for empty batch requests described below, a batch operation contains two
+ * or more database operations explicitly submitted as separate operations in a single
+ * client call, protocol message, or database command.
+ *
+ * Requests to batch APIs that contain only one operation **SHOULD** be modeled as single
+ * operations, not as batch operations.
+ *
+ * A database call is not a batch operation solely because one operation accepts
+ * multiple operands, such as keys, rows, documents, points, or other data elements,
+ * including Redis [`MGET`](https://redis.io/docs/latest/commands/mget/) with
+ * multiple keys.
+ *
+ * In batch APIs that execute the same parameterized operation with parameter sets,
+ * each parameter set represents one database operation for determining whether the
+ * request is a batch operation. Requests with only one parameter set **SHOULD** be modeled
+ * as single operations, not as batch operations.
+ *
+ * `db.operation.batch.size` **SHOULD** be set to the number of operations in the batch.
+ * It **SHOULD NOT** be set for non-batch operations.
+ *
+ * A request to execute a batch operation with no operations **SHOULD** also be treated
+ * as a batch operation, and `db.operation.batch.size` **SHOULD** be set to `0`.
  */
 export const ATTR_DB_OPERATION_BATCH_SIZE = 'db.operation.batch.size' as const;
 
@@ -979,9 +1000,9 @@ export const ATTR_K8S_CRONJOB_UID = 'k8s.cronjob.uid' as const;
  * @note
  * Examples:
  *
- *   - A label `replicas` with value `1` **SHOULD** be recorded
+ *   - An annotation `replicas` with value `1` **SHOULD** be recorded
  *     as the `k8s.daemonset.annotation.replicas` attribute with value `"1"`.
- *   - A label `data` with empty string value **SHOULD** be recorded as
+ *   - An annotation `data` with empty string value **SHOULD** be recorded as
  *     the `k8s.daemonset.annotation.data` attribute with value `""`.
  */
 export const ATTR_K8S_DAEMONSET_ANNOTATION = (key: string) => `k8s.daemonset.annotation.${key}`;
@@ -997,7 +1018,7 @@ export const ATTR_K8S_DAEMONSET_ANNOTATION = (key: string) => `k8s.daemonset.ann
  *
  *   - A label `app` with value `guestbook` **SHOULD** be recorded
  *     as the `k8s.daemonset.label.app` attribute with value `"guestbook"`.
- *   - A label `data` with empty string value **SHOULD** be recorded as
+ *   - A label `injected` with empty string value **SHOULD** be recorded as
  *     the `k8s.daemonset.label.injected` attribute with value `""`.
  */
 export const ATTR_K8S_DAEMONSET_LABEL = (key: string) => `k8s.daemonset.label.${key}`;
@@ -1025,9 +1046,9 @@ export const ATTR_K8S_DAEMONSET_UID = 'k8s.daemonset.uid' as const;
  * @note
  * Examples:
  *
- *   - A label `replicas` with value `1` **SHOULD** be recorded
+ *   - An annotation `replicas` with value `1` **SHOULD** be recorded
  *     as the `k8s.deployment.annotation.replicas` attribute with value `"1"`.
- *   - A label `data` with empty string value **SHOULD** be recorded as
+ *   - An annotation `data` with empty string value **SHOULD** be recorded as
  *     the `k8s.deployment.annotation.data` attribute with value `""`.
  */
 export const ATTR_K8S_DEPLOYMENT_ANNOTATION = (key: string) => `k8s.deployment.annotation.${key}`;
@@ -1041,7 +1062,7 @@ export const ATTR_K8S_DEPLOYMENT_ANNOTATION = (key: string) => `k8s.deployment.a
  * @note
  * Examples:
  *
- *   - A label `replicas` with value `0` **SHOULD** be recorded
+ *   - A label `app` with value `guestbook` **SHOULD** be recorded
  *     as the `k8s.deployment.label.app` attribute with value `"guestbook"`.
  *   - A label `injected` with empty string value **SHOULD** be recorded as
  *     the `k8s.deployment.label.injected` attribute with value `""`.
@@ -1071,9 +1092,9 @@ export const ATTR_K8S_DEPLOYMENT_UID = 'k8s.deployment.uid' as const;
  * @note
  * Examples:
  *
- *   - A label `number` with value `1` **SHOULD** be recorded
+ *   - An annotation `number` with value `1` **SHOULD** be recorded
  *     as the `k8s.job.annotation.number` attribute with value `"1"`.
- *   - A label `data` with empty string value **SHOULD** be recorded as
+ *   - An annotation `data` with empty string value **SHOULD** be recorded as
  *     the `k8s.job.annotation.data` attribute with value `""`.
  */
 export const ATTR_K8S_JOB_ANNOTATION = (key: string) => `k8s.job.annotation.${key}`;
@@ -1089,7 +1110,7 @@ export const ATTR_K8S_JOB_ANNOTATION = (key: string) => `k8s.job.annotation.${ke
  *
  *   - A label `jobtype` with value `ci` **SHOULD** be recorded
  *     as the `k8s.job.label.jobtype` attribute with value `"ci"`.
- *   - A label `data` with empty string value **SHOULD** be recorded as
+ *   - A label `automated` with empty string value **SHOULD** be recorded as
  *     the `k8s.job.label.automated` attribute with value `""`.
  */
 export const ATTR_K8S_JOB_LABEL = (key: string) => `k8s.job.label.${key}`;
@@ -1117,9 +1138,9 @@ export const ATTR_K8S_JOB_UID = 'k8s.job.uid' as const;
  * @note
  * Examples:
  *
- *   - A label `ttl` with value `0` **SHOULD** be recorded
+ *   - An annotation `ttl` with value `0` **SHOULD** be recorded
  *     as the `k8s.namespace.annotation.ttl` attribute with value `"0"`.
- *   - A label `data` with empty string value **SHOULD** be recorded as
+ *   - An annotation `data` with empty string value **SHOULD** be recorded as
  *     the `k8s.namespace.annotation.data` attribute with value `""`.
  */
 export const ATTR_K8S_NAMESPACE_ANNOTATION = (key: string) => `k8s.namespace.annotation.${key}`;
@@ -1288,9 +1309,9 @@ export const ATTR_K8S_POD_UID = 'k8s.pod.uid' as const;
  * @note
  * Examples:
  *
- *   - A label `replicas` with value `0` **SHOULD** be recorded
+ *   - An annotation `replicas` with value `0` **SHOULD** be recorded
  *     as the `k8s.replicaset.annotation.replicas` attribute with value `"0"`.
- *   - A label `data` with empty string value **SHOULD** be recorded as
+ *   - An annotation `data` with empty string value **SHOULD** be recorded as
  *     the `k8s.replicaset.annotation.data` attribute with value `""`.
  */
 export const ATTR_K8S_REPLICASET_ANNOTATION = (key: string) => `k8s.replicaset.annotation.${key}`;
@@ -1334,9 +1355,9 @@ export const ATTR_K8S_REPLICASET_UID = 'k8s.replicaset.uid' as const;
  * @note
  * Examples:
  *
- *   - A label `replicas` with value `1` **SHOULD** be recorded
+ *   - An annotation `replicas` with value `1` **SHOULD** be recorded
  *     as the `k8s.statefulset.annotation.replicas` attribute with value `"1"`.
- *   - A label `data` with empty string value **SHOULD** be recorded as
+ *   - An annotation `data` with empty string value **SHOULD** be recorded as
  *     the `k8s.statefulset.annotation.data` attribute with value `""`.
  */
 export const ATTR_K8S_STATEFULSET_ANNOTATION = (key: string) => `k8s.statefulset.annotation.${key}`;
@@ -1350,7 +1371,7 @@ export const ATTR_K8S_STATEFULSET_ANNOTATION = (key: string) => `k8s.statefulset
  * @note
  * Examples:
  *
- *   - A label `replicas` with value `0` **SHOULD** be recorded
+ *   - A label `app` with value `guestbook` **SHOULD** be recorded
  *     as the `k8s.statefulset.label.app` attribute with value `"guestbook"`.
  *   - A label `injected` with empty string value **SHOULD** be recorded as
  *     the `k8s.statefulset.label.injected` attribute with value `""`.
@@ -1732,6 +1753,11 @@ export const TELEMETRY_SDK_LANGUAGE_VALUE_GO = "go" as const;
  * Enum value "java" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_JAVA = "java" as const;
+
+/**
+ * Enum value "kotlin" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ */
+export const TELEMETRY_SDK_LANGUAGE_VALUE_KOTLIN = "kotlin" as const;
 
 /**
  * Enum value "nodejs" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.

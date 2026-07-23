@@ -12,7 +12,7 @@ import { createNoopLogger } from '@opentelemetry/api-logs';
 import { defaultResource } from '@opentelemetry/resources';
 import { BindOnceFuture } from '@opentelemetry/core';
 
-import type { LoggerProviderOptions } from './types';
+import type { ForceFlushOptions, LoggerProviderOptions } from './types';
 import { Logger } from './Logger';
 import {
   DEFAULT_LOGGER_CONFIGURATOR,
@@ -33,7 +33,6 @@ export class LoggerProvider implements ILoggerProvider {
   constructor(config: LoggerProviderOptions = {}) {
     const mergedConfig = {
       resource: config.resource ?? defaultResource(),
-      forceFlushTimeoutMillis: config.forceFlushTimeoutMillis ?? 30000,
       logRecordLimits: {
         attributeCountLimit: config.logRecordLimits?.attributeCountLimit ?? 128,
         attributeValueLengthLimit:
@@ -46,7 +45,6 @@ export class LoggerProvider implements ILoggerProvider {
     };
     this._sharedState = new LoggerProviderSharedState(
       mergedConfig.resource,
-      mergedConfig.forceFlushTimeoutMillis,
       mergedConfig.logRecordLimits,
       mergedConfig.processors,
       mergedConfig.loggerConfigurator,
@@ -97,13 +95,13 @@ export class LoggerProvider implements ILoggerProvider {
    *
    * Returns a promise which is resolved when all flushes are complete.
    */
-  public forceFlush(): Promise<void> {
+  public forceFlush(options?: ForceFlushOptions): Promise<void> {
     // do not flush after shutdown
     if (this._shutdownOnce.isCalled) {
       diag.warn('invalid attempt to force flush after LoggerProvider shutdown');
       return this._shutdownOnce.promise;
     }
-    return this._sharedState.activeProcessor.forceFlush();
+    return this._sharedState.activeProcessor.forceFlush(options);
   }
 
   /**

@@ -8,8 +8,10 @@ import * as http from 'http';
 import * as sinon from 'sinon';
 import { Stream } from 'stream';
 
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { TracerProvider, SimpleSpanProcessor } from '@opentelemetry/sdk-trace';
 import { OTLPTraceExporter } from '../../src/platform/node';
+import { TestMetricReader } from '../utils';
 
 /*
  * NOTE: Tests here are not intended to test the underlying components directly. They are intended as a quick
@@ -25,6 +27,11 @@ describe('OTLPTraceExporter', () => {
     });
 
     it('successfully exports data', done => {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+
       const fakeRequest = new Stream.PassThrough();
       Object.defineProperty(fakeRequest, 'setTimeout', {
         value: function (_timeout: number) {},
@@ -32,12 +39,19 @@ describe('OTLPTraceExporter', () => {
 
       sinon.stub(http, 'request').returns(fakeRequest as any);
       let buff = Buffer.from('');
-      fakeRequest.on('finish', () => {
+      fakeRequest.on('finish', async () => {
         try {
           const requestBody = buff.toString();
           assert.throws(() => {
             JSON.parse(requestBody);
           }, 'expected requestBody to be in protobuf format, but parsing as JSON succeeded');
+
+          const metrics = await metricReader.collect();
+          const scopeMetrics = metrics.resourceMetrics.scopeMetrics.find(
+            sm => sm.scope.name === '@opentelemetry/otlp-exporter'
+          );
+          assert.ok(scopeMetrics);
+
           done();
         } catch (e) {
           done(e);
@@ -48,14 +62,17 @@ describe('OTLPTraceExporter', () => {
         buff = Buffer.concat([buff, chunk]);
       });
 
-      new TracerProvider({
+      const tracerProvider = new TracerProvider({
         spanProcessors: [
-          new SimpleSpanProcessor({ exporter: new OTLPTraceExporter() }),
+          new SimpleSpanProcessor({
+            exporter: new OTLPTraceExporter({
+              selfObsMeterProvider: meterProvider,
+            }),
+          }),
         ],
-      })
-        .getTracer('test-tracer')
-        .startSpan('test-span')
-        .end();
+      });
+
+      tracerProvider.getTracer('test-tracer').startSpan('test-span').end();
     });
   });
 });

@@ -5,6 +5,7 @@
 
 import type { Metadata, ServiceDefinition } from '@grpc/grpc-js';
 import { Server, ServerCredentials } from '@grpc/grpc-js';
+import { MetricReader } from '@opentelemetry/sdk-metrics';
 
 export interface ExportedData {
   request: Buffer;
@@ -54,4 +55,13 @@ export function startServer(
       }
     );
   });
+}
+
+export class TestMetricReader extends MetricReader {
+  protected override onShutdown(): Promise<void> {
+    return Promise.resolve();
+  }
+  protected override onForceFlush(): Promise<void> {
+    return Promise.resolve();
+  }
 }
