@@ -32,6 +32,7 @@ export type {
   OtlpHttpExporter as OtlpHttpExporterConfigModel,
   OtlpGrpcExporter as OtlpGrpcExporterConfigModel,
   LogRecordLimits as LogRecordLimitsConfigModel,
+  Propagator as PropagatorConfigModel,
 } from './generated/types';
 export { createConfigFactory } from './ConfigFactory';
 export {

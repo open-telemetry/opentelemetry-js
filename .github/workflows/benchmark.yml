@@ -18,14 +18,15 @@ jobs:
           - ^26.3.0
     runs-on: oracle-bare-metal-64cpu-1024gb-x86-64-ubuntu-24
     container:
-      image: ubuntu:24.04@sha256:c4a8d5503dfb2a3eb8ab5f807da5bc69a85730fb49b5cfca2330194ebcc41c7b
+      image: ubuntu:26.04@sha256:3131b4cc82a783df6c9df078f86e01819a13594b865c2cad47bd1bca2b7063bb
     timeout-minutes: 10
     steps:
       # Apt packages:
       # - git: Needed for 'npm run submodule'
+      # - libatomic1: Needed by Node.js 26
       - name: Setup container environment
         run: |
-          apt-get update && apt-get install --fix-missing -y git
+          apt-get update && apt-get install --fix-missing -y git libatomic1
 
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3

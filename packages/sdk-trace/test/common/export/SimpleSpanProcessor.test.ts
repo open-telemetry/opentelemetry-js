@@ -239,6 +239,54 @@ describe('SimpleSpanProcessor', () => {
       assert.strictEqual(exportedSpans.length, 1);
     });
 
+    it('should reject when a pending export fails', async () => {
+      const expectedError = new Error('Exporter failed');
+      const processor = new SimpleSpanProcessor({ exporter });
+      const exporterForceFlushSpy = sinon.spy(exporter, 'forceFlush');
+      const spanContext: SpanContext = {
+        traceId: 'a3cda95b652f4a1592b449d5929fda1b',
+        spanId: '5e0c63257de34c92',
+        traceFlags: TraceFlags.SAMPLED,
+      };
+      const tracer = provider.getTracer('default') as Tracer;
+      const span = new SpanImpl({
+        scope: tracer.instrumentationScope,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
+        spanContext,
+        name: 'span-name',
+        kind: SpanKind.CLIENT,
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
+        spanProcessor: tracer['_spanProcessor'],
+      });
+      processor.onStart(span, ROOT_CONTEXT);
+
+      sinon.stub(exporter, 'export').callsFake((_, callback) => {
+        setTimeout(() => {
+          callback({ code: ExportResultCode.FAILED, error: expectedError });
+        }, 0);
+      });
+
+      const errorHandlerSpy = sinon.spy();
+      setGlobalErrorHandler(errorHandlerSpy);
+
+      try {
+        processor.onEnd(span);
+
+        await assert.rejects(processor.forceFlush(), err => {
+          assert.strictEqual(err, expectedError);
+          return true;
+        });
+
+        assert.strictEqual(errorHandlerSpy.callCount, 1);
+        assert.strictEqual(exporterForceFlushSpy.callCount, 1);
+        assert.strictEqual(processor['_pendingExports'].size, 0);
+      } finally {
+        // reset global error handler
+        setGlobalErrorHandler(loggingErrorHandler());
+      }
+    });
+
     it('should await doExport() and delete from _pendingExports with async resource', async () => {
       const testExporterWithDelay = new TestExporterWithDelay();
       const processor = new SimpleSpanProcessor({
@@ -353,6 +401,8 @@ describe('SimpleSpanProcessor', () => {
         exporter,
         selfObsMeterProvider: meterProvider,
       });
+      const exportError = new Error('Export failed');
+      exportError.name = 'SystemError';
 
       const exportStub = sinon.stub(exporter, 'export');
       exportStub
@@ -362,9 +412,7 @@ describe('SimpleSpanProcessor', () => {
         })
         .onSecondCall()
         .callsFake((_spans, resultCallback: (result: ExportResult) => void) => {
-          const error = new Error('Export failed');
-          error.name = 'SystemError';
-          resultCallback({ code: ExportResultCode.FAILED, error });
+          resultCallback({ code: ExportResultCode.FAILED, error: exportError });
         });
 
       const spanContext: SpanContext = {
@@ -388,7 +436,10 @@ describe('SimpleSpanProcessor', () => {
       processor.onStart(span, ROOT_CONTEXT);
       processor.onEnd(span);
 
-      await processor.forceFlush();
+      await assert.rejects(processor.forceFlush(), err => {
+        assert.strictEqual(err, exportError);
+        return true;
+      });
 
       const { resourceMetrics } = await metricReader.collect();
       const scopeMetrics = resourceMetrics.scopeMetrics.find(
