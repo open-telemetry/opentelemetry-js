@@ -6,7 +6,6 @@
 import {
   getPropagatorFromEnv,
   getKeyListFromObjectArray,
-  getPropagatorFromConfiguration,
   getLoggerProviderConfigFromEnv,
   getBatchLogRecordProcessorConfigFromEnv,
   getPeriodicMetricReaderFromConfiguration,
@@ -126,97 +125,6 @@ describe('getPropagatorFromEnv', function () {
     process.env.OTEL_PROPAGATORS = 'none';
 
     assert.deepStrictEqual(getPropagatorFromEnv(), null);
-  });
-});
-
-describe('getPropagatorFromConfigFactory', function () {
-  afterEach(() => {
-    sinon.restore();
-  });
-
-  it('when not defined', function () {
-    const propagator = getPropagatorFromConfiguration({});
-    assert.deepStrictEqual(propagator, undefined);
-  });
-
-  it('should return the selected propagator when one is in the list', () => {
-    const config: ConfigurationModel = {
-      propagator: { composite: [{ tracecontext: null }] },
-    };
-    assert.deepStrictEqual(getPropagatorFromConfiguration(config)?.fields(), [
-      'traceparent',
-      'tracestate',
-    ]);
-  });
-
-  it('should return the selected propagators when multiple are in the list', () => {
-    const config: ConfigurationModel = {
-      propagator: {
-        composite: [
-          { tracecontext: null },
-          { baggage: null },
-          { b3: null },
-          { b3multi: null },
-          { jaeger: null },
-        ],
-      },
-    };
-    assert.deepStrictEqual(getPropagatorFromConfiguration(config)?.fields(), [
-      'traceparent',
-      'tracestate',
-      'baggage',
-      'b3',
-      'x-b3-traceid',
-      'x-b3-spanid',
-      'x-b3-flags',
-      'x-b3-sampled',
-      'x-b3-parentspanid',
-      'uber-trace-id',
-    ]);
-  });
-
-  it('should return undefined and warn if propagators are unknown', () => {
-    const warnStub = sinon.stub(diag, 'warn');
-    const config: ConfigurationModel = {
-      propagator: {
-        composite: [{ my: null }, { unknown: null }, { propagators: null }],
-      },
-    };
-    assert.deepStrictEqual(getPropagatorFromConfiguration(config), undefined);
-    sinon.assert.calledWithExactly(
-      warnStub,
-      'Propagator "my" requested through configuration is unavailable.'
-    );
-    sinon.assert.calledWithExactly(
-      warnStub,
-      'Propagator "unknown" requested through configuration is unavailable.'
-    );
-    sinon.assert.calledWithExactly(
-      warnStub,
-      'Propagator "propagators" requested through configuration is unavailable.'
-    );
-    sinon.assert.calledThrice(warnStub);
-  });
-
-  it('should return undefined if only "none" is included', () => {
-    const config: ConfigurationModel = {
-      propagator: {
-        composite: [{ traceparent: null }, { none: null }],
-      },
-    };
-    assert.deepStrictEqual(getPropagatorFromConfiguration(config), undefined);
-  });
-
-  it('should throw on invalid composite entry with two keys', () => {
-    const config: ConfigurationModel = {
-      propagator: {
-        composite: [{ traceparent: null, tracestate: null }],
-      },
-    };
-    assert.throws(
-      () => getPropagatorFromConfiguration(config),
-      /invalid "propagator" entry/
-    );
   });
 });
 

@@ -23,9 +23,9 @@ import type { Resource } from '@opentelemetry/resources';
  * SdkLogRecord instances are created and managed by the SDK.
  */
 export interface SdkLogRecord {
-  readonly hrTime: HrTime;
-  readonly hrTimeObserved: HrTime;
-  readonly spanContext?: SpanContext;
+  hrTime: HrTime;
+  hrTimeObserved: HrTime;
+  spanContext?: SpanContext;
   readonly resource: Resource;
   /**
    * The instrumentation scope associated with the log record.

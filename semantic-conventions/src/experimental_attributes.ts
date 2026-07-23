@@ -1759,6 +1759,16 @@ export const ATTR_AZURE_COSMOSDB_REQUEST_BODY_SIZE = 'azure.cosmosdb.request.bod
 export const ATTR_AZURE_COSMOSDB_RESPONSE_SUB_STATUS_CODE = 'azure.cosmosdb.response.sub_status_code' as const;
 
 /**
+ * The name of the Azure [resource group](https://learn.microsoft.com/azure/azure-resource-manager/management/manage-resource-groups-portal) the resource belongs to.
+ *
+ * @example my-resource-group
+ * @example rg-myapp-prod
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_AZURE_RESOURCE_GROUP_NAME = 'azure.resource_group.name' as const;
+
+/**
  * [Azure Resource Provider Namespace](https://learn.microsoft.com/azure/azure-resource-manager/management/azure-services-resource-providers) as recognized by the client.
  *
  * @example Microsoft.Storage
@@ -2041,7 +2051,7 @@ export const ATTR_CICD_PIPELINE_NAME = 'cicd.pipeline.name' as const;
  * @example success
  * @example failure
  * @example timeout
- * @example skipped
+ * @example skip
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2186,7 +2196,7 @@ export const ATTR_CICD_PIPELINE_TASK_RUN_ID = 'cicd.pipeline.task.run.id' as con
  * @example success
  * @example failure
  * @example timeout
- * @example skipped
+ * @example skip
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2329,9 +2339,9 @@ export const ATTR_CICD_WORKER_NAME = 'cicd.worker.name' as const;
 /**
  * The state of a CI/CD worker / agent.
  *
- * @example idle
+ * @example available
  * @example busy
- * @example down
+ * @example offline
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2378,6 +2388,9 @@ export const ATTR_CICD_WORKER_URL_FULL = 'cicd.worker.url.full' as const;
  *
  * @example 111111111111
  * @example opentelemetry
+ * @example 22222222-2222-2222-2222-222222222222
+ *
+ * @note For Azure, this is the subscription ID.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -12500,7 +12513,7 @@ export const NETWORK_CONNECTION_TYPE_VALUE_WIRED = "wired" as const;
 export const ATTR_NETWORK_INTERFACE_NAME = 'network.interface.name' as const;
 
 /**
- * The network IO operation direction.
+ * The direction of traffic from the perspective of the observing host's physical or virtual network interface. It should not be used to represent the logical direction of a stateful connection or network flow.
  *
  * @example transmit
  *

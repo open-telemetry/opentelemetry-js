@@ -3730,6 +3730,8 @@ export const METRIC_OTEL_SDK_SPAN_ENDED_COUNT = 'otel.sdk.span.ended.count' as c
 /**
  * The number of created spans with `recording=true` for which the end operation has not been called yet.
  *
+ * @note Non-recording spans are not counted, hence `otel.span.sampling_result` can only take values `RECORD_ONLY` and `RECORD_AND_SAMPLE`, not `DROP`.
+ *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_OTEL_SDK_SPAN_LIVE = 'otel.sdk.span.live' as const;

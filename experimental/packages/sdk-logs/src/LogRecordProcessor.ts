@@ -7,12 +7,13 @@ import type { Context } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import type { SdkLogRecord } from './export/SdkLogRecord';
 import type { SeverityNumber } from '@opentelemetry/api-logs';
+import type { ForceFlushOptions } from './types';
 
 export interface LogRecordProcessor {
   /**
    * Forces to export all finished log records
    */
-  forceFlush(): Promise<void>;
+  forceFlush(options?: ForceFlushOptions): Promise<void>;
 
   /**
    * Called when a {@link LogRecord} is emit
