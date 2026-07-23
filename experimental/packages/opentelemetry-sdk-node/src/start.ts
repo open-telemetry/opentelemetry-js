@@ -19,10 +19,8 @@ import {
   getIdGeneratorFromConfiguration,
   getSamplerFromConfiguration,
   getInstanceID,
-  createLoggerProviderFromConfig,
   getMeterReadersFromConfiguration,
   getMeterViewsFromConfiguration,
-  getPropagatorFromConfiguration,
   getResourceDetectorsFromConfiguration,
   getResourceFromConfiguration,
   getSpanProcessorsFromConfiguration,
@@ -45,7 +43,11 @@ import {
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
 import { diagLogLevelFromSeverityNumberConfig } from './diag';
-import { createSpanLimitsFromConfig } from './create-from-config';
+import {
+  createLoggerProviderFromConfig,
+  createPropagatorFromConfig,
+  createSpanLimitsFromConfig,
+} from './create-from-config';
 
 // Exported for testing.
 export const NOOP_SDK = {
@@ -138,13 +140,12 @@ function create(
 
     const resource = setupResource(config, sdkOptions);
 
-    const propagator =
-      sdkOptions?.textMapPropagator === null
-        ? null
-        : (sdkOptions?.textMapPropagator ??
-          getPropagatorFromConfiguration(config));
-    if (propagator) {
-      components.propagator = propagator;
+    if (sdkOptions?.textMapPropagator !== undefined) {
+      if (sdkOptions.textMapPropagator !== null) {
+        components.propagator = sdkOptions.textMapPropagator;
+      }
+    } else if (config.propagator) {
+      components.propagator = createPropagatorFromConfig(config.propagator);
     }
 
     if (config.logger_provider) {

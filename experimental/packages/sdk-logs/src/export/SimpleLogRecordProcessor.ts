@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { createNoopMeter } from '@opentelemetry/api';
 import type { ExportResult } from '@opentelemetry/core';
 import {
   BindOnceFuture,
@@ -13,6 +14,8 @@ import {
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
 import type { SdkLogRecord } from './SdkLogRecord';
+import { OTEL_COMPONENT_TYPE_VALUE_SIMPLE_LOG_PROCESSOR } from '../semconv';
+import { LogRecordProcessorMetrics } from './LogRecordProcessorMetrics';
 import type { Context } from '@opentelemetry/api';
 import type { SimpleLogRecordProcessorOptions } from '../types';
 
@@ -27,6 +30,7 @@ import type { SimpleLogRecordProcessorOptions } from '../types';
  */
 export class SimpleLogRecordProcessor implements LogRecordProcessor {
   private readonly _exporter: LogRecordExporter;
+  private readonly _metrics: LogRecordProcessorMetrics;
   private _shutdownOnce: BindOnceFuture<void>;
   private _unresolvedExports: Set<Promise<void>>;
 
@@ -34,6 +38,14 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
     this._exporter = options.exporter;
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
     this._unresolvedExports = new Set<Promise<void>>();
+
+    const meter = options?.selfObsMeterProvider
+      ? options.selfObsMeterProvider.getMeter('@opentelemetry/sdk-logs')
+      : createNoopMeter();
+    this._metrics = new LogRecordProcessorMetrics(
+      OTEL_COMPONENT_TYPE_VALUE_SIMPLE_LOG_PROCESSOR,
+      meter
+    );
   }
 
   public onEmit(logRecord: SdkLogRecord, _context?: Context): void {
@@ -45,6 +57,7 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
       internal
         ._export(this._exporter, [logRecord])
         .then((result: ExportResult) => {
+          this._metrics.finishLogs(1, result.error);
           if (result.code !== ExportResultCode.SUCCESS) {
             globalErrorHandler(
               result.error ??
@@ -86,6 +99,7 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
   }
 
   private _shutdown(): Promise<void> {
+    this._metrics.shutdown();
     return this._exporter.shutdown();
   }
 }

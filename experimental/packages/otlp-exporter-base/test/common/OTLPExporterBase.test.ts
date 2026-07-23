@@ -14,10 +14,12 @@ describe('OTLPExporterBase', function () {
       const exportStub = sinon.stub();
       const forceFlushStub = sinon.stub();
       const shutdownStub = sinon.stub();
+      const setMetricsStub = sinon.stub();
       const delegateStubs: IOtlpExportDelegate<string> = {
         export: exportStub,
         forceFlush: forceFlushStub,
         shutdown: shutdownStub,
+        setMetrics: setMetricsStub,
       };
       const exporterBase = new OTLPExporterBase(delegateStubs);
 
@@ -38,10 +40,12 @@ describe('OTLPExporterBase', function () {
       const exportStub = sinon.stub();
       const forceFlushStub = sinon.stub();
       const shutdownStub = sinon.stub();
+      const setMetricsStub = sinon.stub();
       const delegateStubs: IOtlpExportDelegate<string> = {
         export: exportStub,
         forceFlush: forceFlushStub,
         shutdown: shutdownStub,
+        setMetrics: setMetricsStub,
       };
       const exporterBase = new OTLPExporterBase(delegateStubs);
 
@@ -62,10 +66,12 @@ describe('OTLPExporterBase', function () {
       const exportStub = sinon.stub();
       const forceFlushStub = sinon.stub();
       const shutdownStub = sinon.stub();
+      const setMetricsStub = sinon.stub();
       const delegateStubs: IOtlpExportDelegate<string> = {
         export: exportStub,
         forceFlush: forceFlushStub,
         shutdown: shutdownStub,
+        setMetrics: setMetricsStub,
       };
       const exporterBase = new OTLPExporterBase(delegateStubs);
       const expectedExportItem = 'sample-export-item';

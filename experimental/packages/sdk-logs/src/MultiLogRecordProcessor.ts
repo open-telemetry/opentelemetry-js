@@ -9,6 +9,7 @@ import type { Context } from '@opentelemetry/api';
 import type { LogRecordProcessor } from './LogRecordProcessor';
 import type { SdkLogRecord } from './export/SdkLogRecord';
 import type { SeverityNumber } from '@opentelemetry/api-logs';
+import type { ForceFlushOptions } from './types';
 
 /**
  * Implementation of the {@link LogRecordProcessor} that simply forwards all
@@ -16,17 +17,12 @@ import type { SeverityNumber } from '@opentelemetry/api-logs';
  */
 export class MultiLogRecordProcessor implements LogRecordProcessor {
   public readonly processors: LogRecordProcessor[];
-  public readonly forceFlushTimeoutMillis: number;
-  constructor(
-    processors: LogRecordProcessor[],
-    forceFlushTimeoutMillis: number
-  ) {
+  constructor(processors: LogRecordProcessor[]) {
     this.processors = processors;
-    this.forceFlushTimeoutMillis = forceFlushTimeoutMillis;
   }
 
-  public async forceFlush(): Promise<void> {
-    const timeout = this.forceFlushTimeoutMillis;
+  public async forceFlush(options?: ForceFlushOptions): Promise<void> {
+    const timeout = options?.timeoutMillis ?? 30000;
     await Promise.all(
       this.processors.map(processor =>
         callWithTimeout(processor.forceFlush(), timeout)
