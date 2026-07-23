@@ -68,6 +68,11 @@ describe('metrics', () => {
       assert.strictEqual(rpcData.type, RPCType.HTTP);
       assert.strictEqual(rpcData.route, undefined);
       rpcData.route = 'TheRoute';
+      if (request.url?.endsWith('/error/client')) {
+        response.statusCode = 400;
+      } else if (request.url?.endsWith('/error/server')) {
+        response.statusCode = 500;
+      }
       response.end('Test Server Response');
     });
     server.listen(serverPort);
@@ -173,6 +178,81 @@ describe('metrics', () => {
         [ATTR_SERVER_ADDRESS]: 'localhost',
         [ATTR_SERVER_PORT]: 22346,
         [ATTR_ERROR_TYPE]: 'TypeError',
+      });
+    });
+
+    it('should set error type attribute on metrics for client/server errors', async () => {
+      await httpRequest.get(
+        `${protocol}://${hostname}:${serverPort}${pathname}/error/client`
+      );
+      await httpRequest.get(
+        `${protocol}://${hostname}:${serverPort}${pathname}/error/server`
+      );
+
+      await metricReader.collectAndExport();
+      const resourceMetrics = metricsMemoryExporter.getMetrics();
+      const scopeMetrics = resourceMetrics[0].scopeMetrics;
+      assert.strictEqual(scopeMetrics.length, 1, 'scopeMetrics count');
+      const metrics = scopeMetrics[0].metrics;
+      assert.strictEqual(metrics.length, 2, 'metrics count');
+
+      assert.strictEqual(metrics[0].dataPointType, DataPointType.HISTOGRAM);
+      assert.strictEqual(
+        metrics[0].descriptor.description,
+        'Duration of HTTP server requests.'
+      );
+      assert.strictEqual(
+        metrics[0].descriptor.name,
+        'http.server.request.duration'
+      );
+      assert.strictEqual(metrics[0].descriptor.unit, 's');
+      assert.strictEqual(metrics[0].dataPoints.length, 2);
+      assert.strictEqual((metrics[0].dataPoints[0].value as any).count, 1);
+      assert.strictEqual((metrics[0].dataPoints[1].value as any).count, 1);
+      assert.deepStrictEqual(metrics[0].dataPoints[0].attributes, {
+        [ATTR_HTTP_REQUEST_METHOD]: 'GET',
+        [ATTR_URL_SCHEME]: 'http',
+        [ATTR_HTTP_RESPONSE_STATUS_CODE]: 400,
+        [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
+        [ATTR_HTTP_ROUTE]: 'TheRoute',
+      });
+      assert.deepStrictEqual(metrics[0].dataPoints[1].attributes, {
+        [ATTR_HTTP_REQUEST_METHOD]: 'GET',
+        [ATTR_URL_SCHEME]: 'http',
+        [ATTR_HTTP_RESPONSE_STATUS_CODE]: 500,
+        [ATTR_ERROR_TYPE]: '500',
+        [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
+        [ATTR_HTTP_ROUTE]: 'TheRoute',
+      });
+
+      assert.strictEqual(metrics[1].dataPointType, DataPointType.HISTOGRAM);
+      assert.strictEqual(
+        metrics[1].descriptor.description,
+        'Duration of HTTP client requests.'
+      );
+      assert.strictEqual(
+        metrics[1].descriptor.name,
+        'http.client.request.duration'
+      );
+      assert.strictEqual(metrics[1].descriptor.unit, 's');
+      assert.strictEqual(metrics[1].dataPoints.length, 2);
+      assert.strictEqual((metrics[1].dataPoints[0].value as any).count, 1);
+      assert.strictEqual((metrics[1].dataPoints[1].value as any).count, 1);
+      assert.deepStrictEqual(metrics[1].dataPoints[0].attributes, {
+        [ATTR_HTTP_REQUEST_METHOD]: 'GET',
+        [ATTR_SERVER_ADDRESS]: 'localhost',
+        [ATTR_SERVER_PORT]: 22346,
+        [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
+        [ATTR_HTTP_RESPONSE_STATUS_CODE]: 400,
+        [ATTR_ERROR_TYPE]: '400',
+      });
+      assert.deepStrictEqual(metrics[1].dataPoints[1].attributes, {
+        [ATTR_HTTP_REQUEST_METHOD]: 'GET',
+        [ATTR_SERVER_ADDRESS]: 'localhost',
+        [ATTR_SERVER_PORT]: 22346,
+        [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
+        [ATTR_HTTP_RESPONSE_STATUS_CODE]: 500,
+        [ATTR_ERROR_TYPE]: '500',
       });
     });
   });

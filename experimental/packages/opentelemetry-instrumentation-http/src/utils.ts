@@ -465,9 +465,16 @@ export const getOutgoingStableRequestMetricAttributesOnResponse = (
       spanAttributes[ATTR_NETWORK_PROTOCOL_VERSION];
   }
 
-  if (spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE]) {
-    metricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] =
-      spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
+  const statusCode = spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
+  if (statusCode) {
+    metricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] = statusCode;
+    if (
+      typeof statusCode === 'number' &&
+      statusCode >= 400 &&
+      statusCode < 600
+    ) {
+      metricAttributes[ATTR_ERROR_TYPE] ??= String(statusCode);
+    }
   }
   return metricAttributes;
 };
@@ -779,10 +786,18 @@ export const getIncomingStableRequestMetricAttributesOnResponse = (
   }
 
   // required if and only if one was sent, same as span requirement
-  if (spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE]) {
-    metricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] =
-      spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
+  const statusCode = spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
+  if (statusCode) {
+    metricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] = statusCode;
+    if (
+      typeof statusCode === 'number' &&
+      statusCode >= 500 &&
+      statusCode < 600
+    ) {
+      metricAttributes[ATTR_ERROR_TYPE] ??= String(statusCode);
+    }
   }
+
   return metricAttributes;
 };
 
