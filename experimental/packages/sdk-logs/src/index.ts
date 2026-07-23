@@ -4,11 +4,13 @@
  */
 
 export type {
+  ForceFlushOptions,
   LoggerProviderConfig,
   LoggerProviderOptions,
   LoggerConfig,
   LoggerConfigurator,
   LogRecordLimits,
+  LogRecordProcessorOptions,
   BatchLogRecordProcessorOptions,
   BatchLogRecordProcessorBrowserOptions,
 } from './types';
