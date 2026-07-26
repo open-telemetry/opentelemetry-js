@@ -13,6 +13,7 @@ import {
 import * as assert from 'assert';
 import { urlToHttpOptions } from 'url';
 import { HttpInstrumentation } from '../../src/http';
+import { expectModulePatching } from '../utils/modulePatching';
 import { assertSpan } from '../utils/assertSpan';
 import * as utils from '../utils/utils';
 import {
@@ -291,7 +292,10 @@ describe('HttpInstrumentation Integration tests', () => {
         httpMethod: 'GET',
         pathname: '/',
         resHeaders: result.resHeaders,
-        reqHeaders: result.reqHeaders,
+        // With `Expect: 100-continue` the headers are already flushed when the
+        // diagnostics channel fires, so nothing can be injected; skip the
+        // propagation header checks then.
+        reqHeaders: expectModulePatching ? result.reqHeaders : undefined,
         component: 'http',
       };
 
@@ -353,8 +357,16 @@ describe('HttpInstrumentation Integration tests', () => {
           assert.strictEqual(spans.length, 2);
           assert.strictEqual(span.name, 'GET');
           assert.ok(data);
-          assert.ok(validations.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);
-          assert.ok(validations.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]);
+          if (expectModulePatching || headers.Expect === undefined) {
+            // With `Expect: 100-continue` the headers are already flushed when the
+            // diagnostics channel fires, so nothing can be injected.
+            assert.ok(
+              validations.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]
+            );
+            assert.ok(
+              validations.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]
+            );
+          }
           done();
         });
       });
