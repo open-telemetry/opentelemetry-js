@@ -4,9 +4,19 @@
  */
 
 import type {
-  AggregationSelector,
+  AggregationOption,
+  InstrumentType,
   MetricProducer,
 } from '@opentelemetry/sdk-metrics';
+
+/**
+ * Configures the default aggregation to use per instrument kind. Any instrument
+ * kind that is not listed falls back to the SDK's
+ * {@link https://opentelemetry.io/docs/specs/otel/metrics/sdk/#default-aggregation | default aggregation}.
+ */
+export type AggregationPreference = Partial<
+  Record<InstrumentType, AggregationOption>
+>;
 
 /**
  * Configuration interface for prometheus exporter
@@ -80,9 +90,11 @@ export interface ExporterConfig {
   withoutTargetInfo?: boolean;
 
   /**
-   * Selects the default aggregation as a function of instrument kind for the
-   * underlying {@link https://opentelemetry.io/docs/specs/otel/metrics/sdk/#metricreader | MetricReader}.
+   * Configures the default aggregation per instrument kind for the underlying
+   * {@link https://opentelemetry.io/docs/specs/otel/metrics/sdk/#metricreader | MetricReader}.
+   * Instrument kinds that are not specified fall back to the SDK's
+   * {@link https://opentelemetry.io/docs/specs/otel/metrics/sdk/#default-aggregation | default aggregation}.
    * @default the SDK's {@link https://opentelemetry.io/docs/specs/otel/metrics/sdk/#default-aggregation | default aggregation}
    */
-  aggregationSelector?: AggregationSelector;
+  aggregationPreference?: AggregationPreference;
 }
