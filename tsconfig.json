@@ -37,7 +37,6 @@
       "packages/opentelemetry-context-zone",
       "packages/opentelemetry-context-zone-peer-dep",
       "packages/opentelemetry-core",
-      "packages/opentelemetry-exporter-jaeger",
       "packages/opentelemetry-exporter-zipkin",
       "packages/opentelemetry-propagator-b3",
       "packages/opentelemetry-propagator-jaeger",
@@ -159,9 +158,6 @@
     },
     {
       "path": "packages/opentelemetry-core"
-    },
-    {
-      "path": "packages/opentelemetry-exporter-jaeger"
     },
     {
       "path": "packages/opentelemetry-exporter-zipkin"

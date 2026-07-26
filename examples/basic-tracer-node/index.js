@@ -4,14 +4,11 @@ const opentelemetry = require('@opentelemetry/api');
 const { resourceFromAttributes } = require('@opentelemetry/resources');
 const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 const { TracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace');
-const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { AsyncLocalStorageContextManager } = require("@opentelemetry/context-async-hooks");
 const {CompositePropagator, W3CTraceContextPropagator, W3CBaggagePropagator} = require("@opentelemetry/core");
 
-// Configure span processor to send spans to the exporter
-const exporter = new JaegerExporter({
-  endpoint: 'http://localhost:14268/api/traces',
-});
+// Configure span processor to print spans to the console
+const exporter = new ConsoleSpanExporter();
 
 /**
  * Initialize the OpenTelemetry APIs to use the BasicTracerProvider bindings.

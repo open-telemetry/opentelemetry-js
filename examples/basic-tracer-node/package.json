@@ -26,7 +26,6 @@
   "dependencies": {
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/context-async-hooks": "^2.0.1",
-    "@opentelemetry/exporter-jaeger": "^2.0.1",
     "@opentelemetry/resources": "^2.0.1",
     "@opentelemetry/sdk-trace": "^2.9.0",
     "@opentelemetry/semantic-conventions": "^1.36.0"
