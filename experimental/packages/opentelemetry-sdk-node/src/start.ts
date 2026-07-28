@@ -45,6 +45,7 @@ import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
 import { diagLogLevelFromSeverityNumberConfig } from './diag';
 import {
   createLoggerProviderFromConfig,
+  createMeterProviderFromConfig,
   createPropagatorFromConfig,
   createSpanLimitsFromConfig,
 } from './create-from-config';
@@ -153,6 +154,13 @@ function create(
         resource,
         config.logger_provider,
         config.attribute_limits
+      );
+    }
+
+    if (config.meter_provider) {
+      components.meterProvider = createMeterProviderFromConfig(
+        resource,
+        config.meter_provider
       );
     }
 

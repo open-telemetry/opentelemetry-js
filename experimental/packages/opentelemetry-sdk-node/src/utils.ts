@@ -486,6 +486,7 @@ export function getOtlpMetricExporterFromEnv(): PushMetricExporter {
   return new OTLPProtoMetricExporter();
 }
 
+// XXX rm
 function getMetricProducersFromConfiguration(
   producers: MetricProducerConfigModel[] | undefined
 ): MetricProducer[] | undefined {
@@ -503,6 +504,7 @@ function getMetricProducersFromConfiguration(
   return result.length > 0 ? result : undefined;
 }
 
+// XXX rm
 /**
  * Map a declarative-config `temporality_preference` value to the enum the OTLP
  * metric exporters expect. Returns undefined for an unspecified preference so
@@ -523,6 +525,7 @@ function getMetricTemporalityPreference(
   }
 }
 
+// XXX rm
 /**
  * Map a declarative-config `default_histogram_aggregation` value to an
  * AggregationSelector that applies the requested aggregation to histogram
@@ -601,6 +604,7 @@ function getOtlpGrpcMetricExporter(
   });
 }
 
+// XXX rm
 export function getMetricExporter(
   exporter: PushMetricExporterConfigModel
 ): PushMetricExporter | undefined {
@@ -617,6 +621,7 @@ export function getMetricExporter(
   return undefined;
 }
 
+// XXX rm
 export function getPeriodicMetricReaderFromConfiguration(
   periodic: PeriodicMetricReaderConfigModel
 ): IMetricReader | undefined {
@@ -905,6 +910,7 @@ export function getMeterReadersFromConfiguration(
   return undefined;
 }
 
+// XXX rm
 export function getInstrumentType(
   instrument: InstrumentTypeConfigModel
 ): InstrumentType | undefined {
@@ -929,6 +935,7 @@ export function getInstrumentType(
   }
 }
 
+// XXX rm -> createAggregationOptionFromConfig
 export function getAggregationType(
   aggregation: AggregationConfigModel
 ): AggregationOption | undefined {
@@ -983,6 +990,7 @@ export function getAggregationType(
   return undefined;
 }
 
+// XXX rm
 export function getMeterViewsFromConfiguration(
   config: ConfigurationModel
 ): ViewOptions[] | undefined {
