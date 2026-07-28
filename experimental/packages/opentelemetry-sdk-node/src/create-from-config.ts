@@ -722,24 +722,21 @@ export function createPullMetricReaderFromConfig(
 export function createMetricReaderFromConfig(
   reader: MetricReaderConfigModel
 ): MetricReader {
-  // XXX consider mustSingleEntry again, now have object type change
-  assert.ok(
-    Object.keys(reader).length === 1,
-    'invalid number of keys in MetricReader configuration'
-  );
+  const [name, properties] = mustSingleEntry(reader, 'MetricReader');
 
-  if (reader.periodic) {
-    return createPeriodicMetricReaderFromConfig(
-      reader as PeriodicMetricReaderConfigModel
-    );
-  } else if (reader.pull) {
-    return createPullMetricReaderFromConfig(
-      reader as PullMetricReaderConfigModel
-    );
-  } else {
-    throw new Error(
-      `unknown MetricReader type in configuration: "${Object.keys(reader)[0]}"`
-    );
+  switch (name) {
+    case 'periodic':
+      return createPeriodicMetricReaderFromConfig(
+        properties as PeriodicMetricReaderConfigModel
+      );
+    case 'pull':
+      return createPullMetricReaderFromConfig(
+        properties as PullMetricReaderConfigModel
+      );
+    default:
+      throw new Error(
+        `unknown MetricReader type in configuration: "${Object.keys(reader)[0]}"`
+      );
   }
 }
 
