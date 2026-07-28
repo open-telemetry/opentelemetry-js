@@ -13,6 +13,7 @@
  */
 
 import { inspect } from 'util';
+import * as assert from 'assert';
 
 import type { TextMapPropagator } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
@@ -101,7 +102,6 @@ import {
   getHttpAgentOptionsFromTls,
   validateExporterTimeout,
 } from './utils';
-import assert from 'assert';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
 // ---- internal utilities
@@ -722,6 +722,7 @@ export function createPullMetricReaderFromConfig(
 export function createMetricReaderFromConfig(
   reader: MetricReaderConfigModel
 ): MetricReader {
+  // XXX consider mustSingleEntry again, now have object type change
   assert.ok(
     Object.keys(reader).length === 1,
     'invalid number of keys in MetricReader configuration'
