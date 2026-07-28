@@ -103,12 +103,9 @@ import {
 } from '@opentelemetry/sdk-metrics';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
-// TODO: refactor these into this file, and to fail-fast
-// XXX
 import {
   getGrpcMetadataFromHeaders,
   getHeadersFromConfiguration,
-  validateExporterTimeout,
 } from './utils';
 
 // ---- internal utilities
@@ -251,6 +248,34 @@ export function _grpcCredentialsFromConfig(tls?: GrpcTlsConfigModel) {
   return undefined;
 }
 
+/**
+ * Validate an export(er) timeout value.
+ * "timeout" properties in the declarative config schema are typically
+ * described with:
+ *
+ * 1. Value must be non-negative.
+ * 2. A value of 0 indicates no limit (infinity).
+ *
+ * Search "timeout" at https://opentelemetry.io/docs/specs/otel-config/types/
+ *
+ * This function enforces (1), and guards against (2) because current OTel
+ * JS SDK components to do *not* handle a `0` timeout value this way.
+ * See https://github.com/open-telemetry/opentelemetry-js/issues/6617
+ */
+function _validateExportTimeoutConfig(
+  timeout: number | null | undefined,
+  errLabel: string
+): number | undefined {
+  if (timeout == null) {
+    return undefined;
+  } else if (timeout < 0) {
+    throw new Error(`${errLabel} value must be non-negative: ${timeout}`);
+  } else if (timeout === 0) {
+    throw new Error(`${errLabel} of 0 (infinite) is not supported`);
+  }
+  return timeout;
+}
+
 // ---- create<SDKThing>FromConfig functions
 
 export function createPropagatorFromConfig(
@@ -391,7 +416,10 @@ export function createLogRecordExporterFromConfig(
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
         headers: getHeadersFromConfiguration(props?.headers),
-        timeoutMillis: validateExporterTimeout(props?.timeout),
+        timeoutMillis: _validateExportTimeoutConfig(
+          props?.timeout,
+          'LogRecordExporter.timeout'
+        ),
         httpAgentOptions: _httpTlsOptionsFromConfig(props?.tls),
       };
       const encoding = props?.encoding ?? 'protobuf';
@@ -423,7 +451,10 @@ export function createLogRecordExporterFromConfig(
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
-        timeoutMillis: validateExporterTimeout(props?.timeout),
+        timeoutMillis: _validateExportTimeoutConfig(
+          props?.timeout,
+          'LogRecordExporter.timeout'
+        ),
         credentials: _grpcCredentialsFromConfig(props?.tls),
         metadata: getGrpcMetadataFromHeaders(props?.headers),
       });
@@ -460,7 +491,10 @@ export function createLogRecordProcessorFromConfig(
         maxQueueSize: props.max_queue_size ?? undefined,
         maxExportBatchSize: props.max_export_batch_size ?? undefined,
         scheduledDelayMillis: props.schedule_delay ?? undefined,
-        exportTimeoutMillis: props.export_timeout ?? undefined,
+        exportTimeoutMillis: _validateExportTimeoutConfig(
+          props.export_timeout,
+          'BatchLogRecordProcessor.export_timeout'
+        ),
       });
     }
 
@@ -610,7 +644,10 @@ export function createPushMetricExporterFromConfig(
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
         headers: getHeadersFromConfiguration(props?.headers),
-        timeoutMillis: validateExporterTimeout(props?.timeout),
+        timeoutMillis: _validateExportTimeoutConfig(
+          props?.timeout,
+          'PushMetricExporter.timeout'
+        ),
         httpAgentOptions: _httpTlsOptionsFromConfig(props?.tls),
         temporalityPreference: aggregationTemporalityPreferenceFromConfig(
           props?.temporality_preference
@@ -650,7 +687,10 @@ export function createPushMetricExporterFromConfig(
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
-        timeoutMillis: validateExporterTimeout(props?.timeout),
+        timeoutMillis: _validateExportTimeoutConfig(
+          props?.timeout,
+          'PushMetricExporter.timeout'
+        ),
         credentials: _grpcCredentialsFromConfig(props?.tls),
         metadata: getGrpcMetadataFromHeaders(props?.headers),
         temporalityPreference: aggregationTemporalityPreferenceFromConfig(
@@ -663,12 +703,8 @@ export function createPushMetricExporterFromConfig(
     }
 
     case 'console': {
-      // TODO(XXX): temporality_preference
-      //   ConsoleMetricExporter accepts a `temporalitySelector?: AggregationTemporalitySelector;` which
-      //   (a) is not the same `AggregationTemporalityPreference` type returned by `aggregationTemporalityPreferenceFromConfig()`, and
-      //   (b) `AggregationTemporalitySelector` is a fn that returns a `AggregationTemporality` which does not support a "low memory" value that `AggregationTemporalityPreference` does.
-      //   I don't know why there are separate `AggregationTemporality` and `AggregationTemporalityPreference` enums that are very similar, but not quite the same.
-      // TODO: default_histogram_aggregation (ConsoleMetricExporter does not accept an option for this)
+      // TODO(6957): temporality_preference
+      // TODO(6957): default_histogram_aggregation
       checkConfigUse('PushMetricExporter', properties!, []);
       return new ConsoleMetricExporter();
     }

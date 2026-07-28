@@ -731,7 +731,6 @@ export function validateExporterTimeout(
   return timeout;
 }
 
-// XXX rm
 export function getHttpAgentOptionsFromTls(
   tls: HttpTlsConfigModel | undefined
 ): { ca?: Buffer; cert?: Buffer; key?: Buffer } | undefined {
@@ -745,7 +744,6 @@ export function getHttpAgentOptionsFromTls(
   return undefined;
 }
 
-// XXX rm
 export function getGrpcCredentialsFromTls(tls?: GrpcTlsConfigModel) {
   if (tls?.insecure) {
     return createInsecureCredentials();
