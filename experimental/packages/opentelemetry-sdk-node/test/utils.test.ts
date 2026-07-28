@@ -891,9 +891,9 @@ describe('getHttpAgentOptionsFromTls', function () {
 
   it('should return https agent options if TLS config is provided', async () => {
     const tlsConfig: HttpTlsConfigModel = {
-      ca_file: 'test/fixtures/ca.pem',
-      key_file: 'test/fixtures/ca-key.pem',
-      cert_file: 'test/fixtures/cert.pem',
+      ca_file: 'test/certs/ca.crt',
+      key_file: 'test/certs/client.key',
+      cert_file: 'test/certs/client.crt',
     };
     const agentOptions = getHttpAgentOptionsFromTls(tlsConfig);
     assert.ok(agentOptions);
@@ -906,8 +906,8 @@ describe('getHttpAgentOptionsFromTls', function () {
     const warnStub = sinon.stub(diag, 'warn');
     const tlsConfig: HttpTlsConfigModel = {
       ca_file: 'invalid-ca.pem',
-      key_file: 'test/fixtures/ca-key.pem',
-      cert_file: 'test/fixtures/cert.pem',
+      key_file: 'test/certs/client.key',
+      cert_file: 'test/certs/client.crt',
     };
     const agentOptions = getHttpAgentOptionsFromTls(tlsConfig);
     assert.ok(agentOptions);
@@ -926,9 +926,9 @@ describe('getHttpAgentOptionsFromTls', function () {
   it('show warning messages for invalid ca-key file', async () => {
     const warnStub = sinon.stub(diag, 'warn');
     const tlsConfig: HttpTlsConfigModel = {
-      ca_file: 'test/fixtures/ca.pem',
+      ca_file: 'test/certs/ca.crt',
       key_file: 'invalid-ca-key.pem',
-      cert_file: 'test/fixtures/cert.pem',
+      cert_file: 'test/certs/client.crt',
     };
     const agentOptions = getHttpAgentOptionsFromTls(tlsConfig);
     assert.ok(agentOptions);
@@ -947,8 +947,8 @@ describe('getHttpAgentOptionsFromTls', function () {
   it('show warning messages for invalid cert file', async () => {
     const warnStub = sinon.stub(diag, 'warn');
     const tlsConfig: HttpTlsConfigModel = {
-      ca_file: 'test/fixtures/ca.pem',
-      key_file: 'test/fixtures/ca-key.pem',
+      ca_file: 'test/certs/ca.crt',
+      key_file: 'test/certs/client.key',
       cert_file: 'invalid-cert.pem',
     };
     const agentOptions = getHttpAgentOptionsFromTls(tlsConfig);

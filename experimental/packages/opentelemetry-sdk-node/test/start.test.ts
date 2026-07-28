@@ -265,6 +265,7 @@ describe('startNodeSDK', function () {
   });
 
   it('should register a logger provider if multiple log record processors are provided', async () => {
+    process.env.TEST_DIR = __dirname;
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/logger.yaml';
     const sdk = startNodeSDK({});
 
@@ -301,6 +302,7 @@ describe('startNodeSDK', function () {
   it('should register a meter provider if multiple metric readers are provided', async () => {
     const stubLoggerWarn: Sinon.SinonStub = Sinon.stub(diag, 'warn');
 
+    process.env.TEST_DIR = __dirname;
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/meter.yaml';
     const sdk = startNodeSDK({});
 
@@ -350,6 +352,7 @@ describe('startNodeSDK', function () {
 
   it('should register a tracer provider if an exporter is provided', async () => {
     const stubLoggerWarn: Sinon.SinonStub = Sinon.stub(diag, 'warn');
+    process.env.TEST_DIR = __dirname;
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/tracer.yaml';
     const sdk = startNodeSDK({});
 

@@ -13,6 +13,8 @@
  */
 
 import { inspect } from 'util';
+import { readFileSync } from 'fs';
+import * as path from 'path';
 
 import type { TextMapPropagator } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
@@ -25,6 +27,10 @@ import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exp
 import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
+import {
+  createInsecureCredentials,
+  createSslCredentials,
+} from '@opentelemetry/otlp-grpc-exporter-base';
 import { AggregationTemporalityPreference } from '@opentelemetry/exporter-metrics-otlp-http';
 import type {
   AggregationConfigModel,
@@ -35,6 +41,8 @@ import type {
   ExplicitBucketHistogramAggregationConfigModel,
   ExporterDefaultHistogramAggregationConfigModel,
   ExporterTemporalityPreferenceConfigModel,
+  GrpcTlsConfigModel,
+  HttpTlsConfigModel,
   InstrumentTypeConfigModel,
   LoggerProviderConfigModel,
   LogRecordExporterConfigModel,
@@ -95,13 +103,12 @@ import {
 } from '@opentelemetry/sdk-metrics';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
+
 // TODO: refactor these into this file, and to fail-fast
 // XXX
 import {
-  getGrpcCredentialsFromTls,
   getGrpcMetadataFromHeaders,
   getHeadersFromConfiguration,
-  getHttpAgentOptionsFromTls,
   validateExporterTimeout,
 } from './utils';
 
@@ -171,6 +178,78 @@ function mustSingleEntry(
   }
 
   return entries[0];
+}
+
+function _loadTlsConfigFile(absPath: string, propName: string) {
+  try {
+    if (!path.isAbsolute(absPath)) {
+      throw new Error(`"${absPath}" must be an absolute path`);
+    }
+    return readFileSync(absPath);
+  } catch (err) {
+    throw new Error(
+      `could not load "tls.${propName}" from config: ${err.message}`,
+      { cause: err }
+    );
+  }
+}
+
+/**
+ * Get TLS-related HTTP client options from declarative configuration.
+ * https://opentelemetry.io/docs/specs/otel-config/types/#type-httptls
+ * https://nodejs.org/api/tls.html#tlscreatesecurecontextoptions
+ */
+function _httpTlsOptionsFromConfig(
+  tls?: HttpTlsConfigModel
+): { ca?: Buffer; cert?: Buffer; key?: Buffer } | undefined {
+  if (!tls) {
+    return undefined;
+  }
+
+  checkConfigUse('HttpTls', tls, ['ca_file', 'cert_file', 'key_file']);
+  const httpTlsOptions: { ca?: Buffer; cert?: Buffer; key?: Buffer } = {};
+  if (tls.ca_file) {
+    httpTlsOptions.ca = _loadTlsConfigFile(tls.ca_file, 'ca_file');
+  }
+  if (tls.cert_file) {
+    httpTlsOptions.cert = _loadTlsConfigFile(tls.cert_file, 'cert_file');
+  }
+  if (tls.key_file) {
+    httpTlsOptions.key = _loadTlsConfigFile(tls.key_file, 'key_file');
+  }
+  return httpTlsOptions;
+}
+
+export function _grpcCredentialsFromConfig(tls?: GrpcTlsConfigModel) {
+  if (!tls) {
+    return undefined;
+  }
+
+  checkConfigUse('GrpcTls', tls, [
+    'insecure',
+    'ca_file',
+    'cert_file',
+    'key_file',
+  ]);
+
+  if (tls?.insecure) {
+    return createInsecureCredentials();
+  }
+
+  const rootCert = tls.ca_file
+    ? _loadTlsConfigFile(tls.ca_file, 'ca_file')
+    : undefined;
+  const privateKey = tls.key_file
+    ? _loadTlsConfigFile(tls.key_file, 'key_file')
+    : undefined;
+  const certChain = tls.cert_file
+    ? _loadTlsConfigFile(tls.cert_file, 'cert_file')
+    : undefined;
+  if (rootCert || privateKey || certChain) {
+    return createSslCredentials(rootCert, privateKey, certChain);
+  }
+
+  return undefined;
 }
 
 // ---- create<SDKThing>FromConfig functions
@@ -314,7 +393,7 @@ export function createLogRecordExporterFromConfig(
         url: props?.endpoint ?? undefined,
         headers: getHeadersFromConfiguration(props?.headers),
         timeoutMillis: validateExporterTimeout(props?.timeout),
-        httpAgentOptions: getHttpAgentOptionsFromTls(props?.tls),
+        httpAgentOptions: _httpTlsOptionsFromConfig(props?.tls),
       };
       const encoding = props?.encoding ?? 'protobuf';
       switch (encoding) {
@@ -346,7 +425,7 @@ export function createLogRecordExporterFromConfig(
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
         timeoutMillis: validateExporterTimeout(props?.timeout),
-        credentials: getGrpcCredentialsFromTls(props?.tls),
+        credentials: _grpcCredentialsFromConfig(props?.tls),
         metadata: getGrpcMetadataFromHeaders(props?.headers),
       });
     }
@@ -533,7 +612,7 @@ export function createPushMetricExporterFromConfig(
         url: props?.endpoint ?? undefined,
         headers: getHeadersFromConfiguration(props?.headers),
         timeoutMillis: validateExporterTimeout(props?.timeout),
-        httpAgentOptions: getHttpAgentOptionsFromTls(props?.tls),
+        httpAgentOptions: _httpTlsOptionsFromConfig(props?.tls),
         temporalityPreference: aggregationTemporalityPreferenceFromConfig(
           props?.temporality_preference
         ),
@@ -573,7 +652,7 @@ export function createPushMetricExporterFromConfig(
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
         timeoutMillis: validateExporterTimeout(props?.timeout),
-        credentials: getGrpcCredentialsFromTls(props?.tls),
+        credentials: _grpcCredentialsFromConfig(props?.tls),
         metadata: getGrpcMetadataFromHeaders(props?.headers),
         temporalityPreference: aggregationTemporalityPreferenceFromConfig(
           props?.temporality_preference

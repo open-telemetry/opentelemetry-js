@@ -9,9 +9,9 @@ meter_provider:
           otlp_http:
             endpoint: http://localhost:4318/v1/metrics
             tls:
-              ca_file: /app/cert.pem
-              key_file: /app/cert.pem
-              cert_file: /app/cert.pem
+              ca_file: ${TEST_DIR}/certs/ca.crt
+              key_file: ${TEST_DIR}/certs/client.key
+              cert_file: ${TEST_DIR}/certs/client.crt
             headers:
               - name: api-key
                 value: "1234"
@@ -37,9 +37,9 @@ meter_provider:
           otlp_http:
             endpoint: http://localhost:4318/v1/metrics
             tls:
-              ca_file: /app/cert.pem
-              key_file: /app/cert.pem
-              cert_file: /app/cert.pem
+              ca_file: ${TEST_DIR}/certs/ca.crt
+              key_file: ${TEST_DIR}/certs/client.key
+              cert_file: ${TEST_DIR}/certs/client.crt
             headers:
               - name: api-key
                 value: "1234"
@@ -63,9 +63,9 @@ meter_provider:
           otlp_grpc:
             endpoint: http://localhost:4317
             tls:
-              ca_file: /app/cert.pem
-              key_file: /app/cert.pem
-              cert_file: /app/cert.pem
+              ca_file: ${TEST_DIR}/certs/ca.crt
+              key_file: ${TEST_DIR}/certs/client.key
+              cert_file: ${TEST_DIR}/certs/client.crt
               insecure: false
             headers:
               - name: api-key

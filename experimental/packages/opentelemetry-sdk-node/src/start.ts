@@ -163,18 +163,6 @@ function create(
       );
     }
 
-    // XXX rm
-    // const meterReaders = getMeterReadersFromConfiguration(config);
-    // if (meterReaders) {
-    //   const meterViews = getMeterViewsFromConfiguration(config);
-    //   const meterProvider = new MeterProvider({
-    //     resource: resource,
-    //     readers: meterReaders,
-    //     views: meterViews ?? [],
-    //   });
-    //   components.meterProvider = meterProvider;
-    // }
-
     const spanProcessors = getSpanProcessorsFromConfiguration(config);
     if (spanProcessors) {
       const idGenerator = getIdGeneratorFromConfiguration(config);

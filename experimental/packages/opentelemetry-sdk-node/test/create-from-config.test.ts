@@ -4,6 +4,7 @@
  */
 
 import * as assert from 'assert';
+import * as path from 'path';
 
 import type {
   ConfigurationModel,
@@ -162,9 +163,9 @@ describe('create-from-config', () => {
           otlp_http: {
             endpoint: 'https://coll.example.com/v1/logs',
             tls: {
-              ca_file: './fixtures/ca.pem',
-              key_file: './fixtures/ca-key.pem',
-              cert_file: './fixtures/cert.pem',
+              ca_file: path.resolve(__dirname, './certs/ca.crt'),
+              key_file: path.resolve(__dirname, './certs/client.key'),
+              cert_file: path.resolve(__dirname, './certs/client.crt'),
             },
             headers: [{ name: 'foo', value: 'bar' }],
             headers_list: 'foo=baz,a=b',
@@ -181,9 +182,9 @@ describe('create-from-config', () => {
           otlp_grpc: {
             endpoint: 'https://coll.example.com:4317/v1/logs',
             tls: {
-              ca_file: './fixtures/ca.pem',
-              key_file: './fixtures/ca-key.pem',
-              cert_file: './fixtures/cert.pem',
+              ca_file: path.resolve(__dirname, './certs/ca.crt'),
+              key_file: path.resolve(__dirname, './certs/client.key'),
+              cert_file: path.resolve(__dirname, './certs/client.crt'),
               insecure: false,
             },
             headers: [{ name: 'foo', value: 'bar' }],
