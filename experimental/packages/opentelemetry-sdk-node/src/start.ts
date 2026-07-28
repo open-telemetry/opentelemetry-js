@@ -19,15 +19,12 @@ import {
   getIdGeneratorFromConfiguration,
   getSamplerFromConfiguration,
   getInstanceID,
-  getMeterReadersFromConfiguration,
-  getMeterViewsFromConfiguration,
   getResourceDetectorsFromConfiguration,
   getResourceFromConfiguration,
   getSpanProcessorsFromConfiguration,
 } from './utils';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import type { SDKComponents, SDKOptions } from './types';
-import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { TracerProvider } from '@opentelemetry/sdk-trace';
 import { logs } from '@opentelemetry/api-logs';
 import type {
@@ -166,16 +163,17 @@ function create(
       );
     }
 
-    const meterReaders = getMeterReadersFromConfiguration(config);
-    if (meterReaders) {
-      const meterViews = getMeterViewsFromConfiguration(config);
-      const meterProvider = new MeterProvider({
-        resource: resource,
-        readers: meterReaders,
-        views: meterViews ?? [],
-      });
-      components.meterProvider = meterProvider;
-    }
+    // XXX rm
+    // const meterReaders = getMeterReadersFromConfiguration(config);
+    // if (meterReaders) {
+    //   const meterViews = getMeterViewsFromConfiguration(config);
+    //   const meterProvider = new MeterProvider({
+    //     resource: resource,
+    //     readers: meterReaders,
+    //     views: meterViews ?? [],
+    //   });
+    //   components.meterProvider = meterProvider;
+    // }
 
     const spanProcessors = getSpanProcessorsFromConfiguration(config);
     if (spanProcessors) {
