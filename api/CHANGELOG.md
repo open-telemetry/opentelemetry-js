@@ -15,6 +15,8 @@ All notable changes to this project will be documented in this file.
 
 ### :house: Internal
 
+* perf(api): add getGlobal fast-path [#6956](https://github.com/open-telemetry/opentelemetry-js/pull/6956) @legendecas
+
 ## 1.9.1
 
 ### :bug: (Bug Fix)
