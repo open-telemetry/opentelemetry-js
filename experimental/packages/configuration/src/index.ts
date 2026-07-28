@@ -43,7 +43,7 @@ export type {
   ExperimentalPrometheusMetricExporter as ExperimentalPrometheusMetricExporterConfigModel,
   View as ViewConfigModel,
   ExplicitBucketHistogramAggregation as ExplicitBucketHistogramAggregationConfigModel,
-  Base2ExponentialBucketHistogramAggregation as Base2ExponentialBucketHistogramAggregationConfigModel
+  Base2ExponentialBucketHistogramAggregation as Base2ExponentialBucketHistogramAggregationConfigModel,
 } from './generated/types';
 export { createConfigFactory } from './ConfigFactory';
 export {
