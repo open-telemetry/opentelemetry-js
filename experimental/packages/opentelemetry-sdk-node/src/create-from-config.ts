@@ -103,7 +103,6 @@ import {
 } from '@opentelemetry/sdk-metrics';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
-
 // TODO: refactor these into this file, and to fail-fast
 // XXX
 import {
