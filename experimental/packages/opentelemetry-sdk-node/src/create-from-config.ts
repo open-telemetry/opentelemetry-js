@@ -13,7 +13,6 @@
  */
 
 import { inspect } from 'util';
-import * as assert from 'assert';
 
 import type { TextMapPropagator } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
@@ -94,7 +93,9 @@ import {
   MeterProvider,
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
+import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
+// TODO: refactor these into this file, and to fail-fast
 import {
   getGrpcCredentialsFromTls,
   getGrpcMetadataFromHeaders,
@@ -102,7 +103,6 @@ import {
   getHttpAgentOptionsFromTls,
   validateExporterTimeout,
 } from './utils';
-import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
 // ---- internal utilities
 

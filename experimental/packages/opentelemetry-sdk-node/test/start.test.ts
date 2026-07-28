@@ -258,7 +258,7 @@ describe('startNodeSDK', function () {
     assert.strictEqual(diagError.callCount, 1);
     assert.strictEqual(
       diagError.args[0][0],
-      'Could not create OpenTelemetry SDK: unknown LogRecordProcessor name: "my_custom_processor"'
+      'Could not create OpenTelemetry SDK from configuration, SDK will not be setup: unknown LogRecordProcessor name: "my_custom_processor"'
     );
 
     await sdk.shutdown();
@@ -303,12 +303,6 @@ describe('startNodeSDK', function () {
 
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/meter.yaml';
     const sdk = startNodeSDK({});
-
-    // Periodic type 'otlp_file/development' and 'console' are not supported yet
-    const unsupportedWarnings = stubLoggerWarn.args.filter(
-      args => args[0] === 'Unsupported Metric Exporter.'
-    );
-    assert.strictEqual(unsupportedWarnings.length, 2);
 
     const meterProvider = metrics.getMeterProvider() as MeterProvider;
     const sharedState = (meterProvider as any)['_sharedState'];

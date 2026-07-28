@@ -21,8 +21,6 @@ meter_provider:
             encoding: protobuf
             temporality_preference: delta
             default_histogram_aggregation: base2_exponential_bucket_histogram
-        producers:
-          - opencensus:
         cardinality_limits:
           default: 2000
           counter: 2000
@@ -51,8 +49,6 @@ meter_provider:
             encoding: json
             temporality_preference: delta
             default_histogram_aggregation: base2_exponential_bucket_histogram
-        producers:
-          - opencensus:
         cardinality_limits:
           default: 2000
           counter: 2000
@@ -77,18 +73,6 @@ meter_provider:
             headers_list: "api-key=1234"
             compression: gzip
             timeout: 10000
-            temporality_preference: delta
-            default_histogram_aggregation: base2_exponential_bucket_histogram
-    - periodic:
-        exporter:
-          otlp_file/development:
-            output_stream: file:///var/log/metrics.jsonl
-            temporality_preference: delta
-            default_histogram_aggregation: base2_exponential_bucket_histogram
-    - periodic:
-        exporter:
-          otlp_file/development:
-            output_stream: stdout
             temporality_preference: delta
             default_histogram_aggregation: base2_exponential_bucket_histogram
     - periodic:

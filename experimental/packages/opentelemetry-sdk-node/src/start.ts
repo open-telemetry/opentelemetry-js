@@ -91,7 +91,9 @@ export function startNodeSDK(sdkOptions?: SDKOptions): {
   try {
     components = create(config, sdkOptions);
   } catch (createErr) {
-    diag.error(`Could not create OpenTelemetry SDK: ${createErr.message}`);
+    diag.error(
+      `Could not create OpenTelemetry SDK from configuration, SDK will not be setup: ${createErr.message}`
+    );
     return NOOP_SDK;
   }
   if (components.contextManager) {
