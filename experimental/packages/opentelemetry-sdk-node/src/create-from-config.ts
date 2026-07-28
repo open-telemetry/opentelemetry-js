@@ -399,11 +399,11 @@ export function createLogRecordExporterFromConfig(
 
   switch (name) {
     case 'otlp_http': {
-      // TODO(6953): headers_list
       checkConfigUse('LogRecordExporter', properties!, [
         'compression',
         'endpoint',
         'headers',
+        'headers_list',
         'timeout',
         'tls',
         'encoding',
@@ -415,7 +415,10 @@ export function createLogRecordExporterFromConfig(
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
-        headers: getHeadersFromConfiguration(props?.headers),
+        headers: getHeadersFromConfiguration(
+          props?.headers,
+          props?.headers_list
+        ),
         timeoutMillis: validateExportTimeoutConfig(
           props?.timeout,
           'LogRecordExporter.timeout'
@@ -436,13 +439,13 @@ export function createLogRecordExporterFromConfig(
     }
 
     case 'otlp_grpc': {
-      // TODO(6953): headers_list
       checkConfigUse('LogRecordExporter', properties!, [
         'compression',
         'endpoint',
         'timeout',
         'tls',
         'headers',
+        'headers_list',
       ]);
       const props = properties as OtlpGrpcExporterConfigModel;
       return new OTLPGrpcLogExporter({
@@ -456,7 +459,10 @@ export function createLogRecordExporterFromConfig(
           'LogRecordExporter.timeout'
         ),
         credentials: grpcCredentialsFromConfig(props?.tls),
-        metadata: getGrpcMetadataFromHeaders(props?.headers),
+        metadata: getGrpcMetadataFromHeaders(
+          props?.headers,
+          props?.headers_list
+        ),
       });
     }
 
