@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sdk-trace-base",
-  "version": "2.9.0",
+  "version": "2.10.0",
   "description": "OpenTelemetry Tracing",
   "main": "build/src/index-shim.js",
   "module": "build/esm/index-shim.js",
@@ -63,8 +63,8 @@
   },
   "devDependencies": {
     "@opentelemetry/api": ">=1.3.0 <1.10.0",
-    "@opentelemetry/context-async-hooks": "2.9.0",
-    "@opentelemetry/sdk-metrics": "2.9.0",
+    "@opentelemetry/context-async-hooks": "2.10.0",
+    "@opentelemetry/sdk-metrics": "2.10.0",
     "@types/benchmark": "2.1.5",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
@@ -89,9 +89,9 @@
     "@opentelemetry/api": ">=1.3.0 <1.10.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "2.9.0",
-    "@opentelemetry/resources": "2.9.0",
-    "@opentelemetry/sdk-trace": "2.9.0",
+    "@opentelemetry/core": "2.10.0",
+    "@opentelemetry/resources": "2.10.0",
+    "@opentelemetry/sdk-trace": "2.10.0",
     "@opentelemetry/semantic-conventions": "^1.29.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base",

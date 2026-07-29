@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-zone-peer-dep",
-  "version": "2.9.0",
+  "version": "2.10.0",
   "description": "OpenTelemetry Context Zone with peer dependency for zone.js",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -74,7 +74,7 @@
     "ts-loader": "9.5.7",
     "typescript": "5.2.2",
     "webpack": "5.108.4",
-    "webpack-cli": "7.0.3",
+    "webpack-cli": "7.2.1",
     "zone.js": "0.16.2"
   },
   "peerDependencies": {
