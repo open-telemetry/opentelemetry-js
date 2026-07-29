@@ -115,4 +115,13 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
    * @experimental
    */
   redactedQueryParams?: string[];
+  /**
+   * If set to true, instrument `http`/`https` through the `node:http`
+   * diagnostics channels instead of patching the module exports.
+   * Defaults to the `OTEL_INSTRUMENTATION_HTTP_USE_DIAGNOSTICS_CHANNEL` environment variable.
+   * Falls back to patching when the channels are not available (Node.js <22.12.0, or <23.2.0 on the 23.x line).
+   * Read once when the instrumentation is constructed.
+   * @experimental
+   */
+  useDiagnosticsChannel?: boolean;
 }
