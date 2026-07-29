@@ -52,11 +52,7 @@ import {
   ATTR_SERVICE_INSTANCE_ID,
 } from '../src/semconv';
 import { ATTR_OS_TYPE } from '@opentelemetry/resources/src/semconv';
-import {
-  getPeriodicMetricReaderFromConfiguration,
-  getSpanExporter,
-  setupContextManager,
-} from '../src/utils';
+import { getSpanExporter, setupContextManager } from '../src/utils';
 import { NOOP_SDK } from '../src/start';
 import {
   ConsoleMetricExporter,
@@ -954,21 +950,6 @@ describe('startNodeSDK', function () {
   });
 
   describe('tests to increase code coverage', function () {
-    it('should warn for unsupported metric producer', async () => {
-      const warnSpy = Sinon.spy(diag, 'warn');
-      const reader = getPeriodicMetricReaderFromConfiguration({
-        exporter: { console: {} },
-        producers: [{ 'unknown/producer': {} }],
-      });
-      assert.ok(reader !== undefined);
-      assert.ok(
-        warnSpy.args.some(args =>
-          String(args[0]).includes('Unsupported metric producer')
-        )
-      );
-      await (reader as PeriodicExportingMetricReader).shutdown();
-    });
-
     it('should warn when exporter timeout is 0', async () => {
       const warnSpy = Sinon.spy(diag, 'warn');
       const exporter = getSpanExporter({

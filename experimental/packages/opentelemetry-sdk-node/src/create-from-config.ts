@@ -179,7 +179,7 @@ function mustSingleEntry(
 function _loadTlsConfigFile(absPath: string, propName: string) {
   try {
     if (!path.isAbsolute(absPath)) {
-      throw new Error(`"${absPath}" must be an absolute path`);
+      throw new Error(`TLS config file "${absPath}" must be an absolute path`);
     }
     return readFileSync(absPath);
   } catch (err) {
@@ -216,7 +216,7 @@ function _httpTlsOptionsFromConfig(
   return httpTlsOptions;
 }
 
-export function _grpcCredentialsFromConfig(tls?: GrpcTlsConfigModel) {
+function _grpcCredentialsFromConfig(tls?: GrpcTlsConfigModel) {
   if (!tls) {
     return undefined;
   }
@@ -577,7 +577,7 @@ function aggregationTemporalityPreferenceFromConfig(
       return AggregationTemporalityPreference.CUMULATIVE;
     default:
       throw new Error(
-        `unknown temporality_preference in configuration: ${temporality_preference}`
+        `unknown temporality_preference value in configuration: ${temporality_preference}`
       );
   }
 }
@@ -607,7 +607,7 @@ function aggregationSelectorFromConfig(
       break;
     default:
       throw new Error(
-        `unknown default_histogram_aggregation in configuration: ${default_histogram_aggregation}`
+        `unknown default_histogram_aggregation value in configuration: ${default_histogram_aggregation}`
       );
   }
   return (instrumentType: InstrumentType): AggregationOption =>
@@ -616,6 +616,7 @@ function aggregationSelectorFromConfig(
       : { type: AggregationType.DEFAULT };
 }
 
+/** exported for testing */
 export function createPushMetricExporterFromConfig(
   exporter: PushMetricExporterConfigModel
 ): PushMetricExporter {
@@ -735,7 +736,7 @@ function createMetricProducerFromConfig(
   }
 }
 
-export function createPeriodicMetricReaderFromConfig(
+function createPeriodicMetricReaderFromConfig(
   periodic: PeriodicMetricReaderConfigModel
 ): MetricReader {
   const exporter = createPushMetricExporterFromConfig(periodic.exporter);
@@ -755,13 +756,17 @@ export function createPeriodicMetricReaderFromConfig(
   // TODO: max_export_batch_size/development -> maxExportBatchSize
   return new PeriodicExportingMetricReader({
     exportIntervalMillis: periodic.interval ?? 60_000,
-    exportTimeoutMillis: periodic.timeout ?? 30_000,
+    exportTimeoutMillis:
+      _validateExportTimeoutConfig(
+        periodic?.timeout,
+        'PeriodicExportingMetricReader.timeout'
+      ) ?? 30_000,
     exporter,
     metricProducers,
   });
 }
 
-export function createPullMetricReaderFromConfig(
+function createPullMetricReaderFromConfig(
   pull: PullMetricReaderConfigModel
 ): MetricReader {
   // TODO(6425): add cardinality_limits
@@ -834,7 +839,7 @@ export function createPullMetricReaderFromConfig(
   }
 }
 
-export function createMetricReaderFromConfig(
+function createMetricReaderFromConfig(
   reader: MetricReaderConfigModel
 ): MetricReader {
   const [name, properties] = mustSingleEntry(reader, 'MetricReader');
@@ -939,9 +944,7 @@ function createAggregationOptionFromConfig(
   }
 }
 
-export function createViewOptionsFromConfig(
-  view: ViewConfigModel
-): ViewOptions {
+function createViewOptionsFromConfig(view: ViewConfigModel): ViewOptions {
   const viewOptions: ViewOptions = {};
   checkConfigUse('View', view, ['selector', 'stream']);
 

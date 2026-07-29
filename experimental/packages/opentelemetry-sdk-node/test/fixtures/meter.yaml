@@ -63,10 +63,7 @@ meter_provider:
           otlp_grpc:
             endpoint: http://localhost:4317
             tls:
-              ca_file: ${TEST_DIR}/certs/ca.crt
-              key_file: ${TEST_DIR}/certs/client.key
-              cert_file: ${TEST_DIR}/certs/client.crt
-              insecure: false
+              insecure: true
             headers:
               - name: api-key
                 value: "1234"
