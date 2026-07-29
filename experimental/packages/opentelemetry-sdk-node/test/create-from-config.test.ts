@@ -818,7 +818,7 @@ describe('create-from-config', () => {
 
   describe('createPushMetricExporterFromConfig', () => {
     it('http/protobuf by default', function () {
-      const exporter = createPushMetricExporterFromConfig({ otlp_http: null});
+      const exporter = createPushMetricExporterFromConfig({ otlp_http: null });
       assert.ok(exporter instanceof OTLPProtoMetricExporter);
     });
 
