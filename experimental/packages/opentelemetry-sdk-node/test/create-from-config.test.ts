@@ -557,6 +557,7 @@ describe('create-from-config', () => {
                     'base2_exponential_bucket_histogram',
                 },
               },
+              'max_export_batch_size/development': 1024,
             },
           },
         ],
