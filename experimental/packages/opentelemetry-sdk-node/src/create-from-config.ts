@@ -1259,8 +1259,8 @@ export function createSamplerFromConfig(
     //   return createAlwaysRecordSampler(createSamplerFromConfig(props.root));
     // }
     // TODO(6961): composite/development
-    // TODO(?): jaeger_remote/development? Being discussed in #otel-js-dev.
     // TODO(6541): probability/development (via composite support for?)
+    // TODO(later): Consider supporting jaeger_remote/development if requested by a user. Only consider `sampler-jaeger-remote` package after axios dep is dropped in #6963.
 
     default:
       throw new Error(`unknown Sampler name: "${name}"`);
