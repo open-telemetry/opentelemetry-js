@@ -498,6 +498,33 @@ describe('JaegerRemoteSampler', () => {
       );
     });
 
+    it('Should keep inital sampler if endpoint fails.', async () => {
+      fetchStub.returns(new Response(
+        '',
+        {
+          status: 500,
+          statusText: 'Internal Server Error'
+        }
+      ));
+      const jaegerRemoteSampler = new JaegerRemoteSampler({
+        endpoint,
+        serviceName,
+        poolingInterval,
+        initialSampler: alwaysOnSampler,
+      });
+      await clock.tickAsync(poolingInterval);
+      sinon.assert.calledOnceWithExactly(
+        fetchStub,
+        `${endpoint}/sampling?service=${serviceName}`
+      );
+      // @ts-expect-error -- accessing internal property
+      const jaegerCurrentSampler = jaegerRemoteSampler._sampler;
+      assert.equal(
+        jaegerCurrentSampler,
+        alwaysOnSampler,
+      );
+    });
+
     it('Should pass endpoint and blank service name if nothing is provided.', async () => {
       new JaegerRemoteSampler({
         endpoint,
