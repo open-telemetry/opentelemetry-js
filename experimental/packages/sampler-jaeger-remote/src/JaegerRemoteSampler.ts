@@ -128,7 +128,9 @@ export class JaegerRemoteSampler implements Sampler {
         if (resp.ok) {
           return resp;
         }
-        throw new Error(`Fetch sampling error(${resp.status}): ${resp.statusText}`);
+        throw new Error(
+          `Fetch sampling error(${resp.status}): ${resp.statusText}`
+        );
       })
       .then(resp => resp.json()) as Promise<SamplingStrategyResponse>;
   }

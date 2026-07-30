@@ -477,7 +477,7 @@ describe('JaegerRemoteSampler', () => {
     let fetchStub: sinon.SinonStub;
 
     beforeEach(() => {
-      fetchStub = sinon.stub(globalThis, 'fetch').callsFake((input) => {
+      fetchStub = sinon.stub(globalThis, 'fetch').callsFake(input => {
         const url = new URL(input);
         let response;
 
