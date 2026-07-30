@@ -288,7 +288,7 @@ function _grpcCredentialsFromConfig(tls?: GrpcTlsConfigModel) {
  * Search "timeout" at https://opentelemetry.io/docs/specs/otel-config/types/
  *
  * This function enforces (1), and guards against (2) because current OTel
- * JS SDK components to do *not* handle a `0` timeout value this way.
+ * JS SDK components do *not* handle a `0` timeout value.
  * See https://github.com/open-telemetry/opentelemetry-js/issues/6617
  */
 function _validateExportTimeoutConfig(
@@ -652,7 +652,7 @@ export function createPushMetricExporterFromConfig(
 ): PushMetricExporter {
   const [name, properties] = mustSingleEntry(exporter, 'PushMetricExporter');
 
-  // TODO: test and updates so that unspecific MetricExporter opts do *not* use the env
+  // TODO(6959): use non-envvar reading mechanism to create OTLP exporters, so an `undefined` option does NOT fallback to an envvar
 
   switch (name) {
     case 'otlp_http': {
@@ -780,10 +780,10 @@ function createPeriodicMetricReaderFromConfig(
     'producers',
     'interval',
     'timeout',
+    'max_export_batch_size/development',
   ]);
 
   // TODO(6425): add cardinality_limits
-  // TODO: max_export_batch_size/development -> maxExportBatchSize
   return new PeriodicExportingMetricReader({
     exportIntervalMillis: periodic.interval ?? 60_000,
     exportTimeoutMillis:
@@ -793,6 +793,8 @@ function createPeriodicMetricReaderFromConfig(
       ) ?? 30_000,
     exporter,
     metricProducers,
+    maxExportBatchSize:
+      periodic['max_export_batch_size/development'] ?? undefined,
   });
 }
 
@@ -842,7 +844,8 @@ function createPullMetricReaderFromConfig(
       return new PrometheusExporter({
         // TODO(6605): default host to `undefined` when PrometheusExporter defaults to 'localhost'
         host: props?.host ?? 'localhost',
-        port: props?.port ?? undefined,
+        // TODO(6958): default port and host to `undefined` when PrometheusExporter constructor no longer reads envvars for config
+        port: props?.port ?? 9464,
         withoutScopeInfo:
           props?.scope_info_enabled != null
             ? !props.scope_info_enabled

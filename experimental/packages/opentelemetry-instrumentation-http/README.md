@@ -80,63 +80,39 @@ Hook type                                  | Parameters                         
 
 ## Semantic Conventions
 
-Prior to version `0.54.0`, this instrumentation created spans targeting an experimental semantic convention [Version 1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md).
+**Span attributes:**
 
-HTTP semantic conventions (semconv) were stabilized in v1.23.0, and a [migration process](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/non-normative/http-migration.md#http-semantic-convention-stability-migration) was defined.
-`instrumentation-http` versions 0.54.0 - XXXX include support for migrating to stable HTTP semantic conventions, as described below.
-The intent is to provide an approximate 6 month time window for users of this instrumentation to migrate to the new HTTP semconv, after which a new minor version will use the *new* semconv by default and drop support for the old semconv.
-See the [HTTP semconv migration plan for OpenTelemetry JS instrumentations](https://github.com/open-telemetry/opentelemetry-js/issues/5646).
+v1.23.0 semconv                     | Short Description
+----------------------------------- | -----
+`client.address`                    | The IP address of the original client behind all proxies, if known
+`network.protocol.version`          | Kind of HTTP protocol used
+`server.address`                    | The value of the HTTP host header
+`http.request.method`               | HTTP request method
+(opt-in, `headersToSpanAttributes`) | The size of the request payload body in bytes. For newer semconv, use the `headersToSpanAttributes` option to capture this as `http.request.header.content-length`.
+(not included)                      | The size of the uncompressed request payload body after transport decoding. (In semconv v1.23.0 this is defined by `http.request.body.size`, which is experimental and opt-in.)
+(opt-in, `headersToSpanAttributes`) | The size of the response payload body in bytes. For newer semconv, use the `headersToSpanAttributes` option to capture this as `http.response.header.content-length`.
+(not included)                      | The size of the uncompressed response payload body after transport decoding. (In semconv v1.23.0 this is defined by `http.response.body.size`, which is experimental and opt-in.)
+no change                           | The matched route (path template).
+`url.scheme`                        | The URI scheme identifying the used protocol
+`server.address`                    | The primary server name of the matched virtual host
+`http.response.status_code`         | HTTP response status code
+`url.path` and `url.query`          | The URI path and query component
+`url.full`                          | Full HTTP request URL in the form `scheme://host[:port]/path?query[#fragment]`
+`user_agent.original`               | Value of the HTTP User-Agent header sent by the client
+`network.local.address`             | Like net.peer.ip but for the host IP. Useful in case of a multi-IP host
+`server.address`                    | Local hostname or similar
+`server.port`                       | Like net.peer.port but for the host port
+`network.peer.address`              | Remote address of the peer (dotted decimal for IPv4 or RFC5952 for IPv6)
+`server.address`                    | Server domain name if available without reverse DNS lookup
+`server.port`                       | Server port number
+`network.transport`                 | Transport protocol used
 
-To select which semconv version(s) is emitted from this instrumentation, use the `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable.
-
-- `http`: emit the new (stable) v1.23.0+ semantics
-- `http/dup`: emit **both** the old v1.7.0 and the new (stable) v1.23.0+ semantics
-- By default, if `OTEL_SEMCONV_STABILITY_OPT_IN` includes neither of the above tokens, the old v1.7.0 semconv is used.
-
-`instrumentation-http` versions XXX and later emit the stable v1.23.0+ semantics only.
-
-### Attributes collected
-
-v1.7.0 semconv                              | v1.23.0 semconv                     | Short Description
-------------------------------------------- | ----------------------------------- | -----
-`http.client_ip`                            | `client.address`                    | The IP address of the original client behind all proxies, if known
-`http.flavor`                               | `network.protocol.version`          | Kind of HTTP protocol used
-`http.host`                                 | `server.address`                    | The value of the HTTP host header
-`http.method`                               | `http.request.method`               | HTTP request method
-`http.request_content_length`               | (opt-in, `headersToSpanAttributes`) | The size of the request payload body in bytes. For newer semconv, use the `headersToSpanAttributes` option to capture this as `http.request.header.content-length`.
-`http.request_content_length_uncompressed`  | (not included)                      | The size of the uncompressed request payload body after transport decoding. (In semconv v1.23.0 this is defined by `http.request.body.size`, which is experimental and opt-in.)
-`http.response_content_length`              | (opt-in, `headersToSpanAttributes`) | The size of the response payload body in bytes. For newer semconv, use the `headersToSpanAttributes` option to capture this as `http.response.header.content-length`.
-`http.response_content_length_uncompressed` | (not included)                      | The size of the uncompressed response payload body after transport decoding. (In semconv v1.23.0 this is defined by `http.response.body.size`, which is experimental and opt-in.)
-`http.route`                                | no change                           | The matched route (path template).
-`http.scheme`                               | `url.scheme`                        | The URI scheme identifying the used protocol
-`http.server_name`                          | `server.address`                    | The primary server name of the matched virtual host
-`http.status_code`                          | `http.response.status_code`         | HTTP response status code
-`http.target`                               | `url.path` and `url.query`          | The URI path and query component
-`http.url`                                  | `url.full`                          | Full HTTP request URL in the form `scheme://host[:port]/path?query[#fragment]`
-`http.user_agent`                           | `user_agent.original`               | Value of the HTTP User-Agent header sent by the client
-`net.host.ip`                               | `network.local.address`             | Like net.peer.ip but for the host IP. Useful in case of a multi-IP host
-`net.host.name`                             | `server.address`                    | Local hostname or similar
-`net.host.port`                             | `server.port`                       | Like net.peer.port but for the host port
-`net.peer.ip`                               | `network.peer.address`              | Remote address of the peer (dotted decimal for IPv4 or RFC5952 for IPv6)
-`net.peer.name`                             | `server.address`                    | Server domain name if available without reverse DNS lookup
-`net.peer.port`                             | `server.port`                       | Server port number
-`net.transport`                             | `network.transport`                 | Transport protocol used
-
-Metrics Exported:
+**Metrics:**
 
 - [`http.server.request.duration`](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-metrics.md#metric-httpserverrequestduration)
 - [`http.client.request.duration`](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-metrics.md#metric-httpclientrequestduration)
 
-### Upgrading Semantic Conventions
-
-When upgrading to the new semantic conventions, it is recommended to do so in the following order:
-
-1. Upgrade `@opentelemetry/instrumentation-http` to the latest version
-2. Set `OTEL_SEMCONV_STABILITY_OPT_IN=http/dup` to emit both old and new semantic conventions
-3. Modify alerts, dashboards, metrics, and other processes to expect the new semantic conventions
-4. Set `OTEL_SEMCONV_STABILITY_OPT_IN=http` to emit only the new semantic conventions
-
-This will cause both the old and new semantic conventions to be emitted during the transition period.
+Versions of `@opentelemetry/instrumentation-http` to 0.221.0 used semantic conventions [v1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md) by default. Versions 0.54.0 - 0.220.0 supported [the `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable for migrating from old to stable semantic conventions](https://opentelemetry.io/docs/specs/semconv/non-normative/http-migration/).
 
 ## Useful links
 
