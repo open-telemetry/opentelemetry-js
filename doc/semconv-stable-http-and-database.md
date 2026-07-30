@@ -2,24 +2,31 @@
 
 # Migrating to stable HTTP and database semantic conventions
 
+> [!IMPORTANT]
+> As of 2026-07 this migration process is complete. All `@opentelemetry/instrumentation-*` packages using HTTP and/or database semantic conventions (semconv) emit the stable semconv by default and *no longer* support the `OTEL_SEMCONV_STABILITY_OPT_IN` mechanism for migrating.
+
 This document describes how users of **OTel JS** instrumentations can migrate to stable **HTTP** and **database**-related semantic conventions (semconv).
 
 For example, consider an HTTP client making a `GET /users/42` request that receives an HTTP 200 response status. HTTP instrumentation will generate a [Span](https://opentelemetry.io/docs/concepts/signals/traces/#spans) representing that request/response. Should the HTTP request method be captured with an attribute named `http.method` or `http.request.method`? The response status with `http.status_code` or `http.response.status_code`? This is what semantic conventions define. Which attribute names are used might matter when they are ingested into your Observability system: queries, dashboards, alerts, etc. might be relying on specific attribute names.
 
 To allow users to **migrate** from old names to the stabilized names over a period of time, OpenTelemetry defined a recommended migration process based on setting the `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable to indicate whether old, stable, or both sets of field names should be used. See [the HTTP migration guide](https://opentelemetry.io/docs/specs/semconv/non-normative/http-migration/) and the [database migration guide](https://opentelemetry.io/docs/specs/semconv/non-normative/db-migration/).
 
-For **OTel JS users**, as of 2025-01, all `@opentelemetry/*` instrumentations support stable semconv and `OTEL_SEMCONV_STABILITY_OPT_IN`. By default for backwards compatibility, instrumentations emit the *old* semconv.
+For **OTel JS users**, from 2025-01 to 2026-07, all `@opentelemetry/*` instrumentations supported stable semconv and `OTEL_SEMCONV_STABILITY_OPT_IN`. As of 2026-07 all instrumentations emit stable HTTP and DB semconv, and `OTEL_SEMCONV_STABILITY_OPT_IN` is no longer supported.
 
-## What's the easiest thing I can do?
+## I have migrated, what do I need to do?
 
-1. Set the `OTEL_SEMCONV_STABILITY_OPT_IN=http/dup,database/dup` environment variable when you configure an OTel JS SDK. This tells instrumentations to *emit* both old and stable semconv attributes.
-2. Migrate queries/dashboards/alerts in your Observability system to **use the stable `http.*` and `net.*` semconv** as described in [the HTTP migration guide](https://opentelemetry.io/docs/specs/semconv/non-normative/http-migration/) and **the stable `db.*` semconv`** as described in [the DB migration guide](https://opentelemetry.io/docs/specs/semconv/non-normative/db-migration/).
+Once you have updated to `@opentelemetry/*` packages published after 2026-07-23, you can stop using "http" and "db" values in the `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable when you configure an OTel JS SDK.
 
-Future:
+## I have NOT migrated, what do I need to do?
 
-3. Sometime after a OTel JS SDK 3.0 release (anticipated to be in or after June 2026), you can drop usage of the "http" and "db"-related values in the `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable. In JS SDK 3.0, instrumentations will only support the stable HTTP and database semantic conventions.
+If you have not migrated from the old HTTP and DB semantic conventions, you will need to:
 
-## Browser instrumentations
+1. Pin your `@opentelemetry/*` dependencies to versions published before 2026-07-21.
+2. Set the `OTEL_SEMCONV_STABILITY_OPT_IN=http/dup,database/dup` environment variable when you configure an OTel JS SDK. This tells instrumentations to *emit* both old and stable semconv attributes.
+3. Migrate queries/dashboards/alerts in your Observability system to **use the stable `http.*` and `net.*` semconv** as described in [the HTTP migration guide](https://opentelemetry.io/docs/specs/semconv/non-normative/http-migration/) and **the stable `db.*` semconv`** as described in [the DB migration guide](https://opentelemetry.io/docs/specs/semconv/non-normative/db-migration/).
+4. Upgrade your `@opentelemetry/*` dependencies to versions published after 2026-07-03. Then you can drop usage of `OTEL_SEMCONV_STABILITY_OPT_IN`.
+
+### Browser instrumentations
 
 Some HTTP-related instrumentations are for use in the browser:
 [`@opentelemetry/instrumentation-fetch`](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-fetch/#semantic-conventions),
@@ -34,7 +41,7 @@ Some HTTP-related instrumentations are for use in the browser:
 - 2025-12-19: [OTel JS instrumentations producing **`net.*` semconv** are being updated](https://github.com/open-telemetry/opentelemetry-js/issues/5663) to support stable semconv and `OTEL_SEMCONV_STABILITY_OPT_IN`
 - 2025-12-19: [OTel JS instrumentations producing **`db.*` semconv** are being updated](https://github.com/open-telemetry/opentelemetry-js-contrib/issues/2953) to support stable semconv and `OTEL_SEMCONV_STABILITY_OPT_IN`
 - 2026-01-15: A release of packages from the opentelemetry-js-contrib.git repo include the final set of instrumentations supporting `OTEL_SEMCONV_STABILITY_OPT_IN` for the stable `db.*` and `net.*` semconv.
-- Projected 2026-06: As part of OTel JS SDK 3.0, instrumentations will emit *stable* HTTP and database semantic conventions by default, and drop support for old names.
+- 2026-06-23: The [opentelemetry-js](https://github.com/open-telemetry/opentelemetry-js/pull/6942) and [opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib/pull/3596#issuecomment-5051036858) releases changed relevant instrumentations to use stable HTTP and DB semconv by default and dropped supprot for `OTEL_SEMCONV_STABILITY_OPT_IN`.
 
 ## Q&A
 
