@@ -515,7 +515,7 @@ describe('JaegerRemoteSampler', () => {
       );
     });
 
-    it('Should keep inital sampler if endpoint fails.', async () => {
+    it('Should keep initial sampler if endpoint fails.', async () => {
       const jaegerRemoteSampler = new JaegerRemoteSampler({
         endpoint,
         serviceName: 'failingService',
