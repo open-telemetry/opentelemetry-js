@@ -20,6 +20,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+*refactor(sampler-jaeger-remote): remove `axios` dependency and use `fetch` to get the sampler configuration from Jaeger API [#6963](https://github.com/open-telemetry/opentelemetry-js/pull/6963) @david-luna
+
 ## 0.221.0
 
 ### :boom: Breaking Changes

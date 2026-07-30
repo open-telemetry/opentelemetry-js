@@ -123,6 +123,13 @@ export class JaegerRemoteSampler implements Sampler {
     // As described in https://www.jaegertracing.io/docs/2.20/architecture/apis/#remote-sampling-apis
     // the response is a protobuf mapped to JSON so `response.json()` will get the data parsed.
     const samplingUrl = `${this._endpoint}/sampling?service=${serviceName ?? ''}`;
-    return fetch(samplingUrl).then(r => r.json()) as Promise<SamplingStrategyResponse>;
+    return fetch(samplingUrl)
+      .then(r => {
+        if (r.status < 200 || r.status >= 400) {
+          throw new Error(`Fetch sampling error(${r.status}): ${r.statusText}`);
+        }
+        return r;
+      })
+      .then(r => r.json()) as Promise<SamplingStrategyResponse>;
   }
 }
