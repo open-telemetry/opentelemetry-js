@@ -19,7 +19,6 @@ import type { SamplingStrategyResponse } from '../src/types';
 import { StrategyType } from '../src/types';
 import { PerOperationSampler } from '../src/PerOperationSampler';
 import { randomSamplingProability } from './utils';
-import * as axios from 'axios';
 
 describe('JaegerRemoteSampler', () => {
   const endpoint = 'http://localhost:5778';
@@ -478,7 +477,7 @@ describe('JaegerRemoteSampler', () => {
     let axiosGetStub: sinon.SinonStub;
 
     beforeEach(() => {
-      axiosGetStub = sinon.stub(axios, 'get');
+      axiosGetStub = sinon.stub(globalThis, 'fetch');
     });
 
     afterEach(() => {
