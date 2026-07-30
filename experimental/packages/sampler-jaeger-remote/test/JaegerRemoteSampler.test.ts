@@ -474,14 +474,14 @@ describe('JaegerRemoteSampler', () => {
   });
 
   describe('getSamplerConfig', () => {
-    let axiosGetStub: sinon.SinonStub;
+    let fetchStub: sinon.SinonStub;
 
     beforeEach(() => {
-      axiosGetStub = sinon.stub(globalThis, 'fetch');
+      fetchStub = sinon.stub(globalThis, 'fetch');
     });
 
     afterEach(() => {
-      axiosGetStub.restore();
+      fetchStub.restore();
     });
 
     it('Should pass endpoint and service name.', async () => {
@@ -493,7 +493,7 @@ describe('JaegerRemoteSampler', () => {
       });
       await clock.tickAsync(poolingInterval);
       sinon.assert.calledOnceWithExactly(
-        axiosGetStub,
+        fetchStub,
         `${endpoint}/sampling?service=${serviceName}`
       );
     });
@@ -507,7 +507,7 @@ describe('JaegerRemoteSampler', () => {
       });
       await clock.tickAsync(poolingInterval);
       sinon.assert.calledOnceWithExactly(
-        axiosGetStub,
+        fetchStub,
         `${endpoint}/sampling?service=`
       );
     });
