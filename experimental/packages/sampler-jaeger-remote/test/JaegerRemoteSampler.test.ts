@@ -477,7 +477,24 @@ describe('JaegerRemoteSampler', () => {
     let fetchStub: sinon.SinonStub;
 
     beforeEach(() => {
-      fetchStub = sinon.stub(globalThis, 'fetch');
+      fetchStub = sinon.stub(globalThis, 'fetch').callsFake((input) => {
+        const url = new URL(input);
+        let response;
+
+        if (url.searchParams.get('service') === 'failingService') {
+          response = new Response('', { status: 500 });
+        } else {
+          const payload = {
+            strategyType: 'PROBABILISTIC',
+            probabilisticSampling: { samplingRate: 1 },
+          };
+          response = new Response(JSON.stringify(payload), {
+            status: 200,
+            headers: { 'content-type': 'application/json' },
+          });
+        }
+        return Promise.resolve(response);
+      });
     });
 
     afterEach(() => {
@@ -499,30 +516,20 @@ describe('JaegerRemoteSampler', () => {
     });
 
     it('Should keep inital sampler if endpoint fails.', async () => {
-      fetchStub.returns(new Response(
-        '',
-        {
-          status: 500,
-          statusText: 'Internal Server Error'
-        }
-      ));
       const jaegerRemoteSampler = new JaegerRemoteSampler({
         endpoint,
-        serviceName,
+        serviceName: 'failingService',
         poolingInterval,
         initialSampler: alwaysOnSampler,
       });
       await clock.tickAsync(poolingInterval);
       sinon.assert.calledOnceWithExactly(
         fetchStub,
-        `${endpoint}/sampling?service=${serviceName}`
+        `${endpoint}/sampling?service=failingService`
       );
       // @ts-expect-error -- accessing internal property
       const jaegerCurrentSampler = jaegerRemoteSampler._sampler;
-      assert.equal(
-        jaegerCurrentSampler,
-        alwaysOnSampler,
-      );
+      assert.equal(jaegerCurrentSampler, alwaysOnSampler);
     });
 
     it('Should pass endpoint and blank service name if nothing is provided.', async () => {
