@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Context, Token } from '@opentelemetry/api';
+import type { Context } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
+import type { DisposableToken } from './types';
 import { AsyncLocalStorage } from 'async_hooks';
 import { AbstractAsyncHooksContextManager } from './AbstractAsyncHooksContextManager';
 
@@ -15,7 +16,7 @@ import { AbstractAsyncHooksContextManager } from './AbstractAsyncHooksContextMan
  * @internal not intended for direct public consumption. Will be removed once
  * withScope is available on all supported Node.js versions
  */
-class DisposeOnceToken implements Token {
+class DisposeOnceToken implements DisposableToken {
   private _isDisposed = false;
   private readonly _previousContext: Context;
   private readonly _asyncLocalStorage: AsyncLocalStorage<Context>;
@@ -74,7 +75,7 @@ export class AsyncLocalStorageContextManager extends AbstractAsyncHooksContextMa
 
   /**
    * Imperatively sets `context` as active for the current async execution chain
-   * and operations spawned from it. Returns a {@link Token} whose `dispose()`
+   * and operations spawned from it. Returns a {@link DisposableToken} whose `dispose()`
    * restores the previous context (see {@link ContextManager.attach}).
    *
    * On Node.js 25.9+, delegates to `AsyncLocalStorage.withScope()` which returns
@@ -83,11 +84,11 @@ export class AsyncLocalStorageContextManager extends AbstractAsyncHooksContextMa
    *
    * @experimental This API is experimental and may change in minor releases without prior notice.
    */
-  attach(context: Context): Token {
+  attach(context: Context): DisposableToken {
     // Node.js 25.9+: withScope() returns a RunScope with dispose() + [Symbol.dispose]()
     const withScope = (
       this._asyncLocalStorage as AsyncLocalStorage<Context> & {
-        withScope?: (value: Context) => Token;
+        withScope?: (value: Context) => DisposableToken;
       }
     ).withScope;
     if (withScope) {

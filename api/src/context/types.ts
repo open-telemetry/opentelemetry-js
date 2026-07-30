@@ -35,12 +35,12 @@ export interface Context {
 /**
  * A scope token returned by {@link ContextManager.attach} that restores the previous
  * {@link Context} when disposed. Call `token.dispose()` directly or use the
- * `using` keyword (TypeScript 5.2+).
+ * `using` keyword (Node.js 24+ or TypeScript 5.2+).
  *
  * @since 1.10.0
  * @experimental This API is experimental and may change in minor releases without prior notice.
  */
-export interface Token {
+export interface DisposableToken {
   dispose(): void;
   [Symbol.dispose](): void;
 }
@@ -86,8 +86,8 @@ export interface ContextManager {
   disable(): this;
 
   /**
-   * Imperatively sets `context` as active, returning a {@link Token} whose
-   * {@link Token.dispose} method restores the previous context.
+   * Imperatively sets `context` as active, returning a {@link DisposableToken} whose
+   * {@link DisposableToken.dispose} method restores the previous context.
    *
    * This is a delicate, low-level API - prefer {@link with}/{@link bind}, which
    * restore context automatically. `attach` exists only to bridge callback
@@ -97,9 +97,9 @@ export interface ContextManager {
    * {@link ContextAPI.attach} logs a warning and returns a no-op token.
    *
    * @param context The Context to attach
-   * @returns A Token whose dispose() restores the previous Context
+   * @returns A {@link DisposableToken} whose dispose() restores the previous Context
    * @since 1.10.0
    * @experimental This API is experimental and may change in minor releases without prior notice.
    */
-  attach?(context: Context): Token;
+  attach?(context: Context): DisposableToken;
 }
