@@ -47,6 +47,12 @@ export class TraceState implements TraceStateApi {
     if (typeof currValue === 'string') {
       newLength += value.length - currValue.length;
     } else {
+      // A list can hold at most 32 list-members, so a new key is only
+      // accepted while there is room for it. Updating an existing key does
+      // not change the count and is always allowed.
+      if (currState.size >= MAX_TRACE_STATE_ITEMS) {
+        return this;
+      }
       newLength += key.length + value.length + (currState.size > 0 ? 2 : 1);
     }
     if (newLength > MAX_TRACE_STATE_LEN) {
