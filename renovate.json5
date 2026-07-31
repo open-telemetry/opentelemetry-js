@@ -41,12 +41,13 @@
     },
     {
       "matchPackageNames": ["typescript", "lerna"],
-      "matchUpdateTypes": ["major"],
+      "matchUpdateTypes": ["major", "minor"],
       "dependencyDashboardApproval": true
     },
     {
       "matchPackageNames": ["typescript", "lerna"],
-      "separateMultipleMajor": true
+      "separateMultipleMajor": true,
+      "separateMultipleMinor": true
     }
   ],
   "lockFileMaintenance": {
