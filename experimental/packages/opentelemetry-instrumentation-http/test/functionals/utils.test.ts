@@ -11,7 +11,7 @@ import {
   ATTR_USER_AGENT_ORIGINAL,
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
-import type { IncomingMessage, ServerResponse } from 'http';
+import type { IncomingMessage, RequestOptions, ServerResponse } from 'http';
 import type { Socket } from 'net';
 import * as sinon from 'sinon';
 import * as url from 'url';
@@ -106,6 +106,94 @@ describe('Utility', () => {
         assert.strictEqual(result.pathname, '/aPath');
         assert.strictEqual(result.origin, 'http://google.fr');
       }
+    });
+
+    it('should not throw when method is not a string', () => {
+      // Node.js rejects a non-string method itself; the instrumentation must
+      // not throw before Node.js gets the chance to raise its own error.
+      const result = utils.getRequestInfo(diag, {
+        hostname: 'www.google.com',
+        method: 1234,
+      } as unknown as RequestOptions);
+      assert.strictEqual(result.method, 'GET');
+    });
+
+    it('should treat URL-like objects the same as URL instances, like Node.js does', () => {
+      // Node.js detects URL objects by shape (`href` and `origin`), not by
+      // `instanceof`, so URL objects from other realms (e.g. `vm` contexts)
+      // or WHATWG URL polyfills must take the URL code path as well. Their
+      // properties commonly live on the prototype as getters, which the
+      // options-object code path cannot see (`Object.assign` only copies own
+      // enumerable properties) - taking the wrong path would misdirect the
+      // request.
+      const realUrl = new URL('http://u:p@google.fr:8181/aPath?qu=ry');
+      const urlLike = Object.create({
+        get href() {
+          return realUrl.href;
+        },
+        get origin() {
+          return realUrl.origin;
+        },
+        get protocol() {
+          return realUrl.protocol;
+        },
+        get username() {
+          return realUrl.username;
+        },
+        get password() {
+          return realUrl.password;
+        },
+        get host() {
+          return realUrl.host;
+        },
+        get hostname() {
+          return realUrl.hostname;
+        },
+        get port() {
+          return realUrl.port;
+        },
+        get pathname() {
+          return realUrl.pathname;
+        },
+        get search() {
+          return realUrl.search;
+        },
+        get hash() {
+          return realUrl.hash;
+        },
+      });
+      assert.strictEqual(urlLike instanceof url.URL, false);
+
+      const result = utils.getRequestInfo(diag, urlLike);
+      assert.strictEqual(result.optionsParsed.hostname, 'google.fr');
+      assert.strictEqual(result.optionsParsed.protocol, 'http:');
+      assert.strictEqual(result.optionsParsed.port, 8181);
+      assert.strictEqual(result.optionsParsed.path, '/aPath?qu=ry');
+      assert.strictEqual(result.pathname, '/aPath');
+      assert.strictEqual(result.origin, 'http://google.fr:8181');
+    });
+  });
+
+  describe('isURLLike()', () => {
+    it('should match URL instances and URL-shaped objects', () => {
+      assert.strictEqual(utils.isURLLike(new URL('http://google.fr')), true);
+      assert.strictEqual(
+        utils.isURLLike({
+          href: 'http://google.fr/',
+          origin: 'http://google.fr',
+        }),
+        true
+      );
+    });
+
+    it('should not match strings, non-URL objects and legacy parsed URLs', () => {
+      assert.strictEqual(utils.isURLLike('http://google.fr'), false);
+      assert.strictEqual(utils.isURLLike(null), false);
+      assert.strictEqual(utils.isURLLike(undefined), false);
+      assert.strictEqual(utils.isURLLike({ hostname: 'google.fr' }), false);
+      // legacy url.parse() results have `href` but no `origin` and must keep
+      // taking the options-object code path
+      assert.strictEqual(utils.isURLLike(url.parse('http://google.fr')), false);
     });
   });
 
@@ -247,6 +335,69 @@ describe('Utility', () => {
         result,
         'http://localhosthttp://?AWSAccessKeyId=secret123'
       );
+    });
+    it('should ignore a non-string host and use hostname instead', () => {
+      // Node.js accepts these options: when `hostname` is a valid string it
+      // never looks at `host`. See
+      // https://github.com/open-telemetry/opentelemetry-js/issues/6967
+      const result = utils.getAbsoluteUrl(
+        {
+          host: new URL('http://stale.example.com'),
+          hostname: 'www.google.com',
+          path: '/test/1',
+        } as unknown as ParsedRequestOptions,
+        {}
+      );
+      assert.strictEqual(result, 'http://www.google.com/test/1');
+    });
+    it('should use the host header when neither host nor hostname is a string', () => {
+      // Note: Node.js rejects a non-string `hostname` outright, so these exact
+      // options do not produce a request. This pins the fallback order used
+      // when deriving a best-effort URL, it does not claim Node.js accepts
+      // them.
+      const result = utils.getAbsoluteUrl(
+        {
+          host: 1234,
+          hostname: new URL('http://stale.example.com'),
+          path: '/test/1',
+        } as unknown as ParsedRequestOptions,
+        { host: 'www.google.com:8181' }
+      );
+      assert.strictEqual(result, 'http://www.google.com:8181/test/1');
+    });
+    it('should not throw on options that Node.js itself rejects', () => {
+      // These options never reach the network: Node.js resolves the target as
+      // `validateHost(hostname) || validateHost(host) || 'localhost'`, and
+      // `validateHost` throws ERR_INVALID_ARG_TYPE for any non-string, non-null
+      // value. With no usable `hostname`, the non-string `host` is validated and
+      // rejected - a valid `host` header does not rescue it either.
+      //
+      // So there is no destination to report here, and the URL below is only
+      // ever attached to an error span for a request that never left the
+      // process. What matters is that the instrumentation does not throw first,
+      // so the caller sees Node.js's own error rather than a TypeError from us.
+      // The `localhost` value is this function's long-standing last resort (see
+      // the 'should return default url' case above), not a claim about where
+      // the request went.
+      const result = utils.getAbsoluteUrl(
+        {
+          host: new URL('http://stale.example.com'),
+          hostname: undefined,
+          path: '/test/1',
+        } as unknown as ParsedRequestOptions,
+        { host: 1234 as unknown as string }
+      );
+      assert.strictEqual(result, 'http://localhost/test/1');
+    });
+    it('should not throw when path is not a string', () => {
+      const result = utils.getAbsoluteUrl(
+        {
+          host: 'www.google.com',
+          path: 1234,
+        } as unknown as ParsedRequestOptions,
+        {}
+      );
+      assert.strictEqual(result, 'http://www.google.com1234');
     });
   });
 
@@ -527,6 +678,63 @@ describe('Utility', () => {
       const { hostname, port } = extractHostnameAndPort(parsedOption);
       assert.strictEqual(hostname, 'www.google.com');
       assert.strictEqual(port, '80');
+    });
+
+    it('should ignore a non-string host and use hostname instead', () => {
+      // Node.js accepts these options: when `hostname` is a valid string it
+      // never looks at `host`. See
+      // https://github.com/open-telemetry/opentelemetry-js/issues/6967
+      const { hostname, port } = extractHostnameAndPort({
+        hostname: 'www.google.com',
+        port: null,
+        host: new URL('http://stale.example.com'),
+        protocol: 'http:',
+      } as unknown as ParsedRequestOptions);
+      assert.strictEqual(hostname, 'www.google.com');
+      assert.strictEqual(port, '80');
+    });
+
+    it('should derive host and port from the host field when hostname is not a string', () => {
+      // Note: Node.js rejects a non-string `hostname` outright, so these exact
+      // options do not produce a request. This pins the fallback order used
+      // when deriving best-effort attributes, it does not claim Node.js accepts
+      // them.
+      const { hostname, port } = extractHostnameAndPort({
+        hostname: new URL('http://stale.example.com'),
+        port: null,
+        host: 'www.google.com:8181',
+        protocol: 'http:',
+      } as unknown as ParsedRequestOptions);
+      assert.strictEqual(hostname, 'www.google.com');
+      assert.strictEqual(port, '8181');
+    });
+
+    it('should not throw on options that Node.js itself rejects', () => {
+      // As above: a non-string `hostname` is rejected by Node.js outright
+      // (it is the first value passed to `validateHost`), so this request
+      // never reaches the network. The values below are the pre-existing
+      // defaults used when no host information is available; they describe an
+      // error span rather than a destination. The point of the test is that we
+      // do not throw before Node.js gets to raise its own error.
+      const { hostname, port } = extractHostnameAndPort({
+        hostname: new URL('http://stale.example.com'),
+        port: null,
+        host: 1234,
+        protocol: 'https:',
+      } as unknown as ParsedRequestOptions);
+      assert.strictEqual(hostname, 'localhost');
+      assert.strictEqual(port, '443');
+    });
+
+    it('should ignore a port that is neither a string nor a number', () => {
+      const { hostname, port } = extractHostnameAndPort({
+        hostname: 'www.google.com',
+        port: { value: 8181 },
+        host: null,
+        protocol: 'https:',
+      } as unknown as ParsedRequestOptions);
+      assert.strictEqual(hostname, 'www.google.com');
+      assert.strictEqual(port, '443');
     });
   });
 

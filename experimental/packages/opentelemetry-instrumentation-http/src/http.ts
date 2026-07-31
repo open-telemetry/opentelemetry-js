@@ -33,7 +33,7 @@ import {
 import type * as http from 'http';
 import type * as https from 'https';
 import type { Socket } from 'net';
-import * as url from 'url';
+import type * as url from 'url';
 import type { HttpInstrumentationConfig } from './types';
 import { VERSION } from './version';
 import {
@@ -63,6 +63,7 @@ import {
   getOutgoingRequestAttributesOnResponse,
   getOutgoingStableRequestMetricAttributesOnResponse,
   getRequestInfo,
+  isURLLike,
   headerCapture,
   isValidOptionsType,
   parseResponseStatus,
@@ -657,14 +658,35 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       }
       const extraOptions =
         typeof args[0] === 'object' &&
-        (typeof options === 'string' || options instanceof url.URL)
+        (typeof options === 'string' || isURLLike(options))
           ? (args.shift() as http.RequestOptions)
           : undefined;
-      const { method, invalidUrl, optionsParsed } = getRequestInfo(
-        instrumentation._diag,
-        options,
-        extraOptions
+      const requestInfo = safeExecuteInTheMiddle<
+        ReturnType<typeof getRequestInfo> | undefined
+      >(
+        () => getRequestInfo(instrumentation._diag, options, extraOptions),
+        (e: unknown) => {
+          if (e != null) {
+            instrumentation._diag.error(
+              'caught error while parsing request options: ',
+              e
+            );
+          }
+        },
+        true
       );
+      if (requestInfo === undefined) {
+        // Parsing the request options failed unexpectedly. Pass the original
+        // arguments through untouched so the application behaves exactly as
+        // it would without instrumentation (this request is not traced).
+        return original.apply(
+          this,
+          extraOptions !== undefined
+            ? [options, extraOptions, ...args]
+            : [options, ...args]
+        );
+      }
+      const { method, invalidUrl, optionsParsed } = requestInfo;
 
       if (
         safeExecuteInTheMiddle(
@@ -686,21 +708,40 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         return original.apply(this, [optionsParsed, ...args]);
       }
 
-      const { hostname, port } = extractHostnameAndPort(optionsParsed);
-      const attributes = getOutgoingRequestAttributes(
-        optionsParsed,
-        {
-          component,
-          port,
-          hostname,
-          hookAttributes: instrumentation._callStartSpanHook(
-            optionsParsed,
-            instrumentation.getConfig().startOutgoingSpanHook
-          ),
-          redactedQueryParams: instrumentation.getConfig().redactedQueryParams, // Added config for adding custom query strings
-        },
-        instrumentation.getConfig().enableSyntheticSourceDetection || false
-      );
+      // Computing the attributes must never throw: a defect there would
+      // otherwise crash the application's request. If it fails, trace the
+      // request with whatever attributes could not be computed left unset.
+      const attributes =
+        safeExecuteInTheMiddle<Attributes | undefined>(
+          () => {
+            const { hostname, port } = extractHostnameAndPort(optionsParsed);
+            return getOutgoingRequestAttributes(
+              optionsParsed,
+              {
+                component,
+                port,
+                hostname,
+                hookAttributes: instrumentation._callStartSpanHook(
+                  optionsParsed,
+                  instrumentation.getConfig().startOutgoingSpanHook
+                ),
+                redactedQueryParams:
+                  instrumentation.getConfig().redactedQueryParams, // Added config for adding custom query strings
+              },
+              instrumentation.getConfig().enableSyntheticSourceDetection ||
+                false
+            );
+          },
+          (e: unknown) => {
+            if (e != null) {
+              instrumentation._diag.error(
+                'caught error while computing outgoing request attributes: ',
+                e
+              );
+            }
+          },
+          true
+        ) ?? {};
 
       const startTime = hrTime();
 
