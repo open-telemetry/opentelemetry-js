@@ -20,7 +20,6 @@ const API_NAME = 'context';
 const NOOP_CONTEXT_MANAGER = new NoopContextManager();
 const NOOP_TOKEN: DisposableToken = Object.freeze({
   dispose: () => {},
-  [Symbol.dispose]: () => {},
 });
 
 /**
@@ -100,6 +99,10 @@ export class ContextAPI {
    * restore context automatically. Use `attach` only to bridge callback
    * boundaries that `with` cannot wrap. Call `token.dispose()` when the
    * operation is done.
+   *
+   * **Caveat for async functions:** If called inside an async function before
+   * the first `await`, the context change may leak into the caller's context
+   * and remain active there. Prefer {@link with} for async code.
    *
    * Support is best-effort and varies by the active ContextManager (see
    * {@link ContextManager.attach}); if it does not implement `attach`, this logs

@@ -13,5 +13,4 @@
  */
 export interface DisposableToken {
   dispose(): void;
-  [Symbol.dispose](): void;
 }

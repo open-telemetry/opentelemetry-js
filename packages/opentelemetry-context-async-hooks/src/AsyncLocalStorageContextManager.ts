@@ -37,9 +37,6 @@ class DisposeOnceToken implements DisposableToken {
     this._asyncLocalStorage.enterWith(this._previousContext);
     this._isDisposed = true;
   }
-  [Symbol.dispose]() {
-    this.dispose();
-  }
 }
 
 export class AsyncLocalStorageContextManager extends AbstractAsyncHooksContextManager {
@@ -79,13 +76,19 @@ export class AsyncLocalStorageContextManager extends AbstractAsyncHooksContextMa
    * restores the previous context (see {@link ContextManager.attach}).
    *
    * On Node.js 25.9+, delegates to `AsyncLocalStorage.withScope()` which returns
-   * a native `RunScope` implementing both `dispose()` and `[Symbol.dispose]()`.
-   * On older Node.js versions, falls back to `enterWith()` with a manual token.
+   * a native `RunScope`. On older Node.js versions, falls back to `enterWith()` with
+   * a manual token.
+   *
+   * **Caveat for async functions:** Both `withScope()` and `enterWith()` affect the
+   * entire current async execution chain. If `attach()` is called inside an async
+   * function before the first `await`, the context change will leak into the caller's
+   * context and remain active there until something else restores it. Prefer `with()`
+   * for async code.
    *
    * @experimental This API is experimental and may change in minor releases without prior notice.
    */
   attach(context: Context): DisposableToken {
-    // Node.js 25.9+: withScope() returns a RunScope with dispose() + [Symbol.dispose]()
+    // Node.js 25.9+: withScope() returns a RunScope with dispose()
     const withScope = (
       this._asyncLocalStorage as AsyncLocalStorage<Context> & {
         withScope?: (value: Context) => DisposableToken;

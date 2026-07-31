@@ -34,6 +34,6 @@ export class NoopContextManager implements types.ContextManager {
 
   /** @experimental This API is experimental and may change in minor releases without prior notice. */
   attach(_context: types.Context): types.DisposableToken {
-    return { dispose() {}, [Symbol.dispose]() {} };
+    return { dispose() {} };
   }
 }
