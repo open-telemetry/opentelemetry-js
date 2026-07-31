@@ -123,14 +123,20 @@ describe('PrometheusExporter', () => {
       sinon.assert.calledOnce(mockServer.unref);
     });
 
-    it('should listen on environmentally set host and port', () => {
+    it('should not read host and port from the environment', () => {
       process.env.OTEL_EXPORTER_PROMETHEUS_HOST = '127.0.0.1';
       process.env.OTEL_EXPORTER_PROMETHEUS_PORT = '1234';
-      const exporter = new PrometheusExporter({}, async () => {
-        await exporter.shutdown();
+      const exporter = new PrometheusExporter({
+        preventServerStart: true,
       });
-      assert.strictEqual(exporter['_host'], '127.0.0.1');
-      assert.strictEqual(exporter['_port'], 1234);
+      assert.strictEqual(
+        exporter['_host'],
+        PrometheusExporter.DEFAULT_OPTIONS.host
+      );
+      assert.strictEqual(
+        exporter['_port'],
+        PrometheusExporter.DEFAULT_OPTIONS.port
+      );
     });
 
     it('should not require endpoints to start with a slash', async () => {
