@@ -28,6 +28,49 @@ describe('InstrumentDescriptor', () => {
         assert.strictEqual(result.unit, '');
       });
     }
+
+    it('should use empty advice by default', () => {
+      const result = createInstrumentDescriptor(
+        'example',
+        InstrumentType.COUNTER
+      );
+
+      assert.deepStrictEqual(result.advice, {});
+    });
+
+    it('should preserve advisory attributes', () => {
+      const result = createInstrumentDescriptor(
+        'example',
+        InstrumentType.COUNTER,
+        {
+          advice: {
+            attributes: ['http.method', 'http.route'],
+          },
+        }
+      );
+
+      assert.deepStrictEqual(result.advice, {
+        attributes: ['http.method', 'http.route'],
+      });
+    });
+
+    it('should preserve advisory attributes with explicit bucket boundaries', () => {
+      const result = createInstrumentDescriptor(
+        'example',
+        InstrumentType.HISTOGRAM,
+        {
+          advice: {
+            attributes: ['http.method', 'http.route'],
+            explicitBucketBoundaries: [1, 5, 10],
+          },
+        }
+      );
+
+      assert.deepStrictEqual(result.advice, {
+        attributes: ['http.method', 'http.route'],
+        explicitBucketBoundaries: [1, 5, 10],
+      });
+    });
   });
 
   describe('isDescriptorCompatibleWith', () => {

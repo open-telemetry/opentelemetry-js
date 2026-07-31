@@ -18,6 +18,13 @@ export interface MetricAdvice {
    * aggregated with a HistogramAggregator.
    */
   explicitBucketBoundaries?: number[];
+
+  /**
+   * Hint the attribute keys recommended to be used for resulting metrics.
+   *
+   * @experimental
+   */
+  attributes?: string[];
 }
 
 /**
