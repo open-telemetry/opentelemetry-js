@@ -42,7 +42,8 @@ import {
 import * as msw from 'msw';
 import { setupWorker } from 'msw/browser';
 
-// This should match the unexported constant with the same name in fetch.ts
+// Settle delay kept for tests written against the previous implementation,
+// which deferred span end by this amount; span end is now synchronous.
 const OBSERVER_WAIT_TIME_MS = 300;
 
 class DummySpanExporter implements tracing.SpanExporter {
@@ -503,6 +504,62 @@ describe('fetch', () => {
             exportedSpans[0].attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
             304
           );
+        });
+      });
+
+      describe('span end timing', () => {
+        it('should end the span once the response body is consumed, without waiting for OBSERVER_WAIT_TIME_MS', async () => {
+          await startWorker(
+            msw.http.get('/api/status.json', () => {
+              return msw.HttpResponse.json({ ok: true });
+            })
+          );
+
+          const fetchInstrumentation = new FetchInstrumentation();
+          const dummySpanExporter = new DummySpanExporter();
+          const webTracerProvider = new WebTracerProvider({
+            spanProcessors: [
+              new tracing.SimpleSpanProcessor({ exporter: dummySpanExporter }),
+            ],
+          });
+          registerInstrumentations({
+            tracerProvider: webTracerProvider,
+            instrumentations: [fetchInstrumentation],
+          });
+
+          // Fake only the timers that _endSpan() uses to defer span.end(),
+          // so the deferred callback can never fire unless the clock is
+          // explicitly advanced. Date, performance and MessageChannel stay
+          // real so that msw and the SDK behave normally.
+          const clock = sinon.useFakeTimers({
+            toFake: ['setTimeout', 'clearTimeout'],
+          });
+          try {
+            const response = await fetch('/api/status.json');
+            await response.json();
+            // Let the instrumentation's eager body-draining loop (which reads
+            // a teed clone of the response) observe the end of the stream.
+            // A MessageChannel task is used because setTimeout is faked.
+            await new Promise<void>(resolve => {
+              const channel = new MessageChannel();
+              channel.port1.onmessage = () => resolve();
+              channel.port2.postMessage(null);
+            });
+
+            // Regression test for
+            // https://github.com/open-telemetry/opentelemetry-js/issues/4683
+            // The span must be finished as soon as the response body has
+            // been consumed; it must not depend on a OBSERVER_WAIT_TIME_MS
+            // timer that may never fire (e.g. when the app flushes and the
+            // page navigates away right after the fetch).
+            assert.strictEqual(
+              dummySpanExporter.exported.length,
+              1,
+              'span was not finished without advancing the clock past OBSERVER_WAIT_TIME_MS'
+            );
+          } finally {
+            clock.restore();
+          }
         });
       });
 
@@ -2040,18 +2097,13 @@ describe('fetch', () => {
         beforeEach(async () => {
           sinon.stub(window, 'PerformanceObserver').value(undefined);
 
-          // This seemingly random timeout is testing real behavior!
-          //
-          // Currently, the implementation works by waiting a hardcoded
-          // OBSERVER_WAIT_TIME_MS before trying to get the resource
-          // timing entries, and hoping that they are there by then.
-          //
-          // We will match that here plus an additional 50ms. If the
-          // tests still fail despite this timeout, then we may have
-          // found a bug that could occur in the real world, and it's
-          // probably time to revisit the naïve implementation.
-          //
-          // This should be updated as the implementation changes.
+          // The implementation used to defer span end by a hardcoded
+          // OBSERVER_WAIT_TIME_MS so that resource timing entries could
+          // be collected first; it now ends the span synchronously once
+          // the response body is consumed (via the getEntriesByType
+          // fallback when no PerformanceObserver is available). This wait
+          // is kept as a defensive settle so the assertions below run
+          // after any in-flight export.
           waitForPerformanceObservers = () =>
             waitFor(OBSERVER_WAIT_TIME_MS + 50);
         });
