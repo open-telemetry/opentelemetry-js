@@ -39,7 +39,7 @@ export interface Context {
  * @since 1.10.0
  * @experimental This API is experimental and may change in minor releases without prior notice.
  */
-export interface DisposableToken {
+export interface ContextManagementToken {
   dispose(): void;
 }
 
@@ -84,8 +84,8 @@ export interface ContextManager {
   disable(): this;
 
   /**
-   * Imperatively sets `context` as active, returning a {@link DisposableToken} whose
-   * {@link DisposableToken.dispose} method restores the previous context.
+   * Imperatively sets `context` as active, returning a {@link ContextManagementToken} whose
+   * {@link ContextManagementToken.dispose} method restores the previous context.
    *
    * This is a delicate, low-level API - prefer {@link with}/{@link bind}, which
    * restore context automatically. `attach` exists only to bridge callback
@@ -99,9 +99,9 @@ export interface ContextManager {
    * and remain active there. Prefer {@link with} for async code.
    *
    * @param context The Context to attach
-   * @returns A {@link DisposableToken} whose dispose() restores the previous Context
+   * @returns A {@link ContextManagementToken} whose dispose() restores the previous Context
    * @since 1.10.0
    * @experimental This API is experimental and may change in minor releases without prior notice.
    */
-  attach?(context: Context): DisposableToken;
+  attach?(context: Context): ContextManagementToken;
 }

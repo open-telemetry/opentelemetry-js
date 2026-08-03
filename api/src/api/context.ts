@@ -7,7 +7,7 @@ import { NoopContextManager } from '../context/NoopContextManager';
 import type {
   Context,
   ContextManager,
-  DisposableToken,
+  ContextManagementToken,
 } from '../context/types';
 import {
   getGlobal,
@@ -18,7 +18,7 @@ import { DiagAPI } from './diag';
 
 const API_NAME = 'context';
 const NOOP_CONTEXT_MANAGER = new NoopContextManager();
-const NOOP_TOKEN: DisposableToken = Object.freeze({
+const NOOP_TOKEN: ContextManagementToken = Object.freeze({
   dispose: () => {},
 });
 
@@ -92,8 +92,8 @@ export class ContextAPI {
   }
 
   /**
-   * Imperatively sets `context` as active, returning a {@link DisposableToken} whose
-   * {@link DisposableToken.dispose} restores the previous context.
+   * Imperatively sets `context` as active, returning a {@link ContextManagementToken} whose
+   * {@link ContextManagementToken.dispose} restores the previous context.
    *
    * This is a delicate, low-level API - prefer {@link with}/{@link bind}, which
    * restore context automatically. Use `attach` only to bridge callback
@@ -109,11 +109,11 @@ export class ContextAPI {
    * a warning and returns a no-op token.
    *
    * @param context The Context to attach
-   * @returns A {@link DisposableToken} whose dispose() restores the previous Context
+   * @returns A {@link ContextManagementToken} whose dispose() restores the previous Context
    * @since 1.10.0
    * @experimental This API is experimental and may change in minor releases without prior notice.
    */
-  public attach(context: Context): DisposableToken {
+  public attach(context: Context): ContextManagementToken {
     const contextManager = this._getContextManager();
     if (contextManager.attach) {
       return contextManager.attach(context);
