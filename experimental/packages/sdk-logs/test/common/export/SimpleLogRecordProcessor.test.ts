@@ -31,7 +31,6 @@ import { TestMetricReader } from '../utils';
 const setup = (exporter: LogRecordExporter, resource?: Resource) => {
   const sharedState = new LoggerProviderSharedState(
     resource || defaultResource(),
-    Infinity,
     {
       attributeCountLimit: 128,
       attributeValueLengthLimit: Infinity,
