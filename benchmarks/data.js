@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1785745770848,
+  "lastUpdate": 1785748677121,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -93541,6 +93541,170 @@ window.BENCHMARK_DATA = {
             "range": "±0.51%",
             "unit": "ops/sec",
             "extra": "90 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "35699841+LarryHu0217@users.noreply.github.com",
+            "name": "Liang Hu",
+            "username": "LarryHu0217"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f278e3b8427c406c271b8cba2c0f1a9c47c2f15e",
+          "message": "feat(sdk-trace): configure force flush timeout per call (#6929)",
+          "timestamp": "2026-08-03T09:07:09Z",
+          "tree_id": "aa983d8ba94b8f9c5fa7e4629312857e652ea4e2",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/f278e3b8427c406c271b8cba2c0f1a9c47c2f15e"
+        },
+        "date": 1785748675856,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "generateTraceId",
+            "value": 6172003,
+            "range": "±2.83%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "generateSpanId",
+            "value": 8148509,
+            "range": "±0.45%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 617129,
+            "range": "±0.86%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes w/ setAttributes)",
+            "value": 616622,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "addEvent (128 attributes)",
+            "value": 44633,
+            "range": "±0.93%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "addLink (128 attributes)",
+            "value": 45323,
+            "range": "±0.45%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 546656,
+            "range": "±0.70%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "parsePairKeyValue simple",
+            "value": 4422682,
+            "range": "±3.02%",
+            "unit": "ops/sec",
+            "extra": "89 samples"
+          },
+          {
+            "name": "parsePairKeyValue with metadata",
+            "value": 4375454,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "parsePairKeyValue URI encoded",
+            "value": 4362752,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "parsePairKeyValue complex",
+            "value": 3827512,
+            "range": "±0.88%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "Counter.add (fixed attributes)",
+            "value": 14284815,
+            "range": "±2.75%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "Counter.add (varied attributes, 100 combos)",
+            "value": 15738163,
+            "range": "±0.71%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "Counter.add (with view attribute processor)",
+            "value": 1747609,
+            "range": "±1.12%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "transform 512 spans (protobuf)",
+            "value": 378,
+            "range": "±3.04%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
+          },
+          {
+            "name": "transform 512 spans (json)",
+            "value": 699,
+            "range": "±0.96%",
+            "unit": "ops/sec",
+            "extra": "85 samples"
+          },
+          {
+            "name": "transform 512 logs (protobuf)",
+            "value": 431,
+            "range": "±0.86%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 512 logs (json)",
+            "value": 852,
+            "range": "±1.01%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "transform 512 metrics (protobuf)",
+            "value": 467,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "transform 512 metrics (json)",
+            "value": 449,
+            "range": "±1.20%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
           }
         ]
       }
