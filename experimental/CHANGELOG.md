@@ -16,6 +16,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(otlp-exporter-base): handle abort before fetch starts — check `abortController.signal.aborted` after resolving headers so that timed-out exports are not passed to `fetch()` [#6921](https://github.com/open-telemetry/opentelemetry-js/pull/6921) @Babul422
+
 ### :books: Documentation
 
 ### :house: Internal
