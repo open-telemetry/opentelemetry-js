@@ -75,10 +75,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "2.10.0",
-    "@opentelemetry/otlp-transformer": "0.221.0",
-    "http-proxy-agent": "^7.0.2",
-    "https-proxy-agent": "^7.0.6",
-    "proxy-from-env": "^2.1.0"
+    "@opentelemetry/otlp-transformer": "0.221.0"
   },
   "devDependencies": {
     "@babel/core": "7.29.7",
@@ -86,7 +83,6 @@
     "@opentelemetry/api": "1.9.1",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
-    "@types/proxy-from-env": "1.0.4",
     "@types/sinon": "17.0.4",
     "babel-plugin-istanbul": "8.0.0",
     "karma": "6.4.4",

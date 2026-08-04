@@ -16,7 +16,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
-* fix(otlp-exporter-base): honor standard proxy environment variables in Node.js HTTP exporters without overriding user-provided agent factories. [#6932](https://github.com/open-telemetry/opentelemetry-js/pull/6932) @LarryHu0217
+* fix(otlp-exporter-base): honor standard proxy environment variables in Node.js HTTP exporters while preserving explicit proxy configuration. [#6932](https://github.com/open-telemetry/opentelemetry-js/pull/6932) @LarryHu0217
 
 ### :books: Documentation
 

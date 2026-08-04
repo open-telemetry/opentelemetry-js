@@ -12,9 +12,12 @@ import {
 import type * as http from 'http';
 import type * as https from 'https';
 
+type AgentOptionsWithProxyEnv = (http.AgentOptions | https.AgentOptions) & {
+  proxyEnv?: NodeJS.ProcessEnv;
+};
+
 export type HttpAgentFactory = (
-  protocol: string,
-  url?: string
+  protocol: string
 ) => http.Agent | https.Agent | Promise<http.Agent> | Promise<https.Agent>;
 
 export interface OtlpNodeHttpConfiguration extends OtlpHttpConfiguration {
@@ -37,61 +40,52 @@ export interface OtlpNodeHttpConfiguration extends OtlpHttpConfiguration {
   userAgent?: string;
 }
 
-function hasProxyForProtocol(protocol: string): boolean {
-  if (protocol === 'http:') {
-    return Boolean(process.env.http_proxy || process.env.HTTP_PROXY);
+function getEnvProxyAgentOptions():
+  | { proxyEnv: NodeJS.ProcessEnv }
+  | undefined {
+  if (
+    !process.env.HTTP_PROXY &&
+    !process.env.http_proxy &&
+    !process.env.HTTPS_PROXY &&
+    !process.env.https_proxy
+  ) {
+    return undefined;
   }
-  if (protocol === 'https:') {
-    return Boolean(process.env.https_proxy || process.env.HTTPS_PROXY);
-  }
-  return false;
+
+  return {
+    proxyEnv: {
+      HTTP_PROXY: process.env.HTTP_PROXY,
+      HTTPS_PROXY: process.env.HTTPS_PROXY,
+      NO_PROXY: process.env.NO_PROXY,
+      http_proxy: process.env.http_proxy,
+      https_proxy: process.env.https_proxy,
+      no_proxy: process.env.no_proxy,
+    },
+  };
 }
 
 export function httpAgentFactoryFromOptions(
-  options: http.AgentOptions | https.AgentOptions
+  options: AgentOptionsWithProxyEnv
 ): HttpAgentFactory {
-  return async (protocol, url) => {
+  return async protocol => {
     const isInsecure = protocol === 'http:';
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- these props should not be used in HTTP agent options
-    const { ca, cert, key, ...insecureOptions } = options as https.AgentOptions;
-    const agentOptions = isInsecure ? insecureOptions : options;
-
-    if (url !== undefined && hasProxyForProtocol(protocol)) {
-      const { getProxyForUrl } = await import('proxy-from-env');
-      const proxyUrl = getProxyForUrl(url);
-
-      if (proxyUrl !== '') {
-        const proxy = new URL(proxyUrl);
-        const isInsecureProxy = proxy.protocol === 'http:';
-        if (!isInsecureProxy && proxy.protocol !== 'https:') {
-          throw new Error(`Unsupported proxy protocol: ${proxy.protocol}`);
-        }
-
-        if (isInsecure) {
-          const { HttpProxyAgent } = await import('http-proxy-agent');
-          const proxyAgent = isInsecureProxy
-            ? new HttpProxyAgent<'http:'>(proxy, agentOptions)
-            : new HttpProxyAgent<'https:'>(proxy, agentOptions);
-          Object.assign(proxyAgent.options, agentOptions);
-          return proxyAgent;
-        }
-
-        const { HttpsProxyAgent } = await import('https-proxy-agent');
-        const proxyAgent = isInsecureProxy
-          ? new HttpsProxyAgent<'http:'>(proxy, agentOptions)
-          : new HttpsProxyAgent<'https:'>(proxy, agentOptions);
-        Object.assign(proxyAgent.options, agentOptions);
-        return proxyAgent;
-      }
-    }
+    const module = isInsecure ? import('http') : import('https');
+    const { Agent } = await module;
+    const envProxyAgentOptions = getEnvProxyAgentOptions();
 
     if (isInsecure) {
-      const { Agent } = await import('http');
-      return new Agent(agentOptions);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- these props should not be used in agent options
+      const { ca, cert, key, ...insecureOptions } =
+        options as https.AgentOptions;
+      return new Agent({
+        ...envProxyAgentOptions,
+        ...insecureOptions,
+      } as http.AgentOptions);
     }
-
-    const { Agent } = await import('https');
-    return new Agent(agentOptions);
+    return new Agent({
+      ...envProxyAgentOptions,
+      ...options,
+    } as https.AgentOptions);
   };
 }
 
