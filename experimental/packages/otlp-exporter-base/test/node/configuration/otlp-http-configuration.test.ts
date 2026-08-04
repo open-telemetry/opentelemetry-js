@@ -22,14 +22,15 @@ const TEST_ENV_VARIABLES = [
   'ALL_PROXY',
 ] as const;
 
-type AgentOptionsWithProxyEnv = http.AgentOptions & {
-  proxyEnv?: NodeJS.ProcessEnv;
-};
+function getAgentOptions(agent: http.Agent | https.Agent): http.AgentOptions {
+  return (agent as unknown as { options: http.AgentOptions }).options;
+}
 
-function getAgentOptions(
+function getAgentProxyEnv(
   agent: http.Agent | https.Agent
-): AgentOptionsWithProxyEnv {
-  return (agent as unknown as { options: AgentOptionsWithProxyEnv }).options;
+): NodeJS.ProcessEnv | undefined {
+  return (agent as unknown as { options: { proxyEnv?: NodeJS.ProcessEnv } })
+    .options.proxyEnv;
 }
 
 describe('httpAgentFactoryFromOptions', function () {
@@ -64,8 +65,8 @@ describe('httpAgentFactoryFromOptions', function () {
     assert.ok(httpsAgent instanceof https.Agent);
     assert.strictEqual(getAgentOptions(httpAgent).keepAlive, true);
     assert.strictEqual(getAgentOptions(httpsAgent).keepAlive, true);
-    assert.strictEqual(getAgentOptions(httpAgent).proxyEnv, undefined);
-    assert.strictEqual(getAgentOptions(httpsAgent).proxyEnv, undefined);
+    assert.strictEqual(getAgentProxyEnv(httpAgent), undefined);
+    assert.strictEqual(getAgentProxyEnv(httpsAgent), undefined);
   });
 
   for (const proxyEnvVar of [
@@ -91,14 +92,8 @@ describe('httpAgentFactoryFromOptions', function () {
       const httpAgent = await factory('http:');
       const httpsAgent = await factory('https:');
 
-      assert.deepStrictEqual(
-        getAgentOptions(httpAgent).proxyEnv,
-        expectedProxyEnv
-      );
-      assert.deepStrictEqual(
-        getAgentOptions(httpsAgent).proxyEnv,
-        expectedProxyEnv
-      );
+      assert.deepStrictEqual(getAgentProxyEnv(httpAgent), expectedProxyEnv);
+      assert.deepStrictEqual(getAgentProxyEnv(httpsAgent), expectedProxyEnv);
     });
   }
 
@@ -107,16 +102,17 @@ describe('httpAgentFactoryFromOptions', function () {
     const proxyEnv = {
       HTTPS_PROXY: 'http://explicit.example:3128',
     };
-    const factory = httpAgentFactoryFromOptions({
+    const options = {
       keepAlive: true,
       proxyEnv,
-    });
+    };
+    const factory = httpAgentFactoryFromOptions(options);
 
     const httpAgent = await factory('http:');
     const httpsAgent = await factory('https:');
 
-    assert.strictEqual(getAgentOptions(httpAgent).proxyEnv, proxyEnv);
-    assert.strictEqual(getAgentOptions(httpsAgent).proxyEnv, proxyEnv);
+    assert.strictEqual(getAgentProxyEnv(httpAgent), proxyEnv);
+    assert.strictEqual(getAgentProxyEnv(httpsAgent), proxyEnv);
   });
 });
 

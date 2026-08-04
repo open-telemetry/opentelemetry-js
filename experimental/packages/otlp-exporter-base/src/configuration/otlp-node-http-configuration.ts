@@ -12,10 +12,6 @@ import {
 import type * as http from 'http';
 import type * as https from 'https';
 
-type AgentOptionsWithProxyEnv = (http.AgentOptions | https.AgentOptions) & {
-  proxyEnv?: NodeJS.ProcessEnv;
-};
-
 export type HttpAgentFactory = (
   protocol: string
 ) => http.Agent | https.Agent | Promise<http.Agent> | Promise<https.Agent>;
@@ -65,7 +61,7 @@ function getEnvProxyAgentOptions():
 }
 
 export function httpAgentFactoryFromOptions(
-  options: AgentOptionsWithProxyEnv
+  options: http.AgentOptions | https.AgentOptions
 ): HttpAgentFactory {
   return async protocol => {
     const isInsecure = protocol === 'http:';
