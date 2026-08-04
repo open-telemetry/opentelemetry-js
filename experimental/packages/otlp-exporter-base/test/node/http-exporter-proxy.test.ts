@@ -199,6 +199,30 @@ describe('HttpExporterTransport proxy environment support', function () {
     assert.strictEqual(proxyRequests, 0);
   });
 
+  it('does not apply proxy settings to unsupported target protocols', async function () {
+    process.env.HTTPS_PROXY = 'http://127.0.0.1:1';
+
+    const agent = await httpAgentFactoryFromOptions({ keepAlive: true })(
+      'ftp:',
+      'ftp://collector.invalid/v1/traces'
+    );
+
+    assert.ok(agent instanceof https.Agent);
+  });
+
+  it('rejects unsupported proxy protocols', async function () {
+    process.env.HTTP_PROXY = 'socks://127.0.0.1:1080';
+
+    await assert.rejects(
+      async () =>
+        await httpAgentFactoryFromOptions({})(
+          'http:',
+          'http://collector.invalid/v1/traces'
+        ),
+      new Error('Unsupported proxy protocol: socks:')
+    );
+  });
+
   it('tunnels HTTPS exports through HTTPS_PROXY', async function () {
     const certsDir = `${process.cwd()}/test/certs`;
     const target = https.createServer(
