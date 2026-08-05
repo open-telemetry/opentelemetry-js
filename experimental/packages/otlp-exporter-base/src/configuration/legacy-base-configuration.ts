@@ -10,11 +10,8 @@ export interface OTLPExporterConfigBase {
    *
    * @remarks
    * Prefer using a plain object over a factory function wherever possible.
-   * If using a factory function (`HeadersFactory`), **do not import `http` or `https` at the top of the file**.
-   * Instead, use dynamic `import()` or `require()` to load the module. This lets
-   * `@opentelemetry/instrumentation-http` instrument the module first.
-   *
-   * Functions passed to the exporter MUST NOT throw errors.
+   * A factory function may be async and MUST NOT throw errors.
+   * It should return a string map containing the headers to add to the request.
    *
    * @example <caption> Using headers options directly: </caption>
    * headers: {
@@ -23,7 +20,6 @@ export interface OTLPExporterConfigBase {
    *
    * @example <caption> Using a custom factory function </caption>
    * headers: async () => {
-   *   // ... do whatever you need to obtain the headers, ensuring you `await import('your-library')` to avoid breaking instrumentations ...
    *   return {
    *     Authorization: `Bearer ${token}`,
    *   };
