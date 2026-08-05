@@ -1013,7 +1013,7 @@ function createViewOptionsFromConfig(view: ViewConfigModel): ViewOptions {
         k => k.includes('*') || k.includes('?')
       );
       if (unsupportedKeys.length > 0) {
-        throw Error(
+        throw new Error(
           `invalid /meter_provider/views/?/stream/attribute_keys/included in configuration: do not support wildcards: "${unsupportedKeys.join('", "')}"`
         );
       }
@@ -1032,7 +1032,7 @@ function createViewOptionsFromConfig(view: ViewConfigModel): ViewOptions {
         k => k.includes('*') || k.includes('?')
       );
       if (unsupportedKeys.length > 0) {
-        throw Error(
+        throw new Error(
           `invalid /meter_provider/views/?/stream/attribute_keys/excluded in configuration: do not support wildcards: "${unsupportedKeys.join('", "')}"`
         );
       }
