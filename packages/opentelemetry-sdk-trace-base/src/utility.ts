@@ -6,8 +6,10 @@
 import type { TracerConfig } from './types-shim';
 import { getNumberFromEnv } from '@opentelemetry/core';
 
-export const DEFAULT_ATTRIBUTE_COUNT_LIMIT = 128;
-export const DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT = Infinity;
+const DEFAULT_ATTRIBUTE_COUNT_LIMIT = 128;
+const DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT = Infinity;
+
+export { DEFAULT_ATTRIBUTE_COUNT_LIMIT, DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT };
 
 /**
  * When general limits are provided and model specific limits are not,
