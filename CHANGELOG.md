@@ -18,6 +18,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(sdk-trace): invoke all lifecycle processors during flush and shutdown #6980 @teamleaderleo
+
 ### :books: Documentation
 
 ### :house: Internal

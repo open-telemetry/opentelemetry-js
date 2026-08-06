@@ -22,10 +22,11 @@ export class MultiLogRecordProcessor implements LogRecordProcessor {
   }
 
   public async forceFlush(options?: ForceFlushOptions): Promise<void> {
+    const processors = this.processors.slice();
     const timeout = options?.timeoutMillis ?? 30000;
     await Promise.all(
-      this.processors.map(processor =>
-        callWithTimeout(processor.forceFlush(), timeout)
+      processors.map(processor =>
+        callLifecycle(() => callWithTimeout(processor.forceFlush(), timeout))
       )
     );
   }
@@ -37,7 +38,10 @@ export class MultiLogRecordProcessor implements LogRecordProcessor {
   }
 
   public async shutdown(): Promise<void> {
-    await Promise.all(this.processors.map(processor => processor.shutdown()));
+    const processors = this.processors.slice();
+    await Promise.all(
+      processors.map(processor => callLifecycle(() => processor.shutdown()))
+    );
   }
 
   public enabled(options: {
@@ -52,5 +56,13 @@ export class MultiLogRecordProcessor implements LogRecordProcessor {
       }
     }
     return false;
+  }
+}
+
+function callLifecycle(callback: () => Promise<void>): Promise<void> {
+  try {
+    return callback();
+  } catch (error) {
+    return Promise.reject(error);
   }
 }

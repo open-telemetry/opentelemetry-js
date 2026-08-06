@@ -100,36 +100,34 @@ export class TracerProvider implements ApiTracerProvider {
 
   forceFlush(options?: ForceFlushOptions): Promise<void> {
     const timeout = options?.timeoutMillis ?? this._forceFlushTimeoutMillis;
-    const promises = this._activeSpanProcessor['_spanProcessors'].map(
-      (spanProcessor: SpanProcessor) => {
-        return new Promise(resolve => {
-          let state: ForceFlushState;
-          const timeoutInterval = setTimeout(() => {
-            resolve(
-              new Error(
-                `Span processor did not completed within timeout period of ${timeout} ms`
-              )
-            );
-            state = ForceFlushState.timeout;
-          }, timeout);
+    const spanProcessors = this._activeSpanProcessor['_spanProcessors'].slice();
+    const promises = spanProcessors.map((spanProcessor: SpanProcessor) => {
+      return new Promise(resolve => {
+        let state: ForceFlushState;
+        const timeoutInterval = setTimeout(() => {
+          resolve(
+            new Error(
+              `Span processor did not completed within timeout period of ${timeout} ms`
+            )
+          );
+          state = ForceFlushState.timeout;
+        }, timeout);
 
-          spanProcessor
-            .forceFlush()
-            .then(() => {
-              clearTimeout(timeoutInterval);
-              if (state !== ForceFlushState.timeout) {
-                state = ForceFlushState.resolved;
-                resolve(state);
-              }
-            })
-            .catch(error => {
-              clearTimeout(timeoutInterval);
-              state = ForceFlushState.error;
-              resolve(error);
-            });
-        });
-      }
-    );
+        callLifecycle(() => spanProcessor.forceFlush())
+          .then(() => {
+            clearTimeout(timeoutInterval);
+            if (state !== ForceFlushState.timeout) {
+              state = ForceFlushState.resolved;
+              resolve(state);
+            }
+          })
+          .catch(error => {
+            clearTimeout(timeoutInterval);
+            state = ForceFlushState.error;
+            resolve(error);
+          });
+      });
+    });
 
     return new Promise<void>((resolve, reject) => {
       Promise.all(promises)
@@ -167,5 +165,13 @@ export class TracerProvider implements ApiTracerProvider {
       ),
     };
     return formatInspect('TracerProvider', payload, depth, options, inspect);
+  }
+}
+
+function callLifecycle(callback: () => Promise<void>): Promise<void> {
+  try {
+    return callback();
+  } catch (error) {
+    return Promise.reject(error);
   }
 }
