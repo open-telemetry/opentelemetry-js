@@ -527,35 +527,31 @@ describe('fetch', () => {
             instrumentations: [fetchInstrumentation],
           });
 
-          // Fake only the timers that _endSpan() uses to defer span.end(),
-          // so the deferred callback can never fire unless the clock is
-          // explicitly advanced. Date, performance and MessageChannel stay
-          // real so that msw and the SDK behave normally.
+          // Fake setTimeout/clearTimeout so that any timer-based way of
+          // ending the span would be unable to run: the deferred callback
+          // could never fire unless the clock were explicitly advanced.
+          // Date, performance and MessageChannel stay real so that msw and
+          // the SDK behave normally.
           const clock = sinon.useFakeTimers({
             toFake: ['setTimeout', 'clearTimeout'],
           });
           try {
             const response = await fetch('/api/status.json');
             await response.json();
-            // Let the instrumentation's eager body-draining loop (which reads
-            // a teed clone of the response) observe the end of the stream.
-            // A MessageChannel task is used because setTimeout is faked.
-            await new Promise<void>(resolve => {
-              const channel = new MessageChannel();
-              channel.port1.onmessage = () => resolve();
-              channel.port2.postMessage(null);
-            });
 
             // Regression test for
             // https://github.com/open-telemetry/opentelemetry-js/issues/4683
-            // The span must be finished as soon as the response body has
-            // been consumed; it must not depend on a OBSERVER_WAIT_TIME_MS
-            // timer that may never fire (e.g. when the app flushes and the
-            // page navigates away right after the fetch).
+            // The span must already be finished at this point, with no task
+            // awaited between the body being consumed and the assertion:
+            // that is exactly the reported scenario, where the application
+            // flushes and the page navigates away right after the fetch.
+            // SimpleSpanProcessor exports from within span.end(), so no
+            // forceFlush() is needed — and awaiting one here would put back
+            // the extra task this test exists to rule out.
             assert.strictEqual(
               dummySpanExporter.exported.length,
               1,
-              'span was not finished without advancing the clock past OBSERVER_WAIT_TIME_MS'
+              'span was not finished as soon as the response body was consumed'
             );
           } finally {
             clock.restore();
