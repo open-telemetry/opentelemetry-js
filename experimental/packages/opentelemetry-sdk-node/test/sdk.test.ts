@@ -67,10 +67,17 @@ import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-
 import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
+import { InstrumentationBase } from '@opentelemetry/instrumentation';
 
 import { NOOP_COUNTER_METRIC } from '../../../../api/src/metrics/NoopMeter';
 import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from '../src/semconv';
 import { NOOP_HISTOGRAM_METRIC } from '../../../../api/src/metrics/NoopMeter';
+
+class TestInstrumentation extends InstrumentationBase {
+  init() {
+    return [];
+  }
+}
 
 function assertDefaultContextManagerRegistered() {
   assert.ok(
@@ -87,6 +94,24 @@ function assertDefaultPropagatorRegistered() {
   ]);
 }
 
+function assertTraceContextAndBaggagePropagation() {
+  assertDefaultPropagatorRegistered();
+
+  const extracted = propagation.extract(context.active(), {
+    traceparent: '00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01',
+    baggage: 'test=value',
+  });
+
+  assert.strictEqual(
+    trace.getSpanContext(extracted)?.traceId,
+    '4bf92f3577b34da6a3ce929d0e0e4736'
+  );
+  assert.strictEqual(
+    propagation.getBaggage(extracted)?.getEntry('test')?.value,
+    'value'
+  );
+}
+
 function clearOTelEnv() {
   for (const key of Object.keys(process.env)) {
     if (key.startsWith('OTEL_')) {
@@ -98,6 +123,7 @@ function clearOTelEnv() {
 describe('NodeSDK', () => {
   let setGlobalTracerProviderSpy: Sinon.SinonSpy;
   let setGlobalLoggerProviderSpy: Sinon.SinonSpy;
+  let setGlobalMeterProviderSpy: Sinon.SinonSpy;
 
   beforeEach(() => {
     diag.disable();
@@ -109,6 +135,7 @@ describe('NodeSDK', () => {
 
     setGlobalTracerProviderSpy = Sinon.spy(trace, 'setGlobalTracerProvider');
     setGlobalLoggerProviderSpy = Sinon.spy(logs, 'setGlobalLoggerProvider');
+    setGlobalMeterProviderSpy = Sinon.spy(metrics, 'setGlobalMeterProvider');
 
     // need to set these to none, since the default value is 'otlp'. Tests either
     // provide exporters programatically or reset to an appropriate value.
@@ -1166,21 +1193,62 @@ describe('NodeSDK', () => {
 
   describe('A disabled SDK should be no-op', () => {
     beforeEach(() => {
-      process.env.OTEL_SDK_DISABLED = 'true';
+      process.env.OTEL_SDK_DISABLED = 'TrUe';
     });
 
     afterEach(() => {
       delete process.env.OTEL_SDK_DISABLED;
+      delete process.env.OTEL_PROPAGATORS;
     });
 
-    it('should not register a trace provider', async () => {
-      const sdk = new NodeSDK({});
+    it('should configure context and propagation without starting signal components', async () => {
+      process.env.OTEL_PROPAGATORS = 'tracecontext,baggage';
+      const detect = Sinon.spy(() => ({
+        attributes: { detected: true },
+      }));
+      const instrumentation = new TestInstrumentation('test', '1.0.0', {
+        enabled: false,
+      });
+      const enableInstrumentation = Sinon.spy(instrumentation, 'enable');
+      const sdk = new NodeSDK({
+        instrumentations: [instrumentation],
+        resourceDetectors: [{ detect }],
+      });
+
       sdk.start();
 
-      assert.ok(
-        setGlobalTracerProviderSpy.called === false,
-        'sdk.start() should not change the global tracer provider'
-      );
+      assertDefaultContextManagerRegistered();
+      assertTraceContextAndBaggagePropagation();
+      assert.ok(setGlobalTracerProviderSpy.notCalled);
+      assert.ok(setGlobalMeterProviderSpy.notCalled);
+      assert.ok(setGlobalLoggerProviderSpy.notCalled);
+      assert.ok(enableInstrumentation.notCalled);
+      assert.ok(detect.notCalled);
+      assert.strictEqual(sdk['_tracerProvider'], undefined);
+      assert.strictEqual(sdk['_meterProvider'], undefined);
+      assert.strictEqual(sdk['_loggerProvider'], undefined);
+
+      await sdk.shutdown();
+    });
+
+    it('should not create env metric exporters', async () => {
+      process.env.OTEL_METRICS_EXPORTER = 'console';
+      const sdk = new NodeSDK({});
+
+      assert.strictEqual(sdk['_meterProviderConfig'], undefined);
+
+      sdk.start();
+      await sdk.shutdown();
+    });
+
+    it('should honor OTEL_PROPAGATORS=none', async () => {
+      process.env.OTEL_PROPAGATORS = 'none';
+      const sdk = new NodeSDK({});
+
+      sdk.start();
+
+      assertDefaultContextManagerRegistered();
+      assert.deepStrictEqual(propagation.fields(), []);
 
       await sdk.shutdown();
     });

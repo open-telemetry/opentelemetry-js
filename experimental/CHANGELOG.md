@@ -16,6 +16,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(sdk-node): keep propagation enabled when the SDK is disabled [#6983](https://github.com/open-telemetry/opentelemetry-js/pull/6983) @vincentkoc
+
 ### :books: Documentation
 
 ### :house: Internal
