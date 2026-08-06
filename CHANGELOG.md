@@ -18,7 +18,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
-* fix(sdk-trace-base): avoid a Webpack self-reference error in CommonJS output @sansynx
+* fix(sdk-trace-base): avoid a Webpack self-reference error in CommonJS output #6981 @sansynx
 
 ### :books: Documentation
 
