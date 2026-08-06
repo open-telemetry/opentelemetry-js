@@ -8,6 +8,10 @@ export default {
   mode: 'production',
   entry: './src/index.js',
   target: 'node',
+  resolve: {
+    mainFields: ['main'],
+  },
+  ignoreWarnings: [/Critical dependency/],
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
