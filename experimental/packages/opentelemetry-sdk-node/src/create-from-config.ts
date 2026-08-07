@@ -16,7 +16,7 @@ import { inspect } from 'util';
 import { readFileSync } from 'fs';
 import * as path from 'path';
 
-import type { TextMapPropagator } from '@opentelemetry/api';
+import type { Attributes, TextMapPropagator } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
 import type {
   IdGenerator,
@@ -36,7 +36,20 @@ import {
   TraceIdRatioBasedSampler,
   TracerProvider,
 } from '@opentelemetry/sdk-trace';
-import type { Resource } from '@opentelemetry/resources';
+import type {
+  Resource,
+  DetectedResourceAttributes,
+  ResourceDetector,
+} from '@opentelemetry/resources';
+import {
+  defaultResource,
+  detectResources,
+  hostDetector,
+  osDetector,
+  processDetector,
+  resourceFromAttributes,
+  serviceInstanceIdDetector,
+} from '@opentelemetry/resources';
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
@@ -82,6 +95,7 @@ import type {
   PropagatorConfigModel,
   PullMetricReaderConfigModel,
   PushMetricExporterConfigModel,
+  ResourceConfigModel,
   SamplerConfigModel,
   SimpleLogRecordProcessorConfigModel,
   SimpleSpanProcessorConfigModel,
@@ -93,7 +107,7 @@ import type {
   TracerProviderConfigModel,
   ViewConfigModel,
 } from '@opentelemetry/configuration';
-import { mergePropagatorCompositeConfig } from '@opentelemetry/configuration';
+import { mergePropagatorCompositeConfig, mergeResourceAttributesConfig } from '@opentelemetry/configuration';
 import type {
   LogRecordExporter,
   LogRecordProcessor,
@@ -109,6 +123,7 @@ import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import {
   CompositePropagator,
+  getStringFromEnv,
   W3CBaggagePropagator,
   W3CTraceContextPropagator,
 } from '@opentelemetry/core';
@@ -136,6 +151,7 @@ import {
   getGrpcMetadataFromHeaders,
   getHeadersFromConfiguration,
 } from './utils';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 
 // ---- internal utilities
 
@@ -400,6 +416,107 @@ export function createPropagatorFromConfig(
     // says "Configure the propagators in the composite text map propagator".
     return new CompositePropagator({ propagators });
   }
+}
+
+class ServiceNameDetector implements ResourceDetector {
+  detect() {
+    const attributes: Attributes = {};
+    const serviceName = getStringFromEnv('OTEL_SERVICE_NAME');
+
+    if (serviceName) {
+      attributes[ATTR_SERVICE_NAME] = serviceName;
+    }
+
+    return { attributes };
+  }
+}
+
+export function createResourceFromConfig(
+  resourceConfig?: ResourceConfigModel
+): Resource {
+  // Limitation: Resource#merge() is the only exported mechanism from the
+  // resources package that supports *async* attributes, so we must use it.
+  // However, if `schemaUrl` is being used by detectors and in the config, then
+  // `.merge()` will potentially warn and drop the schema URL if there is a
+  // conflict.  (See `mergeSchemaUrl` behaviour.) This is likely not the
+  // intended behavior when a user specifies a `schema_url` in the declarative
+  // config file.
+
+  let resource = defaultResource();
+
+  if (!resourceConfig) {
+    return resource;
+  }
+
+  if (resourceConfig['detection/development']) {
+    // TODO(6986): support attributes.{include,exclude}; `resources` package doesn't currently support this
+    checkConfigUse(
+      'ExperimentalResourceDetection',
+      resourceConfig['detection/development'],
+      ['detectors']
+    );
+    if (resourceConfig['detection/development'].detectors) {
+      const detectors: ResourceDetector[] = [];
+      for (const d of resourceConfig['detection/development'].detectors) {
+        const [name] = mustSingleEntry(d, 'ExperimentalResourceDetector');
+        // https://opentelemetry.io/docs/specs/otel-config/types/#type-experimentalresourcedetector
+        switch (name) {
+          // Note: The 'container' detector defined in the schema cannot yet
+          // be supported because a container resource detector lives in the
+          // separate opentelemetry-js-contrib.git repo. Supporting 'container'
+          // will come as part of supporting PluginComponentProvider.
+          case 'host':
+            detectors.push(hostDetector);
+            detectors.push(osDetector);
+            break;
+          case 'process':
+            detectors.push(processDetector);
+            break;
+          case 'service':
+            // Note: The declarative schema defines the 'service' detector to
+            // handle `service.instance.id` and the `OTEL_SERVICE_NAME` envvar.
+            // https://opentelemetry.io/docs/specs/otel-config/types/#type-experimentalresourcedetector
+            // This is equivalent to the `serviceInstanceIdDetector` and
+            // *part* of the `envDetector`.  Using this `envDetector` would
+            // incorrectly read the `OTEL_RESOURCE_ATTRIBUTES` envvar.
+            detectors.push(new ServiceNameDetector());
+            detectors.push(serviceInstanceIdDetector);
+            break;
+          default:
+            throw new Error(
+              `unknown ExperimentalResourceDetector name in configuration: "${name}"`
+            );
+        }
+      }
+
+      if (detectors.length > 0) {
+        resource = resource.merge(detectResources({ detectors }));
+      }
+    }
+  }
+
+  const configAttrs = mergeResourceAttributesConfig(
+    resourceConfig.attributes,
+    resourceConfig.attributes_list
+  );
+  if (configAttrs && configAttrs.length > 0) {
+    const attrs: DetectedResourceAttributes = {};
+    for (let i = 0; i < configAttrs.length; i++) {
+      const a = configAttrs[i];
+      if (a.value !== null) {
+        attrs[a.name] = a.value;
+      }
+    }
+    resource = resource.merge(resourceFromAttributes(attrs));
+  }
+
+  if (resourceConfig.schema_url) {
+    resource = resource.merge(
+      resourceFromAttributes({}, { schemaUrl: resourceConfig.schema_url })
+    );
+  }
+
+  return resource;
 }
 
 export function createLogRecordLimitsFromConfig(
