@@ -107,7 +107,10 @@ import type {
   TracerProviderConfigModel,
   ViewConfigModel,
 } from '@opentelemetry/configuration';
-import { mergePropagatorCompositeConfig, mergeResourceAttributesConfig } from '@opentelemetry/configuration';
+import {
+  mergePropagatorCompositeConfig,
+  mergeResourceAttributesConfig,
+} from '@opentelemetry/configuration';
 import type {
   LogRecordExporter,
   LogRecordProcessor,
