@@ -16,7 +16,6 @@ import {
   DiagConsoleLogger,
 } from '@opentelemetry/api';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
-import { W3CTraceContextPropagator } from '@opentelemetry/core';
 import { logs } from '@opentelemetry/api-logs';
 import {
   SimpleLogRecordProcessor,
@@ -146,15 +145,6 @@ describe('startNodeSDK', function () {
       await sdk.shutdown();
     });
 
-    it('should register a propagator if only a propagator is provided', async () => {
-      const expectedPropagator = new W3CTraceContextPropagator();
-      const sdk = startNodeSDK({ textMapPropagator: expectedPropagator });
-
-      const actualPropagator = propagation['_getGlobalPropagator']();
-      assert.equal(actualPropagator, expectedPropagator);
-      await sdk.shutdown();
-    });
-
     it('should register propagators as defined in OTEL_PROPAGATORS', async () => {
       process.env.OTEL_PROPAGATORS = 'b3';
       const sdk = startNodeSDK({});
@@ -176,15 +166,6 @@ describe('startNodeSDK', function () {
     it('should not register propagators OTEL_PROPAGATORS contains "none" alongside valid propagator', async () => {
       process.env.OTEL_PROPAGATORS = 'b3, none';
       const sdk = startNodeSDK({});
-
-      assert.deepStrictEqual(propagation.fields(), []);
-
-      await sdk.shutdown();
-    });
-
-    it('should not register propagators OTEL_PROPAGATORS contains valid propagator but option is set to null', async () => {
-      process.env.OTEL_PROPAGATORS = 'b3';
-      const sdk = startNodeSDK({ textMapPropagator: null });
 
       assert.deepStrictEqual(propagation.fields(), []);
 

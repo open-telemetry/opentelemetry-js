@@ -67,7 +67,7 @@ export function startNodeSDK(sdkOptions?: SDKOptions): {
 
   let components: SDKComponents;
   try {
-    components = create(config, sdkOptions);
+    components = create(config);
   } catch (createErr) {
     diag.error(
       `Could not create OpenTelemetry SDK from configuration, SDK will not be setup: ${createErr.message}`
@@ -109,10 +109,7 @@ export function startNodeSDK(sdkOptions?: SDKOptions): {
 /**
  * Interpret configuration model and return SDK components.
  */
-function create(
-  config: ConfigurationModel,
-  sdkOptions?: SDKOptions
-): SDKComponents {
+function create(config: ConfigurationModel): SDKComponents {
   const components: SDKComponents = {};
 
   try {
@@ -121,11 +118,7 @@ function create(
 
     const resource = createResourceFromConfig(config.resource);
 
-    if (sdkOptions?.textMapPropagator !== undefined) {
-      if (sdkOptions.textMapPropagator !== null) {
-        components.propagator = sdkOptions.textMapPropagator;
-      }
-    } else if (config.propagator) {
+    if (config.propagator) {
       components.propagator = createPropagatorFromConfig(config.propagator);
     }
 
