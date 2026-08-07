@@ -19,6 +19,7 @@ import {
   getIdGeneratorFromConfiguration,
   getSamplerFromConfiguration,
   getInstanceID,
+  ensureResourceDetectorOrder,
   getMeterReadersFromConfiguration,
   getMeterViewsFromConfiguration,
   getResourceDetectorsFromConfiguration,
@@ -38,6 +39,7 @@ import type {
 import {
   defaultResource,
   detectResources,
+  emptyResource,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
@@ -206,8 +208,10 @@ export function setupResource(
   config: ConfigurationModel,
   sdkOptions?: SDKOptions
 ): Resource {
-  let resource: Resource =
-    getResourceFromConfiguration(config) ?? defaultResource();
+  const configuredResource = getResourceFromConfiguration(config);
+  let resource: Resource = configuredResource
+    ? emptyResource()
+    : defaultResource();
   let resourceDetectors: ResourceDetector[] = [];
 
   if (sdkOptions?.resourceDetectors != null) {
@@ -215,12 +219,14 @@ export function setupResource(
   } else if (config.resource?.['detection/development']?.detectors) {
     resourceDetectors = getResourceDetectorsFromConfiguration(config);
   }
+  resourceDetectors = ensureResourceDetectorOrder(resourceDetectors);
 
-  if (resourceDetectors.length > 0) {
-    const internalConfig: ResourceDetectionConfig = {
-      detectors: resourceDetectors,
-    };
-    resource = resource.merge(detectResources(internalConfig));
+  const internalConfig: ResourceDetectionConfig = {
+    detectors: resourceDetectors,
+  };
+  resource = resource.merge(detectResources(internalConfig));
+  if (configuredResource) {
+    resource = resource.merge(configuredResource);
   }
 
   const instanceId = getInstanceID(config);

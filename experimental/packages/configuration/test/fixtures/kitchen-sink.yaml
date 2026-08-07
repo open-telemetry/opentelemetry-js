@@ -429,7 +429,6 @@ resource:
         - process.command_args
     detectors:
       - container:
-      - env:
       - host:
       - os:
       - process:

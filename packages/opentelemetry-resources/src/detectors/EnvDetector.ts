@@ -5,7 +5,6 @@
 
 import type { Attributes } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
-import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import type { ResourceDetectionConfig } from '../config';
 import type { DetectedResource, ResourceDetector } from '../types';
 import { getStringFromEnv } from '@opentelemetry/core';
@@ -35,19 +34,16 @@ class EnvDetector implements ResourceDetector {
     const attributes: Attributes = {};
 
     const rawAttributes = getStringFromEnv('OTEL_RESOURCE_ATTRIBUTES');
-    const serviceName = getStringFromEnv('OTEL_SERVICE_NAME');
-
     if (rawAttributes) {
       try {
         const parsedAttributes = this._parseResourceAttributes(rawAttributes);
+        if (getStringFromEnv('OTEL_SERVICE_NAME')) {
+          delete parsedAttributes['service.name'];
+        }
         Object.assign(attributes, parsedAttributes);
       } catch (e) {
         diag.debug(`EnvDetector failed: ${e instanceof Error ? e.message : e}`);
       }
-    }
-
-    if (serviceName) {
-      attributes[ATTR_SERVICE_NAME] = serviceName;
     }
 
     return { attributes };

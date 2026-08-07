@@ -8,4 +8,4 @@ import { noopDetector } from '../../NoopDetector';
 /**
  * @experimental
  */
-export const serviceInstanceIdDetector = noopDetector;
+export const serviceDetector = noopDetector;

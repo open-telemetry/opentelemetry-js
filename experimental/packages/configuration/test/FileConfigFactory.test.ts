@@ -193,7 +193,6 @@ const configFromKitchenSinkFile = {
       },
       detectors: [
         { container: null },
-        { env: null },
         { host: null },
         { os: null },
         { process: null },

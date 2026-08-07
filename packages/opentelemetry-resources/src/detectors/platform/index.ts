@@ -6,5 +6,5 @@ export {
   hostDetector,
   osDetector,
   processDetector,
-  serviceInstanceIdDetector,
+  serviceDetector,
 } from './node';

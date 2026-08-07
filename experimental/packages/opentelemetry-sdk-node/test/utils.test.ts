@@ -17,6 +17,7 @@ import {
   getMeterViewsFromConfiguration,
   getHttpAgentOptionsFromTls,
   getIdGeneratorFromConfiguration,
+  getResourceDetectorsFromEnv,
 } from '../src/utils';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -35,7 +36,7 @@ import {
   hostDetector,
   osDetector,
   processDetector,
-  serviceInstanceIdDetector,
+  serviceDetector,
 } from '@opentelemetry/resources';
 import type { LoggerProviderOptions } from '@opentelemetry/sdk-logs';
 import {
@@ -569,6 +570,28 @@ describe('getResourceDetectorsFromConfiguration', function () {
     assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), []);
   });
 
+  describe('getResourceDetectorsFromEnv', function () {
+    afterEach(function () {
+      delete process.env.OTEL_NODE_RESOURCE_DETECTORS;
+    });
+
+    it('maps service to serviceDetector and always runs envDetector last', function () {
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,service,host';
+
+      assert.deepStrictEqual(getResourceDetectorsFromEnv(), [
+        serviceDetector,
+        hostDetector,
+        envDetector,
+      ]);
+    });
+
+    it('runs envDetector when configurable resource detection is disabled', function () {
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'none';
+
+      assert.deepStrictEqual(getResourceDetectorsFromEnv(), [envDetector]);
+    });
+  });
+
   it('returns empty array when detectors array is empty', function () {
     const config: ConfigurationModel = {
       resource: { 'detection/development': { detectors: [] } },
@@ -576,13 +599,11 @@ describe('getResourceDetectorsFromConfiguration', function () {
     assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), []);
   });
 
-  it('maps env detector object to envDetector', function () {
+  it('ignores env detector objects because envDetector is always enabled', function () {
     const config: ConfigurationModel = {
       resource: { 'detection/development': { detectors: [{ env: {} }] } },
     };
-    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
-      envDetector,
-    ]);
+    assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), []);
   });
 
   it('maps host detector object to hostDetector', function () {
@@ -612,12 +633,12 @@ describe('getResourceDetectorsFromConfiguration', function () {
     ]);
   });
 
-  it('maps service detector object to serviceInstanceIdDetector', function () {
+  it('maps service detector object to serviceDetector', function () {
     const config: ConfigurationModel = {
       resource: { 'detection/development': { detectors: [{ service: {} }] } },
     };
     assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
-      serviceInstanceIdDetector,
+      serviceDetector,
     ]);
   });
 
@@ -641,7 +662,7 @@ describe('getResourceDetectorsFromConfiguration', function () {
     assert.deepStrictEqual(getResourceDetectorsFromConfiguration(config), [
       hostDetector,
       processDetector,
-      serviceInstanceIdDetector,
+      serviceDetector,
     ]);
   });
 });

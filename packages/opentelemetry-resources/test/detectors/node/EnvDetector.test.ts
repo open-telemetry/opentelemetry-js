@@ -202,7 +202,7 @@ describeNode('envDetector() on Node.js', () => {
     });
   });
 
-  describe('service name and error handling', () => {
+  describe('service name precedence and error handling', () => {
     afterEach(() => {
       delete process.env.OTEL_RESOURCE_ATTRIBUTES;
       delete process.env.OTEL_SERVICE_NAME;
@@ -215,15 +215,23 @@ describeNode('envDetector() on Node.js', () => {
       }
     });
 
-    it('includes OTEL_SERVICE_NAME even when no attributes are set', async () => {
+    it('does not handle OTEL_SERVICE_NAME', async () => {
       process.env.OTEL_SERVICE_NAME = 'svc-from-env';
       const resource = resourceFromDetectedResource(envDetector.detect());
-      assert.strictEqual(resource.attributes?.['service.name'], 'svc-from-env');
+      assertEmptyResource(resource);
+    });
+
+    it('does not override OTEL_SERVICE_NAME with OTEL_RESOURCE_ATTRIBUTES', async () => {
+      process.env.OTEL_SERVICE_NAME = 'svc-from-service-name';
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'service.name=svc-from-resource-attributes,custom=value';
+      const resource = resourceFromDetectedResource(envDetector.detect());
+      assert.strictEqual(resource.attributes?.['service.name'], undefined);
+      assert.strictEqual(resource.attributes?.['custom'], 'value');
     });
 
     it('logs and continues when attribute parsing throws', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES = 'k=v';
-      process.env.OTEL_SERVICE_NAME = 'svc';
       const detectorWithAny = envDetector as any;
       detectorWithAny._parseResourceAttributesBackup =
         detectorWithAny._parseResourceAttributes;
@@ -232,7 +240,7 @@ describeNode('envDetector() on Node.js', () => {
       };
 
       const resource = resourceFromDetectedResource(envDetector.detect());
-      assert.strictEqual(resource.attributes?.['service.name'], 'svc');
+      assertEmptyResource(resource);
     });
   });
 });

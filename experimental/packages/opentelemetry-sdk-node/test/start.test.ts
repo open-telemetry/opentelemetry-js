@@ -26,7 +26,7 @@ import {
   envDetector,
   processDetector,
   hostDetector,
-  serviceInstanceIdDetector,
+  serviceDetector,
 } from '@opentelemetry/resources';
 import { logs } from '@opentelemetry/api-logs';
 import {
@@ -503,6 +503,7 @@ describe('startNodeSDK', function () {
       );
 
       assert.deepStrictEqual(resource.attributes, {
+        'service.instance.id': '627cc493',
         'service.name': 'config-name',
         'service.namespace': 'config-namespace',
         'service.version': '1.0.0',
@@ -590,6 +591,17 @@ describe('startNodeSDK', function () {
       });
     });
 
+    it('should configure service name when SDK options override detectors', async () => {
+      process.env.OTEL_SERVICE_NAME = 'env-set-name';
+      const configFactory: ConfigFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      const resource = setupResource(config, { resourceDetectors: [] });
+      await resource.waitForAsyncAttributes?.();
+
+      assert.strictEqual(resource.attributes['service.name'], 'env-set-name');
+      assertServiceInstanceIdIsUUID(resource);
+    });
+
     it('should configure service name via OTEL_RESOURCE_ATTRIBUTES env var', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
         'service.name=resource-env-set-name,service.instance.id=my-instance-id';
@@ -602,6 +614,19 @@ describe('startNodeSDK', function () {
         name: 'resource-env-set-name',
         instanceId: 'my-instance-id',
       });
+    });
+
+    it('should favor OTEL_SERVICE_NAME over an encoded resource attribute', async () => {
+      process.env.OTEL_SERVICE_NAME = 'env-set-name';
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'service%2Ename=resource-env-set-name';
+      const configFactory: ConfigFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      const resource = setupResource(config, {});
+      await resource.waitForAsyncAttributes?.();
+
+      assert.strictEqual(resource.attributes['service.name'], 'env-set-name');
+      assertServiceInstanceIdIsUUID(resource);
     });
   });
 
@@ -621,7 +646,7 @@ describe('startNodeSDK', function () {
     });
 
     it('should configure service instance id via OTEL_NODE_RESOURCE_DETECTORS env var', async () => {
-      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,host,os,serviceinstance';
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,host,os,service';
       const configFactory: ConfigFactory = createConfigFactory();
       const config = configFactory.getConfigModel();
       const resource = setupResource(config, {});
@@ -638,7 +663,7 @@ describe('startNodeSDK', function () {
           processDetector,
           envDetector,
           hostDetector,
-          serviceInstanceIdDetector,
+          serviceDetector,
         ],
       });
       await resource.waitForAsyncAttributes?.();

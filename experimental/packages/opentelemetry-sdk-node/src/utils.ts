@@ -32,7 +32,7 @@ import {
   osDetector,
   processDetector,
   resourceFromAttributes,
-  serviceInstanceIdDetector,
+  serviceDetector,
 } from '@opentelemetry/resources';
 import type {
   IdGenerator,
@@ -109,7 +109,7 @@ const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';
 const RESOURCE_DETECTOR_OS = 'os';
 const RESOURCE_DETECTOR_PROCESS = 'process';
-const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
+const RESOURCE_DETECTOR_SERVICE = 'service';
 
 export function getResourceFromConfiguration(
   config: ConfigurationModel
@@ -143,9 +143,8 @@ export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
   const resourceDetectors = new Map<string, ResourceDetector>([
     [RESOURCE_DETECTOR_HOST, hostDetector],
     [RESOURCE_DETECTOR_OS, osDetector],
-    [RESOURCE_DETECTOR_SERVICE_INSTANCE_ID, serviceInstanceIdDetector],
+    [RESOURCE_DETECTOR_SERVICE, serviceDetector],
     [RESOURCE_DETECTOR_PROCESS, processDetector],
-    [RESOURCE_DETECTOR_ENVIRONMENT, envDetector],
   ]);
 
   const resourceDetectorsFromEnv = getStringListFromEnv(
@@ -153,14 +152,17 @@ export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
   ) ?? ['all'];
 
   if (resourceDetectorsFromEnv.includes('all')) {
-    return [...resourceDetectors.values()].flat();
+    return ensureResourceDetectorOrder([...resourceDetectors.values()].flat());
   }
 
   if (resourceDetectorsFromEnv.includes('none')) {
-    return [];
+    return ensureResourceDetectorOrder([]);
   }
 
-  return resourceDetectorsFromEnv.flatMap(detector => {
+  const configuredDetectors = resourceDetectorsFromEnv.flatMap(detector => {
+    if (detector === RESOURCE_DETECTOR_ENVIRONMENT) {
+      return [];
+    }
     const resourceDetector = resourceDetectors.get(detector);
     if (!resourceDetector) {
       diag.warn(
@@ -169,6 +171,23 @@ export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
     }
     return resourceDetector || [];
   });
+  return ensureResourceDetectorOrder(configuredDetectors);
+}
+
+export function ensureResourceDetectorOrder(
+  detectors: ResourceDetector[]
+): ResourceDetector[] {
+  const orderedDetectors = detectors.filter(
+    detector => detector !== envDetector
+  );
+  if (
+    getStringFromEnv('OTEL_SERVICE_NAME') &&
+    !orderedDetectors.includes(serviceDetector)
+  ) {
+    orderedDetectors.push(serviceDetector);
+  }
+  orderedDetectors.push(envDetector);
+  return orderedDetectors;
 }
 
 export function getResourceDetectorsFromConfiguration(
@@ -181,8 +200,7 @@ export function getResourceDetectorsFromConfiguration(
     if (detector.host !== undefined) result.push(hostDetector);
     if (detector.os !== undefined) result.push(osDetector);
     if (detector.process !== undefined) result.push(processDetector);
-    if (detector.service !== undefined) result.push(serviceInstanceIdDetector);
-    if (detector.env !== undefined) result.push(envDetector);
+    if (detector.service !== undefined) result.push(serviceDetector);
     return result;
   });
 }

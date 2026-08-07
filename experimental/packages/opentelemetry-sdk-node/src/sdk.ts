@@ -15,7 +15,7 @@ import type {
 import {
   defaultResource,
   detectResources,
-  envDetector,
+  emptyResource,
   hostDetector,
   processDetector,
   resourceFromAttributes,
@@ -50,6 +50,7 @@ import {
   diagLogLevelFromString,
 } from '@opentelemetry/core';
 import {
+  ensureResourceDetectorOrder,
   getResourceDetectorsFromEnv,
   getSpanProcessorsFromEnv,
   getPropagatorFromEnv,
@@ -184,16 +185,23 @@ export class NodeSDK {
 
     this._configuration = configuration;
 
-    this._resource = configuration.resource ?? defaultResource();
+    this._resource = configuration.resource
+      ? emptyResource()
+      : defaultResource();
     this._autoDetectResources = configuration.autoDetectResources ?? true;
     if (!this._autoDetectResources) {
       this._resourceDetectors = [];
     } else if (configuration.resourceDetectors != null) {
-      this._resourceDetectors = configuration.resourceDetectors;
+      this._resourceDetectors = ensureResourceDetectorOrder(
+        configuration.resourceDetectors
+      );
     } else if (getStringFromEnv('OTEL_NODE_RESOURCE_DETECTORS')) {
       this._resourceDetectors = getResourceDetectorsFromEnv();
     } else {
-      this._resourceDetectors = [envDetector, processDetector, hostDetector];
+      this._resourceDetectors = ensureResourceDetectorOrder([
+        processDetector,
+        hostDetector,
+      ]);
     }
 
     this._serviceName = configuration.serviceName;
@@ -265,6 +273,10 @@ export class NodeSDK {
       };
 
       this._resource = this._resource.merge(detectResources(internalConfig));
+    }
+
+    if (this._configuration?.resource) {
+      this._resource = this._resource.merge(this._configuration.resource);
     }
 
     this._resource =
