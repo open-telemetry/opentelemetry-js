@@ -130,22 +130,6 @@ export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
   });
 }
 
-export function getResourceDetectorsFromConfiguration(
-  config: ConfigurationModel
-): Array<ResourceDetector> {
-  const detectors = config.resource?.['detection/development']?.detectors ?? [];
-
-  return detectors.flatMap(detector => {
-    const result: ResourceDetector[] = [];
-    if (detector.host !== undefined) result.push(hostDetector);
-    if (detector.os !== undefined) result.push(osDetector);
-    if (detector.process !== undefined) result.push(processDetector);
-    if (detector.service !== undefined) result.push(serviceInstanceIdDetector);
-    if (detector.env !== undefined) result.push(envDetector);
-    return result;
-  });
-}
-
 export function getOtlpProtocolFromEnv(): string {
   return (
     getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_PROTOCOL') ??
