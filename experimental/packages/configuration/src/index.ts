@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export type { ConfigFactory } from './IConfigFactory';
 export type {
   ConfigurationModel,
   LogRecordExporter as LogRecordExporterConfigModel,
@@ -51,8 +50,8 @@ export type {
   ParentBasedSampler as ParentBasedSamplerConfigModel,
   Resource as ResourceConfigModel,
 } from './generated/types';
-export { createConfigFactory } from './ConfigFactory';
+export { parseConfigFile } from './parse';
 export {
   mergeResourceAttributesConfig,
   mergePropagatorCompositeConfig,
-} from './FileConfigFactory';
+} from './parse';
