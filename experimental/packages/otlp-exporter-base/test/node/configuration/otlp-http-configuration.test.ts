@@ -33,6 +33,13 @@ function getAgentProxyEnv(
     .options.proxyEnv;
 }
 
+function supportsNativeProxyEnv(): boolean {
+  const [major, minor] = process.versions.node.split('.').map(Number);
+  return (
+    major > 24 || (major === 24 && minor >= 5) || (major === 22 && minor >= 21)
+  );
+}
+
 describe('httpAgentFactoryFromOptions', function () {
   let originalEnv: Record<string, string | undefined>;
 
@@ -113,6 +120,54 @@ describe('httpAgentFactoryFromOptions', function () {
 
     assert.strictEqual(getAgentProxyEnv(httpAgent), proxyEnv);
     assert.strictEqual(getAgentProxyEnv(httpsAgent), proxyEnv);
+  });
+
+  it('uses environment proxy variables for requests on supporting Node.js versions', async function () {
+    if (!supportsNativeProxyEnv()) {
+      this.skip();
+    }
+
+    let proxyRequestReceived = false;
+    const proxyServer = http.createServer((request, response) => {
+      proxyRequestReceived = true;
+      response.statusCode = 204;
+      response.end();
+    });
+
+    await new Promise<void>((resolve, reject) => {
+      proxyServer.once('error', reject);
+      proxyServer.listen(0, '127.0.0.1', resolve);
+    });
+
+    try {
+      const address = proxyServer.address();
+      assert.ok(address && typeof address !== 'string');
+      process.env.HTTP_PROXY = `http://127.0.0.1:${address.port}`;
+      const agent = await httpAgentFactoryFromOptions({ keepAlive: false })(
+        'http:'
+      );
+
+      try {
+        const statusCode = await new Promise<number>((resolve, reject) => {
+          const request = http.get(
+            'http://proxy-test.invalid/probe',
+            { agent },
+            response => {
+              response.resume();
+              response.once('end', () => resolve(response.statusCode ?? 0));
+            }
+          );
+          request.once('error', reject);
+        });
+
+        assert.strictEqual(statusCode, 204);
+        assert.strictEqual(proxyRequestReceived, true);
+      } finally {
+        agent.destroy();
+      }
+    } finally {
+      await new Promise<void>(resolve => proxyServer.close(() => resolve()));
+    }
   });
 });
 

@@ -63,6 +63,13 @@ function getEnvProxyAgentOptions():
 export function httpAgentFactoryFromOptions(
   options: http.AgentOptions | https.AgentOptions
 ): HttpAgentFactory {
+  /**
+   * Node's native `proxyEnv` agent option is available from Node.js 22.21.0
+   * and 24.5.0. Earlier supported Node.js versions keep the option in the
+   * agent configuration but do not apply environment proxies to requests.
+   * Applications that need proxying on those versions should provide an
+   * agent factory with an explicit proxy implementation.
+   */
   return async protocol => {
     const isInsecure = protocol === 'http:';
     const module = isInsecure ? import('http') : import('https');
