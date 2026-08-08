@@ -116,6 +116,18 @@ OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=https://metric-service:4318/v1/metrics
 
 For more details, see [OpenTelemetry Specification on Protocol Exporter][opentelemetry-spec-protocol-exporter].
 
+### Creating an exporter without environment variable configuration
+
+The `OTLPTraceExporter` class reads the environment variables described above. When that is not desirable — for example, when the exporter is configured from a configuration file — use `createOtlpHttpSpanExporter` instead. It accepts the same options, but does not read `OTEL_EXPORTER_OTLP_*` environment variables; options that are not provided fall back to the defaults defined by the OTLP exporter specification.
+
+```js
+const { createOtlpHttpSpanExporter } = require('@opentelemetry/exporter-trace-otlp-http');
+
+const exporter = createOtlpHttpSpanExporter({
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/traces
+});
+```
+
 ## Exporter Timeout Configuration
 
 The OTLPTraceExporter has a timeout configuration option which is the maximum time, in milliseconds, the OTLP exporter will wait for each batch export. The default value is 10000ms.

@@ -5,7 +5,10 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
-import { OTLPLogExporter } from '../../src/platform/browser';
+import {
+  createOtlpProtoLogExporter,
+  OTLPLogExporter,
+} from '../../src/platform/browser';
 import {
   LoggerProvider,
   SimpleLogRecordProcessor,
@@ -64,5 +67,35 @@ describe('OTLPLogExporter', function () {
       assert.ok(scopeMetrics);
       await meterProvider.shutdown();
     });
+  });
+});
+
+describe('createOtlpProtoLogExporter', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  it('should send data to the default endpoint', async function () {
+    // arrange
+    const stubFetch = sinon
+      .stub(window, 'fetch')
+      .resolves(new Response('', { status: 200 }));
+    const loggerProvider = new LoggerProvider({
+      processors: [
+        new SimpleLogRecordProcessor({
+          exporter: createOtlpProtoLogExporter(),
+        }),
+      ],
+    });
+
+    // act
+    loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });
+    await loggerProvider.shutdown();
+
+    // assert
+    assert.strictEqual(
+      stubFetch.firstCall.args[0],
+      'http://localhost:4318/v1/logs'
+    );
   });
 });

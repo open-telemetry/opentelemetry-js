@@ -57,6 +57,18 @@ In addition to settings passed to the constructor, the exporter also supports co
 > Settings configured programmatically take precedence over environment variables. Per-signal environment variables take
 > precedence over non-per-signal environment variables.
 
+### Creating an exporter without environment variable configuration
+
+The `OTLPMetricExporter` class reads the environment variables described above. When that is not desirable — for example, when the exporter is configured from a configuration file — use `createOtlpProtoMetricExporter` instead. It accepts the same options, but does not read `OTEL_EXPORTER_OTLP_*` environment variables; options that are not provided fall back to the defaults defined by the OTLP exporter specification (in particular, cumulative aggregation temporality is used when `temporalityPreference` is not set).
+
+```js
+const { createOtlpProtoMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-proto');
+
+const exporter = createOtlpProtoMetricExporter({
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
+});
+```
+
 ## Running opentelemetry-collector locally to see the metrics
 
 1. Go to `examples/otlp-exporter-node`
