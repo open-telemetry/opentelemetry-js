@@ -22,6 +22,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+* chore(ci): run documentation tests on a weekly schedule [#6920](https://github.com/open-telemetry/opentelemetry-js/pull/6920) @LarryHu0217
+
 ## 2.10.0
 
 ### :rocket: Features
@@ -38,7 +40,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
-* chore(ci): run documentation tests on a weekly schedule [#6920](https://github.com/open-telemetry/opentelemetry-js/pull/6920) @LarryHu0217
 * chore: build on Node 26 in CI [#6887](https://github.com/open-telemetry/opentelemetry-js/pull/6887) @overbalance
 * chore: bump to typescript@5.2.2 @pichlermarc
 
