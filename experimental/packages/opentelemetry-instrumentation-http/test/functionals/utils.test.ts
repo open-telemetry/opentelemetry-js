@@ -177,9 +177,13 @@ describe('Utility', () => {
   describe('isURLLike()', () => {
     it('should match URL instances and URL-shaped objects', () => {
       assert.strictEqual(utils.isURLLike(new URL('http://google.fr')), true);
+      // A cross-realm / polyfilled URL is recognised by shape: it carries
+      // `href` and `protocol` but no `auth`/`path` (those live only on request
+      // options and legacy parsed URLs).
       assert.strictEqual(
         utils.isURLLike({
           href: 'http://google.fr/',
+          protocol: 'http:',
           origin: 'http://google.fr',
         }),
         true
@@ -191,9 +195,19 @@ describe('Utility', () => {
       assert.strictEqual(utils.isURLLike(null), false);
       assert.strictEqual(utils.isURLLike(undefined), false);
       assert.strictEqual(utils.isURLLike({ hostname: 'google.fr' }), false);
-      // legacy url.parse() results have `href` but no `origin` and must keep
-      // taking the options-object code path
+      // an object that only carries `href` is not a URL and must not be
+      // treated as one
+      assert.strictEqual(utils.isURLLike({ href: 'http://google.fr/' }), false);
+      // legacy url.parse() results have `href` and `protocol` but also `path`,
+      // so they must keep taking the options-object code path
       assert.strictEqual(utils.isURLLike(url.parse('http://google.fr')), false);
+      // getRequestInfo()'s own output sets `href`, `origin` and `path`; it is
+      // an options object, not a URL, and must not be re-classified as one
+      const parsedOptions = utils.getRequestInfo(
+        diag,
+        'http://google.fr/aPath?qu=ry'
+      ).optionsParsed;
+      assert.strictEqual(utils.isURLLike(parsedOptions), false);
     });
   });
 

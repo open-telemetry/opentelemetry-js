@@ -222,14 +222,26 @@ function stringUrlToHttpOptions(
 
 /**
  * Mirrors how Node.js detects WHATWG `URL` objects passed to `http.request`
- * and `https.request`: by shape (`href` and `origin` present) rather than by
- * `instanceof`, so that URL objects from other realms (e.g. `vm` contexts)
- * or WHATWG URL polyfills are handled the same way Node.js handles them.
+ * and `https.request`: by shape rather than by `instanceof`, so that URL
+ * objects from other realms (e.g. `vm` contexts) or WHATWG URL polyfills are
+ * handled the same way Node.js handles them.
  *
- * See https://github.com/nodejs/node/blob/2505e217bba05fc581b572c685c5cf280a16c5a3/lib/internal/url.js#L766-L768
+ * This mirrors Node's `isURL()` predicate exactly. The `auth`/`path` guards
+ * matter: they keep options objects and legacy `url.parse()` results (both
+ * carry `path`) off the URL code path.
+ *
+ * See https://github.com/nodejs/node/blob/2505e217bba05fc581b572c685c5cf280a16c5a3/lib/internal/url.js#L756-L773
  */
 export const isURLLike = (value: unknown): value is url.URL => {
-  return Boolean((value as url.URL)?.href && (value as url.URL)?.origin);
+  const candidate = value as
+    | (url.URL & { auth?: unknown; path?: unknown })
+    | undefined;
+  return Boolean(
+    candidate?.href &&
+      candidate.protocol &&
+      candidate.auth === undefined &&
+      candidate.path === undefined
+  );
 };
 
 /**
