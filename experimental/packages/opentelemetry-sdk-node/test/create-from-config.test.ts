@@ -681,6 +681,16 @@ describe('create-from-config', () => {
         assertThrowsError: RegExp;
       }[] = [
         {
+          testName: 'otlp_file/development exporter is not supported',
+          meter_provider: {
+            readers: [
+              { periodic: { exporter: { 'otlp_file/development': null } } },
+            ],
+          },
+          assertThrowsError:
+            /unknown PushMetricExporter name in configuration: "otlp_file\/development"/,
+        },
+        {
           testName:
             'View stream.attribute_keys.included wildcards are not yet supported',
           meter_provider: {
