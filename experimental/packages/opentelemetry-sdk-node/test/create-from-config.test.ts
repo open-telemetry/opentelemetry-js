@@ -1240,7 +1240,7 @@ describe('create-from-config', () => {
       assert.ok((bsp as any)._exporter instanceof OTLPProtoTraceExporter);
     });
 
-    describe('throws for various unsupported or invalid traceer_provider config cases', function () {
+    describe('throws for various unsupported or invalid tracer_provider config cases', function () {
       const corpus: {
         testName: string;
         tracer_provider: TracerProviderConfigModel;
