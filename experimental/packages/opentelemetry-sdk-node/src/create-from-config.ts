@@ -224,7 +224,7 @@ function mustSingleEntry(
   return entries[0];
 }
 
-function _loadTlsConfigFile(absPath: string, propName: string) {
+function loadTlsConfigFile(absPath: string, propName: string) {
   try {
     if (!path.isAbsolute(absPath)) {
       throw new Error(`TLS config file "${absPath}" must be an absolute path`);
@@ -243,7 +243,7 @@ function _loadTlsConfigFile(absPath: string, propName: string) {
  * https://opentelemetry.io/docs/specs/otel-config/types/#type-httptls
  * https://nodejs.org/api/tls.html#tlscreatesecurecontextoptions
  */
-function _httpTlsOptionsFromConfig(
+function httpTlsOptionsFromConfig(
   tls?: HttpTlsConfigModel
 ): { ca?: Buffer; cert?: Buffer; key?: Buffer } | undefined {
   if (!tls) {
@@ -253,18 +253,18 @@ function _httpTlsOptionsFromConfig(
   checkConfigUse('HttpTls', tls, ['ca_file', 'cert_file', 'key_file']);
   const httpTlsOptions: { ca?: Buffer; cert?: Buffer; key?: Buffer } = {};
   if (tls.ca_file) {
-    httpTlsOptions.ca = _loadTlsConfigFile(tls.ca_file, 'ca_file');
+    httpTlsOptions.ca = loadTlsConfigFile(tls.ca_file, 'ca_file');
   }
   if (tls.cert_file) {
-    httpTlsOptions.cert = _loadTlsConfigFile(tls.cert_file, 'cert_file');
+    httpTlsOptions.cert = loadTlsConfigFile(tls.cert_file, 'cert_file');
   }
   if (tls.key_file) {
-    httpTlsOptions.key = _loadTlsConfigFile(tls.key_file, 'key_file');
+    httpTlsOptions.key = loadTlsConfigFile(tls.key_file, 'key_file');
   }
   return httpTlsOptions;
 }
 
-function _grpcCredentialsFromConfig(tls?: GrpcTlsConfigModel) {
+function grpcCredentialsFromConfig(tls?: GrpcTlsConfigModel) {
   if (!tls) {
     return undefined;
   }
@@ -281,13 +281,13 @@ function _grpcCredentialsFromConfig(tls?: GrpcTlsConfigModel) {
   }
 
   const rootCert = tls.ca_file
-    ? _loadTlsConfigFile(tls.ca_file, 'ca_file')
+    ? loadTlsConfigFile(tls.ca_file, 'ca_file')
     : undefined;
   const privateKey = tls.key_file
-    ? _loadTlsConfigFile(tls.key_file, 'key_file')
+    ? loadTlsConfigFile(tls.key_file, 'key_file')
     : undefined;
   const certChain = tls.cert_file
-    ? _loadTlsConfigFile(tls.cert_file, 'cert_file')
+    ? loadTlsConfigFile(tls.cert_file, 'cert_file')
     : undefined;
   if (rootCert || privateKey || certChain) {
     return createSslCredentials(rootCert, privateKey, certChain);
@@ -310,7 +310,7 @@ function _grpcCredentialsFromConfig(tls?: GrpcTlsConfigModel) {
  * JS SDK components do *not* handle a `0` timeout value.
  * See https://github.com/open-telemetry/opentelemetry-js/issues/6617
  */
-function _validateExportTimeoutConfig(
+function validateExportTimeoutConfig(
   timeout: number | null | undefined,
   errLabel: string
 ): number | undefined {
@@ -565,11 +565,11 @@ export function createLogRecordExporterFromConfig(
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
         headers: getHeadersFromConfiguration(props?.headers),
-        timeoutMillis: _validateExportTimeoutConfig(
+        timeoutMillis: validateExportTimeoutConfig(
           props?.timeout,
           'OtlpHttpExporter.timeout'
         ),
-        httpAgentOptions: _httpTlsOptionsFromConfig(props?.tls),
+        httpAgentOptions: httpTlsOptionsFromConfig(props?.tls),
       };
       const encoding = props?.encoding ?? 'protobuf';
       switch (encoding) {
@@ -600,11 +600,11 @@ export function createLogRecordExporterFromConfig(
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
-        timeoutMillis: _validateExportTimeoutConfig(
+        timeoutMillis: validateExportTimeoutConfig(
           props?.timeout,
           'OtlpGrpcExporter.timeout'
         ),
-        credentials: _grpcCredentialsFromConfig(props?.tls),
+        credentials: grpcCredentialsFromConfig(props?.tls),
         metadata: getGrpcMetadataFromHeaders(props?.headers),
       });
     }
@@ -640,7 +640,7 @@ export function createLogRecordProcessorFromConfig(
         maxQueueSize: props.max_queue_size ?? undefined,
         maxExportBatchSize: props.max_export_batch_size ?? undefined,
         scheduledDelayMillis: props.schedule_delay ?? undefined,
-        exportTimeoutMillis: _validateExportTimeoutConfig(
+        exportTimeoutMillis: validateExportTimeoutConfig(
           props.export_timeout,
           'BatchLogRecordProcessor.export_timeout'
         ),
@@ -795,11 +795,11 @@ export function createPushMetricExporterFromConfig(
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
         headers: getHeadersFromConfiguration(props?.headers),
-        timeoutMillis: _validateExportTimeoutConfig(
+        timeoutMillis: validateExportTimeoutConfig(
           props?.timeout,
           'PushMetricExporter.timeout'
         ),
-        httpAgentOptions: _httpTlsOptionsFromConfig(props?.tls),
+        httpAgentOptions: httpTlsOptionsFromConfig(props?.tls),
         temporalityPreference: aggregationTemporalityPreferenceFromConfig(
           props?.temporality_preference
         ),
@@ -838,11 +838,11 @@ export function createPushMetricExporterFromConfig(
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
-        timeoutMillis: _validateExportTimeoutConfig(
+        timeoutMillis: validateExportTimeoutConfig(
           props?.timeout,
           'PushMetricExporter.timeout'
         ),
-        credentials: _grpcCredentialsFromConfig(props?.tls),
+        credentials: grpcCredentialsFromConfig(props?.tls),
         metadata: getGrpcMetadataFromHeaders(props?.headers),
         temporalityPreference: aggregationTemporalityPreferenceFromConfig(
           props?.temporality_preference
@@ -907,7 +907,7 @@ function createPeriodicMetricReaderFromConfig(
   return new PeriodicExportingMetricReader({
     exportIntervalMillis: periodic.interval ?? 60_000,
     exportTimeoutMillis:
-      _validateExportTimeoutConfig(
+      validateExportTimeoutConfig(
         periodic?.timeout,
         'PeriodicExportingMetricReader.timeout'
       ) ?? 30_000,
@@ -1163,7 +1163,7 @@ function createViewOptionsFromConfig(view: ViewConfigModel): ViewOptions {
         k => k.includes('*') || k.includes('?')
       );
       if (unsupportedKeys.length > 0) {
-        throw Error(
+        throw new Error(
           `invalid /meter_provider/views/?/stream/attribute_keys/included in configuration: do not support wildcards: "${unsupportedKeys.join('", "')}"`
         );
       }
@@ -1182,7 +1182,7 @@ function createViewOptionsFromConfig(view: ViewConfigModel): ViewOptions {
         k => k.includes('*') || k.includes('?')
       );
       if (unsupportedKeys.length > 0) {
-        throw Error(
+        throw new Error(
           `invalid /meter_provider/views/?/stream/attribute_keys/excluded in configuration: do not support wildcards: "${unsupportedKeys.join('", "')}"`
         );
       }
@@ -1241,11 +1241,11 @@ function createSpanExporterFromConfig(
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
         headers: getHeadersFromConfiguration(props?.headers),
-        timeoutMillis: _validateExportTimeoutConfig(
+        timeoutMillis: validateExportTimeoutConfig(
           props?.timeout,
           'OtlpHttpExporter.timeout'
         ),
-        httpAgentOptions: _httpTlsOptionsFromConfig(props?.tls),
+        httpAgentOptions: httpTlsOptionsFromConfig(props?.tls),
       };
       const encoding = props?.encoding ?? 'protobuf';
       switch (encoding) {
@@ -1276,11 +1276,11 @@ function createSpanExporterFromConfig(
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
-        timeoutMillis: _validateExportTimeoutConfig(
+        timeoutMillis: validateExportTimeoutConfig(
           props?.timeout,
           'OtlpGrpcExporter.timeout'
         ),
-        credentials: _grpcCredentialsFromConfig(props?.tls),
+        credentials: grpcCredentialsFromConfig(props?.tls),
         metadata: getGrpcMetadataFromHeaders(props?.headers),
       });
     }
@@ -1314,7 +1314,7 @@ function createSpanProcessorFromConfig(
         maxQueueSize: props.max_queue_size ?? undefined,
         maxExportBatchSize: props.max_export_batch_size ?? undefined,
         scheduledDelayMillis: props.schedule_delay ?? undefined,
-        exportTimeoutMillis: _validateExportTimeoutConfig(
+        exportTimeoutMillis: validateExportTimeoutConfig(
           props.export_timeout,
           'BatchSpanProcessor.export_timeout'
         ),

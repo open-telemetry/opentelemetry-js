@@ -24,6 +24,7 @@ export type { TimedEvent } from './TimedEvent';
 export type {
   BatchSpanProcessorOptions,
   BatchSpanProcessorBrowserOptions,
+  ForceFlushOptions,
   SimpleSpanProcessorOptions,
   SpanLimits,
   SpanProcessorOptions,
