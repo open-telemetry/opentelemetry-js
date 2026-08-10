@@ -44,6 +44,11 @@ export type {
   View as ViewConfigModel,
   ExplicitBucketHistogramAggregation as ExplicitBucketHistogramAggregationConfigModel,
   Base2ExponentialBucketHistogramAggregation as Base2ExponentialBucketHistogramAggregationConfigModel,
+  TracerProvider as TracerProviderConfigModel,
+  BatchSpanProcessor as BatchSpanProcessorConfigModel,
+  SimpleSpanProcessor as SimpleSpanProcessorConfigModel,
+  TraceIdRatioBasedSampler as TraceIdRatioBasedSamplerConfigModel,
+  ParentBasedSampler as ParentBasedSamplerConfigModel,
 } from './generated/types';
 export { createConfigFactory } from './ConfigFactory';
 export {

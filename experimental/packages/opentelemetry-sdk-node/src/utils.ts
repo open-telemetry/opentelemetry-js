@@ -34,38 +34,18 @@ import {
   resourceFromAttributes,
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
-import type {
-  IdGenerator,
-  Sampler,
-  SpanExporter,
-  SpanProcessor,
-} from '@opentelemetry/sdk-trace';
+import type { SpanExporter, SpanProcessor } from '@opentelemetry/sdk-trace';
 import {
-  AlwaysOffSampler,
-  AlwaysOnSampler,
-  BatchSpanProcessor,
   ConsoleSpanExporter,
-  ParentBasedSampler,
-  RandomIdGenerator,
   SimpleSpanProcessor,
-  TraceIdRatioBasedSampler,
 } from '@opentelemetry/sdk-trace';
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
-import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
-import {
-  createEmptyMetadata,
-  createInsecureCredentials,
-  createSslCredentials,
-} from '@opentelemetry/otlp-grpc-exporter-base';
+import { createEmptyMetadata } from '@opentelemetry/otlp-grpc-exporter-base';
 import type {
   ConfigurationModel,
-  SpanExporterConfigModel,
-  SamplerConfigModel,
   NameStringValuePairConfigModel,
-  HttpTlsConfigModel,
-  GrpcTlsConfigModel,
 } from '@opentelemetry/configuration';
 import { mergeResourceAttributesConfig } from '@opentelemetry/configuration';
 import type {
@@ -82,7 +62,6 @@ import type {
   LoggerProviderOptions,
 } from '@opentelemetry/sdk-logs';
 import { BatchLogRecordProcessor } from '@opentelemetry/sdk-logs';
-import * as fs from 'fs';
 import { createBatchSpanProcessorFromEnv } from './create-from-env';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
@@ -530,56 +509,6 @@ export function getHeadersFromConfiguration(
   return result;
 }
 
-/**
- * Validate an exporter timeout value. The spec says 0 means "no limit
- * (infinity)" but the JS exporters don't support that yet (see #6617).
- * Warn and return undefined so the exporter falls back to its default.
- */
-export function validateExporterTimeout(
-  timeout: number | null | undefined
-): number | undefined {
-  if (timeout === null) {
-    return undefined;
-  } else if (timeout === 0) {
-    diag.warn(
-      'Exporter timeout of 0 (infinite) is not supported. Using default timeout.'
-    );
-    return undefined;
-  }
-  return timeout;
-}
-
-export function getHttpAgentOptionsFromTls(
-  tls: HttpTlsConfigModel | undefined
-): { ca?: Buffer; cert?: Buffer; key?: Buffer } | undefined {
-  if (tls && (tls.ca_file || tls.cert_file || tls.key_file)) {
-    return {
-      ca: readFileOrWarn(tls.ca_file, 'TLS CA'),
-      cert: readFileOrWarn(tls.cert_file, 'TLS cert'),
-      key: readFileOrWarn(tls.key_file, 'TLS key'),
-    };
-  }
-  return undefined;
-}
-
-export function getGrpcCredentialsFromTls(tls?: GrpcTlsConfigModel) {
-  if (tls?.insecure) {
-    return createInsecureCredentials();
-  }
-  const rootCert = readFileOrWarn(tls?.ca_file, 'TLS CA');
-  const privateKey = readFileOrWarn(tls?.key_file, 'TLS key');
-  const certChain = readFileOrWarn(tls?.cert_file, 'TLS cert');
-  if (rootCert || privateKey || certChain) {
-    try {
-      return createSslCredentials(rootCert, privateKey, certChain);
-    } catch (e) {
-      diag.warn(`Failed to create gRPC SSL credentials: ${e}`);
-      return undefined;
-    }
-  }
-  return undefined;
-}
-
 export function getGrpcMetadataFromHeaders(
   headers: NameStringValuePairConfigModel[] | undefined
 ) {
@@ -595,119 +524,6 @@ export function getGrpcMetadataFromHeaders(
   return metadata;
 }
 
-function readFileOrWarn(
-  filePath: string | null | undefined,
-  label: string
-): Buffer | undefined {
-  if (!filePath) return undefined;
-  try {
-    return fs.readFileSync(filePath);
-  } catch (e) {
-    diag.warn(`Failed to read ${label} file at ${filePath}: ${e}`);
-    return undefined;
-  }
-}
-
-export function getSpanExporter(
-  exporter: SpanExporterConfigModel
-): SpanExporter | undefined {
-  if (exporter.otlp_http !== undefined) {
-    const encoding = exporter.otlp_http?.encoding ?? 'protobuf';
-    if (encoding === 'json') {
-      return new OTLPHttpTraceExporter({
-        compression:
-          exporter.otlp_http?.compression === 'gzip'
-            ? CompressionAlgorithm.GZIP
-            : CompressionAlgorithm.NONE,
-        url: exporter.otlp_http?.endpoint ?? undefined,
-        headers: getHeadersFromConfiguration(exporter.otlp_http?.headers),
-        timeoutMillis: validateExporterTimeout(exporter.otlp_http?.timeout),
-        httpAgentOptions: getHttpAgentOptionsFromTls(exporter.otlp_http?.tls),
-      });
-    } else {
-      return new OTLPProtoTraceExporter({
-        compression:
-          exporter.otlp_http?.compression === 'gzip'
-            ? CompressionAlgorithm.GZIP
-            : CompressionAlgorithm.NONE,
-        url: exporter.otlp_http?.endpoint ?? undefined,
-        headers: getHeadersFromConfiguration(exporter.otlp_http?.headers),
-        timeoutMillis: validateExporterTimeout(exporter.otlp_http?.timeout),
-        httpAgentOptions: getHttpAgentOptionsFromTls(exporter.otlp_http?.tls),
-      });
-    }
-  } else if (exporter.otlp_grpc !== undefined) {
-    return new OTLPGrpcTraceExporter({
-      compression:
-        exporter.otlp_grpc?.compression === 'gzip'
-          ? CompressionAlgorithm.GZIP
-          : CompressionAlgorithm.NONE,
-      url: exporter.otlp_grpc?.endpoint ?? undefined,
-      timeoutMillis: validateExporterTimeout(exporter.otlp_grpc?.timeout),
-      credentials: getGrpcCredentialsFromTls(exporter.otlp_grpc?.tls),
-      metadata: getGrpcMetadataFromHeaders(exporter.otlp_grpc?.headers),
-    });
-  } else if (exporter.console !== undefined) {
-    return new ConsoleSpanExporter();
-  }
-  diag.warn('Unsupported Exporter value. No Span Exporter registered');
-  return undefined;
-}
-
-export function getSpanProcessorsFromConfiguration(
-  config: ConfigurationModel
-): SpanProcessor[] | undefined {
-  const spanProcessors: SpanProcessor[] = [];
-  config.tracer_provider?.processors?.forEach(processor => {
-    if (processor.batch) {
-      const exporter = getSpanExporter(processor.batch.exporter);
-      if (exporter) {
-        spanProcessors.push(
-          new BatchSpanProcessor({
-            exporter,
-            maxQueueSize: processor.batch.max_queue_size ?? undefined,
-            maxExportBatchSize:
-              processor.batch.max_export_batch_size ?? undefined,
-            scheduledDelayMillis: processor.batch.schedule_delay ?? undefined,
-            exportTimeoutMillis: processor.batch.export_timeout ?? undefined,
-          })
-        );
-      }
-    }
-    if (processor.simple) {
-      const exporter = getSpanExporter(processor.simple.exporter);
-      if (exporter) {
-        spanProcessors.push(new SimpleSpanProcessor({ exporter }));
-      }
-    }
-  });
-  if (spanProcessors.length > 0) {
-    return spanProcessors;
-  }
-  return undefined;
-}
-
-export function getIdGeneratorFromConfiguration(
-  config: ConfigurationModel
-): IdGenerator | undefined {
-  const idGenerator = config.tracer_provider?.id_generator;
-  if (!idGenerator) {
-    return undefined;
-  }
-  if (idGenerator.random !== undefined) {
-    return new RandomIdGenerator();
-  }
-  // Any other key is a third-party / custom id_generator type which we
-  // don't currently support. Warn and fall back to SDK default.
-  const unknownKeys = Object.keys(idGenerator).filter(k => k !== 'random');
-  if (unknownKeys.length > 0) {
-    diag.warn(
-      `Unsupported id_generator type(s): ${unknownKeys.join(', ')}. Using default.`
-    );
-  }
-  return undefined;
-}
-
 export function getInstanceID(config: ConfigurationModel): string | undefined {
   if (config.resource?.attributes) {
     for (let i = 0; i < config.resource.attributes.length; i++) {
@@ -718,61 +534,4 @@ export function getInstanceID(config: ConfigurationModel): string | undefined {
     }
   }
   return undefined;
-}
-
-const DEFAULT_RATIO = 1;
-
-/**
- * Returns the {@link Sampler} configured under `tracer_provider.sampler` in
- * the declarative configuration, or `undefined` if none is set (in which case
- * the SDK applies its default sampler).
- */
-export function getSamplerFromConfiguration(
-  config: ConfigurationModel
-): Sampler | undefined {
-  const samplerConfig = config.tracer_provider?.sampler;
-  if (!samplerConfig) {
-    return undefined;
-  }
-  return buildSamplerFromConfig(samplerConfig);
-}
-
-/**
- * Builds a {@link Sampler} from a {@link SamplerConfigModel} data model.
- * This allows sampler construction from declarative configuration.
- */
-export function buildSamplerFromConfig(
-  samplerConfig: SamplerConfigModel
-): Sampler {
-  if (samplerConfig.always_on !== undefined) {
-    return new AlwaysOnSampler();
-  }
-  if (samplerConfig.always_off !== undefined) {
-    return new AlwaysOffSampler();
-  }
-  if (samplerConfig.trace_id_ratio_based !== undefined) {
-    return new TraceIdRatioBasedSampler(
-      samplerConfig.trace_id_ratio_based?.ratio ?? DEFAULT_RATIO
-    );
-  }
-  if (samplerConfig.parent_based !== undefined) {
-    const pb = samplerConfig.parent_based ?? {};
-    return new ParentBasedSampler({
-      root: pb.root ? buildSamplerFromConfig(pb.root) : new AlwaysOnSampler(),
-      remoteParentSampled: pb.remote_parent_sampled
-        ? buildSamplerFromConfig(pb.remote_parent_sampled)
-        : undefined,
-      remoteParentNotSampled: pb.remote_parent_not_sampled
-        ? buildSamplerFromConfig(pb.remote_parent_not_sampled)
-        : undefined,
-      localParentSampled: pb.local_parent_sampled
-        ? buildSamplerFromConfig(pb.local_parent_sampled)
-        : undefined,
-      localParentNotSampled: pb.local_parent_not_sampled
-        ? buildSamplerFromConfig(pb.local_parent_not_sampled)
-        : undefined,
-    });
-  }
-  diag.warn('Unknown sampler config, defaulting to ParentBased(AlwaysOn).');
-  return new ParentBasedSampler({ root: new AlwaysOnSampler() });
 }
