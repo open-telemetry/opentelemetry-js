@@ -33,6 +33,17 @@ export type {
   OtlpGrpcExporter as OtlpGrpcExporterConfigModel,
   LogRecordLimits as LogRecordLimitsConfigModel,
   Propagator as PropagatorConfigModel,
+  MeterProvider as MeterProviderConfigModel,
+  MetricReader as MetricReaderConfigModel,
+  ExporterTemporalityPreference as ExporterTemporalityPreferenceConfigModel,
+  ExporterDefaultHistogramAggregation as ExporterDefaultHistogramAggregationConfigModel,
+  ConsoleMetricExporter as ConsoleMetricExporterConfigModel,
+  PullMetricReader as PullMetricReaderConfigModel,
+  PullMetricExporter as PullMetricExporterConfigModel,
+  ExperimentalPrometheusMetricExporter as ExperimentalPrometheusMetricExporterConfigModel,
+  View as ViewConfigModel,
+  ExplicitBucketHistogramAggregation as ExplicitBucketHistogramAggregationConfigModel,
+  Base2ExponentialBucketHistogramAggregation as Base2ExponentialBucketHistogramAggregationConfigModel,
 } from './generated/types';
 export { createConfigFactory } from './ConfigFactory';
 export {

@@ -8,13 +8,8 @@ import {
   getKeyListFromObjectArray,
   getLoggerProviderConfigFromEnv,
   getBatchLogRecordProcessorConfigFromEnv,
-  getPeriodicMetricReaderFromConfiguration,
-  getMetricExporter,
-  getInstrumentType,
-  getAggregationType,
   getResourceDetectorsFromConfiguration,
   getHeadersFromConfiguration,
-  getMeterViewsFromConfiguration,
   getHttpAgentOptionsFromTls,
   getIdGeneratorFromConfiguration,
 } from '../src/utils';
@@ -22,14 +17,9 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag } from '@opentelemetry/api';
 import type {
-  InstrumentTypeConfigModel,
   ConfigurationModel,
   HttpTlsConfigModel,
-  PushMetricExporterConfigModel,
 } from '@opentelemetry/configuration';
-import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
-import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
-import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
 import {
   envDetector,
   hostDetector,
@@ -38,12 +28,6 @@ import {
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 import type { LoggerProviderOptions } from '@opentelemetry/sdk-logs';
-import {
-  AggregationTemporality,
-  AggregationType,
-  ConsoleMetricExporter,
-  InstrumentType,
-} from '@opentelemetry/sdk-metrics';
 
 describe('getPropagatorFromEnv', function () {
   afterEach(() => {
@@ -345,222 +329,6 @@ describe('getBatchLogRecordProcessorConfigFromEnv', function () {
     });
     sinon.assert.callCount(warnStub, 4);
   });
-
-  it('should return warning message for invalid compression type for meter provider', function () {
-    const warnStub = sinon.stub(diag, 'warn');
-    getPeriodicMetricReaderFromConfiguration({
-      exporter: { otlp_http: { encoding: 'invalid' } },
-    } as any);
-    sinon.assert.calledWithExactly(
-      warnStub,
-      'Unsupported OTLP metrics encoding: invalid.'
-    );
-  });
-
-  it('should return values for getInstrumentType', function () {
-    assert.deepStrictEqual(
-      getInstrumentType('counter' as InstrumentTypeConfigModel),
-      InstrumentType.COUNTER
-    );
-    assert.deepStrictEqual(
-      getInstrumentType('gauge' as InstrumentTypeConfigModel),
-      InstrumentType.GAUGE
-    );
-    assert.deepStrictEqual(
-      getInstrumentType('histogram' as InstrumentTypeConfigModel),
-      InstrumentType.HISTOGRAM
-    );
-    assert.deepStrictEqual(
-      getInstrumentType('observable_counter' as InstrumentTypeConfigModel),
-      InstrumentType.OBSERVABLE_COUNTER
-    );
-    assert.deepStrictEqual(
-      getInstrumentType('observable_gauge' as InstrumentTypeConfigModel),
-      InstrumentType.OBSERVABLE_GAUGE
-    );
-    assert.deepStrictEqual(
-      getInstrumentType(
-        'observable_up_down_counter' as InstrumentTypeConfigModel
-      ),
-      InstrumentType.OBSERVABLE_UP_DOWN_COUNTER
-    );
-    assert.deepStrictEqual(
-      getInstrumentType('up_down_counter' as InstrumentTypeConfigModel),
-      InstrumentType.UP_DOWN_COUNTER
-    );
-
-    const warnStub = sinon.stub(diag, 'warn');
-    assert.deepStrictEqual(
-      getInstrumentType('invalid' as InstrumentTypeConfigModel),
-      undefined
-    );
-    sinon.assert.calledWithExactly(
-      warnStub,
-      'Unsupported instrument type: invalid'
-    );
-  });
-
-  it('should return correct values for getAggregationType', function () {
-    assert.equal(getAggregationType({}), undefined);
-    assert.deepStrictEqual(getAggregationType({ default: {} }), {
-      type: AggregationType.DEFAULT,
-    });
-    assert.deepStrictEqual(getAggregationType({ drop: {} }), {
-      type: AggregationType.DROP,
-    });
-    assert.deepStrictEqual(
-      getAggregationType({ explicit_bucket_histogram: {} }),
-      {
-        type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
-        options: {
-          recordMinMax: true,
-          boundaries: [
-            0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500,
-            10000,
-          ],
-        },
-      }
-    );
-    assert.deepStrictEqual(
-      getAggregationType({
-        base2_exponential_bucket_histogram: { max_size: 10 },
-      }),
-      {
-        type: AggregationType.EXPONENTIAL_HISTOGRAM,
-        options: {
-          recordMinMax: undefined,
-          maxSize: 10,
-        },
-      }
-    );
-    assert.deepStrictEqual(getAggregationType({ last_value: {} }), {
-      type: AggregationType.LAST_VALUE,
-    });
-    assert.deepStrictEqual(getAggregationType({ sum: {} }), {
-      type: AggregationType.SUM,
-    });
-  });
-});
-
-describe('getMetricExporter', function () {
-  afterEach(function () {
-    sinon.restore();
-  });
-
-  it('creates an OTLP http/protobuf exporter by default', function () {
-    const exporter = getMetricExporter({ otlp_http: {} });
-    assert.ok(exporter instanceof OTLPProtoMetricExporter);
-  });
-
-  it('creates an OTLP http/json exporter when encoding is json', function () {
-    const exporter = getMetricExporter({
-      otlp_http: { encoding: 'json' },
-    });
-    assert.ok(exporter instanceof OTLPHttpMetricExporter);
-  });
-
-  it('creates an OTLP gRPC exporter', function () {
-    const exporter = getMetricExporter({ otlp_grpc: {} });
-    assert.ok(exporter instanceof OTLPGrpcMetricExporter);
-  });
-
-  it('creates a console exporter', function () {
-    const exporter = getMetricExporter({ console: {} });
-    assert.ok(exporter instanceof ConsoleMetricExporter);
-  });
-
-  it('warns and returns undefined for an unsupported exporter', function () {
-    const warnStub = sinon.stub(diag, 'warn');
-    const exporter = getMetricExporter(
-      {} as unknown as PushMetricExporterConfigModel
-    );
-    assert.strictEqual(exporter, undefined);
-    sinon.assert.calledWithExactly(warnStub, 'Unsupported Metric Exporter.');
-  });
-
-  it('warns and returns undefined for an unsupported encoding', function () {
-    const warnStub = sinon.stub(diag, 'warn');
-    const exporter = getMetricExporter({
-      otlp_http: { encoding: 'invalid' },
-    } as unknown as PushMetricExporterConfigModel);
-    assert.strictEqual(exporter, undefined);
-    sinon.assert.calledWithExactly(
-      warnStub,
-      'Unsupported OTLP metrics encoding: invalid.'
-    );
-  });
-
-  it('maps temporality_preference onto the OTLP http exporter', function () {
-    const exporter = getMetricExporter({
-      otlp_http: { temporality_preference: 'delta' },
-    }) as OTLPProtoMetricExporter;
-    // delta uses DELTA temporality for counters
-    assert.strictEqual(
-      exporter.selectAggregationTemporality(InstrumentType.COUNTER),
-      AggregationTemporality.DELTA
-    );
-    // ...but cumulative for up-down counters
-    assert.strictEqual(
-      exporter.selectAggregationTemporality(InstrumentType.UP_DOWN_COUNTER),
-      AggregationTemporality.CUMULATIVE
-    );
-  });
-
-  it('maps the cumulative temporality_preference', function () {
-    const exporter = getMetricExporter({
-      otlp_http: { temporality_preference: 'cumulative' },
-    }) as OTLPProtoMetricExporter;
-    assert.strictEqual(
-      exporter.selectAggregationTemporality(InstrumentType.COUNTER),
-      AggregationTemporality.CUMULATIVE
-    );
-    assert.strictEqual(
-      exporter.selectAggregationTemporality(InstrumentType.HISTOGRAM),
-      AggregationTemporality.CUMULATIVE
-    );
-  });
-
-  it('maps temporality_preference onto the OTLP gRPC exporter', function () {
-    const exporter = getMetricExporter({
-      otlp_grpc: { temporality_preference: 'low_memory' },
-    }) as OTLPGrpcMetricExporter;
-    // low_memory uses DELTA for counters and histograms
-    assert.strictEqual(
-      exporter.selectAggregationTemporality(InstrumentType.COUNTER),
-      AggregationTemporality.DELTA
-    );
-    assert.strictEqual(
-      exporter.selectAggregationTemporality(InstrumentType.OBSERVABLE_GAUGE),
-      AggregationTemporality.CUMULATIVE
-    );
-  });
-
-  it('maps default_histogram_aggregation to exponential for histograms only', function () {
-    const exporter = getMetricExporter({
-      otlp_http: {
-        default_histogram_aggregation: 'base2_exponential_bucket_histogram',
-      },
-    }) as OTLPProtoMetricExporter;
-    assert.deepStrictEqual(
-      exporter.selectAggregation(InstrumentType.HISTOGRAM),
-      { type: AggregationType.EXPONENTIAL_HISTOGRAM }
-    );
-    assert.deepStrictEqual(exporter.selectAggregation(InstrumentType.COUNTER), {
-      type: AggregationType.DEFAULT,
-    });
-  });
-
-  it('maps default_histogram_aggregation explicit_bucket_histogram', function () {
-    const exporter = getMetricExporter({
-      otlp_grpc: {
-        default_histogram_aggregation: 'explicit_bucket_histogram',
-      },
-    }) as OTLPGrpcMetricExporter;
-    assert.deepStrictEqual(
-      exporter.selectAggregation(InstrumentType.HISTOGRAM),
-      { type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM }
-    );
-  });
 });
 
 describe('getResourceDetectorsFromConfiguration', function () {
@@ -684,155 +452,6 @@ describe('getHeadersFromConfiguration', function () {
   });
 });
 
-describe('getMeterViewsFromConfiguration', function () {
-  it('should return undefined for empty config', function () {
-    const result = getMeterViewsFromConfiguration({});
-    assert.strictEqual(result, undefined);
-  });
-
-  it('should return undefined when meter_provider has no views', function () {
-    const result = getMeterViewsFromConfiguration({
-      meter_provider: { readers: [] },
-    });
-    assert.strictEqual(result, undefined);
-  });
-
-  it('should set attributesProcessors with included attribute_keys', function () {
-    const result = getMeterViewsFromConfiguration({
-      meter_provider: {
-        readers: [],
-        views: [
-          {
-            selector: { instrument_name: 'my.counter' },
-            stream: {
-              attribute_keys: {
-                included: ['key1', 'key2'],
-              },
-            },
-          },
-        ],
-      },
-    });
-    assert.ok(result);
-    assert.strictEqual(result.length, 1);
-    assert.ok(result[0].attributesProcessors);
-    assert.strictEqual(result[0].attributesProcessors!.length, 1);
-
-    // AllowListProcessor should keep only 'key1' and 'key2'
-    const processed = result[0].attributesProcessors![0].process({
-      key1: 'a',
-      key2: 'b',
-      key3: 'c',
-    });
-    assert.deepStrictEqual(processed, { key1: 'a', key2: 'b' });
-  });
-
-  it('should set attributesProcessors with excluded attribute_keys', function () {
-    const result = getMeterViewsFromConfiguration({
-      meter_provider: {
-        readers: [],
-        views: [
-          {
-            selector: { instrument_name: 'my.counter' },
-            stream: {
-              attribute_keys: {
-                excluded: ['key3'],
-              },
-            },
-          },
-        ],
-      },
-    });
-    assert.ok(result);
-    assert.strictEqual(result.length, 1);
-    assert.ok(result[0].attributesProcessors);
-    assert.strictEqual(result[0].attributesProcessors!.length, 1);
-
-    // DenyListProcessor should drop 'key3'
-    const processed = result[0].attributesProcessors![0].process({
-      key1: 'a',
-      key2: 'b',
-      key3: 'c',
-    });
-    assert.deepStrictEqual(processed, { key1: 'a', key2: 'b' });
-  });
-
-  it('should set both processors when included and excluded are provided', function () {
-    const result = getMeterViewsFromConfiguration({
-      meter_provider: {
-        readers: [],
-        views: [
-          {
-            selector: { instrument_name: 'my.counter' },
-            stream: {
-              attribute_keys: {
-                included: ['key1', 'key2', 'key3'],
-                excluded: ['key3'],
-              },
-            },
-          },
-        ],
-      },
-    });
-    assert.ok(result);
-    assert.strictEqual(result.length, 1);
-    assert.ok(result[0].attributesProcessors);
-    // AllowList + DenyList = 2 processors
-    assert.strictEqual(result[0].attributesProcessors!.length, 2);
-
-    // Apply both: first allow key1,key2,key3, then deny key3
-    let processed = result[0].attributesProcessors![0].process({
-      key1: 'a',
-      key2: 'b',
-      key3: 'c',
-      key4: 'd',
-    });
-    processed = result[0].attributesProcessors![1].process(processed);
-    assert.deepStrictEqual(processed, { key1: 'a', key2: 'b' });
-  });
-
-  it('should not set attributesProcessors when attribute_keys is empty', function () {
-    const result = getMeterViewsFromConfiguration({
-      meter_provider: {
-        readers: [],
-        views: [
-          {
-            selector: { instrument_name: 'my.counter' },
-            stream: {
-              attribute_keys: {
-                included: [],
-                excluded: [],
-              },
-            },
-          },
-        ],
-      },
-    });
-    assert.ok(result);
-    assert.strictEqual(result.length, 1);
-    assert.strictEqual(result[0].attributesProcessors, undefined);
-  });
-
-  it('should not set attributesProcessors when stream has no attribute_keys', function () {
-    const result = getMeterViewsFromConfiguration({
-      meter_provider: {
-        readers: [],
-        views: [
-          {
-            selector: { instrument_name: 'my.counter' },
-            stream: {
-              name: 'renamed',
-            },
-          },
-        ],
-      },
-    });
-    assert.ok(result);
-    assert.strictEqual(result.length, 1);
-    assert.strictEqual(result[0].attributesProcessors, undefined);
-  });
-});
-
 describe('getIdGeneratorFromConfiguration', function () {
   afterEach(() => {
     sinon.restore();
@@ -891,9 +510,9 @@ describe('getHttpAgentOptionsFromTls', function () {
 
   it('should return https agent options if TLS config is provided', async () => {
     const tlsConfig: HttpTlsConfigModel = {
-      ca_file: 'test/fixtures/ca.pem',
-      key_file: 'test/fixtures/ca-key.pem',
-      cert_file: 'test/fixtures/cert.pem',
+      ca_file: 'test/certs/ca.crt',
+      key_file: 'test/certs/client.key',
+      cert_file: 'test/certs/client.crt',
     };
     const agentOptions = getHttpAgentOptionsFromTls(tlsConfig);
     assert.ok(agentOptions);
@@ -906,8 +525,8 @@ describe('getHttpAgentOptionsFromTls', function () {
     const warnStub = sinon.stub(diag, 'warn');
     const tlsConfig: HttpTlsConfigModel = {
       ca_file: 'invalid-ca.pem',
-      key_file: 'test/fixtures/ca-key.pem',
-      cert_file: 'test/fixtures/cert.pem',
+      key_file: 'test/certs/client.key',
+      cert_file: 'test/certs/client.crt',
     };
     const agentOptions = getHttpAgentOptionsFromTls(tlsConfig);
     assert.ok(agentOptions);
@@ -926,9 +545,9 @@ describe('getHttpAgentOptionsFromTls', function () {
   it('show warning messages for invalid ca-key file', async () => {
     const warnStub = sinon.stub(diag, 'warn');
     const tlsConfig: HttpTlsConfigModel = {
-      ca_file: 'test/fixtures/ca.pem',
+      ca_file: 'test/certs/ca.crt',
       key_file: 'invalid-ca-key.pem',
-      cert_file: 'test/fixtures/cert.pem',
+      cert_file: 'test/certs/client.crt',
     };
     const agentOptions = getHttpAgentOptionsFromTls(tlsConfig);
     assert.ok(agentOptions);
@@ -947,8 +566,8 @@ describe('getHttpAgentOptionsFromTls', function () {
   it('show warning messages for invalid cert file', async () => {
     const warnStub = sinon.stub(diag, 'warn');
     const tlsConfig: HttpTlsConfigModel = {
-      ca_file: 'test/fixtures/ca.pem',
-      key_file: 'test/fixtures/ca-key.pem',
+      ca_file: 'test/certs/ca.crt',
+      key_file: 'test/certs/client.key',
       cert_file: 'invalid-cert.pem',
     };
     const agentOptions = getHttpAgentOptionsFromTls(tlsConfig);
