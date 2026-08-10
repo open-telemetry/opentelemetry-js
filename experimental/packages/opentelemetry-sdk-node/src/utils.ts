@@ -61,13 +61,6 @@ import {
 } from '@opentelemetry/otlp-grpc-exporter-base';
 import type {
   ConfigurationModel,
-  InstrumentTypeConfigModel,
-  AggregationConfigModel,
-  MetricProducerConfigModel,
-  PeriodicMetricReaderConfigModel,
-  PushMetricExporterConfigModel,
-  OtlpHttpMetricExporterConfigModel,
-  OtlpGrpcMetricExporterConfigModel,
   SpanExporterConfigModel,
   SamplerConfigModel,
   NameStringValuePairConfigModel,
@@ -76,31 +69,18 @@ import type {
 } from '@opentelemetry/configuration';
 import { mergeResourceAttributesConfig } from '@opentelemetry/configuration';
 import type {
-  AggregationOption,
-  AggregationSelector,
-  IAttributesProcessor,
   IMetricReader,
   PushMetricExporter,
-  ViewOptions,
 } from '@opentelemetry/sdk-metrics';
-import {
-  AggregationType,
-  ConsoleMetricExporter,
-  createAllowListAttributesProcessor,
-  createDenyListAttributesProcessor,
-  InstrumentType,
-  PeriodicExportingMetricReader,
-} from '@opentelemetry/sdk-metrics';
+import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
 import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
-import { AggregationTemporalityPreference } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
 import type {
   BatchLogRecordProcessorOptions,
   LogRecordExporter,
   LoggerProviderOptions,
 } from '@opentelemetry/sdk-logs';
-import type { MetricProducer } from '@opentelemetry/sdk-metrics';
 import { BatchLogRecordProcessor } from '@opentelemetry/sdk-logs';
 import * as fs from 'fs';
 import { createBatchSpanProcessorFromEnv } from './create-from-env';
@@ -504,163 +484,6 @@ export function getOtlpMetricExporterFromEnv(): PushMetricExporter {
   return new OTLPProtoMetricExporter();
 }
 
-function getMetricProducersFromConfiguration(
-  producers: MetricProducerConfigModel[] | undefined
-): MetricProducer[] | undefined {
-  if (!producers || producers.length === 0) {
-    return undefined;
-  }
-  const result: MetricProducer[] = [];
-  for (const producer of producers) {
-    // Note: The "opencensus" MetricProducer is intentionally not supported.
-    // It is deprecated in OpenTelemetry Configuration v1.2.0.
-    diag.warn(
-      `Unsupported metric producer in configuration: "${producer}". Skipping.`
-    );
-  }
-  return result.length > 0 ? result : undefined;
-}
-
-/**
- * Map a declarative-config `temporality_preference` value to the enum the OTLP
- * metric exporters expect. Returns undefined for an unspecified preference so
- * the exporter falls back to its own default (cumulative).
- */
-function getMetricTemporalityPreference(
-  preference: string | null | undefined
-): AggregationTemporalityPreference | undefined {
-  switch (preference) {
-    case 'delta':
-      return AggregationTemporalityPreference.DELTA;
-    case 'low_memory':
-      return AggregationTemporalityPreference.LOWMEMORY;
-    case 'cumulative':
-      return AggregationTemporalityPreference.CUMULATIVE;
-    default:
-      return undefined;
-  }
-}
-
-/**
- * Map a declarative-config `default_histogram_aggregation` value to an
- * AggregationSelector that applies the requested aggregation to histogram
- * instruments and leaves all other instrument types at their default. Returns
- * undefined for an unspecified value so the exporter uses its own default.
- */
-function getMetricAggregationPreference(
-  aggregation: string | null | undefined
-): AggregationSelector | undefined {
-  let histogramAggregation: AggregationOption;
-  switch (aggregation) {
-    case 'base2_exponential_bucket_histogram':
-      histogramAggregation = { type: AggregationType.EXPONENTIAL_HISTOGRAM };
-      break;
-    case 'explicit_bucket_histogram':
-      histogramAggregation = {
-        type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
-      };
-      break;
-    default:
-      return undefined;
-  }
-  return (instrumentType: InstrumentType): AggregationOption =>
-    instrumentType === InstrumentType.HISTOGRAM
-      ? histogramAggregation
-      : { type: AggregationType.DEFAULT };
-}
-
-function getOtlpHttpMetricExporter(
-  otlpHttp: OtlpHttpMetricExporterConfigModel
-): PushMetricExporter | undefined {
-  const encoding = otlpHttp?.encoding ?? 'protobuf';
-  const options = {
-    compression:
-      otlpHttp?.compression === 'gzip'
-        ? CompressionAlgorithm.GZIP
-        : CompressionAlgorithm.NONE,
-    url: otlpHttp?.endpoint ?? undefined,
-    headers: getHeadersFromConfiguration(otlpHttp?.headers),
-    timeoutMillis: validateExporterTimeout(otlpHttp?.timeout),
-    httpAgentOptions: getHttpAgentOptionsFromTls(otlpHttp?.tls),
-    temporalityPreference: getMetricTemporalityPreference(
-      otlpHttp?.temporality_preference
-    ),
-    aggregationPreference: getMetricAggregationPreference(
-      otlpHttp?.default_histogram_aggregation
-    ),
-  };
-  if (encoding === 'json') {
-    return new OTLPHttpMetricExporter(options);
-  } else if (encoding === 'protobuf') {
-    return new OTLPProtoMetricExporter(options);
-  }
-  diag.warn(`Unsupported OTLP metrics encoding: ${encoding}.`);
-  return undefined;
-}
-
-function getOtlpGrpcMetricExporter(
-  otlpGrpc: OtlpGrpcMetricExporterConfigModel
-): PushMetricExporter {
-  return new OTLPGrpcMetricExporter({
-    compression:
-      otlpGrpc?.compression === 'gzip'
-        ? CompressionAlgorithm.GZIP
-        : CompressionAlgorithm.NONE,
-    url: otlpGrpc?.endpoint ?? undefined,
-    timeoutMillis: validateExporterTimeout(otlpGrpc?.timeout),
-    credentials: getGrpcCredentialsFromTls(otlpGrpc?.tls),
-    metadata: getGrpcMetadataFromHeaders(otlpGrpc?.headers),
-    temporalityPreference: getMetricTemporalityPreference(
-      otlpGrpc?.temporality_preference
-    ),
-    aggregationPreference: getMetricAggregationPreference(
-      otlpGrpc?.default_histogram_aggregation
-    ),
-  });
-}
-
-export function getMetricExporter(
-  exporter: PushMetricExporterConfigModel
-): PushMetricExporter | undefined {
-  if (exporter.otlp_http !== undefined) {
-    return getOtlpHttpMetricExporter(exporter.otlp_http);
-  }
-  if (exporter.otlp_grpc !== undefined) {
-    return getOtlpGrpcMetricExporter(exporter.otlp_grpc);
-  }
-  if (exporter.console !== undefined) {
-    return new ConsoleMetricExporter();
-  }
-  diag.warn('Unsupported Metric Exporter.');
-  return undefined;
-}
-
-export function getPeriodicMetricReaderFromConfiguration(
-  periodic: PeriodicMetricReaderConfigModel
-): IMetricReader | undefined {
-  if (!periodic.exporter) {
-    diag.warn('Unsupported Metric Exporter.');
-    return undefined;
-  }
-
-  const exporter = getMetricExporter(periodic.exporter);
-  if (!exporter) {
-    return undefined;
-  }
-
-  const metricProducers = getMetricProducersFromConfiguration(
-    periodic.producers
-  );
-
-  // TODO(6425): add cardinality_limits
-  return new PeriodicExportingMetricReader({
-    exportIntervalMillis: periodic.interval ?? 60_000,
-    exportTimeoutMillis: periodic.timeout ?? 30_000,
-    exporter,
-    metricProducers,
-  });
-}
-
 /**
  * Get LoggerProviderConfig from environment variables.
  */
@@ -899,186 +722,6 @@ export function getIdGeneratorFromConfiguration(
     diag.warn(
       `Unsupported id_generator type(s): ${unknownKeys.join(', ')}. Using default.`
     );
-  }
-  return undefined;
-}
-
-export function getMeterReadersFromConfiguration(
-  config: ConfigurationModel
-): IMetricReader[] | undefined {
-  const metricReaders: IMetricReader[] = [];
-  config.meter_provider?.readers?.forEach(reader => {
-    if (reader.periodic) {
-      const periodicReader = getPeriodicMetricReaderFromConfiguration(
-        reader.periodic
-      );
-      if (periodicReader) {
-        metricReaders.push(periodicReader);
-      }
-    }
-  });
-  if (metricReaders.length > 0) {
-    return metricReaders;
-  }
-  return undefined;
-}
-
-export function getInstrumentType(
-  instrument: InstrumentTypeConfigModel
-): InstrumentType | undefined {
-  switch (instrument) {
-    case 'counter':
-      return InstrumentType.COUNTER;
-    case 'gauge':
-      return InstrumentType.GAUGE;
-    case 'histogram':
-      return InstrumentType.HISTOGRAM;
-    case 'observable_counter':
-      return InstrumentType.OBSERVABLE_COUNTER;
-    case 'observable_gauge':
-      return InstrumentType.OBSERVABLE_GAUGE;
-    case 'observable_up_down_counter':
-      return InstrumentType.OBSERVABLE_UP_DOWN_COUNTER;
-    case 'up_down_counter':
-      return InstrumentType.UP_DOWN_COUNTER;
-    default:
-      diag.warn(`Unsupported instrument type: ${instrument}`);
-      return undefined;
-  }
-}
-
-export function getAggregationType(
-  aggregation: AggregationConfigModel
-): AggregationOption | undefined {
-  if (aggregation.default) {
-    return {
-      type: AggregationType.DEFAULT,
-    };
-  }
-  if (aggregation.drop) {
-    return {
-      type: AggregationType.DROP,
-    };
-  }
-  if (aggregation.explicit_bucket_histogram) {
-    return {
-      type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
-      options: {
-        recordMinMax:
-          aggregation.explicit_bucket_histogram.record_min_max ?? true,
-        boundaries: aggregation.explicit_bucket_histogram.boundaries ?? [
-          0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500,
-          10000,
-        ],
-      },
-    };
-  }
-
-  if (aggregation.base2_exponential_bucket_histogram) {
-    return {
-      type: AggregationType.EXPONENTIAL_HISTOGRAM,
-      options: {
-        recordMinMax:
-          aggregation.base2_exponential_bucket_histogram.record_min_max ??
-          undefined,
-        maxSize:
-          aggregation.base2_exponential_bucket_histogram.max_size ?? undefined,
-      },
-    };
-  }
-  if (aggregation.last_value) {
-    return {
-      type: AggregationType.LAST_VALUE,
-    };
-  }
-  if (aggregation.sum) {
-    return {
-      type: AggregationType.SUM,
-    };
-  }
-
-  diag.warn('Unsupported aggregation type');
-  return undefined;
-}
-
-export function getMeterViewsFromConfiguration(
-  config: ConfigurationModel
-): ViewOptions[] | undefined {
-  const metricViews: ViewOptions[] = [];
-  config.meter_provider?.views?.forEach(view => {
-    const viewOption: ViewOptions = {};
-    if (view.selector) {
-      if (view.selector.instrument_name) {
-        viewOption.instrumentName = view.selector.instrument_name;
-      }
-      if (view.selector.instrument_type) {
-        const instrumentType = getInstrumentType(view.selector.instrument_type);
-        if (instrumentType) {
-          viewOption.instrumentType = instrumentType;
-        }
-      }
-      if (view.selector.unit) {
-        viewOption.instrumentUnit = view.selector.unit;
-      }
-      if (view.selector.meter_name) {
-        viewOption.meterName = view.selector.meter_name;
-      }
-      if (view.selector.meter_version) {
-        viewOption.meterVersion = view.selector.meter_version;
-      }
-      if (view.selector.meter_schema_url) {
-        viewOption.meterSchemaUrl = view.selector.meter_schema_url;
-      }
-    }
-    if (view.stream) {
-      if (view.stream.name) {
-        viewOption.name = view.stream.name;
-      }
-      viewOption.aggregationCardinalityLimit =
-        view.stream.aggregation_cardinality_limit ?? 2_000;
-      if (view.stream.description) {
-        viewOption.description = view.stream.description;
-      }
-      if (view.stream.aggregation) {
-        const aggregationType = getAggregationType(view.stream.aggregation);
-        if (aggregationType) {
-          viewOption.aggregation = aggregationType;
-        }
-      }
-      if (view.stream.attribute_keys) {
-        const processors: IAttributesProcessor[] = [];
-        if (
-          view.stream.attribute_keys.included &&
-          view.stream.attribute_keys.included.length > 0
-        ) {
-          processors.push(
-            createAllowListAttributesProcessor(
-              view.stream.attribute_keys.included
-            )
-          );
-        }
-        if (
-          view.stream.attribute_keys.excluded &&
-          view.stream.attribute_keys.excluded.length > 0
-        ) {
-          processors.push(
-            createDenyListAttributesProcessor(
-              view.stream.attribute_keys.excluded
-            )
-          );
-        }
-        if (processors.length > 0) {
-          viewOption.attributesProcessors = processors;
-        }
-      }
-    }
-
-    if (Object.keys(viewOption).length > 0) {
-      metricViews.push(viewOption);
-    }
-  });
-  if (metricViews.length > 0) {
-    return metricViews;
   }
   return undefined;
 }
