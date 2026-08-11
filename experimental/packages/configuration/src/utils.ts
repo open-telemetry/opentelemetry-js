@@ -156,11 +156,7 @@ export function initializeDefaultTracerProviderConfiguration(): NonNullable<
     },
     sampler: {
       parent_based: {
-        root: { always_on: undefined },
-        remote_parent_sampled: { always_on: undefined },
-        remote_parent_not_sampled: { always_off: undefined },
-        local_parent_sampled: { always_on: undefined },
-        local_parent_not_sampled: { always_off: undefined },
+        root: { always_on: null },
       },
     },
   };

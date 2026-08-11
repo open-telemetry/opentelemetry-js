@@ -16,17 +16,13 @@ import {
   propagation,
 } from '@opentelemetry/api';
 import {
-  getIdGeneratorFromConfiguration,
-  getSamplerFromConfiguration,
   getInstanceID,
   ensureResourceDetectorOrder,
   getResourceDetectorsFromConfiguration,
   getResourceFromConfiguration,
-  getSpanProcessorsFromConfiguration,
 } from './utils';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import type { SDKComponents, SDKOptions } from './types';
-import { TracerProvider } from '@opentelemetry/sdk-trace';
 import { logs } from '@opentelemetry/api-logs';
 import type {
   Resource,
@@ -45,7 +41,7 @@ import {
   createLoggerProviderFromConfig,
   createMeterProviderFromConfig,
   createPropagatorFromConfig,
-  createSpanLimitsFromConfig,
+  createTracerProviderFromConfig,
 } from './create-from-config';
 
 // Exported for testing.
@@ -164,22 +160,12 @@ function create(
       );
     }
 
-    const spanProcessors = getSpanProcessorsFromConfiguration(config);
-    if (spanProcessors) {
-      const idGenerator = getIdGeneratorFromConfiguration(config);
-      const sampler = getSamplerFromConfiguration(config);
-      const tracerProvider = new TracerProvider({
+    if (config.tracer_provider) {
+      components.tracerProvider = createTracerProviderFromConfig(
         resource,
-        spanProcessors,
-        idGenerator,
-        sampler,
-        spanLimits: createSpanLimitsFromConfig(
-          config.tracer_provider?.limits,
-          config.attribute_limits
-        ),
-        // TODO (6624): support for `meterProvider: components.meterProvider`
-      });
-      components.tracerProvider = tracerProvider;
+        config.tracer_provider,
+        config.attribute_limits
+      );
     }
 
     return components;
