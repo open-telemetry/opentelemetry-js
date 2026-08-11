@@ -23,9 +23,12 @@ import {
 } from './util/resource-assertions';
 import type { DetectedResource } from '@opentelemetry/resources';
 import {
+  defaultResource,
+  emptyResource,
   envDetector,
   processDetector,
   hostDetector,
+  resourceFromAttributes,
   serviceDetector,
 } from '@opentelemetry/resources';
 import { logs } from '@opentelemetry/api-logs';
@@ -442,6 +445,77 @@ describe('startNodeSDK', function () {
       });
     });
 
+    it('merges resources in the documented priority order', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'configuredPriority=configured,optionPriority=configured';
+      const configFactory: ConfigFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      const resource = setupResource(config, {
+        baseResource: resourceFromAttributes({
+          baseOnly: 'base',
+          detectorPriority: 'base',
+          configuredPriority: 'base',
+          optionPriority: 'base',
+        }),
+        resourceDetectors: [
+          {
+            detect(): DetectedResource {
+              return {
+                attributes: {
+                  detectorPriority: 'detected',
+                  configuredPriority: 'detected',
+                  optionPriority: 'detected',
+                },
+              };
+            },
+          },
+        ],
+        resourceAttributes: {
+          optionPriority: 'option',
+        },
+      });
+      await resource.waitForAsyncAttributes?.();
+
+      assert.strictEqual(resource.attributes['baseOnly'], 'base');
+      assert.strictEqual(resource.attributes['detectorPriority'], 'detected');
+      assert.strictEqual(
+        resource.attributes['configuredPriority'],
+        'configured'
+      );
+      assert.strictEqual(resource.attributes['optionPriority'], 'option');
+    });
+
+    it('uses the default resource when baseResource is not configured', async () => {
+      const configFactory: ConfigFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      const resource = setupResource(config, {});
+      await resource.waitForAsyncAttributes?.();
+
+      for (const [name, value] of Object.entries(
+        defaultResource().attributes
+      )) {
+        if (name !== 'service.name') {
+          assert.strictEqual(resource.attributes[name], value);
+        }
+      }
+    });
+
+    it('allows an empty base resource', async () => {
+      const configFactory: ConfigFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      const resource = setupResource(config, {
+        baseResource: emptyResource(),
+        resourceDetectors: [],
+      });
+      await resource.waitForAsyncAttributes?.();
+
+      for (const name of Object.keys(defaultResource().attributes)) {
+        if (!process.env.OTEL_RESOURCE_ATTRIBUTES?.includes(name)) {
+          assert.strictEqual(resource.attributes[name], undefined);
+        }
+      }
+    });
+
     it('default detectors populate values properly', async () => {
       const configFactory: ConfigFactory = createConfigFactory();
       const config = configFactory.getConfigModel();
@@ -495,7 +569,7 @@ describe('startNodeSDK', function () {
         'https://opentelemetry.io/schemas/1.16.0'
       );
 
-      assert.deepStrictEqual(resource.attributes, {
+      const expectedAttributes = {
         'service.instance.id': '627cc493',
         'service.name': 'config-name',
         'service.namespace': 'config-namespace',
@@ -508,7 +582,17 @@ describe('startNodeSDK', function () {
         int_key: 1,
         string_array_key: ['value1', 'value2'],
         string_key: 'value',
-      });
+      };
+      for (const [name, value] of Object.entries(expectedAttributes)) {
+        assert.deepStrictEqual(resource.attributes[name], value);
+      }
+      for (const [name, value] of Object.entries(
+        defaultResource().attributes
+      )) {
+        if (name !== 'service.name') {
+          assert.strictEqual(resource.attributes[name], value);
+        }
+      }
     });
 
     it('returns a merged resource with a buggy detector', async () => {
@@ -621,6 +705,22 @@ describe('startNodeSDK', function () {
 
       assertServiceResource(resource, {
         name: 'env-set-name',
+      });
+    });
+
+    it('should favor SDK resource attributes over OTEL_SERVICE_NAME', async () => {
+      process.env.OTEL_SERVICE_NAME = 'env-set-name';
+      const configFactory: ConfigFactory = createConfigFactory();
+      const config = configFactory.getConfigModel();
+      const resource = setupResource(config, {
+        resourceAttributes: {
+          'service.name': 'sdk-option-name',
+        },
+      });
+      await resource.waitForAsyncAttributes?.();
+
+      assertServiceResource(resource, {
+        name: 'sdk-option-name',
       });
     });
   });

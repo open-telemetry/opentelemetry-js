@@ -36,7 +36,6 @@ import type {
 import {
   defaultResource,
   detectResources,
-  emptyResource,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
@@ -205,9 +204,7 @@ export function setupResource(
   sdkOptions?: SDKOptions
 ): Resource {
   const configuredResource = getResourceFromConfiguration(config);
-  let resource: Resource = configuredResource
-    ? emptyResource()
-    : defaultResource();
+  let resource: Resource = sdkOptions?.baseResource ?? defaultResource();
   let resourceDetectors: ResourceDetector[] = [];
 
   if (sdkOptions?.resourceDetectors != null) {
@@ -234,6 +231,12 @@ export function setupResource(
             [ATTR_SERVICE_INSTANCE_ID]: instanceId,
           })
         );
+
+  if (sdkOptions?.resourceAttributes) {
+    resource = resource.merge(
+      resourceFromAttributes(sdkOptions.resourceAttributes)
+    );
+  }
 
   return resource;
 }
