@@ -4,6 +4,7 @@
  */
 
 import type { Context, Attributes } from '@opentelemetry/api';
+import { ExactPredicate, PatternPredicate, type Predicate } from './Predicate';
 
 /**
  * The {@link AttributesProcessor} is responsible for customizing which
@@ -41,10 +42,28 @@ class MultiAttributesProcessor implements IAttributesProcessor {
   }
 }
 
+/**
+ * Builds one {@link Predicate} per entry in `attributeNames`: a
+ * {@link PatternPredicate} for entries containing `*`/`?` wildcards, or an
+ * {@link ExactPredicate} otherwise, avoiding regular expression overhead for
+ * plain literal names.
+ */
+function toPredicates(attributeNames: string[]): Predicate[] {
+  return attributeNames.map(name =>
+    PatternPredicate.hasWildcard(name)
+      ? new PatternPredicate(name)
+      : new ExactPredicate(name)
+  );
+}
+
+function matchesAny(predicates: Predicate[], attributeName: string): boolean {
+  return predicates.some(predicate => predicate.match(attributeName));
+}
+
 class AllowListProcessor implements IAttributesProcessor {
-  private readonly _allowedAttributeNames: Set<string>;
+  private readonly _predicates: Predicate[];
   constructor(allowedAttributeNames: string[]) {
-    this._allowedAttributeNames = new Set(allowedAttributeNames);
+    this._predicates = toPredicates(allowedAttributeNames);
   }
 
   process(incoming: Attributes, _context?: Context): Attributes {
@@ -52,7 +71,7 @@ class AllowListProcessor implements IAttributesProcessor {
     for (const attributeName in incoming) {
       if (
         Object.prototype.hasOwnProperty.call(incoming, attributeName) &&
-        this._allowedAttributeNames.has(attributeName)
+        matchesAny(this._predicates, attributeName)
       ) {
         filteredAttributes[attributeName] = incoming[attributeName];
       }
@@ -62,9 +81,9 @@ class AllowListProcessor implements IAttributesProcessor {
 }
 
 class DenyListProcessor implements IAttributesProcessor {
-  private readonly _deniedAttributeNames: Set<string>;
+  private readonly _predicates: Predicate[];
   constructor(deniedAttributeNames: string[]) {
-    this._deniedAttributeNames = new Set(deniedAttributeNames);
+    this._predicates = toPredicates(deniedAttributeNames);
   }
 
   process(incoming: Attributes, _context?: Context): Attributes {
@@ -72,7 +91,7 @@ class DenyListProcessor implements IAttributesProcessor {
     for (const attributeName in incoming) {
       if (
         Object.prototype.hasOwnProperty.call(incoming, attributeName) &&
-        !this._deniedAttributeNames.has(attributeName)
+        !matchesAny(this._predicates, attributeName)
       ) {
         filteredAttributes[attributeName] = incoming[attributeName];
       }
@@ -106,6 +125,13 @@ export function createMultiAttributesProcessor(
 /**
  * Create an {@link IAttributesProcessor} that filters by allowed attribute names and drops any names that are not in the
  * allow list.
+ *
+ * Entries may use `*` to match zero or more characters and `?` to match exactly
+ * one character, following the wildcard semantics of the OpenTelemetry
+ * `IncludeExclude` configuration type
+ * (https://opentelemetry.io/docs/specs/otel-config/types/#type-includeexclude).
+ * For example, `http.request.header.*` matches any attribute name starting
+ * with `http.request.header.`.
  */
 export function createAllowListAttributesProcessor(
   attributeAllowList: string[]
@@ -114,7 +140,13 @@ export function createAllowListAttributesProcessor(
 }
 
 /**
- * Create an {@link IAttributesProcessor} that drops attributes based on the names provided in the deny list
+ * Create an {@link IAttributesProcessor} that drops attributes based on the names provided in the deny list.
+ *
+ * Entries may use `*` to match zero or more characters and `?` to match exactly
+ * one character, following the wildcard semantics of the OpenTelemetry
+ * `IncludeExclude` configuration type
+ * (https://opentelemetry.io/docs/specs/otel-config/types/#type-includeexclude).
+ * For example, `*.password` matches any attribute name ending in `.password`.
  */
 export function createDenyListAttributesProcessor(
   attributeDenyList: string[]
