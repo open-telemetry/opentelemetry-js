@@ -26,7 +26,4 @@ class ServiceDetector implements ResourceDetector {
   }
 }
 
-/**
- * @experimental
- */
 export const serviceDetector = new ServiceDetector();

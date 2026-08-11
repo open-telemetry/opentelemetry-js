@@ -164,7 +164,7 @@ If `resourceDetectors` was not set, you can also use the environment variable `O
 - `host`
 - `os`
 - `process`
-- `service` (experimental)
+- `service`
 - `all` - enable all resource detectors above
   - **NOTE:** future versions of `@opentelemetry/sdk-node` may include additional detectors that will be covered by this scope.
 - `none` - disable configurable resource detection

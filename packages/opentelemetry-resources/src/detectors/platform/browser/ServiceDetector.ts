@@ -5,7 +5,4 @@
 
 import { noopDetector } from '../../NoopDetector';
 
-/**
- * @experimental
- */
 export const serviceDetector = noopDetector;
