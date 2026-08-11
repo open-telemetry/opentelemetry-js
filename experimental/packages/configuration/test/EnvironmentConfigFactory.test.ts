@@ -204,9 +204,13 @@ describe('EnvironmentConfigFactory', function () {
     const expectedConfig: ConfigurationModel = {
       ...defaultConfig,
       resource: {
-        'detection/development': {
-          detectors: [{ service: {} }],
-        },
+        attributes: [
+          {
+            name: 'service.name',
+            value: 'my service name',
+            type: 'string',
+          },
+        ],
       },
     };
     const configFactory = createConfigFactory();
@@ -219,10 +223,13 @@ describe('EnvironmentConfigFactory', function () {
     const expectedConfig: ConfigurationModel = {
       ...defaultConfig,
       resource: {
-        attributes: [],
-        'detection/development': {
-          detectors: [{ service: {} }],
-        },
+        attributes: [
+          {
+            name: 'service.name',
+            value: 'name-from-service-name',
+            type: 'string',
+          },
+        ],
       },
     };
     const configFactory = createConfigFactory();
@@ -236,10 +243,13 @@ describe('EnvironmentConfigFactory', function () {
     const expectedConfig: ConfigurationModel = {
       ...defaultConfig,
       resource: {
-        attributes: [],
-        'detection/development': {
-          detectors: [{ service: {} }],
-        },
+        attributes: [
+          {
+            name: 'service.name',
+            value: 'name-from-service-name',
+            type: 'string',
+          },
+        ],
       },
     };
     const configFactory = createConfigFactory();
@@ -254,15 +264,17 @@ describe('EnvironmentConfigFactory', function () {
       resource: {
         attributes: [
           {
+            name: 'service.name',
+            value: 'name-from-service-name',
+            type: 'string',
+          },
+          {
             name: 'service.instance.id',
             value: 'my-instance-id',
             type: 'string',
           },
         ],
         attributes_list: 'service.instance.id=my-instance-id',
-        'detection/development': {
-          detectors: [{ service: {} }],
-        },
       },
     };
     const configFactory = createConfigFactory();

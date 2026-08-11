@@ -54,6 +54,7 @@ import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import {
   createEmptyMetadata,
   createInsecureCredentials,
@@ -98,8 +99,24 @@ export function getResourceFromConfiguration(
     return undefined;
   }
 
+  let resourceAttributes = config.resource.attributes?.slice();
+  const serviceName = getStringFromEnv('OTEL_SERVICE_NAME');
+  if (
+    serviceName &&
+    !resourceAttributes?.some(attribute => attribute.name === ATTR_SERVICE_NAME)
+  ) {
+    resourceAttributes = [
+      ...(resourceAttributes ?? []),
+      {
+        name: ATTR_SERVICE_NAME,
+        value: serviceName,
+        type: 'string',
+      },
+    ];
+  }
+
   const configAttrs = mergeResourceAttributesConfig(
-    config.resource.attributes,
+    resourceAttributes,
     config.resource.attributes_list
   );
   if (!configAttrs) {
@@ -160,12 +177,6 @@ export function ensureResourceDetectorOrder(
   const orderedDetectors = detectors.filter(
     detector => detector !== envDetector
   );
-  if (
-    getStringFromEnv('OTEL_SERVICE_NAME') &&
-    !orderedDetectors.includes(serviceDetector)
-  ) {
-    orderedDetectors.push(serviceDetector);
-  }
   orderedDetectors.push(envDetector);
   return orderedDetectors;
 }

@@ -1001,8 +1001,9 @@ describe('NodeSDK', () => {
       const resource = sdk['_resource'];
       await resource.waitForAsyncAttributes?.();
 
-      assert.strictEqual(resource.attributes['service.name'], 'env-set-name');
-      assertServiceInstanceIdIsUUID(resource);
+      assertServiceResource(resource, {
+        name: 'env-set-name',
+      });
       await sdk.shutdown();
     });
 
@@ -1014,8 +1015,9 @@ describe('NodeSDK', () => {
       const resource = sdk['_resource'];
       await resource.waitForAsyncAttributes?.();
 
-      assert.strictEqual(resource.attributes['service.name'], 'env-set-name');
-      assertServiceInstanceIdIsUUID(resource);
+      assertServiceResource(resource, {
+        name: 'env-set-name',
+      });
       await sdk.shutdown();
     });
 
@@ -1028,8 +1030,9 @@ describe('NodeSDK', () => {
       const resource = sdk['_resource'];
       await resource.waitForAsyncAttributes?.();
 
-      assert.strictEqual(resource.attributes['service.name'], 'env-set-name');
-      assertServiceInstanceIdIsUUID(resource);
+      assertServiceResource(resource, {
+        name: 'env-set-name',
+      });
       await sdk.shutdown();
     });
 
@@ -1043,11 +1046,9 @@ describe('NodeSDK', () => {
       const resource = sdk['_resource'];
       await resource.waitForAsyncAttributes?.();
 
-      assert.strictEqual(
-        resource.attributes['service.name'],
-        'config-set-name'
-      );
-      assertServiceInstanceIdIsUUID(resource);
+      assertServiceResource(resource, {
+        name: 'config-set-name',
+      });
       await sdk.shutdown();
     });
 

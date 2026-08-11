@@ -221,12 +221,15 @@ describeNode('envDetector() on Node.js', () => {
       assertEmptyResource(resource);
     });
 
-    it('does not override OTEL_SERVICE_NAME with OTEL_RESOURCE_ATTRIBUTES', async () => {
+    it('does not inspect OTEL_SERVICE_NAME when parsing resource attributes', async () => {
       process.env.OTEL_SERVICE_NAME = 'svc-from-service-name';
       process.env.OTEL_RESOURCE_ATTRIBUTES =
         'service.name=svc-from-resource-attributes,custom=value';
       const resource = resourceFromDetectedResource(envDetector.detect());
-      assert.strictEqual(resource.attributes?.['service.name'], undefined);
+      assert.strictEqual(
+        resource.attributes?.['service.name'],
+        'svc-from-resource-attributes'
+      );
       assert.strictEqual(resource.attributes?.['custom'], 'value');
     });
 

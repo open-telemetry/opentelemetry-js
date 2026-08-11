@@ -591,8 +591,9 @@ describe('startNodeSDK', function () {
       const resource = setupResource(config, { resourceDetectors: [] });
       await resource.waitForAsyncAttributes?.();
 
-      assert.strictEqual(resource.attributes['service.name'], 'env-set-name');
-      assertServiceInstanceIdIsUUID(resource);
+      assertServiceResource(resource, {
+        name: 'env-set-name',
+      });
     });
 
     it('should configure service name via OTEL_RESOURCE_ATTRIBUTES env var', async () => {
@@ -618,8 +619,9 @@ describe('startNodeSDK', function () {
       const resource = setupResource(config, {});
       await resource.waitForAsyncAttributes?.();
 
-      assert.strictEqual(resource.attributes['service.name'], 'env-set-name');
-      assertServiceInstanceIdIsUUID(resource);
+      assertServiceResource(resource, {
+        name: 'env-set-name',
+      });
     });
   });
 

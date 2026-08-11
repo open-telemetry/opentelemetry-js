@@ -37,9 +37,6 @@ class EnvDetector implements ResourceDetector {
     if (rawAttributes) {
       try {
         const parsedAttributes = this._parseResourceAttributes(rawAttributes);
-        if (getStringFromEnv('OTEL_SERVICE_NAME')) {
-          delete parsedAttributes['service.name'];
-        }
         Object.assign(attributes, parsedAttributes);
       } catch (e) {
         diag.debug(`EnvDetector failed: ${e instanceof Error ? e.message : e}`);

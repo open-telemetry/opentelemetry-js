@@ -273,6 +273,15 @@ export class NodeSDK {
       };
 
       this._resource = this._resource.merge(detectResources(internalConfig));
+
+      const serviceName = getStringFromEnv('OTEL_SERVICE_NAME');
+      if (serviceName) {
+        this._resource = this._resource.merge(
+          resourceFromAttributes({
+            [ATTR_SERVICE_NAME]: serviceName,
+          })
+        );
+      }
     }
 
     if (this._configuration?.resource) {

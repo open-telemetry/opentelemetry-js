@@ -123,6 +123,16 @@ export function setResources(config: ConfigurationModel): void {
     : [];
   const serviceName = getStringFromEnv('OTEL_SERVICE_NAME');
 
+  if (serviceName) {
+    config.resource.attributes = [
+      {
+        name: 'service.name',
+        value: serviceName,
+        type: 'string',
+      },
+    ];
+  }
+
   if (list.length > 0) {
     const effectiveList = serviceName
       ? list.filter(element => {
@@ -166,9 +176,6 @@ export function setResources(config: ConfigurationModel): void {
       detectors.push({ process: {} });
     if (all || nodeDetectors.includes('service'))
       detectors.push({ service: {} });
-  }
-  if (serviceName && !detectors.some(detector => detector.service != null)) {
-    detectors.push({ service: {} });
   }
   if (detectors.length > 0) {
     if (config.resource['detection/development'] == null) {
