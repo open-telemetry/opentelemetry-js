@@ -20,6 +20,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :books: Documentation
 
+* docs(sdk-logs): mark logger configuration as experimental [#6996](https://github.com/open-telemetry/opentelemetry-js/pull/6996) @LarryHu0217
 * docs(configuration): document the `ConfigModel` suffix naming convention for exported types [#6612](https://github.com/open-telemetry/opentelemetry-js/issues/6612) @vedantchalke36
 
 ### :house: Internal
