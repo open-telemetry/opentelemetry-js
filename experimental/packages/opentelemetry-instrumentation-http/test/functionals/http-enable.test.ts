@@ -1148,6 +1148,119 @@ describe('HttpInstrumentation', () => {
         );
       });
 
+      it('should not throw when `host` is not a string and `hostname` is set', async () => {
+        // Node.js ignores a non-string `host` option when `hostname` is a
+        // valid string, so the instrumentation must accept these options too.
+        // See https://github.com/open-telemetry/opentelemetry-js/issues/6967
+        await new Promise<void>((resolve, reject) => {
+          const req = http.request(
+            {
+              hostname,
+              port: serverPort,
+              path: pathname,
+              host: new URL(
+                `${protocol}://stale.example.com`
+              ) as unknown as string,
+            },
+            res => {
+              res.resume();
+              res.on('end', resolve);
+              res.on('error', reject);
+            }
+          );
+          req.on('error', reject);
+          req.end();
+        });
+
+        const spans = memoryExporter.getFinishedSpans();
+        const outgoingSpan = spans.find(s => s.kind === SpanKind.CLIENT);
+        assert.ok(outgoingSpan);
+        assert.strictEqual(
+          outgoingSpan.attributes[ATTR_SERVER_ADDRESS],
+          hostname
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes[ATTR_SERVER_PORT],
+          serverPort
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes[ATTR_URL_FULL],
+          `${protocol}://${hostname}:${serverPort}${pathname}`
+        );
+      });
+
+      it('should handle URL-like objects (e.g. cross-realm or polyfilled URLs) like Node.js does', async () => {
+        // Node.js detects URL objects by shape (`href` and `origin`), not by
+        // `instanceof`. URL objects from other realms or polyfills keep their
+        // properties as prototype getters, which `Object.assign` cannot see,
+        // so mis-classifying them as an options object misdirects the request.
+        const realUrl = new URL(
+          `${protocol}://${hostname}:${serverPort}${pathname}`
+        );
+        const urlLike = Object.create({
+          get href() {
+            return realUrl.href;
+          },
+          get origin() {
+            return realUrl.origin;
+          },
+          get protocol() {
+            return realUrl.protocol;
+          },
+          get username() {
+            return realUrl.username;
+          },
+          get password() {
+            return realUrl.password;
+          },
+          get host() {
+            return realUrl.host;
+          },
+          get hostname() {
+            return realUrl.hostname;
+          },
+          get port() {
+            return realUrl.port;
+          },
+          get pathname() {
+            return realUrl.pathname;
+          },
+          get search() {
+            return realUrl.search;
+          },
+          get hash() {
+            return realUrl.hash;
+          },
+        });
+
+        await new Promise<void>((resolve, reject) => {
+          const req = http.request(urlLike, res => {
+            assert.strictEqual(res.statusCode, 200);
+            res.resume();
+            res.on('end', resolve);
+            res.on('error', reject);
+          });
+          req.on('error', reject);
+          req.end();
+        });
+
+        const spans = memoryExporter.getFinishedSpans();
+        const outgoingSpan = spans.find(s => s.kind === SpanKind.CLIENT);
+        assert.ok(outgoingSpan);
+        assert.strictEqual(
+          outgoingSpan.attributes[ATTR_SERVER_ADDRESS],
+          hostname
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes[ATTR_SERVER_PORT],
+          serverPort
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes[ATTR_URL_FULL],
+          `${protocol}://${hostname}:${serverPort}${pathname}`
+        );
+      });
+
       it('should generate semconv 1.27 server spans with route when RPC metadata is available', async () => {
         const response = await httpRequest.get(
           `${protocol}://${hostname}:${serverPort}${pathname}/setroute`
