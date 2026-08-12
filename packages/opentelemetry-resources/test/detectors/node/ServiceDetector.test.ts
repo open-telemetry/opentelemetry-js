@@ -22,6 +22,16 @@ describeNode('serviceDetector() on Node.js', () => {
     );
   });
 
+  it('returns the same service instance id for multiple calls', () => {
+    const resource1 = resourceFromDetectedResource(serviceDetector.detect());
+    const resource2 = resourceFromDetectedResource(serviceDetector.detect());
+
+    assert.strictEqual(
+      resource1.attributes['service.instance.id'],
+      resource2.attributes['service.instance.id']
+    );
+  });
+
   it('detects the service name from OTEL_SERVICE_NAME', () => {
     process.env.OTEL_SERVICE_NAME = 'my-service';
     const resource = resourceFromDetectedResource(serviceDetector.detect());

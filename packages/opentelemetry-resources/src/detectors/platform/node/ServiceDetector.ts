@@ -14,13 +14,19 @@ import type { DetectedResource, ResourceDetector } from '../../../types';
  * ServiceDetector detects resources related to the service.
  */
 class ServiceDetector implements ResourceDetector {
+  private _serviceInstanceId: string | undefined;
+
   detect(_config?: ResourceDetectionConfig): DetectedResource {
     const serviceName = getStringFromEnv('OTEL_SERVICE_NAME');
+
+    if (!this._serviceInstanceId) {
+      this._serviceInstanceId = randomUUID();
+    }
 
     return {
       attributes: {
         ...(serviceName ? { [ATTR_SERVICE_NAME]: serviceName } : {}),
-        [ATTR_SERVICE_INSTANCE_ID]: randomUUID(),
+        [ATTR_SERVICE_INSTANCE_ID]: this._serviceInstanceId,
       },
     };
   }
