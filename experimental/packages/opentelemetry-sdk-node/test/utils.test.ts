@@ -11,16 +11,11 @@ import {
   getResourceDetectorsFromConfiguration,
   getGrpcMetadataFromHeaders,
   getHeadersFromConfiguration,
-  getHttpAgentOptionsFromTls,
-  getIdGeneratorFromConfiguration,
 } from '../src/utils';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag } from '@opentelemetry/api';
-import type {
-  ConfigurationModel,
-  HttpTlsConfigModel,
-} from '@opentelemetry/configuration';
+import type { ConfigurationModel } from '@opentelemetry/configuration';
 import {
   envDetector,
   hostDetector,
@@ -479,138 +474,5 @@ describe('getGrpcMetadataFromHeaders', function () {
 
     assert.deepStrictEqual(metadata?.get('shared'), ['from-headers']);
     assert.deepStrictEqual(metadata?.get('list-only'), ['value']);
-  });
-});
-
-describe('getIdGeneratorFromConfiguration', function () {
-  afterEach(() => {
-    sinon.restore();
-  });
-
-  it('returns undefined when no tracer_provider is set', function () {
-    assert.equal(
-      getIdGeneratorFromConfiguration({} as ConfigurationModel),
-      undefined
-    );
-  });
-
-  it('returns undefined when no id_generator is set', function () {
-    const config = {
-      tracer_provider: { processors: [] },
-    } as ConfigurationModel;
-    assert.equal(getIdGeneratorFromConfiguration(config), undefined);
-  });
-
-  it('returns a RandomIdGenerator when random is set', function () {
-    const config = {
-      tracer_provider: { processors: [], id_generator: { random: {} } },
-    } as ConfigurationModel;
-    const idGenerator = getIdGeneratorFromConfiguration(config);
-    assert.ok(idGenerator);
-    assert.strictEqual(idGenerator.constructor.name, 'RandomIdGenerator');
-  });
-
-  it('warns and returns undefined for unsupported id_generator type', function () {
-    const warnStub = sinon.stub(diag, 'warn');
-    const config = {
-      tracer_provider: {
-        processors: [],
-        id_generator: { custom_generator: {} },
-      },
-    } as ConfigurationModel;
-    assert.equal(getIdGeneratorFromConfiguration(config), undefined);
-    assert.ok(
-      warnStub.args.some(args =>
-        String(args[0]).includes(
-          'Unsupported id_generator type(s): custom_generator'
-        )
-      )
-    );
-  });
-});
-
-describe('getHttpAgentOptionsFromTls', function () {
-  afterEach(() => {
-    sinon.restore();
-  });
-
-  it('should return undefined if no TLS config is provided', async () => {
-    assert.equal(getHttpAgentOptionsFromTls({}), undefined);
-  });
-
-  it('should return https agent options if TLS config is provided', async () => {
-    const tlsConfig: HttpTlsConfigModel = {
-      ca_file: 'test/certs/ca.crt',
-      key_file: 'test/certs/client.key',
-      cert_file: 'test/certs/client.crt',
-    };
-    const agentOptions = getHttpAgentOptionsFromTls(tlsConfig);
-    assert.ok(agentOptions);
-    assert.notEqual(agentOptions.ca, undefined);
-    assert.notEqual(agentOptions.key, undefined);
-    assert.notEqual(agentOptions.cert, undefined);
-  });
-
-  it('show warning messages for invalid ca file', async () => {
-    const warnStub = sinon.stub(diag, 'warn');
-    const tlsConfig: HttpTlsConfigModel = {
-      ca_file: 'invalid-ca.pem',
-      key_file: 'test/certs/client.key',
-      cert_file: 'test/certs/client.crt',
-    };
-    const agentOptions = getHttpAgentOptionsFromTls(tlsConfig);
-    assert.ok(agentOptions);
-    assert.equal(agentOptions.ca, undefined);
-    assert.notEqual(agentOptions.key, undefined);
-    assert.notEqual(agentOptions.cert, undefined);
-
-    assert.equal(
-      warnStub.args[0][0].startsWith(
-        'Failed to read TLS CA file at invalid-ca.pem: Error: ENOENT: no such file or directory, open '
-      ),
-      true
-    );
-  });
-
-  it('show warning messages for invalid ca-key file', async () => {
-    const warnStub = sinon.stub(diag, 'warn');
-    const tlsConfig: HttpTlsConfigModel = {
-      ca_file: 'test/certs/ca.crt',
-      key_file: 'invalid-ca-key.pem',
-      cert_file: 'test/certs/client.crt',
-    };
-    const agentOptions = getHttpAgentOptionsFromTls(tlsConfig);
-    assert.ok(agentOptions);
-    assert.notEqual(agentOptions.ca, undefined);
-    assert.equal(agentOptions.key, undefined);
-    assert.notEqual(agentOptions.cert, undefined);
-
-    assert.equal(
-      warnStub.args[0][0].startsWith(
-        'Failed to read TLS key file at invalid-ca-key.pem: Error: ENOENT: no such file or directory, open '
-      ),
-      true
-    );
-  });
-
-  it('show warning messages for invalid cert file', async () => {
-    const warnStub = sinon.stub(diag, 'warn');
-    const tlsConfig: HttpTlsConfigModel = {
-      ca_file: 'test/certs/ca.crt',
-      key_file: 'test/certs/client.key',
-      cert_file: 'invalid-cert.pem',
-    };
-    const agentOptions = getHttpAgentOptionsFromTls(tlsConfig);
-    assert.ok(agentOptions);
-    assert.notEqual(agentOptions.ca, undefined);
-    assert.notEqual(agentOptions.key, undefined);
-    assert.equal(agentOptions.cert, undefined);
-
-    assert.equal(
-      warnStub.args[0][0].startsWith(
-        'Failed to read TLS cert file at invalid-cert.pem: Error: ENOENT: no such file or directory, open '
-      ),
-      true
-    );
   });
 });

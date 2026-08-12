@@ -12,8 +12,15 @@ import type {
   LogRecordProcessorConfigModel,
   MeterProviderConfigModel,
   PushMetricExporterConfigModel,
+  SamplerConfigModel,
+  TracerProviderConfigModel,
 } from '@opentelemetry/configuration';
 import type { SpanLimits } from '@opentelemetry/sdk-trace';
+import {
+  BatchSpanProcessor,
+  RandomIdGenerator,
+  TracerProvider,
+} from '@opentelemetry/sdk-trace';
 import type { LogRecordLimits } from '@opentelemetry/sdk-logs';
 import {
   BatchLogRecordProcessor,
@@ -27,6 +34,7 @@ import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-
 import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
 import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
+import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 import type { Resource } from '@opentelemetry/resources';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 
@@ -38,7 +46,9 @@ import {
   createMeterProviderFromConfig,
   createPropagatorFromConfig,
   createPushMetricExporterFromConfig,
+  createSamplerFromConfig,
   createSpanLimitsFromConfig,
+  createTracerProviderFromConfig,
 } from '../src/create-from-config';
 import { CompositePropagator } from '@opentelemetry/core';
 import {
@@ -938,5 +948,233 @@ describe('create-from-config', () => {
         { type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM }
       );
     });
+  });
+
+  describe('createTracerProviderFromConfig', () => {
+    const resource = resourceFromAttributes({ foo: 'bar' });
+
+    it('basic console exporter', function () {
+      const tracer_provider: TracerProviderConfigModel = {
+        processors: [{ simple: { exporter: { console: null } } }],
+      };
+      const provider = createTracerProviderFromConfig(
+        resource,
+        tracer_provider
+      );
+      assert.ok(provider instanceof TracerProvider);
+    });
+
+    it('more involved tracer_provider config', function () {
+      const tracer_provider: TracerProviderConfigModel = {
+        processors: [
+          {
+            batch: {
+              schedule_delay: 5000,
+              export_timeout: 30000,
+              max_queue_size: 2048,
+              max_export_batch_size: 512,
+              exporter: {
+                otlp_http: {
+                  endpoint: 'http://localhost:4318/v1/traces',
+                  headers: [{ name: 'api-key', value: '1234' }],
+                  compression: 'gzip',
+                  timeout: 10000,
+                },
+              },
+            },
+          },
+        ],
+        limits: {
+          attribute_value_length_limit: 4096,
+          attribute_count_limit: 128,
+          event_count_limit: 128,
+          link_count_limit: 128,
+          event_attribute_count_limit: 128,
+          link_attribute_count_limit: 128,
+        },
+        sampler: {
+          parent_based: { root: { trace_id_ratio_based: { ratio: 0.5 } } },
+        },
+        id_generator: { random: null },
+      };
+      const provider = createTracerProviderFromConfig(
+        resource,
+        tracer_provider
+      );
+
+      assert.ok(provider instanceof TracerProvider);
+
+      // Cheat look at internal structure to confirm some details.
+      assert.deepEqual((provider as any)._resource.attributes, { foo: 'bar' });
+      assert.ok(
+        (provider as any)._tracerOptions.idGenerator instanceof
+          RandomIdGenerator
+      );
+      const bsp = (provider as any)._activeSpanProcessor._spanProcessors[0];
+      assert.ok(bsp instanceof BatchSpanProcessor);
+      assert.ok((bsp as any)._exporter instanceof OTLPProtoTraceExporter);
+    });
+
+    describe('throws for various unsupported or invalid tracer_provider config cases', function () {
+      const corpus: {
+        testName: string;
+        tracer_provider: TracerProviderConfigModel;
+        // The `error` argument to `assert.throws`.
+        assertThrowsError: RegExp;
+      }[] = [
+        {
+          testName: 'a 0 timeout on exporters it not currently supported',
+          tracer_provider: {
+            processors: [
+              { simple: { exporter: { otlp_http: { timeout: 0 } } } },
+            ],
+          },
+          assertThrowsError: /timeout of 0 \(infinite\) is not supported/,
+        },
+        {
+          testName: 'negative exporter timeout is invalid',
+          tracer_provider: {
+            processors: [
+              { simple: { exporter: { otlp_http: { timeout: -1000 } } } },
+            ],
+          },
+          assertThrowsError:
+            /OtlpHttpExporter.timeout value must be non-negative: -1000/,
+        },
+        {
+          testName: 'non-absolute TLS file path is invalid',
+          tracer_provider: {
+            processors: [
+              {
+                batch: {
+                  exporter: { otlp_http: { tls: { ca_file: './ca.pem' } } },
+                },
+              },
+            ],
+          },
+          assertThrowsError:
+            /could not load "tls.ca_file" from config: TLS config file ".\/ca.pem" must be an absolute path/,
+        },
+        {
+          testName: 'unknown OtlpHttpEncoding',
+          tracer_provider: {
+            processors: [
+              {
+                simple: {
+                  exporter: { otlp_http: { encoding: 'unknown-encoding' } },
+                },
+              },
+            ],
+          } as unknown as TracerProviderConfigModel,
+          assertThrowsError: /unknown OtlpHttpExporter encoding/,
+        },
+        {
+          testName: 'unknown SpanExporter',
+          tracer_provider: {
+            processors: [{ simple: { exporter: { unknown_exporter: null } } }],
+          },
+          assertThrowsError:
+            /unknown SpanExporter name in configuration: "unknown_exporter"/,
+        },
+        {
+          testName: 'unknown SpanProcessor',
+          tracer_provider: {
+            processors: [{ some_unknown_processor: null }],
+          },
+          assertThrowsError:
+            /unknown SpanProcessor name: "some_unknown_processor"/,
+        },
+        {
+          testName: 'unknown Sampler',
+          tracer_provider: {
+            processors: [{ simple: { exporter: { console: null } } }],
+            sampler: { some_unknown_sampler: null },
+          },
+          assertThrowsError: /unknown Sampler name: "some_unknown_sampler"/,
+        },
+        {
+          testName: 'unknown IdGenerator',
+          tracer_provider: {
+            processors: [{ simple: { exporter: { console: null } } }],
+            id_generator: { some_unknown_id_generator: null },
+          },
+          assertThrowsError:
+            /unknown IdGenerator name: "some_unknown_id_generator"/,
+        },
+      ];
+
+      for (const item of corpus) {
+        it(item.testName, function () {
+          assert.throws(() => {
+            createTracerProviderFromConfig(resource, item.tracer_provider);
+          }, item.assertThrowsError);
+        });
+      }
+    });
+  });
+
+  describe('createSamplerFromConfig', function () {
+    const corpus: {
+      sampler: SamplerConfigModel | undefined;
+      repr: string;
+    }[] = [
+      {
+        sampler: undefined,
+        repr: 'undefined',
+      },
+      {
+        sampler: { always_off: null },
+        repr: 'AlwaysOffSampler',
+      },
+      {
+        sampler: { always_on: null },
+        repr: 'AlwaysOnSampler',
+      },
+      {
+        sampler: { trace_id_ratio_based: { ratio: 0.5 } },
+        repr: 'TraceIdRatioBased{0.5}',
+      },
+      {
+        sampler: { trace_id_ratio_based: null },
+        repr: 'TraceIdRatioBased{1}',
+      },
+      {
+        sampler: { parent_based: null },
+        repr: 'ParentBased{root=AlwaysOnSampler, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}',
+      },
+      {
+        sampler: { parent_based: { root: { always_on: null } } },
+        repr: 'ParentBased{root=AlwaysOnSampler, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}',
+      },
+      {
+        sampler: { parent_based: { root: { always_off: null } } },
+        repr: 'ParentBased{root=AlwaysOffSampler, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}',
+      },
+      {
+        sampler: {
+          parent_based: { root: { trace_id_ratio_based: { ratio: 0.25 } } },
+        },
+        repr: 'ParentBased{root=TraceIdRatioBased{0.25}, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}',
+      },
+      {
+        sampler: {
+          parent_based: {
+            root: { always_on: {} },
+            remote_parent_sampled: { always_off: {} },
+            remote_parent_not_sampled: { always_on: {} },
+            local_parent_sampled: { always_off: {} },
+            local_parent_not_sampled: { always_on: {} },
+          },
+        },
+        repr: 'ParentBased{root=AlwaysOnSampler, remoteParentSampled=AlwaysOffSampler, remoteParentNotSampled=AlwaysOnSampler, localParentSampled=AlwaysOffSampler, localParentNotSampled=AlwaysOnSampler}',
+      },
+    ];
+
+    for (const item of corpus) {
+      it(String(JSON.stringify(item.sampler)), function () {
+        const sampler = createSamplerFromConfig(item.sampler);
+        assert.equal(item.repr, String(sampler));
+      });
+    }
   });
 });

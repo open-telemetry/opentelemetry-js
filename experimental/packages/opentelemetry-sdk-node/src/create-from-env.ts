@@ -23,6 +23,7 @@ import {
   ParentBasedSampler,
   TraceIdRatioBasedSampler,
 } from '@opentelemetry/sdk-trace';
+// Note: circular import here that would be nice to break
 import { getNonNegativeNumberFromEnv } from './utils';
 
 const DEFAULT_RATIO = 1;

@@ -18,7 +18,24 @@ import * as path from 'path';
 
 import type { TextMapPropagator } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
-import type { SpanLimits } from '@opentelemetry/sdk-trace';
+import type {
+  IdGenerator,
+  Sampler,
+  SpanExporter,
+  SpanLimits,
+  SpanProcessor,
+} from '@opentelemetry/sdk-trace';
+import {
+  AlwaysOffSampler,
+  AlwaysOnSampler,
+  BatchSpanProcessor,
+  ConsoleSpanExporter,
+  ParentBasedSampler,
+  RandomIdGenerator,
+  SimpleSpanProcessor,
+  TraceIdRatioBasedSampler,
+  TracerProvider,
+} from '@opentelemetry/sdk-trace';
 import type { Resource } from '@opentelemetry/resources';
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
@@ -26,6 +43,9 @@ import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter
 import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
 import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
+import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
+import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
 import {
   createInsecureCredentials,
@@ -37,12 +57,14 @@ import type {
   AttributeLimitsConfigModel,
   Base2ExponentialBucketHistogramAggregationConfigModel,
   BatchLogRecordProcessorConfigModel,
+  BatchSpanProcessorConfigModel,
   ExperimentalPrometheusMetricExporterConfigModel,
   ExplicitBucketHistogramAggregationConfigModel,
   ExporterDefaultHistogramAggregationConfigModel,
   ExporterTemporalityPreferenceConfigModel,
   GrpcTlsConfigModel,
   HttpTlsConfigModel,
+  IdGeneratorConfigModel,
   InstrumentTypeConfigModel,
   LoggerProviderConfigModel,
   LogRecordExporterConfigModel,
@@ -55,13 +77,20 @@ import type {
   OtlpGrpcMetricExporterConfigModel,
   OtlpHttpExporterConfigModel,
   OtlpHttpMetricExporterConfigModel,
+  ParentBasedSamplerConfigModel,
   PeriodicMetricReaderConfigModel,
   PropagatorConfigModel,
   PullMetricReaderConfigModel,
   PushMetricExporterConfigModel,
+  SamplerConfigModel,
   SimpleLogRecordProcessorConfigModel,
+  SimpleSpanProcessorConfigModel,
+  SpanExporterConfigModel,
   SpanLimitsConfigModel,
+  SpanProcessorConfigModel,
   TextMapPropagatorConfigModel,
+  TraceIdRatioBasedSamplerConfigModel,
+  TracerProviderConfigModel,
   ViewConfigModel,
 } from '@opentelemetry/configuration';
 import { mergePropagatorCompositeConfig } from '@opentelemetry/configuration';
@@ -399,7 +428,7 @@ export function createLogRecordExporterFromConfig(
 
   switch (name) {
     case 'otlp_http': {
-      checkConfigUse('LogRecordExporter', properties!, [
+      checkConfigUse('OtlpHttpExporter', properties!, [
         'compression',
         'endpoint',
         'headers',
@@ -421,7 +450,7 @@ export function createLogRecordExporterFromConfig(
         ),
         timeoutMillis: validateExportTimeoutConfig(
           props?.timeout,
-          'LogRecordExporter.timeout'
+          'OtlpHttpExporter.timeout'
         ),
         httpAgentOptions: httpTlsOptionsFromConfig(props?.tls),
       };
@@ -439,7 +468,7 @@ export function createLogRecordExporterFromConfig(
     }
 
     case 'otlp_grpc': {
-      checkConfigUse('LogRecordExporter', properties!, [
+      checkConfigUse('OtlpGrpcExporter', properties!, [
         'compression',
         'endpoint',
         'timeout',
@@ -456,7 +485,7 @@ export function createLogRecordExporterFromConfig(
         url: props?.endpoint ?? undefined,
         timeoutMillis: validateExportTimeoutConfig(
           props?.timeout,
-          'LogRecordExporter.timeout'
+          'OtlpGrpcExporter.timeout'
         ),
         credentials: grpcCredentialsFromConfig(props?.tls),
         metadata: getGrpcMetadataFromHeaders(
@@ -539,6 +568,7 @@ export function createLoggerProviderFromConfig(
   });
 }
 
+// Exported for testing.
 export function createSpanLimitsFromConfig(
   limits?: SpanLimitsConfigModel,
   attribute_limits?: AttributeLimitsConfigModel
@@ -1070,5 +1100,227 @@ export function createMeterProviderFromConfig(
     readers,
     views,
     // Note: sdkMetricsEnabled not configurable via decl conf. Once SDK health metrics are stabilized, they will be on by default.
+  });
+}
+
+function createSpanExporterFromConfig(
+  exporter: SpanExporterConfigModel
+): SpanExporter {
+  const [name, properties] = mustSingleEntry(exporter, 'SpanExporter');
+
+  switch (name) {
+    case 'otlp_http': {
+      // TODO(6953): headers_list
+      checkConfigUse('OtlpHttpExporter', properties!, [
+        'compression',
+        'endpoint',
+        'headers',
+        'timeout',
+        'tls',
+        'encoding',
+      ]);
+      const props = properties as OtlpHttpExporterConfigModel;
+      const commonOpts = {
+        compression:
+          props?.compression === 'gzip'
+            ? CompressionAlgorithm.GZIP
+            : CompressionAlgorithm.NONE,
+        url: props?.endpoint ?? undefined,
+        headers: getHeadersFromConfiguration(props?.headers),
+        timeoutMillis: validateExportTimeoutConfig(
+          props?.timeout,
+          'OtlpHttpExporter.timeout'
+        ),
+        httpAgentOptions: httpTlsOptionsFromConfig(props?.tls),
+      };
+      const encoding = props?.encoding ?? 'protobuf';
+      switch (encoding) {
+        case 'json':
+          return new OTLPHttpTraceExporter(commonOpts);
+        case 'protobuf':
+          return new OTLPProtoTraceExporter(commonOpts);
+        default:
+          throw new Error(
+            `unknown OtlpHttpExporter encoding in configuration: "${encoding}"`
+          );
+      }
+    }
+
+    case 'otlp_grpc': {
+      // TODO(6953): headers_list
+      checkConfigUse('OtlpGrpcExporter', properties!, [
+        'compression',
+        'endpoint',
+        'timeout',
+        'tls',
+        'headers',
+      ]);
+      const props = properties as OtlpGrpcExporterConfigModel;
+      return new OTLPGrpcTraceExporter({
+        compression:
+          props?.compression === 'gzip'
+            ? CompressionAlgorithm.GZIP
+            : CompressionAlgorithm.NONE,
+        url: props?.endpoint ?? undefined,
+        timeoutMillis: validateExportTimeoutConfig(
+          props?.timeout,
+          'OtlpGrpcExporter.timeout'
+        ),
+        credentials: grpcCredentialsFromConfig(props?.tls),
+        metadata: getGrpcMetadataFromHeaders(props?.headers),
+      });
+    }
+
+    case 'console':
+      return new ConsoleSpanExporter();
+
+    default:
+      throw new Error(`unknown SpanExporter name in configuration: "${name}"`);
+  }
+}
+
+function createSpanProcessorFromConfig(
+  processor: SpanProcessorConfigModel
+): SpanProcessor {
+  const [name, properties] = mustSingleEntry(processor, 'SpanProcessor');
+
+  switch (name) {
+    case 'batch': {
+      checkConfigUse('BatchSpanProcessor', properties!, [
+        'exporter',
+        'max_queue_size',
+        'max_export_batch_size',
+        'schedule_delay',
+        'export_timeout',
+      ]);
+      const props = properties as BatchSpanProcessorConfigModel;
+      const exporter = createSpanExporterFromConfig(props.exporter);
+      return new BatchSpanProcessor({
+        exporter,
+        maxQueueSize: props.max_queue_size ?? undefined,
+        maxExportBatchSize: props.max_export_batch_size ?? undefined,
+        scheduledDelayMillis: props.schedule_delay ?? undefined,
+        exportTimeoutMillis: validateExportTimeoutConfig(
+          props.export_timeout,
+          'BatchSpanProcessor.export_timeout'
+        ),
+      });
+    }
+
+    case 'simple': {
+      const props = properties as SimpleSpanProcessorConfigModel;
+      const exporter = createSpanExporterFromConfig(props.exporter);
+      return new SimpleSpanProcessor({ exporter });
+    }
+
+    default:
+      throw new Error(`unknown SpanProcessor name: "${name}"`);
+  }
+}
+
+/**
+ * Returns a Sampler for the `tracer_provider.sampler` in configuration,
+ * or `undefined` if not set.
+ *
+ * Exported for testing.
+ */
+export function createSamplerFromConfig(
+  samplerConfig?: SamplerConfigModel
+): Sampler | undefined {
+  if (!samplerConfig) {
+    return undefined;
+  }
+
+  const [name, properties] = mustSingleEntry(samplerConfig, 'Sampler');
+
+  switch (name) {
+    case 'always_off':
+      return new AlwaysOffSampler();
+    case 'always_on':
+      return new AlwaysOnSampler();
+    case 'trace_id_ratio_based': {
+      const DEFAULT_RATIO = 1.0;
+      const props = properties as TraceIdRatioBasedSamplerConfigModel;
+      return new TraceIdRatioBasedSampler(props?.ratio ?? DEFAULT_RATIO);
+    }
+    case 'parent_based': {
+      const props = properties as ParentBasedSamplerConfigModel;
+      return new ParentBasedSampler({
+        root: createSamplerFromConfig(props?.root) ?? new AlwaysOnSampler(),
+        remoteParentSampled: createSamplerFromConfig(
+          props?.remote_parent_sampled
+        ),
+        remoteParentNotSampled: createSamplerFromConfig(
+          props?.remote_parent_not_sampled
+        ),
+        localParentSampled: createSamplerFromConfig(
+          props?.local_parent_sampled
+        ),
+        localParentNotSampled: createSamplerFromConfig(
+          props?.local_parent_not_sampled
+        ),
+      });
+    }
+
+    // TODO: always_record, once there is a release of opentelemetry-configuration with https://github.com/open-telemetry/opentelemetry-configuration/pull/698
+    // case 'always_record': {
+    //   const props = properties as AlwaysRecordConfigModel;
+    //   return createAlwaysRecordSampler(createSamplerFromConfig(props.root));
+    // }
+    // TODO(6961): composite/development
+    // TODO(6541): probability/development (via composite support for?)
+    // TODO(later): Consider supporting jaeger_remote/development if requested by a user. Only consider `sampler-jaeger-remote` package after axios dep is dropped in #6963.
+
+    default:
+      throw new Error(`unknown Sampler name: "${name}"`);
+  }
+}
+
+export function createIdGeneratorFromConfig(
+  id_generator?: IdGeneratorConfigModel
+): IdGenerator | undefined {
+  if (!id_generator) {
+    return undefined;
+  }
+
+  const [name] = mustSingleEntry(id_generator, 'IdGenerator');
+  switch (name) {
+    case 'random':
+      return new RandomIdGenerator();
+    default:
+      throw new Error(`unknown IdGenerator name: "${name}"`);
+  }
+}
+
+export function createTracerProviderFromConfig(
+  resource: Resource,
+  tracer_provider: TracerProviderConfigModel,
+  attribute_limits?: AttributeLimitsConfigModel
+): TracerProvider {
+  const spanProcessors = tracer_provider.processors.map(p =>
+    createSpanProcessorFromConfig(p)
+  );
+  const spanLimits = createSpanLimitsFromConfig(
+    tracer_provider.limits,
+    attribute_limits
+  );
+  const sampler = createSamplerFromConfig(tracer_provider.sampler);
+  const idGenerator = createIdGeneratorFromConfig(tracer_provider.id_generator);
+
+  checkConfigUse('TracerProvider', tracer_provider, [
+    'processors',
+    'limits',
+    'sampler',
+    'id_generator',
+  ]);
+
+  // TODO(6960): 'tracer_configurator/development', TracerProvider doesn't currently support this
+  // TODO(6624): meterProvider, if SDK health metrics enabled
+  return new TracerProvider({
+    resource,
+    spanProcessors,
+    spanLimits,
+    sampler,
+    idGenerator,
   });
 }
