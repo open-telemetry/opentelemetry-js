@@ -9,7 +9,7 @@ import { describeNode } from '../../util';
 import { ATTR_SERVICE_INSTANCE_ID } from '@opentelemetry/semantic-conventions';
 
 describeNode('serviceInstanceIdDetector', () => {
-  it('should return a UUID for service.instance.id', async () => {
+  it('should return a UUID for service.instance.id', () => {
     const attrs = detectResources({
       detectors: [serviceInstanceIdDetector],
     }).attributes;
@@ -20,7 +20,7 @@ describeNode('serviceInstanceIdDetector', () => {
     );
   });
 
-  it('should return the same service.instance.id for multiple calls', async () => {
+  it('should return the same service.instance.id for multiple calls', () => {
     const attrs1 = detectResources({
       detectors: [serviceInstanceIdDetector],
     }).attributes;
