@@ -16,19 +16,12 @@ import {
   propagation,
 } from '@opentelemetry/api';
 import {
-  getIdGeneratorFromConfiguration,
-  getSamplerFromConfiguration,
   getInstanceID,
-  getMeterReadersFromConfiguration,
-  getMeterViewsFromConfiguration,
   getResourceDetectorsFromConfiguration,
   getResourceFromConfiguration,
-  getSpanProcessorsFromConfiguration,
 } from './utils';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import type { SDKComponents, SDKOptions } from './types';
-import { MeterProvider } from '@opentelemetry/sdk-metrics';
-import { TracerProvider } from '@opentelemetry/sdk-trace';
 import { logs } from '@opentelemetry/api-logs';
 import type {
   Resource,
@@ -45,8 +38,9 @@ import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
 import { diagLogLevelFromSeverityNumberConfig } from './diag';
 import {
   createLoggerProviderFromConfig,
+  createMeterProviderFromConfig,
   createPropagatorFromConfig,
-  createSpanLimitsFromConfig,
+  createTracerProviderFromConfig,
 } from './create-from-config';
 
 // Exported for testing.
@@ -90,7 +84,9 @@ export function startNodeSDK(sdkOptions?: SDKOptions): {
   try {
     components = create(config, sdkOptions);
   } catch (createErr) {
-    diag.error(`Could not create OpenTelemetry SDK: ${createErr.message}`);
+    diag.error(
+      `Could not create OpenTelemetry SDK from configuration, SDK will not be setup: ${createErr.message}`
+    );
     return NOOP_SDK;
   }
   if (components.contextManager) {
@@ -156,33 +152,19 @@ function create(
       );
     }
 
-    const meterReaders = getMeterReadersFromConfiguration(config);
-    if (meterReaders) {
-      const meterViews = getMeterViewsFromConfiguration(config);
-      const meterProvider = new MeterProvider({
-        resource: resource,
-        readers: meterReaders,
-        views: meterViews ?? [],
-      });
-      components.meterProvider = meterProvider;
+    if (config.meter_provider) {
+      components.meterProvider = createMeterProviderFromConfig(
+        resource,
+        config.meter_provider
+      );
     }
 
-    const spanProcessors = getSpanProcessorsFromConfiguration(config);
-    if (spanProcessors) {
-      const idGenerator = getIdGeneratorFromConfiguration(config);
-      const sampler = getSamplerFromConfiguration(config);
-      const tracerProvider = new TracerProvider({
+    if (config.tracer_provider) {
+      components.tracerProvider = createTracerProviderFromConfig(
         resource,
-        spanProcessors,
-        idGenerator,
-        sampler,
-        spanLimits: createSpanLimitsFromConfig(
-          config.tracer_provider?.limits,
-          config.attribute_limits
-        ),
-        // TODO (6624): support for `meterProvider: components.meterProvider`
-      });
-      components.tracerProvider = tracerProvider;
+        config.tracer_provider,
+        config.attribute_limits
+      );
     }
 
     return components;
