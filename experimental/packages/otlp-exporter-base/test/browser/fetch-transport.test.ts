@@ -5,6 +5,9 @@
 
 import * as sinon from 'sinon';
 import * as assert from 'assert';
+import { context, propagation } from '@opentelemetry/api';
+import { isTracingSuppressed, suppressTracing } from '@opentelemetry/core';
+import { TestStackContextManager } from './TestStackContextManager';
 import { createFetchTransport } from '../../src/transport/fetch-transport';
 import { createRetryingTransport } from '../../src/retrying-transport';
 import { registerMockDiagLogger } from '../common/test-utils';
@@ -228,6 +231,133 @@ describe('FetchTransport', function () {
         (result as ExportResponseFailure).error.message,
         'Fetch request errored'
       );
+    });
+  });
+
+  describe('suppressTracing context', function () {
+    afterEach(function () {
+      context.disable();
+    });
+
+    it('suppresses tracing for the fetch call when the caller already did so', function (done) {
+      context.setGlobalContextManager(new TestStackContextManager());
+
+      let suppressedDuringFetch: boolean | undefined;
+      sinon.stub(globalThis, 'fetch').callsFake(() => {
+        suppressedDuringFetch = isTracingSuppressed(context.active());
+        return Promise.resolve(new Response('', { status: 200 }));
+      });
+
+      const transport = createFetchTransport(testTransportParameters);
+
+      context.with(suppressTracing(context.active()), () => {
+        transport.send(testPayload, requestTimeout).then(response => {
+          try {
+            assert.strictEqual(response.status, 'success');
+            assert.strictEqual(
+              suppressedDuringFetch,
+              true,
+              'fetch must run with suppressTracing still active to avoid an export -> span -> export loop'
+            );
+          } catch (e) {
+            return done(e);
+          }
+          done();
+        }, done /* catch any rejections */);
+      });
+    });
+
+    it('carries the caller context into the fetch call', function (done) {
+      context.setGlobalContextManager(new TestStackContextManager());
+
+      let baggageDuringFetch: string | undefined;
+      sinon.stub(globalThis, 'fetch').callsFake(() => {
+        baggageDuringFetch = propagation
+          .getBaggage(context.active())
+          ?.getEntry('tenant')?.value;
+        return Promise.resolve(new Response('', { status: 200 }));
+      });
+
+      const transport = createFetchTransport(testTransportParameters);
+      const callerContext = propagation.setBaggage(
+        context.active(),
+        propagation.createBaggage({ tenant: { value: 'acme' } })
+      );
+
+      context.with(callerContext, () => {
+        transport.send(testPayload, requestTimeout).then(() => {
+          try {
+            assert.strictEqual(
+              baggageDuringFetch,
+              'acme',
+              'the caller context must still be active for the fetch call'
+            );
+          } catch (e) {
+            return done(e);
+          }
+          done();
+        }, done /* catch any rejections */);
+      });
+    });
+
+    it('suppresses tracing for the fetch call even when the caller did not', function (done) {
+      context.setGlobalContextManager(new TestStackContextManager());
+
+      let suppressedDuringFetch: boolean | undefined;
+      sinon.stub(globalThis, 'fetch').callsFake(() => {
+        suppressedDuringFetch = isTracingSuppressed(context.active());
+        return Promise.resolve(new Response('', { status: 200 }));
+      });
+
+      const transport = createFetchTransport(testTransportParameters);
+
+      assert.strictEqual(isTracingSuppressed(context.active()), false);
+      transport.send(testPayload, requestTimeout).then(response => {
+        try {
+          assert.strictEqual(response.status, 'success');
+          assert.strictEqual(
+            suppressedDuringFetch,
+            true,
+            'the transport must suppress tracing for its own request'
+          );
+        } catch (e) {
+          return done(e);
+        }
+        done();
+      }, done /* catch any rejections */);
+    });
+
+    it('suppresses tracing on retries, which run from a timer', function (done) {
+      context.setGlobalContextManager(new TestStackContextManager());
+
+      const suppressedPerAttempt: boolean[] = [];
+      let attempt = 0;
+      sinon.stub(globalThis, 'fetch').callsFake(() => {
+        suppressedPerAttempt.push(isTracingSuppressed(context.active()));
+        return Promise.resolve(
+          attempt++ === 0
+            ? new Response('', { status: 503, headers: { 'Retry-After': '0' } })
+            : new Response('', { status: 200 })
+        );
+      });
+
+      const transport = createRetryingTransport({
+        transport: createFetchTransport(testTransportParameters),
+      });
+
+      transport.send(testPayload, requestTimeout).then(response => {
+        try {
+          assert.strictEqual(response.status, 'success');
+          assert.deepStrictEqual(
+            suppressedPerAttempt,
+            [true, true],
+            'every attempt must run suppressed'
+          );
+        } catch (e) {
+          return done(e);
+        }
+        done();
+      }, done /* catch any rejections */);
     });
   });
 
