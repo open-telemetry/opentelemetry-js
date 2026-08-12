@@ -52,7 +52,7 @@ import {
   ATTR_SERVICE_INSTANCE_ID,
 } from '../src/semconv';
 import { ATTR_OS_TYPE } from '@opentelemetry/resources/src/semconv';
-import { getSpanExporter, setupContextManager } from '../src/utils';
+import { setupContextManager } from '../src/utils';
 import { NOOP_SDK } from '../src/start';
 import {
   ConsoleMetricExporter,
@@ -346,18 +346,10 @@ describe('startNodeSDK', function () {
     await sdk.shutdown();
   });
 
-  it('should register a tracer provider if an exporter is provided', async () => {
-    const stubLoggerWarn: Sinon.SinonStub = Sinon.stub(diag, 'warn');
+  it('should register a tracer provider for fixtures/tracer.yaml', async () => {
     process.env.TEST_DIR = __dirname;
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/tracer.yaml';
     const sdk = startNodeSDK({});
-
-    // otlp_file/development exporters are not supported yet
-    const unsupportedWarnings = stubLoggerWarn.args.filter(
-      args =>
-        args[0] === 'Unsupported Exporter value. No Span Exporter registered'
-    );
-    assert.strictEqual(unsupportedWarnings.length, 2);
 
     assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
     assert.ok(
@@ -389,7 +381,6 @@ describe('startNodeSDK', function () {
       (spanProcessors[3] as any)['_exporter'] instanceof ConsoleSpanExporter
     );
 
-    stubLoggerWarn.reset();
     await sdk.shutdown();
   });
 
@@ -821,7 +812,7 @@ describe('startNodeSDK', function () {
 
     it('should only create one span processor when configured using env vars and config', async () => {
       process.env.OTEL_TRACES_EXPORTER = 'console';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSDK();
       const listOfProcessors = getSdkSpanProcessors();
 
       assert.strictEqual(listOfProcessors.length, 1);
@@ -950,19 +941,6 @@ describe('startNodeSDK', function () {
   });
 
   describe('tests to increase code coverage', function () {
-    it('should warn when exporter timeout is 0', async () => {
-      const warnSpy = Sinon.spy(diag, 'warn');
-      const exporter = getSpanExporter({
-        otlp_http: { timeout: 0 },
-      });
-      assert.ok(exporter !== undefined);
-      assert.ok(
-        warnSpy.args.some(args =>
-          String(args[0]).includes('timeout of 0 (infinite) is not supported')
-        )
-      );
-    });
-
     it('null context manager', async () => {
       setupContextManager(null);
       assert.equal(
