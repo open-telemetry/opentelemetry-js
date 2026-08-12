@@ -48,6 +48,7 @@ import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/expor
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
 import {
+  createEmptyMetadata,
   createInsecureCredentials,
   createSslCredentials,
 } from '@opentelemetry/otlp-grpc-exporter-base';
@@ -73,6 +74,7 @@ import type {
   MeterProviderConfigModel,
   MetricProducerConfigModel,
   MetricReaderConfigModel,
+  NameStringValuePairConfigModel,
   OtlpGrpcExporterConfigModel,
   OtlpGrpcMetricExporterConfigModel,
   OtlpHttpExporterConfigModel,
@@ -93,7 +95,10 @@ import type {
   TracerProviderConfigModel,
   ViewConfigModel,
 } from '@opentelemetry/configuration';
-import { mergePropagatorCompositeConfig } from '@opentelemetry/configuration';
+import {
+  mergeHeadersConfig,
+  mergePropagatorCompositeConfig,
+} from '@opentelemetry/configuration';
 import type {
   LogRecordExporter,
   LogRecordProcessor,
@@ -132,12 +137,22 @@ import {
 } from '@opentelemetry/sdk-metrics';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
-import {
-  getGrpcMetadataFromHeaders,
-  getHeadersFromConfiguration,
-} from './utils';
-
 // ---- internal utilities
+
+function getGrpcMetadataFromHeaders(
+  headers: NameStringValuePairConfigModel[] | undefined,
+  headersList?: string | null
+) {
+  const headerValues = mergeHeadersConfig(headers, headersList);
+  if (!headerValues || Object.keys(headerValues).length === 0) {
+    return undefined;
+  }
+  const metadata = createEmptyMetadata();
+  for (const [name, value] of Object.entries(headerValues)) {
+    metadata.set(name, value);
+  }
+  return metadata;
+}
 
 /**
  * Warn if some props from a declarative config object have not been handled.
@@ -444,10 +459,7 @@ export function createLogRecordExporterFromConfig(
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
-        headers: getHeadersFromConfiguration(
-          props?.headers,
-          props?.headers_list
-        ),
+        headers: mergeHeadersConfig(props?.headers, props?.headers_list),
         timeoutMillis: validateExportTimeoutConfig(
           props?.timeout,
           'OtlpHttpExporter.timeout'
@@ -680,10 +692,7 @@ export function createPushMetricExporterFromConfig(
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
-        headers: getHeadersFromConfiguration(
-          props?.headers,
-          props?.headers_list
-        ),
+        headers: mergeHeadersConfig(props?.headers, props?.headers_list),
         timeoutMillis: validateExportTimeoutConfig(
           props?.timeout,
           'PushMetricExporter.timeout'
@@ -1132,10 +1141,7 @@ function createSpanExporterFromConfig(
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
-        headers: getHeadersFromConfiguration(
-          props?.headers,
-          props?.headers_list
-        ),
+        headers: mergeHeadersConfig(props?.headers, props?.headers_list),
         timeoutMillis: validateExportTimeoutConfig(
           props?.timeout,
           'OtlpHttpExporter.timeout'

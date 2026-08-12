@@ -14,7 +14,6 @@ import {
   getNumberFromEnv,
   getStringFromEnv,
   getStringListFromEnv,
-  parseKeyPairsIntoRecord,
   W3CBaggagePropagator,
   W3CTraceContextPropagator,
 } from '@opentelemetry/core';
@@ -43,11 +42,7 @@ import {
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
-import { createEmptyMetadata } from '@opentelemetry/otlp-grpc-exporter-base';
-import type {
-  ConfigurationModel,
-  NameStringValuePairConfigModel,
-} from '@opentelemetry/configuration';
+import type { ConfigurationModel } from '@opentelemetry/configuration';
 import { mergeResourceAttributesConfig } from '@opentelemetry/configuration';
 import type {
   IMetricReader,
@@ -493,37 +488,6 @@ export function getBatchLogRecordProcessorFromEnv(
     selfObsMeterProvider,
     ...getBatchLogRecordProcessorConfigFromEnv(),
   });
-}
-
-export function getHeadersFromConfiguration(
-  headers: NameStringValuePairConfigModel[] | undefined,
-  headersList?: string | null
-): Record<string, string> | undefined {
-  if (!headers && !headersList) {
-    return undefined;
-  }
-  const result = parseKeyPairsIntoRecord(headersList ?? undefined);
-  headers?.forEach(header => {
-    if (header.value !== null) {
-      result[header.name] = header.value;
-    }
-  });
-  return result;
-}
-
-export function getGrpcMetadataFromHeaders(
-  headers: NameStringValuePairConfigModel[] | undefined,
-  headersList?: string | null
-) {
-  const headerValues = getHeadersFromConfiguration(headers, headersList);
-  if (!headerValues || Object.keys(headerValues).length === 0) {
-    return undefined;
-  }
-  const metadata = createEmptyMetadata();
-  for (const [name, value] of Object.entries(headerValues)) {
-    metadata.set(name, value);
-  }
-  return metadata;
 }
 
 export function getInstanceID(config: ConfigurationModel): string | undefined {
