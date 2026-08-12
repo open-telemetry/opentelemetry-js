@@ -48,6 +48,7 @@ import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/expor
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
 import {
+  createEmptyMetadata,
   createInsecureCredentials,
   createSslCredentials,
 } from '@opentelemetry/otlp-grpc-exporter-base';
@@ -73,6 +74,7 @@ import type {
   MeterProviderConfigModel,
   MetricProducerConfigModel,
   MetricReaderConfigModel,
+  NameStringValuePairConfigModel,
   OtlpGrpcExporterConfigModel,
   OtlpGrpcMetricExporterConfigModel,
   OtlpHttpExporterConfigModel,
@@ -93,7 +95,10 @@ import type {
   TracerProviderConfigModel,
   ViewConfigModel,
 } from '@opentelemetry/configuration';
-import { mergePropagatorCompositeConfig } from '@opentelemetry/configuration';
+import {
+  mergeHeadersConfig,
+  mergePropagatorCompositeConfig,
+} from '@opentelemetry/configuration';
 import type {
   LogRecordExporter,
   LogRecordProcessor,
@@ -132,12 +137,22 @@ import {
 } from '@opentelemetry/sdk-metrics';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
-import {
-  getGrpcMetadataFromHeaders,
-  getHeadersFromConfiguration,
-} from './utils';
-
 // ---- internal utilities
+
+function getGrpcMetadataFromHeaders(
+  headers: NameStringValuePairConfigModel[] | undefined,
+  headersList?: string | null
+) {
+  const headerValues = mergeHeadersConfig(headers, headersList);
+  if (!headerValues || Object.keys(headerValues).length === 0) {
+    return undefined;
+  }
+  const metadata = createEmptyMetadata();
+  for (const [name, value] of Object.entries(headerValues)) {
+    metadata.set(name, value);
+  }
+  return metadata;
+}
 
 /**
  * Warn if some props from a declarative config object have not been handled.
@@ -428,11 +443,11 @@ export function createLogRecordExporterFromConfig(
 
   switch (name) {
     case 'otlp_http': {
-      // TODO(6953): headers_list
       checkConfigUse('OtlpHttpExporter', properties!, [
         'compression',
         'endpoint',
         'headers',
+        'headers_list',
         'timeout',
         'tls',
         'encoding',
@@ -444,7 +459,7 @@ export function createLogRecordExporterFromConfig(
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
-        headers: getHeadersFromConfiguration(props?.headers),
+        headers: mergeHeadersConfig(props?.headers, props?.headers_list),
         timeoutMillis: validateExportTimeoutConfig(
           props?.timeout,
           'OtlpHttpExporter.timeout'
@@ -465,13 +480,13 @@ export function createLogRecordExporterFromConfig(
     }
 
     case 'otlp_grpc': {
-      // TODO(6953): headers_list
       checkConfigUse('OtlpGrpcExporter', properties!, [
         'compression',
         'endpoint',
         'timeout',
         'tls',
         'headers',
+        'headers_list',
       ]);
       const props = properties as OtlpGrpcExporterConfigModel;
       return new OTLPGrpcLogExporter({
@@ -485,7 +500,10 @@ export function createLogRecordExporterFromConfig(
           'OtlpGrpcExporter.timeout'
         ),
         credentials: grpcCredentialsFromConfig(props?.tls),
-        metadata: getGrpcMetadataFromHeaders(props?.headers),
+        metadata: getGrpcMetadataFromHeaders(
+          props?.headers,
+          props?.headers_list
+        ),
       });
     }
 
@@ -656,11 +674,11 @@ export function createPushMetricExporterFromConfig(
 
   switch (name) {
     case 'otlp_http': {
-      // TODO(6953): headers_list
       checkConfigUse('PushMetricExporter', properties!, [
         'compression',
         'endpoint',
         'headers',
+        'headers_list',
         'timeout',
         'tls',
         'temporality_preference',
@@ -674,7 +692,7 @@ export function createPushMetricExporterFromConfig(
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
-        headers: getHeadersFromConfiguration(props?.headers),
+        headers: mergeHeadersConfig(props?.headers, props?.headers_list),
         timeoutMillis: validateExportTimeoutConfig(
           props?.timeout,
           'PushMetricExporter.timeout'
@@ -701,13 +719,13 @@ export function createPushMetricExporterFromConfig(
     }
 
     case 'otlp_grpc': {
-      // TODO(6953): headers_list
       checkConfigUse('PushMetricExporter', properties!, [
         'compression',
         'endpoint',
         'timeout',
         'tls',
         'headers',
+        'headers_list',
         'temporality_preference',
         'default_histogram_aggregation',
       ]);
@@ -723,7 +741,10 @@ export function createPushMetricExporterFromConfig(
           'PushMetricExporter.timeout'
         ),
         credentials: grpcCredentialsFromConfig(props?.tls),
-        metadata: getGrpcMetadataFromHeaders(props?.headers),
+        metadata: getGrpcMetadataFromHeaders(
+          props?.headers,
+          props?.headers_list
+        ),
         temporalityPreference: aggregationTemporalityPreferenceFromConfig(
           props?.temporality_preference
         ),
@@ -1104,11 +1125,11 @@ function createSpanExporterFromConfig(
 
   switch (name) {
     case 'otlp_http': {
-      // TODO(6953): headers_list
       checkConfigUse('OtlpHttpExporter', properties!, [
         'compression',
         'endpoint',
         'headers',
+        'headers_list',
         'timeout',
         'tls',
         'encoding',
@@ -1120,7 +1141,7 @@ function createSpanExporterFromConfig(
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
-        headers: getHeadersFromConfiguration(props?.headers),
+        headers: mergeHeadersConfig(props?.headers, props?.headers_list),
         timeoutMillis: validateExportTimeoutConfig(
           props?.timeout,
           'OtlpHttpExporter.timeout'
@@ -1141,13 +1162,13 @@ function createSpanExporterFromConfig(
     }
 
     case 'otlp_grpc': {
-      // TODO(6953): headers_list
       checkConfigUse('OtlpGrpcExporter', properties!, [
         'compression',
         'endpoint',
         'timeout',
         'tls',
         'headers',
+        'headers_list',
       ]);
       const props = properties as OtlpGrpcExporterConfigModel;
       return new OTLPGrpcTraceExporter({
@@ -1161,7 +1182,10 @@ function createSpanExporterFromConfig(
           'OtlpGrpcExporter.timeout'
         ),
         credentials: grpcCredentialsFromConfig(props?.tls),
-        metadata: getGrpcMetadataFromHeaders(props?.headers),
+        metadata: getGrpcMetadataFromHeaders(
+          props?.headers,
+          props?.headers_list
+        ),
       });
     }
 

@@ -59,6 +59,7 @@ export type {
 } from './generated/types';
 export { createConfigFactory } from './ConfigFactory';
 export {
+  mergeHeadersConfig,
   mergeResourceAttributesConfig,
   mergePropagatorCompositeConfig,
 } from './FileConfigFactory';
