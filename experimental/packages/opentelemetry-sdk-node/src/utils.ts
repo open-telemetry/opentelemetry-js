@@ -14,6 +14,7 @@ import {
   getNumberFromEnv,
   getStringFromEnv,
   getStringListFromEnv,
+  parseKeyPairsIntoRecord,
   W3CBaggagePropagator,
   W3CTraceContextPropagator,
 } from '@opentelemetry/core';
@@ -495,13 +496,14 @@ export function getBatchLogRecordProcessorFromEnv(
 }
 
 export function getHeadersFromConfiguration(
-  headers: NameStringValuePairConfigModel[] | undefined
+  headers: NameStringValuePairConfigModel[] | undefined,
+  headersList?: string | null
 ): Record<string, string> | undefined {
-  if (!headers) {
+  if (!headers && !headersList) {
     return undefined;
   }
-  const result: Record<string, string> = {};
-  headers.forEach(header => {
+  const result = parseKeyPairsIntoRecord(headersList ?? undefined);
+  headers?.forEach(header => {
     if (header.value !== null) {
       result[header.name] = header.value;
     }
@@ -510,16 +512,16 @@ export function getHeadersFromConfiguration(
 }
 
 export function getGrpcMetadataFromHeaders(
-  headers: NameStringValuePairConfigModel[] | undefined
+  headers: NameStringValuePairConfigModel[] | undefined,
+  headersList?: string | null
 ) {
-  if (!headers || headers.length === 0) {
+  const headerValues = getHeadersFromConfiguration(headers, headersList);
+  if (!headerValues || Object.keys(headerValues).length === 0) {
     return undefined;
   }
   const metadata = createEmptyMetadata();
-  for (const header of headers) {
-    if (header.value !== null) {
-      metadata.set(header.name, header.value);
-    }
+  for (const [name, value] of Object.entries(headerValues)) {
+    metadata.set(name, value);
   }
   return metadata;
 }

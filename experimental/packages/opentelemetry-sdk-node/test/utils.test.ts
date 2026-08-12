@@ -9,6 +9,7 @@ import {
   getLoggerProviderConfigFromEnv,
   getBatchLogRecordProcessorConfigFromEnv,
   getResourceDetectorsFromConfiguration,
+  getGrpcMetadataFromHeaders,
   getHeadersFromConfiguration,
 } from '../src/utils';
 import * as assert from 'assert';
@@ -444,5 +445,34 @@ describe('getHeadersFromConfiguration', function () {
       ),
       { 'x-test-header': 'test-value' }
     );
+  });
+
+  it('parses headers_list and lets headers take precedence', function () {
+    assert.deepStrictEqual(
+      getHeadersFromConfiguration(
+        [
+          { name: 'shared', value: 'from-headers' },
+          { name: 'ignored', value: null },
+        ],
+        'shared=from-list,list-only=hello%20world,ignored=from-list'
+      ),
+      {
+        shared: 'from-headers',
+        'list-only': 'hello world',
+        ignored: 'from-list',
+      }
+    );
+  });
+});
+
+describe('getGrpcMetadataFromHeaders', function () {
+  it('merges headers_list into metadata with headers taking precedence', function () {
+    const metadata = getGrpcMetadataFromHeaders(
+      [{ name: 'shared', value: 'from-headers' }],
+      'shared=from-list,list-only=value'
+    );
+
+    assert.deepStrictEqual(metadata?.get('shared'), ['from-headers']);
+    assert.deepStrictEqual(metadata?.get('list-only'), ['value']);
   });
 });
