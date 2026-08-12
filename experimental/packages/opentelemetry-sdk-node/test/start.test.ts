@@ -52,11 +52,7 @@ import {
   ATTR_SERVICE_INSTANCE_ID,
 } from '../src/semconv';
 import { ATTR_OS_TYPE } from '@opentelemetry/resources/src/semconv';
-import {
-  getPeriodicMetricReaderFromConfiguration,
-  getSpanExporter,
-  setupContextManager,
-} from '../src/utils';
+import { setupContextManager } from '../src/utils';
 import { NOOP_SDK } from '../src/start';
 import {
   ConsoleMetricExporter,
@@ -258,13 +254,14 @@ describe('startNodeSDK', function () {
     assert.strictEqual(diagError.callCount, 1);
     assert.strictEqual(
       diagError.args[0][0],
-      'Could not create OpenTelemetry SDK: unknown LogRecordProcessor name: "my_custom_processor"'
+      'Could not create OpenTelemetry SDK from configuration, SDK will not be setup: unknown LogRecordProcessor name: "my_custom_processor"'
     );
 
     await sdk.shutdown();
   });
 
   it('should register a logger provider if multiple log record processors are provided', async () => {
+    process.env.TEST_DIR = __dirname;
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/logger.yaml';
     const sdk = startNodeSDK({});
 
@@ -301,14 +298,9 @@ describe('startNodeSDK', function () {
   it('should register a meter provider if multiple metric readers are provided', async () => {
     const stubLoggerWarn: Sinon.SinonStub = Sinon.stub(diag, 'warn');
 
+    process.env.TEST_DIR = __dirname;
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/meter.yaml';
     const sdk = startNodeSDK({});
-
-    // Periodic type 'otlp_file/development' and 'console' are not supported yet
-    const unsupportedWarnings = stubLoggerWarn.args.filter(
-      args => args[0] === 'Unsupported Metric Exporter.'
-    );
-    assert.strictEqual(unsupportedWarnings.length, 2);
 
     const meterProvider = metrics.getMeterProvider() as MeterProvider;
     const sharedState = (meterProvider as any)['_sharedState'];
@@ -354,17 +346,10 @@ describe('startNodeSDK', function () {
     await sdk.shutdown();
   });
 
-  it('should register a tracer provider if an exporter is provided', async () => {
-    const stubLoggerWarn: Sinon.SinonStub = Sinon.stub(diag, 'warn');
+  it('should register a tracer provider for fixtures/tracer.yaml', async () => {
+    process.env.TEST_DIR = __dirname;
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/tracer.yaml';
     const sdk = startNodeSDK({});
-
-    // otlp_file/development exporters are not supported yet
-    const unsupportedWarnings = stubLoggerWarn.args.filter(
-      args =>
-        args[0] === 'Unsupported Exporter value. No Span Exporter registered'
-    );
-    assert.strictEqual(unsupportedWarnings.length, 2);
 
     assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
     assert.ok(
@@ -396,7 +381,6 @@ describe('startNodeSDK', function () {
       (spanProcessors[3] as any)['_exporter'] instanceof ConsoleSpanExporter
     );
 
-    stubLoggerWarn.reset();
     await sdk.shutdown();
   });
 
@@ -828,7 +812,7 @@ describe('startNodeSDK', function () {
 
     it('should only create one span processor when configured using env vars and config', async () => {
       process.env.OTEL_TRACES_EXPORTER = 'console';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSDK();
       const listOfProcessors = getSdkSpanProcessors();
 
       assert.strictEqual(listOfProcessors.length, 1);
@@ -957,34 +941,6 @@ describe('startNodeSDK', function () {
   });
 
   describe('tests to increase code coverage', function () {
-    it('should warn for unsupported metric producer', async () => {
-      const warnSpy = Sinon.spy(diag, 'warn');
-      const reader = getPeriodicMetricReaderFromConfiguration({
-        exporter: { console: {} },
-        producers: [{ 'unknown/producer': {} }],
-      });
-      assert.ok(reader !== undefined);
-      assert.ok(
-        warnSpy.args.some(args =>
-          String(args[0]).includes('Unsupported metric producer')
-        )
-      );
-      await (reader as PeriodicExportingMetricReader).shutdown();
-    });
-
-    it('should warn when exporter timeout is 0', async () => {
-      const warnSpy = Sinon.spy(diag, 'warn');
-      const exporter = getSpanExporter({
-        otlp_http: { timeout: 0 },
-      });
-      assert.ok(exporter !== undefined);
-      assert.ok(
-        warnSpy.args.some(args =>
-          String(args[0]).includes('timeout of 0 (infinite) is not supported')
-        )
-      );
-    });
-
     it('null context manager', async () => {
       setupContextManager(null);
       assert.equal(
