@@ -20,10 +20,11 @@ export class MultiSpanProcessor implements SpanProcessor {
   }
 
   forceFlush(): Promise<void> {
+    const spanProcessors = this._spanProcessors.slice();
     const promises: Promise<void>[] = [];
 
-    for (const spanProcessor of this._spanProcessors) {
-      promises.push(spanProcessor.forceFlush());
+    for (const spanProcessor of spanProcessors) {
+      promises.push(callLifecycle(() => spanProcessor.forceFlush()));
     }
     return new Promise(resolve => {
       Promise.all(promises)
@@ -60,15 +61,24 @@ export class MultiSpanProcessor implements SpanProcessor {
   }
 
   shutdown(): Promise<void> {
+    const spanProcessors = this._spanProcessors.slice();
     const promises: Promise<void>[] = [];
 
-    for (const spanProcessor of this._spanProcessors) {
-      promises.push(spanProcessor.shutdown());
+    for (const spanProcessor of spanProcessors) {
+      promises.push(callLifecycle(() => spanProcessor.shutdown()));
     }
     return new Promise((resolve, reject) => {
       Promise.all(promises).then(() => {
         resolve();
       }, reject);
     });
+  }
+}
+
+function callLifecycle(callback: () => Promise<void>): Promise<void> {
+  try {
+    return callback();
+  } catch (error) {
+    return Promise.reject(error);
   }
 }
