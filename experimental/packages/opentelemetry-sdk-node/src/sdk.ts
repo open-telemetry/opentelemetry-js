@@ -230,7 +230,7 @@ export class NodeSDK {
       diag.warn(
         "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
       );
-    } else {
+    } else if (!this._disabled) {
       this._meterProviderConfig = {
         readers: getMetricReadersFromEnv(),
         views: configuration.views,
@@ -244,6 +244,13 @@ export class NodeSDK {
    * Call this method to construct SDK components and register them with the OpenTelemetry API.
    */
   public start(): void {
+    setupContextManager(this._configuration?.contextManager);
+    setupPropagator(
+      this._configuration?.textMapPropagator === null
+        ? null // null means don't set, so we cannot fall back to env config.
+        : (this._configuration?.textMapPropagator ?? getPropagatorFromEnv())
+    );
+
     if (this._disabled) {
       return;
     }
@@ -251,13 +258,6 @@ export class NodeSDK {
     registerInstrumentations({
       instrumentations: this._instrumentations,
     });
-
-    setupContextManager(this._configuration?.contextManager);
-    setupPropagator(
-      this._configuration?.textMapPropagator === null
-        ? null // null means don't set, so we cannot fall back to env config.
-        : (this._configuration?.textMapPropagator ?? getPropagatorFromEnv())
-    );
 
     if (this._autoDetectResources) {
       const internalConfig: ResourceDetectionConfig = {

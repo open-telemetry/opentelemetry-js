@@ -69,12 +69,27 @@ export function startNodeSDK(sdkOptions?: SDKOptions): {
     return NOOP_SDK;
   }
 
-  if (config.disabled) {
-    return NOOP_SDK;
-  }
-
   const logLevel = diagLogLevelFromSeverityNumberConfig(config.log_level);
   diag.setLogger(new DiagConsoleLogger(), { logLevel });
+
+  if (config.disabled) {
+    const components: SDKComponents = {};
+    try {
+      components.contextManager = new AsyncLocalStorageContextManager();
+      components.contextManager.enable();
+      components.propagator = getPropagator(config, sdkOptions);
+    } catch (createErr) {
+      diag.error(`Could not create OpenTelemetry SDK: ${createErr.message}`);
+      return NOOP_SDK;
+    }
+    if (components.contextManager) {
+      context.setGlobalContextManager(components.contextManager);
+    }
+    if (components.propagator) {
+      propagation.setGlobalPropagator(components.propagator);
+    }
+    return NOOP_SDK;
+  }
 
   registerInstrumentations({
     instrumentations: sdkOptions?.instrumentations?.flat() ?? [],
@@ -136,13 +151,7 @@ function create(
 
     const resource = setupResource(config, sdkOptions);
 
-    if (sdkOptions?.textMapPropagator !== undefined) {
-      if (sdkOptions.textMapPropagator !== null) {
-        components.propagator = sdkOptions.textMapPropagator;
-      }
-    } else if (config.propagator) {
-      components.propagator = createPropagatorFromConfig(config.propagator);
-    }
+    components.propagator = getPropagator(config, sdkOptions);
 
     if (config.logger_provider) {
       components.loggerProvider = createLoggerProviderFromConfig(
@@ -182,6 +191,18 @@ function create(
 
     throw createErr;
   }
+}
+
+function getPropagator(
+  config: ConfigurationModel,
+  sdkOptions?: SDKOptions
+): SDKComponents['propagator'] {
+  if (sdkOptions?.textMapPropagator !== undefined) {
+    return sdkOptions.textMapPropagator ?? undefined;
+  }
+  return config.propagator
+    ? createPropagatorFromConfig(config.propagator)
+    : undefined;
 }
 
 export function setupResource(

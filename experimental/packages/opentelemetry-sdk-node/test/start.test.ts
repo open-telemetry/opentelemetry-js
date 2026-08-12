@@ -66,6 +66,13 @@ import {
   SimpleSpanProcessor,
   TracerProvider,
 } from '@opentelemetry/sdk-trace';
+import { InstrumentationBase } from '@opentelemetry/instrumentation';
+
+class TestInstrumentation extends InstrumentationBase {
+  init() {
+    return [];
+  }
+}
 
 describe('startNodeSDK', function () {
   let setGlobalLoggerProviderSpy: Sinon.SinonSpy;
@@ -103,11 +110,61 @@ describe('startNodeSDK', function () {
   });
 
   describe('Basic Registration', function () {
-    it('should return NOOP_SDK when disabled is true', async () => {
+    it('should configure context and propagation without starting signal components when disabled', async () => {
+      process.env.OTEL_SDK_DISABLED = 'TrUe';
+      process.env.OTEL_PROPAGATORS = 'tracecontext,baggage';
+      process.env.OTEL_TRACES_EXPORTER = 'console';
+      process.env.OTEL_LOGS_EXPORTER = 'console';
+      process.env.OTEL_METRICS_EXPORTER = 'console';
+      const detect = Sinon.spy(() => ({
+        attributes: { detected: true },
+      }));
+      const instrumentation = new TestInstrumentation('test', '1.0.0', {
+        enabled: false,
+      });
+      const enableInstrumentation = Sinon.spy(instrumentation, 'enable');
+      const sdk = startNodeSDK({
+        instrumentations: [instrumentation],
+        resourceDetectors: [{ detect }],
+      });
+
+      assert.strictEqual(sdk, NOOP_SDK);
+      assertDefaultContextManagerRegistered();
+      assert.deepStrictEqual(propagation.fields(), [
+        'traceparent',
+        'tracestate',
+        'baggage',
+      ]);
+
+      const extracted = propagation.extract(context.active(), {
+        traceparent: '00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01',
+        baggage: 'test=value',
+      });
+      assert.strictEqual(
+        trace.getSpanContext(extracted)?.traceId,
+        '4bf92f3577b34da6a3ce929d0e0e4736'
+      );
+      assert.strictEqual(
+        propagation.getBaggage(extracted)?.getEntry('test')?.value,
+        'value'
+      );
+      assert.ok(setGlobalLoggerProviderSpy.notCalled);
+      assert.ok(setGlobalMeterProviderSpy.notCalled);
+      assert.ok(setGlobalTracerProviderSpy.notCalled);
+      assert.ok(enableInstrumentation.notCalled);
+      assert.ok(detect.notCalled);
+
+      await sdk.shutdown();
+    });
+
+    it('should honor OTEL_PROPAGATORS=none when disabled', async () => {
       process.env.OTEL_SDK_DISABLED = 'true';
+      process.env.OTEL_PROPAGATORS = 'none';
       const sdk = startNodeSDK();
 
       assert.strictEqual(sdk, NOOP_SDK);
+      assertDefaultContextManagerRegistered();
+      assert.deepStrictEqual(propagation.fields(), []);
 
       await sdk.shutdown();
     });
