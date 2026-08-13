@@ -5,7 +5,11 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This package implements the [OpenTelemetry declarative configuration](https://github.com/open-telemetry/opentelemetry-configuration) specification for Node.js. It parses configuration from a YAML file and produces a `ConfigurationModel` that can be used to initialize an OpenTelemetry SDK.
+This package implements a part of the [OpenTelemetry declarative configuration](https://opentelemetry.io/docs/specs/otel/configuration/#declarative-configuration) specification for Node.js. It exports:
+
+- a suite of TypeScript types representing [the configuration types](https://opentelemetry.io/docs/specs/otel-config/types/) defined by [the declarative config schema](https://github.com/open-telemetry/opentelemetry-configuration#readme);
+- [`parseConfigFile()` to parse and validate](https://opentelemetry.io/docs/specs/otel/configuration/sdk/#parse) a YAML configuration, which can then be used (e.g. by `@opentelemetry/sdk-node`) to setup an OpenTelemetry SDK; and
+- some utilities for working with parsed configuration data.
 
 ## Installation
 

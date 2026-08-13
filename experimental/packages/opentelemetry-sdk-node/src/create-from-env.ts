@@ -82,7 +82,7 @@ import {
  * This may return `null` if "none" is in OTEL_PROPAGATORS, or only unknown
  * propagator names were provided.
  */
-export function createPropagatorFromEnv(): TextMapPropagator | null {
+function createPropagatorFromEnv(): TextMapPropagator | null {
   let propagatorNames = getStringListFromEnv('OTEL_PROPAGATORS') ?? [];
   if (propagatorNames.length === 0) {
     propagatorNames = ['tracecontext', 'baggage']; // default value
@@ -132,22 +132,21 @@ export function createPropagatorFromEnv(): TextMapPropagator | null {
   }
 }
 
-// XXX See if cleanly can move these to create-from-env (need the StartSdk*Options types there, then) -> types.ts
 export function createPropagatorFromOptsAndEnv(
-  optsPropagators: StartSdkFromEnvOptions['propagators']
+  opts?: Pick<StartSdkFromEnvOptions, 'propagators'>
 ): TextMapPropagator | null {
   let propagator: TextMapPropagator | null;
-  if (optsPropagators !== undefined) {
-    if (optsPropagators === null) {
+  if (opts?.propagators !== undefined) {
+    if (opts?.propagators === null) {
       propagator = null;
-    } else if (optsPropagators.length === 0) {
+    } else if (opts?.propagators.length === 0) {
       throw new Error(
         'invalid "propagators" option: must have at least one item'
       );
-    } else if (optsPropagators.length === 1) {
-      propagator = optsPropagators[0];
+    } else if (opts?.propagators.length === 1) {
+      propagator = opts?.propagators[0];
     } else {
-      propagator = new CompositePropagator({ propagators: optsPropagators });
+      propagator = new CompositePropagator({ propagators: opts?.propagators });
     }
   } else {
     propagator = createPropagatorFromEnv();
@@ -221,7 +220,9 @@ export function createResourceFromOptsAndEnv(
           detectors.push(serviceNameEnvDetector);
           break;
         case 'env':
-          detectors.push(envDetector);
+          diag.warn(
+            '"env" resource detector name is no longer supported, `OTEL_RESOURCE_ATTRIBUTES` is always read, use "service" to handle reading `OTEL_SERVICE_NAME` (see https://opentelemetry.io/docs/specs/otel/resource/sdk/#resource-detector-name)'
+          );
           break;
         default:
           diag.warn(

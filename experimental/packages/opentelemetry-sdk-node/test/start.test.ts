@@ -31,7 +31,6 @@ import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exp
 import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
-import { setupContextManager } from '../src/utils';
 import { NOOP_SDK } from '../src/start';
 import {
   ConsoleMetricExporter,
@@ -260,8 +259,6 @@ describe('startNodeSdk', function () {
   });
 
   it('should register a meter provider if multiple metric readers are provided', async () => {
-    const stubLoggerWarn: Sinon.SinonStub = Sinon.stub(diag, 'warn');
-
     process.env.TEST_DIR = __dirname;
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/meter.yaml';
     const sdk = startNodeSdk({});
@@ -306,7 +303,6 @@ describe('startNodeSdk', function () {
         ConsoleMetricExporter
     );
 
-    stubLoggerWarn.reset();
     await sdk.shutdown();
   });
 
@@ -488,9 +484,6 @@ describe('startNodeSdk', function () {
   });
 
   describe('setup trace exporter from env', () => {
-    let stubLoggerWarn: Sinon.SinonStub;
-    let stubLoggerInfo: Sinon.SinonStub;
-
     const getSdkSpanProcessors = () => {
       const tracerProvider = trace.getTracerProvider();
       return (tracerProvider as any)._delegate._activeSpanProcessor
@@ -498,8 +491,6 @@ describe('startNodeSdk', function () {
     };
 
     beforeEach(() => {
-      stubLoggerWarn = Sinon.stub(diag, 'warn');
-      stubLoggerInfo = Sinon.stub(diag, 'info');
       delete process.env.OTEL_LOGS_EXPORTER;
       delete process.env.OTEL_METRICS_EXPORTER;
       delete process.env.OTEL_TRACES_EXPORTER;
@@ -509,9 +500,6 @@ describe('startNodeSdk', function () {
       delete process.env.OTEL_EXPORTER_OTLP_PROTOCOL;
       delete process.env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
       delete process.env.OTEL_TRACES_EXPORTER;
-      // XXX
-      stubLoggerWarn.restore();
-      stubLoggerInfo.restore();
     });
 
     it('should only create one span processor when configured using env vars and config', async () => {
@@ -629,16 +617,6 @@ describe('startNodeSdk', function () {
         listOfProcessors[1]['_exporter'] instanceof OTLPProtoTraceExporter
       );
       await sdk.shutdown();
-    });
-  });
-
-  describe('tests to increase code coverage', function () {
-    it('null context manager', async () => {
-      setupContextManager(null);
-      assert.equal(
-        context['_getContextManager']().constructor.name,
-        'NoopContextManager'
-      );
     });
   });
 });

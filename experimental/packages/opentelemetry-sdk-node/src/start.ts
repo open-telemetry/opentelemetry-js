@@ -111,7 +111,7 @@ function startNodeSdkFromEnv(opts?: StartSdkFromEnvOptions): NodeSdk {
     // TODO: disable context manager on createErr and shutdown
     const contextManager = new AsyncLocalStorageContextManager();
     contextManager.enable();
-    const propagator = createPropagatorFromOptsAndEnv(opts?.propagators);
+    const propagator = createPropagatorFromOptsAndEnv(opts);
     const resource = createResourceFromOptsAndEnv(opts);
 
     // While SDK metrics are unstable, we require an opt-in.
