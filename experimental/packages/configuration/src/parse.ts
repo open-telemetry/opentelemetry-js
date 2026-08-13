@@ -4,12 +4,14 @@
  */
 
 import { diag } from '@opentelemetry/api';
+import { parseKeyPairsIntoRecord } from '@opentelemetry/core';
 import * as fs from 'fs';
 import * as yaml from 'yaml';
 import { substituteEnvVars } from './utils';
 import type {
   AttributeNameValue,
   ConfigurationModel,
+  NameStringValuePair,
   TextMapPropagator,
 } from './generated/types';
 // Pre-compiled ajv validator — eliminates runtime schema compilation on cold start.
@@ -162,6 +164,27 @@ export function mergeResourceAttributesConfig(
   }
 
   return mergedAttrs;
+}
+
+/**
+ * Merge headers from `headers` and `headers_list` (comma-separated key=value
+ * pairs) into a record. Entries in `headers` take precedence.
+ */
+export function mergeHeadersConfig(
+  headers?: NameStringValuePair[],
+  headers_list?: string | null
+): Record<string, string> | undefined {
+  if (!headers && !headers_list) {
+    return undefined;
+  }
+
+  const mergedHeaders = parseKeyPairsIntoRecord(headers_list ?? undefined);
+  headers?.forEach(header => {
+    if (header.value !== null) {
+      mergedHeaders[header.name] = header.value;
+    }
+  });
+  return mergedHeaders;
 }
 
 /**

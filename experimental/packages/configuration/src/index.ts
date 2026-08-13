@@ -3,6 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+// Naming convention for types exported from this package: configuration
+// types use the `ConfigModel` suffix (e.g. `SamplerConfigModel`) rather than
+// their schema name (e.g. `Sampler`) so that they don't collide with the SDK
+// runtime types of the same name. Internally the package uses the schema
+// names from `./generated/types`; the renaming happens at export time here.
+// Follow this convention when adding new exports.
+
 export type {
   ConfigurationModel,
   LogRecordExporter as LogRecordExporterConfigModel,
@@ -52,6 +59,7 @@ export type {
 } from './generated/types';
 export { parseConfigFile } from './parse';
 export {
+  mergeHeadersConfig,
   mergeResourceAttributesConfig,
   mergePropagatorCompositeConfig,
 } from './parse';

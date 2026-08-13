@@ -14,11 +14,15 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(sdk-trace): allow configuring the force flush timeout per call #6929 @LarryHu0217
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
 
 ### :house: Internal
+
+* chore(resources): Ensure that multiple uses of serviceInstanceIdDetector.detect() return the *same* value for `service.instance.id`
 
 ## 2.10.0
 

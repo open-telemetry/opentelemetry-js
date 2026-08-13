@@ -19,9 +19,15 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(sdk-node): support `headers_list` when creating OTLP exporters from declarative configuration [#6953](https://github.com/open-telemetry/opentelemetry-js/issues/6953) @JacksonWeber
+
 ### :books: Documentation
 
+* docs(configuration): document the `ConfigModel` suffix naming convention for exported types [#6612](https://github.com/open-telemetry/opentelemetry-js/issues/6612) @vedantchalke36
+
 ### :house: Internal
+
+* refactor(sampler-jaeger-remote): remove `axios` dependency and use `fetch` to get the sampler configuration from Jaeger API [#6963](https://github.com/open-telemetry/opentelemetry-js/pull/6963) @david-luna
 
 ## 0.221.0
 
