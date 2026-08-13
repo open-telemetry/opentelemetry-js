@@ -7,7 +7,10 @@ import type { Attributes, ContextManager } from '@opentelemetry/api';
 import type { TextMapPropagator } from '@opentelemetry/api';
 import type { Instrumentation } from '@opentelemetry/instrumentation';
 import type { Resource, ResourceDetector } from '@opentelemetry/resources';
-import type { LogRecordLimits, LogRecordProcessor } from '@opentelemetry/sdk-logs';
+import type {
+  LogRecordLimits,
+  LogRecordProcessor,
+} from '@opentelemetry/sdk-logs';
 import type { IMetricReader, ViewOptions } from '@opentelemetry/sdk-metrics';
 import type {
   Sampler,

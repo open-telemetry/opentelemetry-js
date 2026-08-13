@@ -179,7 +179,7 @@ export function createResourceFromOptsAndEnv(
     //   Documented advice should be to make a per-app explicit decision.
     // - XXX handle the env switch?? then both OTEL_ related envvars. Sigh.
     // - XXX can we export some utilities here to make auto-instr-node handling easier?
-    const DEFAULT_RESOURCE_DETECTOR_NAMES = 'service'.split(',')
+    const DEFAULT_RESOURCE_DETECTOR_NAMES = 'service'.split(',');
 
     let detectorNames = getStringListFromEnv('OTEL_NODE_RESOURCE_DETECTORS');
     if (!detectorNames || detectorNames.length === 0) {
@@ -201,7 +201,7 @@ export function createResourceFromOptsAndEnv(
           break;
         case 'os':
           diag.warn(
-            `"os" resource detector name is no longer supported, use "host" which populates 'host.*' and 'os.*' resource attributes (see https://opentelemetry.io/docs/specs/otel/resource/sdk/#resource-detector-name)`
+            '"os" resource detector name is no longer supported, use "host" which populates \'host.*\' and \'os.*\' resource attributes (see https://opentelemetry.io/docs/specs/otel/resource/sdk/#resource-detector-name)'
           );
           break;
         case 'host':
@@ -210,7 +210,7 @@ export function createResourceFromOptsAndEnv(
           break;
         case 'serviceinstance':
           diag.warn(
-            `"serviceinstance" resource detector name is no longer supported, use "service" which populates 'service.instance.id' and reads OTEL_SERVICE_NAME (see https://opentelemetry.io/docs/specs/otel/resource/sdk/#resource-detector-name)`
+            '"serviceinstance" resource detector name is no longer supported, use "service" which populates \'service.instance.id\' and reads OTEL_SERVICE_NAME (see https://opentelemetry.io/docs/specs/otel/resource/sdk/#resource-detector-name)'
           );
           break;
         case 'service':

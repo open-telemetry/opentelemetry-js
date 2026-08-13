@@ -78,7 +78,6 @@ export type LoggerProviderConfig = {
   logRecordProcessors: LogRecordProcessor[];
 };
 
-
 /**
  * A setup helper for the OpenTelemetry SDKs (logs, metrics, traces).
  * <p> After successful setup using {@link NodeSDK#start()}, use `@opentelemetry/api` to obtain the registered components.
