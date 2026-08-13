@@ -137,9 +137,6 @@ export function getSpanProcessorsFromEnv(
     new Set(getStringListFromEnv('OTEL_TRACES_EXPORTER'))
   ).filter(s => s !== 'null');
 
-  // XXX changes I want for startNodeSDK:
-  // - 'none' means no TracerProvider, even if there are other entries (as is done for metrics and logs)
-  // - remove diag.warn for 'none', silent unless exceptional
   if (traceExportersList[0] === 'none') {
     diag.warn(
       'OTEL_TRACES_EXPORTER contains "none". SDK will not be initialized.'
@@ -462,6 +459,7 @@ export function getLoggerProviderConfigFromEnv(): LoggerProviderOptions {
   };
 }
 
+// XXX refactor these two (and tests) to create-from-env.ts
 /**
  * Get configuration for BatchLogRecordProcessor from environment variables.
  */

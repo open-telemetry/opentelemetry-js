@@ -27,12 +27,16 @@ import type {
   SpanLimits,
   SpanProcessor,
 } from '@opentelemetry/sdk-trace';
-import { TracerProvider } from '@opentelemetry/sdk-trace';
+import { ConsoleSpanExporter, TracerProvider } from '@opentelemetry/sdk-trace';
+import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
+import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,
   ParentBasedSampler,
+  SimpleSpanProcessor,
   TraceIdRatioBasedSampler,
 } from '@opentelemetry/sdk-trace';
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
@@ -70,7 +74,6 @@ import {
   getBatchLogRecordProcessorFromEnv,
   getMetricReadersFromEnv,
   getNonNegativeNumberFromEnv,
-  getSpanProcessorsFromEnv,
 } from './utils';
 
 /**
@@ -343,6 +346,69 @@ export function createBatchSpanProcessorFromEnv(
   });
 }
 
+function createSpanProcessorsFromEnv(
+  selfObsMeterProvider: ApiMeterProvider | undefined
+): SpanProcessor[] {
+  let exporterNames = Array.from(
+    new Set(getStringListFromEnv('OTEL_TRACES_EXPORTER') ?? [])
+  );
+  if (exporterNames.length === 0) {
+    exporterNames = ['otlp'];
+  }
+  if (exporterNames.includes('none')) {
+    return [];
+  }
+
+  const exporters = [];
+  for (const exporterName of exporterNames) {
+    switch (exporterName) {
+      case 'otlp': {
+        const protocol =
+          (
+            getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_PROTOCOL') ??
+            getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL')
+          )?.trim() || 'http/protobuf';
+        switch (protocol) {
+          case 'grpc':
+            exporters.push(new OTLPGrpcTraceExporter());
+            break;
+          case 'http/json':
+            exporters.push(new OTLPHttpTraceExporter());
+            break;
+          case 'http/protobuf':
+            exporters.push(new OTLPProtoTraceExporter());
+            break;
+          default:
+            diag.warn(
+              `Unsupported OTLP traces protocol: "${protocol}". Using http/protobuf.`
+            );
+            exporters.push(new OTLPProtoTraceExporter());
+        }
+        break;
+      }
+      case 'console':
+        exporters.push(new ConsoleSpanExporter());
+        break;
+      default:
+        diag.warn(
+          `Unsupported exporter name in OTEL_TRACES_EXPORTER: "${exporterName}". Supported values are: otlp, console, none.`
+        );
+        break;
+    }
+  }
+
+  return exporters.map(exporter => {
+    if (exporter instanceof ConsoleSpanExporter) {
+      return new SimpleSpanProcessor({
+        exporter,
+        selfObsMeterProvider,
+      });
+    } else {
+      return createBatchSpanProcessorFromEnv(exporter, selfObsMeterProvider);
+    }
+  });
+}
+
 export function createTracerProviderFromOptsAndEnv(
   resource: Resource,
   opts?: Pick<
@@ -355,7 +421,7 @@ export function createTracerProviderFromOptsAndEnv(
   if (opts?.spanProcessors) {
     spanProcessors = opts.spanProcessors;
   } else {
-    spanProcessors = getSpanProcessorsFromEnv(meterProvider);
+    spanProcessors = createSpanProcessorsFromEnv(meterProvider);
   }
 
   if (spanProcessors.length === 0) {

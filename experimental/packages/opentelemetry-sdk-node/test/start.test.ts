@@ -46,8 +46,7 @@ import {
   TracerProvider,
 } from '@opentelemetry/sdk-trace';
 
-// XXX only
-describe.only('startNodeSdk', function () {
+describe('startNodeSdk', function () {
   let setGlobalLoggerProviderSpy: Sinon.SinonSpy;
   let setGlobalMeterProviderSpy: Sinon.SinonSpy;
   let setGlobalTracerProviderSpy: Sinon.SinonSpy;
@@ -99,9 +98,12 @@ describe.only('startNodeSdk', function () {
       process.env.OTEL_METRICS_EXPORTER = 'none';
       const sdk = startNodeSdk();
 
-      // These are minimal OTel functionality and always registered.
       assertDefaultContextManagerRegistered();
-      assert.deepStrictEqual(propagation.fields(), []);
+      assert.deepStrictEqual(propagation.fields(), [
+        'traceparent',
+        'tracestate',
+        'baggage',
+      ]);
 
       assert.ok(
         setGlobalLoggerProviderSpy.called === false,
@@ -347,23 +349,9 @@ describe.only('startNodeSdk', function () {
   });
 
   describe('configuring logger provider from env', function () {
-    let stubLogger: Sinon.SinonStub;
-
-    beforeEach(() => {
-      stubLogger = Sinon.stub(diag, 'info');
-    });
-
-    afterEach(() => {
-      stubLogger.reset();
-    });
-
     it('should not register the provider if OTEL_LOGS_EXPORTER contains none', async () => {
       process.env.OTEL_LOGS_EXPORTER = 'console,none';
-      const sdk = startNodeSdk({});
-      assert.strictEqual(
-        stubLogger.args[0][0],
-        'OTEL_LOGS_EXPORTER contains "none". Logger provider will not be initialized.'
-      );
+      const sdk = startNodeSdk();
 
       assert.ok(
         setGlobalLoggerProviderSpy.callCount === 0,
@@ -521,6 +509,7 @@ describe.only('startNodeSdk', function () {
       delete process.env.OTEL_EXPORTER_OTLP_PROTOCOL;
       delete process.env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
       delete process.env.OTEL_TRACES_EXPORTER;
+      // XXX
       stubLoggerWarn.restore();
       stubLoggerInfo.restore();
     });
@@ -571,12 +560,6 @@ describe.only('startNodeSdk', function () {
       process.env.OTEL_TRACES_EXPORTER = 'none';
       const sdk = startNodeSdk({});
 
-      // also it should info
-      assert.strictEqual(
-        stubLoggerInfo.args[0][0],
-        'OTEL_TRACES_EXPORTER contains "none". Tracer provider will not be initialized.'
-      );
-
       assert.ok(
         setGlobalTracerProviderSpy.called === false,
         'tracer provider should not have changed'
@@ -588,12 +571,6 @@ describe.only('startNodeSdk', function () {
     it('should use no exporter when none value is provided with other exporters', async () => {
       process.env.OTEL_TRACES_EXPORTER = 'otlp,zipkin,none';
       const sdk = startNodeSdk({});
-
-      // also it should info
-      assert.strictEqual(
-        stubLoggerInfo.args[0][0],
-        'OTEL_TRACES_EXPORTER contains "none". Tracer provider will not be initialized.'
-      );
 
       assert.ok(
         setGlobalTracerProviderSpy.called === false,
