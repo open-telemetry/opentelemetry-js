@@ -12,7 +12,6 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag } from '@opentelemetry/api';
-import type { ConfigurationModel } from '@opentelemetry/configuration';
 import type { LoggerProviderOptions } from '@opentelemetry/sdk-logs';
 
 describe('getPropagatorFromEnv', function () {

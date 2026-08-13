@@ -34,7 +34,7 @@ tracer_provider:
 
 Environment variable substitution is supported using `${VAR_NAME}`, `${VAR_NAME:-default}`, `${env:VAR_NAME}`, and `${env:VAR_NAME:-default}` syntax. Use `$$` for a literal `$`.
 
-See https://opentelemetry.io/docs/specs/otel/configuration/#declarative-configuration and https://github.com/open-telemetry/opentelemetry-configuration for documentation, examples, and a JSON schema for declarative configuration.
+See <https://opentelemetry.io/docs/specs/otel/configuration/#declarative-configuration> and <https://github.com/open-telemetry/opentelemetry-configuration> for documentation, examples, and a JSON schema for declarative configuration.
 
 ## Supported schema versions
 
