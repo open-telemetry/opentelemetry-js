@@ -21,17 +21,12 @@ import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/expo
 import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
-import type {
-  DetectedResourceAttributes,
-  Resource,
-  ResourceDetector,
-} from '@opentelemetry/resources';
+import type { ResourceDetector } from '@opentelemetry/resources';
 import {
   envDetector,
   hostDetector,
   osDetector,
   processDetector,
-  resourceFromAttributes,
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 import type { SpanExporter, SpanProcessor } from '@opentelemetry/sdk-trace';
@@ -47,15 +42,18 @@ import type {
   ConfigurationModel,
   NameStringValuePairConfigModel,
 } from '@opentelemetry/configuration';
-import { mergeResourceAttributesConfig } from '@opentelemetry/configuration';
 import type {
   IMetricReader,
   PushMetricExporter,
 } from '@opentelemetry/sdk-metrics';
-import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
+import {
+  ConsoleMetricExporter,
+  PeriodicExportingMetricReader,
+} from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
 import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
+import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 import type {
   BatchLogRecordProcessorOptions,
   LogRecordExporter,
@@ -69,33 +67,6 @@ const RESOURCE_DETECTOR_HOST = 'host';
 const RESOURCE_DETECTOR_OS = 'os';
 const RESOURCE_DETECTOR_PROCESS = 'process';
 const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
-
-export function getResourceFromConfiguration(
-  config: ConfigurationModel
-): Resource | undefined {
-  if (!config.resource) {
-    return undefined;
-  }
-
-  const configAttrs = mergeResourceAttributesConfig(
-    config.resource.attributes,
-    config.resource.attributes_list
-  );
-  if (!configAttrs) {
-    return undefined;
-  }
-
-  const attrs: DetectedResourceAttributes = {};
-  for (let i = 0; i < configAttrs.length; i++) {
-    const a = configAttrs[i];
-    if (a.value !== null) {
-      attrs[a.name] = a.value;
-    }
-  }
-  return resourceFromAttributes(attrs, {
-    schemaUrl: config.resource.schema_url ?? undefined,
-  });
-}
 
 export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
   // When updating this list, make sure to also update the section `resourceDetectors` on README.
@@ -170,6 +141,9 @@ export function getSpanProcessorsFromEnv(
     new Set(getStringListFromEnv('OTEL_TRACES_EXPORTER'))
   ).filter(s => s !== 'null');
 
+  // XXX changes I want for startNodeSDK:
+  // - 'none' means no TracerProvider, even if there are other entries (as is done for metrics and logs)
+  // - remove diag.warn for 'none', silent unless exceptional
   if (traceExportersList[0] === 'none') {
     diag.warn(
       'OTEL_TRACES_EXPORTER contains "none". SDK will not be initialized.'
@@ -427,6 +401,52 @@ export function getOtlpMetricExporterFromEnv(): PushMetricExporter {
     `Unsupported OTLP metrics protocol: "${protocol}". Using http/protobuf.`
   );
   return new OTLPProtoMetricExporter();
+}
+
+// XXX refactor any FromEnv utils shared by NodeSDK and startNodeSDK to create-from-env.ts
+/**
+ *
+ * @returns MetricReader[] if appropriate environment variables are configured
+ */
+export function getMetricReadersFromEnv(): IMetricReader[] {
+  const metricReaders: IMetricReader[] = [];
+  const enabledExporters = Array.from(
+    new Set(getStringListFromEnv('OTEL_METRICS_EXPORTER') ?? [])
+  );
+
+  if (enabledExporters.length === 0) {
+    diag.debug('OTEL_METRICS_EXPORTER is empty. Using default otlp exporter.');
+    enabledExporters.push('otlp');
+  }
+
+  if (enabledExporters.includes('none')) {
+    diag.info(
+      'OTEL_METRICS_EXPORTER contains "none". Metric provider will not be initialized.'
+    );
+    return metricReaders;
+  }
+
+  enabledExporters.forEach(exporter => {
+    if (exporter === 'otlp') {
+      metricReaders.push(
+        getPeriodicExportingMetricReaderFromEnv(getOtlpMetricExporterFromEnv())
+      );
+    } else if (exporter === 'console') {
+      metricReaders.push(
+        new PeriodicExportingMetricReader({
+          exporter: new ConsoleMetricExporter(),
+        })
+      );
+    } else if (exporter === 'prometheus') {
+      metricReaders.push(new PrometheusExporter());
+    } else {
+      diag.warn(
+        `Unsupported OTEL_METRICS_EXPORTER value: "${exporter}". Supported values are: otlp, console, prometheus, none.`
+      );
+    }
+  });
+
+  return metricReaders;
 }
 
 /**

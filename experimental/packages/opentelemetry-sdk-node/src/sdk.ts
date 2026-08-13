@@ -32,13 +32,8 @@ import {
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
-import { PrometheusExporter as PrometheusMetricExporter } from '@opentelemetry/exporter-prometheus';
 import type { IMetricReader, ViewOptions } from '@opentelemetry/sdk-metrics';
-import {
-  MeterProvider,
-  ConsoleMetricExporter,
-  PeriodicExportingMetricReader,
-} from '@opentelemetry/sdk-metrics';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import type { SpanProcessor } from '@opentelemetry/sdk-trace';
 import { TracerProvider } from '@opentelemetry/sdk-trace';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
@@ -55,10 +50,9 @@ import {
   getPropagatorFromEnv,
   setupPropagator,
   setupContextManager,
-  getPeriodicExportingMetricReaderFromEnv,
-  getOtlpMetricExporterFromEnv,
   getBatchLogRecordProcessorFromEnv,
   getLoggerProviderConfigFromEnv,
+  getMetricReadersFromEnv,
 } from './utils';
 import {
   createBatchSpanProcessorFromEnv,
@@ -84,50 +78,6 @@ export type LoggerProviderConfig = {
   logRecordProcessors: LogRecordProcessor[];
 };
 
-/**
- *
- * @returns MetricReader[] if appropriate environment variables are configured
- */
-function getMetricReadersFromEnv(): IMetricReader[] {
-  const metricReaders: IMetricReader[] = [];
-  const enabledExporters = Array.from(
-    new Set(getStringListFromEnv('OTEL_METRICS_EXPORTER') ?? [])
-  );
-
-  if (enabledExporters.length === 0) {
-    diag.debug('OTEL_METRICS_EXPORTER is empty. Using default otlp exporter.');
-    enabledExporters.push('otlp');
-  }
-
-  if (enabledExporters.includes('none')) {
-    diag.info(
-      'OTEL_METRICS_EXPORTER contains "none". Metric provider will not be initialized.'
-    );
-    return metricReaders;
-  }
-
-  enabledExporters.forEach(exporter => {
-    if (exporter === 'otlp') {
-      metricReaders.push(
-        getPeriodicExportingMetricReaderFromEnv(getOtlpMetricExporterFromEnv())
-      );
-    } else if (exporter === 'console') {
-      metricReaders.push(
-        new PeriodicExportingMetricReader({
-          exporter: new ConsoleMetricExporter(),
-        })
-      );
-    } else if (exporter === 'prometheus') {
-      metricReaders.push(new PrometheusMetricExporter());
-    } else {
-      diag.warn(
-        `Unsupported OTEL_METRICS_EXPORTER value: "${exporter}". Supported values are: otlp, console, prometheus, none.`
-      );
-    }
-  });
-
-  return metricReaders;
-}
 
 /**
  * A setup helper for the OpenTelemetry SDKs (logs, metrics, traces).
@@ -193,6 +143,7 @@ export class NodeSDK {
     } else if (getStringFromEnv('OTEL_NODE_RESOURCE_DETECTORS')) {
       this._resourceDetectors = getResourceDetectorsFromEnv();
     } else {
+      // XXX Perhaps add serviceInstaceIdDetector here as a default, and update README
       this._resourceDetectors = [envDetector, processDetector, hostDetector];
     }
 
