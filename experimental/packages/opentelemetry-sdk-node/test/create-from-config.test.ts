@@ -5,6 +5,7 @@
 
 import * as assert from 'assert';
 import * as path from 'path';
+import * as sinon from 'sinon';
 
 import type {
   ConfigurationModel,
@@ -13,15 +14,17 @@ import type {
   MeterProviderConfigModel,
   PushMetricExporterConfigModel,
   SamplerConfigModel,
+  SpanExporterConfigModel,
   TracerProviderConfigModel,
 } from '@opentelemetry/configuration';
 import { createConfigFactory } from '@opentelemetry/configuration';
-import type { SpanLimits } from '@opentelemetry/sdk-trace';
+import type { SpanExporter, SpanLimits } from '@opentelemetry/sdk-trace';
 import {
   BatchSpanProcessor,
   RandomIdGenerator,
   TracerProvider,
 } from '@opentelemetry/sdk-trace';
+import { diag } from '@opentelemetry/api';
 import type { LogRecordLimits } from '@opentelemetry/sdk-logs';
 import {
   BatchLogRecordProcessor,
@@ -71,6 +74,125 @@ import {
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
 describe('create-from-config', () => {
+  describe('headers_list exporter wiring', function () {
+    const headers = [{ name: 'shared', value: 'from-headers' }];
+    const headers_list = 'shared=from-list,list-only=hello%20world';
+    const resource = resourceFromAttributes({});
+
+    function createTraceExporter(
+      exporter: SpanExporterConfigModel
+    ): SpanExporter {
+      const provider = createTracerProviderFromConfig(resource, {
+        processors: [{ simple: { exporter } }],
+      });
+      return (provider as any)._activeSpanProcessor._spanProcessors[0]
+        ._exporter;
+    }
+
+    const corpus: {
+      testName: string;
+      protocol: 'http' | 'grpc';
+      createExporter: () => unknown;
+    }[] = [
+      {
+        testName: 'log OTLP HTTP/protobuf',
+        protocol: 'http',
+        createExporter: () =>
+          createLogRecordExporterFromConfig({
+            otlp_http: { headers, headers_list },
+          }),
+      },
+      {
+        testName: 'log OTLP HTTP/JSON',
+        protocol: 'http',
+        createExporter: () =>
+          createLogRecordExporterFromConfig({
+            otlp_http: { headers, headers_list, encoding: 'json' },
+          }),
+      },
+      {
+        testName: 'log OTLP gRPC',
+        protocol: 'grpc',
+        createExporter: () =>
+          createLogRecordExporterFromConfig({
+            otlp_grpc: { headers, headers_list },
+          }),
+      },
+      {
+        testName: 'metric OTLP HTTP/protobuf',
+        protocol: 'http',
+        createExporter: () =>
+          createPushMetricExporterFromConfig({
+            otlp_http: { headers, headers_list },
+          }),
+      },
+      {
+        testName: 'metric OTLP HTTP/JSON',
+        protocol: 'http',
+        createExporter: () =>
+          createPushMetricExporterFromConfig({
+            otlp_http: { headers, headers_list, encoding: 'json' },
+          }),
+      },
+      {
+        testName: 'metric OTLP gRPC',
+        protocol: 'grpc',
+        createExporter: () =>
+          createPushMetricExporterFromConfig({
+            otlp_grpc: { headers, headers_list },
+          }),
+      },
+      {
+        testName: 'trace OTLP HTTP/protobuf',
+        protocol: 'http',
+        createExporter: () =>
+          createTraceExporter({
+            otlp_http: { headers, headers_list },
+          }),
+      },
+      {
+        testName: 'trace OTLP HTTP/JSON',
+        protocol: 'http',
+        createExporter: () =>
+          createTraceExporter({
+            otlp_http: { headers, headers_list, encoding: 'json' },
+          }),
+      },
+      {
+        testName: 'trace OTLP gRPC',
+        protocol: 'grpc',
+        createExporter: () =>
+          createTraceExporter({
+            otlp_grpc: { headers, headers_list },
+          }),
+      },
+    ];
+
+    afterEach(function () {
+      sinon.restore();
+    });
+
+    for (const item of corpus) {
+      it(item.testName, async function () {
+        const warnStub = sinon.stub(diag, 'warn');
+        const exporter = item.createExporter() as any;
+
+        if (item.protocol === 'http') {
+          const resolvedHeaders =
+            await exporter._delegate._transport._transport._parameters.headers();
+          assert.equal(resolvedHeaders.shared, 'from-headers');
+          assert.equal(resolvedHeaders['list-only'], 'hello world');
+        } else {
+          const metadata = exporter._delegate._transport._parameters.metadata();
+          assert.deepStrictEqual(metadata.get('shared'), ['from-headers']);
+          assert.deepStrictEqual(metadata.get('list-only'), ['hello world']);
+        }
+
+        sinon.assert.notCalled(warnStub);
+      });
+    }
+  });
+
   describe('createPropagatorFromConfig', function () {
     it('single propagator still uses CompositePropagator', function () {
       const propagator = createPropagatorFromConfig({
