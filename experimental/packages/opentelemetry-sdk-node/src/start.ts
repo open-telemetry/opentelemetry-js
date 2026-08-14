@@ -91,7 +91,6 @@ function startNodeSdkFromEnv(opts?: StartSdkFromEnvOptions): NodeSdk {
     return NOOP_SDK;
   }
 
-  // XXX test logLevel
   const logLevelStr =
     opts?.logLevel ?? getStringFromEnv('OTEL_LOG_LEVEL') ?? 'info';
   const logLevel = diagLogLevelFromString(logLevelStr);

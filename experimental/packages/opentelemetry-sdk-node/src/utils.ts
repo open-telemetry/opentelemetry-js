@@ -396,7 +396,6 @@ export function getOtlpMetricExporterFromEnv(): PushMetricExporter {
   return new OTLPProtoMetricExporter();
 }
 
-// XXX refactor any FromEnv utils shared by NodeSDK and startNodeSDK to create-from-env.ts
 /**
  *
  * @returns MetricReader[] if appropriate environment variables are configured
@@ -459,7 +458,6 @@ export function getLoggerProviderConfigFromEnv(): LoggerProviderOptions {
   };
 }
 
-// XXX refactor these two (and tests) to create-from-env.ts
 /**
  * Get configuration for BatchLogRecordProcessor from environment variables.
  */
