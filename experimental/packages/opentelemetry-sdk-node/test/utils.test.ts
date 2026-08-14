@@ -9,7 +9,6 @@ import {
   getLoggerProviderConfigFromEnv,
   getBatchLogRecordProcessorConfigFromEnv,
   getResourceDetectorsFromConfiguration,
-  getHeadersFromConfiguration,
   getResourceDetectorsFromEnv,
 } from '../src/utils';
 import * as assert from 'assert';
@@ -427,43 +426,5 @@ describe('getResourceDetectorsFromConfiguration', function () {
       processDetector,
       serviceDetector,
     ]);
-  });
-});
-
-describe('getHeadersFromConfiguration', function () {
-  it('returns empty object when headers are not set', function () {
-    const config: ConfigurationModel = {};
-    assert.deepStrictEqual(
-      getHeadersFromConfiguration(
-        config.tracer_provider?.processors?.[0]?.simple?.exporter?.otlp_http
-          ?.headers
-      ),
-      undefined
-    );
-  });
-
-  it('returns headers object when headers are set', function () {
-    const config: ConfigurationModel = {
-      tracer_provider: {
-        processors: [
-          {
-            simple: {
-              exporter: {
-                otlp_http: {
-                  headers: [{ name: 'x-test-header', value: 'test-value' }],
-                },
-              },
-            },
-          },
-        ],
-      },
-    };
-    assert.deepStrictEqual(
-      getHeadersFromConfiguration(
-        config.tracer_provider?.processors?.[0]?.simple?.exporter?.otlp_http
-          ?.headers
-      ),
-      { 'x-test-header': 'test-value' }
-    );
   });
 });
