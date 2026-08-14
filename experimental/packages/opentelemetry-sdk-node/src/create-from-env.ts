@@ -8,6 +8,8 @@
  * https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/
  */
 
+import { ok as assertOk } from 'assert';
+
 import type {
   MeterProvider as ApiMeterProvider,
   TextMapPropagator,
@@ -59,16 +61,17 @@ import type { ResourceDetector, Resource } from '@opentelemetry/resources';
 import {
   defaultResource,
   detectResources,
-  envDetector,
   hostDetector,
   osDetector,
   processDetector,
   resourceFromAttributes,
+  serviceNameEnvDetector,
   serviceInstanceIdDetector,
+  resourceAttributesEnvDetector,
 } from '@opentelemetry/resources';
-import type { StartSdkFromEnvOptions } from './types';
-import { serviceNameEnvDetector } from './ServiceNameEnvDetector';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 
+import type { StartSdkFromEnvOptions } from './types';
 // Note: circular import here that would be nice to break
 import {
   getBatchLogRecordProcessorFromEnv,
@@ -224,16 +227,27 @@ export function createResourceFromOptsAndEnv(
   // Handle OTEL_RESOURCE_ATTRIBUTES.
   //
   // One twist from the spec is that while attrs from `OTEL_RESOURCE_ATTRIBUTES`
-  // should win over those from resource detectors, an exception is
+  // should win over those from resource detectors, an exception is that
   // `OTEL_SERVICE_NAME` from the "service" detector should win.
-  // Currently `envDetector` v2.10.0 *also* reads OTEL_SERVICE_NAME, so we
-  // don't need to do anything here. If/when `envDetector` (see #6988) stops
-  // reading OTEL_SERVICE_NAME, then will need to:
-  //    if 'service.name' in envAttrs && detectors && serviceNameEnvDetector in detectors && it set 'service.name': delete envAttrs['service.name']
-  // XXX this is wrong, cannot use envDetector, because if 'service' is not selected, then this reads OTEL_SERVICE_NAME when should not, sigh.
-  // XXX HERE Let's add *new* experimental detectors to ores: ServiceNameEnvDetector, ResourceAttributesEnvDetector, envDetector is a grouping of the two.
-  //     Downstream can use the two as primitives.
-  resource = resource.merge(detectResources({ detectors: [envDetector] }));
+  let envRes = detectResources({
+    detectors: [resourceAttributesEnvDetector],
+  });
+  assertOk(
+    envRes?.asyncAttributesPending === false,
+    'this implementation assumes resourceAttributesEnvDetector has no async attributes'
+  );
+  if (
+    ATTR_SERVICE_NAME in envRes.attributes &&
+    detectors &&
+    detectors.includes(serviceNameEnvDetector) &&
+    getStringFromEnv('OTEL_SERVICE_NAME')
+  ) {
+    // OTEL_SERVICE_NAME should win, drop 'service.name' from envAttrs.
+    const envAttrs = envRes.attributes;
+    delete envAttrs[ATTR_SERVICE_NAME];
+    envRes = resourceFromAttributes(envAttrs);
+  }
+  resource = resource.merge(envRes);
 
   if (opts?.resourceAttributes) {
     resource = resource.merge(resourceFromAttributes(opts.resourceAttributes));

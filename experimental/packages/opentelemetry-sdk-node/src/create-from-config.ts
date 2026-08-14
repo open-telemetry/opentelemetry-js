@@ -49,6 +49,7 @@ import {
   processDetector,
   resourceFromAttributes,
   serviceInstanceIdDetector,
+  serviceNameEnvDetector,
 } from '@opentelemetry/resources';
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
@@ -151,7 +152,6 @@ import {
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
-import { serviceNameEnvDetector } from './ServiceNameEnvDetector';
 
 // ---- internal utilities
 
@@ -475,12 +475,6 @@ export function createResourceFromConfig(
             detectors.push(processDetector);
             break;
           case 'service':
-            // Note: The declarative schema defines the 'service' detector to
-            // handle `service.instance.id` and the `OTEL_SERVICE_NAME` envvar.
-            // https://opentelemetry.io/docs/specs/otel-config/types/#type-experimentalresourcedetector
-            // This is equivalent to the `serviceInstanceIdDetector` and
-            // *part* of the `envDetector`.  Using this `envDetector` would
-            // incorrectly read the `OTEL_RESOURCE_ATTRIBUTES` envvar.
             detectors.push(serviceNameEnvDetector);
             detectors.push(serviceInstanceIdDetector);
             break;

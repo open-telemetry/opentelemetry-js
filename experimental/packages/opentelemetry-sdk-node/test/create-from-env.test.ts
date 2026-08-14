@@ -11,13 +11,6 @@ import {
   W3CBaggagePropagator,
   W3CTraceContextPropagator,
 } from '@opentelemetry/core';
-
-import type { StartSdkFromEnvOptions } from '../src/types';
-import {
-  createPropagatorFromOptsAndEnv,
-  createResourceFromOptsAndEnv,
-  createSamplerFromEnv,
-} from '../src/create-from-env';
 import type { ResourceDetector } from '@opentelemetry/resources';
 import {
   detectResources,
@@ -28,6 +21,14 @@ import {
   resourceFromAttributes,
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+
+import type { StartSdkFromEnvOptions } from '../src/types';
+import {
+  createPropagatorFromOptsAndEnv,
+  createResourceFromOptsAndEnv,
+  createSamplerFromEnv,
+} from '../src/create-from-env';
 
 function clearOTelEnv() {
   for (const key of Object.keys(process.env)) {
@@ -194,7 +195,7 @@ describe('create-from-env', () => {
     const SDK_VERSION =
       require('@opentelemetry/resources/package.json').version;
     const defaultResourceAttrs = {
-      'service.name': 'unknown_service:node',
+      [ATTR_SERVICE_NAME]: 'unknown_service:node',
       'telemetry.sdk.language': 'nodejs',
       'telemetry.sdk.name': 'opentelemetry',
       'telemetry.sdk.version': SDK_VERSION,
@@ -311,8 +312,7 @@ describe('create-from-env', () => {
       assert.deepEqual(resource.attributes, {
         ...defaultResourceAttrs,
         ...(await attrsFromDetectors(serviceInstanceIdDetector)),
-        // XXX ATTR_
-        'service.name': 'my-svc-from-envvar',
+        [ATTR_SERVICE_NAME]: 'my-svc-from-envvar',
       });
     });
 
@@ -421,7 +421,7 @@ describe('create-from-env', () => {
       assert.deepEqual(resource.attributes, {
         ...defaultResourceAttrs,
         ...(await attrsFromDetectors(defaultDetectors)),
-        'service.name': 'svc-from-OTEL_SERVICE_NAME',
+        [ATTR_SERVICE_NAME]: 'svc-from-OTEL_SERVICE_NAME',
       });
     });
   });
