@@ -140,12 +140,10 @@ export function createPropagatorFromOptsAndEnv(
 ): TextMapPropagator | null {
   let propagator: TextMapPropagator | null;
   if (opts?.propagators !== undefined) {
-    if (opts?.propagators === null) {
-      propagator = null;
+    if (!Array.isArray(opts.propagators)) {
+      throw new Error('invalid "propagators" option: must be an array');
     } else if (opts?.propagators.length === 0) {
-      throw new Error(
-        'invalid "propagators" option: must have at least one item'
-      );
+      propagator = null;
     } else if (opts?.propagators.length === 1) {
       propagator = opts?.propagators[0];
     } else {

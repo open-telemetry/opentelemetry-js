@@ -74,13 +74,13 @@ describe('create-from-env', () => {
       },
       {
         name: 'opts.propagators=null',
-        opts: { propagators: null },
-        // Asserts propagator is null.
+        opts: { propagators: null as any },
+        throws: /invalid "propagators" option: must be an array/,
       },
       {
         name: 'opts.propagators=[]',
         opts: { propagators: [] },
-        throws: /invalid "propagators" option: must have at least one item/,
+        // Asserts propagator is null.
       },
       {
         name: 'opts.propagators=[W3CBaggagePropagator]',

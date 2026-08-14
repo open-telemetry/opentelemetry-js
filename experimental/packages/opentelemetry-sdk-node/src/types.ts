@@ -112,11 +112,10 @@ export interface StartSdkFromEnvOptions {
    * https://opentelemetry.io/docs/concepts/context-propagation/#propagation
    *
    * If an array is provided, it must contain at least one entry.
-   * Specify `null` to explicitly not register any propagators.
-   * XXX try changing to simple empty array for none
+   * Pass an empty array to have no propagators.
    * If not provided, then `OTEL_PROPAGATORS` is used.
    */
-  propagators?: TextMapPropagator[] | null;
+  propagators?: TextMapPropagator[];
 
   // Resources
   /**
