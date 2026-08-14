@@ -15,6 +15,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :rocket: Features
 
 * feat(sdk-trace): allow configuring the force flush timeout per call #6929 @LarryHu0217
+* feat(sdk-trace-web): deprecate instrumentation utilities [#5869](https://github.com/open-telemetry/opentelemetry-js/issues/5869) @keshav-019
 
 ### :bug: Bug Fixes
 

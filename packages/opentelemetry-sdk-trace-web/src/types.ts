@@ -4,6 +4,11 @@
  */
 import type { PerformanceTimingNames } from './enums/PerformanceTimingNames';
 
+/**
+ * @deprecated This type supports instrumentation utilities. Instrumentation
+ * packages should copy this definition into their own package. This export
+ * will be removed in a future major release.
+ */
 export type PerformanceEntries = {
   [PerformanceTimingNames.CONNECT_END]?: number;
   [PerformanceTimingNames.CONNECT_START]?: number;
@@ -32,6 +37,10 @@ export type PerformanceEntries = {
 /**
  * This interface defines a fallback to read performance metrics,
  * this happens for example on Safari Mac
+ *
+ * @deprecated This type supports instrumentation utilities. Instrumentation
+ * packages should copy this definition into their own package. This export
+ * will be removed in a future major release.
  */
 export interface PerformanceLegacy {
   timing?: PerformanceEntries;
@@ -40,6 +49,10 @@ export interface PerformanceLegacy {
 /**
  * This interface is used in {@link getResource} function to return
  *     main request and it's corresponding PreFlight request
+ *
+ * @deprecated This type supports instrumentation utilities. Instrumentation
+ * packages should copy this definition into their own package. This export
+ * will be removed in a future major release.
  */
 export interface PerformanceResourceTimingInfo {
   corsPreFlightRequest?: PerformanceResourceTiming;
@@ -50,6 +63,10 @@ type PropagateTraceHeaderCorsUrl = string | RegExp;
 
 /**
  * urls which should include trace headers when origin doesn't match
+ *
+ * @deprecated This type supports instrumentation utilities. Instrumentation
+ * packages should copy this definition into their own package. This export
+ * will be removed in a future major release.
  */
 export type PropagateTraceHeaderCorsUrls =
   | PropagateTraceHeaderCorsUrl
