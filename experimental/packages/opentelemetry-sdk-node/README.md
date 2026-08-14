@@ -154,34 +154,31 @@ If not specified, the [default resource](https://opentelemetry.io/docs/specs/sem
 
 ### resourceDetectors
 
-Configure resource detectors. By default, the resource detectors are [envDetector, processDetector, hostDetector].
+Configure resource detectors.
+If not specified, then detectors will be determined from the `OTEL_NODE_RESOURCE_DETECTORS` environment variable.
+If neither is specified, the default set of detectors is `[serviceInstanceIdDetector, processDetector, hostDetector, osDetector, envDetector]`.
 NOTE: In order to enable the detection, the parameter `autoDetectResources` has to be `true`.
 
-If `resourceDetectors` was not set, you can also use the environment variable `OTEL_NODE_RESOURCE_DETECTORS` to enable only certain detectors, or completely disable them:
+`OTEL_NODE_RESOURCE_DETECTORS` is a comma-separated list of the following detector names:
 
-- `env`
 - `host`
 - `os`
 - `process`
-- `serviceinstance` (experimental)
+- `serviceinstance` - provides the `service.instance.id` attribute
+- `env` - reads attributes from `OTEL_RESOURCE_ATTRIBUTES` and `OTEL_SERVICE_NAME`
 - `all` - enable all resource detectors above
   - **NOTE:** future versions of `@opentelemetry/sdk-node` may include additional detectors that will be covered by this scope.
 - `none` - disable resource detection
 
-XXX update this note:
-**NOTE:** `env` and `os` are Node.js-specific detectors with no equivalent in the [OpenTelemetry declarative configuration spec](https://github.com/open-telemetry/opentelemetry-configuration). They are supported when using the `detection/development` block in a declarative config file.
-
-For example, to enable only the `env`, `host` detectors:
+For example, to enable only the `process` and `env` detectors:
 
 ```shell
-export OTEL_NODE_RESOURCE_DETECTORS="host,env"
+export OTEL_NODE_RESOURCE_DETECTORS="process,env"
 ```
 
-NOTE: The order set on `OTEL_NODE_RESOURCE_DETECTORS` will be respected and the detectors will be executed in order.
-For example, if you have `OTEL_RESOURCE_ATTRIBUTES="service.instance.id=custom-name"`, but also `serviceinstance` and `env` on `OTEL_NODE_RESOURCE_DETECTORS`, it can have 2 scenarios:
-
-- `OTEL_NODE_RESOURCE_DETECTORS="serviceinstance,env"` will have the `service.instance.id` as `custom-name`
-- `OTEL_NODE_RESOURCE_DETECTORS="env,serviceinstance"` will have the `service.instance.id` as a random UUID
+Detectors are processed in the order they are defined. Attributes from a later detector wins.
+You typically want the 'env' detector to be last, so that attributes explicitly set by `OTEL_RESOURCE_ATTRIBUTES` will win over the same attribute from an earlier detector.
+For example with `OTEL_RESOURCE_ATTRIBUTES="service.instance.id=custom-name"` and `OTEL_NODE_RESOURCE_DETECTORS=env,serviceinstance` the "custom-name" value will be lost to the `service.instance.id` value from the "serviceinstance" detector.
 
 ### sampler
 

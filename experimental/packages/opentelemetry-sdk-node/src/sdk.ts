@@ -17,8 +17,10 @@ import {
   detectResources,
   envDetector,
   hostDetector,
+  osDetector,
   processDetector,
   resourceFromAttributes,
+  serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 import type {
   LogRecordProcessor,
@@ -142,8 +144,13 @@ export class NodeSDK {
     } else if (getStringFromEnv('OTEL_NODE_RESOURCE_DETECTORS')) {
       this._resourceDetectors = getResourceDetectorsFromEnv();
     } else {
-      // XXX Perhaps add serviceInstaceIdDetector here as a default, and update README
-      this._resourceDetectors = [envDetector, processDetector, hostDetector];
+      this._resourceDetectors = [
+        serviceInstanceIdDetector,
+        processDetector,
+        hostDetector,
+        osDetector,
+        envDetector,
+      ];
     }
 
     this._serviceName = configuration.serviceName;
