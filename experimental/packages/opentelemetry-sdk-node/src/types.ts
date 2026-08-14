@@ -156,12 +156,10 @@ export interface StartSdkFromEnvOptions {
   // Traces
   /**
    * Configure span processors.
-   * If an array is provided, it must contain at least one entry.
-   * Specify `null` to explicitly disable tracing (no TracerProvider).
-   * XXX try changing to simple empty array for none
+   * Pass an empty array to disable tracing (no TracerProvider).
    * If not provided, then `OTEL_TRACES_EXPORTER` is used.
    */
-  spanProcessors?: SpanProcessor[] | null;
+  spanProcessors?: SpanProcessor[];
   /**
    * Provide a tracing Sampler.
    * See the following for some available samplers:
@@ -180,23 +178,19 @@ export interface StartSdkFromEnvOptions {
   // Metrics
   /**
    * Configure MetricReaders.
-   * If an array is provided, it must contain at least one entry.
-   * Specify `null` to explicitly disable metrics (no MeterProvider).
-   * XXX try changing to simple empty array for none
+   * Pass an empty array to disable metrics (no MeterProvider).
    * If not provided, then `OTEL_METRICS_EXPORTER` is used.
    */
-  metricReaders?: IMetricReader[] | null;
+  metricReaders?: IMetricReader[];
   views?: ViewOptions[];
 
   // Logs
   /**
    * Configure LogRecord processors.
-   * If an array is provided, it must contain at least one entry.
-   * Specify `null` to explicitly disable logs (no LoggerProvider).
-   * XXX try changing to simple empty array for none
+   * Pass an empty array to disable logging (no LoggerProvider).
    * If not provided, then `OTEL_LOGS_EXPORTER` is used.
    */
-  logRecordProcessors?: LogRecordProcessor[] | null;
+  logRecordProcessors?: LogRecordProcessor[];
   /**
    * Provide all or a subset of available LogRecord limits. The given object is
    * merged with limit values read from the environment:
