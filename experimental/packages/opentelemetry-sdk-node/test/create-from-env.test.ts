@@ -179,39 +179,49 @@ describe('create-from-env', () => {
     }
   });
 
-  describe('createResourceFromOptsAndEnv', () => {
-    // Helper to make it a one-liner to get attributes from a resource detector.
-    const attrsFromDetector = async (detector: ResourceDetector) => {
-      const res = detectResources({ detectors: [detector] });
+  describe('createResourceFromOptsAndEnv', async () => {
+    // Helper to make it a one-liner to get attributes from resource detectors.
+    const attrsFromDetectors = async (
+      detectors: ResourceDetector | ResourceDetector[]
+    ) => {
+      const res = detectResources({
+        detectors: Array.isArray(detectors) ? detectors : [detectors],
+      });
       await res.waitForAsyncAttributes?.();
       return res.attributes;
     };
 
     const SDK_VERSION =
       require('@opentelemetry/resources/package.json').version;
-    const defaultResAttrs = {
+    const defaultResourceAttrs = {
       'service.name': 'unknown_service:node',
       'telemetry.sdk.language': 'nodejs',
       'telemetry.sdk.name': 'opentelemetry',
       'telemetry.sdk.version': SDK_VERSION,
     };
+    const defaultDetectors = [
+      serviceInstanceIdDetector,
+      hostDetector,
+      osDetector,
+      processDetector,
+    ];
 
-    it('no opts or env -> default resource + service detector', async function () {
+    it('no opts or env -> default resource detectors', async function () {
       const resource = createResourceFromOptsAndEnv(undefined);
       await resource.waitForAsyncAttributes?.();
       assert.deepEqual(resource.attributes, {
-        ...defaultResAttrs,
-        ...(await attrsFromDetector(serviceInstanceIdDetector)),
+        ...defaultResourceAttrs,
+        ...(await attrsFromDetectors(defaultDetectors)),
       });
     });
 
-    it('opts.baseResource', async function () {
+    it('opts.baseResource=emptyResource() removes defaultResource attrs', async function () {
       const resource = createResourceFromOptsAndEnv({
         baseResource: emptyResource(),
       });
       await resource.waitForAsyncAttributes?.();
       assert.deepEqual(resource.attributes, {
-        ...(await attrsFromDetector(serviceInstanceIdDetector)),
+        ...(await attrsFromDetectors(defaultDetectors)),
       });
     });
 
@@ -230,21 +240,21 @@ describe('create-from-env', () => {
       });
       await resource.waitForAsyncAttributes?.();
       assert.deepEqual(resource.attributes, {
-        ...defaultResAttrs,
-        ...(await attrsFromDetector(hostDetector)),
-        ...(await attrsFromDetector(osDetector)),
+        ...defaultResourceAttrs,
+        ...(await attrsFromDetectors(hostDetector)),
+        ...(await attrsFromDetectors(osDetector)),
       });
     });
 
     it('opts.resourceDetectors wins over OTEL_NODE_RESOURCE_DETECTORS', async function () {
-      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'os';
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'process';
       const resource = createResourceFromOptsAndEnv({
-        resourceDetectors: [hostDetector],
+        resourceDetectors: [serviceInstanceIdDetector],
       });
       await resource.waitForAsyncAttributes?.();
       assert.deepEqual(resource.attributes, {
-        ...defaultResAttrs,
-        ...(await attrsFromDetector(hostDetector)),
+        ...defaultResourceAttrs,
+        ...(await attrsFromDetectors(serviceInstanceIdDetector)),
       });
     });
 
@@ -253,18 +263,18 @@ describe('create-from-env', () => {
       const resource = createResourceFromOptsAndEnv();
       await resource.waitForAsyncAttributes?.();
       assert.deepEqual(resource.attributes, {
-        ...defaultResAttrs,
-        ...(await attrsFromDetector(processDetector)),
-        ...(await attrsFromDetector(serviceInstanceIdDetector)),
+        ...defaultResourceAttrs,
+        ...(await attrsFromDetectors(processDetector)),
+        ...(await attrsFromDetectors(serviceInstanceIdDetector)),
       });
     });
 
     it('none in OTEL_NODE_RESOURCE_DETECTORS', async function () {
-      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'os,service,none';
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'process,service,none';
       const resource = createResourceFromOptsAndEnv();
       await resource.waitForAsyncAttributes?.();
       assert.deepEqual(resource.attributes, {
-        ...defaultResAttrs,
+        ...defaultResourceAttrs,
       });
     });
 
@@ -273,11 +283,13 @@ describe('create-from-env', () => {
       const resource = createResourceFromOptsAndEnv();
       await resource.waitForAsyncAttributes?.();
       assert.deepEqual(resource.attributes, {
-        ...defaultResAttrs,
-        ...(await attrsFromDetector(hostDetector)),
-        ...(await attrsFromDetector(osDetector)),
-        ...(await attrsFromDetector(processDetector)),
-        ...(await attrsFromDetector(serviceInstanceIdDetector)),
+        ...defaultResourceAttrs,
+        ...(await attrsFromDetectors([
+          hostDetector,
+          osDetector,
+          processDetector,
+          serviceInstanceIdDetector,
+        ])),
       });
     });
 
@@ -286,9 +298,8 @@ describe('create-from-env', () => {
       const resource = createResourceFromOptsAndEnv();
       await resource.waitForAsyncAttributes?.();
       assert.deepEqual(resource.attributes, {
-        ...defaultResAttrs,
-        ...(await attrsFromDetector(hostDetector)),
-        ...(await attrsFromDetector(osDetector)),
+        ...defaultResourceAttrs,
+        ...(await attrsFromDetectors([hostDetector, osDetector])),
       });
     });
 
@@ -298,8 +309,9 @@ describe('create-from-env', () => {
       const resource = createResourceFromOptsAndEnv();
       await resource.waitForAsyncAttributes?.();
       assert.deepEqual(resource.attributes, {
-        ...defaultResAttrs,
-        ...(await attrsFromDetector(serviceInstanceIdDetector)),
+        ...defaultResourceAttrs,
+        ...(await attrsFromDetectors(serviceInstanceIdDetector)),
+        // XXX ATTR_
         'service.name': 'my-svc-from-envvar',
       });
     });
@@ -313,7 +325,7 @@ describe('create-from-env', () => {
         '"env" resource detector name is no longer supported, `OTEL_RESOURCE_ATTRIBUTES` is always read, use "service" to handle reading `OTEL_SERVICE_NAME` (see https://opentelemetry.io/docs/specs/otel/resource/sdk/#resource-detector-name)'
       );
       assert.deepEqual(resource.attributes, {
-        ...defaultResAttrs,
+        ...defaultResourceAttrs,
       });
     });
 
@@ -326,7 +338,7 @@ describe('create-from-env', () => {
         '"os" resource detector name is no longer supported, use "host" which populates \'host.*\' and \'os.*\' resource attributes (see https://opentelemetry.io/docs/specs/otel/resource/sdk/#resource-detector-name)'
       );
       assert.deepEqual(resource.attributes, {
-        ...defaultResAttrs,
+        ...defaultResourceAttrs,
       });
     });
 
@@ -339,11 +351,11 @@ describe('create-from-env', () => {
         '"serviceinstance" resource detector name is no longer supported, use "service" which populates \'service.instance.id\' and reads OTEL_SERVICE_NAME (see https://opentelemetry.io/docs/specs/otel/resource/sdk/#resource-detector-name)'
       );
       assert.deepEqual(resource.attributes, {
-        ...defaultResAttrs,
+        ...defaultResourceAttrs,
       });
     });
 
-    it('unknown name in OTEL_NODE_RESOURCE_DETECTORS', async function () {
+    it('unknown name in OTEL_NODE_RESOURCE_DETECTORS warns', async function () {
       process.env.OTEL_NODE_RESOURCE_DETECTORS =
         'process,some_unknown_detector';
       const resource = createResourceFromOptsAndEnv();
@@ -353,8 +365,8 @@ describe('create-from-env', () => {
         'unknown resource detector "some_unknown_detector" in OTEL_NODE_RESOURCE_DETECTORS environment variable: this detector will be skipped'
       );
       assert.deepEqual(resource.attributes, {
-        ...defaultResAttrs,
-        ...(await attrsFromDetector(processDetector)),
+        ...defaultResourceAttrs,
+        ...(await attrsFromDetectors(processDetector)),
       });
     });
 
@@ -363,8 +375,8 @@ describe('create-from-env', () => {
       const resource = createResourceFromOptsAndEnv();
       await resource.waitForAsyncAttributes?.();
       assert.deepEqual(resource.attributes, {
-        ...defaultResAttrs,
-        ...(await attrsFromDetector(serviceInstanceIdDetector)),
+        ...defaultResourceAttrs,
+        ...(await attrsFromDetectors(defaultDetectors)),
         foo: 'bar',
         breakfast: 'ham, eggs',
       });
@@ -376,8 +388,8 @@ describe('create-from-env', () => {
       });
       await resource.waitForAsyncAttributes?.();
       assert.deepEqual(resource.attributes, {
-        ...defaultResAttrs,
-        ...(await attrsFromDetector(serviceInstanceIdDetector)),
+        ...defaultResourceAttrs,
+        ...(await attrsFromDetectors(defaultDetectors)),
         foo: 'bar',
       });
     });
@@ -407,8 +419,8 @@ describe('create-from-env', () => {
       const resource = createResourceFromOptsAndEnv();
       await resource.waitForAsyncAttributes?.();
       assert.deepEqual(resource.attributes, {
-        ...defaultResAttrs,
-        ...(await attrsFromDetector(serviceInstanceIdDetector)),
+        ...defaultResourceAttrs,
+        ...(await attrsFromDetectors(defaultDetectors)),
         'service.name': 'svc-from-OTEL_SERVICE_NAME',
       });
     });

@@ -167,25 +167,10 @@ export function createResourceFromOptsAndEnv(
   if (opts?.resourceDetectors) {
     detectors = opts.resourceDetectors;
   } else {
-    // XXX Debatable what should be the default set of res detectors.
-    // - Current NodeSDK uses 'env,process,host'
-    // - `os.*` and `host.*` are useful, but are still in "Development"
-    //   https://opentelemetry.io/docs/specs/semconv/registry/attributes/os/
-    //   https://opentelemetry.io/docs/specs/semconv/registry/attributes/host/
-    // - `process.*` is still in "Development", and can include some noise, and possibly more data than intended with `process.command_args`.
-    // - `serviceinstance` should be added (perhaps eventually called "service")
-    // - `startNodeSdk()` is a breaking replacement for NodeSDK so we could opt
-    //   to change to using the new spec names: https://opentelemetry.io/docs/specs/otel/resource/sdk/#resource-detector-name
-    //   TODO: do this, similar to create-from-config.ts handling
-    // - My vote is just 'service'. Others can be added when they are stabilized.
-    //   Documented advice should be to make a per-app explicit decision.
-    // - XXX handle the env switch?? then both OTEL_ related envvars. Sigh.
-    // - XXX can we export some utilities here to make auto-instr-node handling easier?
-    const DEFAULT_RESOURCE_DETECTOR_NAMES = 'service'.split(',');
+    const DEFAULT_RESOURCE_DETECTOR_NAMES = 'service,host,process'.split(',');
 
     let detectorNames = getStringListFromEnv('OTEL_NODE_RESOURCE_DETECTORS');
     if (!detectorNames || detectorNames.length === 0) {
-      // XXX Handling empty list here fixes an issue from getResourceDetectorsFromEnv, BTW.
       detectorNames = DEFAULT_RESOURCE_DETECTOR_NAMES;
     } else if (detectorNames.includes('none')) {
       detectorNames = [];
