@@ -60,7 +60,7 @@ fetch('http://localhost:8090/fetch.js');
 ![Screenshot of the running example](images/trace2.png)
 ![Screenshot of the running example](images/trace3.png)
 
-See [examples/tracer-web/fetch](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/tracer-web) for a short example.
+See [examples/opentelemetry-web](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/opentelemetry-web) for a short example.
 
 ### Fetch Instrumentation options
 
