@@ -275,6 +275,42 @@ describe('FetchTransport', function () {
       assert.strictEqual(response.bodyUsed, true);
     });
 
+    it('releases the reader lock after draining the body', async function () {
+      // arrange - a held reader would keep the body locked, and a later export
+      // handed the same response could then not drain it
+      const response = new Response('test response', { status: 200 });
+      sinon.stub(globalThis, 'fetch').resolves(response);
+      const transport = createFetchTransport(testTransportParameters);
+
+      // act
+      const first = await transport.send(testPayload, requestTimeout);
+      const second = await transport.send(testPayload, requestTimeout);
+
+      // assert
+      assert.strictEqual(first.status, 'success');
+      assert.strictEqual(second.status, 'success');
+      assert.strictEqual(response.bodyUsed, true);
+      assert.strictEqual(response.body?.locked, false);
+    });
+
+    it('returns success when the response body is locked by another reader', async function () {
+      // arrange - a fetch wrapper may hold the body's reader. The export
+      // already reached the collector, so a body that cannot be drained must
+      // not turn into a network error and have the export retried.
+      const response = new Response('test response', { status: 200 });
+      response.body?.getReader();
+      sinon.stub(globalThis, 'fetch').resolves(response);
+      const { debug } = registerMockDiagLogger();
+      const transport = createFetchTransport(testTransportParameters);
+
+      // act
+      const result = await transport.send(testPayload, requestTimeout);
+
+      // assert
+      assert.strictEqual(result.status, 'success');
+      sinon.assert.calledWithMatch(debug, /error reading export response body/);
+    });
+
     it('returns success when the response body cannot be read', async function () {
       // arrange
       const erroringBody = new ReadableStream({
