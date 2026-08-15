@@ -16,6 +16,8 @@ describe('parseRetryAfterToMills', function () {
     // duration
     ['-100', -1],
     ['1000', 1000 * 1000],
+    [' 5 ', 5 * 1000],
+    ['1000abc', 0],
     // future timestamp
     ['Fri, 20 Jan 2023 00:00:01 GMT', 1000],
     // Past timestamp
