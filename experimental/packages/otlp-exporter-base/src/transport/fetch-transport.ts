@@ -176,20 +176,29 @@ function isFetchNetworkErrorRetryable(error: unknown): boolean {
  * @see https://fetch.spec.whatwg.org/#fetch-processresponseendofbody
  */
 async function drainResponseBody(response: Response): Promise<void> {
-  // Empty and opaque responses have no body to read.
-  const body = response.body;
-  if (body == null) {
-    return;
-  }
-
-  const reader = body.getReader();
   try {
-    // Chunks are dropped as they arrive: the payload is not used, and buffering
-    // it - with `response.arrayBuffer()` for instance - would keep a response
-    // of arbitrary size in memory.
-    let chunk = await reader.read();
-    while (!chunk.done) {
-      chunk = await reader.read();
+    // Empty and opaque responses have no body to read.
+    const body = response.body;
+    if (body == null) {
+      return;
+    }
+
+    // Throws when the body is already locked to another reader, which happens
+    // when the same response is handed to more than one export.
+    const reader = body.getReader();
+    try {
+      // Chunks are dropped as they arrive: the payload is not used, and
+      // buffering it - with `response.arrayBuffer()` for instance - would keep
+      // a response of arbitrary size in memory.
+      let chunk = await reader.read();
+      while (!chunk.done) {
+        chunk = await reader.read();
+      }
+    } finally {
+      // The reader keeps the body locked until it is released, which would
+      // make a later export handed the same response fail to acquire a reader
+      // and skip the drain.
+      reader.releaseLock();
     }
   } catch (error) {
     // The export outcome is decided by the response status, a body that cannot
