@@ -19,7 +19,10 @@ export function parseRetryAfterToMills(
     return undefined;
   }
 
-  const seconds = Number.parseInt(retryAfter, 10);
+  const trimmedRetryAfter = retryAfter.trim();
+  const seconds = /^-?\d+$/.test(trimmedRetryAfter)
+    ? Number.parseInt(trimmedRetryAfter, 10)
+    : NaN;
   if (Number.isInteger(seconds)) {
     return seconds > 0 ? seconds * 1000 : -1;
   }
