@@ -107,7 +107,6 @@ function startNodeSdkFromEnv(opts?: StartSdkFromEnvOptions): NodeSdk {
   const toShutdown: Shutdownable[] = [];
 
   try {
-    // TODO: disable context manager on createErr and shutdown
     const contextManager = new AsyncLocalStorageContextManager();
     contextManager.enable();
     const propagator = createPropagatorFromOptsAndEnv(opts);
@@ -259,7 +258,6 @@ function createFromConfig(config: ConfigurationModel): SdkComponents {
   const components: SdkComponents = {};
 
   try {
-    // TODO: disable context manager on createErr and shutdown
     components.contextManager = new AsyncLocalStorageContextManager();
     components.contextManager.enable();
 
