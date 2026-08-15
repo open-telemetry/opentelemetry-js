@@ -1072,7 +1072,6 @@ describe('NodeSDK', () => {
       await sdk.shutdown();
     });
 
-
     it('should configure service instance id via OTEL_RESOURCE_ATTRIBUTES env var', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
         'service.instance.id=627cc493,service.name=my-service,service.namespace=default';
