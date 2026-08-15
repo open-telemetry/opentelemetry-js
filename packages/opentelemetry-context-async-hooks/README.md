@@ -12,7 +12,7 @@ See [the definition of the `ContextManager` interface][def-context-manager] and 
 Two `ContextManager` implementations are exported:
 
 - `AsyncLocalStorageContextManager`, based on [`AsyncLocalStorage`](https://nodejs.org/api/async_context.html#class-asynclocalstorage)
-- `AsyncHooksContextManager`, based on [`AsyncHook`](https://nodejs.org/api/async_hooks.html#async_hooks_class_asynchook). This is **deprecated** and will be removed in v3 (planned for mid-2025. `AsyncLocalStorage` is simpler, faster, available in Node.js v14.8.0 and later, and avoids [this possible DoS vulnerability](https://nodejs.org/en/blog/vulnerability/january-2026-dos-mitigation-async-hooks).
+- `AsyncHooksContextManager`, based on [`AsyncHook`](https://nodejs.org/api/async_hooks.html#async_hooks_class_asynchook). This is **deprecated** and will be removed in v3 (planned for mid-2025). `AsyncLocalStorage` is simpler, faster, available in Node.js v14.8.0 and later, and avoids [this possible DoS vulnerability](https://nodejs.org/en/blog/vulnerability/january-2026-dos-mitigation-async-hooks).
 
 ## Prior art
 
