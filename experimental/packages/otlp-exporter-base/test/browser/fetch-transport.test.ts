@@ -231,6 +231,72 @@ describe('FetchTransport', function () {
     });
   });
 
+  describe('response body handling', function () {
+    it('reads the response body of a successful export', async function () {
+      // arrange
+      let cancelled = false;
+      const body = new ReadableStream({
+        start(controller) {
+          controller.enqueue(Uint8Array.from([1, 2, 3]));
+          controller.close();
+        },
+        cancel() {
+          cancelled = true;
+        },
+      });
+      const response = new Response(body, { status: 200 });
+      sinon.stub(globalThis, 'fetch').resolves(response);
+      const transport = createFetchTransport(testTransportParameters);
+
+      // act
+      const result = await transport.send(testPayload, requestTimeout);
+
+      // assert - the body has to be read to its end, cancelling it does not
+      // release the keepalive quota the request holds
+      assert.strictEqual(result.status, 'success');
+      assert.strictEqual(response.bodyUsed, true);
+      assert.strictEqual(cancelled, false);
+    });
+
+    it('reads the response body of a retryable export', async function () {
+      // arrange
+      const response = new Response('test response', {
+        status: 503,
+        headers: { 'Retry-After': '5' },
+      });
+      sinon.stub(globalThis, 'fetch').resolves(response);
+      const transport = createFetchTransport(testTransportParameters);
+
+      // act
+      const result = await transport.send(testPayload, requestTimeout);
+
+      // assert
+      assert.strictEqual(result.status, 'retryable');
+      assert.strictEqual(response.bodyUsed, true);
+    });
+
+    it('returns success when the response body cannot be read', async function () {
+      // arrange
+      const erroringBody = new ReadableStream({
+        start(controller) {
+          controller.error(new Error('body read failed'));
+        },
+      });
+      sinon
+        .stub(globalThis, 'fetch')
+        .resolves(new Response(erroringBody, { status: 200 }));
+      const { debug } = registerMockDiagLogger();
+      const transport = createFetchTransport(testTransportParameters);
+
+      // act
+      const result = await transport.send(testPayload, requestTimeout);
+
+      // assert - the export already reached the collector, the read is best effort
+      assert.strictEqual(result.status, 'success');
+      sinon.assert.calledWithMatch(debug, /error reading export response body/);
+    });
+  });
+
   describe('keepalive queue tracking', function () {
     it('enables keepalive for small requests under limits', async function () {
       // arrange

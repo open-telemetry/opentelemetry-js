@@ -102,6 +102,8 @@ class FetchTransport implements IExporterTransport {
           : 'no-cors',
       });
 
+      await drainResponseBody(response);
+
       if (response.status >= 200 && response.status <= 299) {
         diag.debug(`export response success (status: ${response.status})`);
         return { status: 'success' };
@@ -159,4 +161,39 @@ export function createFetchTransport(
 
 function isFetchNetworkErrorRetryable(error: unknown): boolean {
   return error instanceof TypeError && !error.cause;
+}
+
+/**
+ * Reads the response body to its end and discards it.
+ *
+ * Chromium gives the request's share of the keepalive quota back only once the
+ * response body has been read to the end, and it skips the buffering consumer
+ * that would otherwise drain the body on its own when the response carries a
+ * `Cache-Control: no-store` header, which collectors commonly send. Leaving the
+ * body unread then leaks the quota until the document goes away and every
+ * following keepalive export stays pending forever.
+ *
+ * @see https://fetch.spec.whatwg.org/#fetch-processresponseendofbody
+ */
+async function drainResponseBody(response: Response): Promise<void> {
+  // Empty and opaque responses have no body to read.
+  const body = response.body;
+  if (body == null) {
+    return;
+  }
+
+  const reader = body.getReader();
+  try {
+    // Chunks are dropped as they arrive: the payload is not used, and buffering
+    // it - with `response.arrayBuffer()` for instance - would keep a response
+    // of arbitrary size in memory.
+    let chunk = await reader.read();
+    while (!chunk.done) {
+      chunk = await reader.read();
+    }
+  } catch (error) {
+    // The export outcome is decided by the response status, a body that cannot
+    // be read must not change it.
+    diag.debug(`error reading export response body: ${error}`);
+  }
 }
