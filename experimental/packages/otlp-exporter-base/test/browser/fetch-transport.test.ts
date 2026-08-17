@@ -31,6 +31,25 @@ const MAX_KEEPALIVE_BODY_SIZE = 60 * 1024;
 // 9 is the max concurrent keepalive requests
 const MAX_KEEPALIVE_REQUESTS = 9;
 
+/**
+ * A response body that delivers one chunk and then stays open until the
+ * request is aborted, at which point it fails the way a real fetch body does.
+ */
+function neverEndingBodyAbortedBy(
+  signal: AbortSignal | null | undefined
+): ReadableStream<Uint8Array> {
+  return new ReadableStream({
+    start(controller) {
+      controller.enqueue(Uint8Array.from([1, 2, 3]));
+      signal?.addEventListener('abort', () =>
+        controller.error(
+          new DOMException('The user aborted a request.', 'AbortError')
+        )
+      );
+    },
+  });
+}
+
 describe('FetchTransport', function () {
   afterEach(function () {
     sinon.restore();
@@ -331,6 +350,38 @@ describe('FetchTransport', function () {
       assert.strictEqual(result.status, 'success');
       sinon.assert.calledWithMatch(debug, /error reading export response body/);
     });
+
+    // The timeout keeps running while the body is drained, so a collector that
+    // holds the response open long enough gets the request aborted in the
+    // middle of the read. The headers are in by then, so the status the
+    // collector sent still decides the export outcome.
+    for (const { status, expected } of [
+      { status: 200, expected: 'success' },
+      { status: 503, expected: 'retryable' },
+    ]) {
+      it(`returns ${expected} when the timeout aborts the export while its ${status} response body is being read`, async function () {
+        // arrange - a body that stays open until the request is aborted, which
+        // is what the reader sees when the timeout fires mid-drain
+        sinon
+          .stub(globalThis, 'fetch')
+          .callsFake(
+            async (_input, init) =>
+              new Response(neverEndingBodyAbortedBy(init?.signal), { status })
+          );
+        const { debug } = registerMockDiagLogger();
+        const transport = createFetchTransport(testTransportParameters);
+
+        // act
+        const result = await transport.send(testPayload, 1);
+
+        // assert
+        assert.strictEqual(result.status, expected);
+        sinon.assert.calledWithMatch(
+          debug,
+          /error reading export response body/
+        );
+      });
+    }
   });
 
   describe('keepalive queue tracking', function () {
