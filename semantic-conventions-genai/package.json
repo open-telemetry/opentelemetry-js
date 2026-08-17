@@ -1,0 +1,80 @@
+{
+  "name": "@opentelemetry/semantic-conventions-genai",
+  "version": "1.42.0",
+  "description": "OpenTelemetry generative AI semantic conventions",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./incubating": {
+      "import": {
+        "types": "./dist/index-incubating.d.mts",
+        "default": "./dist/index-incubating.mjs"
+      },
+      "require": {
+        "types": "./dist/index-incubating.d.cts",
+        "default": "./dist/index-incubating.cjs"
+      }
+    }
+  },
+  "repository": "open-telemetry/opentelemetry-js",
+  "scripts": {
+    "prepublishOnly": "npm run compile",
+    "compile": "tsdown",
+    "clean": "rimraf dist build",
+    "version": "node ../scripts/version-update.js",
+    "watch": "tsdown --watch --no-clean",
+    "peer-api-check": "node ../scripts/peer-api-check.mjs",
+    "size-check": "npm run compile && mocha 'test/**/*.test.ts'",
+    "align-api-deps": "node ../scripts/align-api-deps.mjs"
+  },
+  "keywords": [
+    "opentelemetry",
+    "nodejs",
+    "tracing",
+    "attributes",
+    "semantic conventions",
+    "genai",
+    "gen-ai"
+  ],
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=14"
+  },
+  "files": [
+    "doc",
+    "LICENSE",
+    "README.md",
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@opentelemetry/semantic-conventions": "^1.43.0"
+  },
+  "devDependencies": {
+    "@size-limit/file": "^13.0.0",
+    "@size-limit/time": "^13.0.0",
+    "@size-limit/webpack": "^13.0.0",
+    "@types/mocha": "10.0.10",
+    "@types/node": "^14.18.63",
+    "mocha": "11.8.0",
+    "size-limit": "^13.0.0",
+    "ts-node": "10.9.2",
+    "typescript": "5.2.2"
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/semantic-conventions-genai",
+  "sideEffects": false
+}

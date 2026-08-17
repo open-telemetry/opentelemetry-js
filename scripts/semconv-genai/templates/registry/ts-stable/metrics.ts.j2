@@ -1,0 +1,20 @@
+{%- import 'docstring.ts.j2' as d %}
+/*
+ * Copyright The OpenTelemetry Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+//------------------------------------------------------------------------------------------------------------------
+// DO NOT EDIT, this is an Auto-generated file from scripts/semconv-genai/templates/registry/ts-stable/metrics.ts.j2
+//------------------------------------------------------------------------------------------------------------------
+
+{% for metric in ctx.metrics | sort(attribute="name") %}
+{{d.docstring(metric, "metric")}}
+export const METRIC_{{ metric.name | screaming_snake_case }} = '{{metric.name}}' as const;
+
+{% endfor %}
+{% if (ctx.metrics | length) == 0 %}
+// There are no stable GenAI metrics yet. This keeps the file a valid ES
+// module, so that `export * from './stable_metrics'` compiles.
+export {};
+{% endif %}
