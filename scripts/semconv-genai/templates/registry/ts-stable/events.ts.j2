@@ -1,0 +1,20 @@
+{%- import 'docstring.ts.j2' as d %}
+/*
+ * Copyright The OpenTelemetry Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+//-----------------------------------------------------------------------------------------------------------------
+// DO NOT EDIT, this is an Auto-generated file from scripts/semconv-genai/templates/registry/ts-stable/events.ts.j2
+//-----------------------------------------------------------------------------------------------------------------
+
+{% for event in ctx.events %}
+{{d.docstring(event, "event")}}
+export const EVENT_{{ event.name | screaming_snake_case }} = '{{event.name}}' as const;
+
+{% endfor %}
+{% if (ctx.events | length) == 0 %}
+// There are no stable GenAI events yet. This keeps the file a valid ES
+// module, so that `export * from './stable_events'` compiles.
+export {};
+{% endif %}

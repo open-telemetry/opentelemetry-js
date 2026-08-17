@@ -91,6 +91,9 @@
     },
     {
       "path": "semantic-conventions/tsconfig.esm.json"
+    },
+    {
+      "path": "semantic-conventions-genai/tsconfig.esm.json"
     }
   ]
 }

@@ -90,6 +90,7 @@
     "api",
     "packages/*",
     "semantic-conventions",
+    "semantic-conventions-genai",
     "e2e-tests",
     "experimental/packages/*",
     "experimental/examples/*",
