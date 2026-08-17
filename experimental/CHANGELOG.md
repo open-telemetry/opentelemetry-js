@@ -12,6 +12,13 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(sdk-node)!: fail-fast on MeterProvider creation from config file [#6954](https://github.com/open-telemetry/opentelemetry-js/pull/6954) @trentm
 * fix(sdk-node)!: fail-fast on TracerProvider creation from config file [#6962](https://github.com/open-telemetry/opentelemetry-js/pull/6962) @trentm
 * fix(sdk-node)!: fail-fast on Resource creation from config file [#6989](https://github.com/open-telemetry/opentelemetry-js/pull/6989) @trentm
+* feat(sdk-node)!: The experimental `startNodeSdk()` code path for *environment-based* config (i.e. when not using a config file), has full option coverage. [#6999](https://github.com/open-telemetry/opentelemetry-js/pull/6999) @trentm
+  * `startNodeSdk()` should now be a viable replacement for `new NodeSDK()`, supporting similar (but not exactly the same) options for configuring most SDK components.
+  * `startNodeSDK()` has been *deprecated*, use `startNodeSdk()` (slight capitalization change).
+  * Two resource detectors have been added to the default set for `new NodeSDK()` users: `os` and `serviceinstance`. This means that when not specifying `OTEL_NODE_RESOURCE_DETECTORS`, the SDK Resource will include `os.*` and `service.instance.id` attributes.
+* refactor(configuration)!: The responsibility of the `configuration` package has been reduced to just the parsing, validation, and TypeScript types for declarative config files. [#6999](https://github.com/open-telemetry/opentelemetry-js/pull/6999) @trentm
+  * **Breaking:** The `configuration` package no longer supports creating a synthetic `ConfigurationModel` from environment variables.
+  * **Breaking:** The `configuration` package API has changed: `createConfigFactory()` has been replaced with `parseConfigFile().
 
 ### :rocket: Features
 

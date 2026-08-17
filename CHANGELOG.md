@@ -14,7 +14,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
-* feat(resources): Deprecate `envDetector` in favor of separate `resourceAttributesEnvDetector` and `serviceNameEnvDetector`. Also mark `serviceInstanceIdDetector` as stable (the `service.instance.id` semconv attribute is now stable). @trentm
+* feat(resources): Deprecate `envDetector` in favor of separate `resourceAttributesEnvDetector` and `serviceNameEnvDetector`. Also mark `serviceInstanceIdDetector` as stable (the `service.instance.id` semconv attribute is now stable). [#6999](https://github.com/open-telemetry/opentelemetry-js/pull/6999) @trentm
 * feat(sdk-trace): allow configuring the force flush timeout per call #6929 @LarryHu0217
 
 ### :bug: Bug Fixes
