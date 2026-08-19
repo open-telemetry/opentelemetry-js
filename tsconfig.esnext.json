@@ -91,6 +91,9 @@
     },
     {
       "path": "semantic-conventions/tsconfig.esnext.json"
+    },
+    {
+      "path": "semantic-conventions-genai/tsconfig.esnext.json"
     }
   ]
 }

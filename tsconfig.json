@@ -48,7 +48,8 @@
       "packages/opentelemetry-shim-opentracing",
       "packages/sdk-metrics",
       "packages/sdk-trace",
-      "semantic-conventions"
+      "semantic-conventions",
+      "semantic-conventions-genai"
     ],
     "out": "docs",
     "exclude": [
@@ -198,6 +199,9 @@
     },
     {
       "path": "semantic-conventions"
+    },
+    {
+      "path": "semantic-conventions-genai"
     }
   ]
 }
