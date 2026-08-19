@@ -4,7 +4,7 @@
  */
 
 import type { Context, Attributes } from '@opentelemetry/api';
-import { ExactPredicate, PatternPredicate, type Predicate } from './Predicate';
+import { PatternPredicate, type Predicate } from './Predicate';
 
 /**
  * The {@link AttributesProcessor} is responsible for customizing which
@@ -43,27 +43,47 @@ class MultiAttributesProcessor implements IAttributesProcessor {
 }
 
 /**
- * Builds one {@link Predicate} per entry in `attributeNames`: a
- * {@link PatternPredicate} for entries containing `*`/`?` wildcards, or an
- * {@link ExactPredicate} otherwise, avoiding regular expression overhead for
- * plain literal names.
+ * Splits `attributeNames` into an exact-match {@link Set} for plain literal
+ * names and a list of {@link PatternPredicate}s for entries containing `*`/`?`
+ * wildcards. This lets the common all-literal case be checked with a
+ * constant-time `Set.has()` lookup instead of scanning every entry.
  */
-function toPredicates(attributeNames: string[]): Predicate[] {
-  return attributeNames.map(name =>
-    PatternPredicate.hasWildcard(name)
-      ? new PatternPredicate(name)
-      : new ExactPredicate(name)
-  );
+function toMatcher(attributeNames: string[]): {
+  exactNames: Set<string>;
+  wildcardPredicates: Predicate[];
+} {
+  const exactNames = new Set<string>();
+  const wildcardPredicates: Predicate[] = [];
+
+  for (const name of attributeNames) {
+    if (PatternPredicate.hasWildcard(name)) {
+      wildcardPredicates.push(new PatternPredicate(name));
+    } else {
+      exactNames.add(name);
+    }
+  }
+
+  return { exactNames, wildcardPredicates };
 }
 
-function matchesAny(predicates: Predicate[], attributeName: string): boolean {
-  return predicates.some(predicate => predicate.match(attributeName));
+function matches(
+  exactNames: Set<string>,
+  wildcardPredicates: Predicate[],
+  attributeName: string
+): boolean {
+  if (exactNames.has(attributeName)) {
+    return true;
+  }
+  return wildcardPredicates.some(predicate => predicate.match(attributeName));
 }
 
 class AllowListProcessor implements IAttributesProcessor {
-  private readonly _predicates: Predicate[];
+  private readonly _exactNames: Set<string>;
+  private readonly _wildcardPredicates: Predicate[];
   constructor(allowedAttributeNames: string[]) {
-    this._predicates = toPredicates(allowedAttributeNames);
+    const { exactNames, wildcardPredicates } = toMatcher(allowedAttributeNames);
+    this._exactNames = exactNames;
+    this._wildcardPredicates = wildcardPredicates;
   }
 
   process(incoming: Attributes, _context?: Context): Attributes {
@@ -71,7 +91,7 @@ class AllowListProcessor implements IAttributesProcessor {
     for (const attributeName in incoming) {
       if (
         Object.prototype.hasOwnProperty.call(incoming, attributeName) &&
-        matchesAny(this._predicates, attributeName)
+        matches(this._exactNames, this._wildcardPredicates, attributeName)
       ) {
         filteredAttributes[attributeName] = incoming[attributeName];
       }
@@ -81,9 +101,12 @@ class AllowListProcessor implements IAttributesProcessor {
 }
 
 class DenyListProcessor implements IAttributesProcessor {
-  private readonly _predicates: Predicate[];
+  private readonly _exactNames: Set<string>;
+  private readonly _wildcardPredicates: Predicate[];
   constructor(deniedAttributeNames: string[]) {
-    this._predicates = toPredicates(deniedAttributeNames);
+    const { exactNames, wildcardPredicates } = toMatcher(deniedAttributeNames);
+    this._exactNames = exactNames;
+    this._wildcardPredicates = wildcardPredicates;
   }
 
   process(incoming: Attributes, _context?: Context): Attributes {
@@ -91,7 +114,7 @@ class DenyListProcessor implements IAttributesProcessor {
     for (const attributeName in incoming) {
       if (
         Object.prototype.hasOwnProperty.call(incoming, attributeName) &&
-        !matchesAny(this._predicates, attributeName)
+        !matches(this._exactNames, this._wildcardPredicates, attributeName)
       ) {
         filteredAttributes[attributeName] = incoming[attributeName];
       }

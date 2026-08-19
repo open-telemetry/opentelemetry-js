@@ -6,6 +6,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ## Unreleased
 
+* feat(sdk-metrics): support `*` and `?` wildcards in `createAllowListAttributesProcessor` and `createDenyListAttributesProcessor` [#6995](https://github.com/open-telemetry/opentelemetry-js/pull/6995) @SaiprasadDash
+
 ### :boom: Breaking Changes
 
 * fix(sdk-node)!: fail-fast on Propagator creation from config file [#6930](https://github.com/open-telemetry/opentelemetry-js/pull/6930) @trentm
