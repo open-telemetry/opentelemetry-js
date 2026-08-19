@@ -79,7 +79,7 @@ export function getNormalBase2(value: number): number {
 
 /**
  * isPowerOfTwo reports whether value is an exact power of two, e.g. its 52-bit
- * significand is all zeros.
+ * significand is all zeros. Only valid for positive, finite values.
  * @param {number} value - the floating point number to test
  * @returns {boolean} true if value is an exact power of two
  */
