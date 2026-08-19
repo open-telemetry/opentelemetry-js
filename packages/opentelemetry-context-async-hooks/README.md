@@ -42,22 +42,15 @@ token.dispose();
 console.log(contextManager.active()); // ROOT_CONTEXT
 ```
 
-**Important:** You should ensure that every `attach()` call has a corresponding `token.dispose()` call to avoid context leaks. Use a try/finally block for safety, or use the `using` keyword (Node.js 24+ or TypeScript 5.2+):
+**Important:** You should ensure that every `attach()` call has a corresponding `token.dispose()` call to avoid context leaks. Use a try/finally block for safety:
 
 ```javascript
-// try/finally
 const token = contextManager.attach(myContext);
 try {
   await doWork();
 } finally {
   token.dispose(); // Always restore
 }
-
-// or with Node.js 24+ / TypeScript 5.2+ explicit resource management
-{
-  using token = contextManager.attach(myContext);
-  await doWork();
-} // token.dispose() called automatically
 ```
 
 For most use cases, prefer using `with()` as it automatically handles context restoration.
