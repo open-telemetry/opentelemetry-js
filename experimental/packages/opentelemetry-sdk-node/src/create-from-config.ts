@@ -525,8 +525,7 @@ export function createResourceFromConfig(
   );
   if (configAttrs && configAttrs.length > 0) {
     const attrs: DetectedResourceAttributes = {};
-    for (let i = 0; i < configAttrs.length; i++) {
-      const a = configAttrs[i];
+    for (const a of configAttrs) {
       if (a.value !== null) {
         attrs[a.name] = a.value;
       }
