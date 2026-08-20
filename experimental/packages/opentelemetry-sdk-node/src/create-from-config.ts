@@ -503,7 +503,7 @@ export function createResourceFromConfig(
             // This is equivalent to the `serviceInstanceIdDetector` and
             // *part* of the `envDetector`.  Using this `envDetector` would
             // incorrectly read the `OTEL_RESOURCE_ATTRIBUTES` envvar.
-            detectors.push(new ServiceNameDetector());
+            detectors.push(serviceNameDetector);
             detectors.push(serviceInstanceIdDetector);
             break;
           default:
