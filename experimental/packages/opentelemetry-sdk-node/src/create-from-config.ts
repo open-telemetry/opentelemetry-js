@@ -447,6 +447,8 @@ class ServiceNameDetector implements ResourceDetector {
   }
 }
 
+const serviceNameDetector = new ServiceNameDetector();
+
 export function createResourceFromConfig(
   resourceConfig?: ResourceConfigModel
 ): Resource {
