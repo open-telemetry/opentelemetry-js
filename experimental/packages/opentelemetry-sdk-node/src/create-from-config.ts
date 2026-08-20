@@ -458,6 +458,12 @@ export function createResourceFromConfig(
   // intended behavior when a user specifies a `schema_url` in the declarative
   // config file.
 
+  checkConfigUse('Resource', resourceConfig, [
+    'attributes',
+    'attributes_list',
+    'schema_url',
+    'detection/development',
+  ]);
   let resource = defaultResource();
 
   if (!resourceConfig) {
