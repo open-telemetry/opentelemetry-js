@@ -21,17 +21,12 @@ import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/expo
 import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
-import type {
-  DetectedResourceAttributes,
-  Resource,
-  ResourceDetector,
-} from '@opentelemetry/resources';
+import type { ResourceDetector } from '@opentelemetry/resources';
 import {
   envDetector,
   hostDetector,
   osDetector,
   processDetector,
-  resourceFromAttributes,
   serviceDetector,
 } from '@opentelemetry/resources';
 import type { SpanExporter, SpanProcessor } from '@opentelemetry/sdk-trace';
@@ -42,9 +37,6 @@ import {
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
-import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
-import type { ConfigurationModel } from '@opentelemetry/configuration';
-import { mergeResourceAttributesConfig } from '@opentelemetry/configuration';
 import type {
   IMetricReader,
   PushMetricExporter,
@@ -66,49 +58,6 @@ const RESOURCE_DETECTOR_HOST = 'host';
 const RESOURCE_DETECTOR_OS = 'os';
 const RESOURCE_DETECTOR_PROCESS = 'process';
 const RESOURCE_DETECTOR_SERVICE = 'service';
-
-export function getResourceFromConfiguration(
-  config: ConfigurationModel
-): Resource | undefined {
-  if (!config.resource) {
-    return undefined;
-  }
-
-  let resourceAttributes = config.resource.attributes?.slice();
-  const serviceName = getStringFromEnv('OTEL_SERVICE_NAME');
-  if (
-    serviceName &&
-    !resourceAttributes?.some(attribute => attribute.name === ATTR_SERVICE_NAME)
-  ) {
-    resourceAttributes = [
-      ...(resourceAttributes ?? []),
-      {
-        name: ATTR_SERVICE_NAME,
-        value: serviceName,
-        type: 'string',
-      },
-    ];
-  }
-
-  const configAttrs = mergeResourceAttributesConfig(
-    resourceAttributes,
-    config.resource.attributes_list
-  );
-  if (!configAttrs) {
-    return undefined;
-  }
-
-  const attrs: DetectedResourceAttributes = {};
-  for (let i = 0; i < configAttrs.length; i++) {
-    const a = configAttrs[i];
-    if (a.value !== null) {
-      attrs[a.name] = a.value;
-    }
-  }
-  return resourceFromAttributes(attrs, {
-    schemaUrl: config.resource.schema_url ?? undefined,
-  });
-}
 
 export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
   // When updating this list, make sure to also update the section `resourceDetectors` on README.
@@ -154,21 +103,6 @@ export function ensureResourceDetectorOrder(
   );
   orderedDetectors.push(envDetector);
   return orderedDetectors;
-}
-
-export function getResourceDetectorsFromConfiguration(
-  config: ConfigurationModel
-): Array<ResourceDetector> {
-  const detectors = config.resource?.['detection/development']?.detectors ?? [];
-
-  return detectors.flatMap(detector => {
-    const result: ResourceDetector[] = [];
-    if (detector.host !== undefined) result.push(hostDetector);
-    if (detector.os !== undefined) result.push(osDetector);
-    if (detector.process !== undefined) result.push(processDetector);
-    if (detector.service !== undefined) result.push(serviceDetector);
-    return result;
-  });
 }
 
 export function getOtlpProtocolFromEnv(): string {
@@ -517,16 +451,4 @@ export function getBatchLogRecordProcessorFromEnv(
     selfObsMeterProvider,
     ...getBatchLogRecordProcessorConfigFromEnv(),
   });
-}
-
-export function getInstanceID(config: ConfigurationModel): string | undefined {
-  if (config.resource?.attributes) {
-    for (let i = 0; i < config.resource.attributes.length; i++) {
-      const element = config.resource.attributes[i];
-      if (element.name === 'service.instance.id') {
-        return element.value?.toString();
-      }
-    }
-  }
-  return undefined;
 }

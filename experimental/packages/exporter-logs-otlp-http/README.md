@@ -87,7 +87,7 @@ In addition to settings passed to the constructor, the exporter also supports co
 | Environment variable             | Description                                                                                                                                                                                                                                              |
 | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | OTEL_EXPORTER_OTLP_ENDPOINT      | The endpoint to send logs to. This will also be used for the traces exporter if `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` is not configured. By default `http://localhost:4318` will be used. `/v1/logs` will be automatically appended to configured values. |
-| OTEL_EXPORTER_OTLP_LOGS_ENDPOINT | The endpoint to send logs to. By default `https://localhost:4318/v1/logs` will be used. `v1/logs` will not be appended automatically and has to be added explicitly.                                                                                     |
+| OTEL_EXPORTER_OTLP_LOGS_ENDPOINT | The endpoint to send logs to. By default `http://localhost:4318/v1/logs` will be used. `v1/logs` will not be appended automatically and has to be added explicitly.                                                                                      |
 | OTEL_EXPORTER_OTLP_LOGS_TIMEOUT  | The maximum waiting time, in milliseconds, allowed to send each OTLP log batch. Default is 10000.                                                                                                                                                        |
 | OTEL_EXPORTER_OTLP_TIMEOUT       | The maximum waiting time, in milliseconds, allowed to send each OTLP trace/metric/log batch. Default is 10000.                                                                                                                                           |
 
@@ -108,5 +108,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-logs-otlp-http
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-logs-otlp-http.svg
-[trace-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/exporter-trace-otlp-http
+[trace-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-trace-otlp-http
 [metrics-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-http

@@ -16,6 +16,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(context-async-hooks): implement `attach()` on `AsyncLocalStorageContextManager` [#6845](https://github.com/open-telemetry/opentelemetry-js/pull/6845) @pichlermarc
+  * On Node.js 25.9+, delegates to `AsyncLocalStorage.withScope()` returning a native `RunScope`. On older Node.js, falls back to `enterWith()` with a manual disposable wrapper.
 * feat(sdk-trace): allow configuring the force flush timeout per call #6929 @LarryHu0217
 
 ### :bug: Bug Fixes
@@ -24,6 +26,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+* chore(ci): run documentation tests on a weekly schedule [#6920](https://github.com/open-telemetry/opentelemetry-js/pull/6920) @LarryHu0217
 * chore(resources): Ensure that multiple uses of serviceInstanceIdDetector.detect() return the *same* value for `service.instance.id`
 
 ## 2.10.0

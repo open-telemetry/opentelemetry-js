@@ -3,11 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type {
-  Attributes,
-  ContextManager,
-  TextMapPropagator,
-} from '@opentelemetry/api';
+import type { ContextManager } from '@opentelemetry/api';
+import type { TextMapPropagator } from '@opentelemetry/api';
 import type { Instrumentation } from '@opentelemetry/instrumentation';
 import type { Resource, ResourceDetector } from '@opentelemetry/resources';
 import type {
@@ -60,18 +57,7 @@ export interface NodeSDKConfiguration {
  * @experimental Options for new experimental SDK setup
  */
 export interface SDKOptions {
-  /**
-   * The lowest-priority resource used as the starting point for resource
-   * processing. Defaults to `defaultResource()`.
-   */
-  baseResource?: Resource;
   instrumentations?: (Instrumentation | Instrumentation[])[];
-  /**
-   * Resource attributes applied after detected and configured resource
-   * attributes.
-   */
-  resourceAttributes?: Attributes;
-  resourceDetectors?: ResourceDetector[];
   textMapPropagator?: TextMapPropagator | null;
 }
 
