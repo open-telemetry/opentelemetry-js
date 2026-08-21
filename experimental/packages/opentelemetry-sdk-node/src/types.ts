@@ -58,7 +58,6 @@ export interface NodeSDKConfiguration {
  */
 export interface SDKOptions {
   instrumentations?: (Instrumentation | Instrumentation[])[];
-  resourceDetectors?: ResourceDetector[];
   textMapPropagator?: TextMapPropagator | null;
 }
 

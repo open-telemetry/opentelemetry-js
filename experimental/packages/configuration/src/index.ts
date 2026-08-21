@@ -56,6 +56,7 @@ export type {
   SimpleSpanProcessor as SimpleSpanProcessorConfigModel,
   TraceIdRatioBasedSampler as TraceIdRatioBasedSamplerConfigModel,
   ParentBasedSampler as ParentBasedSamplerConfigModel,
+  Resource as ResourceConfigModel,
 } from './generated/types';
 export { createConfigFactory } from './ConfigFactory';
 export {
