@@ -4,6 +4,7 @@
  */
 
 import type { Context, Attributes } from '@opentelemetry/api';
+import { PatternPredicate, type Predicate } from './Predicate';
 
 /**
  * The {@link AttributesProcessor} is responsible for customizing which
@@ -41,10 +42,48 @@ class MultiAttributesProcessor implements IAttributesProcessor {
   }
 }
 
+/**
+ * Splits `attributeNames` into an exact-match {@link Set} for plain literal
+ * names and a list of {@link PatternPredicate}s for entries containing `*`/`?`
+ * wildcards. This lets the common all-literal case be checked with a
+ * constant-time `Set.has()` lookup instead of scanning every entry.
+ */
+function toMatcher(attributeNames: string[]): {
+  exactNames: Set<string>;
+  wildcardPredicates: Predicate[];
+} {
+  const exactNames = new Set<string>();
+  const wildcardPredicates: Predicate[] = [];
+
+  for (const name of attributeNames) {
+    if (PatternPredicate.hasWildcard(name)) {
+      wildcardPredicates.push(new PatternPredicate(name));
+    } else {
+      exactNames.add(name);
+    }
+  }
+
+  return { exactNames, wildcardPredicates };
+}
+
+function matches(
+  exactNames: Set<string>,
+  wildcardPredicates: Predicate[],
+  attributeName: string
+): boolean {
+  if (exactNames.has(attributeName)) {
+    return true;
+  }
+  return wildcardPredicates.some(predicate => predicate.match(attributeName));
+}
+
 class AllowListProcessor implements IAttributesProcessor {
-  private readonly _allowedAttributeNames: Set<string>;
+  private readonly _exactNames: Set<string>;
+  private readonly _wildcardPredicates: Predicate[];
   constructor(allowedAttributeNames: string[]) {
-    this._allowedAttributeNames = new Set(allowedAttributeNames);
+    const { exactNames, wildcardPredicates } = toMatcher(allowedAttributeNames);
+    this._exactNames = exactNames;
+    this._wildcardPredicates = wildcardPredicates;
   }
 
   process(incoming: Attributes, _context?: Context): Attributes {
@@ -52,7 +91,7 @@ class AllowListProcessor implements IAttributesProcessor {
     for (const attributeName in incoming) {
       if (
         Object.prototype.hasOwnProperty.call(incoming, attributeName) &&
-        this._allowedAttributeNames.has(attributeName)
+        matches(this._exactNames, this._wildcardPredicates, attributeName)
       ) {
         filteredAttributes[attributeName] = incoming[attributeName];
       }
@@ -62,9 +101,12 @@ class AllowListProcessor implements IAttributesProcessor {
 }
 
 class DenyListProcessor implements IAttributesProcessor {
-  private readonly _deniedAttributeNames: Set<string>;
+  private readonly _exactNames: Set<string>;
+  private readonly _wildcardPredicates: Predicate[];
   constructor(deniedAttributeNames: string[]) {
-    this._deniedAttributeNames = new Set(deniedAttributeNames);
+    const { exactNames, wildcardPredicates } = toMatcher(deniedAttributeNames);
+    this._exactNames = exactNames;
+    this._wildcardPredicates = wildcardPredicates;
   }
 
   process(incoming: Attributes, _context?: Context): Attributes {
@@ -72,7 +114,7 @@ class DenyListProcessor implements IAttributesProcessor {
     for (const attributeName in incoming) {
       if (
         Object.prototype.hasOwnProperty.call(incoming, attributeName) &&
-        !this._deniedAttributeNames.has(attributeName)
+        !matches(this._exactNames, this._wildcardPredicates, attributeName)
       ) {
         filteredAttributes[attributeName] = incoming[attributeName];
       }
@@ -106,6 +148,13 @@ export function createMultiAttributesProcessor(
 /**
  * Create an {@link IAttributesProcessor} that filters by allowed attribute names and drops any names that are not in the
  * allow list.
+ *
+ * Entries may use `*` to match zero or more characters and `?` to match exactly
+ * one character, following the wildcard semantics of the OpenTelemetry
+ * `IncludeExclude` configuration type
+ * (https://opentelemetry.io/docs/specs/otel-config/types/#type-includeexclude).
+ * For example, `http.request.header.*` matches any attribute name starting
+ * with `http.request.header.`.
  */
 export function createAllowListAttributesProcessor(
   attributeAllowList: string[]
@@ -114,7 +163,13 @@ export function createAllowListAttributesProcessor(
 }
 
 /**
- * Create an {@link IAttributesProcessor} that drops attributes based on the names provided in the deny list
+ * Create an {@link IAttributesProcessor} that drops attributes based on the names provided in the deny list.
+ *
+ * Entries may use `*` to match zero or more characters and `?` to match exactly
+ * one character, following the wildcard semantics of the OpenTelemetry
+ * `IncludeExclude` configuration type
+ * (https://opentelemetry.io/docs/specs/otel-config/types/#type-includeexclude).
+ * For example, `*.password` matches any attribute name ending in `.password`.
  */
 export function createDenyListAttributesProcessor(
   attributeDenyList: string[]
