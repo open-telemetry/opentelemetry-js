@@ -6,8 +6,16 @@
 import type { TracerConfig } from './types-shim';
 import { getNumberFromEnv } from '@opentelemetry/core';
 
-export const DEFAULT_ATTRIBUTE_COUNT_LIMIT = 128;
-export const DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT = Infinity;
+/**
+ * Keep these declarations local and export them separately. TypeScript's
+ * CommonJS output otherwise rewrites internal reads of `export const` to
+ * `exports.*`, which can trigger webpack's self-reference handling when the
+ * export is tree-shaken (#6981, webpack/webpack#21619).
+ */
+const DEFAULT_ATTRIBUTE_COUNT_LIMIT = 128;
+const DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT = Infinity;
+
+export { DEFAULT_ATTRIBUTE_COUNT_LIMIT, DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT };
 
 /**
  * When general limits are provided and model specific limits are not,
