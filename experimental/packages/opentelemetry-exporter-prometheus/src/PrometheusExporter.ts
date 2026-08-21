@@ -53,12 +53,14 @@ export class PrometheusExporter extends MetricReader {
     config: ExporterConfig = {},
     callback: (error: Error | void) => void = () => {}
   ) {
+    // Copy the preference so that mutating the caller's object after
+    // construction cannot change the exporter's configured aggregation.
+    const aggregationPreference = { ...config.aggregationPreference };
     super({
-      aggregationSelector: _instrumentType => {
-        return {
+      aggregationSelector: instrumentType =>
+        aggregationPreference[instrumentType] ?? {
           type: AggregationType.DEFAULT,
-        };
-      },
+        },
       aggregationTemporalitySelector: _instrumentType =>
         AggregationTemporality.CUMULATIVE,
       otelComponentType:

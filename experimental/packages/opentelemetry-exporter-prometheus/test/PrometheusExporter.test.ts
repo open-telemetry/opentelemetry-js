@@ -4,7 +4,11 @@
  */
 
 import type { Counter, Meter, ObservableResult } from '@opentelemetry/api';
-import { MeterProvider } from '@opentelemetry/sdk-metrics';
+import {
+  AggregationType,
+  InstrumentType,
+  MeterProvider,
+} from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as http from 'http';
@@ -598,6 +602,71 @@ describe('PrometheusExporter', () => {
         'counter_total{key1="attributeValue1"} 10',
         '',
       ]);
+    });
+
+    it('should use a configured aggregationPreference', async () => {
+      exporter = new PrometheusExporter({
+        aggregationPreference: {
+          [InstrumentType.HISTOGRAM]: {
+            type: AggregationType.SUM,
+          },
+        },
+      });
+      meterProvider = new MeterProvider({
+        readers: [exporter],
+      });
+      meter = meterProvider.getMeter('test-prometheus');
+      const histogram = meter.createHistogram('test_histogram', {
+        description: 'a test description',
+      });
+      histogram.record(20, { key1: 'attributeValue1' });
+
+      const body = await request('http://localhost:9464/metrics');
+      const lines = body.split('\n');
+
+      // With a SUM aggregation preference for histograms, the histogram
+      // instrument is exported as a single summed counter instead of histogram
+      // buckets.
+      assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
+        '# HELP test_histogram_total a test description',
+        '# TYPE test_histogram_total counter',
+        'test_histogram_total{key1="attributeValue1",otel_scope_name="test-prometheus"} 20',
+        '',
+      ]);
+    });
+
+    it('should fall back to the default aggregation for instrument kinds not listed in aggregationPreference', async () => {
+      exporter = new PrometheusExporter({
+        aggregationPreference: {
+          [InstrumentType.HISTOGRAM]: {
+            type: AggregationType.DROP,
+          },
+        },
+      });
+      meterProvider = new MeterProvider({
+        readers: [exporter],
+      });
+      meter = meterProvider.getMeter('test-prometheus');
+      const counter = meter.createCounter('test_counter', {
+        description: 'a test description',
+      });
+      counter.add(10, { key1: 'attributeValue1' });
+      const histogram = meter.createHistogram('test_histogram', {
+        description: 'a test description',
+      });
+      histogram.record(20, { key1: 'attributeValue1' });
+
+      const body = await request('http://localhost:9464/metrics');
+
+      // The histogram is dropped as configured, while the counter is not listed
+      // in the preference and therefore uses the SDK's default aggregation.
+      assert.strictEqual(body.includes('test_histogram'), false);
+      assert.ok(
+        body.includes(
+          'test_counter_total{key1="attributeValue1",otel_scope_name="test-prometheus"} 10'
+        )
+      );
     });
   });
 });
