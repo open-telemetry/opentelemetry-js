@@ -10,8 +10,13 @@ import { createRetryingTransport } from '../../src/retrying-transport';
 import type { ExportResponse } from '../../src';
 
 const timeoutMillis = 1000000;
+const originalMathRandom = Math.random;
 
 describe('RetryingTransport', function () {
+  afterEach(function () {
+    Math.random = originalMathRandom;
+  });
+
   describe('send', function () {
     it('does not retry when underlying transport succeeds', async function () {
       // arrange
@@ -230,6 +235,36 @@ describe('RetryingTransport', function () {
         timeoutMillis
       );
       assert.strictEqual(result, retryResponse);
+    });
+
+    it('retries when timeoutMillis is 0 (infinite timeout)', async function () {
+      // arrange
+      const retryResponse: ExportResponse = {
+        status: 'retryable',
+      };
+      const successResponse: ExportResponse = {
+        status: 'success',
+      };
+      const mockData = Uint8Array.from([1, 2, 3]);
+
+      const transportStubs = {
+        send: sinon
+          .stub()
+          .onFirstCall()
+          .returns(Promise.resolve(retryResponse))
+          .onSecondCall()
+          .returns(Promise.resolve(successResponse)),
+        shutdown: sinon.stub(),
+      };
+      const mockTransport = <IExporterTransport>transportStubs;
+      const transport = createRetryingTransport({ transport: mockTransport });
+
+      // act
+      const actualResponse = await transport.send(mockData, 0);
+
+      // assert
+      sinon.assert.calledTwice(transportStubs.send);
+      assert.deepEqual(actualResponse, successResponse);
     });
   });
 });
