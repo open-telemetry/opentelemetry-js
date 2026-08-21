@@ -274,6 +274,7 @@ describe('create-from-config', () => {
       'telemetry.sdk.version': SDK_VERSION,
     };
 
+    // Helper to set some envvars, and return a function to restore the env.
     function setEnv(env: Record<string, string>): () => void {
       const toRestore: Record<string, string | null> = {};
       for (const [k, v] of Object.entries(env)) {
@@ -298,7 +299,7 @@ describe('create-from-config', () => {
       return res.attributes;
     };
 
-    it('empty', async function () {
+    it('empty "resource" config', async function () {
       const resource = createResourceFromConfig(undefined);
       await resource.waitForAsyncAttributes?.();
       assert.deepEqual(resource.attributes, defaultResAttrs);

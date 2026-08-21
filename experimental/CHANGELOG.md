@@ -12,6 +12,13 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(sdk-node)!: fail-fast on MeterProvider creation from config file [#6954](https://github.com/open-telemetry/opentelemetry-js/pull/6954) @trentm
 * fix(sdk-node)!: fail-fast on TracerProvider creation from config file [#6962](https://github.com/open-telemetry/opentelemetry-js/pull/6962) @trentm
 * fix(sdk-node)!: fail-fast on Resource creation from config file [#6989](https://github.com/open-telemetry/opentelemetry-js/pull/6989) @trentm
+  * This also breaks some usage of `startNodeSDK()` for *environment-based* config, i.e. when *not* using a config file. For example with `OTEL_NODE_RESOURCE_DETECTORS=all`, it results in an error message and a no-op SDK.
+    (This does not impact users of `new NodeSDK()` -- the currently recommended mechanism to start an SDK using this package.)
+
+    ```bash
+    Could not create OpenTelemetry SDK from configuration, SDK will not be setup: unknown ExperimentalResourceDetector name in configuration: "container"
+    ```
+
 * feat(sdk-node)!: The experimental `startNodeSdk()` code path for *environment-based* config (i.e. when not using a config file), has full option coverage. [#6999](https://github.com/open-telemetry/opentelemetry-js/pull/6999) @trentm
   * `startNodeSdk()` should now be a viable replacement for `new NodeSDK()`, supporting similar (but not exactly the same) options for configuring most SDK components.
   * `startNodeSDK()` has been *deprecated*, use `startNodeSdk()` (slight capitalization change).
@@ -30,6 +37,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :books: Documentation
 
+* docs(sdk-logs): mark logger configuration as experimental [#6996](https://github.com/open-telemetry/opentelemetry-js/pull/6996) @LarryHu0217
 * docs(configuration): document the `ConfigModel` suffix naming convention for exported types [#6612](https://github.com/open-telemetry/opentelemetry-js/issues/6612) @vedantchalke36
 
 ### :house: Internal

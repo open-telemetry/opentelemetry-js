@@ -444,6 +444,12 @@ export function createResourceFromConfig(
   // intended behavior when a user specifies a `schema_url` in the declarative
   // config file.
 
+  checkConfigUse('Resource', resourceConfig, [
+    'attributes',
+    'attributes_list',
+    'schema_url',
+    'detection/development',
+  ]);
   let resource = defaultResource();
 
   if (!resourceConfig) {
@@ -497,8 +503,7 @@ export function createResourceFromConfig(
   );
   if (configAttrs && configAttrs.length > 0) {
     const attrs: DetectedResourceAttributes = {};
-    for (let i = 0; i < configAttrs.length; i++) {
-      const a = configAttrs[i];
+    for (const a of configAttrs) {
       if (a.value !== null) {
         attrs[a.name] = a.value;
       }
