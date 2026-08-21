@@ -17,7 +17,7 @@ import type {
   SpanExporterConfigModel,
   TracerProviderConfigModel,
 } from '@opentelemetry/configuration';
-import { createConfigFactory } from '@opentelemetry/configuration';
+import { parseConfigFile } from '@opentelemetry/configuration';
 import type { SpanExporter, SpanLimits } from '@opentelemetry/sdk-trace';
 import {
   BatchSpanProcessor,
@@ -449,35 +449,28 @@ describe('create-from-config', () => {
     });
 
     it('processes fixtures/resources.yaml correctly', async function () {
-      const restoreEnv = setEnv({
-        OTEL_CONFIG_FILE: 'test/fixtures/resources.yaml',
-      });
-      try {
-        const config = createConfigFactory().getConfigModel();
-        const resource = createResourceFromConfig(config.resource);
-        await resource.waitForAsyncAttributes?.();
+      const config = parseConfigFile('test/fixtures/resources.yaml');
+      const resource = createResourceFromConfig(config.resource);
+      await resource.waitForAsyncAttributes?.();
 
-        assert.deepStrictEqual(
-          resource.schemaUrl,
-          'https://opentelemetry.io/schemas/1.16.0'
-        );
-        assert.deepStrictEqual(resource.attributes, {
-          ...defaultResAttrs,
-          'service.name': 'config-name',
-          'service.namespace': 'config-namespace',
-          'service.version': '1.0.0',
-          bool_array_key: [true, false],
-          bool_key: true,
-          double_array_key: [1.1, 2.2],
-          double_key: 1.1,
-          int_array_key: [1, 2],
-          int_key: 1,
-          string_array_key: ['value1', 'value2'],
-          string_key: 'value',
-        });
-      } finally {
-        restoreEnv();
-      }
+      assert.deepStrictEqual(
+        resource.schemaUrl,
+        'https://opentelemetry.io/schemas/1.16.0'
+      );
+      assert.deepStrictEqual(resource.attributes, {
+        ...defaultResAttrs,
+        'service.name': 'config-name',
+        'service.namespace': 'config-namespace',
+        'service.version': '1.0.0',
+        bool_array_key: [true, false],
+        bool_key: true,
+        double_array_key: [1.1, 2.2],
+        double_key: 1.1,
+        int_array_key: [1, 2],
+        int_key: 1,
+        string_array_key: ['value1', 'value2'],
+        string_key: 'value',
+      });
     });
   });
 

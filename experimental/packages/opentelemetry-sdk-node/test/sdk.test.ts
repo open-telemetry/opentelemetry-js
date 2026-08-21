@@ -1056,10 +1056,20 @@ describe('NodeSDK', () => {
     });
   });
 
-  describe('configureServiceInstanceId', async () => {
+  describe('service.instance.id resource attribute', async () => {
     afterEach(function () {
       delete process.env.OTEL_NODE_RESOURCE_DETECTORS;
       delete process.env.OTEL_RESOURCE_ATTRIBUTES;
+    });
+
+    it('should be added by default', async () => {
+      const sdk = new NodeSDK();
+      sdk.start();
+      const resource = sdk['_resource'];
+      await resource.waitForAsyncAttributes?.();
+
+      assertServiceInstanceIdIsUUID(resource);
+      await sdk.shutdown();
     });
 
     it('should configure service instance id via OTEL_RESOURCE_ATTRIBUTES env var', async () => {
@@ -1128,7 +1138,7 @@ describe('NodeSDK', () => {
       await sdk.shutdown();
     });
 
-    it('should configure service instance id with service instance id from env variable taking priority over random UUID, based on order', async () => {
+    it('service.instance.id from "env" detector wins if it is last', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
         'service.instance.id=custom-service,service.name=my-service';
       process.env.OTEL_NODE_RESOURCE_DETECTORS = 'serviceinstance,env';
@@ -1147,7 +1157,7 @@ describe('NodeSDK', () => {
       await sdk.shutdown();
     });
 
-    it('should configure service instance id with service instance id from env variable taking priority over random UUID, based on order', async () => {
+    it('"serviceinstance" detector beats "env" if it is last', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
         'service.instance.id=custom-service,service.name=my-service';
       process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,serviceinstance';
