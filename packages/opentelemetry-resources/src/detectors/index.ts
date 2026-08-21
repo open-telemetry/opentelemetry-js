@@ -8,6 +8,6 @@ export {
   hostDetector,
   osDetector,
   processDetector,
-  serviceInstanceIdDetector,
+  serviceDetector,
 } from './platform';
 export { noopDetector } from './NoopDetector';

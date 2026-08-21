@@ -27,7 +27,7 @@ import {
   hostDetector,
   osDetector,
   processDetector,
-  serviceInstanceIdDetector,
+  serviceDetector,
 } from '@opentelemetry/resources';
 import type { SpanExporter, SpanProcessor } from '@opentelemetry/sdk-trace';
 import {
@@ -37,7 +37,6 @@ import {
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
-import type { ConfigurationModel } from '@opentelemetry/configuration';
 import type {
   IMetricReader,
   PushMetricExporter,
@@ -58,16 +57,15 @@ const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';
 const RESOURCE_DETECTOR_OS = 'os';
 const RESOURCE_DETECTOR_PROCESS = 'process';
-const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
+const RESOURCE_DETECTOR_SERVICE = 'service';
 
 export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
   // When updating this list, make sure to also update the section `resourceDetectors` on README.
   const resourceDetectors = new Map<string, ResourceDetector>([
     [RESOURCE_DETECTOR_HOST, hostDetector],
     [RESOURCE_DETECTOR_OS, osDetector],
-    [RESOURCE_DETECTOR_SERVICE_INSTANCE_ID, serviceInstanceIdDetector],
+    [RESOURCE_DETECTOR_SERVICE, serviceDetector],
     [RESOURCE_DETECTOR_PROCESS, processDetector],
-    [RESOURCE_DETECTOR_ENVIRONMENT, envDetector],
   ]);
 
   const resourceDetectorsFromEnv = getStringListFromEnv(
@@ -75,14 +73,17 @@ export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
   ) ?? ['all'];
 
   if (resourceDetectorsFromEnv.includes('all')) {
-    return [...resourceDetectors.values()].flat();
+    return ensureResourceDetectorOrder([...resourceDetectors.values()].flat());
   }
 
   if (resourceDetectorsFromEnv.includes('none')) {
-    return [];
+    return ensureResourceDetectorOrder([]);
   }
 
-  return resourceDetectorsFromEnv.flatMap(detector => {
+  const configuredDetectors = resourceDetectorsFromEnv.flatMap(detector => {
+    if (detector === RESOURCE_DETECTOR_ENVIRONMENT) {
+      return [];
+    }
     const resourceDetector = resourceDetectors.get(detector);
     if (!resourceDetector) {
       diag.warn(
@@ -91,6 +92,17 @@ export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
     }
     return resourceDetector || [];
   });
+  return ensureResourceDetectorOrder(configuredDetectors);
+}
+
+export function ensureResourceDetectorOrder(
+  detectors: ResourceDetector[]
+): ResourceDetector[] {
+  const orderedDetectors = detectors.filter(
+    detector => detector !== envDetector
+  );
+  orderedDetectors.push(envDetector);
+  return orderedDetectors;
 }
 
 export function getOtlpProtocolFromEnv(): string {
@@ -439,16 +451,4 @@ export function getBatchLogRecordProcessorFromEnv(
     selfObsMeterProvider,
     ...getBatchLogRecordProcessorConfigFromEnv(),
   });
-}
-
-export function getInstanceID(config: ConfigurationModel): string | undefined {
-  if (config.resource?.attributes) {
-    for (let i = 0; i < config.resource.attributes.length; i++) {
-      const element = config.resource.attributes[i];
-      if (element.name === 'service.instance.id') {
-        return element.value?.toString();
-      }
-    }
-  }
-  return undefined;
 }

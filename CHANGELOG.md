@@ -12,6 +12,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :boom: Breaking Changes
 
+* feat(resources)!: replace the experimental `serviceInstanceIdDetector` with the stable `serviceDetector`, which detects `service.name` from `OTEL_SERVICE_NAME` and generates `service.instance.id` [#6988](https://github.com/open-telemetry/opentelemetry-js/pull/6988) @JacksonWeber
+
 ### :rocket: Features
 
 * feat(context-async-hooks): implement `attach()` on `AsyncLocalStorageContextManager` [#6845](https://github.com/open-telemetry/opentelemetry-js/pull/6845) @pichlermarc

@@ -50,8 +50,9 @@ import {
   envDetector,
   processDetector,
   hostDetector,
-  serviceInstanceIdDetector,
+  serviceDetector,
   defaultResource,
+  resourceFromAttributes,
 } from '@opentelemetry/resources';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { logs } from '@opentelemetry/api-logs';
@@ -973,6 +974,7 @@ describe('NodeSDK', () => {
 
   describe('configureServiceName', async () => {
     afterEach(function () {
+      delete process.env.OTEL_NODE_RESOURCE_DETECTORS;
       delete process.env.OTEL_RESOURCE_ATTRIBUTES;
       delete process.env.OTEL_SERVICE_NAME;
     });
@@ -993,6 +995,35 @@ describe('NodeSDK', () => {
 
     it('should configure service name via OTEL_SERVICE_NAME env var', async () => {
       process.env.OTEL_SERVICE_NAME = 'env-set-name';
+      const sdk = new NodeSDK();
+
+      sdk.start();
+      const resource = sdk['_resource'];
+      await resource.waitForAsyncAttributes?.();
+
+      assertServiceResource(resource, {
+        name: 'env-set-name',
+      });
+      await sdk.shutdown();
+    });
+
+    it('should configure service name with an empty custom detector list', async () => {
+      process.env.OTEL_SERVICE_NAME = 'env-set-name';
+      const sdk = new NodeSDK({ resourceDetectors: [] });
+
+      sdk.start();
+      const resource = sdk['_resource'];
+      await resource.waitForAsyncAttributes?.();
+
+      assertServiceResource(resource, {
+        name: 'env-set-name',
+      });
+      await sdk.shutdown();
+    });
+
+    it('should configure service name when configurable detectors are disabled', async () => {
+      process.env.OTEL_SERVICE_NAME = 'env-set-name';
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'none';
       const sdk = new NodeSDK();
 
       sdk.start();
@@ -1060,6 +1091,7 @@ describe('NodeSDK', () => {
     afterEach(function () {
       delete process.env.OTEL_NODE_RESOURCE_DETECTORS;
       delete process.env.OTEL_RESOURCE_ATTRIBUTES;
+      delete process.env.OTEL_SERVICE_NAME;
     });
 
     it('should configure service instance id via OTEL_RESOURCE_ATTRIBUTES env var', async () => {
@@ -1079,7 +1111,7 @@ describe('NodeSDK', () => {
     });
 
     it('should configure service instance id via OTEL_NODE_RESOURCE_DETECTORS env var', async () => {
-      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,host,os,serviceinstance';
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,host,os,service';
       const sdk = new NodeSDK();
 
       sdk.start();
@@ -1097,7 +1129,7 @@ describe('NodeSDK', () => {
           processDetector,
           envDetector,
           hostDetector,
-          serviceInstanceIdDetector,
+          serviceDetector,
         ],
       });
 
@@ -1106,6 +1138,27 @@ describe('NodeSDK', () => {
       await resource.waitForAsyncAttributes?.();
 
       assertServiceInstanceIdIsUUID(resource);
+      await sdk.shutdown();
+    });
+
+    it('should favor an explicit resource over detected service attributes', async () => {
+      process.env.OTEL_SERVICE_NAME = 'env-set-name';
+      const sdk = new NodeSDK({
+        resource: resourceFromAttributes({
+          'service.name': 'explicit-name',
+          'service.instance.id': 'explicit-instance-id',
+        }),
+        resourceDetectors: [serviceDetector],
+      });
+
+      sdk.start();
+      const resource = sdk['_resource'];
+      await resource.waitForAsyncAttributes?.();
+
+      assertServiceResource(resource, {
+        name: 'explicit-name',
+        instanceId: 'explicit-instance-id',
+      });
       await sdk.shutdown();
     });
 
@@ -1128,10 +1181,10 @@ describe('NodeSDK', () => {
       await sdk.shutdown();
     });
 
-    it('should configure service instance id with service instance id from env variable taking priority over random UUID, based on order', async () => {
+    it('should give env service instance id priority when service is listed before env', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
         'service.instance.id=custom-service,service.name=my-service';
-      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'serviceinstance,env';
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'service,env';
       const sdk = new NodeSDK({
         autoDetectResources: true,
       });
@@ -1147,10 +1200,10 @@ describe('NodeSDK', () => {
       await sdk.shutdown();
     });
 
-    it('should configure service instance id with service instance id from env variable taking priority over random UUID, based on order', async () => {
+    it('should give env service instance id priority when env is listed before service', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
         'service.instance.id=custom-service,service.name=my-service';
-      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,serviceinstance';
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,service';
       const sdk = new NodeSDK({
         autoDetectResources: true,
       });
@@ -1159,7 +1212,10 @@ describe('NodeSDK', () => {
       const resource = sdk['_resource'];
       await resource.waitForAsyncAttributes?.();
 
-      assertServiceInstanceIdIsUUID(resource);
+      assertServiceResource(resource, {
+        name: 'my-service',
+        instanceId: 'custom-service',
+      });
       await sdk.shutdown();
     });
   });

@@ -105,12 +105,12 @@ describe('EnvironmentConfigFactory', function () {
   });
 
   it('should return config with a list of options for node resource detectors', function () {
-    process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,host, serviceinstance';
+    process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,host, service';
     const expectedConfig: ConfigurationModel = {
       ...defaultConfig,
       resource: {
         'detection/development': {
-          detectors: [{ host: {} }, { service: {} }, { env: {} }],
+          detectors: [{ host: {} }, { service: {} }],
         },
       },
     };
@@ -130,7 +130,6 @@ describe('EnvironmentConfigFactory', function () {
             { os: {} },
             { process: {} },
             { service: {} },
-            { env: {} },
           ],
         },
       },
@@ -162,15 +161,10 @@ describe('EnvironmentConfigFactory', function () {
     assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
   });
 
-  it('should map OTEL_NODE_RESOURCE_DETECTORS=env to env detector', function () {
+  it('should not map env into declarative resource detectors', function () {
     process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env';
     const expectedConfig: ConfigurationModel = {
       ...defaultConfig,
-      resource: {
-        'detection/development': {
-          detectors: [{ env: {} }],
-        },
-      },
     };
     const configFactory = createConfigFactory();
     assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
@@ -232,7 +226,26 @@ describe('EnvironmentConfigFactory', function () {
             type: 'string',
           },
         ],
-        attributes_list: 'service.name=name-from-attributes',
+      },
+    };
+    const configFactory = createConfigFactory();
+    assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+  });
+
+  it('OTEL_SERVICE_NAME takes precedence over an encoded service name in OTEL_RESOURCE_ATTRIBUTES', function () {
+    process.env.OTEL_SERVICE_NAME = 'name-from-service-name';
+    process.env.OTEL_RESOURCE_ATTRIBUTES =
+      'service%2Ename=name-from-attributes';
+    const expectedConfig: ConfigurationModel = {
+      ...defaultConfig,
+      resource: {
+        attributes: [
+          {
+            name: 'service.name',
+            value: 'name-from-service-name',
+            type: 'string',
+          },
+        ],
       },
     };
     const configFactory = createConfigFactory();
