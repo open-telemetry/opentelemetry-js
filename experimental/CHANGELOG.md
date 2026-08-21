@@ -26,6 +26,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :bug: Bug Fixes
 
 * fix(sdk-node): support `headers_list` when creating OTLP exporters from declarative configuration [#6953](https://github.com/open-telemetry/opentelemetry-js/issues/6953) @JacksonWeber
+* fix(otlp-exporter-base): drain the fetch response body so that browsers release the keepalive quota [#7002](https://github.com/open-telemetry/opentelemetry-js/pull/7002) @anneheartrecord
 
 ### :books: Documentation
 
