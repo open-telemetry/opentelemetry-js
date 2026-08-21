@@ -36,12 +36,6 @@ import {
 } from './utils';
 import { VERSION } from './version';
 
-// how long to wait for observer to collect information about resources
-// this is needed as event "load" is called before observer
-// hard to say how long it should really wait, seems like 300ms is
-// safe enough
-const OBSERVER_WAIT_TIME_MS = 300;
-
 const hasBrowserPerformanceAPI = typeof PerformanceObserver !== 'undefined';
 
 export interface FetchCustomAttributeFunction {
@@ -249,12 +243,13 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   ): void {
     let resources: PerformanceResourceTiming[] = resourcesObserver.entries;
     if (!resources.length) {
-      if (!performance.getEntriesByType) {
+      if (resourcesObserver.observer || !performance.getEntriesByType) {
+        // This span has its own PerformanceObserver: only the entries it
+        // collected are used, never the getEntriesByType fallback.
         return;
       }
-      // fallback - either Observer is not available or it took longer
-      // then OBSERVER_WAIT_TIME_MS and observer didn't collect enough
-      // information
+      // No PerformanceObserver available in this environment: fall back to
+      // the global resource timing buffer.
       resources = performance.getEntriesByType(
         'resource'
       ) as PerformanceResourceTiming[];
@@ -314,13 +309,27 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       span.setAttribute(ATTR_ERROR_TYPE, String(response.status));
     }
 
-    setTimeout(() => {
-      spanData.observer?.disconnect();
-      this._findResourceAndAddNetworkEvents(span, spanData, performanceEndTime);
-      this._tasksCount--;
-      this._clearResources();
-      span.end(endTime);
-    }, OBSERVER_WAIT_TIME_MS);
+    if (spanData.observer) {
+      // Drain entries the observer has captured but not yet delivered to
+      // its callback — still the observer's own data, never a fallback to
+      // performance.getEntriesByType. Applies the same filter as the
+      // observer callback in _prepareSpanData.
+      const pendingEntries =
+        spanData.observer.takeRecords() as PerformanceResourceTiming[];
+      pendingEntries.forEach(entry => {
+        if (
+          entry.initiatorType === 'fetch' &&
+          entry.name === spanData.spanUrl
+        ) {
+          spanData.entries.push(entry);
+        }
+      });
+      spanData.observer.disconnect();
+    }
+    this._findResourceAndAddNetworkEvents(span, spanData, performanceEndTime);
+    this._tasksCount--;
+    this._clearResources();
+    span.end(endTime);
   }
 
   /**
