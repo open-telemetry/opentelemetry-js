@@ -7,7 +7,10 @@ import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { TracerProvider, SimpleSpanProcessor } from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { OTLPTraceExporter } from '../../src/platform/browser/index';
+import {
+  createOtlpProtoSpanExporter,
+  OTLPTraceExporter,
+} from '../../src/platform/browser/index';
 import { TestMetricReader } from '../utils';
 
 /*
@@ -62,5 +65,33 @@ describe('OTLPTraceExporter', () => {
       assert.ok(scopeMetrics);
       await meterProvider.shutdown();
     });
+  });
+});
+
+describe('createOtlpProtoSpanExporter', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  it('should send data to the default endpoint', async function () {
+    // arrange
+    const stubFetch = sinon
+      .stub(window, 'fetch')
+      .resolves(new Response('', { status: 200 }));
+    const tracerProvider = new TracerProvider({
+      spanProcessors: [
+        new SimpleSpanProcessor({ exporter: createOtlpProtoSpanExporter() }),
+      ],
+    });
+
+    // act
+    tracerProvider.getTracer('test-tracer').startSpan('test-span').end();
+    await tracerProvider.shutdown();
+
+    // assert
+    assert.strictEqual(
+      stubFetch.firstCall.args[0],
+      'http://localhost:4318/v1/traces'
+    );
   });
 });

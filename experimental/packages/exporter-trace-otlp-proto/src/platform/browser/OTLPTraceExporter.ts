@@ -36,3 +36,28 @@ export class OTLPTraceExporter
     );
   }
 }
+
+/**
+ * Creates a span exporter that sends data over OTLP/HTTP with protobuf
+ * encoding.
+ *
+ * The created exporter does not use `OTEL_EXPORTER_OTLP_*` environment
+ * variables for configuration: options that are not provided in `config` fall
+ * back to the defaults defined by the OTLP exporter specification. Reading
+ * configuration from the environment is the caller's responsibility.
+ */
+export function createOtlpProtoSpanExporter(
+  config: OTLPExporterConfigBase = {}
+): SpanExporter {
+  return new OTLPExporterBase(
+    createLegacyOtlpBrowserExportDelegate(
+      config,
+      ProtobufTraceSerializer,
+      OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_SPAN_EXPORTER,
+      TraceExporterMetricsHelper,
+      config.selfObsMeterProvider,
+      DEFAULT_COLLECTOR_RESOURCE_PATH,
+      { 'Content-Type': 'application/x-protobuf' }
+    )
+  );
+}
