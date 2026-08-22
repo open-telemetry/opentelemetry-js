@@ -17,12 +17,13 @@ describe('parseRetryAfterToMills', function () {
     ['-100', -1],
     ['1000', 1000 * 1000],
     [' 5 ', 5 * 1000],
-    ['1000abc', 0],
+    ['1000abc', undefined],
+    ['not-a-date', undefined],
     // future timestamp
     ['Fri, 20 Jan 2023 00:00:01 GMT', 1000],
     // Past timestamp
     ['Fri, 19 Jan 2023 23:59:59 GMT', 0],
-  ] as [string | null, number][];
+  ] as [string | null, number | undefined][];
 
   afterEach(() => {
     sinon.restore();
