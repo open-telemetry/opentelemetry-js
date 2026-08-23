@@ -9,6 +9,15 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :boom: Breaking Changes
 
 * fix(sdk-node)!: fail-fast on Propagator creation from config file [#6930](https://github.com/open-telemetry/opentelemetry-js/pull/6930) @trentm
+* fix(sdk-node)!: fail-fast on MeterProvider creation from config file [#6954](https://github.com/open-telemetry/opentelemetry-js/pull/6954) @trentm
+* fix(sdk-node)!: fail-fast on TracerProvider creation from config file [#6962](https://github.com/open-telemetry/opentelemetry-js/pull/6962) @trentm
+* fix(sdk-node)!: fail-fast on Resource creation from config file [#6989](https://github.com/open-telemetry/opentelemetry-js/pull/6989) @trentm
+  * This also breaks some usage of `startNodeSDK()` for *environment-based* config, i.e. when *not* using a config file. For example with `OTEL_NODE_RESOURCE_DETECTORS=all`, it results in an error message and a no-op SDK.
+    (This does not impact users of `new NodeSDK()` -- the currently recommended mechanism to start an SDK using this package.)
+
+    ```bash
+    Could not create OpenTelemetry SDK from configuration, SDK will not be setup: unknown ExperimentalResourceDetector name in configuration: "container"
+    ```
 
 ### :rocket: Features
 
@@ -16,10 +25,14 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(sdk-node): support `headers_list` when creating OTLP exporters from declarative configuration [#6953](https://github.com/open-telemetry/opentelemetry-js/issues/6953) @JacksonWeber
 * fix(instrumentation-fetch): end spans when the response body is consumed instead of after a fixed observer wait [#6971](https://github.com/open-telemetry/opentelemetry-js/pull/6971) @pacocartones
   * (user-facing): `span.end()` now runs in the same microtask as the synchronous portion of `applyCustomAttributesOnSpan`, rather than up to 300 ms later. A hook that starts asynchronous work (for example `res.clone().json().then(b => span.setAttribute(...))`) previously had that window and the attribute landed; such a deferred `setAttribute` is now dropped, with only the SDK generic "Cannot execute the operation on ended Span" warning. The hook signature is synchronous, so only synchronous use is supported.
 
 ### :books: Documentation
+
+* docs(sdk-logs): mark logger configuration as experimental [#6996](https://github.com/open-telemetry/opentelemetry-js/pull/6996) @LarryHu0217
+* docs(configuration): document the `ConfigModel` suffix naming convention for exported types [#6612](https://github.com/open-telemetry/opentelemetry-js/issues/6612) @vedantchalke36
 
 ### :house: Internal
 
