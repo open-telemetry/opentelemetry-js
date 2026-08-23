@@ -139,6 +139,12 @@ When no config file is set, the factory reads from the standard OpenTelemetry SD
 
 See [`src/EnvironmentConfigFactory.ts`](src/EnvironmentConfigFactory.ts) for the exact parsing logic.
 
+## Exported types
+
+Types exported from this package that model configuration data use a `ConfigModel` suffix (e.g. `SamplerConfigModel`, `SpanExporterConfigModel`) rather than their schema name (e.g. `Sampler`, `SpanExporter`). This keeps them from colliding with the SDK runtime types of the same name. The root type is `ConfigurationModel`.
+
+Internally the package uses the schema names from `src/generated/types.ts`; the renaming happens at export time in `src/index.ts`. Follow this convention when adding new exports.
+
 ## Development
 
 ### Generated files

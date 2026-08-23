@@ -5,11 +5,11 @@ logger_provider:
   processors:
     - # Configure a batch log record processor.
       batch:
-        # Configure delay interval (in milliseconds) between two consecutive exports. 
+        # Configure delay interval (in milliseconds) between two consecutive exports.
         # Value must be non-negative.
         # If omitted or null, 1000 is used.
         schedule_delay: 5000
-        # Configure maximum allowed time (in milliseconds) to export data. 
+        # Configure maximum allowed time (in milliseconds) to export data.
         # Value must be non-negative. A value of 0 indicates no limit (infinity).
         # If omitted or null, 30000 is used.
         export_timeout: 30000
@@ -25,9 +25,9 @@ logger_provider:
           otlp_http:
             endpoint: http://localhost:4318/v1/logs
             tls:
-              ca_file: /app/cert.pem
-              key_file: /app/cert.pem
-              cert_file: /app/cert.pem
+              ca_file: ${TEST_DIR}/certs/ca.crt
+              key_file: ${TEST_DIR}/certs/client.key
+              cert_file: ${TEST_DIR}/certs/client.crt
             headers:
               - name: api-key
                 value: "1234"
@@ -43,9 +43,9 @@ logger_provider:
           otlp_grpc:
             endpoint: http://localhost:4317
             tls:
-              ca_file: /app/cert.pem
-              key_file: /app/cert.pem
-              cert_file: /app/cert.pem
+              ca_file: ${TEST_DIR}/certs/ca.crt
+              key_file: ${TEST_DIR}/certs/client.key
+              cert_file: ${TEST_DIR}/certs/client.crt
               insecure: false
             headers:
               - name: api-key
@@ -61,11 +61,11 @@ logger_provider:
           console:
   # Configure log record limits. See also attribute_limits.
   limits:
-    # Configure max attribute value size. Overrides .attribute_limits.attribute_value_length_limit. 
+    # Configure max attribute value size. Overrides .attribute_limits.attribute_value_length_limit.
     # Value must be non-negative.
     # If omitted or null, there is no limit.
     attribute_value_length_limit: 4096
-    # Configure max attribute count. Overrides .attribute_limits.attribute_count_limit. 
+    # Configure max attribute count. Overrides .attribute_limits.attribute_count_limit.
     # Value must be non-negative.
     # If omitted or null, 128 is used.
     attribute_count_limit: 128

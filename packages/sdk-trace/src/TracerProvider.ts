@@ -13,7 +13,11 @@ import { defaultResource } from '@opentelemetry/resources';
 import type { SpanProcessor } from './SpanProcessor';
 import { Tracer } from './Tracer';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
-import type { TracerProviderOptions, TracerOptions } from './types';
+import type {
+  ForceFlushOptions,
+  TracerProviderOptions,
+  TracerOptions,
+} from './types';
 import { ParentBasedSampler } from './sampler/ParentBasedSampler';
 import { AlwaysOnSampler } from './sampler/AlwaysOnSampler';
 import { RandomIdGenerator } from './platform';
@@ -94,8 +98,8 @@ export class TracerProvider implements ApiTracerProvider {
     return this._tracers.get(key)!;
   }
 
-  forceFlush(): Promise<void> {
-    const timeout = this._forceFlushTimeoutMillis;
+  forceFlush(options?: ForceFlushOptions): Promise<void> {
+    const timeout = options?.timeoutMillis ?? this._forceFlushTimeoutMillis;
     const promises = this._activeSpanProcessor['_spanProcessors'].map(
       (spanProcessor: SpanProcessor) => {
         return new Promise(resolve => {

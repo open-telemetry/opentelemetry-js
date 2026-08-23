@@ -97,10 +97,6 @@ new MeterProvider({
 });
 ```
 
-## Example
-
-See [examples/opencensus-shim](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/examples/opencensus-shim) for a short example.
-
 ## License
 
 Apache 2.0 - See [LICENSE][license-url] for more information.

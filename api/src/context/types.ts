@@ -33,6 +33,17 @@ export interface Context {
 }
 
 /**
+ * A scope token returned by {@link ContextManager.attach} that restores the previous
+ * {@link Context} when disposed. Call `token.dispose()` to restore the previous context.
+ *
+ * @since 1.10.0
+ * @experimental This API is experimental and may change in minor releases without prior notice.
+ */
+export interface ContextManagementToken {
+  dispose(): void;
+}
+
+/**
  * @since 1.0.0
  */
 export interface ContextManager {
@@ -71,4 +82,26 @@ export interface ContextManager {
    * Disable context management
    */
   disable(): this;
+
+  /**
+   * Imperatively sets `context` as active, returning a {@link ContextManagementToken} whose
+   * {@link ContextManagementToken.dispose} method restores the previous context.
+   *
+   * This is a delicate, low-level API - prefer {@link with}/{@link bind}, which
+   * restore context automatically. `attach` exists only to bridge callback
+   * boundaries that `with` cannot wrap. The caller is responsible for disposing
+   * the token via `token.dispose()` when the operation is complete. Support is
+   * optional and best-effort; when omitted, {@link ContextAPI.attach} logs a
+   * warning and returns a no-op token.
+   *
+   * **Caveat for async functions:** If called inside an async function before
+   * the first `await`, the context change may leak into the caller's context
+   * and remain active there. Prefer {@link with} for async code.
+   *
+   * @param context The Context to attach
+   * @returns A {@link ContextManagementToken} whose dispose() restores the previous Context
+   * @since 1.10.0
+   * @experimental This API is experimental and may change in minor releases without prior notice.
+   */
+  attach?(context: Context): ContextManagementToken;
 }

@@ -15,38 +15,17 @@ import {
   trace,
   propagation,
 } from '@opentelemetry/api';
-import {
-  getIdGeneratorFromConfiguration,
-  getSamplerFromConfiguration,
-  getInstanceID,
-  getMeterReadersFromConfiguration,
-  getMeterViewsFromConfiguration,
-  getResourceDetectorsFromConfiguration,
-  getResourceFromConfiguration,
-  getSpanProcessorsFromConfiguration,
-} from './utils';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import type { SDKComponents, SDKOptions } from './types';
-import { MeterProvider } from '@opentelemetry/sdk-metrics';
-import { TracerProvider } from '@opentelemetry/sdk-trace';
 import { logs } from '@opentelemetry/api-logs';
-import type {
-  Resource,
-  ResourceDetectionConfig,
-  ResourceDetector,
-} from '@opentelemetry/resources';
-import {
-  defaultResource,
-  detectResources,
-  resourceFromAttributes,
-} from '@opentelemetry/resources';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
-import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
 import { diagLogLevelFromSeverityNumberConfig } from './diag';
 import {
   createLoggerProviderFromConfig,
+  createMeterProviderFromConfig,
   createPropagatorFromConfig,
-  createSpanLimitsFromConfig,
+  createResourceFromConfig,
+  createTracerProviderFromConfig,
 } from './create-from-config';
 
 // Exported for testing.
@@ -90,7 +69,9 @@ export function startNodeSDK(sdkOptions?: SDKOptions): {
   try {
     components = create(config, sdkOptions);
   } catch (createErr) {
-    diag.error(`Could not create OpenTelemetry SDK: ${createErr.message}`);
+    diag.error(
+      `Could not create OpenTelemetry SDK from configuration, SDK will not be setup: ${createErr.message}`
+    );
     return NOOP_SDK;
   }
   if (components.contextManager) {
@@ -138,7 +119,7 @@ function create(
     components.contextManager = new AsyncLocalStorageContextManager();
     components.contextManager.enable();
 
-    const resource = setupResource(config, sdkOptions);
+    const resource = createResourceFromConfig(config.resource);
 
     if (sdkOptions?.textMapPropagator !== undefined) {
       if (sdkOptions.textMapPropagator !== null) {
@@ -156,33 +137,19 @@ function create(
       );
     }
 
-    const meterReaders = getMeterReadersFromConfiguration(config);
-    if (meterReaders) {
-      const meterViews = getMeterViewsFromConfiguration(config);
-      const meterProvider = new MeterProvider({
-        resource: resource,
-        readers: meterReaders,
-        views: meterViews ?? [],
-      });
-      components.meterProvider = meterProvider;
+    if (config.meter_provider) {
+      components.meterProvider = createMeterProviderFromConfig(
+        resource,
+        config.meter_provider
+      );
     }
 
-    const spanProcessors = getSpanProcessorsFromConfiguration(config);
-    if (spanProcessors) {
-      const idGenerator = getIdGeneratorFromConfiguration(config);
-      const sampler = getSamplerFromConfiguration(config);
-      const tracerProvider = new TracerProvider({
+    if (config.tracer_provider) {
+      components.tracerProvider = createTracerProviderFromConfig(
         resource,
-        spanProcessors,
-        idGenerator,
-        sampler,
-        spanLimits: createSpanLimitsFromConfig(
-          config.tracer_provider?.limits,
-          config.attribute_limits
-        ),
-        // TODO (6624): support for `meterProvider: components.meterProvider`
-      });
-      components.tracerProvider = tracerProvider;
+        config.tracer_provider,
+        config.attribute_limits
+      );
     }
 
     return components;
@@ -200,38 +167,4 @@ function create(
 
     throw createErr;
   }
-}
-
-export function setupResource(
-  config: ConfigurationModel,
-  sdkOptions?: SDKOptions
-): Resource {
-  let resource: Resource =
-    getResourceFromConfiguration(config) ?? defaultResource();
-  let resourceDetectors: ResourceDetector[] = [];
-
-  if (sdkOptions?.resourceDetectors != null) {
-    resourceDetectors = sdkOptions.resourceDetectors;
-  } else if (config.resource?.['detection/development']?.detectors) {
-    resourceDetectors = getResourceDetectorsFromConfiguration(config);
-  }
-
-  if (resourceDetectors.length > 0) {
-    const internalConfig: ResourceDetectionConfig = {
-      detectors: resourceDetectors,
-    };
-    resource = resource.merge(detectResources(internalConfig));
-  }
-
-  const instanceId = getInstanceID(config);
-  resource =
-    instanceId === undefined
-      ? resource
-      : resource.merge(
-          resourceFromAttributes({
-            [ATTR_SERVICE_INSTANCE_ID]: instanceId,
-          })
-        );
-
-  return resource;
 }

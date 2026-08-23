@@ -90,7 +90,7 @@
     "ts-loader": "9.5.7",
     "typescript": "5.2.2",
     "webpack": "5.108.4",
-    "webpack-cli": "7.2.1"
+    "webpack-cli": "7.2.2"
   },
   "dependencies": {
     "@opentelemetry/api-logs": "0.221.0",

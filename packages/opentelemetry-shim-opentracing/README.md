@@ -47,8 +47,6 @@ new TracerShim(tracer, {
 
 If propagators are not specified, OpenTelemetry's global propagator will be used.
 
-See [examples/opentracing-shim](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/opentracing-shim) for a short example.
-
 ## License
 
 Apache 2.0 - See [LICENSE][license-url] for more information.

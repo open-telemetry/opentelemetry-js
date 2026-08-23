@@ -10,6 +10,7 @@ import { diag } from '@opentelemetry/api';
 import type { ConfigurationModel } from '../src';
 import { createConfigFactory } from '../src/ConfigFactory';
 import {
+  mergeHeadersConfig,
   mergeResourceAttributesConfig,
   mergePropagatorCompositeConfig,
   parseConfigFile,
@@ -1270,6 +1271,36 @@ describe('mergeResourceAttributesConfig', function () {
       warnStub.restore();
     });
   }
+});
+
+describe('mergeHeadersConfig', function () {
+  it('returns undefined when headers are not set', function () {
+    assert.strictEqual(mergeHeadersConfig(undefined, undefined), undefined);
+  });
+
+  it('returns headers when headers are set', function () {
+    assert.deepStrictEqual(
+      mergeHeadersConfig([{ name: 'x-test-header', value: 'test-value' }]),
+      { 'x-test-header': 'test-value' }
+    );
+  });
+
+  it('parses headers_list and lets headers take precedence', function () {
+    assert.deepStrictEqual(
+      mergeHeadersConfig(
+        [
+          { name: 'shared', value: 'from-headers' },
+          { name: 'ignored', value: null },
+        ],
+        'shared=from-list,list-only=hello%20world,ignored=from-list'
+      ),
+      {
+        shared: 'from-headers',
+        'list-only': 'hello world',
+        ignored: 'from-list',
+      }
+    );
+  });
 });
 
 describe('mergePropagatorCompositeConfig', function () {

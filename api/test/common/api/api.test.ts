@@ -17,6 +17,7 @@ import api, {
   defaultTextMapGetter,
   defaultTextMapSetter,
   diag,
+  DiagLogLevel,
   metrics,
   propagation,
   ROOT_CONTEXT,
@@ -77,6 +78,58 @@ describe('API', function () {
         context.with(ROOT_CONTEXT, () => 3.14),
         3.14
       );
+    });
+
+    describe('attach when the ContextManager does not implement it', function () {
+      afterEach(() => {
+        context.disable();
+        diag.disable();
+      });
+
+      it('should warn and no-op rather than throw', function () {
+        const warnings: string[] = [];
+        diag.setLogger(
+          {
+            verbose() {},
+            debug() {},
+            info() {},
+            warn(message: string) {
+              warnings.push(message);
+            },
+            error() {},
+          },
+          DiagLogLevel.ALL
+        );
+
+        // a minimal ContextManager that omits the optional attach()
+        context.setGlobalContextManager({
+          active: () => ROOT_CONTEXT,
+          with: (_ctx: Context, fn: () => unknown) => fn(),
+          bind: (_ctx: Context, target: unknown) => target,
+          enable() {
+            return this;
+          },
+          disable() {
+            return this;
+          },
+        } as any);
+
+        // Call attach multiple times to verify we warn at most once.
+        const token = context.attach(ROOT_CONTEXT);
+        context.attach(ROOT_CONTEXT);
+        assert.ok(token, 'attach() still returns a no-op token');
+        assert.doesNotThrow(() => {
+          token.dispose();
+          token.dispose();
+        });
+
+        assert.strictEqual(
+          warnings.length,
+          1,
+          'should warn once for unsupported attach()'
+        );
+        assert.ok(/attach\(\)/.test(warnings[0]));
+      });
     });
   });
 

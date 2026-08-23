@@ -66,6 +66,11 @@ configuration as specified in [config.ts](./src/config.ts)
 
 ## Logger Configuration
 
+**Experimental:** `LoggerConfigurator` and the filtering options described in
+this section are experimental and opt-in. They do not alter log processing
+unless a `loggerConfigurator` is explicitly configured, and their APIs may
+change in future releases.
+
 The SDK supports advanced logger configuration through the `LoggerConfigurator` API, which allows you to:
 
 - **Filter logs by minimum severity level** - Drop logs below a configured severity threshold

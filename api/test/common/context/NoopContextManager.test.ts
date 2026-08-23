@@ -120,4 +120,19 @@ describe('NoopContextManager', function () {
       contextManager.enable();
     });
   });
+
+  describe('.attach()', function () {
+    it('should be a no-op that keeps ROOT_CONTEXT active', function () {
+      const key = createContextKey('test key 1');
+      const test = ROOT_CONTEXT.setValue(key, 1);
+      const token = contextManager.attach(test);
+      assert.strictEqual(
+        contextManager.active(),
+        ROOT_CONTEXT,
+        'attach should not change the active context'
+      );
+      assert.doesNotThrow(() => token.dispose());
+      assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+    });
+  });
 });
