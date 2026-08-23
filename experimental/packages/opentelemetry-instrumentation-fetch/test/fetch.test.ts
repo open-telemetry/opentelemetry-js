@@ -42,9 +42,10 @@ import {
 import * as msw from 'msw';
 import { setupWorker } from 'msw/browser';
 
-// Settle delay kept for tests written against the previous implementation,
-// which deferred span end by this amount; span end is now synchronous.
-const OBSERVER_WAIT_TIME_MS = 300;
+// Settle delay used by tests that need to wait for work the instrumentation
+// does not signal. Nothing in the implementation is an observer wait any
+// more, hence the neutral name.
+const SETTLE_DELAY_MS = 300;
 
 class DummySpanExporter implements tracing.SpanExporter {
   readonly exported: tracing.ReadableSpan[][] = [];
@@ -316,7 +317,7 @@ describe('fetch', () => {
       );
       assert.ok(module instanceof WebAssembly.Module);
 
-      await waitFor(OBSERVER_WAIT_TIME_MS + 50);
+      await waitFor(SETTLE_DELAY_MS + 50);
     });
   });
 
@@ -508,7 +509,7 @@ describe('fetch', () => {
       });
 
       describe('span end timing', () => {
-        it('should end the span once the response body is consumed, without waiting for OBSERVER_WAIT_TIME_MS', async () => {
+        it('should end the span once the response body is consumed, without any deferred timer', async () => {
           await startWorker(
             msw.http.get('/api/status.json', () => {
               return msw.HttpResponse.json({ ok: true });
@@ -552,6 +553,23 @@ describe('fetch', () => {
               dummySpanExporter.exported.length,
               1,
               'span was not finished as soon as the response body was consumed'
+            );
+
+            // One-sided "ended by now" is not enough: assert no timer was
+            // left pending, so a regression that reintroduces a deferred
+            // end cannot keep this green, and assert the identity of the
+            // exported span so that one which never really ran the fetch
+            // path would not satisfy it either.
+            assert.strictEqual(
+              clock.countTimers(),
+              0,
+              'span end must not depend on a pending timer'
+            );
+            const [exportedSpan] = dummySpanExporter.exported[0];
+            assert.strictEqual(exportedSpan.name, 'GET');
+            assert.ok(
+              exportedSpan.endTime[0] > 0,
+              'exported span has no end time'
             );
           } finally {
             clock.restore();
@@ -2089,19 +2107,109 @@ describe('fetch', () => {
         });
       });
 
+      // The drain added in _endSpan is otherwise only covered by a race:
+      // in Chrome the observer callback happens to run first, so deleting
+      // takeRecords() could leave the describe above green. Starving the
+      // callback makes the drain the only possible source of entries.
+      describe('when the `PerformanceObserver` callback never runs', () => {
+        if (!PerformanceObserver?.supportedEntryTypes?.includes('resource')) {
+          // eslint-disable-next-line no-console
+          console.warn(
+            'Testing in an environment without `PerformanceObserver`!'
+          );
+
+          return;
+        }
+
+        let getEntriesByTypeStub: sinon.SinonStub | undefined;
+
+        beforeEach(async () => {
+          // Entries can then only reach the span through takeRecords().
+          const RealPO = window.PerformanceObserver;
+          const starved = sinon
+            .stub(window, 'PerformanceObserver')
+            .callsFake(() => new RealPO(() => {}));
+          // The instrumentation checks supportedEntryTypes before observing.
+          (
+            starved as unknown as { supportedEntryTypes: readonly string[] }
+          ).supportedEntryTypes = RealPO.supportedEntryTypes;
+
+          getEntriesByTypeStub = sinon
+            .stub(performance, 'getEntriesByType')
+            .throws();
+
+          await tracedFetch({ config: {} });
+        });
+
+        afterEach(() => {
+          assert.strictEqual(
+            getEntriesByTypeStub?.notCalled,
+            true,
+            'should not call performance.getEntriesByType'
+          );
+          getEntriesByTypeStub = undefined;
+        });
+
+        it('span should still have correct events, sourced from takeRecords()', () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          const events = span.events;
+          assert.strictEqual(events.length, 8, 'number of events is wrong');
+          testForCorrectEvents(events, [
+            PTN.FETCH_START,
+            PTN.DOMAIN_LOOKUP_START,
+            PTN.DOMAIN_LOOKUP_END,
+            PTN.CONNECT_START,
+            PTN.CONNECT_END,
+            PTN.REQUEST_START,
+            PTN.RESPONSE_START,
+            PTN.RESPONSE_END,
+          ]);
+        });
+      });
+
+      // The rejected-fetch path (onError -> endSpanOnError -> _endSpan) was
+      // not exercised anywhere in this file. It has to end the span, drop
+      // _tasksCount and disconnect the observer synchronously, exactly like
+      // the success path.
+      describe('when the fetch rejects', () => {
+        it('should end the span and disconnect the observer', async () => {
+          await startWorker(
+            msw.http.get('/api/status.json', () => {
+              return msw.HttpResponse.error();
+            })
+          );
+
+          const rootSpan = await trace(async () => {
+            await assert.rejects(fetch('/api/status.json'), TypeError);
+          });
+
+          assert.strictEqual(
+            exportedSpans.length,
+            1,
+            'the span for a rejected fetch must still be exported'
+          );
+
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          assert.strictEqual(
+            span.parentSpanContext?.spanId,
+            rootSpan.spanContext().spanId,
+            'parent span is not root span'
+          );
+          assert.ok(span.endTime[0] > 0, 'span was not ended');
+          // The root afterEach asserts no PerformanceObserver was leaked,
+          // which covers the disconnect on this path.
+        });
+      });
+
       describe('when `PerformanceObserver` is NOT available', () => {
         beforeEach(async () => {
           sinon.stub(window, 'PerformanceObserver').value(undefined);
 
-          // The implementation used to defer span end by a hardcoded
-          // OBSERVER_WAIT_TIME_MS so that resource timing entries could
-          // be collected first; it now ends the span synchronously once
-          // the response body is consumed (via the getEntriesByType
-          // fallback when no PerformanceObserver is available). This wait
-          // is kept as a defensive settle so the assertions below run
-          // after any in-flight export.
-          waitForPerformanceObservers = () =>
-            waitFor(OBSERVER_WAIT_TIME_MS + 50);
+          // No observer is created here, so there is no disconnect to await,
+          // and the default callback never consumes the body: this waits for
+          // the instrumentation's own clone reader to drain and end the span.
+          // Removing it fails both child describes below with `0 !== 1`.
+          waitForPerformanceObservers = () => waitFor(SETTLE_DELAY_MS + 50);
         });
 
         // The assertions are essentially the same as the tests from above, but
