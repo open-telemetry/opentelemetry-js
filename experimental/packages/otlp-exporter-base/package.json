@@ -86,7 +86,7 @@
     "@types/sinon": "17.0.4",
     "babel-plugin-istanbul": "8.0.0",
     "karma": "6.4.4",
-    "karma-chrome-launcher": "3.1.0",
+    "karma-chrome-launcher": "3.2.0",
     "karma-coverage": "2.2.1",
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.36",
