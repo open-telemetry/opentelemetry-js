@@ -17,6 +17,10 @@ All notable changes to this project will be documented in this file.
 
 ### :books: Documentation
 
+* docs(api): complete `@since` annotations for the public API [#7023](https://github.com/open-telemetry/opentelemetry-js/pull/7023) @nabeelamjadsheikh
+  * Adds the three missing exported-type annotations and the member-level annotations for methods and properties introduced after their enclosing type.
+  * Corrects `Attributes`, `AttributeValue` and `TracerOptions` from `1.3.0` to `1.1.0`; all three were already importable in 1.1.0 via wildcard re-export.
+
 ### :house: Internal
 
 * perf(api): add getGlobal fast-path [#6956](https://github.com/open-telemetry/opentelemetry-js/pull/6956) @legendecas
