@@ -19,6 +19,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :bug: Bug Fixes
 
 * fix(sdk-node): support `headers_list` when creating OTLP exporters from declarative configuration [#6953](https://github.com/open-telemetry/opentelemetry-js/issues/6953) @JacksonWeber
+* fix(otlp-exporter-base): parse the `Retry-After` delay strictly so a malformed value falls back to exponential backoff [#7010](https://github.com/open-telemetry/opentelemetry-js/pull/7010) @rajanpanth
 
 ### :books: Documentation
 
