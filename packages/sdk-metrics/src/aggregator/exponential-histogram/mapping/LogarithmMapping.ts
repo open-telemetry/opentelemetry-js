@@ -33,7 +33,7 @@ export class LogarithmMapping implements Mapping {
     }
 
     // exact power of two special case
-    if (ieee754.getSignificand(value) === 0) {
+    if (ieee754.isPowerOfTwo(value)) {
       const exp = ieee754.getNormalBase2(value);
       return (exp << this._scale) - 1;
     }
