@@ -12,6 +12,25 @@ These samplers provide the implementation for (the experimental) [Consistent Pro
 
 To get started you will need to install a compatible OpenTelemetry SDK.
 
+### ProbabilitySampler
+
+[`ProbabilitySampler`](https://opentelemetry.io/docs/specs/otel/trace/sdk/#probabilitysampler) is the
+non-composable form of probability sampling, for use directly as an SDK sampler. It replaces the
+deprecated `TraceIdRatioBasedSampler` from `@opentelemetry/sdk-trace`, whose algorithm was never
+specified and therefore samples a different set of traces than other language SDKs given the same
+input.
+
+```typescript
+import { createProbabilitySampler } from '@opentelemetry/sampler-composite';
+
+// sample 10% of traces, consistently across every SDK that handles the trace
+const sampler = createProbabilitySampler(0.1);
+```
+
+As the specification requires, this sampler ignores the parent `SampledFlag`. To respect it, use the
+sampler as a delegate of `ParentBasedSampler`, or use `createComposableParentThresholdSampler` as
+shown below.
+
 ### Samplers
 
 This module exports samplers that follow the general behavior of the standard SDK samplers, but ensuring

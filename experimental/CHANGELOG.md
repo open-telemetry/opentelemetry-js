@@ -21,6 +21,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(sampler-composite): add `createProbabilitySampler()` [#6541](https://github.com/open-telemetry/opentelemetry-js/issues/6541) @nabeelamjadsheikh
+  * Implements the specification's `ProbabilitySampler`, the non-composable form of probability sampling, for direct use as an SDK sampler. Unlike the deprecated `TraceIdRatioBasedSampler`, it samples consistently across SDKs by using the randomness features of W3C Trace Context Level 2.
 * feat(sdk-logs): deprecate `SdkLogRecord` in favor of `ReadWriteLogRecord` [#6939](https://github.com/open-telemetry/opentelemetry-js/pull/6939) @pichlermarc
 
 ### :bug: Bug Fixes
