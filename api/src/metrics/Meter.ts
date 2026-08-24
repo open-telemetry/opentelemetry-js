@@ -43,6 +43,8 @@ export interface Meter {
    * Creates and returns a new `Gauge`.
    * @param name the name of the metric.
    * @param [options] the metric options.
+   *
+   * @since 1.9.0
    */
   createGauge<AttributesTypes extends MetricAttributes = MetricAttributes>(
     name: string,
