@@ -16,7 +16,7 @@ npm install --save @opentelemetry/exporter-logs-otlp-proto
 ## Further Documentation
 
 To see documentation and sample code for the traces exporter, as well as instructions for using TLS, see the [exporter-trace-otlp-proto package][trace-exporter-url].
-To see documentation and sample code for the metric exporter, see the [exporter-trace-otlp-proto package][metrics-exporter-url].
+To see documentation and sample code for the metric exporter, see the [opentelemetry-exporter-metrics-otlp-proto package][metrics-exporter-url].
 
 ## Example Setup
 
@@ -105,5 +105,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-logs-otlp-proto
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-logs-otlp-proto.svg
-[trace-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/exporter-trace-otlp-proto
+[trace-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-trace-otlp-proto
 [metrics-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-proto

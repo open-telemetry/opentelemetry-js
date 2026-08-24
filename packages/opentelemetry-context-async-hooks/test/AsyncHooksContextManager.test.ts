@@ -492,5 +492,238 @@ for (const contextManagerClass of [
         patchedEE.emit('test');
       });
     });
+
+    if (contextManagerClass.name === 'AsyncLocalStorageContextManager') {
+      describe('.attach()', function () {
+        it('should attach and restore context via token.dispose()', () => {
+          const context1 = ROOT_CONTEXT.setValue(key1, 1);
+          assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+
+          const token1 = (
+            contextManager as AsyncLocalStorageContextManager
+          ).attach(context1);
+          assert.strictEqual(contextManager.active(), context1);
+
+          token1.dispose();
+          assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+        });
+
+        it('should support nested attach with token.dispose()', function () {
+          const context1 = ROOT_CONTEXT.setValue(key1, 1);
+          const context2 = ROOT_CONTEXT.setValue(key1, 2);
+          const context3 = ROOT_CONTEXT.setValue(key1, 3);
+
+          assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+
+          const token1 = (
+            contextManager as AsyncLocalStorageContextManager
+          ).attach(context1);
+          assert.strictEqual(contextManager.active(), context1);
+
+          const token2 = (
+            contextManager as AsyncLocalStorageContextManager
+          ).attach(context2);
+          assert.strictEqual(contextManager.active(), context2);
+
+          const token3 = (
+            contextManager as AsyncLocalStorageContextManager
+          ).attach(context3);
+          assert.strictEqual(contextManager.active(), context3);
+
+          token3.dispose();
+          assert.strictEqual(contextManager.active(), context2);
+
+          token2.dispose();
+          assert.strictEqual(contextManager.active(), context1);
+
+          token1.dispose();
+          assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+        });
+
+        it('should work with async operations', async function () {
+          const context1 = ROOT_CONTEXT.setValue(key1, 1);
+          const token1 = (
+            contextManager as AsyncLocalStorageContextManager
+          ).attach(context1);
+
+          assert.strictEqual(contextManager.active(), context1);
+
+          await new Promise(resolve => {
+            setImmediate(() => {
+              assert.strictEqual(contextManager.active(), context1);
+              resolve(undefined);
+            });
+          });
+
+          assert.strictEqual(contextManager.active(), context1);
+
+          token1.dispose();
+          assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+        });
+
+        it('should interact correctly with .with()', function () {
+          const context1 = ROOT_CONTEXT.setValue(key1, 1);
+          const context2 = ROOT_CONTEXT.setValue(key1, 2);
+
+          const token1 = (
+            contextManager as AsyncLocalStorageContextManager
+          ).attach(context1);
+          assert.strictEqual(contextManager.active(), context1);
+
+          contextManager.with(context2, () => {
+            assert.strictEqual(contextManager.active(), context2);
+          });
+
+          assert.strictEqual(contextManager.active(), context1);
+
+          token1.dispose();
+          assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+        });
+
+        it('should maintain context across attach inside with()', function () {
+          const context1 = ROOT_CONTEXT.setValue(key1, 1);
+          const context2 = ROOT_CONTEXT.setValue(key1, 2);
+          const context3 = ROOT_CONTEXT.setValue(key1, 3);
+
+          const token1 = (
+            contextManager as AsyncLocalStorageContextManager
+          ).attach(context1);
+          assert.strictEqual(contextManager.active(), context1);
+
+          contextManager.with(context2, () => {
+            assert.strictEqual(contextManager.active(), context2);
+
+            const token3 = (
+              contextManager as AsyncLocalStorageContextManager
+            ).attach(context3);
+            assert.strictEqual(contextManager.active(), context3);
+
+            token3.dispose();
+            // After detach within with(), we should be back to context2
+            assert.strictEqual(contextManager.active(), context2);
+          });
+
+          // After exiting with(), we should be back to context1
+          assert.strictEqual(contextManager.active(), context1);
+
+          token1.dispose();
+          assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+        });
+
+        it('should work with bound functions after attach', function () {
+          const context1 = ROOT_CONTEXT.setValue(key1, 1);
+          const context2 = ROOT_CONTEXT.setValue(key1, 2);
+
+          const token1 = (
+            contextManager as AsyncLocalStorageContextManager
+          ).attach(context1);
+          assert.strictEqual(contextManager.active(), context1);
+
+          const fn = contextManager.bind(context2, () => {
+            return contextManager.active();
+          });
+
+          const result = fn();
+          assert.strictEqual(result, context2);
+
+          // After bound function executes, we should be back to context1
+          assert.strictEqual(contextManager.active(), context1);
+
+          token1.dispose();
+          assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+        });
+
+        it('should handle multiple attach/dispose sequences', function () {
+          const context1 = ROOT_CONTEXT.setValue(key1, 1);
+          const context2 = ROOT_CONTEXT.setValue(key1, 2);
+
+          // First sequence
+          const token1 = (
+            contextManager as AsyncLocalStorageContextManager
+          ).attach(context1);
+          assert.strictEqual(contextManager.active(), context1);
+          token1.dispose();
+          assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+
+          // Second sequence
+          const token2 = (
+            contextManager as AsyncLocalStorageContextManager
+          ).attach(context2);
+          assert.strictEqual(contextManager.active(), context2);
+          token2.dispose();
+          assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+        });
+
+        it('should propagate context to promises after attach', async function () {
+          const context1 = ROOT_CONTEXT.setValue(key1, 1);
+          const token1 = (
+            contextManager as AsyncLocalStorageContextManager
+          ).attach(context1);
+
+          assert.strictEqual(contextManager.active(), context1);
+
+          const result = await Promise.resolve().then(() => {
+            return contextManager.active();
+          });
+
+          assert.strictEqual(result, context1);
+          assert.strictEqual(contextManager.active(), context1);
+
+          token1.dispose();
+          assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+        });
+
+        it('should not leak an attached context into a concurrent sibling async chain', async function () {
+          // enterWith() only affects the current async execution chain, so two
+          // concurrent chains that each attach() their own context must not
+          // observe each other's context, even while both are still attached.
+          const cm = contextManager as AsyncLocalStorageContextManager;
+          const contextA = ROOT_CONTEXT.setValue(key1, 'A');
+          const contextB = ROOT_CONTEXT.setValue(key1, 'B');
+
+          const chain = (ctx: typeof contextA, ms: number) =>
+            new Promise<void>(resolve => {
+              setTimeout(() => {
+                const token = cm.attach(ctx);
+                assert.strictEqual(cm.active(), ctx);
+                setTimeout(() => {
+                  // By now the sibling chain has attached its own context;
+                  // this chain must still see its own.
+                  assert.strictEqual(
+                    cm.active(),
+                    ctx,
+                    'concurrent sibling chain must not pollute this context'
+                  );
+                  token.dispose();
+                  resolve();
+                }, ms);
+              }, ms);
+            });
+
+          await Promise.all([chain(contextA, 10), chain(contextB, 5)]);
+
+          // The attach() calls happened in timer callbacks (separate async
+          // frames), so the test's own frame is unaffected.
+          assert.strictEqual(cm.active(), ROOT_CONTEXT);
+        });
+
+        it('should work correctly when disabled', function () {
+          contextManager.disable();
+
+          const context1 = ROOT_CONTEXT.setValue(key1, 1);
+          const token1 = (
+            contextManager as AsyncLocalStorageContextManager
+          ).attach(context1);
+
+          // Context should be set even when disabled
+          assert.strictEqual(contextManager.active(), context1);
+
+          token1.dispose();
+          assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
+
+          contextManager.enable();
+        });
+      });
+    }
   });
 }
