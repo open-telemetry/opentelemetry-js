@@ -16,7 +16,7 @@ import { inspect } from 'util';
 import { readFileSync } from 'fs';
 import * as path from 'path';
 
-import type { TextMapPropagator } from '@opentelemetry/api';
+import type { Attributes, TextMapPropagator } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
 import type {
   IdGenerator,
@@ -36,7 +36,20 @@ import {
   TraceIdRatioBasedSampler,
   TracerProvider,
 } from '@opentelemetry/sdk-trace';
-import type { Resource } from '@opentelemetry/resources';
+import type {
+  Resource,
+  DetectedResourceAttributes,
+  ResourceDetector,
+} from '@opentelemetry/resources';
+import {
+  defaultResource,
+  detectResources,
+  hostDetector,
+  osDetector,
+  processDetector,
+  resourceFromAttributes,
+  serviceInstanceIdDetector,
+} from '@opentelemetry/resources';
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
@@ -48,6 +61,7 @@ import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/expor
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
 import {
+  createEmptyMetadata,
   createInsecureCredentials,
   createSslCredentials,
 } from '@opentelemetry/otlp-grpc-exporter-base';
@@ -73,6 +87,7 @@ import type {
   MeterProviderConfigModel,
   MetricProducerConfigModel,
   MetricReaderConfigModel,
+  NameStringValuePairConfigModel,
   OtlpGrpcExporterConfigModel,
   OtlpGrpcMetricExporterConfigModel,
   OtlpHttpExporterConfigModel,
@@ -82,6 +97,7 @@ import type {
   PropagatorConfigModel,
   PullMetricReaderConfigModel,
   PushMetricExporterConfigModel,
+  ResourceConfigModel,
   SamplerConfigModel,
   SimpleLogRecordProcessorConfigModel,
   SimpleSpanProcessorConfigModel,
@@ -93,7 +109,11 @@ import type {
   TracerProviderConfigModel,
   ViewConfigModel,
 } from '@opentelemetry/configuration';
-import { mergePropagatorCompositeConfig } from '@opentelemetry/configuration';
+import {
+  mergeHeadersConfig,
+  mergePropagatorCompositeConfig,
+  mergeResourceAttributesConfig,
+} from '@opentelemetry/configuration';
 import type {
   LogRecordExporter,
   LogRecordProcessor,
@@ -109,6 +129,7 @@ import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import {
   CompositePropagator,
+  getStringFromEnv,
   W3CBaggagePropagator,
   W3CTraceContextPropagator,
 } from '@opentelemetry/core';
@@ -131,13 +152,24 @@ import {
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
-
-import {
-  getGrpcMetadataFromHeaders,
-  getHeadersFromConfiguration,
-} from './utils';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 
 // ---- internal utilities
+
+function getGrpcMetadataFromHeaders(
+  headers: NameStringValuePairConfigModel[] | undefined,
+  headersList?: string | null
+) {
+  const headerValues = mergeHeadersConfig(headers, headersList);
+  if (!headerValues || Object.keys(headerValues).length === 0) {
+    return undefined;
+  }
+  const metadata = createEmptyMetadata();
+  for (const [name, value] of Object.entries(headerValues)) {
+    metadata.set(name, value);
+  }
+  return metadata;
+}
 
 /**
  * Warn if some props from a declarative config object have not been handled.
@@ -402,6 +434,114 @@ export function createPropagatorFromConfig(
   }
 }
 
+class ServiceNameDetector implements ResourceDetector {
+  detect() {
+    const attributes: Attributes = {};
+    const serviceName = getStringFromEnv('OTEL_SERVICE_NAME');
+
+    if (serviceName) {
+      attributes[ATTR_SERVICE_NAME] = serviceName;
+    }
+
+    return { attributes };
+  }
+}
+
+const serviceNameDetector = new ServiceNameDetector();
+
+export function createResourceFromConfig(
+  resourceConfig?: ResourceConfigModel
+): Resource {
+  // Limitation: Resource#merge() is the only exported mechanism from the
+  // resources package that supports *async* attributes, so we must use it.
+  // However, if `schemaUrl` is being used by detectors and in the config, then
+  // `.merge()` will potentially warn and drop the schema URL if there is a
+  // conflict.  (See `mergeSchemaUrl` behaviour.) This is likely not the
+  // intended behavior when a user specifies a `schema_url` in the declarative
+  // config file.
+
+  checkConfigUse('Resource', resourceConfig, [
+    'attributes',
+    'attributes_list',
+    'schema_url',
+    'detection/development',
+  ]);
+  let resource = defaultResource();
+
+  if (!resourceConfig) {
+    return resource;
+  }
+
+  if (resourceConfig['detection/development']) {
+    // TODO(6986): support attributes.{include,exclude}; `resources` package doesn't currently support this
+    checkConfigUse(
+      'ExperimentalResourceDetection',
+      resourceConfig['detection/development'],
+      ['detectors']
+    );
+    if (resourceConfig['detection/development'].detectors) {
+      const detectors: ResourceDetector[] = [];
+      for (const d of resourceConfig['detection/development'].detectors) {
+        const [name] = mustSingleEntry(d, 'ExperimentalResourceDetector');
+        // https://opentelemetry.io/docs/specs/otel-config/types/#type-experimentalresourcedetector
+        switch (name) {
+          // Note: The 'container' detector defined in the schema cannot yet
+          // be supported because a container resource detector lives in the
+          // separate opentelemetry-js-contrib.git repo. Supporting 'container'
+          // will come as part of supporting PluginComponentProvider.
+          case 'host':
+            detectors.push(hostDetector);
+            detectors.push(osDetector);
+            break;
+          case 'process':
+            detectors.push(processDetector);
+            break;
+          case 'service':
+            // Note: The declarative schema defines the 'service' detector to
+            // handle `service.instance.id` and the `OTEL_SERVICE_NAME` envvar.
+            // https://opentelemetry.io/docs/specs/otel-config/types/#type-experimentalresourcedetector
+            // This is equivalent to the `serviceInstanceIdDetector` and
+            // *part* of the `envDetector`.  Using this `envDetector` would
+            // incorrectly read the `OTEL_RESOURCE_ATTRIBUTES` envvar.
+            detectors.push(serviceNameDetector);
+            detectors.push(serviceInstanceIdDetector);
+            break;
+          default:
+            throw new Error(
+              `unknown ExperimentalResourceDetector name in configuration: "${name}"`
+            );
+        }
+      }
+
+      if (detectors.length > 0) {
+        resource = resource.merge(detectResources({ detectors }));
+      }
+    }
+  }
+
+  const configAttrs = mergeResourceAttributesConfig(
+    resourceConfig.attributes,
+    resourceConfig.attributes_list
+  );
+  if (configAttrs && configAttrs.length > 0) {
+    const attrs: DetectedResourceAttributes = {};
+    for (const a of configAttrs) {
+      if (a.value !== null) {
+        attrs[a.name] = a.value;
+      }
+    }
+    resource = resource.merge(resourceFromAttributes(attrs));
+  }
+
+  if (resourceConfig.schema_url) {
+    resource = resource.merge(
+      resourceFromAttributes({}, { schemaUrl: resourceConfig.schema_url })
+    );
+  }
+
+  return resource;
+}
+
 export function createLogRecordLimitsFromConfig(
   limits?: LogRecordLimitsConfigModel,
   attribute_limits?: AttributeLimitsConfigModel
@@ -428,11 +568,11 @@ export function createLogRecordExporterFromConfig(
 
   switch (name) {
     case 'otlp_http': {
-      // TODO(6953): headers_list
       checkConfigUse('OtlpHttpExporter', properties!, [
         'compression',
         'endpoint',
         'headers',
+        'headers_list',
         'timeout',
         'tls',
         'encoding',
@@ -444,7 +584,7 @@ export function createLogRecordExporterFromConfig(
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
-        headers: getHeadersFromConfiguration(props?.headers),
+        headers: mergeHeadersConfig(props?.headers, props?.headers_list),
         timeoutMillis: validateExportTimeoutConfig(
           props?.timeout,
           'OtlpHttpExporter.timeout'
@@ -465,13 +605,13 @@ export function createLogRecordExporterFromConfig(
     }
 
     case 'otlp_grpc': {
-      // TODO(6953): headers_list
       checkConfigUse('OtlpGrpcExporter', properties!, [
         'compression',
         'endpoint',
         'timeout',
         'tls',
         'headers',
+        'headers_list',
       ]);
       const props = properties as OtlpGrpcExporterConfigModel;
       return new OTLPGrpcLogExporter({
@@ -485,7 +625,10 @@ export function createLogRecordExporterFromConfig(
           'OtlpGrpcExporter.timeout'
         ),
         credentials: grpcCredentialsFromConfig(props?.tls),
-        metadata: getGrpcMetadataFromHeaders(props?.headers),
+        metadata: getGrpcMetadataFromHeaders(
+          props?.headers,
+          props?.headers_list
+        ),
       });
     }
 
@@ -656,11 +799,11 @@ export function createPushMetricExporterFromConfig(
 
   switch (name) {
     case 'otlp_http': {
-      // TODO(6953): headers_list
       checkConfigUse('PushMetricExporter', properties!, [
         'compression',
         'endpoint',
         'headers',
+        'headers_list',
         'timeout',
         'tls',
         'temporality_preference',
@@ -674,7 +817,7 @@ export function createPushMetricExporterFromConfig(
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
-        headers: getHeadersFromConfiguration(props?.headers),
+        headers: mergeHeadersConfig(props?.headers, props?.headers_list),
         timeoutMillis: validateExportTimeoutConfig(
           props?.timeout,
           'PushMetricExporter.timeout'
@@ -701,13 +844,13 @@ export function createPushMetricExporterFromConfig(
     }
 
     case 'otlp_grpc': {
-      // TODO(6953): headers_list
       checkConfigUse('PushMetricExporter', properties!, [
         'compression',
         'endpoint',
         'timeout',
         'tls',
         'headers',
+        'headers_list',
         'temporality_preference',
         'default_histogram_aggregation',
       ]);
@@ -723,7 +866,10 @@ export function createPushMetricExporterFromConfig(
           'PushMetricExporter.timeout'
         ),
         credentials: grpcCredentialsFromConfig(props?.tls),
-        metadata: getGrpcMetadataFromHeaders(props?.headers),
+        metadata: getGrpcMetadataFromHeaders(
+          props?.headers,
+          props?.headers_list
+        ),
         temporalityPreference: aggregationTemporalityPreferenceFromConfig(
           props?.temporality_preference
         ),
@@ -1104,11 +1250,11 @@ function createSpanExporterFromConfig(
 
   switch (name) {
     case 'otlp_http': {
-      // TODO(6953): headers_list
       checkConfigUse('OtlpHttpExporter', properties!, [
         'compression',
         'endpoint',
         'headers',
+        'headers_list',
         'timeout',
         'tls',
         'encoding',
@@ -1120,7 +1266,7 @@ function createSpanExporterFromConfig(
             ? CompressionAlgorithm.GZIP
             : CompressionAlgorithm.NONE,
         url: props?.endpoint ?? undefined,
-        headers: getHeadersFromConfiguration(props?.headers),
+        headers: mergeHeadersConfig(props?.headers, props?.headers_list),
         timeoutMillis: validateExportTimeoutConfig(
           props?.timeout,
           'OtlpHttpExporter.timeout'
@@ -1141,13 +1287,13 @@ function createSpanExporterFromConfig(
     }
 
     case 'otlp_grpc': {
-      // TODO(6953): headers_list
       checkConfigUse('OtlpGrpcExporter', properties!, [
         'compression',
         'endpoint',
         'timeout',
         'tls',
         'headers',
+        'headers_list',
       ]);
       const props = properties as OtlpGrpcExporterConfigModel;
       return new OTLPGrpcTraceExporter({
@@ -1161,7 +1307,10 @@ function createSpanExporterFromConfig(
           'OtlpGrpcExporter.timeout'
         ),
         credentials: grpcCredentialsFromConfig(props?.tls),
-        metadata: getGrpcMetadataFromHeaders(props?.headers),
+        metadata: getGrpcMetadataFromHeaders(
+          props?.headers,
+          props?.headers_list
+        ),
       });
     }
 

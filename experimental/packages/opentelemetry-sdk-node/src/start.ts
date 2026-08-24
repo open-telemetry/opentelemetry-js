@@ -15,31 +15,16 @@ import {
   trace,
   propagation,
 } from '@opentelemetry/api';
-import {
-  getInstanceID,
-  getResourceDetectorsFromConfiguration,
-  getResourceFromConfiguration,
-} from './utils';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import type { SDKComponents, SDKOptions } from './types';
 import { logs } from '@opentelemetry/api-logs';
-import type {
-  Resource,
-  ResourceDetectionConfig,
-  ResourceDetector,
-} from '@opentelemetry/resources';
-import {
-  defaultResource,
-  detectResources,
-  resourceFromAttributes,
-} from '@opentelemetry/resources';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
-import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
 import { diagLogLevelFromSeverityNumberConfig } from './diag';
 import {
   createLoggerProviderFromConfig,
   createMeterProviderFromConfig,
   createPropagatorFromConfig,
+  createResourceFromConfig,
   createTracerProviderFromConfig,
 } from './create-from-config';
 
@@ -134,7 +119,7 @@ function create(
     components.contextManager = new AsyncLocalStorageContextManager();
     components.contextManager.enable();
 
-    const resource = setupResource(config, sdkOptions);
+    const resource = createResourceFromConfig(config.resource);
 
     if (sdkOptions?.textMapPropagator !== undefined) {
       if (sdkOptions.textMapPropagator !== null) {
@@ -182,38 +167,4 @@ function create(
 
     throw createErr;
   }
-}
-
-export function setupResource(
-  config: ConfigurationModel,
-  sdkOptions?: SDKOptions
-): Resource {
-  let resource: Resource =
-    getResourceFromConfiguration(config) ?? defaultResource();
-  let resourceDetectors: ResourceDetector[] = [];
-
-  if (sdkOptions?.resourceDetectors != null) {
-    resourceDetectors = sdkOptions.resourceDetectors;
-  } else if (config.resource?.['detection/development']?.detectors) {
-    resourceDetectors = getResourceDetectorsFromConfiguration(config);
-  }
-
-  if (resourceDetectors.length > 0) {
-    const internalConfig: ResourceDetectionConfig = {
-      detectors: resourceDetectors,
-    };
-    resource = resource.merge(detectResources(internalConfig));
-  }
-
-  const instanceId = getInstanceID(config);
-  resource =
-    instanceId === undefined
-      ? resource
-      : resource.merge(
-          resourceFromAttributes({
-            [ATTR_SERVICE_INSTANCE_ID]: instanceId,
-          })
-        );
-
-  return resource;
 }

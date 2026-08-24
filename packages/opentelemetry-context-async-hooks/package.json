@@ -11,6 +11,7 @@
     "clean": "tsc --build --clean",
     "test": "nyc mocha 'test/**/*.test.ts'",
     "tdd": "npm run test -- --watch-extensions ts --watch",
+    "test:bench": "node test/performance/benchmark/attach.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "version": "node ../../scripts/version-update.js",
@@ -44,6 +45,7 @@
   },
   "devDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.10.0",
+    "benchmark": "2.1.4",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "mocha": "11.7.6",

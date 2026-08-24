@@ -5,6 +5,7 @@
 
 import * as assert from 'assert';
 import * as path from 'path';
+import * as sinon from 'sinon';
 
 import type {
   ConfigurationModel,
@@ -13,14 +14,17 @@ import type {
   MeterProviderConfigModel,
   PushMetricExporterConfigModel,
   SamplerConfigModel,
+  SpanExporterConfigModel,
   TracerProviderConfigModel,
 } from '@opentelemetry/configuration';
-import type { SpanLimits } from '@opentelemetry/sdk-trace';
+import { createConfigFactory } from '@opentelemetry/configuration';
+import type { SpanExporter, SpanLimits } from '@opentelemetry/sdk-trace';
 import {
   BatchSpanProcessor,
   RandomIdGenerator,
   TracerProvider,
 } from '@opentelemetry/sdk-trace';
+import { diag } from '@opentelemetry/api';
 import type { LogRecordLimits } from '@opentelemetry/sdk-logs';
 import {
   BatchLogRecordProcessor,
@@ -35,8 +39,15 @@ import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/ex
 import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
 import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
-import type { Resource } from '@opentelemetry/resources';
-import { resourceFromAttributes } from '@opentelemetry/resources';
+import type { Resource, ResourceDetector } from '@opentelemetry/resources';
+import {
+  detectResources,
+  hostDetector,
+  osDetector,
+  processDetector,
+  resourceFromAttributes,
+  serviceInstanceIdDetector,
+} from '@opentelemetry/resources';
 
 import {
   createLoggerProviderFromConfig,
@@ -46,6 +57,7 @@ import {
   createMeterProviderFromConfig,
   createPropagatorFromConfig,
   createPushMetricExporterFromConfig,
+  createResourceFromConfig,
   createSamplerFromConfig,
   createSpanLimitsFromConfig,
   createTracerProviderFromConfig,
@@ -62,6 +74,125 @@ import {
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
 describe('create-from-config', () => {
+  describe('headers_list exporter wiring', function () {
+    const headers = [{ name: 'shared', value: 'from-headers' }];
+    const headers_list = 'shared=from-list,list-only=hello%20world';
+    const resource = resourceFromAttributes({});
+
+    function createTraceExporter(
+      exporter: SpanExporterConfigModel
+    ): SpanExporter {
+      const provider = createTracerProviderFromConfig(resource, {
+        processors: [{ simple: { exporter } }],
+      });
+      return (provider as any)._activeSpanProcessor._spanProcessors[0]
+        ._exporter;
+    }
+
+    const corpus: {
+      testName: string;
+      protocol: 'http' | 'grpc';
+      createExporter: () => unknown;
+    }[] = [
+      {
+        testName: 'log OTLP HTTP/protobuf',
+        protocol: 'http',
+        createExporter: () =>
+          createLogRecordExporterFromConfig({
+            otlp_http: { headers, headers_list },
+          }),
+      },
+      {
+        testName: 'log OTLP HTTP/JSON',
+        protocol: 'http',
+        createExporter: () =>
+          createLogRecordExporterFromConfig({
+            otlp_http: { headers, headers_list, encoding: 'json' },
+          }),
+      },
+      {
+        testName: 'log OTLP gRPC',
+        protocol: 'grpc',
+        createExporter: () =>
+          createLogRecordExporterFromConfig({
+            otlp_grpc: { headers, headers_list },
+          }),
+      },
+      {
+        testName: 'metric OTLP HTTP/protobuf',
+        protocol: 'http',
+        createExporter: () =>
+          createPushMetricExporterFromConfig({
+            otlp_http: { headers, headers_list },
+          }),
+      },
+      {
+        testName: 'metric OTLP HTTP/JSON',
+        protocol: 'http',
+        createExporter: () =>
+          createPushMetricExporterFromConfig({
+            otlp_http: { headers, headers_list, encoding: 'json' },
+          }),
+      },
+      {
+        testName: 'metric OTLP gRPC',
+        protocol: 'grpc',
+        createExporter: () =>
+          createPushMetricExporterFromConfig({
+            otlp_grpc: { headers, headers_list },
+          }),
+      },
+      {
+        testName: 'trace OTLP HTTP/protobuf',
+        protocol: 'http',
+        createExporter: () =>
+          createTraceExporter({
+            otlp_http: { headers, headers_list },
+          }),
+      },
+      {
+        testName: 'trace OTLP HTTP/JSON',
+        protocol: 'http',
+        createExporter: () =>
+          createTraceExporter({
+            otlp_http: { headers, headers_list, encoding: 'json' },
+          }),
+      },
+      {
+        testName: 'trace OTLP gRPC',
+        protocol: 'grpc',
+        createExporter: () =>
+          createTraceExporter({
+            otlp_grpc: { headers, headers_list },
+          }),
+      },
+    ];
+
+    afterEach(function () {
+      sinon.restore();
+    });
+
+    for (const item of corpus) {
+      it(item.testName, async function () {
+        const warnStub = sinon.stub(diag, 'warn');
+        const exporter = item.createExporter() as any;
+
+        if (item.protocol === 'http') {
+          const resolvedHeaders =
+            await exporter._delegate._transport._transport._parameters.headers();
+          assert.equal(resolvedHeaders.shared, 'from-headers');
+          assert.equal(resolvedHeaders['list-only'], 'hello world');
+        } else {
+          const metadata = exporter._delegate._transport._parameters.metadata();
+          assert.deepStrictEqual(metadata.get('shared'), ['from-headers']);
+          assert.deepStrictEqual(metadata.get('list-only'), ['hello world']);
+        }
+
+        sinon.assert.notCalled(warnStub);
+      });
+    }
+  });
+
   describe('createPropagatorFromConfig', function () {
     it('single propagator still uses CompositePropagator', function () {
       const propagator = createPropagatorFromConfig({
@@ -130,6 +261,223 @@ describe('create-from-config', () => {
       ]);
       // Cheat usage of private _propagators to confirm dedupe worked.
       assert.equal((propagator as any)._propagators.length, 2);
+    });
+  });
+
+  describe('createResourceFromConfig', () => {
+    const SDK_VERSION =
+      require('@opentelemetry/resources/package.json').version;
+    const defaultResAttrs = {
+      'service.name': 'unknown_service:node',
+      'telemetry.sdk.language': 'nodejs',
+      'telemetry.sdk.name': 'opentelemetry',
+      'telemetry.sdk.version': SDK_VERSION,
+    };
+
+    // Helper to set some envvars, and return a function to restore the env.
+    function setEnv(env: Record<string, string>): () => void {
+      const toRestore: Record<string, string | null> = {};
+      for (const [k, v] of Object.entries(env)) {
+        toRestore[k] = process.env[k] ?? null;
+        process.env[k] = v;
+      }
+      return () => {
+        for (const [k, v] of Object.entries(toRestore)) {
+          if (v === null) {
+            delete process.env[k];
+          } else {
+            process.env[k] = v;
+          }
+        }
+      };
+    }
+
+    // Helper to make it a one-liner to get attributes from a resource detector.
+    const attrsFromDetector = async (detector: ResourceDetector) => {
+      const res = detectResources({ detectors: [detector] });
+      await res.waitForAsyncAttributes?.();
+      return res.attributes;
+    };
+
+    it('empty "resource" config', async function () {
+      const resource = createResourceFromConfig(undefined);
+      await resource.waitForAsyncAttributes?.();
+      assert.deepEqual(resource.attributes, defaultResAttrs);
+    });
+
+    it('resource.attributes', async function () {
+      const resource = createResourceFromConfig({
+        attributes: [{ name: 'foo', value: 'bar' }],
+      });
+      await resource.waitForAsyncAttributes?.();
+      assert.deepEqual(resource.attributes, {
+        ...defaultResAttrs,
+        foo: 'bar',
+      });
+    });
+
+    it('resource.attributes_list', async function () {
+      const resource = createResourceFromConfig({
+        attributes_list: 'foo=baz, spam=eggs \t',
+      });
+      await resource.waitForAsyncAttributes?.();
+      assert.deepEqual(resource.attributes, {
+        ...defaultResAttrs,
+        foo: 'baz',
+        spam: 'eggs',
+      });
+    });
+
+    it('resource.attributes beats resource.attributes_list', async function () {
+      const resource = createResourceFromConfig({
+        attributes: [{ name: 'foo', value: 'bar' }],
+        attributes_list: 'foo=baz, spam=eggs \t',
+      });
+      await resource.waitForAsyncAttributes?.();
+      assert.deepEqual(resource.attributes, {
+        ...defaultResAttrs,
+        foo: 'bar',
+        spam: 'eggs',
+      });
+    });
+
+    // Detectors.
+    // https://opentelemetry.io/docs/specs/otel-config/types/#type-experimentalresourcedetector
+
+    it('resource detector: host', async function () {
+      const resource = createResourceFromConfig({
+        'detection/development': { detectors: [{ host: null }] },
+      });
+      await resource.waitForAsyncAttributes?.();
+      assert.deepEqual(resource.attributes, {
+        ...defaultResAttrs,
+        ...(await attrsFromDetector(hostDetector)),
+        ...(await attrsFromDetector(osDetector)),
+      });
+    });
+
+    it('resource detector: process', async function () {
+      const resource = createResourceFromConfig({
+        'detection/development': { detectors: [{ process: null }] },
+      });
+      await resource.waitForAsyncAttributes?.();
+      assert.deepEqual(resource.attributes, {
+        ...defaultResAttrs,
+        ...(await attrsFromDetector(processDetector)),
+      });
+    });
+
+    it('resource detector: service', async function () {
+      const restoreEnv = setEnv({
+        OTEL_SERVICE_NAME: 'my-service-name',
+        OTEL_RESOURCE_ATTRIBUTES: 'foo=bar,spam=eggs',
+      });
+      try {
+        const resource = createResourceFromConfig({
+          'detection/development': { detectors: [{ service: null }] },
+        });
+        await resource.waitForAsyncAttributes?.();
+        assert.deepEqual(resource.attributes, {
+          ...defaultResAttrs,
+          ...(await attrsFromDetector(serviceInstanceIdDetector)),
+          'service.name': 'my-service-name',
+          // Attributes from OTEL_RESOURCE_ATTRIBUTES should explicitly NOT be set.
+        });
+      } finally {
+        restoreEnv();
+      }
+    });
+
+    it('resource detector: container (not yet supported, throws)', async function () {
+      assert.throws(() => {
+        createResourceFromConfig({
+          'detection/development': { detectors: [{ container: null }] },
+        });
+      });
+    });
+
+    it('resource detector: unknown name throws', async function () {
+      assert.throws(() => {
+        createResourceFromConfig({
+          'detection/development': {
+            detectors: [{ some_unknown_detector: null }],
+          },
+        });
+      });
+    });
+
+    it('schema_url', function () {
+      const schema_url = 'https://example.com/a-scheme';
+      const resource = createResourceFromConfig({ schema_url });
+      assert.deepEqual(resource.attributes, defaultResAttrs);
+      assert.deepEqual(resource.schemaUrl, schema_url);
+    });
+
+    it('all together, attributes > attributes_list > detectors > default', async function () {
+      const restoreEnv = setEnv({
+        OTEL_SERVICE_NAME: 'service-name-from-env',
+      });
+      try {
+        const schema_url = 'https://example.com/a-scheme';
+        const resource = createResourceFromConfig({
+          attributes: [
+            { name: 'service.name', value: 'service-name-from-attributes' },
+            { name: 'os.type', value: 'my-os-type' }, // override from osDetector
+          ],
+          attributes_list:
+            'spam=eggs, service.name=service-name-from-attributes-list',
+          schema_url,
+          'detection/development': {
+            detectors: [{ host: null }, { process: null }, { service: null }],
+          },
+        });
+        await resource.waitForAsyncAttributes?.();
+
+        assert.deepEqual(resource.attributes, {
+          ...defaultResAttrs,
+          ...(await attrsFromDetector(hostDetector)),
+          ...(await attrsFromDetector(osDetector)),
+          ...(await attrsFromDetector(processDetector)),
+          ...(await attrsFromDetector(serviceInstanceIdDetector)),
+          spam: 'eggs',
+          'service.name': 'service-name-from-attributes',
+          'os.type': 'my-os-type',
+        });
+      } finally {
+        restoreEnv();
+      }
+    });
+
+    it('processes fixtures/resources.yaml correctly', async function () {
+      const restoreEnv = setEnv({
+        OTEL_CONFIG_FILE: 'test/fixtures/resources.yaml',
+      });
+      try {
+        const config = createConfigFactory().getConfigModel();
+        const resource = createResourceFromConfig(config.resource);
+        await resource.waitForAsyncAttributes?.();
+
+        assert.deepStrictEqual(
+          resource.schemaUrl,
+          'https://opentelemetry.io/schemas/1.16.0'
+        );
+        assert.deepStrictEqual(resource.attributes, {
+          ...defaultResAttrs,
+          'service.name': 'config-name',
+          'service.namespace': 'config-namespace',
+          'service.version': '1.0.0',
+          bool_array_key: [true, false],
+          bool_key: true,
+          double_array_key: [1.1, 2.2],
+          double_key: 1.1,
+          int_array_key: [1, 2],
+          int_key: 1,
+          string_array_key: ['value1', 'value2'],
+          string_key: 'value',
+        });
+      } finally {
+        restoreEnv();
+      }
     });
   });
 
