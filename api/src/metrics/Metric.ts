@@ -161,6 +161,8 @@ export interface ObservableResult<
 
 /**
  * Interface that is being used in batch observable callback function.
+ *
+ * @since 1.3.0
  */
 export interface BatchObservableResult<
   AttributesTypes extends MetricAttributes = MetricAttributes,
