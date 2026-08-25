@@ -12,12 +12,17 @@ import type {
 } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import type { Instrumentation } from '../../src';
 import { InstrumentationBase, registerInstrumentations } from '../../src';
 import type {
   Logger,
   LoggerOptions,
   LoggerProvider,
 } from '@opentelemetry/api-logs';
+import type {
+  ConfigProperties,
+  ConfigProvider,
+} from '@opentelemetry/api-config';
 
 class DummyTracerProvider implements TracerProvider {
   getTracer(name: string, version?: string): Tracer {
@@ -37,12 +42,22 @@ class DummyLoggerProvider implements LoggerProvider {
   }
 }
 
+class DummyConfigProvider implements ConfigProvider {
+  getInstrumentationConfig(name?: string): ConfigProperties {
+    throw new Error('not implemented');
+  }
+  getGeneralInstrumentationConfig(): ConfigProperties {
+    throw new Error('not implemented');
+  }
+}
+
 class FooInstrumentation extends InstrumentationBase {
   init() {
     return [];
   }
   override enable() {}
   override disable() {}
+  setConfigProvider(_configProvider: ConfigProvider) {}
 }
 
 describe('autoLoader', function () {
@@ -59,25 +74,29 @@ describe('autoLoader', function () {
 
   describe('registerInstrumentations', function () {
     describe('InstrumentationBase', function () {
-      let instrumentation: InstrumentationBase;
+      let instrumentation: Instrumentation;
       let enableSpy: sinon.SinonSpy;
       let setTracerProviderSpy: sinon.SinonSpy;
       let setMeterProviderSpy: sinon.SinonSpy;
       let setLoggerProviderSpy: sinon.SinonSpy;
+      let setConfigProviderSpy: sinon.SinonSpy;
       const tracerProvider = new DummyTracerProvider();
       const meterProvider = new DummyMeterProvider();
       const loggerProvider = new DummyLoggerProvider();
+      const configProvider = new DummyConfigProvider();
       beforeEach(() => {
         instrumentation = new FooInstrumentation('foo', '1', {});
         enableSpy = sinon.spy(instrumentation, 'enable');
         setTracerProviderSpy = sinon.stub(instrumentation, 'setTracerProvider');
         setMeterProviderSpy = sinon.stub(instrumentation, 'setMeterProvider');
         setLoggerProviderSpy = sinon.stub(instrumentation, 'setLoggerProvider');
+        setConfigProviderSpy = sinon.stub(instrumentation, 'setConfigProvider');
         unload = registerInstrumentations({
           instrumentations: [instrumentation],
           tracerProvider,
           meterProvider,
           loggerProvider,
+          configProvider,
         });
       });
 
@@ -130,6 +149,12 @@ describe('autoLoader', function () {
         assert.strictEqual(setLoggerProviderSpy.callCount, 1);
         assert.ok(setLoggerProviderSpy.lastCall.args[0] === loggerProvider);
         assert.strictEqual(setLoggerProviderSpy.lastCall.args.length, 1);
+      });
+
+      it('should set ConfigProvider (if setConfigProvider implemented)', function () {
+        assert.strictEqual(setConfigProviderSpy.callCount, 1);
+        assert.ok(setConfigProviderSpy.lastCall.args[0] === configProvider);
+        assert.strictEqual(setConfigProviderSpy.lastCall.args.length, 1);
       });
     });
   });

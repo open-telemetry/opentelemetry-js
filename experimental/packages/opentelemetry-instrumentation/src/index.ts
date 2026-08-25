@@ -12,7 +12,6 @@ export type {
   InstrumentationConfig,
   InstrumentationModuleDefinition,
   InstrumentationModuleFile,
-  InstrumentationRegistry,
   ShimWrapped,
   SpanCustomizationHook,
 } from './types';
@@ -21,6 +20,6 @@ export {
   isWrapped,
   safeExecuteInTheMiddle,
   safeExecuteInTheMiddleAsync,
+  readConfigProperties,
 } from './utils';
 export { SemconvStability, semconvStabilityFromStr } from './semconvStability';
-export type { ConfigProperties } from '@opentelemetry/api-config';

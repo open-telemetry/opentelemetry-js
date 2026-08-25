@@ -21,6 +21,7 @@ import {
   trace,
   ValueType,
 } from '@opentelemetry/api';
+import type { ConfigProvider } from '@opentelemetry/api-config';
 import type { RPCMetadata } from '@opentelemetry/core';
 import {
   hrTime,
@@ -40,6 +41,7 @@ import {
   InstrumentationBase,
   InstrumentationNodeModuleDefinition,
   safeExecuteInTheMiddle,
+  readConfigProperties,
 } from '@opentelemetry/instrumentation';
 import { errorMonitor } from 'events';
 import {
@@ -84,28 +86,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
   constructor(config: HttpInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-http', VERSION, config);
-
-    // Apply declarative config over the constructor config. Unset keys keep their
-    // constructor default, and unrecognized keys are warned about.
-    this.applyDeclarativeConfig(own => ({
-      requireParentforOutgoingSpans: own.getBoolean(
-        'require_parent_for_outgoing_spans'
-      ),
-      requireParentforIncomingSpans: own.getBoolean(
-        'require_parent_for_incoming_spans'
-      ),
-      disableOutgoingRequestInstrumentation: own.getBoolean(
-        'disable_outgoing_request_instrumentation'
-      ),
-      disableIncomingRequestInstrumentation: own.getBoolean(
-        'disable_incoming_request_instrumentation'
-      ),
-      serverName: own.getString('server_name'),
-      redactedQueryParams: own.getStringArray('redacted_query_params'),
-      enableSyntheticSourceDetection: own.getBoolean(
-        'enable_synthetic_source_detection'
-      ),
-    }));
 
     this._headerCapture = this._createHeaderCapture();
   }
@@ -154,6 +134,75 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   override setConfig(config: HttpInstrumentationConfig = {}): void {
     super.setConfig(config);
     this._headerCapture = this._createHeaderCapture();
+  }
+
+  /**
+   * Update the current config (rather than fully *replace* it), with any
+   * settings from declarative config.
+   *
+   * XXX Document the supported declconf settings in README configuration section.
+   */
+  setConfigProvider(configProvider: ConfigProvider): void {
+    const config = readConfigProperties({
+      configProvider,
+      instrumentationName: this.instrumentationName,
+      instrumentationProps: [
+        [
+          'disable_incoming_request_instrumentation',
+          'boolean',
+          'disableIncomingRequestInstrumentation',
+        ],
+        [
+          'disable_outgoing_request_instrumentation',
+          'boolean',
+          'disableOutgoingRequestInstrumentation',
+        ],
+        [
+          'require_parent_for_incoming_spans',
+          'boolean',
+          'requireParentforIncomingSpans',
+        ],
+        [
+          'require_parent_for_outgoing_spans',
+          'boolean',
+          'requireParentforOutgoingSpans',
+        ],
+        ['redacted_query_params', 'string[]', 'redactedQueryParams'],
+        [
+          'enable_synthetic_source_detection',
+          'boolean',
+          'enableSyntheticSourceDetection',
+        ],
+        ['server_name', 'string', 'serverName'],
+      ],
+      generalProps: [
+        [
+          'http.client.request_captured_headers',
+          'string[]',
+          'headersToSpanAttributes.client.requestHeaders',
+        ],
+        [
+          'http.client.response_captured_headers',
+          'string[]',
+          'headersToSpanAttributes.client.responseHeaders',
+        ],
+        [
+          'http.server.request_captured_headers',
+          'string[]',
+          'headersToSpanAttributes.server.requestHeaders',
+        ],
+        [
+          'http.server.response_captured_headers',
+          'string[]',
+          'headersToSpanAttributes.server.responseHeaders',
+        ],
+      ],
+      diag: this._diag,
+    });
+
+    if (Object.keys(config).length > 0) {
+      this.setConfig({ ...this.getConfig(), ...config });
+    }
   }
 
   init(): [

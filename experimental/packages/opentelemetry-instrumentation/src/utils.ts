@@ -3,6 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import * as assert from 'assert';
+
+import type { ConfigProvider } from '@opentelemetry/api-config';
+import type { DiagLogger } from '@opentelemetry/api';
+
 import type { ShimWrapped } from './types';
 
 /**
@@ -73,3 +78,207 @@ export function isWrapped(func: unknown): func is ShimWrapped {
     (func as ShimWrapped).__wrapped === true
   );
 }
+
+/**
+ * Lookup a property in a plain object, where `lookup` is a dotted lookup.
+ * Returns `undefined` if the lookup path doesn't exist.
+ * For example:
+ *
+ *   > const o = { foo: { bar: { baz: 42 } } }
+ *   > dottedGet(o, 'foo.bar.baz');
+ *   42
+ */
+function dottedGet(obj: unknown, lookup: string): unknown {
+  let result: unknown = obj;
+  for (const key of lookup.split('.')) {
+    if (
+      typeof result === 'object' &&
+      result !== null &&
+      !Array.isArray(result) &&
+      Object.hasOwn(result, key)
+    ) {
+      result = result[key as keyof typeof result];
+    } else {
+      return undefined;
+    }
+  }
+  return result;
+}
+
+/**
+ * Set a value on a plain object, where `lookup` is a dotted-path to index
+ * into the given object, creating empty objects as necessary. E.g.:
+ *
+ *   > const o = {};
+ *   > dottedSet(o, 'foo.bar.baz', 42);
+ *   > o
+ *   { foo: { bar: { baz: 42 } } }
+ */
+function dottedSet(
+  obj: Record<string, unknown>,
+  lookup: string,
+  val: unknown
+): void {
+  let targ = obj;
+  const segs = lookup.split('.');
+  const lastSeg = segs.pop();
+  assert.ok(typeof lastSeg === 'string');
+  for (const key of segs) {
+    if (!Object.hasOwn(targ, key)) {
+      targ[key] = {};
+    }
+    const candidate = targ[key];
+    if (
+      typeof candidate !== 'object' ||
+      candidate === null ||
+      Array.isArray(candidate)
+    ) {
+      throw new Error(
+        `invalid lookup path ("${lookup}") for dottedSet: value at "${key}" is not a plain object: ${typeof candidate}`
+      );
+    }
+    targ = candidate as Record<string, unknown>;
+  }
+
+  targ[lastSeg] = val;
+}
+
+function isStringArray(arr: unknown): boolean {
+  if (!Array.isArray(arr)) {
+    return false;
+  }
+  for (const el of arr) {
+    if (typeof el !== 'string') {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Flattens all keys of a nested object into dotted string paths.
+ */
+function flattenedKeys(obj: Record<string, unknown>, prefix = ''): string[] {
+  return Object.keys(obj).reduce((acc: string[], key) => {
+    const currPath = prefix ? `${prefix}.${key}` : key;
+    const val = obj[key];
+
+    if (typeof val === 'object' && val !== null && !Array.isArray(val)) {
+      acc.push(...flattenedKeys(val as Record<string, unknown>, currPath));
+    } else {
+      acc.push(currPath);
+    }
+
+    return acc;
+  }, []);
+}
+
+/**
+ * Validate that the given declarative config property is of the given "type".
+ */
+function validConfigPropertyType(
+  name: string,
+  val: unknown,
+  type: string,
+  diag?: DiagLogger
+): boolean {
+  switch (type) {
+    case 'boolean':
+      if (typeof val !== 'boolean') {
+        diag?.warn(
+          `unexpected type for declarative config property "${name}": expected "boolean", got "${typeof val}"`
+        );
+        return false;
+      }
+      break;
+    case 'string':
+      if (typeof val !== 'string') {
+        diag?.warn(
+          `unexpected type for declarative config property "${name}": expected "string", got "${typeof val}"`
+        );
+        return false;
+      }
+      break;
+    case 'string[]':
+      if (!isStringArray(val)) {
+        diag?.warn(
+          `unexpected type for declarative config property "${name}": expected array of strings`
+        );
+        return false;
+      }
+      break;
+    default:
+      throw new Error(`unsupported declconf type: "${type}"`);
+  }
+  return true;
+}
+
+export function readConfigProperties(opts: {
+  configProvider: ConfigProvider;
+  instrumentationName?: string;
+  instrumentationProps?: [string, string, string][];
+  generalProps?: [string, string, string][];
+  diag?: DiagLogger;
+}): Record<string, unknown> {
+  const propNames: string[] = [];
+  const handledPropNames: string[] = [];
+  const config = {};
+
+  if (opts.instrumentationName && opts.instrumentationProps) {
+    const instrConf = opts.configProvider.getInstrumentationConfig(
+      opts.instrumentationName
+    );
+    if (instrConf) {
+      const prefix = `instrumentation/development.js.${opts.instrumentationName}`;
+      propNames.push(...flattenedKeys(instrConf, prefix));
+
+      for (const [fromLookup, type, toLookup] of opts.instrumentationProps) {
+        const propName = prefix + '.' + fromLookup;
+        handledPropNames.push(propName);
+        const val = dottedGet(instrConf, fromLookup);
+        if (val === undefined) {
+          continue;
+        }
+        if (!validConfigPropertyType(propName, val, type, opts.diag)) {
+          continue;
+        }
+        dottedSet(config, toLookup, val);
+      }
+    }
+  }
+
+  if (opts.generalProps) {
+    const generalConf = opts.configProvider.getGeneralInstrumentationConfig();
+    if (generalConf) {
+      const prefix = 'instrumentation/development.general';
+      propNames.push(...flattenedKeys(generalConf, prefix));
+
+      for (const [fromLookup, type, toLookup] of opts.generalProps) {
+        const propName = prefix + '.' + fromLookup;
+        handledPropNames.push(propName);
+        const val = dottedGet(generalConf, fromLookup);
+        if (val === undefined) {
+          continue;
+        }
+        if (!validConfigPropertyType(propName, val, type, opts.diag)) {
+          continue;
+        }
+        dottedSet(config, toLookup, val);
+      }
+    }
+  }
+
+  // Warn about unhandled properties in the config.
+  // Dev note: I'd use Set#difference, but that requires Node.js v22.
+  const unhandledPropNames = propNames.filter(
+    k => !handledPropNames.includes(k)
+  );
+  if (unhandledPropNames.length > 0) {
+    opts.diag?.warn(
+      `unhandled declarative configuration properties: ${JSON.stringify(unhandledPropNames)}`
+    );
+  }
+
+  return config;
+}
+

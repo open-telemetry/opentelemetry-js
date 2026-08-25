@@ -6,28 +6,46 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { context, propagation, diag } from '@opentelemetry/api';
+import type { ConfigProvider } from '@opentelemetry/api-config';
 import { config } from '@opentelemetry/api-config';
-import { InstrumentationBase } from '@opentelemetry/instrumentation';
+import {
+  InstrumentationBase,
+  readConfigProperties,
+} from '@opentelemetry/instrumentation';
 import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import { startNodeSDK } from '../src/start';
 
 interface TestConfig extends InstrumentationConfig {
   serverName?: string;
+  captureHeaders?: string[];
 }
 
-// Reads its declarative config in the constructor.
+// A test Instrumentation that reads some declarative config.
 class TestInstrumentation extends InstrumentationBase<TestConfig> {
   constructor(name: string, config: TestConfig = {}) {
     super(name, '1.0.0', config);
-    this.applyDeclarativeConfig(own => ({
-      serverName: own.getString('server_name'),
-    }));
   }
   init() {
     return [];
   }
   override enable() {}
   override disable() {}
+
+  setConfigProvider(configProvider: ConfigProvider): void {
+    const config = readConfigProperties({
+      configProvider,
+      instrumentationName: this.instrumentationName,
+      instrumentationProps: [['server_name', 'string', 'serverName']],
+      generalProps: [
+        ['http.client.request_captured_headers', 'string[]', 'captureHeaders'],
+      ],
+      diag: this._diag,
+    });
+
+    if (Object.keys(config).length > 0) {
+      this.setConfig({ ...this.getConfig(), ...config });
+    }
+  }
 }
 
 describe('startNodeSDK declarative instrumentation config', function () {
@@ -60,54 +78,22 @@ describe('startNodeSDK declarative instrumentation config', function () {
   it('sets a global ConfigProvider from the config file', function () {
     sdk = startNodeSDK();
     const provider = config.getConfigProvider();
-    assert.strictEqual(
-      provider
-        .getInstrumentationConfig('@otel/with-config')
-        .getString('server_name'),
-      'from-file'
-    );
     assert.deepStrictEqual(
-      provider
-        .getGeneralInstrumentationConfig()
-        .getStructured('http')
-        ?.getStructured('client')
-        ?.getStringArray('request_captured_headers'),
-      ['content-type']
+      provider.getInstrumentationConfig('@otel/with-config'),
+      { server_name: 'from-file' }
     );
-  });
-
-  it('constructs enabled registry entries and applies their config', function () {
-    const built: Record<string, TestInstrumentation> = {};
-    const make = (name: string) => () =>
-      (built[name] = new TestInstrumentation(name));
-
-    sdk = startNodeSDK({
-      instrumentationRegistry: {
-        '@otel/with-config': make('@otel/with-config'),
-        '@otel/enabled-false': make('@otel/enabled-false'),
-      },
+    assert.deepStrictEqual(provider.getGeneralInstrumentationConfig(), {
+      http: { client: { request_captured_headers: ['content-type'] } },
     });
-
-    // Enabled entry is constructed and configured from the file.
-    assert.ok(built['@otel/with-config']);
-    assert.strictEqual(
-      built['@otel/with-config'].getConfig().serverName,
-      'from-file'
-    );
-    // Disabled entry is never constructed.
-    assert.strictEqual(built['@otel/enabled-false'], undefined);
   });
 
-  it('throws when both instrumentations and instrumentationRegistry are passed', function () {
-    assert.throws(
-      () =>
-        startNodeSDK({
-          instrumentations: [new TestInstrumentation('@otel/a')],
-          instrumentationRegistry: {
-            '@otel/b': () => new TestInstrumentation('@otel/b'),
-          },
-        }),
-      /not both/
-    );
+  it('instrumentations load their declarative config', function () {
+    const instrumentations = [new TestInstrumentation('@otel/with-config')];
+    sdk = startNodeSDK({ instrumentations });
+
+    assert.strictEqual(instrumentations[0].getConfig().serverName, 'from-file');
+    assert.deepStrictEqual(instrumentations[0].getConfig().captureHeaders, [
+      'content-type',
+    ]);
   });
 });

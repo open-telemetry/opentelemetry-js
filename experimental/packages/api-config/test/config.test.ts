@@ -4,22 +4,34 @@
  */
 
 import * as assert from 'assert';
-import { config, createConfigProperties, NoopConfigProvider } from '../src';
+import { config } from '../src';
 import type { ConfigProperties, ConfigProvider } from '../src';
+import {
+  EMPTY_CONFIG_PROPERTIES,
+  NoopConfigProvider,
+} from '../src/NoopConfigProvider';
 
 class StubConfigProvider implements ConfigProvider {
-  private readonly _block: Record<string, unknown>;
+  private readonly _config: Record<string, unknown>;
 
-  constructor(block: Record<string, unknown>) {
-    this._block = block;
+  constructor(config: Record<string, unknown>) {
+    this._config = config;
   }
 
-  getInstrumentationConfig(_name?: string): ConfigProperties {
-    return createConfigProperties(this._block);
+  getInstrumentationConfig(name?: string): ConfigProperties {
+    if (!name) {
+      return (this._config['instrumentation/development'] ??
+        EMPTY_CONFIG_PROPERTIES) as ConfigProperties;
+    } else {
+      return (
+        (this._config['instrumentation/development'] as any)?.js?.[name] ??
+        EMPTY_CONFIG_PROPERTIES
+      );
+    }
   }
 
   getGeneralInstrumentationConfig(): ConfigProperties {
-    return createConfigProperties(undefined);
+    return (this._config['instrumentation/development'] as any)?.general;
   }
 }
 
@@ -31,26 +43,20 @@ describe('config (global ConfigProvider API)', function () {
   it('returns a no-op provider when none is registered', function () {
     const provider = config.getConfigProvider();
     assert.ok(provider instanceof NoopConfigProvider);
-    assert.deepStrictEqual(
-      provider.getInstrumentationConfig().getPropertyKeys(),
-      []
-    );
-    assert.deepStrictEqual(
-      provider.getGeneralInstrumentationConfig().getPropertyKeys(),
-      []
-    );
+    assert.deepStrictEqual(provider.getInstrumentationConfig(), {});
+    assert.deepStrictEqual(provider.getInstrumentationConfig('aName'), {});
+    assert.deepStrictEqual(provider.getGeneralInstrumentationConfig(), {});
   });
 
   it('returns the registered provider after setGlobalConfigProvider', function () {
-    const provider = new StubConfigProvider({ enabled: true });
+    const provider = new StubConfigProvider({
+      'instrumentation/development': { foo: true },
+    });
     const returned = config.setGlobalConfigProvider(provider);
     assert.strictEqual(returned, provider);
     assert.strictEqual(config.getConfigProvider(), provider);
     assert.strictEqual(
-      config
-        .getConfigProvider()
-        .getInstrumentationConfig()
-        .getBoolean('enabled'),
+      (config.getConfigProvider().getInstrumentationConfig() as any).foo,
       true
     );
   });

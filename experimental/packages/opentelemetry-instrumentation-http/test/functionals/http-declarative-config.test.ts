@@ -6,34 +6,21 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag, DiagLogLevel } from '@opentelemetry/api';
-import { config, createConfigProperties } from '@opentelemetry/api-config';
-import type {
-  ConfigProperties,
-  ConfigProvider,
-} from '@opentelemetry/api-config';
+import { config } from '@opentelemetry/api-config';
+import { createConfigProvider } from '@opentelemetry/configuration';
+import type { ConfigProvider } from '@opentelemetry/api-config';
 import { HttpInstrumentation } from '../../src/http';
-
-// Register a global provider that serves `block` as the http instrumentation's
-// own config.
-function setHttpDeclarativeConfig(block: Record<string, unknown>): void {
-  const provider: ConfigProvider = {
-    getInstrumentationConfig(name?: string): ConfigProperties {
-      return createConfigProperties(
-        name === '@opentelemetry/instrumentation-http' ? block : undefined
-      );
-    },
-    getGeneralInstrumentationConfig: () => createConfigProperties(undefined),
-  };
-  config.setGlobalConfigProvider(provider);
-}
 
 describe('HttpInstrumentation declarative config', function () {
   let warn: sinon.SinonStub;
+
   const created: HttpInstrumentation[] = [];
   function makeInstrumentation(
+    configProvider: ConfigProvider,
     config?: ConstructorParameters<typeof HttpInstrumentation>[0]
   ): HttpInstrumentation {
     const instrumentation = new HttpInstrumentation(config);
+    instrumentation.setConfigProvider(configProvider);
     created.push(instrumentation);
     return instrumentation;
   }
@@ -60,59 +47,96 @@ describe('HttpInstrumentation declarative config', function () {
     sinon.restore();
   });
 
-  it('maps snake_case keys to config fields in the constructor', function () {
-    setHttpDeclarativeConfig({
-      require_parent_for_outgoing_spans: true,
-      server_name: 'my-server',
-      redacted_query_params: ['token', 'sig'],
-      enable_synthetic_source_detection: true,
+  it('reads supported "general.http.*" and "js.$instrumentationScope.*" config', function () {
+    const configProvider = createConfigProvider({
+      'instrumentation/development': {
+        js: {
+          '@opentelemetry/instrumentation-http': {
+            disable_incoming_request_instrumentation: true,
+            disable_outgoing_request_instrumentation: true,
+            require_parent_for_incoming_spans: true,
+            // Test warning for an invalid `boolean`.
+            require_parent_for_outgoing_spans: 42,
+            server_name: 'my-server',
+            enable_synthetic_source_detection: true,
+            // Test warning for an invalid `string[]`.
+            redacted_query_params: ['token', 42],
+          },
+        },
+        general: {
+          http: {
+            client: {
+              request_captured_headers: ['A', 'B'],
+              response_captured_headers: ['C', 'D'],
+              // This is to test that we get a diag.warn, because
+              // instrumentation-http doesn't currently support this setting.
+              known_methods:
+                'GET,HEAD,POST,PUT,DELETE,CONNECT,OPTIONS,TRACE'.split(','),
+            },
+            server: {
+              request_captured_headers: ['E', 'F'],
+              response_captured_headers: ['G', 'H'],
+            },
+          },
+        },
+      },
     });
-    const config = makeInstrumentation().getConfig();
+    const config = makeInstrumentation(configProvider).getConfig();
 
-    assert.strictEqual(config.requireParentforOutgoingSpans, true);
+    assert.strictEqual(config.disableIncomingRequestInstrumentation, true);
+    assert.strictEqual(config.disableOutgoingRequestInstrumentation, true);
+    assert.strictEqual(config.requireParentforIncomingSpans, true);
     assert.strictEqual(config.serverName, 'my-server');
-    assert.deepStrictEqual(config.redactedQueryParams, ['token', 'sig']);
     assert.strictEqual(config.enableSyntheticSourceDetection, true);
-    sinon.assert.notCalled(warn);
-  });
 
-  it('does not read enabled (handled by the SDK registry)', function () {
-    setHttpDeclarativeConfig({ enabled: false, server_name: 'x' });
-    const instrumentation = makeInstrumentation();
+    // Ensure the default value is kept when there is a type mismatch.
+    assert.strictEqual(config.requireParentforOutgoingSpans, undefined);
+    assert.deepStrictEqual(config.redactedQueryParams, undefined);
 
-    assert.strictEqual(instrumentation.getConfig().serverName, 'x');
-    sinon.assert.notCalled(warn);
+    assert.deepStrictEqual(config.headersToSpanAttributes, {
+      client: {
+        requestHeaders: ['A', 'B'],
+        responseHeaders: ['C', 'D'],
+      },
+      server: {
+        requestHeaders: ['E', 'F'],
+        responseHeaders: ['G', 'H'],
+      },
+    });
+
+    sinon.assert.calledThrice(warn);
+    sinon.assert.calledWithMatch(
+      warn.firstCall,
+      '@opentelemetry/instrumentation-http',
+      'unexpected type for declarative config property "instrumentation/development.js.@opentelemetry/instrumentation-http.require_parent_for_outgoing_spans": expected "boolean", got "number"'
+    );
+    sinon.assert.calledWithMatch(
+      warn.secondCall,
+      '@opentelemetry/instrumentation-http',
+      'unexpected type for declarative config property "instrumentation/development.js.@opentelemetry/instrumentation-http.redacted_query_params": expected array of strings'
+    );
+    sinon.assert.calledWithMatch(
+      warn.thirdCall,
+      '@opentelemetry/instrumentation-http',
+      'unhandled declarative configuration properties: ["instrumentation/development.general.http.client.known_methods"]'
+    );
   });
 
   it('leaves unset fields at their constructor value', function () {
-    setHttpDeclarativeConfig({ require_parent_for_incoming_spans: true });
-    const config = makeInstrumentation({ serverName: 'keep-me' }).getConfig();
+    const configProvider = createConfigProvider({
+      'instrumentation/development': {
+        js: {
+          '@opentelemetry/instrumentation-http': {
+            require_parent_for_incoming_spans: true,
+          },
+        },
+      },
+    });
+    const config = makeInstrumentation(configProvider, {
+      serverName: 'keep-me',
+    }).getConfig();
 
     assert.strictEqual(config.requireParentforIncomingSpans, true);
     assert.strictEqual(config.serverName, 'keep-me');
-  });
-
-  it('warns about an unrecognized key', function () {
-    setHttpDeclarativeConfig({ server_name: 'x', not_a_real_key: true });
-    const instrumentation = makeInstrumentation();
-
-    assert.strictEqual(instrumentation.getConfig().serverName, 'x');
-    sinon.assert.calledOnce(warn);
-    assert.match(warn.firstCall.args.join(' '), /unrecognized.*not_a_real_key/);
-  });
-
-  it('warns on a type mismatch and keeps the default', function () {
-    setHttpDeclarativeConfig({ require_parent_for_outgoing_spans: 'yes' });
-    const instrumentation = makeInstrumentation();
-
-    assert.strictEqual(
-      instrumentation.getConfig().requireParentforOutgoingSpans,
-      undefined
-    );
-    sinon.assert.calledOnce(warn);
-    assert.match(
-      warn.firstCall.args.join(' '),
-      /require_parent_for_outgoing_spans.*expected boolean/
-    );
   });
 });

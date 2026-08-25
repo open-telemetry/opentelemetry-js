@@ -7,7 +7,5 @@ instrumentation/development:
         request_captured_headers:
           - content-type
   js:
-    "@otel/enabled-false":
-      enabled: false
     "@otel/with-config":
       server_name: from-file

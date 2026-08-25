@@ -7,8 +7,12 @@ import type {
   ConfigProperties,
   ConfigProvider,
 } from '@opentelemetry/api-config';
-import { createConfigProperties } from '@opentelemetry/api-config';
-import type { ConfigurationModel } from './generated/types';
+import type {
+  ConfigurationModel,
+  ExperimentalInstrumentation,
+} from './generated/types';
+
+export const EMPTY_CONFIG_PROPERTIES: ConfigProperties = Object.freeze({});
 
 /**
  * A {@link ConfigProvider} over a parsed {@link ConfigurationModel}. Exposes the
@@ -16,29 +20,28 @@ import type { ConfigurationModel } from './generated/types';
  * `.js.<name>` and shared config at `.general`.
  */
 class SdkConfigProvider implements ConfigProvider {
-  private readonly _instrumentationConfig: ConfigProperties;
+  private readonly _instrumentationConfig:
+    | ExperimentalInstrumentation
+    | undefined;
 
-  constructor(model: ConfigurationModel) {
-    this._instrumentationConfig = createConfigProperties(
-      model['instrumentation/development']
-    );
+  constructor(config: ConfigurationModel) {
+    this._instrumentationConfig = config['instrumentation/development'];
   }
 
   getInstrumentationConfig(name?: string): ConfigProperties {
     if (name === undefined) {
-      return this._instrumentationConfig;
+      return (this._instrumentationConfig ??
+        EMPTY_CONFIG_PROPERTIES) as ConfigProperties;
+    } else {
+      // XXX guard and test on the `name` node not being a Record<string,unknown>.
+      return (this._instrumentationConfig?.js?.[name] ??
+        EMPTY_CONFIG_PROPERTIES) as ConfigProperties;
     }
-    return (
-      this._instrumentationConfig.getStructured('js')?.getStructured(name) ??
-      createConfigProperties(undefined)
-    );
   }
 
   getGeneralInstrumentationConfig(): ConfigProperties {
-    return (
-      this._instrumentationConfig.getStructured('general') ??
-      createConfigProperties(undefined)
-    );
+    return (this._instrumentationConfig?.general ??
+      EMPTY_CONFIG_PROPERTIES) as ConfigProperties;
   }
 }
 
@@ -46,7 +49,7 @@ class SdkConfigProvider implements ConfigProvider {
  * Build a {@link ConfigProvider} from a parsed configuration model.
  */
 export function createConfigProvider(
-  model: ConfigurationModel
+  config: ConfigurationModel
 ): ConfigProvider {
-  return new SdkConfigProvider(model);
+  return new SdkConfigProvider(config);
 }

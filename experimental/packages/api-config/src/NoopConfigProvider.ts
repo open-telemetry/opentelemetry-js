@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ConfigProvider } from './types/ConfigProvider';
-import type { ConfigProperties } from './types/ConfigProperties';
-import { createConfigProperties } from './ConfigPropertiesImpl';
+import type { ConfigProvider, ConfigProperties } from './types/ConfigProvider';
+
+// Exported for testing.
+export const EMPTY_CONFIG_PROPERTIES = Object.freeze({});
 
 /**
  * A {@link ConfigProvider} that yields empty configuration for every lookup, so
@@ -13,11 +14,11 @@ import { createConfigProperties } from './ConfigPropertiesImpl';
  */
 export class NoopConfigProvider implements ConfigProvider {
   getInstrumentationConfig(_name?: string): ConfigProperties {
-    return createConfigProperties(undefined);
+    return EMPTY_CONFIG_PROPERTIES;
   }
 
   getGeneralInstrumentationConfig(): ConfigProperties {
-    return createConfigProperties(undefined);
+    return EMPTY_CONFIG_PROPERTIES;
   }
 }
 

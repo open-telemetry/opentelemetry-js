@@ -3,7 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ConfigProperties } from './ConfigProperties';
+/**
+ * Representation of a declarative config mapping node.
+ * https://opentelemetry.io/docs/specs/otel/configuration/api/#configproperties
+ */
+export type ConfigProperties = Record<string, unknown>;
 
 /**
  * @experimental This feature is in development as per the OpenTelemetry
@@ -24,9 +28,19 @@ export interface ConfigProvider {
    * Returns the config for a single instrumentation
    * (`instrumentation/development.js.<name>`), or an empty accessor when absent.
    *
-   * @param name the instrumentation's npm package name
+   * @param name the instrumentation scope name (often the npm package name)
    */
   getInstrumentationConfig(name: string): ConfigProperties;
+
+  // XXX don't love ^^ the overload, could change second name later, e.g.
+  // getInstrumentationConfigFromScopeName (ugh that is wordy),
+  // `jsInstrumentationConfigFromScopeName()`, but not using that pattern here
+  // Most common usage will be the latter two methods here, so what about:
+  //    - getInstrumentationConfigRoot() - or whatever name
+  //    - getInstrumentationConfig(name)
+  //    - getGeneralInstrumentationConfig()
+  // Still not sure.
+
   /**
    * Returns the shared `instrumentation/development.general` node, or an empty
    * accessor when absent.

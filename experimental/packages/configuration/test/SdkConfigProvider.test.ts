@@ -4,7 +4,11 @@
  */
 
 import * as assert from 'assert';
-import type { ConfigurationModel } from '../src';
+import type {
+  ConfigurationModel,
+  ExperimentalGeneralInstrumentationConfigModel,
+  ExperimentalInstrumentationConfigModel,
+} from '../src';
 import { createConfigProvider } from '../src/SdkConfigProvider';
 
 const model: ConfigurationModel = {
@@ -28,49 +32,39 @@ const model: ConfigurationModel = {
 describe('SdkConfigProvider', () => {
   it('exposes the whole instrumentation/development node', () => {
     const provider = createConfigProvider(model);
-    const node = provider.getInstrumentationConfig();
-    assert.deepStrictEqual(node.getPropertyKeys().sort(), ['general', 'js']);
+    const node =
+      provider.getInstrumentationConfig() as ExperimentalInstrumentationConfigModel;
+    assert.deepStrictEqual(Object.keys(node), ['general', 'js']);
   });
 
-  it('reads a single instrumentation block by name', () => {
+  it('returns a single instrumentation node by name', () => {
     const provider = createConfigProvider(model);
     const http = provider.getInstrumentationConfig(
       '@opentelemetry/instrumentation-http'
-    );
-    assert.strictEqual(http.getBoolean('enabled'), false);
-    assert.strictEqual(http.getString('server_name'), 'example');
+    ) as any;
+    assert.strictEqual(typeof http, 'object');
+    assert.strictEqual(http.enabled, false);
+    assert.strictEqual(http.server_name, 'example');
   });
 
-  it('reads the general block', () => {
+  it('returns the general block', () => {
     const provider = createConfigProvider(model);
-    const headers = provider
-      .getGeneralInstrumentationConfig()
-      .getStructured('http')
-      ?.getStructured('client')
-      ?.getStringArray('request_captured_headers');
+    const general =
+      provider.getGeneralInstrumentationConfig() as ExperimentalGeneralInstrumentationConfigModel;
+    const headers = general?.http?.client?.request_captured_headers;
     assert.deepStrictEqual(headers, ['content-type']);
   });
 
-  it('returns an empty accessor for an unknown instrumentation', () => {
+  it('returns empty ConfigProperties for an instrumentation scope name with no config node', () => {
     const provider = createConfigProvider(model);
-    const unknown = provider.getInstrumentationConfig('does-not-exist');
-    assert.deepStrictEqual(unknown.getPropertyKeys(), []);
-    assert.strictEqual(unknown.getBoolean('enabled'), undefined);
+    const config = provider.getInstrumentationConfig('no-config-for-instr');
+    assert.deepStrictEqual(config, {});
   });
 
-  it('returns empty accessors when the node is absent', () => {
+  it('returns empty ConfigProperties when the node is absent', () => {
     const provider = createConfigProvider({} as ConfigurationModel);
-    assert.deepStrictEqual(
-      provider.getInstrumentationConfig().getPropertyKeys(),
-      []
-    );
-    assert.deepStrictEqual(
-      provider.getInstrumentationConfig('anything').getPropertyKeys(),
-      []
-    );
-    assert.deepStrictEqual(
-      provider.getGeneralInstrumentationConfig().getPropertyKeys(),
-      []
-    );
+    assert.deepStrictEqual(provider.getInstrumentationConfig(), {});
+    assert.deepStrictEqual(provider.getInstrumentationConfig('aName'), {});
+    assert.deepStrictEqual(provider.getGeneralInstrumentationConfig(), {});
   });
 });

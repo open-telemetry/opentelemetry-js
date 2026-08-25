@@ -4,6 +4,7 @@
  */
 
 import type { TracerProvider, MeterProvider, Span } from '@opentelemetry/api';
+import type { ConfigProvider } from '@opentelemetry/api-config';
 import type { LoggerProvider } from '@opentelemetry/api-logs';
 
 /** Interface Instrumentation to apply patch. */
@@ -31,17 +32,43 @@ export interface Instrumentation<
   /** Method to set logger provider  */
   setLoggerProvider?(loggerProvider: LoggerProvider): void;
 
+  /**
+   * Method to set the (declarative) ConfigProvider for this instrumentation.
+   *
+   * The ConfigProvider is an API to access values defined by the Declarative
+   * Configuration spec, typically defined in a YAML file provided at SDK
+   * setup. See:
+   * - https://opentelemetry.io/docs/specs/otel/configuration/api/
+   * - https://opentelemetry.io/docs/specs/otel-config/types/#type-experimentalinstrumentation
+   *
+   * This method is typically called by `registerInstrumentations()`,
+   * typically by SDK setup.
+   *
+   * Instrumentations that want to use declarative config should
+   * implement this method to collect configuration.
+   * Note that this is called *after* instrumentation construction,
+   * and often *after* `.enable()`, so an instrumentation cannot use this
+   * config to impact one-time setup (e.g. module monkey-patching).
+   *
+   * Implementations of setConfigProvider MUST NOT throw.
+   * Instrumentation declarative config is often loosely typed, be defensive.
+   * Implementations SHOULD diag.warn on unsupported / unrecognized config
+   * values.
+   *
+   * Warning: Be aware that the "config" here differs from the "config" in
+   * the `.setConfig() / .getConfig()` interface methods.
+   *
+   * XXX Should provide recommended usage docs. E.g. using `instrumentationName`
+   *     for `name` arg to get instr config. Point to `readConfigProperties` util in instrumentation package.
+   */
+  setConfigProvider?(configProvider: ConfigProvider): void;
+
   /** Method to set instrumentation config  */
   setConfig(config: ConfigType): void;
 
   /** Method to get instrumentation config  */
   getConfig(): ConfigType;
 }
-
-/**
- * A map of npm package name to a factory that constructs the instrumentation.
- */
-export type InstrumentationRegistry = Record<string, () => Instrumentation>;
 
 /**
  * Base interface for configuration options common to all instrumentations.
