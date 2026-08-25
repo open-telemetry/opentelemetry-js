@@ -12,7 +12,10 @@ class ComposableProbabilitySampler implements ComposableSampler {
   private readonly description: string;
 
   constructor(ratio: number) {
-    if (ratio < 0 || ratio > 1) {
+    // `NaN` fails every `<`/`>` comparison, so it would otherwise slip past
+    // both range checks below and only fail later with a confusing BigInt
+    // conversion error out of `calculateThreshold()`.
+    if (Number.isNaN(ratio) || ratio < 0 || ratio > 1) {
       throw new Error(
         `Invalid sampling probability: ${ratio}. Must be between 0 and 1.`
       );

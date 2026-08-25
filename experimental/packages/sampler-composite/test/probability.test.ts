@@ -74,7 +74,7 @@ describe('ComposableProbabilitySampler', () => {
   });
 
   describe('ratio validation', () => {
-    [-1, -0.0001, 1.0001, 2].forEach(ratio => {
+    [-1, -0.0001, 1.0001, 2, NaN, Infinity, -Infinity].forEach(ratio => {
       it(`should reject the out-of-range ratio ${ratio}`, () => {
         assert.throws(
           () => createComposableProbabilitySampler(ratio),
@@ -102,6 +102,14 @@ describe('ComposableProbabilitySampler', () => {
     it('should still allow the minimum representable nonzero ratio', () => {
       assert.doesNotThrow(() =>
         createComposableProbabilitySampler(Math.pow(2, -56))
+      );
+    });
+
+    it('should treat -0 the same as 0', () => {
+      const sampler = createComposableProbabilitySampler(-0);
+      assert.strictEqual(
+        sampler.toString(),
+        'ComposableProbabilitySampler(threshold=max, ratio=0)'
       );
     });
   });

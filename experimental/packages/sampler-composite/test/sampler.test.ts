@@ -241,5 +241,31 @@ describe('ConsistentSampler', () => {
       assert.strictEqual(result.decision, SamplingDecision.RECORD_AND_SAMPLED);
       assert.strictEqual(result.traceState?.get('ot'), 'th:0');
     });
+
+    it('should preserve unrelated tracestate members while clearing `ot`', () => {
+      const sampler = createCompositeSampler(
+        createComposableProbabilitySampler(0)
+      );
+      const parentWithVendor = new TraceState()
+        .set('vendor', 'xyz')
+        .set('ot', 'th:8');
+      const parentContextWithVendor = trace.setSpanContext(context.active(), {
+        traceId,
+        spanId,
+        traceFlags: TraceFlags.SAMPLED,
+        traceState: parentWithVendor,
+      });
+      const result = sampler.shouldSample(
+        parentContextWithVendor,
+        traceId,
+        'name',
+        SpanKind.INTERNAL,
+        {},
+        []
+      );
+      assert.strictEqual(result.decision, SamplingDecision.NOT_RECORD);
+      assert.strictEqual(result.traceState?.get('vendor'), 'xyz');
+      assert.strictEqual(result.traceState?.get('ot'), undefined);
+    });
   });
 });
