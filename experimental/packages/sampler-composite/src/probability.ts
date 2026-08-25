@@ -17,6 +17,15 @@ class ComposableProbabilitySampler implements ComposableSampler {
         `Invalid sampling probability: ${ratio}. Must be between 0 and 1.`
       );
     }
+    // `0` is a valid ratio (sample nothing); anything smaller than the
+    // minimum representable, nonzero ratio would otherwise be silently
+    // rounded down to the same behavior, which is more likely to be a
+    // configuration mistake than intentional.
+    if (ratio > 0 && ratio < MIN_NONZERO_RATIO) {
+      throw new Error(
+        `Invalid sampling probability: ${ratio}. Must be 0 or at least ${MIN_NONZERO_RATIO}.`
+      );
+    }
     const threshold = calculateThreshold(ratio);
     const thresholdStr =
       threshold === MAX_THRESHOLD ? 'max' : serializeTh(threshold);
@@ -56,6 +65,8 @@ export function createComposableProbabilitySampler(
 }
 
 const probabilityThresholdScale = Math.pow(2, 56);
+// https://opentelemetry.io/docs/specs/otel/trace/sdk/#probabilitysampler-sampler-configuration
+const MIN_NONZERO_RATIO = Math.pow(2, -56);
 
 // TODO: Reduce threshold precision following spec recommendation of 4
 // to reduce size of serialized tracestate.

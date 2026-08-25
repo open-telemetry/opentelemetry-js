@@ -20,7 +20,6 @@ describe('ComposableProbabilitySampler', () => {
     { ratio: 1.0, thresholdStr: '0' },
     { ratio: 0.5, thresholdStr: '8' },
     { ratio: 0.25, thresholdStr: 'c' },
-    { ratio: 1e-300, thresholdStr: 'max' },
     { ratio: 0, thresholdStr: 'max' },
   ].forEach(({ ratio, thresholdStr }) => {
     it(`should have a description for ratio ${ratio}`, () => {
@@ -70,6 +69,39 @@ describe('ComposableProbabilitySampler', () => {
       assert.ok(
         Math.abs(numSampled - expectedNumSampled) < 50,
         `expected ${expectedNumSampled}, have ${numSampled}`
+      );
+    });
+  });
+
+  describe('ratio validation', () => {
+    [-1, -0.0001, 1.0001, 2].forEach(ratio => {
+      it(`should reject the out-of-range ratio ${ratio}`, () => {
+        assert.throws(
+          () => createComposableProbabilitySampler(ratio),
+          /Invalid sampling probability/
+        );
+      });
+    });
+
+    // The spec's minimum valid nonzero sampling ratio is 2^-56; anything
+    // smaller cannot be represented and would silently collapse to the same
+    // behavior as ratio 0.
+    [Math.pow(2, -57), Math.pow(2, -100), 1e-300].forEach(ratio => {
+      it(`should reject the unrepresentable nonzero ratio ${ratio}`, () => {
+        assert.throws(
+          () => createComposableProbabilitySampler(ratio),
+          /Invalid sampling probability/
+        );
+      });
+    });
+
+    it('should still allow ratio 0', () => {
+      assert.doesNotThrow(() => createComposableProbabilitySampler(0));
+    });
+
+    it('should still allow the minimum representable nonzero ratio', () => {
+      assert.doesNotThrow(() =>
+        createComposableProbabilitySampler(Math.pow(2, -56))
       );
     });
   });

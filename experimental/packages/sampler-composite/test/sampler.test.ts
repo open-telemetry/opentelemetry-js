@@ -173,4 +173,73 @@ describe('ConsistentSampler', () => {
       });
     }
   );
+
+  describe('clearing a stale inherited `ot` value', () => {
+    // Reproduces the case where the recomputed `ot` member serializes to an
+    // empty string (nothing new to write): no threshold, no random value, and
+    // no other members. Before the fix, the code only called
+    // `traceState.set('ot', otts)` when `otts` was truthy, so an inherited
+    // `ot` value from the parent passed straight through untouched.
+    const parentTraceState = new TraceState().set('ot', 'th:8');
+    const parentSpanContext: SpanContext = {
+      traceId,
+      spanId,
+      traceFlags: TraceFlags.SAMPLED,
+      traceState: parentTraceState,
+    };
+    const parentContext = trace.setSpanContext(
+      context.active(),
+      parentSpanContext
+    );
+
+    it('should clear the parent `ot` value from a dropped span', () => {
+      // ratio 0 drops unconditionally and is not threshold-reliable, so the
+      // recomputed otTraceState has no valid threshold or random value.
+      const sampler = createCompositeSampler(
+        createComposableProbabilitySampler(0)
+      );
+      const result = sampler.shouldSample(
+        parentContext,
+        traceId,
+        'name',
+        SpanKind.INTERNAL,
+        {},
+        []
+      );
+      assert.strictEqual(result.decision, SamplingDecision.NOT_RECORD);
+      assert.strictEqual(result.traceState?.get('ot'), undefined);
+    });
+
+    it('should leave no `ot` member on a root span with nothing to write', () => {
+      const sampler = createCompositeSampler(
+        createComposableProbabilitySampler(0)
+      );
+      const result = sampler.shouldSample(
+        context.active(),
+        traceId,
+        'name',
+        SpanKind.INTERNAL,
+        {},
+        []
+      );
+      assert.strictEqual(result.decision, SamplingDecision.NOT_RECORD);
+      assert.strictEqual(result.traceState, undefined);
+    });
+
+    it('should still write a fresh `ot` value when sampled', () => {
+      const sampler = createCompositeSampler(
+        createComposableProbabilitySampler(1)
+      );
+      const result = sampler.shouldSample(
+        parentContext,
+        traceId,
+        'name',
+        SpanKind.INTERNAL,
+        {},
+        []
+      );
+      assert.strictEqual(result.decision, SamplingDecision.RECORD_AND_SAMPLED);
+      assert.strictEqual(result.traceState?.get('ot'), 'th:0');
+    });
+  });
 });
