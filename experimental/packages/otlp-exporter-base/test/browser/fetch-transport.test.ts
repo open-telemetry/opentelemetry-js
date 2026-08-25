@@ -169,6 +169,12 @@ describe('FetchTransport', function () {
 
     it('returns failure when aborted during headers resolution', function (done) {
       // arrange
+      // Stub globalThis.fetch so we can assert it is never called.
+      // Without this stub the test would pass even on the pre-fix behavior
+      // because calling fetch() with an already-aborted signal also rejects
+      // with AbortError, making the outcome indistinguishable.
+      const fetchStub = sinon.stub(globalThis, 'fetch');
+
       const clock = sinon.useFakeTimers();
       const headersPromise = new Promise<Record<string, string>>(resolve => {
         setTimeout(() => {
@@ -182,7 +188,7 @@ describe('FetchTransport', function () {
 
       //act
       transport.send(testPayload, 100).then(response => {
-        // assert
+        // assert - transport must fail with an AbortError-caused failure
         try {
           assert.strictEqual(response.status, 'failure');
           assert.strictEqual(
@@ -193,8 +199,14 @@ describe('FetchTransport', function () {
             ((response as ExportResponseFailure).error.cause as Error).name,
             'AbortError'
           );
+          // Critical regression guard: fetch must NOT be called when the
+          // timeout fires before headers resolve. The transport must bail
+          // out after detecting the aborted signal, never reaching the
+          // fetch() call. This assertion fails on the pre-fix behavior.
+          sinon.assert.notCalled(fetchStub);
         } catch (e) {
           done(e);
+          return;
         }
         done();
       }, done /* catch any rejections */);
