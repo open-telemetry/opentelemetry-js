@@ -30,8 +30,28 @@ The `NODE_OPTIONS` for the startup command should include `--import ./telemetry.
 ## Instrumentation Hook Required for ESM
 
 If your application is written in JavaScript as ESM, or compiled to ESM from TypeScript, then a loader hook is required to properly patch instrumentation.
-The custom hook for ESM instrumentation is `--experimental-loader=@opentelemetry/instrumentation/hook.mjs`.
-This flag must be passed to the `node` binary, which is often done as a startup command and/or in the `NODE_OPTIONS` environment variable.
+The custom hook for ESM instrumentation is `@opentelemetry/instrumentation/hook.mjs`.
+This must be registered with the `node` binary, which is often done as a startup command and/or in the `NODE_OPTIONS` environment variable.
+
+On Node.js versions that still use the experimental loader flag:
+
+```sh
+node --experimental-loader=@opentelemetry/instrumentation/hook.mjs --import ./telemetry.js app.js
+```
+
+`--import` does **not** register exported loader hooks by itself.
+`node --import @opentelemetry/instrumentation/hook.mjs` evaluates the file but does not install `load`/`resolve`/`initialize`, so ESM instrumentation is silently skipped.
+To register the hook with `--import`, use a small preload that calls `module.register()`:
+
+```javascript
+/*register-otel-hook.mjs*/
+import { register } from 'node:module';
+register('@opentelemetry/instrumentation/hook.mjs', import.meta.url);
+```
+
+```sh
+node --import ./register-otel-hook.mjs --import ./telemetry.js app.js
+```
 
 ### Additional Notes on Experimental Loaders
 
@@ -40,6 +60,7 @@ The only currently supported loader hook is `@opentelemetry/instrumentation/hook
 
 **Note:** Eventually the recommendation for how to setup OpenTelemetry for usage with ESM will change to no longer require `--experimental-loader=@opentelemetry/instrumentation/hook.mjs`.
 Instead the bootstrap code (in `./telemetry.js`) will use Node.js's newer `module.register(...)`.
+Until then, the `register-otel-hook.mjs` preload above is the supported `--import` replacement.
 Refer to this [issue](https://github.com/open-telemetry/opentelemetry-js/issues/4933) for details.
 
 Because of ongoing issues with loaders running TypeScript code as ESM in development environments, results may vary.
@@ -118,6 +139,12 @@ Startup command for compiled ESM:
 node --experimental-loader=@opentelemetry/instrumentation/hook.mjs --import ./telemetry.js app.js
 ```
 
+On Node.js 24+, register the hook with `--import` of a `module.register()` preload instead of `--experimental-loader`:
+
+```sh
+node --import ./register-otel-hook.mjs --import ./telemetry.js app.js
+```
+
 ### ESM Options for Different Versions of Node.js
 
 The entire startup command should include the following `NODE_OPTIONS`:
@@ -129,3 +156,4 @@ The entire startup command should include the following `NODE_OPTIONS`:
 | ^18.19.0          | `--import ./telemetry.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
 | 20.x              | `--import ./telemetry.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
 | 22.x              | `--import ./telemetry.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
+| 24.x              | `--import ./register-otel-hook.mjs --import ./telemetry.mjs`                                   |
