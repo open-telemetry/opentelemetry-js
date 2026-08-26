@@ -240,7 +240,7 @@ export function readConfigProperties(opts: {
         const propName = prefix + '.' + fromLookup;
         handledPropNames.push(propName);
         const val = dottedGet(instrConf, fromLookup);
-        if (val === undefined) {
+        if (val === undefined || val === null) {
           continue;
         }
         if (!validConfigPropertyType(propName, val, type, opts.diag)) {
@@ -265,7 +265,7 @@ export function readConfigProperties(opts: {
         const propName = prefix + '.' + fromLookup;
         handledPropNames.push(propName);
         const val = dottedGet(generalConf, fromLookup);
-        if (val === undefined) {
+        if (val === undefined || val === null) {
           continue;
         }
         if (!validConfigPropertyType(propName, val, type, opts.diag)) {

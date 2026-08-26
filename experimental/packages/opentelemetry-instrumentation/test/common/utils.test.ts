@@ -267,6 +267,41 @@ describe('readConfigProperties', function () {
     assert.match(warnings[0], /invalid target path "serverName.nested"/);
   });
 
+  it('treats an explicit null as unset, without warning', function () {
+    const config = readConfigProperties({
+      configProvider: provider({
+        '@otel/test': { server_name: null, require_parent: null },
+      }),
+      instrumentationName: '@otel/test',
+      instrumentationProps: [
+        ['server_name', 'string', 'serverName'],
+        ['require_parent', 'boolean', 'requireParent'],
+      ],
+      diag,
+    });
+    assert.deepStrictEqual(config, {});
+    assert.deepStrictEqual(warnings, []);
+  });
+
+  it('treats an explicit null in the general block as unset', function () {
+    const config = readConfigProperties({
+      configProvider: provider(
+        {},
+        { http: { client: { request_captured_headers: null } } }
+      ),
+      generalProps: [
+        [
+          'http.client.request_captured_headers',
+          'string[]',
+          'headersToSpanAttributes.client.requestHeaders',
+        ],
+      ],
+      diag,
+    });
+    assert.deepStrictEqual(config, {});
+    assert.deepStrictEqual(warnings, []);
+  });
+
   it('returns an empty object when nothing is declared', function () {
     const config = readConfigProperties({
       configProvider: provider({ '@otel/test': { server_name: 'srv' } }),
