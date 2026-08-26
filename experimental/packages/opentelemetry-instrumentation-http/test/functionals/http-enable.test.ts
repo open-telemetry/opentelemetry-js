@@ -1367,6 +1367,81 @@ describe('HttpInstrumentation', () => {
         assert.strictEqual(spans[0].attributes.key, 'value');
       });
     });
+
+    describe('propagation carrier', () => {
+      beforeEach(() => {
+        memoryExporter.reset();
+        instrumentation.setConfig({});
+        instrumentation.enable();
+        server = http.createServer((request, response) => {
+          response.end('Test Server Response');
+        });
+      });
+
+      afterEach(() => {
+        server.close();
+        instrumentation.disable();
+        propagation.disable();
+        propagation.setGlobalPropagator(new DummyPropagation());
+      });
+
+      it('should pass the incoming request as extract carrier', async () => {
+        let extractCarrier: unknown;
+        propagation.disable();
+        propagation.setGlobalPropagator({
+          inject: () => {},
+          extract: (context, carrier) => {
+            extractCarrier = carrier;
+            return context;
+          },
+          fields: () => [],
+        });
+
+        await new Promise<void>(resolve => server.listen(serverPort, resolve));
+        await httpRequest.get(`${protocol}://${hostname}:${serverPort}`);
+
+        assert.ok(extractCarrier instanceof http.IncomingMessage);
+      });
+
+      it('should allow a propagator to make trust decisions based on the request', async () => {
+        // A propagator that only extracts the remote context when the
+        // request comes from a trusted IP address.
+        propagation.disable();
+        const dummyPropagation = new DummyPropagation();
+        propagation.setGlobalPropagator({
+          inject: (context, carrier) =>
+            dummyPropagation.inject(
+              context,
+              carrier as { [key: string]: string }
+            ),
+          extract: (context, carrier, getter) => {
+            const request = carrier as http.IncomingMessage;
+            if (request.socket.remoteAddress !== '10.1.2.3') {
+              // untrusted source: ignore incoming propagation headers
+              return context;
+            }
+            return dummyPropagation.extract(context, request, getter);
+          },
+          fields: () => dummyPropagation.fields(),
+        });
+
+        await new Promise<void>(resolve => server.listen(serverPort, resolve));
+        await httpRequest.get(`${protocol}://${hostname}:${serverPort}`);
+
+        const spans = memoryExporter.getFinishedSpans();
+        const incomingSpan = spans.find(s => s.kind === SpanKind.SERVER);
+        const outgoingSpan = spans.find(s => s.kind === SpanKind.CLIENT);
+        assert.ok(incomingSpan);
+        assert.ok(outgoingSpan);
+        // The client sent propagation headers, but the propagator refused
+        // them based on the request's remote address: no remote parent.
+        assert.strictEqual(incomingSpan.parentSpanContext, undefined);
+        assert.notStrictEqual(
+          incomingSpan.spanContext().traceId,
+          outgoingSpan.spanContext().traceId
+        );
+      });
+    });
   });
 
   describe('capturing headers as span attributes', () => {
