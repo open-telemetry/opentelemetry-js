@@ -302,6 +302,61 @@ describe('readConfigProperties', function () {
     assert.deepStrictEqual(warnings, []);
   });
 
+  it('does not report general-block keys outside its declared domains', function () {
+    readConfigProperties({
+      configProvider: provider(
+        {},
+        {
+          http: { client: { request_captured_headers: ['a'] } },
+          db: { statement_sanitizer: true },
+        }
+      ),
+      instrumentationName: '@otel/test',
+      instrumentationProps: [],
+      generalProps: [
+        [
+          'http.client.request_captured_headers',
+          'string[]',
+          'headersToSpanAttributes.client.requestHeaders',
+        ],
+      ],
+      generalDomains: ['http'],
+      diag,
+    });
+    assert.deepStrictEqual(warnings, []);
+  });
+
+  it('reports unmapped keys inside its declared general domains', function () {
+    readConfigProperties({
+      configProvider: provider(
+        {},
+        {
+          http: { client: { known_methods: ['GET'] } },
+          db: { statement_sanitizer: true },
+        }
+      ),
+      instrumentationName: '@otel/test',
+      instrumentationProps: [],
+      generalProps: [],
+      generalDomains: ['http'],
+      diag,
+    });
+    assert.strictEqual(warnings.length, 1);
+    assert.match(warnings[0], /unhandled.*http\.client\.known_methods/);
+    assert.doesNotMatch(warnings[0], /statement_sanitizer/);
+  });
+
+  it('reports no general-block keys when no domains are declared', function () {
+    readConfigProperties({
+      configProvider: provider({}, { db: { statement_sanitizer: true } }),
+      instrumentationName: '@otel/test',
+      instrumentationProps: [],
+      generalProps: [],
+      diag,
+    });
+    assert.deepStrictEqual(warnings, []);
+  });
+
   it('returns an empty object when nothing is declared', function () {
     const config = readConfigProperties({
       configProvider: provider({ '@otel/test': { server_name: 'srv' } }),

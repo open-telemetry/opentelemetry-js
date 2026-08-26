@@ -197,6 +197,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           'headersToSpanAttributes.server.responseHeaders',
         ],
       ],
+      // instrumentation-http owns the `general.http` domain.
+      generalDomains: ['http'],
       diag: this._diag,
     });
 

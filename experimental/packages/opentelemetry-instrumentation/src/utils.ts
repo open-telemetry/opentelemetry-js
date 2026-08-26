@@ -222,9 +222,18 @@ export function readConfigProperties(opts: {
   instrumentationName?: string;
   instrumentationProps?: [string, string, string][];
   generalProps?: [string, string, string][];
+  /**
+   * The `general` domains this instrumentation is responsible for, e.g.
+   * `['http']`. Unhandled properties are reported for these domains only,
+   * because `general` is shared between instrumentations.
+   */
+  generalDomains?: string[];
   diag?: DiagLogger;
 }): Record<string, unknown> {
-  const propNames: string[] = [];
+  // Unhandled-property reporting covers the properties this instrumentation is
+  // responsible for: its own block, plus the `general` domains it declares via
+  // `generalDomains`. The rest of `general` belongs to other instrumentations.
+  const ownedPropNames: string[] = [];
   const handledPropNames: string[] = [];
   const config = {};
 
@@ -234,7 +243,7 @@ export function readConfigProperties(opts: {
     );
     if (instrConf) {
       const prefix = `instrumentation/development.js.${opts.instrumentationName}`;
-      propNames.push(...flattenedKeys(instrConf, prefix));
+      ownedPropNames.push(...flattenedKeys(instrConf, prefix));
 
       for (const [fromLookup, type, toLookup] of opts.instrumentationProps) {
         const propName = prefix + '.' + fromLookup;
@@ -259,7 +268,21 @@ export function readConfigProperties(opts: {
     const generalConf = opts.configProvider.getGeneralInstrumentationConfig();
     if (generalConf) {
       const prefix = 'instrumentation/development.general';
-      propNames.push(...flattenedKeys(generalConf, prefix));
+      for (const domain of opts.generalDomains ?? []) {
+        const subtree = dottedGet(generalConf, domain);
+        if (
+          typeof subtree === 'object' &&
+          subtree !== null &&
+          !Array.isArray(subtree)
+        ) {
+          ownedPropNames.push(
+            ...flattenedKeys(
+              subtree as Record<string, unknown>,
+              `${prefix}.${domain}`
+            )
+          );
+        }
+      }
 
       for (const [fromLookup, type, toLookup] of opts.generalProps) {
         const propName = prefix + '.' + fromLookup;
@@ -282,7 +305,7 @@ export function readConfigProperties(opts: {
 
   // Warn about unhandled properties in the config.
   // Dev note: I'd use Set#difference, but that requires Node.js v22.
-  const unhandledPropNames = propNames.filter(
+  const unhandledPropNames = ownedPropNames.filter(
     k => !handledPropNames.includes(k)
   );
   if (unhandledPropNames.length > 0) {
