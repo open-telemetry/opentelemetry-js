@@ -236,6 +236,37 @@ describe('readConfigProperties', function () {
     assert.match(warnings[0], /unhandled.*typo_key/);
   });
 
+  it('warns on an unsupported type tag', function () {
+    const config = readConfigProperties({
+      configProvider: provider({ '@otel/test': { port: 8080 } }),
+      instrumentationName: '@otel/test',
+      instrumentationProps: [['port', 'bogus', 'port']],
+      diag,
+    });
+    assert.deepStrictEqual(config, {});
+    assert.strictEqual(warnings.length, 1);
+    assert.match(warnings[0], /unsupported declarative config type "bogus"/);
+  });
+
+  it('warns when the target path is not walkable', function () {
+    const config = readConfigProperties({
+      configProvider: provider({
+        '@otel/test': { a: 'one', b: 'two' },
+      }),
+      instrumentationName: '@otel/test',
+      // 'serverName' is set to a string first, so 'serverName.nested' cannot be
+      // walked.
+      instrumentationProps: [
+        ['a', 'string', 'serverName'],
+        ['b', 'string', 'serverName.nested'],
+      ],
+      diag,
+    });
+    assert.deepStrictEqual(config, { serverName: 'one' });
+    assert.strictEqual(warnings.length, 1);
+    assert.match(warnings[0], /invalid target path "serverName.nested"/);
+  });
+
   it('returns an empty object when nothing is declared', function () {
     const config = readConfigProperties({
       configProvider: provider({ '@otel/test': { server_name: 'srv' } }),

@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as assert from 'assert';
-
 import type { ConfigProvider } from '@opentelemetry/api-config';
 import type { DiagLogger } from '@opentelemetry/api';
 
@@ -113,16 +111,20 @@ function dottedGet(obj: unknown, lookup: string): unknown {
  *   > dottedSet(o, 'foo.bar.baz', 42);
  *   > o
  *   { foo: { bar: { baz: 42 } } }
+ *
+ * Returns false, without setting anything, when the path cannot be walked.
  */
 function dottedSet(
   obj: Record<string, unknown>,
   lookup: string,
   val: unknown
-): void {
+): boolean {
   let targ = obj;
   const segs = lookup.split('.');
   const lastSeg = segs.pop();
-  assert.ok(typeof lastSeg === 'string');
+  if (lastSeg === undefined) {
+    return false;
+  }
   for (const key of segs) {
     if (!Object.hasOwn(targ, key)) {
       targ[key] = {};
@@ -133,14 +135,13 @@ function dottedSet(
       candidate === null ||
       Array.isArray(candidate)
     ) {
-      throw new Error(
-        `invalid lookup path ("${lookup}") for dottedSet: value at "${key}" is not a plain object: ${typeof candidate}`
-      );
+      return false;
     }
     targ = candidate as Record<string, unknown>;
   }
 
   targ[lastSeg] = val;
+  return true;
 }
 
 function isStringArray(arr: unknown): boolean {
@@ -208,7 +209,10 @@ function validConfigPropertyType(
       }
       break;
     default:
-      throw new Error(`unsupported declconf type: "${type}"`);
+      diag?.warn(
+        `unsupported declarative config type "${type}" for property "${name}"; ignoring`
+      );
+      return false;
   }
   return true;
 }
@@ -242,7 +246,11 @@ export function readConfigProperties(opts: {
         if (!validConfigPropertyType(propName, val, type, opts.diag)) {
           continue;
         }
-        dottedSet(config, toLookup, val);
+        if (!dottedSet(config, toLookup, val)) {
+          opts.diag?.warn(
+            `cannot apply declarative config property "${propName}": invalid target path "${toLookup}"`
+          );
+        }
       }
     }
   }
@@ -263,7 +271,11 @@ export function readConfigProperties(opts: {
         if (!validConfigPropertyType(propName, val, type, opts.diag)) {
           continue;
         }
-        dottedSet(config, toLookup, val);
+        if (!dottedSet(config, toLookup, val)) {
+          opts.diag?.warn(
+            `cannot apply declarative config property "${propName}": invalid target path "${toLookup}"`
+          );
+        }
       }
     }
   }
@@ -281,4 +293,3 @@ export function readConfigProperties(opts: {
 
   return config;
 }
-
