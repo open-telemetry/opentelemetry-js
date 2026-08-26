@@ -357,6 +357,61 @@ describe('readConfigProperties', function () {
     assert.deepStrictEqual(warnings, []);
   });
 
+  it('maps number, number[] and boolean[] properties', function () {
+    const config = readConfigProperties({
+      configProvider: provider({
+        '@otel/test': {
+          max_len: 128,
+          ports: [80, 443],
+          flags: [true, false],
+        },
+      }),
+      instrumentationName: '@otel/test',
+      instrumentationProps: [
+        ['max_len', 'number', 'maxLen'],
+        ['ports', 'number[]', 'ports'],
+        ['flags', 'boolean[]', 'flags'],
+      ],
+      diag,
+    });
+    assert.deepStrictEqual(config, {
+      maxLen: 128,
+      ports: [80, 443],
+      flags: [true, false],
+    });
+    assert.deepStrictEqual(warnings, []);
+  });
+
+  it('rejects NaN for number properties', function () {
+    const config = readConfigProperties({
+      configProvider: provider({ '@otel/test': { max_len: NaN } }),
+      instrumentationName: '@otel/test',
+      instrumentationProps: [['max_len', 'number', 'maxLen']],
+      diag,
+    });
+    assert.deepStrictEqual(config, {});
+    assert.strictEqual(warnings.length, 1);
+    assert.match(warnings[0], /expected "number", got "number"/);
+  });
+
+  it('warns when an array element has the wrong type', function () {
+    const config = readConfigProperties({
+      configProvider: provider({
+        '@otel/test': { ports: [80, '443'], flags: [true, 1] },
+      }),
+      instrumentationName: '@otel/test',
+      instrumentationProps: [
+        ['ports', 'number[]', 'ports'],
+        ['flags', 'boolean[]', 'flags'],
+      ],
+      diag,
+    });
+    assert.deepStrictEqual(config, {});
+    assert.strictEqual(warnings.length, 2);
+    assert.match(warnings[0], /expected array of numbers/);
+    assert.match(warnings[1], /expected array of booleans/);
+  });
+
   it('returns an empty object when nothing is declared', function () {
     const config = readConfigProperties({
       configProvider: provider({ '@otel/test': { server_name: 'srv' } }),

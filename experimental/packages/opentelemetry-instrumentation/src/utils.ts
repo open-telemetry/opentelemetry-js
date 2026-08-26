@@ -144,16 +144,12 @@ function dottedSet(
   return true;
 }
 
-function isStringArray(arr: unknown): boolean {
-  if (!Array.isArray(arr)) {
-    return false;
-  }
-  for (const el of arr) {
-    if (typeof el !== 'string') {
-      return false;
-    }
-  }
-  return true;
+function isNumber(val: unknown): boolean {
+  return typeof val === 'number' && !Number.isNaN(val);
+}
+
+function isArrayOf(arr: unknown, isElement: (el: unknown) => boolean): boolean {
+  return Array.isArray(arr) && arr.every(isElement);
 }
 
 /**
@@ -200,10 +196,34 @@ function validConfigPropertyType(
         return false;
       }
       break;
+    case 'number':
+      if (!isNumber(val)) {
+        diag?.warn(
+          `unexpected type for declarative config property "${name}": expected "number", got "${typeof val}"`
+        );
+        return false;
+      }
+      break;
     case 'string[]':
-      if (!isStringArray(val)) {
+      if (!isArrayOf(val, el => typeof el === 'string')) {
         diag?.warn(
           `unexpected type for declarative config property "${name}": expected array of strings`
+        );
+        return false;
+      }
+      break;
+    case 'boolean[]':
+      if (!isArrayOf(val, el => typeof el === 'boolean')) {
+        diag?.warn(
+          `unexpected type for declarative config property "${name}": expected array of booleans`
+        );
+        return false;
+      }
+      break;
+    case 'number[]':
+      if (!isArrayOf(val, isNumber)) {
+        diag?.warn(
+          `unexpected type for declarative config property "${name}": expected array of numbers`
         );
         return false;
       }
