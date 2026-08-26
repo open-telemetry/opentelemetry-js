@@ -7,15 +7,17 @@ import * as assert from 'assert';
 import type { DiagLogger, SpanContext } from '@opentelemetry/api';
 import {
   context,
+  defaultTextMapGetter,
   diag,
   DiagLogLevel,
   SpanKind,
   TraceFlags,
   trace,
 } from '@opentelemetry/api';
-import { TraceState } from '@opentelemetry/core';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
+import { TraceState, W3CTraceContextPropagator } from '@opentelemetry/core';
 import type { Sampler } from '@opentelemetry/sdk-trace';
-import { SamplingDecision } from '@opentelemetry/sdk-trace';
+import { SamplingDecision, TracerProvider } from '@opentelemetry/sdk-trace';
 
 import {
   createCompositeSampler,
@@ -205,6 +207,107 @@ describe('ProbabilitySampler', () => {
       for (let i = 0; i < 5; i++) {
         sample(sampler, ctx);
       }
+      assert.strictEqual(presumed().length, 1);
+    });
+  });
+
+  describe('compatibility warning (through a real TracerProvider)', () => {
+    // The unit tests above hand-build a `SpanContext` to reach every branch
+    // of the warning logic directly. `Tracer.startSpan()` only ever passes
+    // through the *incoming* context (from context propagation) unmodified,
+    // but always rebuilds the *new* span's own `traceFlags` down to just
+    // `SAMPLED`/`NONE`, so a locally created span can never itself carry the
+    // random flag. That means the "random flag set" / "explicit rv" cases
+    // are only reachable in practice via a remote parent extracted from real
+    // W3C headers -- this exercises that path end to end, propagator
+    // extraction included, instead of a synthetic SpanContext.
+    let warnings: string[];
+    const propagator = new W3CTraceContextPropagator();
+    const remoteTraceId = '00112233445566778899aabbccddeeff';
+    const presumed = () =>
+      warnings.filter(w => w.includes('presuming TraceIDs are random'));
+
+    function extractRemoteContext(traceparent: string, tracestate?: string) {
+      const carrier: Record<string, string> = { traceparent };
+      if (tracestate) carrier.tracestate = tracestate;
+      return propagator.extract(
+        context.active(),
+        carrier,
+        defaultTextMapGetter
+      );
+    }
+
+    beforeEach(() => {
+      context.setGlobalContextManager(new AsyncLocalStorageContextManager());
+      warnings = [];
+      const logger = {
+        warn: (message: string) => warnings.push(message),
+        error: () => {},
+        info: () => {},
+        debug: () => {},
+        verbose: () => {},
+      } satisfies DiagLogger;
+      diag.setLogger(logger, DiagLogLevel.WARN);
+      warnings.length = 0;
+    });
+
+    afterEach(() => {
+      diag.disable();
+      context.disable();
+    });
+
+    it('should not warn for a local root span', () => {
+      const provider = new TracerProvider({
+        sampler: createProbabilitySampler(0.5),
+        spanProcessors: [],
+      });
+      const span = provider.getTracer('test').startSpan('root');
+      assert.deepStrictEqual(presumed(), []);
+      // The new span's own flags never carry the random bit, confirming it
+      // can only ever be observed by way of an extracted remote parent.
+      assert.strictEqual(span.spanContext().traceFlags & 0x2, 0);
+    });
+
+    it('should not warn for a remote parent with the random flag set', () => {
+      const provider = new TracerProvider({
+        sampler: createProbabilitySampler(0.5),
+        spanProcessors: [],
+      });
+      const parentCtx = extractRemoteContext(
+        `00-${remoteTraceId}-0123456789abcdef-02`
+      );
+      context.with(parentCtx, () =>
+        provider.getTracer('test').startSpan('child')
+      );
+      assert.deepStrictEqual(presumed(), []);
+    });
+
+    it('should not warn for a remote parent with an explicit rv', () => {
+      const provider = new TracerProvider({
+        sampler: createProbabilitySampler(0.5),
+        spanProcessors: [],
+      });
+      const parentCtx = extractRemoteContext(
+        `00-${remoteTraceId}-0123456789abcdef-00`,
+        'ot=rv:7f99aa40c02744'
+      );
+      context.with(parentCtx, () =>
+        provider.getTracer('test').startSpan('child')
+      );
+      assert.deepStrictEqual(presumed(), []);
+    });
+
+    it('should warn for an old-style remote parent with no rv', () => {
+      const provider = new TracerProvider({
+        sampler: createProbabilitySampler(0.5),
+        spanProcessors: [],
+      });
+      const parentCtx = extractRemoteContext(
+        `00-${remoteTraceId}-0123456789abcdef-01`
+      );
+      context.with(parentCtx, () =>
+        provider.getTracer('test').startSpan('child')
+      );
       assert.strictEqual(presumed().length, 1);
     });
   });

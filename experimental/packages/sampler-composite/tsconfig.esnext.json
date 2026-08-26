@@ -13,6 +13,9 @@
       "path": "../../../api"
     },
     {
+      "path": "../../../packages/opentelemetry-context-async-hooks"
+    },
+    {
       "path": "../../../packages/opentelemetry-core"
     },
     {
