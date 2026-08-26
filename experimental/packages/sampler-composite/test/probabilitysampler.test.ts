@@ -310,5 +310,105 @@ describe('ProbabilitySampler', () => {
       );
       assert.strictEqual(presumed().length, 1);
     });
+
+    it('should warn for a remote parent with a malformed rv', () => {
+      const provider = new TracerProvider({
+        sampler: createProbabilitySampler(0.5),
+        spanProcessors: [],
+      });
+      const parentCtx = extractRemoteContext(
+        `00-${remoteTraceId}-0123456789abcdef-00`,
+        'ot=rv:zz' // not valid hex; falls back to unconfirmed
+      );
+      context.with(parentCtx, () =>
+        provider.getTracer('test').startSpan('child')
+      );
+      assert.strictEqual(presumed().length, 1);
+    });
+
+    it('should not warn when rv is present alongside other tracestate vendors', () => {
+      const provider = new TracerProvider({
+        sampler: createProbabilitySampler(0.5),
+        spanProcessors: [],
+      });
+      const parentCtx = extractRemoteContext(
+        `00-${remoteTraceId}-0123456789abcdef-00`,
+        'congo=t61rcWkgMzE,ot=rv:7f99aa40c02744,rojo=00f067aa0ba902b7'
+      );
+      context.with(parentCtx, () =>
+        provider.getTracer('test').startSpan('child')
+      );
+      assert.deepStrictEqual(presumed(), []);
+    });
+
+    it('should warn for a local child of a local root using the trace-ID fallback', () => {
+      // The root correctly doesn't warn (nothing upstream to distrust), but it
+      // also doesn't have an explicit `rv` to hand down -- it sampled using the
+      // trace-ID fallback. A local child inherits that same unconfirmed trace
+      // ID, so it re-presumes randomness and warns once, on the child.
+      const provider = new TracerProvider({
+        sampler: createProbabilitySampler(0.5),
+        spanProcessors: [],
+      });
+      const tracer = provider.getTracer('test');
+      const root = tracer.startSpan('root');
+      assert.deepStrictEqual(presumed(), []);
+
+      context.with(trace.setSpan(context.active(), root), () =>
+        tracer.startSpan('child')
+      );
+      assert.strictEqual(presumed().length, 1);
+    });
+
+    it('known limitation: confirmed randomness does not survive a second hop', () => {
+      // Service A receives a remote parent with the random flag confirmed.
+      // Tracer.startSpan() always rebuilds a new span's own traceFlags down to
+      // SAMPLED/NONE (see Tracer.ts), and the spec only permits -- it does not
+      // require -- a *root* sampler to write an explicit `rv` into tracestate
+      // (https://opentelemetry.io/docs/specs/otel/trace/sdk/#probabilitysampler-sampler-configuration).
+      // ProbabilitySampler doesn't do this, so once the flag is gone, a second
+      // hop (service B, receiving A's outgoing header) has no way to confirm
+      // randomness and warns again, even though the trace genuinely started
+      // with confirmed randomness. This test documents that current, spec-
+      // compliant behavior rather than asserting it's ideal.
+      const providerA = new TracerProvider({
+        sampler: createProbabilitySampler(0.5),
+        spanProcessors: [],
+      });
+      const tracerA = providerA.getTracer('serviceA');
+      const incomingToA = extractRemoteContext(
+        `00-${remoteTraceId}-0123456789abcdef-02`
+      );
+
+      const outgoingCarrier: Record<string, string> = {};
+      context.with(incomingToA, () => {
+        const spanA = tracerA.startSpan('handle-request');
+        assert.deepStrictEqual(presumed(), []);
+        propagator.inject(
+          trace.setSpan(context.active(), spanA),
+          outgoingCarrier,
+          {
+            set: (carrier, key, value) => {
+              carrier[key] = value;
+            },
+          }
+        );
+      });
+
+      warnings.length = 0;
+      const providerB = new TracerProvider({
+        sampler: createProbabilitySampler(0.5),
+        spanProcessors: [],
+      });
+      const incomingToB = propagator.extract(
+        context.active(),
+        outgoingCarrier,
+        defaultTextMapGetter
+      );
+      context.with(incomingToB, () =>
+        providerB.getTracer('serviceB').startSpan('handle-in-b')
+      );
+      assert.strictEqual(presumed().length, 1);
+    });
   });
 });
