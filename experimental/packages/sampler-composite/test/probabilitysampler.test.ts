@@ -17,7 +17,11 @@ import {
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { TraceState, W3CTraceContextPropagator } from '@opentelemetry/core';
 import type { Sampler } from '@opentelemetry/sdk-trace';
-import { SamplingDecision, TracerProvider } from '@opentelemetry/sdk-trace';
+import {
+  ParentBasedSampler,
+  SamplingDecision,
+  TracerProvider,
+} from '@opentelemetry/sdk-trace';
 
 import {
   createCompositeSampler,
@@ -409,6 +413,100 @@ describe('ProbabilitySampler', () => {
         providerB.getTracer('serviceB').startSpan('handle-in-b')
       );
       assert.strictEqual(presumed().length, 1);
+    });
+
+    it('should warn independently per sampler instance, not globally', () => {
+      const samplerX = createProbabilitySampler(0.5);
+      const samplerY = createProbabilitySampler(0.5);
+      const providerX = new TracerProvider({
+        sampler: samplerX,
+        spanProcessors: [],
+      });
+      const providerY = new TracerProvider({
+        sampler: samplerY,
+        spanProcessors: [],
+      });
+      const oldStyleCtx = extractRemoteContext(
+        `00-${remoteTraceId}-0123456789abcdef-01`
+      );
+
+      context.with(oldStyleCtx, () =>
+        providerX.getTracer('x').startSpan('spanX1')
+      );
+      assert.strictEqual(presumed().length, 1);
+
+      // Same instance, same unconfirmed parent again: still just the one warning.
+      context.with(oldStyleCtx, () =>
+        providerX.getTracer('x').startSpan('spanX2')
+      );
+      assert.strictEqual(presumed().length, 1);
+
+      // A different sampler instance hasn't warned yet, so it warns on its own.
+      context.with(oldStyleCtx, () =>
+        providerY.getTracer('y').startSpan('spanY1')
+      );
+      assert.strictEqual(presumed().length, 2);
+    });
+
+    it('should not warn when `root: true` overrides an unconfirmed active parent', () => {
+      // `Tracer.startSpan()` strips the parent from context before invoking the
+      // sampler when `root: true` is passed, so this should behave exactly
+      // like the no-parent case regardless of what the active parent was.
+      const provider = new TracerProvider({
+        sampler: createProbabilitySampler(0.5),
+        spanProcessors: [],
+      });
+      const oldStyleCtx = extractRemoteContext(
+        `00-${remoteTraceId}-0123456789abcdef-01`
+      );
+      context.with(oldStyleCtx, () =>
+        provider.getTracer('test').startSpan('forced-root', { root: true })
+      );
+      assert.deepStrictEqual(presumed(), []);
+    });
+
+    it('should sample correctly and never warn when composed as the root of a ParentBasedSampler', () => {
+      // The package's own README recommends wrapping ProbabilitySampler in
+      // ParentBasedSampler to respect the parent SampledFlag (this sampler
+      // ignores it on its own). ParentBasedSampler only ever delegates to the
+      // wrapped `root` sampler when there is no parent at all -- a sampled or
+      // unsampled remote parent is handled by ParentBasedSampler's own
+      // defaults and never reaches ProbabilitySampler.
+      const provider = new TracerProvider({
+        sampler: new ParentBasedSampler({
+          root: createProbabilitySampler(0.5),
+        }),
+        spanProcessors: [],
+      });
+      const tracer = provider.getTracer('test');
+
+      let sampled = 0;
+      const N = 2000;
+      for (let i = 0; i < N; i++) {
+        const span = tracer.startSpan(`root${i}`);
+        if ((span.spanContext().traceFlags & TraceFlags.SAMPLED) !== 0) {
+          sampled++;
+        }
+      }
+      assert.ok(
+        Math.abs(sampled / N - 0.5) < 0.05,
+        `sampled ${sampled} of ${N}, want ~${N / 2}`
+      );
+      assert.deepStrictEqual(presumed(), []);
+
+      // A sampled remote parent is respected as-is, bypassing ProbabilitySampler.
+      const sampledParentCtx = extractRemoteContext(
+        `00-${remoteTraceId}-0123456789abcdef-01`
+      );
+      let child: ReturnType<typeof tracer.startSpan> | undefined;
+      context.with(sampledParentCtx, () => {
+        child = tracer.startSpan('child-of-sampled-parent');
+      });
+      assert.strictEqual(
+        (child!.spanContext().traceFlags & TraceFlags.SAMPLED) !== 0,
+        true
+      );
+      assert.deepStrictEqual(presumed(), []);
     });
   });
 });
