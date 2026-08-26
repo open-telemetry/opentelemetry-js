@@ -65,12 +65,22 @@ export class PropagationAPI {
    *
    * @param context Context carrying tracing data to inject
    * @param carrier carrier to inject context into
-   * @param setter Function used to set values on the carrier
+   * @param setter Function used to set values on the carrier. If not provided, the carrier must be a plain object and values will be set by direct object assignment.
    */
   public inject<Carrier>(
     context: Context,
     carrier: Carrier,
-    setter: TextMapSetter<Carrier> = defaultTextMapSetter
+    setter: TextMapSetter<Carrier>
+  ): void;
+  public inject<Carrier extends Record<string, undefined | string | string[]>>(
+    context: Context,
+    carrier: Carrier,
+    setter?: TextMapSetter<Carrier>
+  ): void;
+  public inject<Carrier>(
+    context: Context,
+    carrier: Carrier,
+    setter: TextMapSetter<Carrier> = defaultTextMapSetter as TextMapSetter<Carrier>
   ): void {
     return this._getGlobalPropagator().inject(context, carrier, setter);
   }
@@ -80,12 +90,22 @@ export class PropagationAPI {
    *
    * @param context Context which the newly created context will inherit from
    * @param carrier Carrier to extract context from
-   * @param getter Function used to extract keys from a carrier
+   * @param getter Function used to extract keys from a carrier. If not provided, the carrier must be a plain object and keys will be extracted via direct object access.
    */
   public extract<Carrier>(
     context: Context,
     carrier: Carrier,
-    getter: TextMapGetter<Carrier> = defaultTextMapGetter
+    getter: TextMapGetter<Carrier>
+  ): Context;
+  public extract<Carrier extends Record<string, undefined | string | string[]>>(
+    context: Context,
+    carrier: Carrier,
+    getter?: TextMapGetter<Carrier>
+  ): Context;
+  public extract<Carrier>(
+    context: Context,
+    carrier: Carrier,
+    getter: TextMapGetter<Carrier> = defaultTextMapGetter as TextMapGetter<Carrier>
   ): Context {
     return this._getGlobalPropagator().extract(context, carrier, getter);
   }
