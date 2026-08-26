@@ -13,12 +13,15 @@ import type { AttributeHashMap } from './HashMap';
  * An interface representing SyncMetricStorage with type parameters removed.
  */
 export interface WritableMetricStorage {
+  /** Whether this storage has an attribute processor that needs context. */
+  hasAttributeProcessor: boolean;
+
   /** Records a measurement. */
   record(
     value: number,
     attributes: Attributes,
-    context: Context,
-    recordTime: HrTime
+    context: Context | undefined,
+    recordTime: number
   ): void;
 }
 

@@ -4,7 +4,7 @@
  */
 
 import type { Attributes, TraceState } from '@opentelemetry/api';
-import { type Sampler } from '@opentelemetry/sdk-trace-base';
+import { type Sampler } from '@opentelemetry/sdk-trace';
 
 /** Information to make a sampling decision. */
 export type SamplingIntent = {

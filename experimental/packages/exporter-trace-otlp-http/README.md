@@ -59,7 +59,8 @@ provider.register();
 ## Traces in Node - JSON over http
 
 ```js
-const { NodeTracerProvider, BatchSpanProcessor } = require('@opentelemetry/sdk-trace-node');
+const { trace } = require('@opentelemetry/api');
+const { TracerProvider, BatchSpanProcessor } = require('@opentelemetry/sdk-trace');
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-http');
 
 const collectorOptions = {
@@ -71,9 +72,10 @@ const collectorOptions = {
 };
 
 const exporter = new OTLPTraceExporter(collectorOptions);
-const provider = new NodeTracerProvider({
+const tracerProvider = new TracerProvider({
   spanProcessors: [
-    new BatchSpanProcessor(exporter, {
+    new BatchSpanProcessor({
+      exporter,
       // The maximum queue size. After the size is reached spans are dropped.
       maxQueueSize: 1000,
       // The interval between two consecutive exports
@@ -81,9 +83,7 @@ const provider = new NodeTracerProvider({
     })
   ]
 });
-
-provider.register();
-
+trace.setGlobalTracerProvider(tracerProvider);
 ```
 
 ## GRPC

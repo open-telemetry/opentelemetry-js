@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 // Test that http/https are not *double*-instrumented if http is loaded by
@@ -27,17 +16,17 @@ const path = require('path');
 const fs = require('fs');
 
 const { SpanKind } = require('@opentelemetry/api');
-const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
 const {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} = require('@opentelemetry/sdk-trace-base');
+  TracerProvider,
+} = require('@opentelemetry/sdk-trace');
 
 const { HttpInstrumentation } = require('../../build/src/index.js');
 
 const memoryExporter = new InMemorySpanExporter();
-const provider = new NodeTracerProvider({
-  spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+const provider = new TracerProvider({
+  spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
 });
 const instrumentation = new HttpInstrumentation();
 instrumentation.setTracerProvider(provider);
@@ -54,7 +43,13 @@ function assertTwoSpans(spans, opts) {
       '@opentelemetry/instrumentation-http'
     );
     if (opts.pathname) {
-      assert.strictEqual(span.attributes['http.target'], opts.pathname);
+      if (span.kind === SpanKind.SERVER) {
+        assert.strictEqual(span.attributes['url.path'], opts.pathname);
+      } else {
+        assert.ok(
+          (span.attributes['url.full'] ?? '').endsWith(opts.pathname)
+        );
+      }
     }
   }
   assert.strictEqual(spans[0].kind, SpanKind.SERVER);

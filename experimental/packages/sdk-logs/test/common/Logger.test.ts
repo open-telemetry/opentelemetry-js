@@ -5,6 +5,7 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import type { LoggerPattern } from '../../src';
 import { LoggerProvider, createLoggerConfigurator } from '../../src';
 import { NoopLogRecordProcessor } from '../../src/export/NoopLogRecordProcessor';
 import { LogRecordImpl } from '../../src/LogRecordImpl';
@@ -16,34 +17,34 @@ import { InMemoryLogRecordExporter } from '../../src/export/InMemoryLogRecordExp
 import { SimpleLogRecordProcessor } from '../../src/export/SimpleLogRecordProcessor';
 import { LoggerProviderSharedState } from '../../src/internal/LoggerProviderSharedState';
 
-const setup = () => {
-  const logProcessor = new NoopLogRecordProcessor();
-  const loggerProvider = new LoggerProvider({ processors: [logProcessor] });
+function setupLoggerProvider(
+  processor: 'noop' | 'simple',
+  patterns?: LoggerPattern[]
+) {
+  const isNoop = processor === 'noop';
+  const logExporter = new InMemoryLogRecordExporter();
+  const logProcessor = isNoop
+    ? new NoopLogRecordProcessor()
+    : new SimpleLogRecordProcessor({ exporter: logExporter });
+  const loggerProvider = new LoggerProvider({
+    processors: [logProcessor],
+    loggerConfigurator: patterns && createLoggerConfigurator(patterns),
+  });
   const logger = loggerProvider.getLogger('test name', 'test version', {
     schemaUrl: 'test schema url',
   }) as Logger;
-  return { logger, logProcessor };
-};
+  return { logger, loggerProvider, logProcessor, logExporter };
+}
 
 describe('Logger', () => {
   describe('constructor', () => {
     it('should create an instance', () => {
-      const { logger } = setup();
+      const { logger } = setupLoggerProvider('simple');
       assert.ok(logger instanceof Logger);
     });
 
     it('should cache the logger config at construction time', () => {
-      const logProcessor = new NoopLogRecordProcessor();
-      const loggerProvider = new LoggerProvider({
-        processors: [logProcessor],
-        loggerConfigurator: createLoggerConfigurator([
-          {
-            pattern: 'test-logger',
-            config: { minimumSeverity: SeverityNumber.WARN },
-          },
-        ]),
-      });
-
+      const { loggerProvider } = setupLoggerProvider('simple');
       const getLoggerConfigSpy = sinon.spy(
         LoggerProviderSharedState.prototype,
         'getLoggerConfig'
@@ -78,8 +79,17 @@ describe('Logger', () => {
   });
 
   describe('emit', () => {
+    it('should not emit a logRecord instance if no processors are active', () => {
+      const { logger, logProcessor } = setupLoggerProvider('noop');
+      const callSpy = sinon.spy(logProcessor, 'onEmit');
+      logger.emit({
+        body: 'test log body',
+      });
+      assert.ok(callSpy.called === false);
+    });
+
     it('should emit a logRecord instance', () => {
-      const { logger, logProcessor } = setup();
+      const { logger, logProcessor } = setupLoggerProvider('simple');
       const callSpy = sinon.spy(logProcessor, 'onEmit');
       logger.emit({
         body: 'test log body',
@@ -87,8 +97,51 @@ describe('Logger', () => {
       assert.ok(callSpy.called);
     });
 
+    it('should not do any work when emitting after the LoggerProvider has shut down', async () => {
+      const { logger, loggerProvider, logProcessor } =
+        setupLoggerProvider('simple');
+      const onEmitSpy = sinon.spy(logProcessor, 'onEmit');
+      const makeReadonlySpy = sinon.spy(
+        LogRecordImpl.prototype,
+        '_makeReadonly'
+      );
+
+      try {
+        assert.strictEqual(
+          logger.enabled(),
+          true,
+          'sanity: logger should be enabled before shutdown'
+        );
+
+        await loggerProvider.shutdown();
+
+        assert.strictEqual(
+          logger.enabled(),
+          false,
+          'enabled() should report false after the provider has shut down'
+        );
+
+        logger.emit({
+          body: 'log body emitted after shutdown',
+        });
+
+        assert.strictEqual(
+          onEmitSpy.called,
+          false,
+          'processor.onEmit should not be called after the provider has shut down'
+        );
+        assert.strictEqual(
+          makeReadonlySpy.called,
+          false,
+          'no LogRecord should be constructed after the provider has shut down'
+        );
+      } finally {
+        makeReadonlySpy.restore();
+      }
+    });
+
     it('should make log record instance readonly after emit it', () => {
-      const { logger } = setup();
+      const { logger } = setupLoggerProvider('simple');
       const makeOnlySpy = sinon.spy(LogRecordImpl.prototype, '_makeReadonly');
       logger.emit({
         body: 'test log body',
@@ -97,7 +150,7 @@ describe('Logger', () => {
     });
 
     it('should emit with current Context', () => {
-      const { logger, logProcessor } = setup();
+      const { logger, logProcessor } = setupLoggerProvider('simple');
       const callSpy = sinon.spy(logProcessor, 'onEmit');
       logger.emit({
         body: 'test log body',
@@ -106,7 +159,7 @@ describe('Logger', () => {
     });
 
     it('should emit with Context specified in LogRecord', () => {
-      const { logger, logProcessor } = setup();
+      const { logger, logProcessor } = setupLoggerProvider('simple');
       const spanContext = {
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
         spanId: '6e0c63257de34c92',
@@ -124,16 +177,12 @@ describe('Logger', () => {
 
     describe('minimum severity filtering', () => {
       it('should emit log records with severity above minimum', () => {
-        const exporter = new InMemoryLogRecordExporter();
-        const loggerProvider = new LoggerProvider({
-          processors: [new SimpleLogRecordProcessor(exporter)],
-          loggerConfigurator: createLoggerConfigurator([
-            {
-              pattern: 'test-logger',
-              config: { minimumSeverity: SeverityNumber.INFO },
-            },
-          ]),
-        });
+        const { loggerProvider, logExporter } = setupLoggerProvider('simple', [
+          {
+            pattern: 'test-logger',
+            config: { minimumSeverity: SeverityNumber.INFO },
+          },
+        ]);
         const logger = loggerProvider.getLogger('test-logger') as Logger;
 
         logger.emit({
@@ -146,22 +195,18 @@ describe('Logger', () => {
           severityNumber: SeverityNumber.WARN,
         });
 
-        const logRecords = exporter.getFinishedLogRecords();
+        const logRecords = logExporter.getFinishedLogRecords();
         assert.strictEqual(logRecords.length, 2);
       });
 
       it('should drop log records with severity below minimum', () => {
-        const exporter = new InMemoryLogRecordExporter();
-        const loggerProvider = new LoggerProvider({
-          processors: [new SimpleLogRecordProcessor(exporter)],
-          loggerConfigurator: createLoggerConfigurator([
-            {
-              pattern: 'test-logger',
-              config: { minimumSeverity: SeverityNumber.WARN },
-            },
-          ]),
-        });
-        const logger = loggerProvider.getLogger('test-logger') as Logger;
+        const { loggerProvider, logExporter } = setupLoggerProvider('simple', [
+          {
+            pattern: 'test-logger',
+            config: { minimumSeverity: SeverityNumber.WARN },
+          },
+        ]);
+        const logger = loggerProvider.getLogger('test-logger');
 
         logger.emit({
           body: 'debug message',
@@ -173,43 +218,35 @@ describe('Logger', () => {
           severityNumber: SeverityNumber.INFO,
         });
 
-        const logRecords = exporter.getFinishedLogRecords();
+        const logRecords = logExporter.getFinishedLogRecords();
         assert.strictEqual(logRecords.length, 0);
       });
 
       it('should emit log records with severity equal to minimum', () => {
-        const exporter = new InMemoryLogRecordExporter();
-        const loggerProvider = new LoggerProvider({
-          processors: [new SimpleLogRecordProcessor(exporter)],
-          loggerConfigurator: createLoggerConfigurator([
-            {
-              pattern: 'test-logger',
-              config: { minimumSeverity: SeverityNumber.WARN },
-            },
-          ]),
-        });
-        const logger = loggerProvider.getLogger('test-logger') as Logger;
+        const { loggerProvider, logExporter } = setupLoggerProvider('simple', [
+          {
+            pattern: 'test-logger',
+            config: { minimumSeverity: SeverityNumber.WARN },
+          },
+        ]);
+        const logger = loggerProvider.getLogger('test-logger');
 
         logger.emit({
           body: 'warn message',
           severityNumber: SeverityNumber.WARN,
         });
 
-        const logRecords = exporter.getFinishedLogRecords();
+        const logRecords = logExporter.getFinishedLogRecords();
         assert.strictEqual(logRecords.length, 1);
       });
 
       it('should emit log records with unspecified severity (0) regardless of minimum', () => {
-        const exporter = new InMemoryLogRecordExporter();
-        const loggerProvider = new LoggerProvider({
-          processors: [new SimpleLogRecordProcessor(exporter)],
-          loggerConfigurator: createLoggerConfigurator([
-            {
-              pattern: 'test-logger',
-              config: { minimumSeverity: SeverityNumber.ERROR },
-            },
-          ]),
-        });
+        const { loggerProvider, logExporter } = setupLoggerProvider('simple', [
+          {
+            pattern: 'test-logger',
+            config: { minimumSeverity: SeverityNumber.ERROR },
+          },
+        ]);
         const logger = loggerProvider.getLogger('test-logger') as Logger;
 
         logger.emit({
@@ -222,18 +259,13 @@ describe('Logger', () => {
           // severityNumber not specified at all
         });
 
-        const logRecords = exporter.getFinishedLogRecords();
+        const logRecords = logExporter.getFinishedLogRecords();
         assert.strictEqual(logRecords.length, 2);
       });
 
       it('should use default minimum severity of 0 when not configured', () => {
-        const exporter = new InMemoryLogRecordExporter();
-        const loggerProvider = new LoggerProvider({
-          processors: [new SimpleLogRecordProcessor(exporter)],
-        });
-        const logger = loggerProvider.getLogger(
-          'unconfigured-logger'
-        ) as Logger;
+        const { loggerProvider, logExporter } = setupLoggerProvider('simple');
+        const logger = loggerProvider.getLogger('unconfigured-logger');
 
         logger.emit({
           body: 'debug message',
@@ -245,31 +277,23 @@ describe('Logger', () => {
           severityNumber: SeverityNumber.TRACE,
         });
 
-        const logRecords = exporter.getFinishedLogRecords();
+        const logRecords = logExporter.getFinishedLogRecords();
         assert.strictEqual(logRecords.length, 2);
       });
 
       it('should only filter logs for configured logger, not other loggers', () => {
-        const exporter = new InMemoryLogRecordExporter();
-        const loggerProvider = new LoggerProvider({
-          processors: [new SimpleLogRecordProcessor(exporter)],
-          loggerConfigurator: createLoggerConfigurator([
-            {
-              pattern: 'filtered-logger',
-              config: { minimumSeverity: SeverityNumber.ERROR },
-            },
-            {
-              pattern: '*',
-              config: { minimumSeverity: SeverityNumber.UNSPECIFIED },
-            },
-          ]),
-        });
-        const filteredLogger = loggerProvider.getLogger(
-          'filtered-logger'
-        ) as Logger;
-        const unfilteredLogger = loggerProvider.getLogger(
-          'unfiltered-logger'
-        ) as Logger;
+        const { loggerProvider, logExporter } = setupLoggerProvider('simple', [
+          {
+            pattern: 'filtered-logger',
+            config: { minimumSeverity: SeverityNumber.ERROR },
+          },
+          {
+            pattern: '*',
+            config: { minimumSeverity: SeverityNumber.UNSPECIFIED },
+          },
+        ]);
+        const filteredLogger = loggerProvider.getLogger('filtered-logger');
+        const unfilteredLogger = loggerProvider.getLogger('unfiltered-logger');
 
         // Should be dropped (below minimum)
         filteredLogger.emit({
@@ -283,7 +307,7 @@ describe('Logger', () => {
           severityNumber: SeverityNumber.DEBUG,
         });
 
-        const logRecords = exporter.getFinishedLogRecords();
+        const logRecords = logExporter.getFinishedLogRecords();
         assert.strictEqual(logRecords.length, 1);
         assert.strictEqual(logRecords[0].body, 'unfiltered debug');
       });
@@ -291,16 +315,12 @@ describe('Logger', () => {
 
     describe('trace-based filtering', () => {
       it('should emit log records associated with sampled traces', () => {
-        const exporter = new InMemoryLogRecordExporter();
-        const loggerProvider = new LoggerProvider({
-          processors: [new SimpleLogRecordProcessor(exporter)],
-          loggerConfigurator: createLoggerConfigurator([
-            {
-              pattern: 'test-logger',
-              config: { traceBased: true },
-            },
-          ]),
-        });
+        const { loggerProvider, logExporter } = setupLoggerProvider('simple', [
+          {
+            pattern: 'test-logger',
+            config: { traceBased: true },
+          },
+        ]);
         const logger = loggerProvider.getLogger('test-logger') as Logger;
 
         const spanContext = {
@@ -315,21 +335,17 @@ describe('Logger', () => {
           context: activeContext,
         });
 
-        const logRecords = exporter.getFinishedLogRecords();
+        const logRecords = logExporter.getFinishedLogRecords();
         assert.strictEqual(logRecords.length, 1);
       });
 
       it('should drop log records associated with unsampled traces', () => {
-        const exporter = new InMemoryLogRecordExporter();
-        const loggerProvider = new LoggerProvider({
-          processors: [new SimpleLogRecordProcessor(exporter)],
-          loggerConfigurator: createLoggerConfigurator([
-            {
-              pattern: 'test-logger',
-              config: { traceBased: true },
-            },
-          ]),
-        });
+        const { loggerProvider, logExporter } = setupLoggerProvider('simple', [
+          {
+            pattern: 'test-logger',
+            config: { traceBased: true },
+          },
+        ]);
         const logger = loggerProvider.getLogger('test-logger') as Logger;
 
         const spanContext = {
@@ -344,21 +360,17 @@ describe('Logger', () => {
           context: activeContext,
         });
 
-        const logRecords = exporter.getFinishedLogRecords();
+        const logRecords = logExporter.getFinishedLogRecords();
         assert.strictEqual(logRecords.length, 0);
       });
 
       it('should emit log records without trace context when trace-based filtering is enabled', () => {
-        const exporter = new InMemoryLogRecordExporter();
-        const loggerProvider = new LoggerProvider({
-          processors: [new SimpleLogRecordProcessor(exporter)],
-          loggerConfigurator: createLoggerConfigurator([
-            {
-              pattern: 'test-logger',
-              config: { traceBased: true },
-            },
-          ]),
-        });
+        const { loggerProvider, logExporter } = setupLoggerProvider('simple', [
+          {
+            pattern: 'test-logger',
+            config: { traceBased: true },
+          },
+        ]);
         const logger = loggerProvider.getLogger('test-logger') as Logger;
 
         logger.emit({
@@ -366,15 +378,12 @@ describe('Logger', () => {
           context: ROOT_CONTEXT,
         });
 
-        const logRecords = exporter.getFinishedLogRecords();
+        const logRecords = logExporter.getFinishedLogRecords();
         assert.strictEqual(logRecords.length, 1);
       });
 
       it('should not filter when trace-based filtering is disabled (default)', () => {
-        const exporter = new InMemoryLogRecordExporter();
-        const loggerProvider = new LoggerProvider({
-          processors: [new SimpleLogRecordProcessor(exporter)],
-        });
+        const { loggerProvider, logExporter } = setupLoggerProvider('simple');
         const logger = loggerProvider.getLogger('test-logger') as Logger;
 
         const spanContext = {
@@ -389,24 +398,20 @@ describe('Logger', () => {
           context: activeContext,
         });
 
-        const logRecords = exporter.getFinishedLogRecords();
+        const logRecords = logExporter.getFinishedLogRecords();
         assert.strictEqual(logRecords.length, 1);
       });
 
       it('should combine trace-based and minimum severity filtering', () => {
-        const exporter = new InMemoryLogRecordExporter();
-        const loggerProvider = new LoggerProvider({
-          processors: [new SimpleLogRecordProcessor(exporter)],
-          loggerConfigurator: createLoggerConfigurator([
-            {
-              pattern: 'test-logger',
-              config: {
-                traceBased: true,
-                minimumSeverity: SeverityNumber.WARN,
-              },
+        const { loggerProvider, logExporter } = setupLoggerProvider('simple', [
+          {
+            pattern: 'test-logger',
+            config: {
+              traceBased: true,
+              minimumSeverity: SeverityNumber.WARN,
             },
-          ]),
-        });
+          },
+        ]);
         const logger = loggerProvider.getLogger('test-logger') as Logger;
 
         const sampledSpanContext = {
@@ -457,9 +462,165 @@ describe('Logger', () => {
           context: unsampledContext,
         });
 
-        const logRecords = exporter.getFinishedLogRecords();
+        const logRecords = logExporter.getFinishedLogRecords();
         assert.strictEqual(logRecords.length, 1);
         assert.strictEqual(logRecords[0].body, 'sampled warn');
+      });
+    });
+  });
+
+  describe('enabled', () => {
+    describe('with default configuration and disabled log processors', () => {
+      const { logger } = setupLoggerProvider('noop');
+
+      it('should return "false" when called with no options', () => {
+        assert.ok(!logger.enabled());
+      });
+
+      it('should return "false" when called with a severity number', () => {
+        assert.ok(!logger.enabled({ severityNumber: SeverityNumber.WARN }));
+      });
+
+      it('should return "false" when called with a context with a recording span', () => {
+        const spanContext = {
+          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+          spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
+        };
+        const activeContext = trace.setSpanContext(ROOT_CONTEXT, spanContext);
+        assert.ok(!logger.enabled({ context: activeContext }));
+      });
+    });
+
+    describe('with default configuration and enabled log processors', () => {
+      const { logger } = setupLoggerProvider('simple');
+
+      it('should return "true" when called with no options', () => {
+        assert.ok(logger.enabled());
+      });
+
+      it('should return "true" when called with a severity number', () => {
+        assert.ok(logger.enabled({ severityNumber: SeverityNumber.WARN }));
+      });
+
+      it('should return "true" when called with a context with an unsampled span', () => {
+        const spanContext = {
+          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+          spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
+        };
+        const activeContext = trace.setSpanContext(ROOT_CONTEXT, spanContext);
+        assert.ok(logger.enabled({ context: activeContext }));
+      });
+    });
+
+    describe('with custom configuration and disabled log processors', () => {
+      const { loggerProvider } = setupLoggerProvider('noop', [
+        {
+          pattern: 'disabled-logger',
+          config: { disabled: true },
+        },
+        {
+          pattern: 'warn-logger',
+          config: { minimumSeverity: SeverityNumber.WARN },
+        },
+        {
+          pattern: 'trace-logger',
+          config: { traceBased: true },
+        },
+      ]);
+
+      it('should return "false" no matter the combinations', () => {
+        const disabledLogger = loggerProvider.getLogger('disabled-logger');
+        assert.ok(!disabledLogger.enabled());
+
+        const warnLogger = loggerProvider.getLogger('warn-logger');
+        assert.ok(!warnLogger.enabled({ severityNumber: SeverityNumber.INFO }));
+        assert.ok(
+          !warnLogger.enabled({ severityNumber: SeverityNumber.ERROR })
+        );
+
+        const sampledSpanContext = {
+          traceId: 'e4cda95b652f4a1592b449d5929fda1b',
+          spanId: '9e0c63257de34c92',
+          traceFlags: TraceFlags.SAMPLED,
+        };
+        const traceLogger = loggerProvider.getLogger('trace-logger');
+        assert.ok(
+          !traceLogger.enabled({
+            context: trace.setSpanContext(ROOT_CONTEXT, sampledSpanContext),
+          })
+        );
+
+        const customLogger = loggerProvider.getLogger('custom-logger');
+        assert.ok(!customLogger.enabled());
+      });
+    });
+
+    describe('with custom configuration and enabled log processors', () => {
+      const { loggerProvider } = setupLoggerProvider('simple', [
+        {
+          pattern: 'disabled-logger',
+          config: { disabled: true },
+        },
+        {
+          pattern: 'warn-logger',
+          config: { minimumSeverity: SeverityNumber.WARN },
+        },
+        {
+          pattern: 'trace-logger',
+          config: { traceBased: true },
+        },
+      ]);
+
+      it('should return "false" if the logger is configured to be disabled', () => {
+        const logger = loggerProvider.getLogger('disabled-logger');
+        assert.ok(!logger.enabled());
+      });
+
+      it('should return "true" when severity is greater or equal than the configured', () => {
+        const logger = loggerProvider.getLogger('warn-logger');
+        assert.ok(!logger.enabled({ severityNumber: SeverityNumber.INFO }));
+        assert.ok(logger.enabled({ severityNumber: SeverityNumber.WARN }));
+        assert.ok(logger.enabled({ severityNumber: SeverityNumber.ERROR }));
+      });
+
+      it('should return "true" when severity is not passed or UNSPECIFIED', () => {
+        const logger = loggerProvider.getLogger('warn-logger');
+        assert.ok(logger.enabled());
+        assert.ok(
+          logger.enabled({ severityNumber: SeverityNumber.UNSPECIFIED })
+        );
+      });
+
+      it('should return "true" when trace based and context has a sampled span', () => {
+        const logger = loggerProvider.getLogger('trace-logger');
+        const unsampledSpanContext = {
+          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+          spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
+        };
+        const sampledSpanContext = {
+          traceId: 'e4cda95b652f4a1592b449d5929fda1b',
+          spanId: '9e0c63257de34c92',
+          traceFlags: TraceFlags.SAMPLED,
+        };
+
+        assert.ok(
+          !logger.enabled({
+            context: trace.setSpanContext(ROOT_CONTEXT, unsampledSpanContext),
+          })
+        );
+        assert.ok(
+          logger.enabled({
+            context: trace.setSpanContext(ROOT_CONTEXT, sampledSpanContext),
+          })
+        );
+      });
+
+      it('should return "true" when a log processor is enabled', () => {
+        const logger = loggerProvider.getLogger('my-logger');
+        assert.ok(logger.enabled());
       });
     });
   });

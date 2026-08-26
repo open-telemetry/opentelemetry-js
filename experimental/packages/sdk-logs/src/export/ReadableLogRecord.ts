@@ -21,7 +21,15 @@ export interface ReadableLogRecord {
   readonly body?: LogBody;
   readonly eventName?: string;
   readonly resource: Resource;
-  readonly instrumentationScope: InstrumentationScope;
+  /**
+   * The instrumentation scope associated with this log record. Identity of this object
+   * MUST be stable across identical scopes, as it is intended be used for efficient scope-based
+   * filtering and grouping.
+   */
+  readonly instrumentationScope: InstrumentationScope & {
+    attributes?: LogAttributes;
+    droppedAttributesCount?: number;
+  };
   readonly attributes: LogAttributes;
   readonly droppedAttributesCount: number;
 }

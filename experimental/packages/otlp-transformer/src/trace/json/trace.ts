@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import type { ISerializer } from '../../i-serializer';
-import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace';
 import type { IExportTraceServiceResponse } from '../export-response';
 import { createExportTraceServiceRequest } from '../internal';
 import { JSON_ENCODER } from '../../common/utils';
+import { diag } from '@opentelemetry/api';
 
 export const JsonTraceSerializer: ISerializer<
   ReadableSpan[],
@@ -22,6 +23,13 @@ export const JsonTraceSerializer: ISerializer<
       return {};
     }
     const decoder = new TextDecoder();
-    return JSON.parse(decoder.decode(arg)) as IExportTraceServiceResponse;
+    try {
+      return JSON.parse(decoder.decode(arg)) as IExportTraceServiceResponse;
+    } catch (err) {
+      diag.warn(
+        `Failed to parse trace export response: ${err.message}. Returning empty response`
+      );
+      return {};
+    }
   },
 };

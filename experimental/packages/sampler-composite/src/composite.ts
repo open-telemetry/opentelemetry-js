@@ -11,8 +11,8 @@ import type {
 } from '@opentelemetry/api';
 import { trace } from '@opentelemetry/api';
 import { TraceState as CoreTraceState } from '@opentelemetry/core';
-import type { Sampler, SamplingResult } from '@opentelemetry/sdk-trace-base';
-import { SamplingDecision } from '@opentelemetry/sdk-trace-base';
+import type { Sampler, SamplingResult } from '@opentelemetry/sdk-trace';
+import { SamplingDecision } from '@opentelemetry/sdk-trace';
 import type { ComposableSampler } from './types';
 import { parseOtelTraceState, serializeTraceState } from './tracestate';
 import {

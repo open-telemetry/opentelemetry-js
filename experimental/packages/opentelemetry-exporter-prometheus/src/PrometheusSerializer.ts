@@ -228,7 +228,11 @@ export class PrometheusSerializer {
   private _serializeScopeMetrics(scopeMetrics: ScopeMetrics) {
     let str = '';
     for (const metric of scopeMetrics.metrics) {
-      str += this._serializeMetricData(metric, scopeMetrics.scope) + '\n';
+      const metricStr = this._serializeMetricData(metric, scopeMetrics.scope);
+
+      if (metricStr) {
+        str += metricStr + '\n';
+      }
     }
     return str;
   }
@@ -243,6 +247,21 @@ export class PrometheusSerializer {
     if (this._prefix) {
       name = `${this._prefix}${name}`;
     }
+
+    if (name === '') {
+      diag.error(
+        `Normalization for metric "${metricData.descriptor.name}" resulted in empty name`
+      );
+      return '';
+    } else if (name === '_') {
+      diag.error(
+        `Normalization for metric "${metricData.descriptor.name}" resulted in an invalid name: "_"`
+      );
+      return '';
+    } else if (name[0] >= '0' && name[0] <= '9') {
+      name = `_${name}`;
+    }
+
     const dataPointType = metricData.dataPointType;
 
     name = enforcePrometheusNamingConvention(name, metricData);
@@ -322,7 +341,6 @@ export class PrometheusSerializer {
   ): string {
     let results = '';
 
-    name = enforcePrometheusNamingConvention(name, data);
     const { value, attributes } = dataPoint;
     const timestamp = hrTimeToMilliseconds(dataPoint.endTime);
     results += stringify(
@@ -343,7 +361,6 @@ export class PrometheusSerializer {
   ): string {
     let results = '';
 
-    name = enforcePrometheusNamingConvention(name, data);
     const attributes = dataPoint.attributes;
     const histogram = dataPoint.value;
     const timestamp = hrTimeToMilliseconds(dataPoint.endTime);

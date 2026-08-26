@@ -19,6 +19,8 @@ const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
  * - New key-value pair should be added into the beginning of the list
  * - The value of any key can be updated. Modified keys MUST be moved to the
  * beginning of the list.
+ *
+ * @deprecated Use TraceState from "@opentelemetry/core". This will be removed in the next major version.
  */
 export class TraceStateImpl implements TraceState {
   private _internalState: Map<string, string> = new Map();

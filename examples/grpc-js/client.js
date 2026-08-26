@@ -23,7 +23,6 @@ function main() {
     const request = new messages.HelloRequest();
     let user;
     if (process.argv.length >= 3) {
-      // eslint-disable-next-line prefer-destructuring
       user = process.argv[2];
     } else {
       user = 'world';

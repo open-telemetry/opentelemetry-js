@@ -5,8 +5,8 @@
 
 import * as assert from 'assert';
 import * as opentracing from 'opentracing';
-import type { Span } from '@opentelemetry/sdk-trace-base';
-import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
+import type { Span } from '@opentelemetry/sdk-trace';
+import { TracerProvider } from '@opentelemetry/sdk-trace';
 import type { SpanShim } from '../src/shim';
 import { SpanContextShim, TracerShim } from '../src/shim';
 import {
@@ -26,7 +26,6 @@ import {
 } from '@opentelemetry/api';
 import { performance } from 'perf_hooks';
 import { B3Propagator } from '@opentelemetry/propagator-b3';
-import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import {
   ATTR_EXCEPTION_MESSAGE,
   ATTR_EXCEPTION_STACKTRACE,
@@ -58,7 +57,7 @@ describe('OpenTracing Shim', () => {
 
     describe('propagation using default propagators', () => {
       before(() => {
-        const provider = new BasicTracerProvider();
+        const provider = new TracerProvider();
         shimTracer = new TracerShim(provider.getTracer('default'));
         opentracing.initGlobalTracer(shimTracer);
       });
@@ -132,13 +131,13 @@ describe('OpenTracing Shim', () => {
     });
 
     describe('propagation using configured propagators', () => {
-      const jaegerPropagator = new JaegerPropagator();
+      const w3cPropagator = new W3CTraceContextPropagator();
       const b3Propagator = new B3Propagator();
       before(() => {
-        const provider = new BasicTracerProvider();
+        const provider = new TracerProvider();
         shimTracer = new TracerShim(provider.getTracer('default'), {
           textMapPropagator: b3Propagator,
-          httpHeadersPropagator: jaegerPropagator,
+          httpHeadersPropagator: w3cPropagator,
         });
         opentracing.initGlobalTracer(shimTracer);
       });
@@ -152,7 +151,7 @@ describe('OpenTracing Shim', () => {
         const carrier: { [key: string]: unknown } = {};
         shimTracer.inject(context, opentracing.FORMAT_HTTP_HEADERS, carrier);
         const extractedContext = trace.getSpanContext(
-          jaegerPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
+          w3cPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
         );
         assert.ok(extractedContext !== null);
         assert.strictEqual(extractedContext?.traceId, context.toTraceId());
@@ -161,7 +160,7 @@ describe('OpenTracing Shim', () => {
 
       it('extracts HTTP carriers', () => {
         const carrier: { [key: string]: unknown } = {};
-        jaegerPropagator.inject(
+        w3cPropagator.inject(
           trace.setSpanContext(
             ROOT_CONTEXT,
             (context as SpanContextShim).getSpanContext()
@@ -213,7 +212,7 @@ describe('OpenTracing Shim', () => {
 
     describe('starting spans', () => {
       before(() => {
-        const provider = new BasicTracerProvider();
+        const provider = new TracerProvider();
         shimTracer = new TracerShim(provider.getTracer('default'));
         opentracing.initGlobalTracer(shimTracer);
       });
@@ -293,7 +292,7 @@ describe('OpenTracing Shim', () => {
     let otSpan: Span;
 
     before(() => {
-      const provider = new BasicTracerProvider();
+      const provider = new TracerProvider();
       shimTracer = new TracerShim(provider.getTracer('default'));
       opentracing.initGlobalTracer(shimTracer);
     });

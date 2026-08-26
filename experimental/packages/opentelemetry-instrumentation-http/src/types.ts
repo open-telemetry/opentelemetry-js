@@ -19,26 +19,48 @@ export interface HttpCustomAttributeFunction {
   ): void;
 }
 
+/**
+ * Called with each incoming request. Return `true` to skip creating a server
+ * span for that request.
+ */
 export interface IgnoreIncomingRequestFunction {
   (request: IncomingMessage): boolean;
 }
 
+/**
+ * Called with each outgoing request's parsed options. Return `true` to skip
+ * creating a client span for that request.
+ */
 export interface IgnoreOutgoingRequestFunction {
   (request: RequestOptions): boolean;
 }
 
+/**
+ * Called with the active span and request before the request is handled.
+ */
 export interface HttpRequestCustomAttributeFunction {
   (span: Span, request: ClientRequest | IncomingMessage): void;
 }
 
+/**
+ * Called with the active span and response before the response is handled.
+ */
 export interface HttpResponseCustomAttributeFunction {
   (span: Span, response: IncomingMessage | ServerResponse): void;
 }
 
+/**
+ * Called before an incoming request span is started. Returned attributes are
+ * added to the new server span.
+ */
 export interface StartIncomingSpanCustomAttributeFunction {
   (request: IncomingMessage): Attributes;
 }
 
+/**
+ * Called with an outgoing request's parsed options before the span is started.
+ * Returned attributes are added to the new client span.
+ */
 export interface StartOutgoingSpanCustomAttributeFunction {
   (request: RequestOptions): Attributes;
 }
@@ -47,9 +69,9 @@ export interface StartOutgoingSpanCustomAttributeFunction {
  * Options available for the HTTP instrumentation (see [documentation](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-http#http-instrumentation-options))
  */
 export interface HttpInstrumentationConfig extends InstrumentationConfig {
-  /** Not trace all incoming requests that matched with custom function */
+  /** Do not trace incoming requests for which this function returns `true`. */
   ignoreIncomingRequestHook?: IgnoreIncomingRequestFunction;
-  /** Not trace all outgoing requests that matched with custom function */
+  /** Do not trace outgoing requests for which this function returns `true`. */
   ignoreOutgoingRequestHook?: IgnoreOutgoingRequestFunction;
   /** If set to true, incoming requests will not be instrumented at all. */
   disableIncomingRequestInstrumentation?: boolean;
@@ -65,7 +87,11 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
   startIncomingSpanHook?: StartIncomingSpanCustomAttributeFunction;
   /** Function for adding custom attributes before a span is started in outgoingRequest */
   startOutgoingSpanHook?: StartOutgoingSpanCustomAttributeFunction;
-  /** The primary server name of the matched virtual host. */
+  /**
+   * The primary server name of the matched virtual host.
+   * @deprecated No longer used. Stable HTTP semantic conventions do not include
+   * the `http.server_name` attribute; this option has no effect.
+   */
   serverName?: string;
   /** Require parent to create span for outgoing requests */
   requireParentforOutgoingSpans?: boolean;

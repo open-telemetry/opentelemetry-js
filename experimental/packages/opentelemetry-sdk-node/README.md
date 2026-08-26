@@ -103,11 +103,6 @@ Deprecated, please use [logRecordProcessors](#logrecordprocessors) instead.
 
 An array of log record processors to register to the logger provider.
 
-### mergeResourceWithDefaults
-
-Merge user-provided resources with the default resource. Default `true`.
-The default will change to `false` in a future iteration of this package.
-
 ### metricReader
 
 Add a [MetricReader](../../../packages/sdk-metrics/src/export/MetricReader.ts)
@@ -128,7 +123,34 @@ or configure each instrumentation individually.
 
 ### resource
 
-Configure a resource. Resources may also be detected by using the `autoDetectResources` method of the SDK.
+A [Resource](https://opentelemetry.io/docs/specs/otel/resource/sdk/) to associate with generated telemetry.
+This resource will be use as the basis for additional resource attributes determined by [resource detectors](#resourcedetectors).
+See also the [`autoDetectResources` setting](#autodetectresources).
+
+If not specified, the [default resource](https://opentelemetry.io/docs/specs/semconv/resource/#semantic-attributes-with-sdk-provided-default-value) will be used.
+
+> [!WARNING]
+> If specifying the `resource` option, it is recommended that the default resource be included.
+> Otherwise the important `service.name` and `telemetry.sdk.*` resource attributes might not be included on telemetry,
+> which can adversely impact downstream processing or visualization.
+> The default resource can be include as follows:
+>
+> ```js
+> import { NodeSDK } from '@opentelemetry/sdk-node';
+> import { resourceFromAttributes, defaultResource } from '@opentelemetry/resources';
+> const sdk = new NodeSDK({
+>   resource: defaultResource().merge(
+>     resourceFromAttributes({
+>       'my.custom.attr': 'some value',
+>     })
+>   ),
+>   // ...
+> });
+> ```
+>
+> Alternatively, consider setting custom resource attributes via the
+> [`OTEL_RESOURCE_ATTRIBUTES`](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#general-sdk-configuration)
+> environment variable.
 
 ### resourceDetectors
 
@@ -174,11 +196,11 @@ An array of span processors to register to the tracer provider.
 
 ### traceExporter
 
-Configure a trace exporter. If an exporter is configured, it will be used with a [BatchSpanProcessor](../../../packages/opentelemetry-sdk-trace-base/src/platform/node/export/BatchSpanProcessor.ts). If an exporter OR span processor is not configured programmatically, this package will auto setup the default `otlp` exporter  with `http/protobuf` protocol with a `BatchSpanProcessor`.
+Configure a trace exporter. If an exporter is configured, it will be used with a [BatchSpanProcessor](../../../packages/sdk-trace/src/platform/node/export/BatchSpanProcessor.ts). If an exporter OR span processor is not configured programmatically, this package will auto setup the default `otlp` exporter  with `http/protobuf` protocol with a `BatchSpanProcessor`.
 
 ### spanLimits
 
-Configure tracing parameters. These are the same trace parameters used to [configure a tracer](../../../packages/opentelemetry-sdk-trace-base/src/types.ts#L71).
+Configure tracing parameters. These are the same trace parameters used to [configure a tracer](../../../packages/sdk-trace/src/types.ts#L20).
 
 ### serviceName
 
@@ -243,7 +265,9 @@ OTEL_NODE_EXPERIMENTAL_SDK_METRICS=true
 Currently a subset of the specified metrics are implemented. See the following
 linkes for details:
 
-- Span metrics: [TracerMetrics.ts](../../../packages/opentelemetry-sdk-trace-base/src/TracerMetrics.ts)
+- Metric reader metrics: [MetricReaderMetrics](../../../packages//sdk-metrics/src/export/MetricReaderMetrics.ts)
+- Logger metrics: [LoggerMetrics.ts](../sdk-logs/src/LoggerMetrics.ts)
+- Span metrics: [TracerMetrics.ts](../../../packages/sdk-trace/src/TracerMetrics.ts)
 
 ## Useful links
 

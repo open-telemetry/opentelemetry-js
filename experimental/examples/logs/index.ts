@@ -16,9 +16,7 @@ diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
 
 const loggerProvider = new LoggerProvider({
   processors: [
-    new SimpleLogRecordProcessor(
-      new ConsoleLogRecordExporter()
-    )
+    new SimpleLogRecordProcessor({ exporter: new ConsoleLogRecordExporter() }),
   ],
 });
 

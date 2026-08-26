@@ -3,28 +3,36 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { diag } from '@opentelemetry/api';
-import type * as logsAPI from '@opentelemetry/api-logs';
-import { NOOP_LOGGER } from '@opentelemetry/api-logs';
+import type {
+  LoggerProvider as ILoggerProvider,
+  LoggerOptions as ILoggerOptions,
+  Logger as ILogger,
+} from '@opentelemetry/api-logs';
+import { createNoopLogger } from '@opentelemetry/api-logs';
 import { defaultResource } from '@opentelemetry/resources';
 import { BindOnceFuture } from '@opentelemetry/core';
 
-import type { LoggerProviderConfig } from './types';
+import type { ForceFlushOptions, LoggerProviderOptions } from './types';
 import { Logger } from './Logger';
 import {
   DEFAULT_LOGGER_CONFIGURATOR,
   LoggerProviderSharedState,
 } from './internal/LoggerProviderSharedState';
+import {
+  getInstrumentationScopeKey,
+  type LogInstrumentationScope,
+} from './internal/utils';
+import { normalizeScopeAttributes } from './utils/validation';
 
 export const DEFAULT_LOGGER_NAME = 'unknown';
 
-export class LoggerProvider implements logsAPI.LoggerProvider {
+export class LoggerProvider implements ILoggerProvider {
   private _shutdownOnce: BindOnceFuture<void>;
   private readonly _sharedState: LoggerProviderSharedState;
 
-  constructor(config: LoggerProviderConfig = {}) {
+  constructor(config: LoggerProviderOptions = {}) {
     const mergedConfig = {
       resource: config.resource ?? defaultResource(),
-      forceFlushTimeoutMillis: config.forceFlushTimeoutMillis ?? 30000,
       logRecordLimits: {
         attributeCountLimit: config.logRecordLimits?.attributeCountLimit ?? 128,
         attributeValueLengthLimit:
@@ -33,13 +41,14 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
       loggerConfigurator:
         config.loggerConfigurator ?? DEFAULT_LOGGER_CONFIGURATOR,
       processors: config.processors ?? [],
+      meterProvider: config.meterProvider,
     };
     this._sharedState = new LoggerProviderSharedState(
       mergedConfig.resource,
-      mergedConfig.forceFlushTimeoutMillis,
       mergedConfig.logRecordLimits,
       mergedConfig.processors,
-      mergedConfig.loggerConfigurator
+      mergedConfig.loggerConfigurator,
+      mergedConfig.meterProvider
     );
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
   }
@@ -50,28 +59,34 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
   public getLogger(
     name: string,
     version?: string,
-    options?: logsAPI.LoggerOptions
-  ): logsAPI.Logger {
+    options?: ILoggerOptions
+  ): ILogger {
     if (this._shutdownOnce.isCalled) {
       diag.warn('A shutdown LoggerProvider cannot provide a Logger');
-      return NOOP_LOGGER;
+      return createNoopLogger();
     }
 
     if (!name) {
       diag.warn('Logger requested without instrumentation scope name.');
     }
     const loggerName = name || DEFAULT_LOGGER_NAME;
-    const key = `${loggerName}@${version || ''}:${options?.schemaUrl || ''}`;
+    const instrumentationScope: LogInstrumentationScope = {
+      name: loggerName,
+      version,
+      schemaUrl: options?.schemaUrl,
+      ...normalizeScopeAttributes(
+        this._sharedState.logRecordLimits,
+        options?.attributes
+      ),
+    };
+    const key = getInstrumentationScopeKey(instrumentationScope);
     if (!this._sharedState.loggers.has(key)) {
       this._sharedState.loggers.set(
         key,
-        new Logger(
-          { name: loggerName, version, schemaUrl: options?.schemaUrl },
-          this._sharedState
-        )
+        new Logger(instrumentationScope, this._sharedState)
       );
     }
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     return this._sharedState.loggers.get(key)!;
   }
 
@@ -80,13 +95,13 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
    *
    * Returns a promise which is resolved when all flushes are complete.
    */
-  public forceFlush(): Promise<void> {
+  public forceFlush(options?: ForceFlushOptions): Promise<void> {
     // do not flush after shutdown
     if (this._shutdownOnce.isCalled) {
       diag.warn('invalid attempt to force flush after LoggerProvider shutdown');
       return this._shutdownOnce.promise;
     }
-    return this._sharedState.activeProcessor.forceFlush();
+    return this._sharedState.activeProcessor.forceFlush(options);
   }
 
   /**
@@ -104,6 +119,7 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
   }
 
   private _shutdown(): Promise<void> {
+    this._sharedState.hasShutdown = true;
     return this._sharedState.activeProcessor.shutdown();
   }
 }

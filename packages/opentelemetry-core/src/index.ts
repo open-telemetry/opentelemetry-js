@@ -20,6 +20,7 @@ export {
   hrTimeToMicroseconds,
   hrTimeToMilliseconds,
   hrTimeToNanoseconds,
+  hrTimeToSeconds,
   hrTimeToTimeStamp,
   isTimeInput,
   isTimeInputHrTime,

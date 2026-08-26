@@ -45,7 +45,7 @@ const tracerProvider = new NodeTracerProvider({
   spanProcessors: [new BatchSpanProcessor(exporter)]
 })
 
-const tracer = traceProvider.getTracer('my-tracer')
+const tracer = tracerProvider.getTracer('my-tracer')
 ```
 
 You can use built-in `SimpleSpanProcessor` or `BatchSpanProcessor` or write your own.

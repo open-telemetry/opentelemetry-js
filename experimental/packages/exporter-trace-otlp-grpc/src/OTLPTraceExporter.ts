@@ -3,14 +3,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace';
 import type { OTLPGRPCExporterConfigNode } from '@opentelemetry/otlp-grpc-exporter-base';
 import {
   convertLegacyOtlpGrpcOptions,
   createOtlpGrpcExportDelegate,
 } from '@opentelemetry/otlp-grpc-exporter-base';
-import { ProtobufTraceSerializer } from '@opentelemetry/otlp-transformer';
+import {
+  ProtobufTraceSerializer,
+  TraceExporterMetricsHelper,
+} from '@opentelemetry/otlp-transformer';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
+
+import { OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_SPAN_EXPORTER } from './semconv';
 
 /**
  * OTLP Trace Exporter for Node
@@ -24,6 +29,9 @@ export class OTLPTraceExporter
       createOtlpGrpcExportDelegate(
         convertLegacyOtlpGrpcOptions(config, 'TRACES'),
         ProtobufTraceSerializer,
+        OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_SPAN_EXPORTER,
+        TraceExporterMetricsHelper,
+        config.selfObsMeterProvider,
         'TraceExportService',
         '/opentelemetry.proto.collector.trace.v1.TraceService/Export'
       )

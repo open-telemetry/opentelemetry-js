@@ -231,6 +231,56 @@ describe('JaegerPropagator', () => {
       );
     });
 
+    it('returns undefined and does not throw on malformed percent-encoding in UBER_TRACE_ID_HEADER', () => {
+      for (const malformed of ['%ZZ', 'abc%G:123:0:01', '%']) {
+        carrier[UBER_TRACE_ID_HEADER] = malformed;
+        let result = ROOT_CONTEXT;
+        assert.doesNotThrow(() => {
+          result = jaegerPropagator.extract(
+            ROOT_CONTEXT,
+            carrier,
+            defaultTextMapGetter
+          );
+        });
+        assert.deepStrictEqual(trace.getSpanContext(result), undefined);
+      }
+    });
+
+    it('ignores a malformed UBER_TRACE_ID_HEADER but still extracts valid baggage', () => {
+      carrier[UBER_TRACE_ID_HEADER] = '%ZZ';
+      carrier[`${UBER_BAGGAGE_HEADER_PREFIX}-test`] = 'value';
+      let result = ROOT_CONTEXT;
+      assert.doesNotThrow(() => {
+        result = jaegerPropagator.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        );
+      });
+      assert.deepStrictEqual(trace.getSpanContext(result), undefined);
+      const entry = propagation.getBaggage(result)?.getEntry('test');
+      assert.ok(typeof entry !== 'undefined');
+      assert.ok(entry.value === 'value');
+    });
+
+    it('skips a baggage entry with malformed percent-encoding and keeps valid entries', () => {
+      carrier[`${UBER_BAGGAGE_HEADER_PREFIX}-bad`] = '%ZZ';
+      carrier[`${UBER_BAGGAGE_HEADER_PREFIX}-test`] = 'value';
+      let result = ROOT_CONTEXT;
+      assert.doesNotThrow(() => {
+        result = jaegerPropagator.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        );
+      });
+      const extractedBaggage = propagation.getBaggage(result);
+      assert.ok(typeof extractedBaggage?.getEntry('bad') === 'undefined');
+      const validEntry = extractedBaggage?.getEntry('test');
+      assert.ok(typeof validEntry !== 'undefined');
+      assert.ok(validEntry.value === 'value');
+    });
+
     it('should extract baggage from carrier', () => {
       carrier[`${UBER_BAGGAGE_HEADER_PREFIX}-test`] = 'value';
       carrier[`${UBER_BAGGAGE_HEADER_PREFIX}-myuser`] = '%25id%25';

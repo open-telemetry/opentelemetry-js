@@ -5,7 +5,7 @@
 
 import * as assert from 'assert';
 import * as nock from 'nock';
-import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace';
 import type { ExportResult } from '@opentelemetry/core';
 import { hrTimeToMicroseconds, ExportResultCode } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';

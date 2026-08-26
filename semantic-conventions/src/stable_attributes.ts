@@ -212,6 +212,36 @@ export const ATTR_CODE_LINE_NUMBER = 'code.line.number' as const;
 export const ATTR_CODE_STACKTRACE = 'code.stacktrace' as const;
 
 /**
+ * Container ID. Usually a UUID, as for example used to [identify Docker containers](https://docs.docker.com/engine/containers/run/#container-identification). The UUID might be abbreviated.
+ *
+ * @example a3bf90e006b2
+ */
+export const ATTR_CONTAINER_ID = 'container.id' as const;
+
+/**
+ * Name of the image the container was built on.
+ *
+ * @example gcr.io/opentelemetry/operator
+ */
+export const ATTR_CONTAINER_IMAGE_NAME = 'container.image.name' as const;
+
+/**
+ * Repo digests of the container image as provided by the container runtime.
+ *
+ * @example ["example@sha256:afcc7f1ac1b49db317a7196c902e61c6c3c4607d63599ee1a82d702d249a0ccb", "internal.registry.example.com:5000/example@sha256:b69959407d21e8a062e0416bf13405bb2b71ed7a84dde4158ebafacfa06f5578"]
+ *
+ * @note [Docker](https://docs.docker.com/reference/api/engine/version/v1.52/#tag/Image/operation/ImageInspect) and [CRI](https://github.com/kubernetes/cri-api/blob/c75ef5b473bbe2d0a4fc92f82235efd665ea8e9f/pkg/apis/runtime/v1/api.proto#L1237-L1238) report those under the `RepoDigests` field.
+ */
+export const ATTR_CONTAINER_IMAGE_REPO_DIGESTS = 'container.image.repo_digests' as const;
+
+/**
+ * Container image tags. An example can be found in [Docker Image Inspect](https://docs.docker.com/reference/api/engine/version/v1.52/#tag/Image/operation/ImageInspect). Should be only the `<tag>` section of the full name for example from `registry.example.com/my-org/my-image:<tag>`.
+ *
+ * @example ["v1.27.1", "3.5.7-0"]
+ */
+export const ATTR_CONTAINER_IMAGE_TAGS = 'container.image.tags' as const;
+
+/**
  * The name of a collection (table, container) within the database.
  *
  * @example public.users
@@ -242,13 +272,34 @@ export const ATTR_DB_COLLECTION_NAME = 'db.collection.name' as const;
 export const ATTR_DB_NAMESPACE = 'db.namespace' as const;
 
 /**
- * The number of queries included in a batch operation.
+ * The number of database operations included in a batch operation.
  *
  * @example 2
  * @example 3
  * @example 4
  *
- * @note Operations are only considered batches when they contain two or more operations, and so `db.operation.batch.size` **SHOULD** never be `1`.
+ * @note Except for empty batch requests described below, a batch operation contains two
+ * or more database operations explicitly submitted as separate operations in a single
+ * client call, protocol message, or database command.
+ *
+ * Requests to batch APIs that contain only one operation **SHOULD** be modeled as single
+ * operations, not as batch operations.
+ *
+ * A database call is not a batch operation solely because one operation accepts
+ * multiple operands, such as keys, rows, documents, points, or other data elements,
+ * including Redis [`MGET`](https://redis.io/docs/latest/commands/mget/) with
+ * multiple keys.
+ *
+ * In batch APIs that execute the same parameterized operation with parameter sets,
+ * each parameter set represents one database operation for determining whether the
+ * request is a batch operation. Requests with only one parameter set **SHOULD** be modeled
+ * as single operations, not as batch operations.
+ *
+ * `db.operation.batch.size` **SHOULD** be set to the number of operations in the batch.
+ * It **SHOULD NOT** be set for non-batch operations.
+ *
+ * A request to execute a batch operation with no operations **SHOULD** also be treated
+ * as a batch operation, and `db.operation.batch.size` **SHOULD** be set to `0`.
  */
 export const ATTR_DB_OPERATION_BATCH_SIZE = 'db.operation.batch.size' as const;
 
@@ -374,6 +425,50 @@ export const DB_SYSTEM_NAME_VALUE_MYSQL = "mysql" as const;
 export const DB_SYSTEM_NAME_VALUE_POSTGRESQL = "postgresql" as const;
 
 /**
+ * Name of the [deployment environment](https://wikipedia.org/wiki/Deployment_environment) (aka deployment tier).
+ *
+ * @example staging
+ * @example production
+ *
+ * @note `deployment.environment.name` does not affect the uniqueness constraints defined through
+ * the `service.namespace`, `service.name` and `service.instance.id` resource attributes.
+ * This implies that resources carrying the following attribute combinations **MUST** be
+ * considered to be identifying the same service:
+ *
+ *   - `service.name=frontend`, `deployment.environment.name=production`
+ *   - `service.name=frontend`, `deployment.environment.name=staging`.
+ */
+export const ATTR_DEPLOYMENT_ENVIRONMENT_NAME = 'deployment.environment.name' as const;
+
+/**
+ * Enum value "development" for attribute {@link ATTR_DEPLOYMENT_ENVIRONMENT_NAME}.
+ *
+ * Development environment
+ */
+export const DEPLOYMENT_ENVIRONMENT_NAME_VALUE_DEVELOPMENT = "development" as const;
+
+/**
+ * Enum value "production" for attribute {@link ATTR_DEPLOYMENT_ENVIRONMENT_NAME}.
+ *
+ * Production environment
+ */
+export const DEPLOYMENT_ENVIRONMENT_NAME_VALUE_PRODUCTION = "production" as const;
+
+/**
+ * Enum value "staging" for attribute {@link ATTR_DEPLOYMENT_ENVIRONMENT_NAME}.
+ *
+ * Staging environment
+ */
+export const DEPLOYMENT_ENVIRONMENT_NAME_VALUE_STAGING = "staging" as const;
+
+/**
+ * Enum value "test" for attribute {@link ATTR_DEPLOYMENT_ENVIRONMENT_NAME}.
+ *
+ * Testing environment
+ */
+export const DEPLOYMENT_ENVIRONMENT_NAME_VALUE_TEST = "test" as const;
+
+/**
  * Name of the garbage collector managed heap generation.
  *
  * @example gen0
@@ -430,6 +525,12 @@ export const DOTNET_GC_HEAP_GENERATION_VALUE_POH = "poh" as const;
  * When `error.type` is set to a type (e.g., an exception type), its
  * canonical class name identifying the type within the artifact **SHOULD** be used.
  *
+ * If the recorded error type is a wrapper that is not meaningful for
+ * failure classification, instrumentation **MAY** use the type of the inner
+ * error instead. For example, in Go, errors created with `fmt.Errorf`
+ * using `%w` **MAY** be unwrapped when the wrapper type does not help
+ * classify the failure.
+ *
  * Instrumentations **SHOULD** document the list of errors they report.
  *
  * The cardinality of `error.type` within one instrumentation library **SHOULD** be low.
@@ -485,6 +586,12 @@ export const ATTR_EXCEPTION_STACKTRACE = 'exception.stacktrace' as const;
  *
  * @example java.net.ConnectException
  * @example OSError
+ *
+ * @note If the recorded exception type is a wrapper that is not meaningful for
+ * failure classification, instrumentation **MAY** use the type of the inner
+ * exception instead. For example, in Go, errors created with `fmt.Errorf`
+ * using `%w` **MAY** be unwrapped when the wrapper type does not help
+ * classify the failure.
  */
 export const ATTR_EXCEPTION_TYPE = 'exception.type' as const;
 
@@ -792,6 +899,500 @@ export const JVM_THREAD_STATE_VALUE_TIMED_WAITING = "timed_waiting" as const;
 export const JVM_THREAD_STATE_VALUE_WAITING = "waiting" as const;
 
 /**
+ * The name of the cluster.
+ *
+ * @example opentelemetry-cluster
+ */
+export const ATTR_K8S_CLUSTER_NAME = 'k8s.cluster.name' as const;
+
+/**
+ * A pseudo-ID for the cluster, set to the UID of the `kube-system` namespace.
+ *
+ * @example 218fc5a9-a5f1-4b54-aa05-46717d0ab26d
+ *
+ * @note K8s doesn't have support for obtaining a cluster ID. If this is ever
+ * added, we will recommend collecting the `k8s.cluster.uid` through the
+ * official APIs. In the meantime, we are able to use the `uid` of the
+ * `kube-system` namespace as a proxy for cluster ID. Read on for the
+ * rationale.
+ *
+ * Every object created in a K8s cluster is assigned a distinct UID. The
+ * `kube-system` namespace is used by Kubernetes itself and will exist
+ * for the lifetime of the cluster. Using the `uid` of the `kube-system`
+ * namespace is a reasonable proxy for the K8s ClusterID as it will only
+ * change if the cluster is rebuilt. Furthermore, Kubernetes UIDs are
+ * UUIDs as standardized by
+ * [ISO/IEC 9834-8 and ITU-T X.667](https://www.itu.int/ITU-T/studygroups/com17/oid.html).
+ * Which states:
+ *
+ * > If generated according to one of the mechanisms defined in Rec.
+ * > ITU-T X.667 | ISO/IEC 9834-8, a UUID is either guaranteed to be
+ * > different from all other UUIDs generated before 3603 A.D., or is
+ * > extremely likely to be different (depending on the mechanism chosen).
+ *
+ * Therefore, UIDs between clusters should be extremely unlikely to
+ * conflict.
+ */
+export const ATTR_K8S_CLUSTER_UID = 'k8s.cluster.uid' as const;
+
+/**
+ * The name of the Container from Pod specification, must be unique within a Pod. Container runtime usually uses different globally unique name (`container.name`).
+ *
+ * @example redis
+ */
+export const ATTR_K8S_CONTAINER_NAME = 'k8s.container.name' as const;
+
+/**
+ * Number of times the container was restarted. This attribute can be used to identify a particular container (running or stopped) within a container spec.
+ */
+export const ATTR_K8S_CONTAINER_RESTART_COUNT = 'k8s.container.restart_count' as const;
+
+/**
+ * The cronjob annotation placed on the CronJob, the `<key>` being the annotation name, the value being the annotation value.
+ *
+ * @example 4
+ * @example
+ *
+ * @note Examples:
+ *
+ *   - An annotation `retries` with value `4` **SHOULD** be recorded as the
+ *     `k8s.cronjob.annotation.retries` attribute with value `"4"`.
+ *   - An annotation `data` with empty string value **SHOULD** be recorded as
+ *     the `k8s.cronjob.annotation.data` attribute with value `""`.
+ */
+export const ATTR_K8S_CRONJOB_ANNOTATION = (key: string) => `k8s.cronjob.annotation.${key}`;
+
+/**
+ * The label placed on the CronJob, the `<key>` being the label name, the value being the label value.
+ *
+ * @example weekly
+ * @example
+ *
+ * @note Examples:
+ *
+ *   - A label `type` with value `weekly` **SHOULD** be recorded as the
+ *     `k8s.cronjob.label.type` attribute with value `"weekly"`.
+ *   - A label `automated` with empty string value **SHOULD** be recorded as
+ *     the `k8s.cronjob.label.automated` attribute with value `""`.
+ */
+export const ATTR_K8S_CRONJOB_LABEL = (key: string) => `k8s.cronjob.label.${key}`;
+
+/**
+ * The name of the CronJob.
+ *
+ * @example opentelemetry
+ */
+export const ATTR_K8S_CRONJOB_NAME = 'k8s.cronjob.name' as const;
+
+/**
+ * The UID of the CronJob.
+ *
+ * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
+ */
+export const ATTR_K8S_CRONJOB_UID = 'k8s.cronjob.uid' as const;
+
+/**
+ * The annotation placed on the DaemonSet, the `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+ *
+ * @example 1
+ * @example
+ *
+ * @note
+ * Examples:
+ *
+ *   - An annotation `replicas` with value `1` **SHOULD** be recorded
+ *     as the `k8s.daemonset.annotation.replicas` attribute with value `"1"`.
+ *   - An annotation `data` with empty string value **SHOULD** be recorded as
+ *     the `k8s.daemonset.annotation.data` attribute with value `""`.
+ */
+export const ATTR_K8S_DAEMONSET_ANNOTATION = (key: string) => `k8s.daemonset.annotation.${key}`;
+
+/**
+ * The label placed on the DaemonSet, the `<key>` being the label name, the value being the label value, even if the value is empty.
+ *
+ * @example guestbook
+ * @example
+ *
+ * @note
+ * Examples:
+ *
+ *   - A label `app` with value `guestbook` **SHOULD** be recorded
+ *     as the `k8s.daemonset.label.app` attribute with value `"guestbook"`.
+ *   - A label `injected` with empty string value **SHOULD** be recorded as
+ *     the `k8s.daemonset.label.injected` attribute with value `""`.
+ */
+export const ATTR_K8S_DAEMONSET_LABEL = (key: string) => `k8s.daemonset.label.${key}`;
+
+/**
+ * The name of the DaemonSet.
+ *
+ * @example opentelemetry
+ */
+export const ATTR_K8S_DAEMONSET_NAME = 'k8s.daemonset.name' as const;
+
+/**
+ * The UID of the DaemonSet.
+ *
+ * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
+ */
+export const ATTR_K8S_DAEMONSET_UID = 'k8s.daemonset.uid' as const;
+
+/**
+ * The annotation placed on the Deployment, the `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+ *
+ * @example 1
+ * @example
+ *
+ * @note
+ * Examples:
+ *
+ *   - An annotation `replicas` with value `1` **SHOULD** be recorded
+ *     as the `k8s.deployment.annotation.replicas` attribute with value `"1"`.
+ *   - An annotation `data` with empty string value **SHOULD** be recorded as
+ *     the `k8s.deployment.annotation.data` attribute with value `""`.
+ */
+export const ATTR_K8S_DEPLOYMENT_ANNOTATION = (key: string) => `k8s.deployment.annotation.${key}`;
+
+/**
+ * The label placed on the Deployment, the `<key>` being the label name, the value being the label value, even if the value is empty.
+ *
+ * @example guestbook
+ * @example
+ *
+ * @note
+ * Examples:
+ *
+ *   - A label `app` with value `guestbook` **SHOULD** be recorded
+ *     as the `k8s.deployment.label.app` attribute with value `"guestbook"`.
+ *   - A label `injected` with empty string value **SHOULD** be recorded as
+ *     the `k8s.deployment.label.injected` attribute with value `""`.
+ */
+export const ATTR_K8S_DEPLOYMENT_LABEL = (key: string) => `k8s.deployment.label.${key}`;
+
+/**
+ * The name of the Deployment.
+ *
+ * @example opentelemetry
+ */
+export const ATTR_K8S_DEPLOYMENT_NAME = 'k8s.deployment.name' as const;
+
+/**
+ * The UID of the Deployment.
+ *
+ * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
+ */
+export const ATTR_K8S_DEPLOYMENT_UID = 'k8s.deployment.uid' as const;
+
+/**
+ * The annotation placed on the Job, the `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+ *
+ * @example 1
+ * @example
+ *
+ * @note
+ * Examples:
+ *
+ *   - An annotation `number` with value `1` **SHOULD** be recorded
+ *     as the `k8s.job.annotation.number` attribute with value `"1"`.
+ *   - An annotation `data` with empty string value **SHOULD** be recorded as
+ *     the `k8s.job.annotation.data` attribute with value `""`.
+ */
+export const ATTR_K8S_JOB_ANNOTATION = (key: string) => `k8s.job.annotation.${key}`;
+
+/**
+ * The label placed on the Job, the `<key>` being the label name, the value being the label value, even if the value is empty.
+ *
+ * @example ci
+ * @example
+ *
+ * @note
+ * Examples:
+ *
+ *   - A label `jobtype` with value `ci` **SHOULD** be recorded
+ *     as the `k8s.job.label.jobtype` attribute with value `"ci"`.
+ *   - A label `automated` with empty string value **SHOULD** be recorded as
+ *     the `k8s.job.label.automated` attribute with value `""`.
+ */
+export const ATTR_K8S_JOB_LABEL = (key: string) => `k8s.job.label.${key}`;
+
+/**
+ * The name of the Job.
+ *
+ * @example opentelemetry
+ */
+export const ATTR_K8S_JOB_NAME = 'k8s.job.name' as const;
+
+/**
+ * The UID of the Job.
+ *
+ * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
+ */
+export const ATTR_K8S_JOB_UID = 'k8s.job.uid' as const;
+
+/**
+ * The annotation placed on the Namespace, the `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+ *
+ * @example 0
+ * @example
+ *
+ * @note
+ * Examples:
+ *
+ *   - An annotation `ttl` with value `0` **SHOULD** be recorded
+ *     as the `k8s.namespace.annotation.ttl` attribute with value `"0"`.
+ *   - An annotation `data` with empty string value **SHOULD** be recorded as
+ *     the `k8s.namespace.annotation.data` attribute with value `""`.
+ */
+export const ATTR_K8S_NAMESPACE_ANNOTATION = (key: string) => `k8s.namespace.annotation.${key}`;
+
+/**
+ * The label placed on the Namespace, the `<key>` being the label name, the value being the label value, even if the value is empty.
+ *
+ * @example default
+ * @example
+ *
+ * @note
+ * Examples:
+ *
+ *   - A label `kubernetes.io/metadata.name` with value `default` **SHOULD** be recorded
+ *     as the `k8s.namespace.label.kubernetes.io/metadata.name` attribute with value `"default"`.
+ *   - A label `data` with empty string value **SHOULD** be recorded as
+ *     the `k8s.namespace.label.data` attribute with value `""`.
+ */
+export const ATTR_K8S_NAMESPACE_LABEL = (key: string) => `k8s.namespace.label.${key}`;
+
+/**
+ * The name of the namespace that the pod is running in.
+ *
+ * @example default
+ */
+export const ATTR_K8S_NAMESPACE_NAME = 'k8s.namespace.name' as const;
+
+/**
+ * The annotation placed on the Node, the `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+ *
+ * @example 0
+ * @example
+ *
+ * @note Examples:
+ *
+ *   - An annotation `node.alpha.kubernetes.io/ttl` with value `0` **SHOULD** be recorded as
+ *     the `k8s.node.annotation.node.alpha.kubernetes.io/ttl` attribute with value `"0"`.
+ *   - An annotation `data` with empty string value **SHOULD** be recorded as
+ *     the `k8s.node.annotation.data` attribute with value `""`.
+ */
+export const ATTR_K8S_NODE_ANNOTATION = (key: string) => `k8s.node.annotation.${key}`;
+
+/**
+ * The label placed on the Node, the `<key>` being the label name, the value being the label value, even if the value is empty.
+ *
+ * @example arm64
+ * @example
+ *
+ * @note Examples:
+ *
+ *   - A label `kubernetes.io/arch` with value `arm64` **SHOULD** be recorded
+ *     as the `k8s.node.label.kubernetes.io/arch` attribute with value `"arm64"`.
+ *   - A label `data` with empty string value **SHOULD** be recorded as
+ *     the `k8s.node.label.data` attribute with value `""`.
+ */
+export const ATTR_K8S_NODE_LABEL = (key: string) => `k8s.node.label.${key}`;
+
+/**
+ * The name of the Node.
+ *
+ * @example node-1
+ */
+export const ATTR_K8S_NODE_NAME = 'k8s.node.name' as const;
+
+/**
+ * The UID of the Node.
+ *
+ * @example 1eb3a0c6-0477-4080-a9cb-0cb7db65c6a2
+ */
+export const ATTR_K8S_NODE_UID = 'k8s.node.uid' as const;
+
+/**
+ * The annotation placed on the Pod, the `<key>` being the annotation name, the value being the annotation value.
+ *
+ * @example true
+ * @example x64
+ * @example
+ *
+ * @note Examples:
+ *
+ *   - An annotation `kubernetes.io/enforce-mountable-secrets` with value `true` **SHOULD** be recorded as
+ *     the `k8s.pod.annotation.kubernetes.io/enforce-mountable-secrets` attribute with value `"true"`.
+ *   - An annotation `mycompany.io/arch` with value `x64` **SHOULD** be recorded as
+ *     the `k8s.pod.annotation.mycompany.io/arch` attribute with value `"x64"`.
+ *   - An annotation `data` with empty string value **SHOULD** be recorded as
+ *     the `k8s.pod.annotation.data` attribute with value `""`.
+ */
+export const ATTR_K8S_POD_ANNOTATION = (key: string) => `k8s.pod.annotation.${key}`;
+
+/**
+ * Specifies the hostname of the Pod.
+ *
+ * @example collector-gateway
+ *
+ * @note The K8s Pod spec has an optional hostname field, which can be used to specify a hostname.
+ * Refer to [K8s docs](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-hostname-and-subdomain-field)
+ * for more information about this field.
+ *
+ * This attribute aligns with the `hostname` field of the
+ * [K8s PodSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#podspec-v1-core).
+ */
+export const ATTR_K8S_POD_HOSTNAME = 'k8s.pod.hostname' as const;
+
+/**
+ * IP address allocated to the Pod.
+ *
+ * @example 172.18.0.2
+ *
+ * @note This attribute aligns with the `podIP` field of the
+ * [K8s PodStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#podstatus-v1-core).
+ */
+export const ATTR_K8S_POD_IP = 'k8s.pod.ip' as const;
+
+/**
+ * The label placed on the Pod, the `<key>` being the label name, the value being the label value.
+ *
+ * @example my-app
+ * @example x64
+ * @example
+ *
+ * @note Examples:
+ *
+ *   - A label `app` with value `my-app` **SHOULD** be recorded as
+ *     the `k8s.pod.label.app` attribute with value `"my-app"`.
+ *   - A label `mycompany.io/arch` with value `x64` **SHOULD** be recorded as
+ *     the `k8s.pod.label.mycompany.io/arch` attribute with value `"x64"`.
+ *   - A label `data` with empty string value **SHOULD** be recorded as
+ *     the `k8s.pod.label.data` attribute with value `""`.
+ */
+export const ATTR_K8S_POD_LABEL = (key: string) => `k8s.pod.label.${key}`;
+
+/**
+ * The name of the Pod.
+ *
+ * @example opentelemetry-pod-autoconf
+ */
+export const ATTR_K8S_POD_NAME = 'k8s.pod.name' as const;
+
+/**
+ * The start timestamp of the Pod.
+ *
+ * @example 2025-12-04T08:41:03Z
+ *
+ * @note Date and time at which the object was acknowledged by the Kubelet.
+ * This is before the Kubelet pulled the container image(s) for the pod.
+ *
+ * This attribute aligns with the `startTime` field of the
+ * [K8s PodStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#podstatus-v1-core),
+ * in ISO 8601 (RFC 3339 compatible) format.
+ */
+export const ATTR_K8S_POD_START_TIME = 'k8s.pod.start_time' as const;
+
+/**
+ * The UID of the Pod.
+ *
+ * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
+ */
+export const ATTR_K8S_POD_UID = 'k8s.pod.uid' as const;
+
+/**
+ * The annotation placed on the ReplicaSet, the `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+ *
+ * @example 0
+ * @example
+ *
+ * @note
+ * Examples:
+ *
+ *   - An annotation `replicas` with value `0` **SHOULD** be recorded
+ *     as the `k8s.replicaset.annotation.replicas` attribute with value `"0"`.
+ *   - An annotation `data` with empty string value **SHOULD** be recorded as
+ *     the `k8s.replicaset.annotation.data` attribute with value `""`.
+ */
+export const ATTR_K8S_REPLICASET_ANNOTATION = (key: string) => `k8s.replicaset.annotation.${key}`;
+
+/**
+ * The label placed on the ReplicaSet, the `<key>` being the label name, the value being the label value, even if the value is empty.
+ *
+ * @example guestbook
+ * @example
+ *
+ * @note
+ * Examples:
+ *
+ *   - A label `app` with value `guestbook` **SHOULD** be recorded
+ *     as the `k8s.replicaset.label.app` attribute with value `"guestbook"`.
+ *   - A label `injected` with empty string value **SHOULD** be recorded as
+ *     the `k8s.replicaset.label.injected` attribute with value `""`.
+ */
+export const ATTR_K8S_REPLICASET_LABEL = (key: string) => `k8s.replicaset.label.${key}`;
+
+/**
+ * The name of the ReplicaSet.
+ *
+ * @example opentelemetry
+ */
+export const ATTR_K8S_REPLICASET_NAME = 'k8s.replicaset.name' as const;
+
+/**
+ * The UID of the ReplicaSet.
+ *
+ * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
+ */
+export const ATTR_K8S_REPLICASET_UID = 'k8s.replicaset.uid' as const;
+
+/**
+ * The annotation placed on the StatefulSet, the `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+ *
+ * @example 1
+ * @example
+ *
+ * @note
+ * Examples:
+ *
+ *   - An annotation `replicas` with value `1` **SHOULD** be recorded
+ *     as the `k8s.statefulset.annotation.replicas` attribute with value `"1"`.
+ *   - An annotation `data` with empty string value **SHOULD** be recorded as
+ *     the `k8s.statefulset.annotation.data` attribute with value `""`.
+ */
+export const ATTR_K8S_STATEFULSET_ANNOTATION = (key: string) => `k8s.statefulset.annotation.${key}`;
+
+/**
+ * The label placed on the StatefulSet, the `<key>` being the label name, the value being the label value, even if the value is empty.
+ *
+ * @example guestbook
+ * @example
+ *
+ * @note
+ * Examples:
+ *
+ *   - A label `app` with value `guestbook` **SHOULD** be recorded
+ *     as the `k8s.statefulset.label.app` attribute with value `"guestbook"`.
+ *   - A label `injected` with empty string value **SHOULD** be recorded as
+ *     the `k8s.statefulset.label.injected` attribute with value `""`.
+ */
+export const ATTR_K8S_STATEFULSET_LABEL = (key: string) => `k8s.statefulset.label.${key}`;
+
+/**
+ * The name of the StatefulSet.
+ *
+ * @example opentelemetry
+ */
+export const ATTR_K8S_STATEFULSET_NAME = 'k8s.statefulset.name' as const;
+
+/**
+ * The UID of the StatefulSet.
+ *
+ * @example 275ecb36-5aa8-4c2a-9c47-d8bb681b9aff
+ */
+export const ATTR_K8S_STATEFULSET_UID = 'k8s.statefulset.uid' as const;
+
+/**
  * Local address of the network connection - IP address or Unix domain socket name.
  *
  * @example 10.1.2.80
@@ -916,6 +1517,16 @@ export const NETWORK_TYPE_VALUE_IPV4 = "ipv4" as const;
 export const NETWORK_TYPE_VALUE_IPV6 = "ipv6" as const;
 
 /**
+ * Identifies the class / type of event.
+ *
+ * @example browser.mouse.click
+ * @example device.app.lifecycle
+ *
+ * @note This attribute **SHOULD** be used by non-OTLP exporters when destination does not support `EventName` or equivalent field. This attribute **MAY** be used by applications using existing logging libraries so that it can be used to set the `EventName` field by Collector or SDK components.
+ */
+export const ATTR_OTEL_EVENT_NAME = 'otel.event.name' as const;
+
+/**
  * The name of the instrumentation scope - (`InstrumentationScope.Name` in OTLP).
  *
  * @example io.opentelemetry.contrib.mongodb
@@ -1016,7 +1627,8 @@ export const ATTR_SERVICE_INSTANCE_ID = 'service.instance.id' as const;
  *
  * @example shoppingcart
  *
- * @note **MUST** be the same for all instances of horizontally scaled services. If the value was not specified, SDKs **MUST** fallback to `unknown_service:` concatenated with [`process.executable.name`](process.md), e.g. `unknown_service:bash`. If `process.executable.name` is not available, the value **MUST** be set to `unknown_service`.
+ * @note **MUST** be the same for all instances of horizontally scaled services. If the value was not specified, SDKs **MUST** fallback to `unknown_service:` concatenated with the process executable name, e.g. `unknown_service:bash`. If the process executable name is not available, the value **MUST** be set to `unknown_service`.
+ * The process executable name is the name of the process executable, the same value as described by the [`process.executable.name`](process.md) resource attribute.
  */
 export const ATTR_SERVICE_NAME = 'service.name' as const;
 
@@ -1096,6 +1708,23 @@ export const SIGNALR_TRANSPORT_VALUE_SERVER_SENT_EVENTS = "server_sent_events" a
 export const SIGNALR_TRANSPORT_VALUE_WEB_SOCKETS = "web_sockets" as const;
 
 /**
+ * The name of the auto instrumentation agent or distribution, if used.
+ *
+ * @example parts-unlimited-java
+ *
+ * @note Official auto instrumentation agents and distributions **SHOULD** set the `telemetry.distro.name` attribute to
+ * a string starting with `opentelemetry-`, e.g. `opentelemetry-java-instrumentation`.
+ */
+export const ATTR_TELEMETRY_DISTRO_NAME = 'telemetry.distro.name' as const;
+
+/**
+ * The version string of the auto instrumentation agent or distribution, if used.
+ *
+ * @example 1.2.3
+ */
+export const ATTR_TELEMETRY_DISTRO_VERSION = 'telemetry.distro.version' as const;
+
+/**
  * The language of the telemetry SDK.
  */
 export const ATTR_TELEMETRY_SDK_LANGUAGE = 'telemetry.sdk.language' as const;
@@ -1124,6 +1753,11 @@ export const TELEMETRY_SDK_LANGUAGE_VALUE_GO = "go" as const;
  * Enum value "java" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_JAVA = "java" as const;
+
+/**
+ * Enum value "kotlin" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ */
+export const TELEMETRY_SDK_LANGUAGE_VALUE_KOTLIN = "kotlin" as const;
 
 /**
  * Enum value "nodejs" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
@@ -1208,8 +1842,9 @@ export const ATTR_URL_FRAGMENT = 'url.fragment' as const;
  * Query string values for the following keys **SHOULD** be redacted by default and replaced by the
  * value `REDACTED`:
  *
- *   - [`AWSAccessKeyId`](https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html#RESTAuthenticationQueryStringAuth)
- *   - [`Signature`](https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html#RESTAuthenticationQueryStringAuth)
+ *   - [`X-Amz-Signature`](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv-authentication-methods.html)
+ *   - [`X-Amz-Credential`](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv-authentication-methods.html)
+ *   - [`X-Amz-Security-Token`](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv-authentication-methods.html)
  *   - [`sig`](https://learn.microsoft.com/azure/storage/common/storage-sas-overview#sas-token)
  *   - [`X-Goog-Signature`](https://cloud.google.com/storage/docs/access-control/signed-urls)
  *
@@ -1249,8 +1884,9 @@ export const ATTR_URL_PATH = 'url.path' as const;
  *
  * Query string values for the following keys **SHOULD** be redacted by default and replaced by the value `REDACTED`:
  *
- *   - [`AWSAccessKeyId`](https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html#RESTAuthenticationQueryStringAuth)
- *   - [`Signature`](https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html#RESTAuthenticationQueryStringAuth)
+ *   - [`X-Amz-Signature`](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv-authentication-methods.html)
+ *   - [`X-Amz-Credential`](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv-authentication-methods.html)
+ *   - [`X-Amz-Security-Token`](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv-authentication-methods.html)
  *   - [`sig`](https://learn.microsoft.com/azure/storage/common/storage-sas-overview#sas-token)
  *   - [`X-Goog-Signature`](https://cloud.google.com/storage/docs/access-control/signed-urls)
  *

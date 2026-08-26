@@ -4,7 +4,7 @@
  */
 
 import type { SessionProvider } from './types/SessionProvider';
-import type { SpanProcessor } from '@opentelemetry/sdk-trace-base';
+import type { SpanProcessor } from '@opentelemetry/sdk-trace';
 import { SessionSpanProcessor } from './SessionSpanProcessor';
 import type { LogRecordProcessor } from '@opentelemetry/sdk-logs';
 import { SessionLogRecordProcessor } from './SessionLogRecordProcessor';

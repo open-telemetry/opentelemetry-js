@@ -396,12 +396,12 @@ const XRANGEPLAIN =
   `(?:\\.(${XRANGEIDENTIFIER})` +
   `(?:\\.(${XRANGEIDENTIFIER})` +
   `(?:${PRERELEASE})?${BUILD}?` +
-  `)?)?`;
+  ')?)?';
 const XRANGE = `^${GTLT}\\s*${XRANGEPLAIN}$`;
 const XRANGE_REGEXP = new RegExp(XRANGE);
 
 const HYPHENRANGE =
-  `^\\s*(${XRANGEPLAIN})` + `\\s+-\\s+` + `(${XRANGEPLAIN})` + `\\s*$`;
+  `^\\s*(${XRANGEPLAIN})` + '\\s+-\\s+' + `(${XRANGEPLAIN})` + '\\s*$';
 const HYPHENRANGE_REGEXP = new RegExp(HYPHENRANGE);
 
 const LONETILDE = '(?:~>?)';

@@ -14,12 +14,16 @@ jobs:
     runs-on: ubuntu-latest
     environment: npm-publish-environment
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           # Require npm 11.5.1 or later for https://docs.npmjs.com/trusted-publishers.
           node-version: 24
           registry-url: 'https://registry.npmjs.org'
+          # Disable caching in release workflows (https://docs.zizmor.sh/audits/#cache-poisoning).
+          package-manager-cache: false
       - run: npm ci --ignore-scripts
       - run: npm run compile
       # Release Please has already incremented versions and published tags, so we just

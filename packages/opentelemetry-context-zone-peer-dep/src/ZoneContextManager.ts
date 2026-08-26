@@ -86,6 +86,17 @@ export class ZoneContextManager implements ContextManager {
       properties: {
         [ZONE_CONTEXT_KEY]: context,
       },
+      onCancelTask(
+        parentZoneDelegate: ZoneDelegate,
+        currentZone: Zone,
+        targetZone: Zone,
+        task: Task
+      ): Task {
+        if (task.state === 'notScheduled' || task.state === 'running') {
+          return task;
+        }
+        return parentZoneDelegate.cancelTask(targetZone, task);
+      },
     });
   }
 

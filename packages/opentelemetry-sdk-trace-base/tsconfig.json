@@ -22,6 +22,9 @@
       "path": "../../semantic-conventions"
     },
     {
+      "path": "../opentelemetry-context-async-hooks"
+    },
+    {
       "path": "../opentelemetry-core"
     },
     {
@@ -29,6 +32,9 @@
     },
     {
       "path": "../sdk-metrics"
+    },
+    {
+      "path": "../sdk-trace"
     }
   ]
 }

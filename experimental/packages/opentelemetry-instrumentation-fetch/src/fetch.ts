@@ -13,25 +13,12 @@ import {
 import type { Attributes, HrTime, Span } from '@opentelemetry/api';
 import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import {
-  SemconvStability,
-  semconvStabilityFromStr,
-  isWrapped,
   InstrumentationBase,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import * as core from '@opentelemetry/core';
 import * as web from '@opentelemetry/sdk-trace-web';
-import { AttributeNames } from './enums/AttributeNames';
-import {
-  ATTR_HTTP_STATUS_CODE,
-  ATTR_HTTP_HOST,
-  ATTR_HTTP_USER_AGENT,
-  ATTR_HTTP_SCHEME,
-  ATTR_HTTP_URL,
-  ATTR_HTTP_METHOD,
-  ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-  ATTR_HTTP_REQUEST_BODY_SIZE,
-} from './semconv';
+import { ATTR_HTTP_REQUEST_BODY_SIZE } from './semconv';
 import {
   ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
@@ -95,8 +82,6 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
   ignoreNetworkEvents?: boolean;
   /** Measure outgoing request size */
   measureRequestSize?: boolean;
-  /** Select the HTTP semantic conventions version(s) used. */
-  semconvStabilityOptIn?: string;
 }
 
 /**
@@ -109,14 +94,17 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
   private _tasksCount = 0;
 
-  private _semconvStability: SemconvStability;
+  // Note: Intentionally *not* using `_enabled` as the field name to avoid
+  // any possible confusion with the `_enabled` field used on the *Node.js*
+  // InstrumentationBase class.
+  // Also not initializing the fields to `false` because the base class
+  // constructor already call `enable` modifying their values and it will
+  // set the instrumentaitons in a bas state (enabled, patched but with flags set to false)
+  declare private _isEnabled: boolean;
+  declare private _isFetchPatched: boolean;
 
   constructor(config: FetchInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-fetch', VERSION, config);
-    this._semconvStability = semconvStabilityFromStr(
-      'http',
-      config?.semconvStabilityOptIn
-    );
   }
 
   init(): void {}
@@ -137,15 +125,12 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       },
       trace.setSpan(context.active(), span)
     );
-    const skipOldSemconvContentLengthAttrs = !(
-      this._semconvStability & SemconvStability.OLD
-    );
     web.addSpanNetworkEvents(
       childSpan,
       corsPreFlightRequest,
       this.getConfig().ignoreNetworkEvents,
       undefined,
-      skipOldSemconvContentLengthAttrs
+      true
     );
     childSpan.end(
       corsPreFlightRequest[web.PerformanceTimingNames.RESPONSE_END]
@@ -159,28 +144,13 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
    */
   private _addFinalSpanAttributes(span: Span, response: FetchResponse): void {
     const parsedUrl = web.parseUrl(response.url);
-
-    if (this._semconvStability & SemconvStability.OLD) {
-      span.setAttribute(ATTR_HTTP_STATUS_CODE, response.status);
-      if (response.statusText != null) {
-        span.setAttribute(AttributeNames.HTTP_STATUS_TEXT, response.statusText);
-      }
-      span.setAttribute(ATTR_HTTP_HOST, parsedUrl.host);
-      span.setAttribute(ATTR_HTTP_SCHEME, parsedUrl.protocol.replace(':', ''));
-      if (typeof navigator !== 'undefined') {
-        span.setAttribute(ATTR_HTTP_USER_AGENT, navigator.userAgent);
-      }
-    }
-
-    if (this._semconvStability & SemconvStability.STABLE) {
-      span.setAttribute(ATTR_HTTP_RESPONSE_STATUS_CODE, response.status);
-      // TODO: Set server.{address,port} at span creation for sampling decisions
-      // (a "SHOULD" requirement in semconv).
-      span.setAttribute(ATTR_SERVER_ADDRESS, parsedUrl.hostname);
-      const serverPort = serverPortFromUrl(parsedUrl);
-      if (serverPort) {
-        span.setAttribute(ATTR_SERVER_PORT, serverPort);
-      }
+    span.setAttribute(ATTR_HTTP_RESPONSE_STATUS_CODE, response.status);
+    // TODO: Set server.{address,port} at span creation for sampling decisions
+    // (a "SHOULD" requirement in semconv).
+    span.setAttribute(ATTR_SERVER_ADDRESS, parsedUrl.hostname);
+    const serverPort = serverPortFromUrl(parsedUrl);
+    if (serverPort) {
+      span.setAttribute(ATTR_SERVER_PORT, serverPort);
     }
   }
 
@@ -249,29 +219,16 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       return;
     }
 
-    let name = '';
     const attributes = {} as Attributes;
-    if (this._semconvStability & SemconvStability.OLD) {
-      const method = (options.method || 'GET').toUpperCase();
-      name = `HTTP ${method}`;
-      attributes[AttributeNames.COMPONENT] = this.moduleName;
-      attributes[ATTR_HTTP_METHOD] = method;
-      attributes[ATTR_HTTP_URL] = url;
+    const origMethod = options.method;
+    const normMethod = normalizeHttpRequestMethod(options.method || 'GET');
+    const name = normMethod;
+
+    attributes[ATTR_HTTP_REQUEST_METHOD] = normMethod;
+    if (normMethod !== origMethod) {
+      attributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = origMethod;
     }
-    if (this._semconvStability & SemconvStability.STABLE) {
-      const origMethod = options.method;
-      const normMethod = normalizeHttpRequestMethod(options.method || 'GET');
-      if (!name) {
-        // The "old" span name wins if emitting both old and stable semconv
-        // ('http/dup').
-        name = normMethod;
-      }
-      attributes[ATTR_HTTP_REQUEST_METHOD] = normMethod;
-      if (normMethod !== origMethod) {
-        attributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = origMethod;
-      }
-      attributes[ATTR_URL_FULL] = url;
-    }
+    attributes[ATTR_URL_FULL] = url;
 
     return this.tracer.startSpan(name, {
       kind: SpanKind.CLIENT,
@@ -320,15 +277,12 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         this._addChildSpan(span, corsPreFlightRequest);
         this._markResourceAsUsed(corsPreFlightRequest);
       }
-      const skipOldSemconvContentLengthAttrs = !(
-        this._semconvStability & SemconvStability.OLD
-      );
       web.addSpanNetworkEvents(
         span,
         mainRequest,
         this.getConfig().ignoreNetworkEvents,
         undefined,
-        skipOldSemconvContentLengthAttrs
+        true
       );
     }
   }
@@ -354,12 +308,10 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     const performanceEndTime = core.hrTime();
     this._addFinalSpanAttributes(span, response);
 
-    if (this._semconvStability & SemconvStability.STABLE) {
-      // https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#status
-      if (response.status >= 400) {
-        span.setStatus({ code: SpanStatusCode.ERROR });
-        span.setAttribute(ATTR_ERROR_TYPE, String(response.status));
-      }
+    // https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#status
+    if (response.status >= 400) {
+      span.setStatus({ code: SpanStatusCode.ERROR });
+      span.setAttribute(ATTR_ERROR_TYPE, String(response.status));
     }
 
     setTimeout(() => {
@@ -377,38 +329,31 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   private _patchConstructor(): (original: typeof fetch) => typeof fetch {
     return original => {
       const plugin = this;
-      const readOnlyProps = new Set(['url', 'type', 'redirected']);
-      function createResponseProxy(
-        target: Response,
-        originalResponse: Response
-      ): Response {
-        return new Proxy(target, {
-          get(t, prop, _receiver) {
-            if (typeof prop === 'string' && readOnlyProps.has(prop)) {
-              return Reflect.get(originalResponse, prop);
-            }
-            if (prop === 'clone') {
-              return function clone() {
-                return createResponseProxy(t.clone(), originalResponse);
-              };
-            }
-            // Use target as receiver so getters (e.g. headers) run with correct this and avoid "Illegal invocation"
-            const value = Reflect.get(t, prop, t);
-            return typeof value === 'function' ? value.bind(t) : value;
-          },
-        }) as Response;
-      }
 
       return function patchConstructor(
         this: typeof globalThis,
         ...args: Parameters<typeof fetch>
       ): Promise<Response> {
+        if (!plugin._isEnabled) {
+          return original.apply(this, args);
+        }
         const self = this;
         const url = web.parseUrl(
           args[0] instanceof Request ? args[0].url : String(args[0])
         ).href;
 
-        const options = args[0] instanceof Request ? args[0] : args[1] || {};
+        // Per the Fetch spec, when fetch() is called with a Request object
+        // and a separate init object, the init properties override the
+        // Request's properties. Merge them into a new Request so that
+        // downstream consumers (hooks, header injection, the actual fetch
+        // call) see the correct final values.
+        // See: https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#parameters
+        let options: Request | RequestInit;
+        if (args[0] instanceof Request) {
+          options = args[1] != null ? new Request(args[0], args[1]) : args[0];
+        } else {
+          options = args[1] || {};
+        }
         const createdSpan = plugin._createSpan(url, options);
         if (!createdSpan) {
           return original.apply(this, args);
@@ -419,18 +364,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           getFetchBodyLength(...args)
             .then(bodyLength => {
               if (!bodyLength) return;
-              if (plugin._semconvStability & SemconvStability.OLD) {
-                createdSpan.setAttribute(
-                  ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-                  bodyLength
-                );
-              }
-              if (plugin._semconvStability & SemconvStability.STABLE) {
-                createdSpan.setAttribute(
-                  ATTR_HTTP_REQUEST_BODY_SIZE,
-                  bodyLength
-                );
-              }
+              createdSpan.setAttribute(ATTR_HTTP_REQUEST_BODY_SIZE, bodyLength);
             })
             .catch(error => {
               plugin._diag.warn('getFetchBodyLength', error);
@@ -459,56 +393,13 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           }
         }
 
-        function withCancelPropagation(
-          body: ReadableStream<Uint8Array> | null,
-          readerClone: ReadableStreamDefaultReader<Uint8Array>
-        ): ReadableStream<Uint8Array> | null {
-          if (!body) return null;
-
-          const reader = body.getReader();
-
-          return new ReadableStream({
-            async pull(controller) {
-              try {
-                const { value, done } = await reader.read();
-                if (done) {
-                  reader.releaseLock();
-                  controller.close();
-                } else {
-                  controller.enqueue(value);
-                }
-              } catch (err) {
-                controller.error(err);
-                reader.cancel(err).catch(_ => {});
-
-                try {
-                  reader.releaseLock();
-                } catch {
-                  // Spec reference:
-                  // https://streams.spec.whatwg.org/#default-reader-release-lock
-                  //
-                  // releaseLock() only throws if called on an invalid reader
-                  // (i.e. reader.[[stream]] is undefined, meaning the lock is already released
-                  // or the reader was never associated). In normal use this cannot happen.
-                  // This catch is defensive only.
-                }
-              }
-            },
-            cancel(reason) {
-              readerClone.cancel(reason).catch(_ => {});
-              return reader.cancel(reason);
-            },
-          });
-        }
-
-        function onSuccess(
-          span: Span,
-          resolve: (value: Response | PromiseLike<Response>) => void,
-          response: Response
-        ): void {
-          let proxiedResponse: Response | null = null;
-
+        function onSuccess(span: Span, response: Response): Response {
           try {
+            // Clone the response and eagerly consume the clone to detect
+            // when the body transfer completes.  The original response is
+            // returned to the caller untouched so that it passes internal
+            // brand-checks required by APIs such as
+            // WebAssembly.compileStreaming.
             // TODO: Switch to a consumer-driven model and drop `resClone`.
             // Keeping eager consumption here to preserve current behavior and avoid breaking existing tests.
             // Context: discussion in PR #5894 → https://github.com/open-telemetry/opentelemetry-js/pull/5894
@@ -516,24 +407,6 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
             const body = resClone.body;
             if (body) {
               const reader = body.getReader();
-              const isNullBodyStatus =
-                // 101 responses and protocol upgrading is handled internally by the browser
-                response.status === 204 ||
-                response.status === 205 ||
-                response.status === 304;
-              const wrappedBody = isNullBodyStatus
-                ? null
-                : withCancelPropagation(response.body, reader);
-
-              const newResponse = new Response(wrappedBody, {
-                status: response.status,
-                statusText: response.statusText,
-                headers: response.headers,
-              });
-
-              // Response url, type, and redirected are read-only properties that can't be set via constructor
-              // Use a Proxy to forward them from the original response and maintain the wrapped body
-              proxiedResponse = createResponseProxy(newResponse, response);
 
               const read = (): void => {
                 reader.read().then(
@@ -554,46 +427,55 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
               // some older browsers don't have .body implemented
               endSpanOnSuccess(span, response);
             }
-          } finally {
-            resolve(proxiedResponse ?? response);
+          } catch (error) {
+            // Setup failed (e.g. clone() or getReader() threw).
+            // End the span and clean up so _tasksCount doesn't leak.
+            plugin._diag.error('Failed to read fetch response body', error);
+            plugin._endSpan(span, spanData, {
+              status: 0,
+              url,
+            });
           }
+          return response;
         }
 
-        function onError(
-          span: Span,
-          reject: (reason?: unknown) => void,
-          error: FetchError
-        ) {
+        function onError(span: Span, error: FetchError): never {
           try {
             endSpanOnError(span, error);
-          } finally {
-            reject(error);
+          } catch (e: unknown) {
+            // endSpanOnError failed — fall back to ending the span
+            // directly so _tasksCount doesn't leak.
+            plugin._diag.error('Failed to end span on fetch error', e);
+            plugin._endSpan(span, spanData, {
+              status: error.status || 0,
+              url,
+            });
           }
+
+          throw error;
         }
 
-        return new Promise((resolve, reject) => {
-          return context.with(
-            trace.setSpan(context.active(), createdSpan),
-            () => {
-              // Call request hook before injection so hooks cannot tamper with propagation headers.
-              // Also, this means the hook will see `options.headers` in the same type as passed in,
-              // rather than as a `Headers` instance set by `_addHeaders()`.
-              plugin._callRequestHook(createdSpan, options);
-              plugin._addHeaders(options, url);
-              plugin._tasksCount++;
+        return context.with(
+          trace.setSpan(context.active(), createdSpan),
+          () => {
+            // Call request hook before injection so hooks cannot tamper with propagation headers.
+            // Also, this means the hook will see `options.headers` in the same type as passed in,
+            // rather than as a `Headers` instance set by `_addHeaders()`.
+            plugin._callRequestHook(createdSpan, options);
+            plugin._addHeaders(options, url);
+            plugin._tasksCount++;
 
-              return original
-                .apply(
-                  self,
-                  options instanceof Request ? [options] : [url, options]
-                )
-                .then(
-                  onSuccess.bind(self, createdSpan, resolve),
-                  onError.bind(self, createdSpan, reject)
-                );
-            }
-          );
-        });
+            return original
+              .apply(
+                self,
+                options instanceof Request ? [options] : [url, options]
+              )
+              .then(
+                onSuccess.bind(self, createdSpan),
+                onError.bind(self, createdSpan)
+              );
+          }
+        );
       };
     };
   }
@@ -673,21 +555,43 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       );
       return;
     }
-    if (isWrapped(fetch)) {
-      this._unwrap(globalThis, 'fetch');
-      this._diag.debug('removing previous patch for constructor');
+
+    if (this._isEnabled) {
+      return;
     }
-    this._wrap(globalThis, 'fetch', this._patchConstructor());
+
+    if (this._isFetchPatched) {
+      this._diag.debug('fetch constructor already patched');
+      this._isEnabled = true;
+      return;
+    }
+
+    try {
+      // `_wrap` throws if a third-party script has locked globalThis.fetch via
+      // Object.defineProperty(window, 'fetch', { writable: false, ... }).
+      this._wrap(globalThis, 'fetch', this._patchConstructor());
+      this._isFetchPatched = true;
+      this._isEnabled = true;
+    } catch (err) {
+      this._diag.warn(
+        'Failed to patch globalThis.fetch; instrumentation will not be enabled. ' +
+          'Another script may have locked globalThis.fetch via Object.defineProperty.',
+        err
+      );
+    }
   }
 
   /**
-   * implements unpatch function
+   * deactivates fetch instrumentation
    */
   override disable(): void {
     if (!hasBrowserPerformanceAPI) {
       return;
     }
-    this._unwrap(globalThis, 'fetch');
+    if (!this._isEnabled) {
+      return;
+    }
+    this._isEnabled = false;
     this._usedResources = new WeakSet<PerformanceResourceTiming>();
   }
 }

@@ -26,7 +26,11 @@ export class LocalStorageSessionStore implements SessionStore {
 
     const sessionData = localStorage.getItem(SESSION_STORAGE_KEY);
     if (sessionData) {
-      return Promise.resolve(JSON.parse(sessionData) as Session);
+      try {
+        return Promise.resolve(JSON.parse(sessionData) as Session);
+      } catch {
+        return Promise.resolve(null);
+      }
     }
     return Promise.resolve(null);
   }

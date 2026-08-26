@@ -6,7 +6,9 @@
 import type { Resource } from '@opentelemetry/resources';
 import type { SeverityNumber } from '@opentelemetry/api-logs';
 import type { InstrumentationScope } from '@opentelemetry/core';
+import type { MeterProvider } from '@opentelemetry/api';
 import type { LogRecordProcessor } from './LogRecordProcessor';
+import type { LogRecordExporter } from './export/LogRecordExporter';
 
 /**
  * A LoggerConfig defines various configurable aspects of a Logger's behavior.
@@ -60,15 +62,17 @@ export type LoggerConfigurator = (
   loggerScope: InstrumentationScope
 ) => Required<LoggerConfig>;
 
-export interface LoggerProviderConfig {
+export interface ForceFlushOptions {
+  /**
+   * How long the force flush can run before it is cancelled.
+   * The default value is 30000ms.
+   */
+  timeoutMillis?: number;
+}
+
+export interface LoggerProviderOptions {
   /** Resource associated with trace telemetry  */
   resource?: Resource;
-
-  /**
-   * How long the forceFlush can run before it is cancelled.
-   * The default value is 30000ms
-   */
-  forceFlushTimeoutMillis?: number;
 
   /** Log Record Limits*/
   logRecordLimits?: LogRecordLimits;
@@ -83,7 +87,18 @@ export interface LoggerProviderConfig {
    * @experimental This feature is in development as per the OpenTelemetry specification.
    */
   loggerConfigurator?: LoggerConfigurator;
+
+  /**
+   * A meter provider to record logs SDK metrics to.
+   * @experimental This option is experimental and is subject to breaking changes in minor releases.
+   */
+  meterProvider?: MeterProvider;
 }
+
+/**
+ * @deprecated please use {@link LoggerProviderOptions}
+ */
+export type LoggerProviderConfig = LoggerProviderOptions;
 
 export interface LogRecordLimits {
   /** attributeValueLengthLimit is maximum allowed attribute value size */
@@ -93,14 +108,32 @@ export interface LogRecordLimits {
   attributeCountLimit?: number;
 }
 
-/** Interface configuration for a buffer. */
-export interface BufferConfig {
+/**
+ * Common options for SDK log processors.
+ */
+export interface LogRecordProcessorOptions {
+  /**
+   * A meter provider to which to record self-observability log processor metrics.
+   * @experimental This option is experimental and is subject to breaking changes in minor releases.
+   */
+  selfObsMeterProvider?: MeterProvider;
+}
+
+export interface SimpleLogRecordProcessorOptions
+  extends LogRecordProcessorOptions {
+  exporter: LogRecordExporter;
+}
+
+export interface BatchLogRecordProcessorOptions
+  extends LogRecordProcessorOptions {
+  exporter: LogRecordExporter;
+
   /** The maximum batch size of every export. It must be smaller or equal to
    * maxQueueSize. The default value is 512. */
   maxExportBatchSize?: number;
 
   /** The delay interval in milliseconds between two consecutive exports.
-   *  The default value is 5000ms. */
+   *  The default value is 1000ms. */
   scheduledDelayMillis?: number;
 
   /** How long the export can run before it is cancelled.
@@ -112,7 +145,8 @@ export interface BufferConfig {
   maxQueueSize?: number;
 }
 
-export interface BatchLogRecordProcessorBrowserConfig extends BufferConfig {
+export interface BatchLogRecordProcessorBrowserOptions
+  extends BatchLogRecordProcessorOptions {
   /** Disable flush when a user navigates to a new page, closes the tab or the browser, or,
    * on mobile, switches to a different app. Auto flush is enabled by default. */
   disableAutoFlushOnDocumentHide?: boolean;

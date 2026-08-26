@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import type { HrTime } from '@opentelemetry/api';
+import { MetricReader } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 
 export interface SimpleTestObject {
@@ -65,4 +66,13 @@ export function ensureHeadersContain(
       `Expected ${actual} to contain ${k}: ${v}`
     );
   });
+}
+
+export class TestMetricReader extends MetricReader {
+  protected override onShutdown(): Promise<void> {
+    return Promise.resolve();
+  }
+  protected override onForceFlush(): Promise<void> {
+    return Promise.resolve();
+  }
 }

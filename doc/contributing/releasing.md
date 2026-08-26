@@ -64,6 +64,7 @@ We aim to eventually automate this process as much as possible.
    - `npm run _github:draft_release:api` if you published an `api` release
 3. Verify that the contents of the created draft releases (title, changelog, selected commit)
 4. Publish the releases
-   - uncheck `Set as a pre-release` for all releases
-   - uncheck `Set as the latest release` for all releases except for the `stable` SDK release. This will ensure that the
-     `stable` SDK release consistently shows up as latest under `Releases` when navigating to the project page.
+   - If this is a manual pre-release, set `Pre-release` for the `Release label`.
+   - If you published a `sdk` release, set `Latest` for the `Release label`.
+     This will ensure that the `stable` SDK release consistently shows up as latest under `Releases` when navigating to the project page.
+   - For all other releases, set `None` for the `Release label`.

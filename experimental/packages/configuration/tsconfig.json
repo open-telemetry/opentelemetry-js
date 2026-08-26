@@ -1,11 +1,16 @@
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
+    "allowJs": true,
     "outDir": "build",
     "rootDir": "."
   },
+  "exclude": [
+    "test/fixtures/**"
+  ],
   "include": [
     "src/**/*.ts",
+    "src/generated/*.js",
     "test/**/*.ts"
   ],
   "references": [

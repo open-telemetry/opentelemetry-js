@@ -269,7 +269,7 @@ describe('utils', function () {
         });
       });
     });
-    describe(`when entry is zero`, function () {
+    describe('when entry is zero', function () {
       it('should not add event to span by default', function () {
         const addEventSpy = sinon.spy();
         const span = {

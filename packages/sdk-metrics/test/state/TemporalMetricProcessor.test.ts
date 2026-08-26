@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as api from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { SumAggregator } from '../../src/aggregator';
@@ -48,7 +47,7 @@ describe('TemporalMetricProcessor', () => {
         const temporalMetricStorage = new TemporalMetricProcessor(aggregator, [
           deltaCollector1,
         ]);
-        deltaMetricStorage.record(1, {}, api.context.active(), [1, 1]);
+        deltaMetricStorage.record(1, {}, 1000);
         {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,
@@ -64,10 +63,10 @@ describe('TemporalMetricProcessor', () => {
             AggregationTemporality.DELTA
           );
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 1, [1, 1], [2, 2]);
+          assertDataPoint(metric.dataPoints[0], {}, 1, [1, 0], [2, 2]);
         }
 
-        deltaMetricStorage.record(2, {}, api.context.active(), [3, 3]);
+        deltaMetricStorage.record(2, {}, 3000);
         {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,
@@ -113,7 +112,7 @@ describe('TemporalMetricProcessor', () => {
           deltaCollector2,
         ]);
 
-        deltaMetricStorage.record(1, {}, api.context.active(), [1, 1]);
+        deltaMetricStorage.record(1, {}, 1000);
         {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,
@@ -129,7 +128,7 @@ describe('TemporalMetricProcessor', () => {
             AggregationTemporality.DELTA
           );
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 1, [1, 1], [2, 2]);
+          assertDataPoint(metric.dataPoints[0], {}, 1, [1, 0], [2, 2]);
         }
 
         {
@@ -147,7 +146,7 @@ describe('TemporalMetricProcessor', () => {
             AggregationTemporality.DELTA
           );
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 1, [1, 1], [3, 3]);
+          assertDataPoint(metric.dataPoints[0], {}, 1, [1, 0], [3, 3]);
         }
       });
     });
@@ -165,7 +164,7 @@ describe('TemporalMetricProcessor', () => {
           cumulativeCollector1,
         ]);
 
-        deltaMetricStorage.record(1, {}, api.context.active(), [1, 1]);
+        deltaMetricStorage.record(1, {}, 1000);
         {
           const metric = temporalMetricStorage.buildMetrics(
             cumulativeCollector1,
@@ -181,10 +180,10 @@ describe('TemporalMetricProcessor', () => {
             AggregationTemporality.CUMULATIVE
           );
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 1, [1, 1], [2, 2]);
+          assertDataPoint(metric.dataPoints[0], {}, 1, [1, 0], [2, 2]);
         }
 
-        deltaMetricStorage.record(2, {}, api.context.active(), [3, 3]);
+        deltaMetricStorage.record(2, {}, 3000);
         {
           const metric = temporalMetricStorage.buildMetrics(
             cumulativeCollector1,
@@ -200,7 +199,7 @@ describe('TemporalMetricProcessor', () => {
             AggregationTemporality.CUMULATIVE
           );
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 3, [1, 1], [4, 4]);
+          assertDataPoint(metric.dataPoints[0], {}, 3, [1, 0], [4, 4]);
         }
 
         // selectAggregationTemporality should be called only once.
@@ -217,7 +216,7 @@ describe('TemporalMetricProcessor', () => {
           deltaCollector1,
         ]);
 
-        deltaMetricStorage.record(1, {}, api.context.active(), [1, 1]);
+        deltaMetricStorage.record(1, {}, 1000);
         {
           const metric = temporalMetricStorage.buildMetrics(
             cumulativeCollector1,
@@ -233,10 +232,10 @@ describe('TemporalMetricProcessor', () => {
             AggregationTemporality.CUMULATIVE
           );
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 1, [1, 1], [2, 2]);
+          assertDataPoint(metric.dataPoints[0], {}, 1, [1, 0], [2, 2]);
         }
 
-        deltaMetricStorage.record(2, {}, api.context.active(), [3, 3]);
+        deltaMetricStorage.record(2, {}, 3000);
         {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,
@@ -252,7 +251,7 @@ describe('TemporalMetricProcessor', () => {
             AggregationTemporality.DELTA
           );
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 3, [1, 1], [4, 4]);
+          assertDataPoint(metric.dataPoints[0], {}, 3, [1, 0], [4, 4]);
         }
         {
           const metric = temporalMetricStorage.buildMetrics(
@@ -269,7 +268,7 @@ describe('TemporalMetricProcessor', () => {
             AggregationTemporality.CUMULATIVE
           );
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 3, [1, 1], [5, 5]);
+          assertDataPoint(metric.dataPoints[0], {}, 3, [1, 0], [5, 5]);
         }
       });
     });

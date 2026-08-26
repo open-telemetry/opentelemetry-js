@@ -40,7 +40,7 @@ const collectorOptions = {
 
 const loggerExporter = new OTLPLogExporter(collectorOptions);
 const loggerProvider = new LoggerProvider({
-  processors: [new BatchLogRecordProcessor(loggerExporter)]
+  processors: [new BatchLogRecordProcessor({ exporter: loggerExporter })]
 });
 
 ['SIGINT', 'SIGTERM'].forEach(signal => {
@@ -67,7 +67,7 @@ const collectorOptions = {
 
 const loggerExporter = new OTLPLogExporter(collectorOptions);
 const loggerProvider = new LoggerProvider({
-  processors: [new BatchLogRecordProcessor(loggerExporter)]
+  processors: [new BatchLogRecordProcessor({ exporter: loggerExporter })]
 });
 ```
 
@@ -88,7 +88,7 @@ const collectorOptions = {
 
 const loggerExporter = new OTLPLogExporter(collectorOptions);
 const loggerProvider = new LoggerProvider({
-  processors: [new BatchLogRecordProcessor(loggerExporter)]
+  processors: [new BatchLogRecordProcessor({ exporter: loggerExporter })]
 });
 ```
 
@@ -123,5 +123,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-logs-otlp-grpc
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-logs-otlp-grpc.svg
 [semconv-resource-service-name]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service
-[trace-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/exporter-trace-otlp-grpc
+[trace-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-trace-otlp-grpc
 [metrics-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-grpc

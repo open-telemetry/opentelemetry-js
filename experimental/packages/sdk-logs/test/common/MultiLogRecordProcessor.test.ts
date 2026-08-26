@@ -6,6 +6,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
+import { ROOT_CONTEXT } from '@opentelemetry/api';
 import type { LogRecordProcessor, ReadableLogRecord } from '../../src';
 import {
   LoggerProvider,
@@ -15,25 +16,29 @@ import {
 import { MultiLogRecordProcessor } from './../../src/MultiLogRecordProcessor';
 
 class TestProcessor implements LogRecordProcessor {
+  shutdownCalled = false;
   logRecords: ReadableLogRecord[] = [];
   onEmit(logRecord: ReadableLogRecord): void {
-    this.logRecords.push(logRecord);
+    if (!this.shutdownCalled) {
+      this.logRecords.push(logRecord);
+    }
   }
   shutdown(): Promise<void> {
     this.logRecords = [];
+    this.shutdownCalled = true;
     return Promise.resolve();
   }
   forceFlush(): Promise<void> {
     return Promise.resolve();
   }
+  enabled(): boolean {
+    return !this.shutdownCalled;
+  }
 }
 
 const setup = (processors: LogRecordProcessor[] = []) => {
   const forceFlushTimeoutMillis = 30_000;
-  const multiProcessor = new MultiLogRecordProcessor(
-    processors,
-    forceFlushTimeoutMillis
-  );
+  const multiProcessor = new MultiLogRecordProcessor(processors);
   return { multiProcessor, forceFlushTimeoutMillis };
 };
 
@@ -114,12 +119,12 @@ describe('MultiLogRecordProcessor', () => {
 
     it('should wait for all log record processors to finish flushing', done => {
       let flushed = 0;
-      const processor1 = new SimpleLogRecordProcessor(
-        new InMemoryLogRecordExporter()
-      );
-      const processor2 = new SimpleLogRecordProcessor(
-        new InMemoryLogRecordExporter()
-      );
+      const processor1 = new SimpleLogRecordProcessor({
+        exporter: new InMemoryLogRecordExporter(),
+      });
+      const processor2 = new SimpleLogRecordProcessor({
+        exporter: new InMemoryLogRecordExporter(),
+      });
 
       const spy1 = sinon.stub(processor1, 'forceFlush').callsFake(() => {
         flushed++;
@@ -192,6 +197,28 @@ describe('MultiLogRecordProcessor', () => {
         processor1.logRecords.length,
         processor2.logRecords.length
       );
+    });
+  });
+
+  describe('enabled', () => {
+    const processor1 = new TestProcessor();
+    const processor2 = new TestProcessor();
+    const { multiProcessor } = setup([processor1, processor2]);
+    const context = ROOT_CONTEXT;
+    const instrumentationScope = { name: 'test', version: '0.0.0' };
+
+    it('should return "true" if all processors are enabled', async () => {
+      assert.ok(multiProcessor.enabled({ context, instrumentationScope }));
+    });
+
+    it('should return "true" if any of the processors is enabled', async () => {
+      await processor1.shutdown();
+      assert.ok(multiProcessor.enabled({ context, instrumentationScope }));
+    });
+
+    it('should return "false" if all processors are not enabled', async () => {
+      await processor2.shutdown();
+      assert.ok(!multiProcessor.enabled({ context, instrumentationScope }));
     });
   });
 });

@@ -144,7 +144,7 @@ export abstract class InstrumentationAbstract<
   }
 
   /**
-   * Sets TraceProvider to this plugin
+   * Sets TracerProvider to this plugin
    * @param tracerProvider
    */
   public setTracerProvider(tracerProvider: TracerProvider): void {
@@ -196,7 +196,7 @@ export abstract class InstrumentationAbstract<
       hookHandler(span, info);
     } catch (e) {
       this._diag.error(
-        `Error running span customization hook due to exception in handler`,
+        'Error running span customization hook due to exception in handler',
         { triggerName },
         e
       );

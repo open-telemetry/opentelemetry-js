@@ -8,10 +8,10 @@ import type {
   IKeyValue,
   Resource,
 } from './internal-types';
-import type { Attributes } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import type { Resource as ISdkResource } from '@opentelemetry/resources';
 import type { Encoder } from './utils';
+import type { LogAttributes } from '@opentelemetry/api-logs';
 
 export function createResource(
   resource: ISdkResource,
@@ -29,16 +29,27 @@ export function createResource(
 }
 
 export function createInstrumentationScope(
-  scope: InstrumentationScope
+  scope: InstrumentationScope & {
+    attributes?: LogAttributes;
+    droppedAttributesCount?: number;
+  },
+  encoder: Encoder
 ): IInstrumentationScope {
-  return {
+  const result: IInstrumentationScope = {
     name: scope.name,
     version: scope.version,
   };
+
+  if (scope.attributes && Object.keys(scope.attributes).length > 0) {
+    result.attributes = toAttributes(scope.attributes, encoder);
+    result.droppedAttributesCount = scope.droppedAttributesCount ?? 0;
+  }
+
+  return result;
 }
 
 export function toAttributes(
-  attributes: Attributes,
+  attributes: LogAttributes,
   encoder: Encoder
 ): IKeyValue[] {
   return Object.keys(attributes).map(key =>

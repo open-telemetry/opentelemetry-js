@@ -51,4 +51,16 @@ describe('LocalStorageSessionStore', () => {
 
     assert.deepStrictEqual(retrieved, session);
   });
+
+  it('return null if localStorage is not available', async () => {
+    sinon.stub(window, 'localStorage').value(undefined);
+    const retrieved = await store.get();
+    assert.strictEqual(retrieved, null);
+  });
+
+  it('return null if stored session is invalid', async () => {
+    getItemStub.returns('invalid-json');
+    const retrieved = await store.get();
+    assert.strictEqual(retrieved, null);
+  });
 });

@@ -39,6 +39,9 @@
       "path": "experimental/packages/opentelemetry-instrumentation-xml-http-request/tsconfig.esm.json"
     },
     {
+      "path": "experimental/packages/opentelemetry-propagator-env-carrier/tsconfig.esm.json"
+    },
+    {
       "path": "experimental/packages/otlp-exporter-base/tsconfig.esm.json"
     },
     {
@@ -82,6 +85,9 @@
     },
     {
       "path": "packages/sdk-metrics/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/sdk-trace/tsconfig.esm.json"
     },
     {
       "path": "semantic-conventions/tsconfig.esm.json"
