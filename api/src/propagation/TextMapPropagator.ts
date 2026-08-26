@@ -18,7 +18,7 @@ import type { Context } from '../context/types';
  *
  * @since 1.0.0
  */
-export interface TextMapPropagator {
+export interface TextMapPropagator<BaseCarrier = unknown> {
   /**
    * Injects values from a given `Context` into a carrier.
    *
@@ -32,7 +32,7 @@ export interface TextMapPropagator {
    * @param setter an optional {@link TextMapSetter}. If undefined, values will be
    *     set by direct object assignment.
    */
-  inject<Carrier>(
+  inject<Carrier extends BaseCarrier>(
     context: Context,
     carrier: Carrier,
     setter: TextMapSetter<Carrier>
@@ -50,7 +50,7 @@ export interface TextMapPropagator {
    * @param getter an optional {@link TextMapGetter}. If undefined, keys will be all
    *     own properties, and keys will be accessed by direct object access.
    */
-  extract<Carrier>(
+  extract<Carrier extends BaseCarrier>(
     context: Context,
     carrier: Carrier,
     getter: TextMapGetter<Carrier>
