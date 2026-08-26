@@ -65,7 +65,11 @@ describe('Utility', () => {
       it('should set the value on the carrier', () => {
         const headers = Object.freeze({ 'x-foo': 'bar' });
         const carrier: RequestOptions = { headers };
-        utils.requestTextMapSetter.set(carrier, 'traceparent', 'some-value');
+        utils.requestOptionsTextMapSetter.set(
+          carrier,
+          'traceparent',
+          'some-value'
+        );
         assert.notStrictEqual(carrier.headers, headers);
         assert.deepStrictEqual(carrier.headers, {
           'x-foo': 'bar',
@@ -80,7 +84,11 @@ describe('Utility', () => {
           headers: ['x-foo', 'bar'],
         };
 
-        utils.requestTextMapSetter.set(carrier, 'traceparent', 'some-value');
+        utils.requestOptionsTextMapSetter.set(
+          carrier,
+          'traceparent',
+          'some-value'
+        );
         assert.deepStrictEqual(carrier.headers, [
           'x-foo',
           'bar',
@@ -93,7 +101,11 @@ describe('Utility', () => {
         const carrier: RequestOptions = {
           headers: ['x-foo', 'bar', 'traceparent', 'old-value', 'x-baz', 'qux'],
         };
-        utils.requestTextMapSetter.set(carrier, 'traceparent', 'new-value');
+        utils.requestOptionsTextMapSetter.set(
+          carrier,
+          'traceparent',
+          'new-value'
+        );
         assert.deepStrictEqual(carrier.headers, [
           'x-foo',
           'bar',
@@ -107,14 +119,22 @@ describe('Utility', () => {
       it('should replace the value of an existing key regardless of casing', () => {
         const headers = Object.freeze(['TraceParent', 'old-value']);
         const carrier: RequestOptions = { headers };
-        utils.requestTextMapSetter.set(carrier, 'traceparent', 'new-value');
+        utils.requestOptionsTextMapSetter.set(
+          carrier,
+          'traceparent',
+          'new-value'
+        );
         assert.notStrictEqual(carrier.headers, headers);
         assert.deepStrictEqual(carrier.headers, ['TraceParent', 'new-value']);
       });
 
       it('should append to an empty carrier', () => {
         const carrier: RequestOptions = { headers: [] };
-        utils.requestTextMapSetter.set(carrier, 'traceparent', 'some-value');
+        utils.requestOptionsTextMapSetter.set(
+          carrier,
+          'traceparent',
+          'some-value'
+        );
         assert.deepStrictEqual(carrier.headers, ['traceparent', 'some-value']);
       });
     });
