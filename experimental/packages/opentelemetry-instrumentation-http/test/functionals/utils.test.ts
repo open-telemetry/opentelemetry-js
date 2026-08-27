@@ -8,6 +8,7 @@ import {
   ATTR_ERROR_TYPE,
   ATTR_HTTP_ROUTE,
   ATTR_URL_PATH,
+  ATTR_URL_QUERY,
   ATTR_USER_AGENT_ORIGINAL,
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
@@ -415,6 +416,60 @@ describe('Utility', () => {
     });
   });
 
+  describe('redactQueryString()', () => {
+    it('redacts a matching parameter', () => {
+      assert.strictEqual(
+        utils.redactQueryString(new URLSearchParams('sig=secret&foo=bar'), [
+          'sig',
+        ]),
+        'sig=REDACTED&foo=bar'
+      );
+    });
+
+    it('leaves non-matching parameters unchanged', () => {
+      assert.strictEqual(
+        utils.redactQueryString(new URLSearchParams('foo=bar&baz=qux'), [
+          'sig',
+        ]),
+        'foo=bar&baz=qux'
+      );
+    });
+
+    it('redacts multiple parameters', () => {
+      assert.strictEqual(
+        utils.redactQueryString(
+          new URLSearchParams('sig=a&AWSAccessKeyId=b&keep=c'),
+          ['sig', 'AWSAccessKeyId']
+        ),
+        'sig=REDACTED&AWSAccessKeyId=REDACTED&keep=c'
+      );
+    });
+
+    it('returns the input unchanged when the list is empty', () => {
+      assert.strictEqual(
+        utils.redactQueryString(new URLSearchParams('sig=secret'), []),
+        'sig=secret'
+      );
+    });
+
+    it('redacts a param with an empty value', () => {
+      assert.strictEqual(
+        utils.redactQueryString(new URLSearchParams('sig=&foo=bar'), ['sig']),
+        'sig=REDACTED&foo=bar'
+      );
+    });
+
+    it('redacts all occurrences of a duplicated parameter', () => {
+      assert.strictEqual(
+        utils.redactQueryString(
+          new URLSearchParams('sig=SECRET1&sig=SECRET2&foo=bar'),
+          ['sig']
+        ),
+        'sig=REDACTED&foo=bar'
+      );
+    });
+  });
+
   describe('setSpanWithError()', () => {
     it('should have error attributes', () => {
       const errorMessage = 'test error';
@@ -551,6 +606,85 @@ describe('Utility', () => {
         attributes[ATTR_USER_AGENT_SYNTHETIC_TYPE],
         USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT
       );
+    });
+
+    describe('query parameter redaction', () => {
+      function makeRequest(query: string): IncomingMessage {
+        const req = {
+          url: `http://hostname/path?${query}`,
+          method: 'GET',
+          socket: {},
+        } as IncomingMessage;
+        req.headers = { host: 'hostname' };
+        return req;
+      }
+
+      it('redacts default sensitive params by default', () => {
+        const attributes = utils.getIncomingRequestAttributes(
+          makeRequest('sig=secret&foo=bar'),
+          { component: 'http', enableSyntheticSourceDetection: false },
+          diag
+        );
+        assert.strictEqual(attributes[ATTR_URL_QUERY], 'sig=REDACTED&foo=bar');
+      });
+
+      it('redacts all default params (AWSAccessKeyId, Signature, X-Goog-Signature)', () => {
+        const attributes = utils.getIncomingRequestAttributes(
+          makeRequest(
+            'AWSAccessKeyId=key&Signature=sig&X-Goog-Signature=gsig&keep=1'
+          ),
+          { component: 'http', enableSyntheticSourceDetection: false },
+          diag
+        );
+        assert.strictEqual(
+          attributes[ATTR_URL_QUERY],
+          'AWSAccessKeyId=REDACTED&Signature=REDACTED&X-Goog-Signature=REDACTED&keep=1'
+        );
+      });
+
+      it('redacts only params in the custom list when redactedQueryParams is provided', () => {
+        const attributes = utils.getIncomingRequestAttributes(
+          makeRequest('sig=secret&custom=sensitive&foo=bar'),
+          {
+            component: 'http',
+            enableSyntheticSourceDetection: false,
+            redactedQueryParams: ['custom'],
+          },
+          diag
+        );
+        assert.strictEqual(
+          attributes[ATTR_URL_QUERY],
+          'sig=secret&custom=REDACTED&foo=bar'
+        );
+      });
+
+      it('does not redact anything when redactedQueryParams is an empty array', () => {
+        const attributes = utils.getIncomingRequestAttributes(
+          makeRequest('sig=secret&foo=bar'),
+          {
+            component: 'http',
+            enableSyntheticSourceDetection: false,
+            redactedQueryParams: [],
+          },
+          diag
+        );
+        assert.strictEqual(attributes[ATTR_URL_QUERY], 'sig=secret&foo=bar');
+      });
+
+      it('does not set url.query when there is no query string', () => {
+        const req = {
+          url: 'http://hostname/path',
+          method: 'GET',
+          socket: {},
+        } as IncomingMessage;
+        req.headers = { host: 'hostname' };
+        const attributes = utils.getIncomingRequestAttributes(
+          req,
+          { component: 'http', enableSyntheticSourceDetection: false },
+          diag
+        );
+        assert.strictEqual(attributes[ATTR_URL_QUERY], undefined);
+      });
     });
   });
 

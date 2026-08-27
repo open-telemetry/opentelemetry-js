@@ -55,6 +55,25 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import forwardedParse = require('forwarded-parse');
 
+const defaultQueryStringsToRedact = Array.from(DEFAULT_QUERY_STRINGS_TO_REDACT);
+
+/**
+ * Redacts sensitive query parameters from a query string (without leading '?').
+ * Returns the input unchanged if it cannot be parsed.
+ */
+export const redactQueryString = (
+  searchParams: URLSearchParams,
+  paramsToRedact: string[]
+): string => {
+  const params = new URLSearchParams(searchParams);
+  for (const param of paramsToRedact) {
+    if (params.has(param)) {
+      params.set(param, STR_REDACTED);
+    }
+  }
+  return params.toString();
+};
+
 /**
  * Get an absolute url
  */
@@ -87,15 +106,11 @@ export const getAbsoluteUrl = (
   if (typeof path === 'string' && path.includes('?')) {
     try {
       const parsedUrl = new URL(path, 'http://localhost');
-      const sensitiveParamsToRedact: string[] = redactedQueryParams || [];
-
-      for (const sensitiveParam of sensitiveParamsToRedact) {
-        if (parsedUrl.searchParams.get(sensitiveParam)) {
-          parsedUrl.searchParams.set(sensitiveParam, STR_REDACTED);
-        }
-      }
-
-      path = `${parsedUrl.pathname}${parsedUrl.search}`;
+      const redacted = redactQueryString(
+        parsedUrl.searchParams,
+        redactedQueryParams
+      );
+      path = `${parsedUrl.pathname}?${redacted}`;
     } catch {
       // Ignore error, as the path was not a valid URL.
     }
@@ -746,10 +761,16 @@ export const getIncomingRequestAttributes = (
     component: 'http' | 'https';
     hookAttributes?: Attributes;
     enableSyntheticSourceDetection: boolean;
+    redactedQueryParams?: string[];
   },
   logger: DiagLogger
 ): Attributes => {
-  const { component, enableSyntheticSourceDetection, hookAttributes } = options;
+  const {
+    component,
+    enableSyntheticSourceDetection,
+    hookAttributes,
+    redactedQueryParams,
+  } = options;
   const { headers, method } = request;
   const { 'user-agent': userAgent } = headers;
   const parsedUrl = getInfoFromIncomingMessage(component, request, logger);
@@ -775,7 +796,11 @@ export const getIncomingRequestAttributes = (
 
   if (parsedUrl.search) {
     // Remove leading '?' from URL search (https://developer.mozilla.org/en-US/docs/Web/API/URL/search).
-    attributes[ATTR_URL_QUERY] = parsedUrl.search.slice(1);
+    const paramsToRedact = redactedQueryParams ?? defaultQueryStringsToRedact;
+    attributes[ATTR_URL_QUERY] = redactQueryString(
+      new URLSearchParams(parsedUrl.search.slice(1)),
+      paramsToRedact
+    );
   }
 
   if (remoteClientAddress != null) {

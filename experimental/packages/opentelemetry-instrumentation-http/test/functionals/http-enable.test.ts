@@ -1682,7 +1682,7 @@ describe('HttpInstrumentation', () => {
       );
     });
 
-    it('should not modify URLs with empty query parameters', async () => {
+    it('should redact sensitive query parameters with empty values', async () => {
       await httpRequest.get(
         `${protocol}://${hostname}:${serverPort}${pathname}?sig=&empty=`
       );
@@ -1691,7 +1691,7 @@ describe('HttpInstrumentation', () => {
 
       assert.strictEqual(
         outgoingSpan.attributes[ATTR_URL_FULL],
-        `${protocol}://${hostname}:${serverPort}${pathname}?sig=&empty=`
+        `${protocol}://${hostname}:${serverPort}${pathname}?sig=REDACTED&empty=`
       );
     });
 
