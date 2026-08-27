@@ -9,11 +9,9 @@
  * number. We need to work with all 64-bits, thus, care needs to be
  * taken when working with Javascript's bitwise operators (<<, >>, &,
  * |, etc) as they truncate operands to 32-bits. In order to work around
- * this we work with the 64-bits as two 32-bit halves, perform bitwise
- * operations on them independently, and combine the results (if needed).
+ * this we work with the 64-bits as two 32-bit halves and perform bitwise
+ * operations on each half independently.
  */
-
-export const SIGNIFICAND_WIDTH = 52;
 
 /**
  * EXPONENT_MASK is set to 1 for the hi 32-bits of an IEEE 754
@@ -50,6 +48,21 @@ export const MAX_NORMAL_EXPONENT = EXPONENT_BIAS;
  */
 export const MIN_VALUE = Math.pow(2, -1022);
 
+// A single DataView, allocated once and reused. Sharing the buffer is safe
+// because every read below is synchronous.
+const dv = new DataView(new ArrayBuffer(8));
+
+/**
+ * floatBits writes value into the shared buffer and returns its two 32-bit
+ * halves.
+ * @param {number} value - the floating point number to read
+ * @returns {{hi: number, lo: number}} the high and low 32-bit halves
+ */
+function floatBits(value: number): { hi: number; lo: number } {
+  dv.setFloat64(0, value);
+  return { hi: dv.getUint32(0), lo: dv.getUint32(4) };
+}
+
 /**
  * getNormalBase2 extracts the normalized base-2 fractional exponent.
  * This returns k for the equation f x 2**k where f is
@@ -60,28 +73,17 @@ export const MIN_VALUE = Math.pow(2, -1022);
  * @returns {number} the normalized base-2 exponent
  */
 export function getNormalBase2(value: number): number {
-  const dv = new DataView(new ArrayBuffer(8));
-  dv.setFloat64(0, value);
-  // access the raw 64-bit float as 32-bit uints
-  const hiBits = dv.getUint32(0);
-  const expBits = (hiBits & EXPONENT_MASK) >> 20;
-  return expBits - EXPONENT_BIAS;
+  const { hi } = floatBits(value);
+  return ((hi & EXPONENT_MASK) >> 20) - EXPONENT_BIAS;
 }
 
 /**
- * GetSignificand returns the 52 bit (unsigned) significand as a signed value.
- * @param {number} value - the floating point number to extract the significand from
- * @returns {number} The 52-bit significand
+ * isPowerOfTwo reports whether value is an exact power of two, e.g. its 52-bit
+ * significand is all zeros. Only valid for positive, finite values.
+ * @param {number} value - the floating point number to test
+ * @returns {boolean} true if value is an exact power of two
  */
-export function getSignificand(value: number): number {
-  const dv = new DataView(new ArrayBuffer(8));
-  dv.setFloat64(0, value);
-  // access the raw 64-bit float as two 32-bit uints
-  const hiBits = dv.getUint32(0);
-  const loBits = dv.getUint32(4);
-  // extract the significand bits from the hi bits and left shift 32 places note:
-  // we can't use the native << operator as it will truncate the result to 32-bits
-  const significandHiBits = (hiBits & SIGNIFICAND_MASK) * Math.pow(2, 32);
-  // combine the hi and lo bits and return
-  return significandHiBits + loBits;
+export function isPowerOfTwo(value: number): boolean {
+  const { hi, lo } = floatBits(value);
+  return (hi & SIGNIFICAND_MASK) === 0 && lo === 0;
 }
