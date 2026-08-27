@@ -9,7 +9,7 @@ import type { ISerializer } from '../../i-serializer';
 import { serializeLogsExportRequest } from './logs-serializer';
 import { deserializeExportLogsServiceResponse } from './response-deserializer';
 
-/*
+/**
  * @experimental this serializer may receive breaking changes in minor versions, pin this package's version when using this constant
  */
 export const ProtobufLogsSerializer: ISerializer<

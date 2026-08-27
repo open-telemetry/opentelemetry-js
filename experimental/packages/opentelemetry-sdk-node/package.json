@@ -16,7 +16,8 @@
     "watch": "tsc --build --watch",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
-    "align-api-deps": "node ../../../scripts/align-api-deps.js"
+    "align-api-deps": "node ../../../scripts/align-api-deps.js",
+    "maint:regenerate-test-certs": "cd test/certs && ./regenerate.sh"
   },
   "keywords": [
     "opentelemetry",
@@ -79,7 +80,7 @@
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
-    "mocha": "11.7.6",
+    "mocha": "11.8.0",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
     "ts-loader": "9.5.7",
