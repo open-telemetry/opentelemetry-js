@@ -342,6 +342,19 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           args[0] instanceof Request ? args[0].url : String(args[0])
         ).href;
 
+        // `new Request(existing, init)` consumes the original body. Decide
+        // whether to create a span first so ignored/unsampled calls can
+        // forward the caller's args untouched (#7037).
+        const createdSpan = plugin._createSpan(
+          url,
+          args[0] instanceof Request
+            ? { method: args[1]?.method ?? args[0].method }
+            : args[1] || {}
+        );
+        if (!createdSpan) {
+          return original.apply(this, args);
+        }
+
         // Per the Fetch spec, when fetch() is called with a Request object
         // and a separate init object, the init properties override the
         // Request's properties. Merge them into a new Request so that
@@ -353,10 +366,6 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           options = args[1] != null ? new Request(args[0], args[1]) : args[0];
         } else {
           options = args[1] || {};
-        }
-        const createdSpan = plugin._createSpan(url, options);
-        if (!createdSpan) {
-          return original.apply(this, args);
         }
         const spanData = plugin._prepareSpanData(url);
 
