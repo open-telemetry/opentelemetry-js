@@ -5,9 +5,9 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-XXX Update description here.
-
 This package provides the OpenTelemetry declarative configuration API: `ConfigProvider` and `ConfigProperties`. Instrumentations pull their configuration from a globally registered `ConfigProvider`; an SDK sets that provider from a parsed configuration file. When no provider is registered the global default is a no-op that yields empty configuration, so instrumentations fall back to their constructor defaults.
+
+`ConfigProperties` is a configuration mapping node, as parsed from the configuration file. Values are `unknown`, and a node is only as well formed as the file it came from, so a reader must check the type of every value it uses. Instrumentation authors should not read these nodes directly: use `readConfigProperties()` from `@opentelemetry/instrumentation`, which maps configuration properties onto instrumentation config fields, validates their types, and warns on unrecognized properties.
 
 Per the [OpenTelemetry specification][spec-url], `ConfigProperties` is stable and `ConfigProvider` is in development.
 
@@ -23,8 +23,18 @@ npm install --save @opentelemetry/api-config
 import { config } from '@opentelemetry/api-config';
 
 const provider = config.getConfigProvider();
-const httpConfig = provider.getInstrumentationConfig('@opentelemetry/instrumentation-http');
-const timeout = httpConfig.getNumber('timeout');
+
+// An instrumentation's own node: instrumentation/development.js.<name>
+const httpConfig = provider.getInstrumentationConfig(
+  '@opentelemetry/instrumentation-http'
+);
+const serverName = httpConfig['server_name'];
+if (typeof serverName === 'string') {
+  // ...
+}
+
+// The shared node: instrumentation/development.general
+const generalConfig = provider.getGeneralInstrumentationConfig();
 ```
 
 ## Useful links

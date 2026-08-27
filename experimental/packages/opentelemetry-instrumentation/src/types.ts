@@ -58,8 +58,33 @@ export interface Instrumentation<
    * Warning: Be aware that the "config" here differs from the "config" in
    * the `.setConfig() / .getConfig()` interface methods.
    *
-   * XXX Should provide recommended usage docs. E.g. using `instrumentationName`
-   *     for `name` arg to get instr config. Point to `readConfigProperties` util in instrumentation package.
+   * Use `readConfigProperties()` to do the reading. Pass
+   * `this.instrumentationName` as `instrumentationName` to get this
+   * instrumentation's own node, declare the config properties it supports, and
+   * merge the result over the current config:
+   *
+   * ```ts
+   * setConfigProvider(configProvider: ConfigProvider): void {
+   *   const config = readConfigProperties({
+   *     configProvider,
+   *     instrumentationName: this.instrumentationName,
+   *     instrumentationProps: [['server_name', 'string', 'serverName']],
+   *     currentConfig: this.getConfig() as Record<string, unknown>,
+   *     diag: this._diag,
+   *   });
+   *   if (Object.keys(config).length > 0) {
+   *     this.setConfig({ ...this.getConfig(), ...config });
+   *   }
+   * }
+   * ```
+   *
+   * Because config arrives after construction, state derived from config in the
+   * constructor goes stale unless it is rebuilt. Override `setConfig()` to
+   * rebuild it. Read config through `getConfig()` at the point of use where
+   * possible, so a later change is picked up without any rebuild.
+   *
+   * Function-valued options cannot come from declarative config; they remain
+   * in-code only.
    */
   setConfigProvider?(configProvider: ConfigProvider): void;
 

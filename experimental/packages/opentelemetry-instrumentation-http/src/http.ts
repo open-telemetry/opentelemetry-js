@@ -138,9 +138,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
   /**
    * Update the current config (rather than fully *replace* it), with any
-   * settings from declarative config.
-   *
-   * XXX Document the supported declconf settings in README configuration section.
+   * settings from declarative config. See the "Declarative Configuration"
+   * section of the README for the properties this instrumentation supports.
    */
   setConfigProvider(configProvider: ConfigProvider): void {
     const config = readConfigProperties({

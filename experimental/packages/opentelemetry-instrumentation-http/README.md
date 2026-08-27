@@ -78,6 +78,60 @@ Hook type                                  | Parameters                         
 `StartOutgoingSpanCustomAttributeFunction` | `request: RequestOptions`                                                                                    | `Attributes` to add before the outgoing request span starts
 `HttpCustomAttributeFunction`              | `span: Span`, `request: ClientRequest` or `IncomingMessage`, `response: IncomingMessage` or `ServerResponse` | `void`
 
+## Declarative Configuration
+
+**Note: declarative configuration is under development and may change.**
+
+This instrumentation reads the `instrumentation/development` section of a
+[declarative configuration](https://opentelemetry.io/docs/specs/otel/configuration/) file.
+Properties set in the file take precedence over the same option passed in code.
+Options not listed here, including every function-valued option, are in-code only.
+
+Its own properties live under `instrumentation/development.js.@opentelemetry/instrumentation-http`:
+
+Config property | Type | Instrumentation option
+--------------- | ---- | ----------------------
+`disable_incoming_request_instrumentation` | boolean | `disableIncomingRequestInstrumentation`
+`disable_outgoing_request_instrumentation` | boolean | `disableOutgoingRequestInstrumentation`
+`require_parent_for_incoming_spans` | boolean | `requireParentforIncomingSpans`
+`require_parent_for_outgoing_spans` | boolean | `requireParentforOutgoingSpans`
+`redacted_query_params` | string[] | `redactedQueryParams`
+`enable_synthetic_source_detection` | boolean | `enableSyntheticSourceDetection`
+`server_name` | string | `serverName`
+
+Header capture comes from the shared `instrumentation/development.general.http` section:
+
+Config property | Type | Instrumentation option
+--------------- | ---- | ----------------------
+`http.client.request_captured_headers` | string[] | `headersToSpanAttributes.client.requestHeaders`
+`http.client.response_captured_headers` | string[] | `headersToSpanAttributes.client.responseHeaders`
+`http.server.request_captured_headers` | string[] | `headersToSpanAttributes.server.requestHeaders`
+`http.server.response_captured_headers` | string[] | `headersToSpanAttributes.server.responseHeaders`
+
+For example:
+
+```yaml
+file_format: "1.1"
+
+instrumentation/development:
+  general:
+    http:
+      client:
+        request_captured_headers:
+          - content-type
+  js:
+    "@opentelemetry/instrumentation-http":
+      server_name: my-server
+      require_parent_for_outgoing_spans: true
+      redacted_query_params:
+        - sig
+        - token
+```
+
+A property with a value of the wrong type is ignored with a warning, leaving the
+in-code value in place. A property this instrumentation does not support is also
+reported with a warning.
+
 ## Semantic Conventions
 
 **Span attributes:**
