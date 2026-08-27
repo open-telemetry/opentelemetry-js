@@ -1852,6 +1852,34 @@ describe('fetch', () => {
 
         assertDebugMessage();
       });
+
+      it('should not leave a span open if Request constructor throws', async () => {
+        let threw: unknown;
+        try {
+          await tracedFetch({
+            handlers: [
+              msw.http.post('/api/not-ignored.json', () => {
+                return msw.HttpResponse.json({ ok: true });
+              }),
+            ],
+            callback: () =>
+              fetch(
+                new Request('/api/not-ignored.json', {
+                  method: 'POST',
+                  body: JSON.stringify({ hello: 'world' }),
+                }),
+                { method: 'GET' }
+              ),
+            expectExport: false,
+          });
+        } catch (err) {
+          threw = err;
+        }
+
+        assert.ok(threw instanceof TypeError);
+        assert.strictEqual(exportedSpans.length, 0);
+        assertNoDebugMessages();
+      });
     });
 
     describe('unsuccessful request', () => {
