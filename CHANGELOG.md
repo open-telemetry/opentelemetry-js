@@ -14,17 +14,36 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
-* feat(sdk-logs): implement log processor metrics [#6554](https://github.com/open-telemetry/opentelemetry-js/pull/6554) @anuraaga
-* feat(otlp-exporter): implement exporter metrics [#6480](https://github.com/open-telemetry/opentelemetry-js/pull/6480) @anuraaga
-* feat(propagator-jaeger):  *Notice*: The `@opentelemetry/propagator-jaeger` package will be removed in SDK 3.x, planned for approximately September 2026. @pichlermarc
-  * The Jaeger propagator has been deprecated by the OpenTelemetry specification in favor of `W3CTraceContextPropagator`. This package will be removed in a future release.
+* feat(context-async-hooks): implement `attach()` on `AsyncLocalStorageContextManager` [#6845](https://github.com/open-telemetry/opentelemetry-js/pull/6845) @pichlermarc
+  * On Node.js 25.9+, delegates to `AsyncLocalStorage.withScope()` returning a native `RunScope`. On older Node.js, falls back to `enterWith()` with a manual disposable wrapper.
+* feat(sdk-trace): allow configuring the force flush timeout per call #6929 @LarryHu0217
 * feat(sdk-metrics): wire exemplar support into metrics pipeline [#6830](https://github.com/open-telemetry/opentelemetry-js/pull/6830) @CharlieTLe @rnavarro
 
 ### :bug: Bug Fixes
 
-* fix(sdk-trace): include trace IDs at the ratio 1 upper bound in `TraceIdRatioBasedSampler` [#6890](https://github.com/open-telemetry/opentelemetry-js/pull/6890) @LarryHu0217
+* fix(sdk-metrics): ignore `Infinity` in exponential histograms [#7015](https://github.com/open-telemetry/opentelemetry-js/pull/7015) @mwear
 
 ### :books: Documentation
+
+### :house: Internal
+
+* perf(sdk-metrics): reuse a single DataView for exponential histogram bit reads [#6998](https://github.com/open-telemetry/opentelemetry-js/pull/6998) @mwear
+* chore(ci): run documentation tests on a weekly schedule [#6920](https://github.com/open-telemetry/opentelemetry-js/pull/6920) @LarryHu0217
+* chore(resources): Ensure that multiple uses of serviceInstanceIdDetector.detect() return the *same* value for `service.instance.id`
+
+## 2.10.0
+
+### :rocket: Features
+
+* feat(sdk-logs): implement log processor metrics [#6554](https://github.com/open-telemetry/opentelemetry-js/pull/6554) @anuraaga
+* feat(otlp-exporter): implement exporter metrics [#6480](https://github.com/open-telemetry/opentelemetry-js/pull/6480) @anuraaga
+* feat(propagator-jaeger):  *Notice*: The `@opentelemetry/propagator-jaeger` package will be removed in SDK 3.x, planned for approximately September 2026. @pichlermarc
+  * The Jaeger propagator has been deprecated by the OpenTelemetry specification in favor of `W3CTraceContextPropagator`. This package will be removed in a future release.
+
+### :bug: Bug Fixes
+
+* fix(sdk-trace): reject `SimpleSpanProcessor.forceFlush()` when a pending export fails [#6771](https://github.com/open-telemetry/opentelemetry-js/issues/6771) @LarryHu0217
+* fix(sdk-trace): include trace IDs at the ratio 1 upper bound in `TraceIdRatioBasedSampler` [#6890](https://github.com/open-telemetry/opentelemetry-js/pull/6890) @LarryHu0217
 
 ### :house: Internal
 

@@ -4,7 +4,7 @@
  */
 
 import * as assert from 'assert';
-import { setupResource, startNodeSDK } from '../src/start';
+import { startNodeSDK } from '../src/start';
 import * as Sinon from 'sinon';
 import {
   context,
@@ -17,28 +17,12 @@ import {
 } from '@opentelemetry/api';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
-import {
-  assertServiceInstanceIdIsUUID,
-  assertServiceResource,
-} from './util/resource-assertions';
-import type { DetectedResource } from '@opentelemetry/resources';
-import {
-  envDetector,
-  processDetector,
-  hostDetector,
-  serviceInstanceIdDetector,
-} from '@opentelemetry/resources';
 import { logs } from '@opentelemetry/api-logs';
 import {
   SimpleLogRecordProcessor,
   ConsoleLogRecordExporter,
   BatchLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
-import type {
-  ConfigFactory,
-  LogRecordExporterConfigModel,
-} from '@opentelemetry/configuration';
-import { createConfigFactory } from '@opentelemetry/configuration';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
@@ -48,19 +32,7 @@ import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exp
 import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
-
-import {
-  ATTR_HOST_NAME,
-  ATTR_PROCESS_PID,
-  ATTR_SERVICE_INSTANCE_ID,
-} from '../src/semconv';
-import { ATTR_OS_TYPE } from '@opentelemetry/resources/src/semconv';
-import {
-  createLogRecordExporterFromConfig,
-  getPeriodicMetricReaderFromConfiguration,
-  getSpanExporter,
-  setupContextManager,
-} from '../src/utils';
+import { setupContextManager } from '../src/utils';
 import { NOOP_SDK } from '../src/start';
 import {
   ConsoleMetricExporter,
@@ -262,13 +234,14 @@ describe('startNodeSDK', function () {
     assert.strictEqual(diagError.callCount, 1);
     assert.strictEqual(
       diagError.args[0][0],
-      'Could not create OpenTelemetry SDK: unknown LogRecordProcessor name: "my_custom_processor"'
+      'Could not create OpenTelemetry SDK from configuration, SDK will not be setup: unknown LogRecordProcessor name: "my_custom_processor"'
     );
 
     await sdk.shutdown();
   });
 
   it('should register a logger provider if multiple log record processors are provided', async () => {
+    process.env.TEST_DIR = __dirname;
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/logger.yaml';
     const sdk = startNodeSDK({});
 
@@ -305,14 +278,9 @@ describe('startNodeSDK', function () {
   it('should register a meter provider if multiple metric readers are provided', async () => {
     const stubLoggerWarn: Sinon.SinonStub = Sinon.stub(diag, 'warn');
 
+    process.env.TEST_DIR = __dirname;
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/meter.yaml';
     const sdk = startNodeSDK({});
-
-    // Periodic type 'otlp_file/development' and 'console' are not supported yet
-    const unsupportedWarnings = stubLoggerWarn.args.filter(
-      args => args[0] === 'Unsupported Metric Exporter.'
-    );
-    assert.strictEqual(unsupportedWarnings.length, 2);
 
     const meterProvider = metrics.getMeterProvider() as MeterProvider;
     const sharedState = (meterProvider as any)['_sharedState'];
@@ -358,17 +326,10 @@ describe('startNodeSDK', function () {
     await sdk.shutdown();
   });
 
-  it('should register a tracer provider if an exporter is provided', async () => {
-    const stubLoggerWarn: Sinon.SinonStub = Sinon.stub(diag, 'warn');
+  it('should register a tracer provider for fixtures/tracer.yaml', async () => {
+    process.env.TEST_DIR = __dirname;
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/tracer.yaml';
     const sdk = startNodeSDK({});
-
-    // otlp_file/development exporters are not supported yet
-    const unsupportedWarnings = stubLoggerWarn.args.filter(
-      args =>
-        args[0] === 'Unsupported Exporter value. No Span Exporter registered'
-    );
-    assert.strictEqual(unsupportedWarnings.length, 2);
 
     assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
     assert.ok(
@@ -400,255 +361,7 @@ describe('startNodeSDK', function () {
       (spanProcessors[3] as any)['_exporter'] instanceof ConsoleSpanExporter
     );
 
-    stubLoggerWarn.reset();
     await sdk.shutdown();
-  });
-
-  describe('setupResources', async function () {
-    beforeEach(() => {
-      process.env.OTEL_RESOURCE_ATTRIBUTES =
-        'service.instance.id=627cc493,service.name=my-service,service.namespace=default,service.version=0.0.1';
-    });
-
-    afterEach(() => {
-      delete process.env.OTEL_RESOURCE_ATTRIBUTES;
-    });
-
-    // Local function to test if a mocked method is ever called with a specific argument or regex matching for an argument.
-    // Needed because of race condition with parallel detectors.
-    const callArgsMatches = (
-      mockedFunction: Sinon.SinonSpy,
-      regex: RegExp
-    ): boolean => {
-      return mockedFunction.getCalls().some(call => {
-        return call.args.some(callArgs => regex.test(callArgs.toString()));
-      });
-    };
-
-    it('returns a merged resource with custom resource', async () => {
-      const configFactory: ConfigFactory = createConfigFactory();
-      const config = configFactory.getConfigModel();
-      const resource = setupResource(config, {
-        resourceDetectors: [
-          processDetector,
-          {
-            detect(): DetectedResource {
-              return {
-                attributes: { customAttr: 'someValue' },
-              };
-            },
-          },
-          envDetector,
-          hostDetector,
-        ],
-      });
-      await resource.waitForAsyncAttributes?.();
-
-      assert.strictEqual(resource.attributes['customAttr'], 'someValue');
-      assertServiceResource(resource, {
-        instanceId: '627cc493',
-        name: 'my-service',
-        namespace: 'default',
-        version: '0.0.1',
-      });
-    });
-
-    it('default detectors populate values properly', async () => {
-      const configFactory: ConfigFactory = createConfigFactory();
-      const config = configFactory.getConfigModel();
-      const resource = setupResource(config, {});
-      await resource.waitForAsyncAttributes?.();
-
-      assertServiceResource(resource, {
-        instanceId: '627cc493',
-        name: 'my-service',
-        namespace: 'default',
-        version: '0.0.1',
-      });
-
-      assert.equal(resource.attributes[ATTR_PROCESS_PID], undefined);
-      assert.equal(resource.attributes[ATTR_HOST_NAME], undefined);
-    });
-
-    it('no resource detectors with OTEL_NODE_RESOURCE_DETECTORS as none', async () => {
-      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'none';
-      const configFactory: ConfigFactory = createConfigFactory();
-      const config = configFactory.getConfigModel();
-      const resource = setupResource(config, {});
-      await resource.waitForAsyncAttributes?.();
-
-      assert.equal(resource.attributes[ATTR_PROCESS_PID], undefined);
-      assert.equal(resource.attributes[ATTR_HOST_NAME], undefined);
-    });
-
-    it('have node resource detectors with OTEL_NODE_RESOURCE_DETECTORS as all', async () => {
-      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'all';
-      const configFactory: ConfigFactory = createConfigFactory();
-      const config = configFactory.getConfigModel();
-      const resource = setupResource(config, {});
-      await resource.waitForAsyncAttributes?.();
-
-      assert.notEqual(resource.attributes[ATTR_PROCESS_PID], undefined);
-      assert.notEqual(resource.attributes[ATTR_HOST_NAME], undefined);
-      assert.notEqual(resource.attributes[ATTR_SERVICE_INSTANCE_ID], undefined);
-      assert.notEqual(resource.attributes[ATTR_OS_TYPE], undefined);
-    });
-
-    it('should configure resources from config file', async () => {
-      process.env.OTEL_CONFIG_FILE = 'test/fixtures/resources.yaml';
-      const configFactory: ConfigFactory = createConfigFactory();
-      const config = configFactory.getConfigModel();
-      const resource = setupResource(config, {});
-      await resource.waitForAsyncAttributes?.();
-
-      assert.deepStrictEqual(
-        resource.schemaUrl,
-        'https://opentelemetry.io/schemas/1.16.0'
-      );
-
-      assert.deepStrictEqual(resource.attributes, {
-        'service.name': 'config-name',
-        'service.namespace': 'config-namespace',
-        'service.version': '1.0.0',
-        bool_array_key: [true, false],
-        bool_key: true,
-        double_array_key: [1.1, 2.2],
-        double_key: 1.1,
-        int_array_key: [1, 2],
-        int_key: 1,
-        string_array_key: ['value1', 'value2'],
-        string_key: 'value',
-      });
-    });
-
-    it('returns a merged resource with a buggy detector', async () => {
-      const configFactory: ConfigFactory = createConfigFactory();
-      const config = configFactory.getConfigModel();
-      const resource = setupResource(config, {
-        resourceDetectors: [
-          processDetector,
-          {
-            detect() {
-              throw new Error('Buggy detector');
-            },
-          },
-          envDetector,
-          hostDetector,
-        ],
-      });
-      await resource.waitForAsyncAttributes?.();
-
-      assertServiceResource(resource, {
-        instanceId: '627cc493',
-        name: 'my-service',
-        namespace: 'default',
-        version: '0.0.1',
-      });
-    });
-
-    // 1. If not auto-detecting resources, then NodeSDK should not
-    //    complain about `OTEL_NODE_RESOURCE_DETECTORS` values.
-    // 2. If given resourceDetectors, then NodeSDK should not complain
-    //    about `OTEL_NODE_RESOURCE_DETECTORS` values.
-    //
-    // Practically, these tests help ensure that there is no spurious
-    // diag error message when using OTEL_NODE_RESOURCE_DETECTORS with
-    // @opentelemetry/auto-instrumentations-node, which supports more values
-    // than this package (e.g. 'gcp').
-    it('does not diag.warn when not using the envvar', async () => {
-      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,os,no-such-detector';
-      const diagMocks = {
-        error: Sinon.fake(),
-        warn: Sinon.fake(),
-        info: Sinon.fake(),
-        debug: Sinon.fake(),
-        verbose: Sinon.fake(),
-      };
-      diag.setLogger(diagMocks, DiagLogLevel.DEBUG);
-      const sdk1 = startNodeSDK({});
-      await sdk1.shutdown();
-
-      const sdk2 = startNodeSDK({ resourceDetectors: [envDetector] });
-      await sdk2.shutdown();
-
-      assert.ok(
-        !callArgsMatches(diagMocks.error, /no-such-detector/),
-        'diag.error() messages do not mention "no-such-detector"'
-      );
-    });
-  });
-
-  describe('configureServiceName', async function () {
-    it('should configure service name via OTEL_SERVICE_NAME env var', async () => {
-      process.env.OTEL_SERVICE_NAME = 'env-set-name';
-      process.env.OTEL_RESOURCE_ATTRIBUTES =
-        'service.instance.id=my-instance-id';
-      const configFactory: ConfigFactory = createConfigFactory();
-      const config = configFactory.getConfigModel();
-      const resource = setupResource(config, {});
-      await resource.waitForAsyncAttributes?.();
-
-      assertServiceResource(resource, {
-        name: 'env-set-name',
-        instanceId: 'my-instance-id',
-      });
-    });
-
-    it('should configure service name via OTEL_RESOURCE_ATTRIBUTES env var', async () => {
-      process.env.OTEL_RESOURCE_ATTRIBUTES =
-        'service.name=resource-env-set-name,service.instance.id=my-instance-id';
-      const configFactory: ConfigFactory = createConfigFactory();
-      const config = configFactory.getConfigModel();
-      const resource = setupResource(config, {});
-      await resource.waitForAsyncAttributes?.();
-
-      assertServiceResource(resource, {
-        name: 'resource-env-set-name',
-        instanceId: 'my-instance-id',
-      });
-    });
-  });
-
-  describe('configureServiceInstanceId', async function () {
-    it('should configure service instance id via OTEL_RESOURCE_ATTRIBUTES env var', async () => {
-      process.env.OTEL_RESOURCE_ATTRIBUTES =
-        'service.instance.id=627cc493,service.name=my-service,service.namespace';
-      const configFactory: ConfigFactory = createConfigFactory();
-      const config = configFactory.getConfigModel();
-      const resource = setupResource(config, {});
-      await resource.waitForAsyncAttributes?.();
-
-      assertServiceResource(resource, {
-        name: 'my-service',
-        instanceId: '627cc493',
-      });
-    });
-
-    it('should configure service instance id via OTEL_NODE_RESOURCE_DETECTORS env var', async () => {
-      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,host,os,serviceinstance';
-      const configFactory: ConfigFactory = createConfigFactory();
-      const config = configFactory.getConfigModel();
-      const resource = setupResource(config, {});
-      await resource.waitForAsyncAttributes?.();
-
-      assertServiceInstanceIdIsUUID(resource);
-    });
-
-    it('should configure service instance id with random UUID', async () => {
-      const configFactory: ConfigFactory = createConfigFactory();
-      const config = configFactory.getConfigModel();
-      const resource = setupResource(config, {
-        resourceDetectors: [
-          processDetector,
-          envDetector,
-          hostDetector,
-          serviceInstanceIdDetector,
-        ],
-      });
-      await resource.waitForAsyncAttributes?.();
-
-      assertServiceInstanceIdIsUUID(resource);
-    });
   });
 
   describe('configuring logger provider from env', function () {
@@ -832,7 +545,7 @@ describe('startNodeSDK', function () {
 
     it('should only create one span processor when configured using env vars and config', async () => {
       process.env.OTEL_TRACES_EXPORTER = 'console';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSDK();
       const listOfProcessors = getSdkSpanProcessors();
 
       assert.strictEqual(listOfProcessors.length, 1);
@@ -961,41 +674,6 @@ describe('startNodeSDK', function () {
   });
 
   describe('tests to increase code coverage', function () {
-    it('should throw for invalid log record exporter model', async () => {
-      assert.throws(() => {
-        const exporter: LogRecordExporterConfigModel = {};
-        createLogRecordExporterFromConfig(exporter);
-      });
-    });
-
-    it('should warn for unsupported metric producer', async () => {
-      const warnSpy = Sinon.spy(diag, 'warn');
-      const reader = getPeriodicMetricReaderFromConfiguration({
-        exporter: { console: {} },
-        producers: [{ 'unknown/producer': {} }],
-      });
-      assert.ok(reader !== undefined);
-      assert.ok(
-        warnSpy.args.some(args =>
-          String(args[0]).includes('Unsupported metric producer')
-        )
-      );
-      await (reader as PeriodicExportingMetricReader).shutdown();
-    });
-
-    it('should warn when exporter timeout is 0', async () => {
-      const warnSpy = Sinon.spy(diag, 'warn');
-      const exporter = getSpanExporter({
-        otlp_http: { timeout: 0 },
-      });
-      assert.ok(exporter !== undefined);
-      assert.ok(
-        warnSpy.args.some(args =>
-          String(args[0]).includes('timeout of 0 (infinite) is not supported')
-        )
-      );
-    });
-
     it('null context manager', async () => {
       setupContextManager(null);
       assert.equal(

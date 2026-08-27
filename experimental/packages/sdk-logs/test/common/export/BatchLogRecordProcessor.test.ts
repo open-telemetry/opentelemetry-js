@@ -16,7 +16,7 @@ import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import type {
   BatchLogRecordProcessorOptions,
   LogRecordLimits,
-  SdkLogRecord,
+  ReadWriteLogRecord,
   LogRecordExporter,
 } from '../../../src';
 import { InMemoryLogRecordExporter } from '../../../src';
@@ -37,10 +37,9 @@ class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BatchLogRecord
 const createLogRecord = (
   limits?: LogRecordLimits,
   resource?: Resource
-): SdkLogRecord => {
+): ReadWriteLogRecord => {
   const sharedState = new LoggerProviderSharedState(
     resource || defaultResource(),
-    Infinity,
     {
       attributeCountLimit: limits?.attributeCountLimit ?? 128,
       attributeValueLengthLimit: limits?.attributeValueLengthLimit ?? Infinity,
@@ -657,10 +656,10 @@ describe('BatchLogRecordProcessorBase', () => {
     it('should only send a single batch at a time', async () => {
       // arrange
       const callbacks: ((result: ExportResult) => void)[] = [];
-      const logRecords: SdkLogRecord[] = [];
+      const logRecords: ReadWriteLogRecord[] = [];
       const exporter: LogRecordExporter = {
         export: async (
-          exportedLogRecords: SdkLogRecord[],
+          exportedLogRecords: ReadWriteLogRecord[],
           resultCallback: (result: ExportResult) => void
         ) => {
           callbacks.push(resultCallback);

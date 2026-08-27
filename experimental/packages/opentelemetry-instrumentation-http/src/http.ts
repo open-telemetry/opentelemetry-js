@@ -69,6 +69,7 @@ import {
   setSpanWithError,
 } from './utils';
 import type { Err, Func, Http, HttpRequestArgs, Https } from './internal-types';
+import { DEFAULT_QUERY_STRINGS_TO_REDACT } from './internal-types';
 
 /**
  * `node:http` and `node:https` instrumentation for OpenTelemetry
@@ -549,6 +550,9 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           ),
           enableSyntheticSourceDetection:
             instrumentation.getConfig().enableSyntheticSourceDetection || false,
+          redactedQueryParams:
+            instrumentation.getConfig().redactedQueryParamsServer ??
+            Array.from(DEFAULT_QUERY_STRINGS_TO_REDACT),
         },
         instrumentation._diag
       );
