@@ -412,6 +412,62 @@ describe('readConfigProperties', function () {
     assert.match(warnings[1], /expected array of booleans/);
   });
 
+  it('keeps sibling branches of the current config when merging nested targets', function () {
+    const config = readConfigProperties({
+      configProvider: provider(
+        {},
+        { http: { client: { request_captured_headers: ['from-yaml'] } } }
+      ),
+      generalProps: [
+        [
+          'http.client.request_captured_headers',
+          'string[]',
+          'headersToSpanAttributes.client.requestHeaders',
+        ],
+      ],
+      currentConfig: {
+        headersToSpanAttributes: {
+          client: { responseHeaders: ['in-code-resp'] },
+          server: { requestHeaders: ['in-code-server'] },
+        },
+      },
+      diag,
+    });
+    assert.deepStrictEqual(config, {
+      headersToSpanAttributes: {
+        client: {
+          responseHeaders: ['in-code-resp'],
+          requestHeaders: ['from-yaml'],
+        },
+        server: { requestHeaders: ['in-code-server'] },
+      },
+    });
+  });
+
+  it('does not mutate the current config while merging', function () {
+    const currentConfig = {
+      headersToSpanAttributes: { server: { requestHeaders: ['keep'] } },
+    };
+    readConfigProperties({
+      configProvider: provider(
+        {},
+        { http: { client: { request_captured_headers: ['a'] } } }
+      ),
+      generalProps: [
+        [
+          'http.client.request_captured_headers',
+          'string[]',
+          'headersToSpanAttributes.client.requestHeaders',
+        ],
+      ],
+      currentConfig,
+      diag,
+    });
+    assert.deepStrictEqual(currentConfig, {
+      headersToSpanAttributes: { server: { requestHeaders: ['keep'] } },
+    });
+  });
+
   it('returns an empty object when nothing is declared', function () {
     const config = readConfigProperties({
       configProvider: provider({ '@otel/test': { server_name: 'srv' } }),

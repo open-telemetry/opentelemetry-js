@@ -77,6 +77,27 @@ export function isWrapped(func: unknown): func is ShimWrapped {
   );
 }
 
+function isPlainObject(val: unknown): val is Record<string, unknown> {
+  return typeof val === 'object' && val !== null && !Array.isArray(val);
+}
+
+/**
+ * Merge `overlay` over `base`, recursing into plain objects. Returns new
+ * objects throughout, so neither argument is mutated.
+ */
+function deepMerge(
+  base: unknown,
+  overlay: Record<string, unknown>
+): Record<string, unknown> {
+  const result: Record<string, unknown> = isPlainObject(base)
+    ? { ...base }
+    : {};
+  for (const [key, val] of Object.entries(overlay)) {
+    result[key] = isPlainObject(val) ? deepMerge(result[key], val) : val;
+  }
+  return result;
+}
+
 /**
  * Lookup a property in a plain object, where `lookup` is a dotted lookup.
  * Returns `undefined` if the lookup path doesn't exist.
@@ -89,12 +110,7 @@ export function isWrapped(func: unknown): func is ShimWrapped {
 function dottedGet(obj: unknown, lookup: string): unknown {
   let result: unknown = obj;
   for (const key of lookup.split('.')) {
-    if (
-      typeof result === 'object' &&
-      result !== null &&
-      !Array.isArray(result) &&
-      Object.hasOwn(result, key)
-    ) {
+    if (isPlainObject(result) && Object.hasOwn(result, key)) {
       result = result[key as keyof typeof result];
     } else {
       return undefined;
@@ -130,14 +146,10 @@ function dottedSet(
       targ[key] = {};
     }
     const candidate = targ[key];
-    if (
-      typeof candidate !== 'object' ||
-      candidate === null ||
-      Array.isArray(candidate)
-    ) {
+    if (!isPlainObject(candidate)) {
       return false;
     }
-    targ = candidate as Record<string, unknown>;
+    targ = candidate;
   }
 
   targ[lastSeg] = val;
@@ -160,8 +172,8 @@ function flattenedKeys(obj: Record<string, unknown>, prefix = ''): string[] {
     const currPath = prefix ? `${prefix}.${key}` : key;
     const val = obj[key];
 
-    if (typeof val === 'object' && val !== null && !Array.isArray(val)) {
-      acc.push(...flattenedKeys(val as Record<string, unknown>, currPath));
+    if (isPlainObject(val)) {
+      acc.push(...flattenedKeys(val, currPath));
     } else {
       acc.push(currPath);
     }
@@ -248,6 +260,12 @@ export function readConfigProperties(opts: {
    * because `general` is shared between instrumentations.
    */
   generalDomains?: string[];
+  /**
+   * The instrumentation's current config. Nested target paths are merged over
+   * the matching branch of this, so declarative config that sets one leaf does
+   * not drop sibling leaves set in code.
+   */
+  currentConfig?: Record<string, unknown>;
   diag?: DiagLogger;
 }): Record<string, unknown> {
   // Unhandled-property reporting covers the properties this instrumentation is
@@ -255,7 +273,7 @@ export function readConfigProperties(opts: {
   // `generalDomains`. The rest of `general` belongs to other instrumentations.
   const ownedPropNames: string[] = [];
   const handledPropNames: string[] = [];
-  const config = {};
+  const config: Record<string, unknown> = {};
 
   if (opts.instrumentationName && opts.instrumentationProps) {
     const instrConf = opts.configProvider.getInstrumentationConfig(
@@ -290,17 +308,8 @@ export function readConfigProperties(opts: {
       const prefix = 'instrumentation/development.general';
       for (const domain of opts.generalDomains ?? []) {
         const subtree = dottedGet(generalConf, domain);
-        if (
-          typeof subtree === 'object' &&
-          subtree !== null &&
-          !Array.isArray(subtree)
-        ) {
-          ownedPropNames.push(
-            ...flattenedKeys(
-              subtree as Record<string, unknown>,
-              `${prefix}.${domain}`
-            )
-          );
+        if (isPlainObject(subtree)) {
+          ownedPropNames.push(...flattenedKeys(subtree, `${prefix}.${domain}`));
         }
       }
 
@@ -332,6 +341,17 @@ export function readConfigProperties(opts: {
     opts.diag?.warn(
       `unhandled declarative configuration properties: ${JSON.stringify(unhandledPropNames)}`
     );
+  }
+
+  // The caller merges the result with a shallow spread, so any nested branch it
+  // returns must already carry the current config's sibling values.
+  const current = opts.currentConfig;
+  if (current) {
+    for (const [key, val] of Object.entries(config)) {
+      if (isPlainObject(val)) {
+        config[key] = deepMerge(current[key], val);
+      }
+    }
   }
 
   return config;

@@ -139,4 +139,31 @@ describe('HttpInstrumentation declarative config', function () {
     assert.strictEqual(config.requireParentforIncomingSpans, true);
     assert.strictEqual(config.serverName, 'keep-me');
   });
+
+  it('keeps in-code header capture settings that declarative config does not set', function () {
+    const configProvider = createConfigProvider({
+      'instrumentation/development': {
+        general: {
+          http: { client: { request_captured_headers: ['from-yaml'] } },
+        },
+      },
+    });
+    const instrumentation = makeInstrumentation(configProvider, {
+      headersToSpanAttributes: {
+        client: { responseHeaders: ['in-code-client-resp'] },
+        server: { requestHeaders: ['in-code-server-req'] },
+      },
+    });
+
+    assert.deepStrictEqual(
+      instrumentation.getConfig().headersToSpanAttributes,
+      {
+        client: {
+          requestHeaders: ['from-yaml'],
+          responseHeaders: ['in-code-client-resp'],
+        },
+        server: { requestHeaders: ['in-code-server-req'] },
+      }
+    );
+  });
 });

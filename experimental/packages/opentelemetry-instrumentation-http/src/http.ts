@@ -199,6 +199,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       ],
       // instrumentation-http owns the `general.http` domain.
       generalDomains: ['http'],
+      currentConfig: this.getConfig() as Record<string, unknown>,
       diag: this._diag,
     });
 
