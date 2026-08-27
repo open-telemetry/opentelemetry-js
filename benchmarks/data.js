@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1787778143696,
+  "lastUpdate": 1787834765103,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -100203,6 +100203,184 @@ window.BENCHMARK_DATA = {
             "range": "±0.97%",
             "unit": "ops/sec",
             "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dyladan@users.noreply.github.com",
+            "name": "Daniel Dyla",
+            "username": "dyladan"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e086dec7f9304107ef6d50b5877be88895c06aa7",
+          "message": "Merge commit from fork\n\n* fix(instrumentation-http): redact sensitive query params on server spans\n\nSensitive query parameters (sig, Signature, AWSAccessKeyId,\nX-Goog-Signature) were redacted on outgoing client spans via\ngetAbsoluteUrl() but were written verbatim to url.query on incoming\nserver spans. Explicitly configuring redactedQueryParams had no effect\non server spans, making the documented mitigation silently inert.\n\n- Extract redactQueryString() helper shared by both paths\n- Apply redaction in getIncomingRequestAttributes() defaulting to the\n  same built-in list as the client path\n- Add redactedQueryParamsServer config option for independent per-side\n  control; set to [] to opt out of server-side redaction\n\nFixes GHSA-3v2p-hm54-8qcq\n\n* Update experimental/CHANGELOG.md\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\n\n* apply review comments\n\n* Document sensitive query parameter redaction\n\n* fix(instrumentation-http): use has() to redact duplicate and empty query params\n\n* Update experimental/packages/opentelemetry-instrumentation-http/src/types.ts\n\nCo-authored-by: Jamie Danielson <jamiedanielson@honeycomb.io>\n\n* fix(instrumentation-http): accept URLSearchParams in redactQueryString to avoid redundant URL parsing\n\n---------\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\nCo-authored-by: Jamie Danielson <jamiedanielson@honeycomb.io>",
+          "timestamp": "2026-08-27T08:39:00-04:00",
+          "tree_id": "ccb65c85099d87e2707eb867056d29922243a9e5",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/e086dec7f9304107ef6d50b5877be88895c06aa7"
+        },
+        "date": 1787834763784,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "generateTraceId",
+            "value": 6754844,
+            "range": "±0.37%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "generateSpanId",
+            "value": 7958740,
+            "range": "±0.80%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 634724,
+            "range": "±0.88%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes w/ setAttributes)",
+            "value": 640697,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "addEvent (128 attributes)",
+            "value": 43805,
+            "range": "±1.11%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "addLink (128 attributes)",
+            "value": 45153,
+            "range": "±0.16%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 451283,
+            "range": "±2.82%",
+            "unit": "ops/sec",
+            "extra": "88 samples"
+          },
+          {
+            "name": "parsePairKeyValue simple",
+            "value": 4424632,
+            "range": "±2.92%",
+            "unit": "ops/sec",
+            "extra": "88 samples"
+          },
+          {
+            "name": "parsePairKeyValue with metadata",
+            "value": 4346603,
+            "range": "±0.87%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "parsePairKeyValue URI encoded",
+            "value": 4364430,
+            "range": "±0.35%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "parsePairKeyValue complex",
+            "value": 3785604,
+            "range": "±1.03%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "Counter.add (fixed attributes)",
+            "value": 17317318,
+            "range": "±0.75%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "Counter.add (varied attributes, 100 combos)",
+            "value": 16934354,
+            "range": "±0.90%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "Counter.add (with view attribute processor)",
+            "value": 1759393,
+            "range": "±0.79%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "context.active() x100",
+            "value": 4850663,
+            "range": "±2.53%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
+          },
+          {
+            "name": "trace.getTracerProvider() x100",
+            "value": 12659201,
+            "range": "±0.68%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 512 spans (protobuf)",
+            "value": 388,
+            "range": "±2.58%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "transform 512 spans (json)",
+            "value": 670,
+            "range": "±0.68%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "transform 512 logs (protobuf)",
+            "value": 426,
+            "range": "±0.36%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 512 logs (json)",
+            "value": 818,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 512 metrics (protobuf)",
+            "value": 457,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "transform 512 metrics (json)",
+            "value": 411,
+            "range": "±0.40%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
           }
         ]
       }
