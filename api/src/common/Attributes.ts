@@ -8,7 +8,7 @@
  *
  * Note: only the own enumerable keys are counted as valid attribute keys.
  *
- * @since 1.3.0
+ * @since 1.1.0
  */
 export interface Attributes {
   [attributeKey: string]: AttributeValue | undefined;
@@ -19,7 +19,7 @@ export interface Attributes {
  *
  * null or undefined attribute values are invalid and will result in undefined behavior.
  *
- * @since 1.3.0
+ * @since 1.1.0
  */
 export type AttributeValue =
   | string

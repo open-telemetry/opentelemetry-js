@@ -21,17 +21,12 @@ import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/expo
 import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
-import type {
-  DetectedResourceAttributes,
-  Resource,
-  ResourceDetector,
-} from '@opentelemetry/resources';
+import type { ResourceDetector } from '@opentelemetry/resources';
 import {
   envDetector,
   hostDetector,
   osDetector,
   processDetector,
-  resourceFromAttributes,
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 import type { SpanExporter, SpanProcessor } from '@opentelemetry/sdk-trace';
@@ -43,7 +38,6 @@ import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import type { ConfigurationModel } from '@opentelemetry/configuration';
-import { mergeResourceAttributesConfig } from '@opentelemetry/configuration';
 import type {
   IMetricReader,
   PushMetricExporter,
@@ -65,33 +59,6 @@ const RESOURCE_DETECTOR_HOST = 'host';
 const RESOURCE_DETECTOR_OS = 'os';
 const RESOURCE_DETECTOR_PROCESS = 'process';
 const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
-
-export function getResourceFromConfiguration(
-  config: ConfigurationModel
-): Resource | undefined {
-  if (!config.resource) {
-    return undefined;
-  }
-
-  const configAttrs = mergeResourceAttributesConfig(
-    config.resource.attributes,
-    config.resource.attributes_list
-  );
-  if (!configAttrs) {
-    return undefined;
-  }
-
-  const attrs: DetectedResourceAttributes = {};
-  for (let i = 0; i < configAttrs.length; i++) {
-    const a = configAttrs[i];
-    if (a.value !== null) {
-      attrs[a.name] = a.value;
-    }
-  }
-  return resourceFromAttributes(attrs, {
-    schemaUrl: config.resource.schema_url ?? undefined,
-  });
-}
 
 export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
   // When updating this list, make sure to also update the section `resourceDetectors` on README.
@@ -123,22 +90,6 @@ export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
       );
     }
     return resourceDetector || [];
-  });
-}
-
-export function getResourceDetectorsFromConfiguration(
-  config: ConfigurationModel
-): Array<ResourceDetector> {
-  const detectors = config.resource?.['detection/development']?.detectors ?? [];
-
-  return detectors.flatMap(detector => {
-    const result: ResourceDetector[] = [];
-    if (detector.host !== undefined) result.push(hostDetector);
-    if (detector.os !== undefined) result.push(osDetector);
-    if (detector.process !== undefined) result.push(processDetector);
-    if (detector.service !== undefined) result.push(serviceInstanceIdDetector);
-    if (detector.env !== undefined) result.push(envDetector);
-    return result;
   });
 }
 

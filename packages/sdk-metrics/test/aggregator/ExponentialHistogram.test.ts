@@ -217,6 +217,21 @@ describe('ExponentialHistogramAccumulation', () => {
       assert.deepStrictEqual(getCounts(accumulation.positive), []);
       assert.deepStrictEqual(getCounts(accumulation.negative), []);
     });
+
+    it('ignores +Infinity and -Infinity', () => {
+      const accumulation = new ExponentialHistogramAccumulation([0, 0], 1);
+
+      accumulation.record(Infinity);
+      accumulation.record(-Infinity);
+
+      assert.strictEqual(accumulation.scale, 0);
+      assert.strictEqual(accumulation.max, -Infinity);
+      assert.strictEqual(accumulation.min, Infinity);
+      assert.strictEqual(accumulation.sum, 0);
+      assert.strictEqual(accumulation.count, 0);
+      assert.deepStrictEqual(getCounts(accumulation.positive), []);
+      assert.deepStrictEqual(getCounts(accumulation.negative), []);
+    });
   });
   describe('merge', () => {
     it('handles simple (even) case', () => {
