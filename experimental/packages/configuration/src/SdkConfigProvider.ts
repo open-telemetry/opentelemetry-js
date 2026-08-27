@@ -15,6 +15,17 @@ import type {
 export const EMPTY_CONFIG_PROPERTIES: ConfigProperties = Object.freeze({});
 
 /**
+ * The schema types a config node as an object, but the parsed file is only as
+ * good as its input. Callers index the returned node, so anything that is not a
+ * mapping is reported as absent.
+ */
+function asConfigProperties(node: unknown): ConfigProperties {
+  return typeof node === 'object' && node !== null && !Array.isArray(node)
+    ? (node as ConfigProperties)
+    : EMPTY_CONFIG_PROPERTIES;
+}
+
+/**
  * A {@link ConfigProvider} over a parsed {@link ConfigurationModel}. Exposes the
  * `instrumentation/development` node; per-instrumentation config lives at
  * `.js.<name>` and shared config at `.general`.
@@ -30,18 +41,13 @@ class SdkConfigProvider implements ConfigProvider {
 
   getInstrumentationConfig(name?: string): ConfigProperties {
     if (name === undefined) {
-      return (this._instrumentationConfig ??
-        EMPTY_CONFIG_PROPERTIES) as ConfigProperties;
-    } else {
-      // XXX guard and test on the `name` node not being a Record<string,unknown>.
-      return (this._instrumentationConfig?.js?.[name] ??
-        EMPTY_CONFIG_PROPERTIES) as ConfigProperties;
+      return asConfigProperties(this._instrumentationConfig);
     }
+    return asConfigProperties(this._instrumentationConfig?.js?.[name]);
   }
 
   getGeneralInstrumentationConfig(): ConfigProperties {
-    return (this._instrumentationConfig?.general ??
-      EMPTY_CONFIG_PROPERTIES) as ConfigProperties;
+    return asConfigProperties(this._instrumentationConfig?.general);
   }
 }
 

@@ -67,4 +67,37 @@ describe('SdkConfigProvider', () => {
     assert.deepStrictEqual(provider.getInstrumentationConfig('aName'), {});
     assert.deepStrictEqual(provider.getGeneralInstrumentationConfig(), {});
   });
+
+  it('treats a non-mapping instrumentation node as absent', function () {
+    const provider = createConfigProvider({
+      'instrumentation/development': {
+        js: {
+          '@otel/a-string': 'oops',
+          '@otel/an-array': ['oops'],
+          '@otel/a-null': null,
+        },
+      },
+    } as unknown as ConfigurationModel);
+
+    assert.deepStrictEqual(
+      provider.getInstrumentationConfig('@otel/a-string'),
+      {}
+    );
+    assert.deepStrictEqual(
+      provider.getInstrumentationConfig('@otel/an-array'),
+      {}
+    );
+    assert.deepStrictEqual(
+      provider.getInstrumentationConfig('@otel/a-null'),
+      {}
+    );
+  });
+
+  it('treats a non-mapping general node as absent', function () {
+    const provider = createConfigProvider({
+      'instrumentation/development': { general: 'oops' },
+    } as unknown as ConfigurationModel);
+
+    assert.deepStrictEqual(provider.getGeneralInstrumentationConfig(), {});
+  });
 });
