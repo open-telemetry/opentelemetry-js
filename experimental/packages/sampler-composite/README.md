@@ -27,10 +27,6 @@ import { createProbabilitySampler } from '@opentelemetry/sampler-composite';
 const sampler = createProbabilitySampler(0.1);
 ```
 
-As the specification requires, this sampler ignores the parent `SampledFlag`. To respect it, use the
-sampler as a delegate of `ParentBasedSampler`, or use `createComposableParentThresholdSampler` as
-shown below.
-
 ### Samplers
 
 This module exports samplers that follow the general behavior of the standard SDK samplers, but ensuring

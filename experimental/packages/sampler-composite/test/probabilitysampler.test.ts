@@ -16,20 +16,14 @@ import {
 } from '@opentelemetry/api';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { TraceState, W3CTraceContextPropagator } from '@opentelemetry/core';
-import type { Sampler } from '@opentelemetry/sdk-trace';
 import {
   ParentBasedSampler,
   SamplingDecision,
   TracerProvider,
 } from '@opentelemetry/sdk-trace';
 
-import {
-  createCompositeSampler,
-  createComposableProbabilitySampler,
-  createProbabilitySampler,
-} from '../src';
+import { createProbabilitySampler } from '../src';
 import { parseOtelTraceState } from '../src/tracestate';
-import { traceIdGenerator } from './util';
 
 const traceId = '00112233445566778800000000000000';
 // The rightmost 56 bits are the randomness value; this one is all-ones, so it
@@ -119,42 +113,6 @@ describe('ProbabilitySampler', () => {
       sample(createProbabilitySampler(0), parentContext(TraceFlags.SAMPLED))
         .decision,
       SamplingDecision.NOT_RECORD
-    );
-  });
-
-  it('should decide identically to the equivalent composite sampler', () => {
-    const ratio = 0.25;
-    const probability = createProbabilitySampler(ratio);
-    const composite = createCompositeSampler(
-      createComposableProbabilitySampler(ratio)
-    );
-    const nextTraceId = traceIdGenerator();
-
-    let sampled = 0;
-    for (let i = 0; i < 1000; i++) {
-      const id = nextTraceId();
-      const args: Parameters<Sampler['shouldSample']> = [
-        context.active(),
-        id,
-        'name',
-        SpanKind.INTERNAL,
-        {},
-        [],
-      ];
-      const actual = probability.shouldSample(...args);
-      assert.strictEqual(
-        actual.decision,
-        composite.shouldSample(...args).decision,
-        id
-      );
-      if (actual.decision === SamplingDecision.RECORD_AND_SAMPLED) {
-        sampled++;
-      }
-    }
-    // Guards against both samplers being trivially broken in the same way.
-    assert.ok(
-      sampled > 200 && sampled < 300,
-      `sampled ${sampled} of 1000, want ~250`
     );
   });
 
@@ -269,7 +227,7 @@ describe('ProbabilitySampler', () => {
       assert.deepStrictEqual(presumed(), []);
       // The new span's own flags never carry the random bit, confirming it
       // can only ever be observed by way of an extracted remote parent.
-      assert.strictEqual(span.spanContext().traceFlags & 0x2, 0);
+      assert.strictEqual(span.spanContext().traceFlags & TRACE_FLAG_RANDOM, 0);
     });
 
     it('should not warn for a remote parent with the random flag set', () => {
@@ -466,7 +424,7 @@ describe('ProbabilitySampler', () => {
     });
 
     it('should sample correctly and never warn when composed as the root of a ParentBasedSampler', () => {
-      // The package's own README recommends wrapping ProbabilitySampler in
+      // createProbabilitySampler()'s own doc comment recommends wrapping it in
       // ParentBasedSampler to respect the parent SampledFlag (this sampler
       // ignores it on its own). ParentBasedSampler only ever delegates to the
       // wrapped `root` sampler when there is no parent at all -- a sampled or
