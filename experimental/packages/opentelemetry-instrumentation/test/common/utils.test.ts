@@ -468,6 +468,22 @@ describe('readConfigProperties', function () {
     });
   });
 
+  it('refuses an unsafe target path', function () {
+    const config = readConfigProperties({
+      configProvider: provider({ '@otel/test': { a: 'x', b: 'y', c: 'z' } }),
+      instrumentationName: '@otel/test',
+      instrumentationProps: [
+        ['a', 'string', '__proto__.polluted'],
+        ['b', 'string', 'constructor.prototype.polluted'],
+        ['c', 'string', '__proto__'],
+      ],
+      diag,
+    });
+    assert.deepStrictEqual(config, {});
+    assert.strictEqual(warnings.length, 3);
+    assert.strictEqual(({} as Record<string, unknown>)['polluted'], undefined);
+  });
+
   it('returns an empty object when nothing is declared', function () {
     const config = readConfigProperties({
       configProvider: provider({ '@otel/test': { server_name: 'srv' } }),

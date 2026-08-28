@@ -120,6 +120,12 @@ function dottedGet(obj: unknown, lookup: string): unknown {
 }
 
 /**
+ * Path segments that must never be assignment targets: writing to them can
+ * reach an object's prototype.
+ */
+const UNSAFE_PATH_SEGMENTS = new Set(['__proto__', 'constructor', 'prototype']);
+
+/**
  * Set a value on a plain object, where `lookup` is a dotted-path to index
  * into the given object, creating empty objects as necessary. E.g.:
  *
@@ -128,7 +134,8 @@ function dottedGet(obj: unknown, lookup: string): unknown {
  *   > o
  *   { foo: { bar: { baz: 42 } } }
  *
- * Returns false, without setting anything, when the path cannot be walked.
+ * Returns false, without setting anything, when the path cannot be walked or
+ * names an unsafe segment.
  */
 function dottedSet(
   obj: Record<string, unknown>,
@@ -138,10 +145,13 @@ function dottedSet(
   let targ = obj;
   const segs = lookup.split('.');
   const lastSeg = segs.pop();
-  if (lastSeg === undefined) {
+  if (lastSeg === undefined || UNSAFE_PATH_SEGMENTS.has(lastSeg)) {
     return false;
   }
   for (const key of segs) {
+    if (UNSAFE_PATH_SEGMENTS.has(key)) {
+      return false;
+    }
     if (!Object.hasOwn(targ, key)) {
       targ[key] = {};
     }
