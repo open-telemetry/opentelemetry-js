@@ -22,6 +22,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :rocket: Features
 
 * feat(sdk-logs): deprecate `SdkLogRecord` in favor of `ReadWriteLogRecord` [#6939](https://github.com/open-telemetry/opentelemetry-js/pull/6939) @pichlermarc
+* feat(otlp-exporter-base): add `createOtlp*Exporter()` factory functions to the OTLP trace, metric and log exporter packages (`-otlp-http`, `-otlp-proto`, `-otlp-grpc`); unlike the exporter classes, they do not read `OTEL_EXPORTER_OTLP_*` environment variables, which makes them suitable for use with declarative configuration [#6959](https://github.com/open-telemetry/opentelemetry-js/issues/6959) @pacocartones
 
 ### :bug: Bug Fixes
 

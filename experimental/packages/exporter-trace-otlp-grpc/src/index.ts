@@ -3,4 +3,4 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export { OTLPTraceExporter } from './OTLPTraceExporter';
+export { createOtlpGrpcSpanExporter, OTLPTraceExporter } from './OTLPTraceExporter';

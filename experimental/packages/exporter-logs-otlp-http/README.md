@@ -98,6 +98,18 @@ In addition to settings passed to the constructor, the exporter also supports co
 
 > Settings configured programmatically take precedence over environment variables. Per-signal environment variables take precedence over non-per-signal environment variables.
 
+### Creating an exporter without environment variable configuration
+
+The `OTLPLogExporter` class reads the environment variables described above. When that is not desirable — for example, when the exporter is configured from a configuration file — use `createOtlpHttpLogExporter` instead. It accepts the same options, but does not read `OTEL_EXPORTER_OTLP_*` environment variables; options that are not provided fall back to the defaults defined by the OTLP exporter specification.
+
+```js
+const { createOtlpHttpLogExporter } = require('@opentelemetry/exporter-logs-otlp-http');
+
+const exporter = createOtlpHttpLogExporter({
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/logs
+});
+```
+
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

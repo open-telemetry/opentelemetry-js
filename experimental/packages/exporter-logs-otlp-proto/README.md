@@ -49,6 +49,18 @@ logger.emit({
 })
 ```
 
+## Creating an exporter without environment variable configuration
+
+The `OTLPLogExporter` class reads `OTEL_EXPORTER_OTLP_*` environment variables for configuration. When that is not desirable — for example, when the exporter is configured from a configuration file — use `createOtlpProtoLogExporter` instead. It accepts the same options, but does not read environment variables; options that are not provided fall back to the defaults defined by the OTLP exporter specification.
+
+```js
+const { createOtlpProtoLogExporter } = require('@opentelemetry/exporter-logs-otlp-proto');
+
+const exporter = createOtlpProtoLogExporter({
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/logs
+});
+```
+
 ## Exporter Timeout Configuration
 
 The OTLPLogExporter has a timeout configuration option which is the maximum time, in milliseconds, the OTLP exporter will wait for each batch export. The default value is 10000ms.
