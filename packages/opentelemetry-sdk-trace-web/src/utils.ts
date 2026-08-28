@@ -34,6 +34,10 @@ function getUrlNormalizingAnchor(): HTMLAnchorElement {
  * Helper function to be able to use enum as typed key in type and in interface when using forEach
  * @param obj
  * @param key
+ *
+ * @deprecated This is an instrumentation utility. Instrumentation packages
+ * should copy this implementation into their own package. This export will be
+ * removed in a future major release.
  */
 export function hasKey<O extends object>(
   obj: O,
@@ -48,6 +52,10 @@ export function hasKey<O extends object>(
  * @param performanceName name of performance entry for time start
  * @param entries
  * @param ignoreZeros
+ *
+ * @deprecated This is an instrumentation utility. Instrumentation packages
+ * should copy this implementation into their own package. This export will be
+ * removed in a future major release.
  */
 export function addSpanNetworkEvent(
   span: api.Span,
@@ -68,6 +76,10 @@ export function addSpanNetworkEvent(
 
 /**
  * Helper function for adding network events and content length attributes.
+ *
+ * @deprecated This is an instrumentation utility. Instrumentation packages
+ * should copy this implementation into their own package. This export will be
+ * removed in a future major release.
  */
 export function addSpanNetworkEvents(
   span: api.Span,
@@ -119,6 +131,10 @@ export function addSpanNetworkEvents(
 /**
  * sort resources by startTime
  * @param filteredResources
+ *
+ * @deprecated This is an instrumentation utility. Instrumentation packages
+ * should copy this implementation into their own package. This export will be
+ * removed in a future major release.
  */
 export function sortResources(
   filteredResources: PerformanceResourceTiming[]
@@ -149,6 +165,10 @@ function getOrigin(): string | undefined {
  * @param resources
  * @param ignoredResources
  * @param initiatorType
+ *
+ * @deprecated This is an instrumentation utility. Instrumentation packages
+ * should copy this implementation into their own package. This export will be
+ * removed in a future major release.
  */
 export function getResource(
   spanUrl: string,
@@ -298,6 +318,10 @@ function filterResourcesForSpan(
 
 /**
  * The URLLike interface represents an URL and HTMLAnchorElement compatible fields.
+ *
+ * @deprecated This type supports instrumentation utilities. Instrumentation
+ * packages should copy this definition into their own package. This export
+ * will be removed in a future major release.
  */
 export interface URLLike {
   hash: string;
@@ -316,6 +340,10 @@ export interface URLLike {
 /**
  * Parses url using URL constructor or fallback to anchor element.
  * @param url
+ *
+ * @deprecated This is an instrumentation utility. Instrumentation packages
+ * should copy this implementation into their own package. This export will be
+ * removed in a future major release.
  */
 export function parseUrl(url: string): URLLike {
   if (typeof URL === 'function') {
@@ -340,6 +368,10 @@ export function parseUrl(url: string): URLLike {
  * Performs the steps described in https://html.spec.whatwg.org/multipage/urls-and-fetching.html#parse-a-url
  *
  * @param url
+ *
+ * @deprecated This is an instrumentation utility. Instrumentation packages
+ * should copy this implementation into their own package. This export will be
+ * removed in a future major release.
  */
 export function normalizeUrl(url: string): string {
   const urlLike = parseUrl(url);
@@ -351,6 +383,10 @@ export function normalizeUrl(url: string): string {
  * @param target - target element
  * @param optimised - when id attribute of element is present the xpath can be
  * simplified to contain id
+ *
+ * @deprecated This is an instrumentation utility. Instrumentation packages
+ * should copy this implementation into their own package. This export will be
+ * removed in a future major release.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getElementXPath(target: any, optimised?: boolean): string {
@@ -433,6 +469,10 @@ function getNodeValue(target: HTMLElement, optimised?: boolean): string {
  * Checks if trace headers should be propagated
  * @param spanUrl
  * @private
+ *
+ * @deprecated This is an instrumentation utility. Instrumentation packages
+ * should copy this implementation into their own package. This export will be
+ * removed in a future major release.
  */
 export function shouldPropagateTraceHeaders(
   spanUrl: string,

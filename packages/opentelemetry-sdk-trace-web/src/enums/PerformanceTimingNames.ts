@@ -3,6 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+/**
+ * @deprecated This enum supports instrumentation utilities. Instrumentation
+ * packages should copy this definition into their own package. This export
+ * will be removed in a future major release.
+ */
 export enum PerformanceTimingNames {
   CONNECT_END = 'connectEnd',
   CONNECT_START = 'connectStart',
