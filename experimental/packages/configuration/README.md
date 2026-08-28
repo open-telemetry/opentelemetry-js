@@ -72,7 +72,7 @@ When no config file is set, the factory reads from the standard OpenTelemetry SD
 | `OTEL_LOG_LEVEL` | Internal SDK log level |
 | `OTEL_SERVICE_NAME` | Service name resource attribute |
 | `OTEL_RESOURCE_ATTRIBUTES` | Comma-separated resource attributes |
-| `OTEL_NODE_RESOURCE_DETECTORS` | Resource detectors to enable (`env`, `host`, `os`, `process`, `serviceinstance`, `all`, `none`) |
+| `OTEL_NODE_RESOURCE_DETECTORS` | Resource detectors to enable (`host`, `os`, `process`, `service`, `all`, `none`). Environment resource attributes are always detected. |
 | `OTEL_PROPAGATORS` | Propagators: `tracecontext`, `baggage`, `b3`, `b3multi` |
 | `OTEL_TRACES_EXPORTER` | Traces exporter(s): `otlp`, `console`, `none` |
 | `OTEL_METRICS_EXPORTER` | Metrics exporter(s): `otlp`, `prometheus`, `console`, `none` |

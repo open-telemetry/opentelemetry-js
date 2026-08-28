@@ -46,7 +46,7 @@ import {
   osDetector,
   processDetector,
   resourceFromAttributes,
-  serviceInstanceIdDetector,
+  serviceDetector,
 } from '@opentelemetry/resources';
 
 import {
@@ -379,8 +379,7 @@ describe('create-from-config', () => {
         await resource.waitForAsyncAttributes?.();
         assert.deepEqual(resource.attributes, {
           ...defaultResAttrs,
-          ...(await attrsFromDetector(serviceInstanceIdDetector)),
-          'service.name': 'my-service-name',
+          ...(await attrsFromDetector(serviceDetector)),
           // Attributes from OTEL_RESOURCE_ATTRIBUTES should explicitly NOT be set.
         });
       } finally {
@@ -438,7 +437,7 @@ describe('create-from-config', () => {
           ...(await attrsFromDetector(hostDetector)),
           ...(await attrsFromDetector(osDetector)),
           ...(await attrsFromDetector(processDetector)),
-          ...(await attrsFromDetector(serviceInstanceIdDetector)),
+          ...(await attrsFromDetector(serviceDetector)),
           spam: 'eggs',
           'service.name': 'service-name-from-attributes',
           'os.type': 'my-os-type',

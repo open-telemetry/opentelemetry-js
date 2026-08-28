@@ -132,50 +132,56 @@ export function setResources(config: ConfigurationModel): void {
       },
     ];
   }
+
   if (list.length > 0) {
-    config.resource.attributes_list = resourceAttrList;
+    const effectiveList = serviceName
+      ? list.filter(element => {
+          try {
+            return decodeURIComponent(element.split('=')[0]) !== 'service.name';
+          } catch {
+            return true;
+          }
+        })
+      : list;
+    if (effectiveList.length > 0) {
+      config.resource.attributes_list = effectiveList.join(',');
+    }
     if (config.resource.attributes == null) {
       config.resource.attributes = [];
     }
 
-    for (let i = 0; i < list.length; i++) {
-      const element = list[i].split('=');
-      if (
-        element[0] !== 'service.name' ||
-        (element[0] === 'service.name' && serviceName === undefined)
-      ) {
-        config.resource.attributes.push({
-          name: element[0],
-          value: element[1],
-          type: 'string',
-        });
-      }
+    for (let i = 0; i < effectiveList.length; i++) {
+      const element = effectiveList[i].split('=');
+      config.resource.attributes.push({
+        name: element[0],
+        value: element[1],
+        type: 'string',
+      });
     }
   }
 
   const nodeDetectors = getStringListFromEnv('OTEL_NODE_RESOURCE_DETECTORS');
+  const detectors: ExperimentalResourceDetector[] = [];
   if (
     nodeDetectors &&
     nodeDetectors.length > 0 &&
     !nodeDetectors.includes('none')
   ) {
     const all = nodeDetectors.includes('all');
-    const detectors: ExperimentalResourceDetector[] = [];
     if (all || nodeDetectors.includes('container'))
       detectors.push({ container: {} });
     if (all || nodeDetectors.includes('host')) detectors.push({ host: {} });
     if (all || nodeDetectors.includes('os')) detectors.push({ os: {} });
     if (all || nodeDetectors.includes('process'))
       detectors.push({ process: {} });
-    if (all || nodeDetectors.includes('serviceinstance'))
+    if (all || nodeDetectors.includes('service'))
       detectors.push({ service: {} });
-    if (all || nodeDetectors.includes('env')) detectors.push({ env: {} });
-    if (detectors.length > 0) {
-      if (config.resource['detection/development'] == null) {
-        config.resource['detection/development'] = {};
-      }
-      config.resource['detection/development'].detectors = detectors;
+  }
+  if (detectors.length > 0) {
+    if (config.resource['detection/development'] == null) {
+      config.resource['detection/development'] = {};
     }
+    config.resource['detection/development'].detectors = detectors;
   }
 }
 

@@ -8,10 +8,16 @@ import {
   getKeyListFromObjectArray,
   getLoggerProviderConfigFromEnv,
   getBatchLogRecordProcessorConfigFromEnv,
+  getResourceDetectorsFromEnv,
 } from '../src/utils';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag } from '@opentelemetry/api';
+import {
+  envDetector,
+  hostDetector,
+  serviceDetector,
+} from '@opentelemetry/resources';
 import type { LoggerProviderOptions } from '@opentelemetry/sdk-logs';
 
 describe('getPropagatorFromEnv', function () {
@@ -313,5 +319,27 @@ describe('getBatchLogRecordProcessorConfigFromEnv', function () {
       maxExportBatchSize: undefined,
     });
     sinon.assert.callCount(warnStub, 4);
+  });
+});
+
+describe('getResourceDetectorsFromEnv', function () {
+  afterEach(function () {
+    delete process.env.OTEL_NODE_RESOURCE_DETECTORS;
+  });
+
+  it('maps service to serviceDetector and always runs envDetector last', function () {
+    process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,service,host';
+
+    assert.deepStrictEqual(getResourceDetectorsFromEnv(), [
+      serviceDetector,
+      hostDetector,
+      envDetector,
+    ]);
+  });
+
+  it('runs envDetector when configurable resource detection is disabled', function () {
+    process.env.OTEL_NODE_RESOURCE_DETECTORS = 'none';
+
+    assert.deepStrictEqual(getResourceDetectorsFromEnv(), [envDetector]);
   });
 });
