@@ -39,6 +39,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@opentelemetry/api-config": "0.221.0",
     "@opentelemetry/core": "2.10.0",
     "yaml": "^2.8.3"
   },

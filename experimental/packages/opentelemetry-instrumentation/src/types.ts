@@ -4,6 +4,7 @@
  */
 
 import type { TracerProvider, MeterProvider, Span } from '@opentelemetry/api';
+import type { ConfigProvider } from '@opentelemetry/api-config';
 import type { LoggerProvider } from '@opentelemetry/api-logs';
 
 /** Interface Instrumentation to apply patch. */
@@ -30,6 +31,62 @@ export interface Instrumentation<
 
   /** Method to set logger provider  */
   setLoggerProvider?(loggerProvider: LoggerProvider): void;
+
+  /**
+   * Method to set the (declarative) ConfigProvider for this instrumentation.
+   *
+   * The ConfigProvider is an API to access values defined by the Declarative
+   * Configuration spec, typically defined in a YAML file provided at SDK
+   * setup. See:
+   * - https://opentelemetry.io/docs/specs/otel/configuration/api/
+   * - https://opentelemetry.io/docs/specs/otel-config/types/#type-experimentalinstrumentation
+   *
+   * This method is typically called by `registerInstrumentations()`,
+   * typically by SDK setup.
+   *
+   * Instrumentations that want to use declarative config should
+   * implement this method to collect configuration.
+   * Note that this is called *after* instrumentation construction,
+   * and often *after* `.enable()`, so an instrumentation cannot use this
+   * config to impact one-time setup (e.g. module monkey-patching).
+   *
+   * Implementations of setConfigProvider MUST NOT throw.
+   * Instrumentation declarative config is often loosely typed, be defensive.
+   * Implementations SHOULD diag.warn on unsupported / unrecognized config
+   * values.
+   *
+   * Warning: Be aware that the "config" here differs from the "config" in
+   * the `.setConfig() / .getConfig()` interface methods.
+   *
+   * Use `readConfigProperties()` to do the reading. Pass
+   * `this.instrumentationName` as `instrumentationName` to get this
+   * instrumentation's own node, declare the config properties it supports, and
+   * merge the result over the current config:
+   *
+   * ```ts
+   * setConfigProvider(configProvider: ConfigProvider): void {
+   *   const config = readConfigProperties({
+   *     configProvider,
+   *     instrumentationName: this.instrumentationName,
+   *     instrumentationProps: [['server_name', 'string', 'serverName']],
+   *     currentConfig: this.getConfig() as Record<string, unknown>,
+   *     diag: this._diag,
+   *   });
+   *   if (Object.keys(config).length > 0) {
+   *     this.setConfig({ ...this.getConfig(), ...config });
+   *   }
+   * }
+   * ```
+   *
+   * Because config arrives after construction, state derived from config in the
+   * constructor goes stale unless it is rebuilt. Override `setConfig()` to
+   * rebuild it. Read config through `getConfig()` at the point of use where
+   * possible, so a later change is picked up without any rebuild.
+   *
+   * Function-valued options cannot come from declarative config; they remain
+   * in-code only.
+   */
+  setConfigProvider?(configProvider: ConfigProvider): void;
 
   /** Method to set instrumentation config  */
   setConfig(config: ConfigType): void;

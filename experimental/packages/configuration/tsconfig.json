@@ -19,6 +19,9 @@
     },
     {
       "path": "../../../packages/opentelemetry-core"
+    },
+    {
+      "path": "../api-config"
     }
   ]
 }

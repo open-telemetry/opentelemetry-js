@@ -21,6 +21,7 @@ import {
   trace,
   ValueType,
 } from '@opentelemetry/api';
+import type { ConfigProvider } from '@opentelemetry/api-config';
 import type { RPCMetadata } from '@opentelemetry/core';
 import {
   hrTime,
@@ -40,6 +41,7 @@ import {
   InstrumentationBase,
   InstrumentationNodeModuleDefinition,
   safeExecuteInTheMiddle,
+  readConfigProperties,
 } from '@opentelemetry/instrumentation';
 import { errorMonitor } from 'events';
 import {
@@ -85,6 +87,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
   constructor(config: HttpInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-http', VERSION, config);
+
     this._headerCapture = this._createHeaderCapture();
   }
 
@@ -132,6 +135,77 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   override setConfig(config: HttpInstrumentationConfig = {}): void {
     super.setConfig(config);
     this._headerCapture = this._createHeaderCapture();
+  }
+
+  /**
+   * Update the current config (rather than fully *replace* it), with any
+   * settings from declarative config. See the "Declarative Configuration"
+   * section of the README for the properties this instrumentation supports.
+   */
+  setConfigProvider(configProvider: ConfigProvider): void {
+    const config = readConfigProperties({
+      configProvider,
+      instrumentationName: this.instrumentationName,
+      instrumentationProps: [
+        [
+          'disable_incoming_request_instrumentation',
+          'boolean',
+          'disableIncomingRequestInstrumentation',
+        ],
+        [
+          'disable_outgoing_request_instrumentation',
+          'boolean',
+          'disableOutgoingRequestInstrumentation',
+        ],
+        [
+          'require_parent_for_incoming_spans',
+          'boolean',
+          'requireParentforIncomingSpans',
+        ],
+        [
+          'require_parent_for_outgoing_spans',
+          'boolean',
+          'requireParentforOutgoingSpans',
+        ],
+        ['redacted_query_params', 'string[]', 'redactedQueryParams'],
+        [
+          'enable_synthetic_source_detection',
+          'boolean',
+          'enableSyntheticSourceDetection',
+        ],
+        ['server_name', 'string', 'serverName'],
+      ],
+      generalProps: [
+        [
+          'http.client.request_captured_headers',
+          'string[]',
+          'headersToSpanAttributes.client.requestHeaders',
+        ],
+        [
+          'http.client.response_captured_headers',
+          'string[]',
+          'headersToSpanAttributes.client.responseHeaders',
+        ],
+        [
+          'http.server.request_captured_headers',
+          'string[]',
+          'headersToSpanAttributes.server.requestHeaders',
+        ],
+        [
+          'http.server.response_captured_headers',
+          'string[]',
+          'headersToSpanAttributes.server.responseHeaders',
+        ],
+      ],
+      // instrumentation-http owns the `general.http` domain.
+      generalDomains: ['http'],
+      currentConfig: this.getConfig() as Record<string, unknown>,
+      diag: this._diag,
+    });
+
+    if (Object.keys(config).length > 0) {
+      this.setConfig({ ...this.getConfig(), ...config });
+    }
   }
 
   init(): [

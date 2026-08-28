@@ -6,6 +6,9 @@
       "path": "api/tsconfig.esnext.json"
     },
     {
+      "path": "experimental/packages/api-config/tsconfig.esnext.json"
+    },
+    {
       "path": "experimental/packages/api-logs/tsconfig.esnext.json"
     },
     {

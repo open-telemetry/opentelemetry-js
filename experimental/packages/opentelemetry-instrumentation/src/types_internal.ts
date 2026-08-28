@@ -6,6 +6,7 @@
 import type { TracerProvider, MeterProvider } from '@opentelemetry/api';
 import type { Instrumentation } from './types';
 import type { LoggerProvider } from '@opentelemetry/api-logs';
+import type { ConfigProvider } from '@opentelemetry/api-config';
 
 export interface AutoLoaderResult {
   instrumentations: Instrumentation[];
@@ -16,4 +17,5 @@ export interface AutoLoaderOptions {
   tracerProvider?: TracerProvider;
   meterProvider?: MeterProvider;
   loggerProvider?: LoggerProvider;
+  configProvider?: ConfigProvider;
 }

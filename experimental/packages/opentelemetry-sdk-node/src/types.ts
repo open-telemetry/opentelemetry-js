@@ -5,6 +5,7 @@
 
 import type { ContextManager } from '@opentelemetry/api';
 import type { TextMapPropagator } from '@opentelemetry/api';
+import type { ConfigProvider } from '@opentelemetry/api-config';
 import type { Instrumentation } from '@opentelemetry/instrumentation';
 import type { Resource, ResourceDetector } from '@opentelemetry/resources';
 import type {
@@ -58,10 +59,12 @@ export interface NodeSDKConfiguration {
  */
 export interface SDKOptions {
   instrumentations?: (Instrumentation | Instrumentation[])[];
+  resourceDetectors?: ResourceDetector[];
   textMapPropagator?: TextMapPropagator | null;
 }
 
 export interface SDKComponents {
+  configProvider?: ConfigProvider;
   contextManager?: ContextManager;
   loggerProvider?: LoggerProvider;
   meterProvider?: MeterProvider;
