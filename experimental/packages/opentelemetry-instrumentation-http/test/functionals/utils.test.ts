@@ -254,24 +254,28 @@ describe('Utility', () => {
   describe('redactQueryString()', () => {
     it('redacts a matching parameter', () => {
       assert.strictEqual(
-        utils.redactQueryString(new URLSearchParams('sig=secret&foo=bar'), ['sig']),
+        utils.redactQueryString(new URLSearchParams('sig=secret&foo=bar'), [
+          'sig',
+        ]),
         'sig=REDACTED&foo=bar'
       );
     });
 
     it('leaves non-matching parameters unchanged', () => {
       assert.strictEqual(
-        utils.redactQueryString(new URLSearchParams('foo=bar&baz=qux'), ['sig']),
+        utils.redactQueryString(new URLSearchParams('foo=bar&baz=qux'), [
+          'sig',
+        ]),
         'foo=bar&baz=qux'
       );
     });
 
     it('redacts multiple parameters', () => {
       assert.strictEqual(
-        utils.redactQueryString(new URLSearchParams('sig=a&AWSAccessKeyId=b&keep=c'), [
-          'sig',
-          'AWSAccessKeyId',
-        ]),
+        utils.redactQueryString(
+          new URLSearchParams('sig=a&AWSAccessKeyId=b&keep=c'),
+          ['sig', 'AWSAccessKeyId']
+        ),
         'sig=REDACTED&AWSAccessKeyId=REDACTED&keep=c'
       );
     });
@@ -285,14 +289,19 @@ describe('Utility', () => {
 
     it('redacts a param with an empty value', () => {
       assert.strictEqual(
-        utils.redactQueryString(new URLSearchParams('sig=&foo=bar'), ['sig']),
+        utils.redactQueryString(new URLSearchParams('sig=&foo=bar'), [
+          'sig',
+        ]),
         'sig=REDACTED&foo=bar'
       );
     });
 
     it('redacts all occurrences of a duplicated parameter', () => {
       assert.strictEqual(
-        utils.redactQueryString(new URLSearchParams('sig=SECRET1&sig=SECRET2&foo=bar'), ['sig']),
+        utils.redactQueryString(
+          new URLSearchParams('sig=SECRET1&sig=SECRET2&foo=bar'),
+          ['sig']
+        ),
         'sig=REDACTED&foo=bar'
       );
     });
