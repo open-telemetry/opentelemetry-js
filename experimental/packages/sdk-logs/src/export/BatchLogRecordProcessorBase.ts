@@ -12,7 +12,7 @@ import {
 } from '@opentelemetry/core';
 
 import type { BatchLogRecordProcessorOptions } from '../types';
-import type { SdkLogRecord } from './SdkLogRecord';
+import type { ReadWriteLogRecord } from './ReadWriteLogRecord';
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
 import { LogRecordProcessorMetrics } from './LogRecordProcessorMetrics';
@@ -21,7 +21,9 @@ import { OTEL_COMPONENT_TYPE_VALUE_BATCHING_LOG_PROCESSOR } from '../semconv';
 /**
  * Waits for all pending async resources in the log records to be resolved.
  */
-async function waitForResources(logRecords: SdkLogRecord[]): Promise<void> {
+async function waitForResources(
+  logRecords: ReadWriteLogRecord[]
+): Promise<void> {
   const pendingResources: Array<Promise<void>> = [];
   for (let i = 0, len = logRecords.length; i < len; i++) {
     const logRecord = logRecords[i];
@@ -49,7 +51,7 @@ class ExportOperation {
 
   constructor(
     exporter: LogRecordExporter,
-    logRecords: SdkLogRecord[],
+    logRecords: ReadWriteLogRecord[],
     exportTimeoutMillis: number,
     metrics: LogRecordProcessorMetrics
   ) {
@@ -76,7 +78,7 @@ class ExportOperation {
 
   private async _executeExport(
     exporter: LogRecordExporter,
-    logRecords: SdkLogRecord[],
+    logRecords: ReadWriteLogRecord[],
     exportTimeoutMillis: number
   ): Promise<void> {
     try {
@@ -101,7 +103,7 @@ class ExportOperation {
 
   private async _exportWithTimeout(
     exporter: LogRecordExporter,
-    logRecords: SdkLogRecord[],
+    logRecords: ReadWriteLogRecord[],
     exportTimeoutMillis: number
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
@@ -141,7 +143,7 @@ export abstract class BatchLogRecordProcessorBase<
   private readonly _metrics: LogRecordProcessorMetrics;
 
   private _currentExport: ExportOperation | null = null;
-  private _finishedLogRecords: SdkLogRecord[] = [];
+  private _finishedLogRecords: ReadWriteLogRecord[] = [];
   private _timer: NodeJS.Timeout | number | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
   private _flushing: boolean = false;
@@ -176,7 +178,7 @@ export abstract class BatchLogRecordProcessorBase<
     );
   }
 
-  public onEmit(logRecord: SdkLogRecord): void {
+  public onEmit(logRecord: ReadWriteLogRecord): void {
     if (this._shutdownOnce.isCalled) {
       return;
     }
@@ -191,7 +193,7 @@ export abstract class BatchLogRecordProcessorBase<
   }
 
   /** Add a LogRecord in the buffer. */
-  private _addToBuffer(logRecord: SdkLogRecord) {
+  private _addToBuffer(logRecord: ReadWriteLogRecord) {
     if (this._finishedLogRecords.length >= this._maxQueueSize) {
       this._metrics.dropLogs(1);
       return;
@@ -281,7 +283,7 @@ export abstract class BatchLogRecordProcessorBase<
    * Extracts one batch from the buffer.
    * Returns null if buffer is empty.
    */
-  private _extractBatch(): SdkLogRecord[] | null {
+  private _extractBatch(): ReadWriteLogRecord[] | null {
     if (this._finishedLogRecords.length === 0) {
       return null;
     }

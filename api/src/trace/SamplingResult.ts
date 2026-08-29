@@ -54,6 +54,8 @@ export interface SamplingResult {
    * the new {@link SpanContext}. Samplers SHOULD return the TraceState from
    * the passed-in {@link Context} if they do not intend to change it. Leaving
    * the value undefined will also leave the TraceState unchanged.
+   *
+   * @since 1.4.1
    */
   traceState?: TraceState;
 }

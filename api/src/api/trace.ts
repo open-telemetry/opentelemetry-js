@@ -94,6 +94,7 @@ export class TraceAPI {
 
   public getSpan = getSpan;
 
+  /** @since 1.2.0 */
   public getActiveSpan = getActiveSpan;
 
   public getSpanContext = getSpanContext;
