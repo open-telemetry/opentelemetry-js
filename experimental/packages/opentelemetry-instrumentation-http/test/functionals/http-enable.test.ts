@@ -417,6 +417,51 @@ describe('HttpInstrumentation', () => {
         });
       });
 
+      it('should record an IPv6 destination from request options', async function () {
+        const ipv6Server = http.createServer((_request, response) =>
+          response.end('ok')
+        );
+
+        try {
+          try {
+            await new Promise<void>((resolve, reject) => {
+              ipv6Server.listen(0, '::1', resolve);
+              ipv6Server.once('error', reject);
+            });
+          } catch (err: unknown) {
+            if ((err as NodeJS.ErrnoException).code === 'EADDRNOTAVAIL') {
+              this.skip();
+            }
+            throw err;
+          }
+
+          const port = (ipv6Server.address() as { port: number }).port;
+          const result = await httpRequest.get({
+            host: '::1',
+            port,
+            path: '/ipv6',
+          });
+          assert.strictEqual(result.statusCode, 200);
+
+          const clientSpan = memoryExporter
+            .getFinishedSpans()
+            .find(span => span.kind === SpanKind.CLIENT);
+          assert.ok(clientSpan);
+          assert.strictEqual(clientSpan.attributes[ATTR_SERVER_ADDRESS], '::1');
+          assert.strictEqual(clientSpan.attributes[ATTR_SERVER_PORT], port);
+          assert.strictEqual(
+            clientSpan.attributes[ATTR_URL_FULL],
+            `http://[::1]:${port}/ipv6`
+          );
+        } finally {
+          if (ipv6Server.listening) {
+            await new Promise<void>((resolve, reject) =>
+              ipv6Server.close(err => (err ? reject(err) : resolve()))
+            );
+          }
+        }
+      });
+
       it('should respect HTTP_ROUTE', async () => {
         await httpRequest.get(
           `${protocol}://${hostname}:${serverPort}/setroute`

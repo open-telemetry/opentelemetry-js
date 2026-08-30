@@ -7,6 +7,9 @@ import { SpanStatusCode, SpanKind, context, diag } from '@opentelemetry/api';
 import {
   ATTR_ERROR_TYPE,
   ATTR_HTTP_ROUTE,
+  ATTR_SERVER_ADDRESS,
+  ATTR_SERVER_PORT,
+  ATTR_URL_FULL,
   ATTR_URL_PATH,
   ATTR_URL_QUERY,
   ATTR_USER_AGENT_ORIGINAL,
@@ -148,6 +151,32 @@ describe('Utility', () => {
     });
   });
 
+  describe('getOutgoingRequestAttributes()', () => {
+    it('should format IPv6 attributes according to semantic conventions', () => {
+      const attributes = utils.getOutgoingRequestAttributes(
+        {
+          protocol: 'http:',
+          hostname: '::1',
+          port: 8080,
+          path: '/helloworld',
+        },
+        {
+          component: 'http',
+          hostname: '::1',
+          port: 8080,
+        },
+        false
+      );
+
+      assert.strictEqual(
+        attributes[ATTR_URL_FULL],
+        'http://[::1]:8080/helloworld'
+      );
+      assert.strictEqual(attributes[ATTR_SERVER_ADDRESS], '::1');
+      assert.strictEqual(attributes[ATTR_SERVER_PORT], 8080);
+    });
+  });
+
   describe('getAbsoluteUrl()', () => {
     it('should return absolute url with localhost', () => {
       const path = '/test/1';
@@ -201,6 +230,45 @@ describe('Utility', () => {
         {}
       );
       assert.strictEqual(result, 'http://localhost:8080/helloworld');
+    });
+    it('should omit only the default port for the URL scheme', () => {
+      const cases: Array<{
+        options: ParsedRequestOptions;
+        expected: string;
+      }> = [
+        {
+          options: { protocol: 'http:', hostname: 'example.com', port: 80 },
+          expected: 'http://example.com/',
+        },
+        {
+          options: { protocol: 'https:', hostname: 'example.com', port: 443 },
+          expected: 'https://example.com/',
+        },
+        {
+          options: { protocol: 'https:', hostname: 'example.com', port: 80 },
+          expected: 'https://example.com:80/',
+        },
+        {
+          options: { protocol: 'http:', hostname: '::1', port: 443 },
+          expected: 'http://[::1]:443/',
+        },
+      ];
+
+      for (const { options, expected } of cases) {
+        assert.strictEqual(utils.getAbsoluteUrl(options, {}), expected);
+      }
+    });
+    it('should preserve a bracketed IPv6 authority with a port', () => {
+      const result = utils.getAbsoluteUrl(
+        {
+          protocol: 'http:',
+          host: '[::1]:8080',
+          port: 9090,
+          path: '/helloworld',
+        },
+        {}
+      );
+      assert.strictEqual(result, 'http://[::1]:8080/helloworld');
     });
     it('should return auth credentials as REDACTED to avoid leaking sensitive information', () => {
       const result = utils.getAbsoluteUrl(
@@ -661,6 +729,27 @@ describe('Utility', () => {
       const { hostname, port } = extractHostnameAndPort(parsedOption);
       assert.strictEqual(hostname, 'www.google.com');
       assert.strictEqual(port, '80');
+    });
+
+    it('should extract a bare IPv6 host with a separate port', () => {
+      const { hostname, port } = extractHostnameAndPort({
+        host: '::1',
+        port: 8080,
+        protocol: 'http:',
+      });
+
+      assert.strictEqual(hostname, '::1');
+      assert.strictEqual(port, 8080);
+    });
+
+    it('should extract a bracketed IPv6 host with an embedded port', () => {
+      const { hostname, port } = extractHostnameAndPort({
+        host: '[::1]:8080',
+        protocol: 'http:',
+      });
+
+      assert.strictEqual(hostname, '::1');
+      assert.strictEqual(port, '8080');
     });
   });
 

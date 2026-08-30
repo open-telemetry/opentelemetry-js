@@ -40,6 +40,7 @@ import type {
   RequestOptions,
   ServerResponse,
 } from 'http';
+import { isIPv6 } from 'net';
 import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 import * as url from 'url';
 import type {
@@ -87,16 +88,24 @@ export const getAbsoluteUrl = (
   const protocol = reqUrlObject.protocol || fallbackProtocol;
   const port = (reqUrlObject.port || '').toString();
   let path = reqUrlObject.path || '/';
-  let host =
-    reqUrlObject.host || reqUrlObject.hostname || headers.host || 'localhost';
-  // if there is no port in host and there is a port
-  // it should be displayed if it's not 80 and 443 (default ports)
-  if (
-    (host as string).indexOf(':') === -1 &&
-    port &&
-    port !== '80' &&
-    port !== '443'
-  ) {
+  let host = String(
+    reqUrlObject.host || reqUrlObject.hostname || headers.host || 'localhost'
+  );
+  let hostHasPort = false;
+  if (isIPv6(host)) {
+    host = `[${host}]`;
+  } else {
+    // Parse an already-bracketed IPv6 authority with an optional port.
+    const bracketedHost = /^\[([^\]]+)\](?::(\d+))?$/.exec(host);
+    const bracketedIpv6 = bracketedHost !== null && isIPv6(bracketedHost[1]);
+    hostHasPort = bracketedIpv6
+      ? bracketedHost[2] !== undefined
+      : host.includes(':');
+  }
+  const isDefaultPort =
+    (protocol === 'http:' && port === '80') ||
+    (protocol === 'https:' && port === '443');
+  if (!hostHasPort && port && !isDefaultPort) {
     host += `:${port}`;
   }
   if (path.includes('?')) {
@@ -349,6 +358,28 @@ export const extractHostnameAndPort = (
 ): { hostname: string; port: number | string } => {
   if (requestOptions.hostname && requestOptions.port) {
     return { hostname: requestOptions.hostname, port: requestOptions.port };
+  }
+  if (!requestOptions.hostname && requestOptions.host) {
+    if (isIPv6(requestOptions.host)) {
+      return {
+        hostname: requestOptions.host,
+        port:
+          requestOptions.port ||
+          (requestOptions.protocol === 'https:' ? '443' : '80'),
+      };
+    }
+    const bracketedHost = /^\[([^\]]+)\](?::(\d{1,5}))?$/.exec(
+      requestOptions.host
+    );
+    if (bracketedHost && isIPv6(bracketedHost[1])) {
+      return {
+        hostname: bracketedHost[1],
+        port:
+          requestOptions.port ||
+          bracketedHost[2] ||
+          (requestOptions.protocol === 'https:' ? '443' : '80'),
+      };
+    }
   }
   const matches = requestOptions.host?.match(/^([^:/ ]+)(:\d{1,5})?/) || null;
   const hostname =
