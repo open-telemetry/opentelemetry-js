@@ -636,6 +636,36 @@ describe('PrometheusExporter', () => {
       ]);
     });
 
+    it('should copy nested aggregationPreference options', () => {
+      const options = {
+        boundaries: [1, 10, 100],
+        recordMinMax: true,
+      };
+      exporter = new PrometheusExporter({
+        preventServerStart: true,
+        aggregationPreference: {
+          [InstrumentType.HISTOGRAM]: {
+            type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+            options,
+          },
+        },
+      });
+
+      options.boundaries[0] = 5;
+      options.recordMinMax = false;
+
+      assert.deepStrictEqual(
+        exporter.selectAggregation(InstrumentType.HISTOGRAM),
+        {
+          type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+          options: {
+            boundaries: [1, 10, 100],
+            recordMinMax: true,
+          },
+        }
+      );
+    });
+
     it('should fall back to the default aggregation for instrument kinds not listed in aggregationPreference', async () => {
       exporter = new PrometheusExporter({
         aggregationPreference: {

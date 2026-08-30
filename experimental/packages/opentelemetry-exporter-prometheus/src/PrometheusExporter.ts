@@ -55,7 +55,9 @@ export class PrometheusExporter extends MetricReader {
   ) {
     // Copy the preference so that mutating the caller's object after
     // construction cannot change the exporter's configured aggregation.
-    const aggregationPreference = { ...config.aggregationPreference };
+    const aggregationPreference = structuredClone(
+      config.aggregationPreference ?? {}
+    );
     super({
       aggregationSelector: instrumentType =>
         aggregationPreference[instrumentType] ?? {
