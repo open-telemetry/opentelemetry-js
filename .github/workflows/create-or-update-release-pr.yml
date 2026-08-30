@@ -11,6 +11,7 @@ on:
           - inherit # no release unless required by other settings
           - patch
           - minor
+          - major # experimental packages inherit this as a minor bump
       experimental_release:
         type: choice
         description: 'Experimental packages (./experimental/packages/*)'
@@ -35,6 +36,17 @@ on:
           - inherit # no release
           - patch
           - minor
+      prerelease:
+        type: choice
+        description: 'Pre-release identifier - modifies the bumps above, selects nothing on its own'
+        default: 'none'
+        # Listed in semver precedence order: development < rc. An identifier can only
+        # be changed to a later one, so a `development` stream is promoted to `rc`,
+        # never the other way around.
+        options:
+          - none # normal release
+          - development # regular cadence of builds off main
+          - rc
 
 permissions:
   contents: read
@@ -77,4 +89,5 @@ jobs:
           EXPERIMENTAL_RELEASE: ${{ github.event.inputs.experimental_release }}
           API_RELEASE: ${{ github.event.inputs.api_release }}
           SEMCONV_RELEASE: ${{ github.event.inputs.semconv_release }}
+          PRERELEASE: ${{ github.event.inputs.prerelease }}
           RELEASE_PR_REMOTE: origin
