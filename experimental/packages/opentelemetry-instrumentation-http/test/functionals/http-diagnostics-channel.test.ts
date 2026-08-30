@@ -20,6 +20,7 @@ import {
 import {
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
+  ATTR_SERVER_ADDRESS,
   ATTR_SERVER_PORT,
   ATTR_URL_FULL,
   METRIC_HTTP_CLIENT_REQUEST_DURATION,
@@ -148,6 +149,27 @@ runIfSupported('HttpInstrumentation diagnostics channel', () => {
     assert.strictEqual(result.statusCode, 200);
   });
 
+  it('preserves host in reconstructed options for origin-form requests', async () => {
+    let hookOptions: http.RequestOptions | undefined;
+    instrumentation.setConfig({
+      useDiagnosticsChannel: true,
+      startOutgoingSpanHook: options => {
+        hookOptions = options;
+        return {};
+      },
+    });
+
+    try {
+      await httpRequest.get(`http://${hostname}:${serverPort}/hook-options`);
+
+      assert.ok(hookOptions);
+      assert.strictEqual(hookOptions.host, hostname);
+      assert.strictEqual(hookOptions.hostname, undefined);
+    } finally {
+      instrumentation.setConfig({ useDiagnosticsChannel: true });
+    }
+  });
+
   it('propagates context from client to server', async () => {
     const result = await httpRequest.get(
       `http://${hostname}:${serverPort}/test`
@@ -214,26 +236,65 @@ runIfSupported('HttpInstrumentation diagnostics channel', () => {
     assert.strictEqual(result.req.getHeader('traceparent'), undefined);
   });
 
-  it('recovers the origin-form path of requests rewritten for a proxy', async () => {
-    // Node.js rewrites the path absolute-form (and adds a
-    // `proxy-connection` header) for env-configured proxies; simulate that
-    // shape, as the proxy configuration is only read at process startup.
-    const result = await httpRequest.get({
-      hostname,
-      port: serverPort,
-      path: `http://${hostname}:${serverPort}/proxied`,
-      headers: { 'proxy-connection': 'keep-alive' },
-    });
+  it('recovers the origin destination of requests rewritten for a proxy', async () => {
+    await metricReader.collectAndExport();
+    metricsMemoryExporter.reset();
 
-    assert.strictEqual(result.statusCode, 200);
-    const clientSpan = memoryExporter
+    // Simulate the absolute-form request target sent to an HTTP proxy.
+    for (const target of [
+      'http://origin.example/proxied',
+      'http://origin.example:80/proxied-default-port',
+      'HTTP://origin.example/proxied-mixed-case-scheme',
+    ]) {
+      const result = await httpRequest.get({
+        hostname,
+        port: serverPort,
+        path: target,
+      });
+      assert.strictEqual(result.statusCode, 200);
+    }
+
+    const clientSpans = memoryExporter
       .getFinishedSpans()
-      .find(span => span.kind === SpanKind.CLIENT);
-    assert.ok(clientSpan);
+      .filter(span => span.kind === SpanKind.CLIENT);
+    assert.strictEqual(clientSpans.length, 3);
+    for (const clientSpan of clientSpans) {
+      assert.strictEqual(
+        clientSpan.attributes[ATTR_SERVER_ADDRESS],
+        'origin.example'
+      );
+      assert.strictEqual(clientSpan.attributes[ATTR_SERVER_PORT], 80);
+    }
     assert.strictEqual(
-      clientSpan.attributes[ATTR_URL_FULL],
-      `http://${hostname}:${serverPort}/proxied`
+      clientSpans[0].attributes[ATTR_URL_FULL],
+      'http://origin.example/proxied'
     );
+    assert.strictEqual(
+      clientSpans[1].attributes[ATTR_URL_FULL],
+      'http://origin.example/proxied-default-port'
+    );
+    assert.strictEqual(
+      clientSpans[2].attributes[ATTR_URL_FULL],
+      'http://origin.example/proxied-mixed-case-scheme'
+    );
+
+    await metricReader.collectAndExport();
+    const metrics =
+      metricsMemoryExporter.getMetrics()[0].scopeMetrics[0].metrics;
+    const clientDuration = metrics.find(
+      metric => metric.descriptor.name === METRIC_HTTP_CLIENT_REQUEST_DURATION
+    );
+    assert.ok(clientDuration);
+    assert.strictEqual(clientDuration.dataPoints.length, 1);
+    for (const dataPoint of clientDuration.dataPoints) {
+      assert.strictEqual(
+        dataPoint.attributes[ATTR_SERVER_ADDRESS],
+        'origin.example'
+      );
+      assert.strictEqual(dataPoint.attributes[ATTR_SERVER_PORT], 80);
+      assert.strictEqual((dataPoint.value as any).count, 3);
+    }
+    metricsMemoryExporter.reset();
   });
 
   it('records client and server duration metrics', async () => {

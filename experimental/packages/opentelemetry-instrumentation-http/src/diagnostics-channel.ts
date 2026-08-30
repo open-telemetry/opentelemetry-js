@@ -113,7 +113,9 @@ function recoverRequestOptions(
   const headers = request.getHeaders();
   const hostHeader =
     typeof headers.host === 'string' ? headers.host : undefined;
-  const port = hostHeader ? portFromHostHeader(hostHeader) : undefined;
+  let hostname: string | undefined;
+  let port = hostHeader ? portFromHostHeader(hostHeader) : undefined;
+  let protocol = request.protocol;
 
   // An `Authorization` header set directly by the caller cannot be told apart
   // from one generated from the `auth` option, so `url.full` may carry
@@ -124,16 +126,20 @@ function recoverRequestOptions(
     auth = Buffer.from(authHeader.slice(6), 'base64').toString('utf8');
   }
 
-  // When a proxy is configured through the environment, the path is rewritten
-  // to absolute-form (and a `proxy-connection` header is added) before the
-  // channel fires; recover the origin-form path the caller requested.
+  // A proxy request may use an absolute-form request target; recover its
+  // origin authority and the origin-form path the caller requested.
   let path = request.path;
-  if (
-    headers['proxy-connection'] !== undefined &&
-    (path.startsWith('http://') || path.startsWith('https://'))
-  ) {
+  if (/^https?:\/\//i.test(path)) {
     try {
       const pathUrl = new URL(path);
+      hostname = pathUrl.hostname.replace(/^\[|\]$/g, '');
+      protocol = pathUrl.protocol;
+      port =
+        pathUrl.port === ''
+          ? protocol === 'https:'
+            ? 443
+            : 80
+          : Number(pathUrl.port);
       path = `${pathUrl.pathname}${pathUrl.search}`;
     } catch {
       // not a URL after all; leave the path alone
@@ -143,8 +149,8 @@ function recoverRequestOptions(
   return {
     method: request.method,
     port,
-    protocol: request.protocol,
-    host: request.host,
+    protocol,
+    ...(hostname === undefined ? { host: request.host } : { hostname }),
     path,
     auth,
     headers,
