@@ -16,7 +16,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
-## 0.222.0-development.0
+## 0.222.0
 
 ### :boom: Breaking Changes
 
