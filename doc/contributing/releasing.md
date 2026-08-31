@@ -120,8 +120,13 @@ reachable from `main`.
 | Branch | `dist_tag` input | Stable release goes to | Pre-release goes to |
 | --- | --- | --- | --- |
 | `main` | `auto` | `latest` | `canary` |
-| `v2.x` | `auto` | `latest-2` | `canary-2` |
-| `v2.x` | `latest` | `latest` | `canary-2` |
+| `v2.x` | `auto` | `latest-2` | n/a - not supported, see below |
+| `v2.x` | `latest` | `latest` | n/a - not supported, see below |
+
+The publish workflow still passes a `canary-2` pre-dist-tag along on a maintenance branch,
+but only as a backstop: `lerna publish` applies it per package and only to versions that are
+pre-releases, and the release PR workflow refuses to mint one here in the first place. Should
+a `2.11.0-rc.0` reach the publish workflow anyway, that scoping keeps it off `canary`.
 
 > [!IMPORTANT]
 > While `main` publishes nothing but pre-releases, no release claims `latest` and it stays
