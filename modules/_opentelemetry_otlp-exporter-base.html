@@ -20,6 +20,131 @@
 <pre><code class="bash"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">install</span><span class="hl-1"> </span><span class="hl-3">--save</span><span class="hl-1"> </span><span class="hl-2">@opentelemetry/otlp-exporter-base</span>
 </code><button type="button">Copy</button></pre>
 
+<h2 id="http-exporter-configuration" class="tsd-anchor-link">HTTP exporter configuration<a href="#http-exporter-configuration" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>HTTP JSON and HTTP/protobuf exporters for traces, metrics, and logs share these configuration options.
+Node.js exporters accept <code>OTLPExporterNodeConfigBase</code>, which also includes the options from <code>OTLPExporterConfigBase</code>.
+Configuration precedence is: programmatic options, then per-signal environment variables, then general environment variables, then built-in defaults.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>url</code></td>
+<td><code>string</code></td>
+<td><code>undefined</code> (default resolved per precedence above)</td>
+<td>Collector endpoint URL.</td>
+</tr>
+<tr>
+<td><code>headers</code></td>
+<td><code>Record&lt;string, string&gt; | HeadersFactory</code></td>
+<td><code>undefined</code></td>
+<td>Custom HTTP headers. A factory function may be async and must not throw. Exporters still apply required transport headers.</td>
+</tr>
+<tr>
+<td><code>concurrencyLimit</code></td>
+<td><code>number</code></td>
+<td><code>30</code></td>
+<td>Maximum number of in-flight export requests.</td>
+</tr>
+<tr>
+<td><code>timeoutMillis</code></td>
+<td><code>number</code></td>
+<td><code>10000</code></td>
+<td>Maximum time, in milliseconds, to wait for each batch export.</td>
+</tr>
+<tr>
+<td><code>compression</code></td>
+<td><code>CompressionAlgorithm.NONE | CompressionAlgorithm.GZIP</code></td>
+<td><code>CompressionAlgorithm.NONE</code></td>
+<td>Compression for outgoing OTLP HTTP requests in Node.js.</td>
+</tr>
+<tr>
+<td><code>keepAlive</code></td>
+<td><code>boolean</code></td>
+<td><code>true</code></td>
+<td>Sets <code>keepAlive</code> on the Node.js HTTP or HTTPS agent created by the exporter. A <code>keepAlive</code> value in <code>httpAgentOptions</code> takes precedence.</td>
+</tr>
+<tr>
+<td><code>httpAgentOptions</code></td>
+<td><code>http.AgentOptions | https.AgentOptions | HttpAgentFactory</code></td>
+<td>Agent options with <code>keepAlive: true</code></td>
+<td>Custom Node.js HTTP or HTTPS agent options, or a factory function that receives the request protocol and returns an agent.</td>
+</tr>
+<tr>
+<td><code>userAgent</code></td>
+<td><code>string</code></td>
+<td>The exporter's default user agent</td>
+<td>Prefix to add to the exporter's default <code>User-Agent</code> header in Node.js.</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>General environment variable</th>
+<th>Signal-specific environment variables</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>url</code></td>
+<td><code>OTEL_EXPORTER_OTLP_ENDPOINT</code></td>
+<td><code>OTEL_EXPORTER_OTLP_TRACES_ENDPOINT</code>, <code>OTEL_EXPORTER_OTLP_METRICS_ENDPOINT</code>, <code>OTEL_EXPORTER_OTLP_LOGS_ENDPOINT</code></td>
+</tr>
+<tr>
+<td><code>headers</code></td>
+<td><code>OTEL_EXPORTER_OTLP_HEADERS</code></td>
+<td><code>OTEL_EXPORTER_OTLP_TRACES_HEADERS</code>, <code>OTEL_EXPORTER_OTLP_METRICS_HEADERS</code>, <code>OTEL_EXPORTER_OTLP_LOGS_HEADERS</code></td>
+</tr>
+<tr>
+<td><code>timeoutMillis</code></td>
+<td><code>OTEL_EXPORTER_OTLP_TIMEOUT</code></td>
+<td><code>OTEL_EXPORTER_OTLP_TRACES_TIMEOUT</code>, <code>OTEL_EXPORTER_OTLP_METRICS_TIMEOUT</code>, <code>OTEL_EXPORTER_OTLP_LOGS_TIMEOUT</code></td>
+</tr>
+<tr>
+<td><code>compression</code></td>
+<td><code>OTEL_EXPORTER_OTLP_COMPRESSION</code></td>
+<td><code>OTEL_EXPORTER_OTLP_TRACES_COMPRESSION</code>, <code>OTEL_EXPORTER_OTLP_METRICS_COMPRESSION</code>, <code>OTEL_EXPORTER_OTLP_LOGS_COMPRESSION</code></td>
+</tr>
+<tr>
+<td><code>concurrencyLimit</code></td>
+<td>Not supported</td>
+<td>Not supported</td>
+</tr>
+<tr>
+<td><code>keepAlive</code></td>
+<td>Not supported</td>
+<td>Not supported</td>
+</tr>
+<tr>
+<td><code>httpAgentOptions.ca</code></td>
+<td><code>OTEL_EXPORTER_OTLP_CERTIFICATE</code></td>
+<td><code>OTEL_EXPORTER_OTLP_{TRACES,METRICS,LOGS}_CERTIFICATE</code></td>
+</tr>
+<tr>
+<td><code>httpAgentOptions.cert</code></td>
+<td><code>OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE</code></td>
+<td><code>OTEL_EXPORTER_OTLP_{TRACES,METRICS,LOGS}_CLIENT_CERTIFICATE</code></td>
+</tr>
+<tr>
+<td><code>httpAgentOptions.key</code></td>
+<td><code>OTEL_EXPORTER_OTLP_CLIENT_KEY</code></td>
+<td><code>OTEL_EXPORTER_OTLP_{TRACES,METRICS,LOGS}_CLIENT_KEY</code></td>
+</tr>
+<tr>
+<td><code>userAgent</code></td>
+<td>Not supported</td>
+<td>Not supported</td>
+</tr>
+</tbody>
+</table>
 <h2 id="grpc" class="tsd-anchor-link">GRPC<a href="#grpc" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
 <p>For GRPC please check <a href="https://www.npmjs.com/package/@opentelemetry/otlp-grpc-exporter-base">npm-url-grpc</a></p>
 <h2 id="useful-links" class="tsd-anchor-link">Useful links<a href="#useful-links" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
@@ -50,6 +175,7 @@
 <div class="tsd-accordion-details"><a href="#opentelemetry-collector-exporter-for-web-and-node"><span>Open<wbr/>Telemetry <wbr/>Collector <wbr/>Exporter for web and node</span></a>
 <ul>
 <li><a href="#installation"><span>Installation</span></a></li>
+<li><a href="#http-exporter-configuration"><span>HTTP exporter configuration</span></a></li>
 <li><a href="#grpc"><span>GRPC</span></a></li>
 <li><a href="#useful-links"><span>Useful links</span></a></li>
 <li><a href="#license"><span>License</span></a></li></ul>

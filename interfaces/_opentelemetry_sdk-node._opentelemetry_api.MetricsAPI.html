@@ -14,10 +14,14 @@
 <h1>Interface MetricsAPI</h1></div>
 <section class="tsd-panel tsd-comment">
 <div class="tsd-comment tsd-typography"><p>Singleton object which represents the entry point to the OpenTelemetry Metrics API</p>
-</div></section>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-since">
+<h4 class="tsd-anchor-link" id="since">Since<a href="#since" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>1.4.1</p>
+</div></div></section>
 <div class="tsd-signature"><span class="tsd-signature-keyword">interface</span> <span class="tsd-kind-interface">MetricsAPI</span> <span class="tsd-signature-symbol">{</span><br/>    <a class="tsd-kind-call-signature" href="#disable-1">disable</a><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#getmeter-1">getMeter</a><span class="tsd-signature-symbol">(</span><br/>        <span class="tsd-kind-parameter">name</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>        <span class="tsd-kind-parameter">version</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>        <span class="tsd-kind-parameter">options</span><span class="tsd-signature-symbol">?:</span> <a href="../modules/_opentelemetry_sdk-node._opentelemetry_api.html" class="tsd-signature-type tsd-kind-namespace">@opentelemetry/api</a><span class="tsd-signature-symbol">.</span><a href="_opentelemetry_sdk-node._opentelemetry_api.MeterOptions.html" class="tsd-signature-type tsd-kind-interface">MeterOptions</a><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="../modules/_opentelemetry_sdk-node._opentelemetry_api.html" class="tsd-signature-type tsd-kind-namespace">@opentelemetry/api</a><span class="tsd-signature-symbol">.</span><a href="_opentelemetry_sdk-node._opentelemetry_api.Meter.html" class="tsd-signature-type tsd-kind-interface">Meter</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#getmeterprovider-1">getMeterProvider</a><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <a href="../modules/_opentelemetry_sdk-node._opentelemetry_api.html" class="tsd-signature-type tsd-kind-namespace">@opentelemetry/api</a><span class="tsd-signature-symbol">.</span><a href="_opentelemetry_sdk-node._opentelemetry_api.MeterProvider.html" class="tsd-signature-type tsd-kind-interface">MeterProvider</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#setglobalmeterprovider-1">setGlobalMeterProvider</a><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">provider</span><span class="tsd-signature-symbol">:</span> <a href="../modules/_opentelemetry_sdk-node._opentelemetry_api.html" class="tsd-signature-type tsd-kind-namespace">@opentelemetry/api</a><span class="tsd-signature-symbol">.</span><a href="_opentelemetry_sdk-node._opentelemetry_api.MeterProvider.html" class="tsd-signature-type tsd-kind-interface">MeterProvider</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/><span class="tsd-signature-symbol">}</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in api/build/src/api/metrics.d.ts:6</li></ul></aside>
+<li>Defined in api/build/src/api/metrics.d.ts:8</li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
@@ -43,7 +47,7 @@
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in api/build/src/api/metrics.d.ts:26</li></ul></aside></div></li></ul></section>
+<li>Defined in api/build/src/api/metrics.d.ts:28</li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="getmeter"><span>get<wbr/>Meter</span><a href="#getmeter" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -60,7 +64,7 @@
 <li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">options</span>: <a href="../modules/_opentelemetry_sdk-node._opentelemetry_api.html" class="tsd-signature-type tsd-kind-namespace">@opentelemetry/api</a><span class="tsd-signature-symbol">.</span><a href="_opentelemetry_sdk-node._opentelemetry_api.MeterOptions.html" class="tsd-signature-type tsd-kind-interface">MeterOptions</a></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="../modules/_opentelemetry_sdk-node._opentelemetry_api.html" class="tsd-signature-type tsd-kind-namespace">@opentelemetry/api</a><span class="tsd-signature-symbol">.</span><a href="_opentelemetry_sdk-node._opentelemetry_api.Meter.html" class="tsd-signature-type tsd-kind-interface">Meter</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in api/build/src/api/metrics.d.ts:24</li></ul></aside></div></li></ul></section>
+<li>Defined in api/build/src/api/metrics.d.ts:26</li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="getmeterprovider"><span>get<wbr/>Meter<wbr/>Provider</span><a href="#getmeterprovider" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -71,7 +75,7 @@
 </div>
 <h4 class="tsd-returns-title">Returns <a href="../modules/_opentelemetry_sdk-node._opentelemetry_api.html" class="tsd-signature-type tsd-kind-namespace">@opentelemetry/api</a><span class="tsd-signature-symbol">.</span><a href="_opentelemetry_sdk-node._opentelemetry_api.MeterProvider.html" class="tsd-signature-type tsd-kind-interface">MeterProvider</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in api/build/src/api/metrics.d.ts:20</li></ul></aside></div></li></ul></section>
+<li>Defined in api/build/src/api/metrics.d.ts:22</li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="setglobalmeterprovider"><span>set<wbr/>Global<wbr/>Meter<wbr/>Provider</span><a href="#setglobalmeterprovider" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -87,7 +91,7 @@ Returns true if the meter provider was successfully registered, else false.</p>
 <li><span><span class="tsd-kind-parameter">provider</span>: <a href="../modules/_opentelemetry_sdk-node._opentelemetry_api.html" class="tsd-signature-type tsd-kind-namespace">@opentelemetry/api</a><span class="tsd-signature-symbol">.</span><a href="_opentelemetry_sdk-node._opentelemetry_api.MeterProvider.html" class="tsd-signature-type tsd-kind-interface">MeterProvider</a></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in api/build/src/api/metrics.d.ts:16</li></ul></aside></div></li></ul></section></section></details></div>
+<li>Defined in api/build/src/api/metrics.d.ts:18</li></ul></aside></div></li></ul></section></section></details></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">

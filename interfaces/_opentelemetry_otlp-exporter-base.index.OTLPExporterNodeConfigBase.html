@@ -13,17 +13,17 @@
 <li><a href="" aria-current="page">OTLPExporterNodeConfigBase</a></li></ul>
 <h1>Interface OTLPExporterNodeConfigBase</h1></div>
 <section class="tsd-panel tsd-comment">
-<div class="tsd-comment tsd-typography"><p>Collector Exporter node base config</p>
+<div class="tsd-comment tsd-typography"><p>Node.js HTTP exporter configuration.</p>
 </div></section>
 <div class="tsd-signature"><span class="tsd-signature-keyword">interface</span> <span class="tsd-kind-interface">OTLPExporterNodeConfigBase</span> <span class="tsd-signature-symbol">{</span><br/>    <a class="tsd-kind-property" href="#compression">compression</a><span class="tsd-signature-symbol">?:</span> <a href="../enums/_opentelemetry_otlp-exporter-base.index.CompressionAlgorithm.html" class="tsd-signature-type tsd-kind-enum">CompressionAlgorithm</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#concurrencylimit">concurrencyLimit</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#headers">headers</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">HeadersFactory</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#httpagentoptions">httpAgentOptions</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">HttpAgentFactory</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">AgentOptions</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">AgentOptions</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#keepalive">keepAlive</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#selfobsmeterprovider">selfObsMeterProvider</a><span class="tsd-signature-symbol">?:</span> <a href="_opentelemetry_api._opentelemetry_api.MeterProvider.html" class="tsd-signature-type tsd-kind-interface">MeterProvider</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#timeoutmillis">timeoutMillis</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#url">url</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#useragent">userAgent</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/><span class="tsd-signature-symbol">}</span></div>
-<section class="tsd-panel tsd-hierarchy" data-refl="15228">
+<section class="tsd-panel tsd-hierarchy" data-refl="15442">
 <h4>Hierarchy (<a href="../hierarchy.html#@opentelemetry/otlp-exporter-base.index.OTLPExporterNodeConfigBase">View Summary</a>)</h4>
 <ul class="tsd-hierarchy">
 <li class="tsd-hierarchy-item"><a href="_opentelemetry_otlp-exporter-base.index.OTLPExporterConfigBase.html" class="tsd-signature-type tsd-kind-interface">OTLPExporterConfigBase</a>
 <ul class="tsd-hierarchy">
 <li class="tsd-hierarchy-item"><span class="tsd-hierarchy-target">OTLPExporterNodeConfigBase</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/otlp-exporter-base/src/configuration/legacy-node-configuration.ts#L16">experimental/packages/otlp-exporter-base/src/configuration/legacy-node-configuration.ts:16</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0b72a81636fa476e8f1f1afd2ae0c90a1362194c/experimental/packages/otlp-exporter-base/src/configuration/legacy-node-configuration.ts#L16">experimental/packages/otlp-exporter-base/src/configuration/legacy-node-configuration.ts:16</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
@@ -46,15 +46,31 @@
 <section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="compression"><code class="tsd-tag">Optional</code><span>compression</span><a href="#compression" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<div class="tsd-signature"><span class="tsd-kind-property">compression</span><span class="tsd-signature-symbol">?:</span> <a href="../enums/_opentelemetry_otlp-exporter-base.index.CompressionAlgorithm.html" class="tsd-signature-type tsd-kind-enum">CompressionAlgorithm</a></div><aside class="tsd-sources">
+<div class="tsd-signature"><span class="tsd-kind-property">compression</span><span class="tsd-signature-symbol">?:</span> <a href="../enums/_opentelemetry_otlp-exporter-base.index.CompressionAlgorithm.html" class="tsd-signature-type tsd-kind-enum">CompressionAlgorithm</a></div>
+<div class="tsd-comment tsd-typography"><p>Compression algorithm for outgoing OTLP HTTP requests.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-defaultValue">
+<h4 class="tsd-anchor-link" id="default-value">Default Value<a href="#default-value" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-6">CompressionAlgorithm</span><span class="hl-1">.</span><span class="hl-4">NONE</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/otlp-exporter-base/src/configuration/legacy-node-configuration.ts#L18">experimental/packages/otlp-exporter-base/src/configuration/legacy-node-configuration.ts:18</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0b72a81636fa476e8f1f1afd2ae0c90a1362194c/experimental/packages/otlp-exporter-base/src/configuration/legacy-node-configuration.ts#L32">experimental/packages/otlp-exporter-base/src/configuration/legacy-node-configuration.ts:32</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited">
 <h3 class="tsd-anchor-link" id="concurrencylimit"><code class="tsd-tag">Optional</code><span>concurrency<wbr/>Limit</span><a href="#concurrencylimit" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<div class="tsd-signature"><span class="tsd-kind-property">concurrencyLimit</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div><aside class="tsd-sources">
+<div class="tsd-signature"><span class="tsd-kind-property">concurrencyLimit</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
+<div class="tsd-comment tsd-typography"><p>Maximum number of in-flight export requests.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-defaultValue">
+<h4 class="tsd-anchor-link" id="default-value-1">Default Value<a href="#default-value-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">30</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
 <p>Inherited from <a href="_opentelemetry_otlp-exporter-base.index.OTLPExporterConfigBase.html">OTLPExporterConfigBase</a>.<a href="_opentelemetry_otlp-exporter-base.index.OTLPExporterConfigBase.html#concurrencylimit">concurrencyLimit</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/otlp-exporter-base/src/configuration/legacy-base-configuration.ts#L35">experimental/packages/otlp-exporter-base/src/configuration/legacy-base-configuration.ts:35</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0b72a81636fa476e8f1f1afd2ae0c90a1362194c/experimental/packages/otlp-exporter-base/src/configuration/legacy-base-configuration.ts#L44">experimental/packages/otlp-exporter-base/src/configuration/legacy-base-configuration.ts:44</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited">
 <h3 class="tsd-anchor-link" id="headers"><code class="tsd-tag">Optional</code><span>headers</span><a href="#headers" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">headers</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">HeadersFactory</span></div>
@@ -63,10 +79,8 @@
 <div class="tsd-comment tsd-typography">
 <div class="tsd-tag-remarks">
 <h4 class="tsd-anchor-link" id="remarks">Remarks<a href="#remarks" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>Prefer using a plain object over a factory function wherever possible.
-If using a factory function (<code>HttpAgentFactory</code>), <strong>do not import <code>http</code> or <code>https</code> at the top of the file</strong>
-Instead, use dynamic <code>import()</code> or <code>require()</code> to load the module. This ensures that the <code>http</code> or <code>https</code>
-module is not loaded before <code>@opentelemetry/instrumentation-http</code> can instrument it.</p>
-<p>Functions passed to the exporter MUST NOT throw errors.</p>
+A factory function may be async and MUST NOT throw errors.
+It should return a string map containing the headers to add to the request.</p>
 </div>
 <div class="tsd-tag-example">
 <h4 class="tsd-anchor-link" id="example-using-headers-options-directly">Example:  Using headers options directly: <a href="#example-using-headers-options-directly" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-13">headers</span><span class="hl-1">: {</span><br/><span class="hl-1"> </span><span class="hl-13">Authorization</span><span class="hl-1">: </span><span class="hl-2">&quot;Api-Token my-secret-token&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">}</span>
@@ -74,13 +88,13 @@ module is not loaded before <code>@opentelemetry/instrumentation-http</code> can
 
 </div>
 <div class="tsd-tag-example">
-<h4 class="tsd-anchor-link" id="example-using-a-custom-factory-function">Example:  Using a custom factory function <a href="#example-using-a-custom-factory-function" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-13">headers</span><span class="hl-1">: </span><span class="hl-3">async</span><span class="hl-1"> () </span><span class="hl-3">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-5">// ... do whatever you need to obtain the headers, ensuring you `await import(&#39;your-library&#39;)` to avoid breaking instrumentations ...</span><br/><span class="hl-1">  </span><span class="hl-7">return</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-6">Authorization:</span><span class="hl-1"> </span><span class="hl-2">`Bearer </span><span class="hl-3">${</span><span class="hl-6">token</span><span class="hl-3">}</span><span class="hl-2">`</span><span class="hl-1">,</span><br/><span class="hl-1">  };</span><br/><span class="hl-1">};</span>
+<h4 class="tsd-anchor-link" id="example-using-a-custom-factory-function">Example:  Using a custom factory function <a href="#example-using-a-custom-factory-function" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-13">headers</span><span class="hl-1">: </span><span class="hl-3">async</span><span class="hl-1"> () </span><span class="hl-3">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-7">return</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-6">Authorization:</span><span class="hl-1"> </span><span class="hl-2">`Bearer </span><span class="hl-3">${</span><span class="hl-6">token</span><span class="hl-3">}</span><span class="hl-2">`</span><span class="hl-1">,</span><br/><span class="hl-1">  };</span><br/><span class="hl-1">};</span>
 </code><button type="button">Copy</button></pre>
 
 </div></div><aside class="tsd-sources">
 <p>Inherited from <a href="_opentelemetry_otlp-exporter-base.index.OTLPExporterConfigBase.html">OTLPExporterConfigBase</a>.<a href="_opentelemetry_otlp-exporter-base.index.OTLPExporterConfigBase.html#headers">headers</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/otlp-exporter-base/src/configuration/legacy-base-configuration.ts#L33">experimental/packages/otlp-exporter-base/src/configuration/legacy-base-configuration.ts:33</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0b72a81636fa476e8f1f1afd2ae0c90a1362194c/experimental/packages/otlp-exporter-base/src/configuration/legacy-base-configuration.ts#L29">experimental/packages/otlp-exporter-base/src/configuration/legacy-base-configuration.ts:29</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="httpagentoptions"><code class="tsd-tag">Optional</code><span>http<wbr/>Agent<wbr/>Options</span><a href="#httpagentoptions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">httpAgentOptions</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">HttpAgentFactory</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">AgentOptions</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">AgentOptions</span></div>
@@ -91,8 +105,8 @@ module is not loaded before <code>@opentelemetry/instrumentation-http</code> can
 <h4 class="tsd-anchor-link" id="remarks-1">Remarks<a href="#remarks-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>Prefer using <code>http.AgentOptions</code> or <code>https.AgentOptions</code> over a factory function wherever possible.
 If using a factory function (<code>HttpAgentFactory</code>), <strong>do not import <code>http.Agent</code> or <code>https.Agent</code>
 statically at the top of the file</strong>.
-Instead, use dynamic <code>import()</code> or <code>require()</code> to load the module. This ensures that the <code>http</code> or <code>https</code>
-module is not loaded before <code>@opentelemetry/instrumentation-http</code> can instrument it.</p>
+Instead, use dynamic <code>import()</code> or <code>require()</code> to load the module. This lets
+<code>@opentelemetry/instrumentation-http</code> instrument the module first.</p>
 </div>
 <div class="tsd-tag-example">
 <h4 class="tsd-anchor-link" id="example-using-agent-options-directly">Example:  Using agent options directly: <a href="#example-using-agent-options-directly" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-13">httpAgentOptions</span><span class="hl-1">: {</span><br/><span class="hl-1">  </span><span class="hl-13">keepAlive</span><span class="hl-1">: </span><span class="hl-3">true</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-13">maxSockets</span><span class="hl-1">: </span><span class="hl-9">10</span><br/><span class="hl-1">}</span>
@@ -105,12 +119,24 @@ module is not loaded before <code>@opentelemetry/instrumentation-http</code> can
 
 </div></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/otlp-exporter-base/src/configuration/legacy-node-configuration.ts#L41">experimental/packages/otlp-exporter-base/src/configuration/legacy-node-configuration.ts:41</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0b72a81636fa476e8f1f1afd2ae0c90a1362194c/experimental/packages/otlp-exporter-base/src/configuration/legacy-node-configuration.ts#L55">experimental/packages/otlp-exporter-base/src/configuration/legacy-node-configuration.ts:55</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="keepalive"><code class="tsd-tag">Optional</code><span>keep<wbr/>Alive</span><a href="#keepalive" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<div class="tsd-signature"><span class="tsd-kind-property">keepAlive</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div><aside class="tsd-sources">
+<div class="tsd-signature"><span class="tsd-kind-property">keepAlive</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p>Sets <code>keepAlive</code> on the Node.js HTTP or HTTPS agent created by the exporter.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-remarks">
+<h4 class="tsd-anchor-link" id="remarks-2">Remarks<a href="#remarks-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>If <code>httpAgentOptions</code> is an object with its own <code>keepAlive</code> value, the
+value in <code>httpAgentOptions</code> takes precedence.</p>
+</div>
+<div class="tsd-tag-defaultValue">
+<h4 class="tsd-anchor-link" id="default-value-2">Default Value<a href="#default-value-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">true</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/otlp-exporter-base/src/configuration/legacy-node-configuration.ts#L17">experimental/packages/otlp-exporter-base/src/configuration/legacy-node-configuration.ts:17</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0b72a81636fa476e8f1f1afd2ae0c90a1362194c/experimental/packages/otlp-exporter-base/src/configuration/legacy-node-configuration.ts#L26">experimental/packages/otlp-exporter-base/src/configuration/legacy-node-configuration.ts:26</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited">
 <h3 class="tsd-anchor-link" id="selfobsmeterprovider"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Experimental</code><span>self<wbr/>Obs<wbr/>Meter<wbr/>Provider</span><a href="#selfobsmeterprovider" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">selfObsMeterProvider</span><span class="tsd-signature-symbol">?:</span> <a href="_opentelemetry_api._opentelemetry_api.MeterProvider.html" class="tsd-signature-type tsd-kind-interface">MeterProvider</a></div>
@@ -119,31 +145,44 @@ This option is experimental and is subject to breaking changes in minor releases
 </div><aside class="tsd-sources">
 <p>Inherited from <a href="_opentelemetry_otlp-exporter-base.index.OTLPExporterConfigBase.html">OTLPExporterConfigBase</a>.<a href="_opentelemetry_otlp-exporter-base.index.OTLPExporterConfigBase.html#selfobsmeterprovider">selfObsMeterProvider</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/otlp-exporter-base/src/configuration/legacy-base-configuration.ts#L44">experimental/packages/otlp-exporter-base/src/configuration/legacy-base-configuration.ts:44</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0b72a81636fa476e8f1f1afd2ae0c90a1362194c/experimental/packages/otlp-exporter-base/src/configuration/legacy-base-configuration.ts#L56">experimental/packages/otlp-exporter-base/src/configuration/legacy-base-configuration.ts:56</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited">
 <h3 class="tsd-anchor-link" id="timeoutmillis"><code class="tsd-tag">Optional</code><span>timeout<wbr/>Millis</span><a href="#timeoutmillis" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">timeoutMillis</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
-<div class="tsd-comment tsd-typography"><p>Maximum time the OTLP exporter will wait for each batch export.
-The default value is 10000ms.</p>
-</div><aside class="tsd-sources">
+<div class="tsd-comment tsd-typography"><p>Maximum time, in milliseconds, the OTLP exporter will wait for each batch export.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-defaultValue">
+<h4 class="tsd-anchor-link" id="default-value-3">Default Value<a href="#default-value-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">10000</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
 <p>Inherited from <a href="_opentelemetry_otlp-exporter-base.index.OTLPExporterConfigBase.html">OTLPExporterConfigBase</a>.<a href="_opentelemetry_otlp-exporter-base.index.OTLPExporterConfigBase.html#timeoutmillis">timeoutMillis</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/otlp-exporter-base/src/configuration/legacy-base-configuration.ts#L38">experimental/packages/otlp-exporter-base/src/configuration/legacy-base-configuration.ts:38</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0b72a81636fa476e8f1f1afd2ae0c90a1362194c/experimental/packages/otlp-exporter-base/src/configuration/legacy-base-configuration.ts#L50">experimental/packages/otlp-exporter-base/src/configuration/legacy-base-configuration.ts:50</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited">
 <h3 class="tsd-anchor-link" id="url"><code class="tsd-tag">Optional</code><span>url</span><a href="#url" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<div class="tsd-signature"><span class="tsd-kind-property">url</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div><aside class="tsd-sources">
+<div class="tsd-signature"><span class="tsd-kind-property">url</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p>Collector endpoint URL for the exporter.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-remarks">
+<h4 class="tsd-anchor-link" id="remarks-3">Remarks<a href="#remarks-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>Defaults to the signal-specific endpoint, such as
+<code>http://localhost:4318/v1/traces</code>, <code>http://localhost:4318/v1/metrics</code>,
+or <code>http://localhost:4318/v1/logs</code>.</p>
+</div></div><aside class="tsd-sources">
 <p>Inherited from <a href="_opentelemetry_otlp-exporter-base.index.OTLPExporterConfigBase.html">OTLPExporterConfigBase</a>.<a href="_opentelemetry_otlp-exporter-base.index.OTLPExporterConfigBase.html#url">url</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/otlp-exporter-base/src/configuration/legacy-base-configuration.ts#L34">experimental/packages/otlp-exporter-base/src/configuration/legacy-base-configuration.ts:34</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0b72a81636fa476e8f1f1afd2ae0c90a1362194c/experimental/packages/otlp-exporter-base/src/configuration/legacy-base-configuration.ts#L38">experimental/packages/otlp-exporter-base/src/configuration/legacy-base-configuration.ts:38</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="useragent"><code class="tsd-tag">Optional</code><span>user<wbr/>Agent</span><a href="#useragent" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">userAgent</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
 <div class="tsd-comment tsd-typography"><p>User agent header string to be prepended to the exporter's default value.
-Availablie since v1.49.0 of the spec.
+Available since v1.49.0 of the spec.
 Ref: <a href="https://opentelemetry.io/docs/specs/otel/protocol/exporter/#user-agent">https://opentelemetry.io/docs/specs/otel/protocol/exporter/#user-agent</a></p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/experimental/packages/otlp-exporter-base/src/configuration/legacy-node-configuration.ts#L47">experimental/packages/otlp-exporter-base/src/configuration/legacy-node-configuration.ts:47</a></li></ul></aside></section></section></details></div>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0b72a81636fa476e8f1f1afd2ae0c90a1362194c/experimental/packages/otlp-exporter-base/src/configuration/legacy-node-configuration.ts#L61">experimental/packages/otlp-exporter-base/src/configuration/legacy-node-configuration.ts:61</a></li></ul></aside></section></section></details></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">

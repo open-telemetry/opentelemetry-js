@@ -11,14 +11,14 @@
 <li><a href="../modules/_opentelemetry_context-async-hooks.html">@opentelemetry/context-async-hooks</a></li>
 <li><a href="" aria-current="page">AsyncLocalStorageContextManager</a></li></ul>
 <h1>Class AsyncLocalStorageContextManager</h1></div>
-<section class="tsd-panel tsd-hierarchy" data-refl="15777">
+<section class="tsd-panel tsd-hierarchy" data-refl="15992">
 <h4>Hierarchy</h4>
 <ul class="tsd-hierarchy">
 <li class="tsd-hierarchy-item"><span class="tsd-signature-type">AbstractAsyncHooksContextManager</span>
 <ul class="tsd-hierarchy">
 <li class="tsd-hierarchy-item"><span class="tsd-hierarchy-target">AsyncLocalStorageContextManager</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/opentelemetry-context-async-hooks/src/AsyncLocalStorageContextManager.ts#L11">AsyncLocalStorageContextManager.ts:11</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0b72a81636fa476e8f1f1afd2ae0c90a1362194c/packages/opentelemetry-context-async-hooks/src/AsyncLocalStorageContextManager.ts#L42">AsyncLocalStorageContextManager.ts:42</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
@@ -31,6 +31,7 @@
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading tsd-anchor-link" id="methods">Methods<a href="#methods" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-index-list"><a href="#active" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>active</span></a>
+<a href="#attach" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>attach</span></a>
 <a href="#bind" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>bind</span></a>
 <a href="#disable" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>disable</span></a>
 <a href="#enable" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>enable</span></a>
@@ -48,7 +49,7 @@
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">AsyncLocalStorageContextManager</a></h4><aside class="tsd-sources">
 <p>Overrides AbstractAsyncHooksContextManager.constructor</p>
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/opentelemetry-context-async-hooks/src/AsyncLocalStorageContextManager.ts#L14">AsyncLocalStorageContextManager.ts:14</a></li></ul></aside></div></li></ul></section></section></details>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0b72a81636fa476e8f1f1afd2ae0c90a1362194c/packages/opentelemetry-context-async-hooks/src/AsyncLocalStorageContextManager.ts#L45">AsyncLocalStorageContextManager.ts:45</a></li></ul></aside></div></li></ul></section></section></details>
 <details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
 <h2 class="tsd-anchor-link" id="methods-1">Methods<a href="#methods-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
 <section>
@@ -61,7 +62,33 @@
 <h4 class="tsd-returns-title">Returns <a href="../interfaces/_opentelemetry_api._opentelemetry_api.Context.html" class="tsd-signature-type tsd-kind-interface">Context</a></h4><aside class="tsd-sources">
 <p>Overrides AbstractAsyncHooksContextManager.active</p>
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/opentelemetry-context-async-hooks/src/AsyncLocalStorageContextManager.ts#L19">AsyncLocalStorageContextManager.ts:19</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0b72a81636fa476e8f1f1afd2ae0c90a1362194c/packages/opentelemetry-context-async-hooks/src/AsyncLocalStorageContextManager.ts#L50">AsyncLocalStorageContextManager.ts:50</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="attach"><span>attach</span><a href="#attach" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="attach-1"><span class="tsd-kind-call-signature">attach</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">context</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/_opentelemetry_api._opentelemetry_api.Context.html" class="tsd-signature-type tsd-kind-interface">Context</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ContextManagementToken</span><a href="#attach-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description"><code class="tsd-tag">Experimental</code>
+<div class="tsd-comment tsd-typography"><p>Imperatively sets <code>context</code> as active for the current async execution chain
+and operations spawned from it. Returns a ContextManagementToken whose <code>dispose()</code>
+restores the previous context (see ContextManager.attach).</p>
+<p>On Node.js 25.9+, delegates to <code>AsyncLocalStorage.withScope()</code> which returns
+a native <code>RunScope</code>. On older Node.js versions, falls back to <code>enterWith()</code> with
+a manual token.</p>
+<p><strong>Caveat for async functions:</strong> Both <code>withScope()</code> and <code>enterWith()</code> affect the
+entire current async execution chain. If <code>attach()</code> is called inside an async
+function before the first <code>await</code>, the context change will leak into the caller's
+context and remain active there until something else restores it. Prefer <code>with()</code>
+for async code.</p>
+<p>This API is experimental and may change in minor releases without prior notice.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">context</span>: <a href="../interfaces/_opentelemetry_api._opentelemetry_api.Context.html" class="tsd-signature-type tsd-kind-interface">Context</a></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ContextManagementToken</span></h4><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0b72a81636fa476e8f1f1afd2ae0c90a1362194c/packages/opentelemetry-context-async-hooks/src/AsyncLocalStorageContextManager.ts#L90">AsyncLocalStorageContextManager.ts:90</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited">
 <h3 class="tsd-anchor-link" id="bind"><span>bind</span><a href="#bind" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -87,7 +114,7 @@ the provided context will be used as the active context for the duration of the 
 <h4 class="tsd-returns-title">Returns <a class="tsd-signature-type tsd-kind-type-parameter" href="_opentelemetry_context-async-hooks.AsyncHooksContextManager.html#bindt">T</a></h4><aside class="tsd-sources">
 <p>Inherited from AbstractAsyncHooksContextManager.bind</p>
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/opentelemetry-context-async-hooks/src/AbstractAsyncHooksContextManager.ts#L50">AbstractAsyncHooksContextManager.ts:50</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0b72a81636fa476e8f1f1afd2ae0c90a1362194c/packages/opentelemetry-context-async-hooks/src/AbstractAsyncHooksContextManager.ts#L50">AbstractAsyncHooksContextManager.ts:50</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="disable"><span>disable</span><a href="#disable" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -97,7 +124,7 @@ the provided context will be used as the active context for the duration of the 
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4><aside class="tsd-sources">
 <p>Overrides AbstractAsyncHooksContextManager.disable</p>
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/opentelemetry-context-async-hooks/src/AsyncLocalStorageContextManager.ts#L37">AsyncLocalStorageContextManager.ts:37</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0b72a81636fa476e8f1f1afd2ae0c90a1362194c/packages/opentelemetry-context-async-hooks/src/AsyncLocalStorageContextManager.ts#L68">AsyncLocalStorageContextManager.ts:68</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="enable"><span>enable</span><a href="#enable" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -107,7 +134,7 @@ the provided context will be used as the active context for the duration of the 
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4><aside class="tsd-sources">
 <p>Overrides AbstractAsyncHooksContextManager.enable</p>
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/opentelemetry-context-async-hooks/src/AsyncLocalStorageContextManager.ts#L33">AsyncLocalStorageContextManager.ts:33</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0b72a81636fa476e8f1f1afd2ae0c90a1362194c/packages/opentelemetry-context-async-hooks/src/AsyncLocalStorageContextManager.ts#L64">AsyncLocalStorageContextManager.ts:64</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="with"><span>with</span><a href="#with" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -129,7 +156,7 @@ the provided context will be used as the active context for the duration of the 
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ReturnType</span><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#withf">F</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Overrides AbstractAsyncHooksContextManager.with</p>
 <ul>
-<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/76fa6b509e2b48d9cbee31cb37a2efc61dc4d384/packages/opentelemetry-context-async-hooks/src/AsyncLocalStorageContextManager.ts#L23">AsyncLocalStorageContextManager.ts:23</a></li></ul></aside></div></li></ul></section></section></details></div>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0b72a81636fa476e8f1f1afd2ae0c90a1362194c/packages/opentelemetry-context-async-hooks/src/AsyncLocalStorageContextManager.ts#L54">AsyncLocalStorageContextManager.ts:54</a></li></ul></aside></div></li></ul></section></section></details></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -148,7 +175,7 @@ the provided context will be used as the active context for the duration of the 
 <details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Constructors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Constructors</summary>
 <div><a href="#constructor"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Constructor"><use href="../assets/icons.svg#icon-512"></use></svg><span>constructor</span></a></div></details>
 <details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Methods</summary>
-<div><a href="#active"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>active</span></a><a href="#bind" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>bind</span></a><a href="#disable"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>disable</span></a><a href="#enable"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>enable</span></a><a href="#with"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>with</span></a></div></details></div></details></div>
+<div><a href="#active"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>active</span></a><a href="#attach"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>attach</span></a><a href="#bind" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>bind</span></a><a href="#disable"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>disable</span></a><a href="#enable"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>enable</span></a><a href="#with"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>with</span></a></div></details></div></details></div>
 <div class="site-menu">
 <nav class="tsd-navigation"><a href="../index.html">OpenTelemetry SDK</a>
 <ul class="tsd-small-nested-navigation" id="tsd-nav-container">
