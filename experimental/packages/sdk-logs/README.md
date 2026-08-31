@@ -62,7 +62,7 @@ logger.emit({
 ## Config
 
 Logs configuration is a merge of both the user supplied configuration and the default
-configuration as specified in [config.ts](./src/config.ts)
+configuration as specified in [LoggerConfigurators.ts](./src/config/LoggerConfigurators.ts)
 
 ## Logger Configuration
 
