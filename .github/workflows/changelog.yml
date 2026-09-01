@@ -13,7 +13,6 @@ on:
     types: [opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - main
-      - next
       - 'v[0-9]*.x'
 permissions:
   contents: read
