@@ -91,6 +91,17 @@ So a full 3.0.0 cycle looks like:
   Experimental packages pin stable SDK packages exactly, so this would publish a stable
   version depending on a pre-release. Finalize the Stable SDK first.
 
+#### Changelogs across a cycle
+
+Each pre-release rotates the `## Unreleased` section into its own `## 3.0.0-development.3` heading,
+so its GitHub release notes describe what changed since the previous pre-release.
+
+Finalizing collapses those sections back together: the pre-release headings are removed and their
+entries are merged, per category, into the single `## 3.0.0` section. The changelog then reads as if
+there were never any pre-releases, and the release notes for `3.0.0` cover the whole cycle rather
+than just the entries that landed after the last release candidate. Nothing is lost - the
+per-pre-release notes stay in the git history and in the GitHub pre-releases published from them.
+
 ### Maintenance branches
 
 Once the next major version is being developed on `main`, the previous major keeps getting

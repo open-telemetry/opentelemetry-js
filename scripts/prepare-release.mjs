@@ -3,7 +3,8 @@
  * This script:
  * 1. Validates and resolves release configuration from environment variables
  * 2. Bumps package versions selectively based on configuration
- * 3. Updates changelogs for affected packages
+ * 3. Updates changelogs for affected packages, collapsing the pre-release sections of a
+ *    cycle into the release that finalizes it - see lib/changelog-utils.mjs
  * 4. Handles API version bumping when needed
  *
  * Environment Variables (Input):
@@ -36,6 +37,7 @@ import {
 import { RELEASE_GROUPS } from './lib/release-groups.mjs';
 import { nextVersion } from './lib/bump-utils.mjs';
 import { parseReleaseBranch, resolveDistTags, RELEASE_BRANCH_HINT } from './lib/release-branch.mjs';
+import { rotateChangelog } from './lib/changelog-utils.mjs';
 
 function isLowerOrEqualReleaseType(expectedLower, expectedHigher) {
   const order = { 'patch': 1, 'minor': 2, 'major': 3 };
@@ -432,41 +434,33 @@ function bumpApiVersion(releaseType) {
 
 // Update changelogs
 function updateChangelogs(config) {
-  const EMPTY_UNRELEASED_SECTION = `## Unreleased
-
-### :boom: Breaking Changes
-
-### :rocket: Features
-
-### :bug: Bug Fixes
-
-### :books: Documentation
-
-### :house: Internal
-
-`;
-
-  const updateSingleChangelog = (changelogPath, packagePath) => {
-    const version = determineVersionFromPath(packagePath);
-
-    const changelog = fs.readFileSync(changelogPath, 'utf8').toString()
-      // replace all empty sections
-      .replace(new RegExp('^###.*\n*(?=^##)', 'gm'), '')
-      // replace unreleased header with new unreleased section and a version header for the former unreleased section
-      .replace(RegExp('## Unreleased'), EMPTY_UNRELEASED_SECTION + '## ' + version);
-
-    fs.writeFileSync(changelogPath, changelog);
-  };
-
   console.log('\nUpdating changelogs...');
 
-  // Update changelogs for each release group
   Object.entries(RELEASE_GROUPS).forEach(([groupName, groupConfig]) => {
-    const releaseType = config[groupConfig.configKey];
-    if (releaseType) {
-      console.log(`  Updating ${groupName} changelog...`);
-      updateSingleChangelog(groupConfig.changelogPath, groupConfig.packagePath);
+    if (!config[groupConfig.configKey]) return;
+
+    const version = determineVersionFromPath(groupConfig.packagePath);
+    console.log(`  Updating ${groupName} changelog (${version})...`);
+
+    let result;
+    try {
+      result = rotateChangelog(
+        fs.readFileSync(groupConfig.changelogPath, 'utf8'),
+        version
+      );
+    } catch (err) {
+      console.error(`Error updating ${groupConfig.changelogPath}: ${err.message}`);
+      process.exit(1);
     }
+
+    // Finalizing a pre-release cycle folds the pre-release sections into this release. Logged
+    // because it is the one case where the release notes cover more than the "## Unreleased"
+    // section did.
+    if (result.absorbed.length > 0) {
+      console.log(`    Collapsed ${result.absorbed.join(', ')} into ${version}`);
+    }
+
+    fs.writeFileSync(groupConfig.changelogPath, result.changelog);
   });
 
   console.log('Changelog updates complete.');
