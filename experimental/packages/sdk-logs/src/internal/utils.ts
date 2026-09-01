@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { AnyValue, LogAttributes } from '@opentelemetry/api-logs';
+import type { AnyValue, Attributes } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 
 export type LogInstrumentationScope = InstrumentationScope & {
-  readonly attributes?: LogAttributes;
+  readonly attributes?: Attributes;
   readonly droppedAttributesCount?: number;
 };
 

@@ -19,7 +19,7 @@ describe('NoopLoggerProvider', () => {
     );
   });
 
-  describe('LoggerOptions#attributes (LogAttributes)', () => {
+  describe('LoggerOptions#attributes', () => {
     it('should accept attributes with primitive values', () => {
       const logger = loggerProvider.getLogger('logger-name', undefined, {
         attributes: {

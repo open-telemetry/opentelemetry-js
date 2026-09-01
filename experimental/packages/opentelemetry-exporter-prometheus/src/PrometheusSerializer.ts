@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Attributes, AttributeValue } from '@opentelemetry/api';
+import type { AnyValue, Attributes } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
 import type {
   ResourceMetrics,
@@ -41,9 +41,16 @@ function escapeString(str: string) {
  *
  * `undefined` is converted to an empty string.
  */
-function escapeAttributeValue(str: AttributeValue = '') {
-  if (typeof str !== 'string') {
-    str = JSON.stringify(str);
+function escapeAttributeValue(val: AnyValue = '') {
+  let str: string;
+  if (typeof val !== 'string') {
+    // XXX throw on BigInt, circular. How best to doc and protect?
+    //     Are we allowed to drop?
+    //     Spec doesn't cover serialization of attributes at all that I can tell:
+    //     https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/prometheus.md
+    str = JSON.stringify(val);
+  } else {
+    str = val;
   }
   return escapeString(str).replace(/"/g, '\\"');
 }

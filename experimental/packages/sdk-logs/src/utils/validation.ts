@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { AnyValue, Attributes } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
-import type { AnyValue, LogAttributes } from '@opentelemetry/api-logs';
 import type { LogRecordLimits } from '../types';
 
 /**
@@ -95,7 +95,7 @@ export const enum AddAttributeDecision {
 }
 
 export function addAttribute(
-  attributes: LogAttributes,
+  attributes: Attributes,
   limits: Readonly<Required<LogRecordLimits>>,
   currentAttributesCount: number,
   key: string,
@@ -174,16 +174,16 @@ function truncateToSize(value: AnyValue, limit: number): AnyValue {
  */
 export function normalizeScopeAttributes(
   limits: Readonly<Required<LogRecordLimits>>,
-  attributes?: LogAttributes
+  attributes?: Attributes
 ): {
-  readonly attributes?: LogAttributes;
+  readonly attributes?: Attributes;
   readonly droppedAttributesCount?: number;
 } {
   if (attributes == null) {
     return {};
   }
 
-  const normalizedAttributes: LogAttributes = {};
+  const normalizedAttributes: Attributes = {};
   let currentAttributesCount = 0;
   let droppedAttributesCount = 0;
 
