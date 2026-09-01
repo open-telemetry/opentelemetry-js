@@ -10,6 +10,11 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* refactor!(api-logs): remove AnyValue-related types in favor of new types in the `api` package [#6780](https://github.com/open-telemetry/opentelemetry-js/pull/6780) @trentm
+  * The `AnyValue`, `LogBody`, and `LogAttributes` types are no longer exported by the `api-logs` package.
+    Instead, use the `AnyValue` and `Attributes` types from the latest `@opentelemetry/api` package.
+  * This is part of supporting [OTEP 4485](https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/4485-extending-attributes-to-support-complex-values.md#how).
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
