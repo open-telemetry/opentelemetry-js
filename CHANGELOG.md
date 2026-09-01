@@ -18,6 +18,9 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :books: Documentation
 
+* docs(sdk-trace): deprecate `TraceIdRatioBasedSampler` in favour of `ProbabilitySampler` [#6541](https://github.com/open-telemetry/opentelemetry-js/issues/6541) @nabeelamjadsheikh
+  * Documentation only. The specification requires that the behavior of this sampler is neither removed nor modified before January 1, 2027, so it is unchanged.
+
 ### :house: Internal
 
 ## 2.11.0
@@ -31,11 +34,6 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 ### :bug: Bug Fixes
 
 * fix(sdk-metrics): ignore `Infinity` in exponential histograms [#7015](https://github.com/open-telemetry/opentelemetry-js/pull/7015) @mwear
-
-### :books: Documentation
-
-* docs(sdk-trace): deprecate `TraceIdRatioBasedSampler` in favour of `ProbabilitySampler` [#6541](https://github.com/open-telemetry/opentelemetry-js/issues/6541) @nabeelamjadsheikh
-  * Documentation only. The specification requires that the behavior of this sampler is neither removed nor modified before January 1, 2027, so it is unchanged.
 
 ### :house: Internal
 
