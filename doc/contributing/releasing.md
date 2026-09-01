@@ -159,17 +159,33 @@ explanatory error rather than producing any of these:
   from a maintenance branch they would be published under `latest-2` instead of `latest`.
   Release them from `main`.
 
+#### Changelogs on a maintenance branch
+
+Every branch keeps its own `## Unreleased` section and its own release notes. Backporting a
+fix therefore needs a changelog entry *on the maintenance branch* - the entry the original
+PR added lives in `main`'s changelog, and cherry-picking the fix does not necessarily bring
+it along.
+
+Nothing is collapsed here. The pre-release folding described under
+[Changelogs across a cycle](#changelogs-across-a-cycle) only applies to a version that
+finalizes a pre-release cycle, and maintenance branches do not cut pre-releases - so every
+maintenance release is a plain `## Unreleased` -> `## 2.10.1` rotation.
+
 #### Cutting a maintenance branch
 
 Before the first release from a new maintenance branch:
 
-1. Cut the branch from the last release of that major (e.g. `v2.x` from the `v2.10.0` tag).
+1. Cut the branch from the last release of that major (e.g. `v2.x` from the `v2.10.0` tag) -
+   not from a later commit on `main`. Cutting later copies `main`'s in-flight
+   `## 3.0.0-development.N` changelog sections onto the branch, where nothing will ever
+   collapse or remove them (see [Changelogs](#changelogs-on-a-maintenance-branch) above).
 2. **Reserve the experimental version band on `main`.** Experimental packages have no major
    of their own, so both branches would otherwise mint `0.2xx.x` versions. If a version has
    already been published from the other branch, `lerna publish from-package` *silently skips*
    those packages and the workflow still succeeds - a partial release with no error. Do the
-   manual vanity bump on `main` (e.g. `0.221.0` -> `0.300.0`, see the note on vanity bumps in
-   the release rules above) so the two lines cannot overlap.
+   manual vanity bump on `main` (e.g. `0.221.0` -> `0.300.0`) so the two lines cannot overlap.
+   The workflow only ever applies a `semver.inc()` on top of the current version, so this one
+   is edited into the package manifests by hand.
 3. **Add the branch to the `npm-publish-environment` deployment branch policy** (repository
    settings -> Environments). It is restricted to an explicit list of branches, and a
    `workflow_dispatch` from any other branch is rejected before the first step runs.
@@ -183,7 +199,9 @@ Before the first release from a new maintenance branch:
 
 ## 2. Review and merge the release PR
 
-1. Review the PR generated via the workflow (it will be titled `chore: prepare next release` and opened by [otelbot[bot]](https://github.com/apps/otelbot))
+1. Review the PR generated via the workflow (it will be titled `chore: prepare next release` -
+   or `chore: prepare next v2.x release` when released from a maintenance branch - and opened
+   by [otelbot[bot]](https://github.com/apps/otelbot))
 2. Once approved, merge the PR
 
 ## 3. Publish to NPM
