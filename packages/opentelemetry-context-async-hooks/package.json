@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-async-hooks",
-  "version": "2.10.0",
+  "version": "2.11.0",
   "description": "OpenTelemetry AsyncLocalStorage-based Context Manager",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -48,7 +48,7 @@
     "benchmark": "2.1.4",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
-    "mocha": "11.7.6",
+    "mocha": "11.8.0",
     "nyc": "17.1.0",
     "typescript": "5.2.2"
   },

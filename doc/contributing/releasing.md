@@ -12,10 +12,11 @@ We aim to eventually automate this process as much as possible.
 1. Go to the [Release PR Workflow](https://github.com/open-telemetry/opentelemetry-js/actions/workflows/create-or-update-release-pr.yml)
 2. Click "Run workflow"
 3. Configure which packages to release and their version bump type:
-   - **Stable SDK packages** (`./packages/*`): Select `minor`, `patch`, or `inherit` (no release unless required)
+   - **Stable SDK packages** (`./packages/*`): Select `major`, `minor`, `patch`, or `inherit` (no release unless required)
    - **Experimental packages** (`./experimental/packages/*`): Select `minor`, `patch`, or `inherit` (automatically inherits from Stable SDK if Stable SDK is released)
    - **API package** (`./api`): Select `minor`, `patch`, or `inherit` (no release). When set, makes Stable SDK and Experimental packages inherit the same version bump.
    - **Semantic Conventions** (`./semantic-conventions`): Select `minor`, `patch`, or `inherit` (no release)
+   - **Pre-release identifier**: Select `development`, `rc`, or `none` (a normal release). See [Pre-releases](#pre-releases).
 
 **Release Rules:**
 
@@ -23,6 +24,81 @@ We aim to eventually automate this process as much as possible.
 - If you use "API package", it will make both Stable SDK and Experimental packages inherit the same version bump
 - You cannot set "API package" to a specific version while also setting Stable SDK or Experimental to different bumps (the workflow will fail)
 - Semantic Conventions can be released independently or alongside other packages
+- `major` is only offered for Stable SDK packages. Experimental packages inherit it as a
+  `minor` bump, because they track the stable SDK generation in their minor version
+  (`2.x` ↔ `0.2xx.x`, see [the upgrade guide](../upgrade-to-2.x.md)) — a stable `3.0.0`
+  means an experimental `0.222.0`, not `1.0.0`.
+
+### Pre-releases
+
+Setting a **pre-release identifier** produces a pre-release version, which the publish
+workflow puts on the `canary` npm dist-tag instead of `latest` — so it is only installed
+by users who explicitly opt in (`npm install @opentelemetry/sdk-trace-node@canary`). This
+is how pre-releases of the next major version are cut from `main` while it is still being
+developed.
+
+The identifier is a *modifier*: it changes how the packages you selected above are
+bumped, but it does not select any package on its own.
+
+There are two identifiers:
+
+- **`development`** — for releasing on a regular cadence off `main`, while the next
+  major version is still being built.
+- **`rc`** — for release candidates, once the release is close to final.
+
+| Starting from | Bump | Identifier | Result |
+| --- | --- | --- | --- |
+| `2.10.0` | `major` | `development` | `3.0.0-development.0` |
+| `3.0.0-development.0` | `major` | `development` | `3.0.0-development.1` |
+| `3.0.0-development.7` | `major` | `rc` | `3.0.0-rc.0` |
+| `3.0.0-rc.2` | `major` | `none` | `3.0.0` |
+
+To iterate, re-run the workflow with the **same** bump type and identifier — only the
+trailing counter moves. To promote a `development` stream to `rc`, keep the bump type and
+switch the identifier. To finalize, keep the bump type and set the identifier back to
+`none`; the pre-release suffix is dropped, and because the version is no longer a
+pre-release the packages go back to the `latest` dist-tag.
+
+So a full 3.0.0 cycle looks like:
+
+```text
+3.0.0-development.0 ... 3.0.0-development.42  ->  3.0.0-rc.0 ... 3.0.0-rc.2  ->  3.0.0
+```
+
+> [!IMPORTANT]
+> Keep the same bump type for the whole pre-release cycle, and only move the identifier
+> forward. The workflow fails with an explanatory error rather than publishing either of
+> these:
+>
+> - Switching the bump type — finalizing a `3.0.0-rc.2` with `minor` instead of `major`
+>   produces a different version and abandons the release that is in flight.
+> - Going back to `development` from `rc` — npm compares identifiers as strings, so
+>   `development` sorts before `rc` and this would be a *downgrade*, producing a version
+>   lower than what is already published.
+
+**Not supported for pre-releases:**
+
+- The **API package** and **Semantic Conventions**. Both are depended on through version
+  *ranges* (`^1.29.0`, `>=1.0.0 <1.10.0`) rather than exact pins, and a pre-release
+  version does not satisfy such a range — npm would resolve those dependencies to the
+  last published release from the registry instead of linking the local workspace copy.
+  The API additionally bans pre-release versions outright, because
+  `@opentelemetry/api` requires an exact version match when either side carries a
+  pre-release tag. Release these packages separately, as normal releases.
+- Cutting a **normal** Experimental release while the Stable SDK is mid-pre-release.
+  Experimental packages pin stable SDK packages exactly, so this would publish a stable
+  version depending on a pre-release. Finalize the Stable SDK first.
+
+#### Changelogs across a cycle
+
+Each pre-release rotates the `## Unreleased` section into its own `## 3.0.0-development.3` heading,
+so its GitHub release notes describe what changed since the previous pre-release.
+
+Finalizing collapses those sections back together: the pre-release headings are removed and their
+entries are merged, per category, into the single `## 3.0.0` section. The changelog then reads as if
+there were never any pre-releases, and the release notes for `3.0.0` cover the whole cycle rather
+than just the entries that landed after the last release candidate. Nothing is lost - the
+per-pre-release notes stay in the git history and in the GitHub pre-releases published from them.
 
 > [!TIP]
 > If there was a commit to `main`, after PR creation simply run the workflow again before merging it.
@@ -64,7 +140,8 @@ We aim to eventually automate this process as much as possible.
    - `npm run _github:draft_release:api` if you published an `api` release
 3. Verify that the contents of the created draft releases (title, changelog, selected commit)
 4. Publish the releases
-   - If this is a manual pre-release, set `Pre-release` for the `Release label`.
-   - If you published a `sdk` release, set `Latest` for the `Release label`.
+   - If you released with a pre-release identifier, the draft is already marked as a
+     pre-release; leave `Pre-release` set for the `Release label`.
+   - If you published a stable `sdk` release, set `Latest` for the `Release label`.
      This will ensure that the `stable` SDK release consistently shows up as latest under `Releases` when navigating to the project page.
    - For all other releases, set `None` for the `Release label`.

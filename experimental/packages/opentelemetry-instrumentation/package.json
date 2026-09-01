@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation",
-  "version": "0.221.0",
+  "version": "0.222.0",
   "description": "Base class for node which OpenTelemetry instrumentation modules extend",
   "author": "OpenTelemetry Authors",
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation",
@@ -70,7 +70,7 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/api-logs": "0.221.0",
+    "@opentelemetry/api-logs": "0.222.0",
     "import-in-the-middle": "^3.0.0",
     "require-in-the-middle": "^8.0.0"
   },
@@ -81,7 +81,7 @@
     "@babel/core": "7.29.7",
     "@babel/preset-env": "7.29.7",
     "@opentelemetry/api": "1.9.1",
-    "@opentelemetry/sdk-metrics": "2.10.0",
+    "@opentelemetry/sdk-metrics": "2.11.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
@@ -94,7 +94,7 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.36",
     "karma-webpack": "5.0.1",
-    "mocha": "11.7.6",
+    "mocha": "11.8.0",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
     "ts-loader": "9.5.7",
