@@ -163,7 +163,7 @@ This minimum support level is subject to change as the project evolves and as th
 
 ## TypeScript Support
 
-OpenTelemetry JavaScript is built with TypeScript `v5.0.4`. If you have a TypeScript project (app, library, instrumentation, etc.)
+OpenTelemetry JavaScript is built with TypeScript `v5.2.2`. If you have a TypeScript project (app, library, instrumentation, etc.)
 that depends on it, we recommend using same or higher version to compile the project.
 
 OpenTelemetry JavaScript will follow DefinitelyType's [support policy for TypeScript](https://github.com/DefinitelyTyped/DefinitelyTyped#support-window) which sets a support window of 2 years. Support for TypeScript versions older than 2 years will be dropped in minor releases of OpenTelemetry JavaScript.
@@ -250,6 +250,7 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [David Luna](https://github.com/david-luna), Elastic
 - [Jamie Danielson](https://github.com/JamieDanielson), Honeycomb
 - [Marc Pichler](https://github.com/pichlermarc), Dynatrace
+- [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
 - [Trent Mick](https://github.com/trentm), Elastic
 
 For more information about the maintainer role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#maintainer).
@@ -259,7 +260,6 @@ For more information about the maintainer role, see the [community repository](h
 - [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
 - [Jackson Weber](https://github.com/JacksonWeber), Microsoft
 - [Martin Kuba](https://github.com/martinkuba), Grafana Labs
-- [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
 - [Raphaël Thériault](https://github.com/raphael-theriault-swi), SolarWinds
 
 In addition, [Browser SIG Maintainers](https://github.com/orgs/open-telemetry/teams/browser-maintainers) are granted the

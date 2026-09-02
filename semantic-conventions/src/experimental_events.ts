@@ -8,6 +8,27 @@
 //-----------------------------------------------------------------------------------------------------------------
 
 /**
+ * This event represents a termination of a user-facing application due to
+ * unrecoverable programming errors such as exceptions or signals that
+ * indicate an error has happened at a lower level.
+ *
+ * @note Crash events can be produced asynchronously by an OTel SDK instance that is
+ * not running in the application instance in which the crash happened. For
+ * example, the instrumentation may report crashes from previous app instances
+ * based on information found in tombstones on disk.
+ * If the reporter of the crash is not the crashing application instance itself,
+ * relevant resource attributes that identify the application instance that
+ * crashed **MUST** be provided as event attributes so that the corresponding
+ * attributes from the reporter's resource aren't used instead.
+ * How the instrumentation will determine whether an instance of a crash has
+ * already been reported and how the necessary data will be retrieved is left up
+ * to the instrumentation. Providing enough data to dedupe is NOT **REQUIRED**.
+ *
+ * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const EVENT_APP_CRASH = 'app.crash' as const;
+
+/**
  * This event indicates that the application has detected substandard UI rendering performance.
  *
  * @note Jank happens when the UI is rendered slowly enough for the user to experience some disruption or sluggishness.
@@ -123,6 +144,8 @@ export const EVENT_GEN_AI_CHOICE = 'gen_ai.choice' as const;
  * @note This event is opt-in and could be used to store input and output details independently from traces.
  *
  * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const EVENT_GEN_AI_CLIENT_INFERENCE_OPERATION_DETAILS = 'gen_ai.client.inference.operation.details' as const;
 
@@ -134,6 +157,8 @@ export const EVENT_GEN_AI_CLIENT_INFERENCE_OPERATION_DETAILS = 'gen_ai.client.in
  * Instrumentations **MAY** provide a configuration option to populate exception events with the attributes captured on the corresponding Generative AI client span.
  *
  * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const EVENT_GEN_AI_CLIENT_OPERATION_EXCEPTION = 'gen_ai.client.operation.exception' as const;
 
@@ -141,6 +166,8 @@ export const EVENT_GEN_AI_CLIENT_OPERATION_EXCEPTION = 'gen_ai.client.operation.
  * This event captures the result of evaluating GenAI output for quality, accuracy, or other characteristics. This event **SHOULD** be parented to GenAI operation span being evaluated when possible or set `gen_ai.response.id` when span id is not available.
  *
  * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const EVENT_GEN_AI_EVALUATION_RESULT = 'gen_ai.evaluation.result' as const;
 

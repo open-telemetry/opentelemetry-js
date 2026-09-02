@@ -6,12 +6,10 @@
 import type { Span } from '@opentelemetry/api';
 import { SpanKind, context, propagation } from '@opentelemetry/api';
 import {
-  ATTR_HTTP_FLAVOR,
-  ATTR_HTTP_HOST,
-  ATTR_NET_TRANSPORT,
-  HTTP_FLAVOR_VALUE_HTTP_1_1,
-  NET_TRANSPORT_VALUE_IP_TCP,
-} from '../../src/semconv';
+  ATTR_NETWORK_PROTOCOL_VERSION,
+  ATTR_SERVER_ADDRESS,
+  ATTR_SERVER_PORT,
+} from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import { urlToHttpOptions } from 'url';
 import { HttpInstrumentation } from '../../src/http';
@@ -220,14 +218,7 @@ describe('HttpInstrumentation Integration tests', () => {
       assert.strictEqual(spans.length, 2);
       assert.strictEqual(span.name, 'GET');
       assert.strictEqual(result.reqHeaders['x-foo'], 'foo');
-      assert.strictEqual(
-        span.attributes[ATTR_HTTP_FLAVOR],
-        HTTP_FLAVOR_VALUE_HTTP_1_1
-      );
-      assert.strictEqual(
-        span.attributes[ATTR_NET_TRANSPORT],
-        NET_TRANSPORT_VALUE_IP_TCP
-      );
+      assert.strictEqual(span.attributes[ATTR_NETWORK_PROTOCOL_VERSION], '1.1');
       assertSpan(span, SpanKind.CLIENT, validations);
     });
 
@@ -395,10 +386,8 @@ describe('HttpInstrumentation Integration tests', () => {
       const span = spans.find(s => s.kind === SpanKind.CLIENT);
       assert.ok(span);
       assert.strictEqual(span.name, 'GET');
-      assert.strictEqual(
-        span.attributes[ATTR_HTTP_HOST],
-        `localhost:${mockServerPort}`
-      );
+      assert.strictEqual(span.attributes[ATTR_SERVER_ADDRESS], 'localhost');
+      assert.strictEqual(span.attributes[ATTR_SERVER_PORT], mockServerPort);
     });
   });
 });

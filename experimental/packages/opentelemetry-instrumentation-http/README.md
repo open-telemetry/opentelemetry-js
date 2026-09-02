@@ -61,10 +61,52 @@ Options                                 | Type                                  
 `ignoreOutgoingRequestHook`             | `IgnoreOutgoingRequestFunction`            | Function for filtering outgoing requests. HTTP instrumentation will not trace outgoing requests for which the function returns `true`.
 `disableOutgoingRequestInstrumentation` | `boolean`                                  | Set to true to avoid instrumenting outgoing requests at all. This can be helpful when another instrumentation handles outgoing requests.
 `disableIncomingRequestInstrumentation` | `boolean`                                  | Set to true to avoid instrumenting incoming requests at all. This can be helpful when another instrumentation handles incoming requests.
-`serverName`                            | `string`                                   | The primary server name of the matched virtual host.
+`serverName`                            | `string`                                   | **Deprecated.** No longer used. Stable HTTP semantic conventions do not include the `http.server_name` attribute; this option has no effect.
 `requireParentforOutgoingSpans`         | Boolean                                    | Require that is a parent span to create new span for outgoing requests.
 `requireParentforIncomingSpans`         | Boolean                                    | Require that is a parent span to create new span for incoming requests.
+`redactedQueryParams`                   | `string[]`                                 | **Experimental.** Query parameter names whose values are redacted on outgoing (client) spans. Replaces the built-in list. See [Query parameter redaction](#query-parameter-redaction).
+`redactedQueryParamsServer`             | `string[]`                                 | **Experimental.** Query parameter names whose values are redacted on incoming (server) spans. Replaces the built-in list. See [Query parameter redaction](#query-parameter-redaction).
 `headersToSpanAttributes`               | `object`                                   | Specify which HTTP headers should be captured as span attributes. This is an object of the form `{client: {requestHeaders: [...], responseHeaders: [...]}, server: {requestHeaders: [...], responseHeaders: [...]}}`, where each `[...]` is an array of HTTP header names (case-insensitive) to capture. Client (outgoing requests, incoming responses) and server (incoming requests, outgoing responses) headers will be converted to span attributes in the form of `http.{request,response}.header.$header_name`, e.g. `http.response.header.content_length`. By default hyphens in header names are converted to underscore. However, if stable semantic conventions are selected (see next section), then, hyphens in header names are not changed, e.g. `http.response.header.content-length`.
+
+#### Query parameter redaction
+
+Query parameters that commonly carry credentials are redacted before URLs are recorded as span attributes. On client spans the redacted URL is recorded as `url.full`; on server spans the redacted query string is recorded as `url.query`. Matching values are replaced with the literal string `REDACTED`.
+
+By default both sides redact the following parameters:
+
+```text
+sig, Signature, AWSAccessKeyId, X-Goog-Signature,
+X-Amz-Signature, X-Amz-Credential, X-Amz-Security-Token
+```
+
+`redactedQueryParams` controls the client side and `redactedQueryParamsServer` controls the server side, independently. For each option:
+
+- Omit it to use the built-in list above.
+- Supply an array to **replace** the built-in list entirely. The arrays are not merged, so include any built-in parameters you still want redacted.
+- Supply an empty array to disable redaction on that side.
+
+The two options do not fall back to each other: when `redactedQueryParamsServer` is omitted, server spans use the built-in list, *not* the value of `redactedQueryParams`. Setting `redactedQueryParams` alone therefore leaves custom parameters unredacted on server spans. To redact the same custom parameters on both sides, set both options to the same array.
+
+Parameter names are matched exactly and are case-sensitive, which is why the built-in list contains both `sig` and `Signature`.
+
+```js
+// The built-in list plus an application-specific parameter, applied to both sides.
+const redacted = [
+  'sig',
+  'Signature',
+  'AWSAccessKeyId',
+  'X-Goog-Signature',
+  'X-Amz-Signature',
+  'X-Amz-Credential',
+  'X-Amz-Security-Token',
+  'api_key',
+];
+
+new HttpInstrumentation({
+  redactedQueryParams: redacted,
+  redactedQueryParamsServer: redacted,
+});
+```
 
 #### Hook function signatures
 
@@ -80,61 +122,39 @@ Hook type                                  | Parameters                         
 
 ## Semantic Conventions
 
-Prior to version `0.54.0`, this instrumentation created spans targeting an experimental semantic convention [Version 1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md).
+**Span attributes:**
 
-HTTP semantic conventions (semconv) were stabilized in v1.23.0, and a [migration process](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/non-normative/http-migration.md#http-semantic-convention-stability-migration) was defined.
-`instrumentation-http` versions 0.54.0 and later include support for migrating to stable HTTP semantic conventions, as described below.
-The intent is to provide an approximate 6 month time window for users of this instrumentation to migrate to the new HTTP semconv, after which a new minor version will use the *new* semconv by default and drop support for the old semconv.
-See the [HTTP semconv migration plan for OpenTelemetry JS instrumentations](https://github.com/open-telemetry/opentelemetry-js/issues/5646).
+v1.23.0 semconv                     | Short Description
+----------------------------------- | -----
+`client.address`                    | The IP address of the original client behind all proxies, if known
+`network.protocol.version`          | Kind of HTTP protocol used
+`server.address`                    | The value of the HTTP host header
+`http.request.method`               | HTTP request method
+(opt-in, `headersToSpanAttributes`) | The size of the request payload body in bytes. For newer semconv, use the `headersToSpanAttributes` option to capture this as `http.request.header.content-length`.
+(not included)                      | The size of the uncompressed request payload body after transport decoding. (In semconv v1.23.0 this is defined by `http.request.body.size`, which is experimental and opt-in.)
+(opt-in, `headersToSpanAttributes`) | The size of the response payload body in bytes. For newer semconv, use the `headersToSpanAttributes` option to capture this as `http.response.header.content-length`.
+(not included)                      | The size of the uncompressed response payload body after transport decoding. (In semconv v1.23.0 this is defined by `http.response.body.size`, which is experimental and opt-in.)
+no change                           | The matched route (path template).
+`url.scheme`                        | The URI scheme identifying the used protocol
+`server.address`                    | The primary server name of the matched virtual host
+`http.response.status_code`         | HTTP response status code
+`url.path` and `url.query`          | The URI path and query component
+`url.full`                          | Full HTTP request URL in the form `scheme://host[:port]/path?query[#fragment]`
+`user_agent.original`               | Value of the HTTP User-Agent header sent by the client
+`network.local.address`             | Like net.peer.ip but for the host IP. Useful in case of a multi-IP host
+`server.address`                    | Local hostname or similar
+`server.port`                       | Like net.peer.port but for the host port
+`network.peer.address`              | Remote address of the peer (dotted decimal for IPv4 or RFC5952 for IPv6)
+`server.address`                    | Server domain name if available without reverse DNS lookup
+`server.port`                       | Server port number
+`network.transport`                 | Transport protocol used
 
-To select which semconv version(s) is emitted from this instrumentation, use the `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable.
-
-- `http`: emit the new (stable) v1.23.0+ semantics
-- `http/dup`: emit **both** the old v1.7.0 and the new (stable) v1.23.0+ semantics
-- By default, if `OTEL_SEMCONV_STABILITY_OPT_IN` includes neither of the above tokens, the old v1.7.0 semconv is used.
-
-### Attributes collected
-
-v1.7.0 semconv                              | v1.23.0 semconv                     | Short Description
-------------------------------------------- | ----------------------------------- | -----
-`http.client_ip`                            | `client.address`                    | The IP address of the original client behind all proxies, if known
-`http.flavor`                               | `network.protocol.version`          | Kind of HTTP protocol used
-`http.host`                                 | `server.address`                    | The value of the HTTP host header
-`http.method`                               | `http.request.method`               | HTTP request method
-`http.request_content_length`               | (opt-in, `headersToSpanAttributes`) | The size of the request payload body in bytes. For newer semconv, use the `headersToSpanAttributes` option to capture this as `http.request.header.content-length`.
-`http.request_content_length_uncompressed`  | (not included)                      | The size of the uncompressed request payload body after transport decoding. (In semconv v1.23.0 this is defined by `http.request.body.size`, which is experimental and opt-in.)
-`http.response_content_length`              | (opt-in, `headersToSpanAttributes`) | The size of the response payload body in bytes. For newer semconv, use the `headersToSpanAttributes` option to capture this as `http.response.header.content-length`.
-`http.response_content_length_uncompressed` | (not included)                      | The size of the uncompressed response payload body after transport decoding. (In semconv v1.23.0 this is defined by `http.response.body.size`, which is experimental and opt-in.)
-`http.route`                                | no change                           | The matched route (path template).
-`http.scheme`                               | `url.scheme`                        | The URI scheme identifying the used protocol
-`http.server_name`                          | `server.address`                    | The primary server name of the matched virtual host
-`http.status_code`                          | `http.response.status_code`         | HTTP response status code
-`http.target`                               | `url.path` and `url.query`          | The URI path and query component
-`http.url`                                  | `url.full`                          | Full HTTP request URL in the form `scheme://host[:port]/path?query[#fragment]`
-`http.user_agent`                           | `user_agent.original`               | Value of the HTTP User-Agent header sent by the client
-`net.host.ip`                               | `network.local.address`             | Like net.peer.ip but for the host IP. Useful in case of a multi-IP host
-`net.host.name`                             | `server.address`                    | Local hostname or similar
-`net.host.port`                             | `server.port`                       | Like net.peer.port but for the host port
-`net.peer.ip`                               | `network.peer.address`              | Remote address of the peer (dotted decimal for IPv4 or RFC5952 for IPv6)
-`net.peer.name`                             | `server.address`                    | Server domain name if available without reverse DNS lookup
-`net.peer.port`                             | `server.port`                       | Server port number
-`net.transport`                             | `network.transport`                 | Transport protocol used
-
-Metrics Exported:
+**Metrics:**
 
 - [`http.server.request.duration`](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-metrics.md#metric-httpserverrequestduration)
 - [`http.client.request.duration`](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-metrics.md#metric-httpclientrequestduration)
 
-### Upgrading Semantic Conventions
-
-When upgrading to the new semantic conventions, it is recommended to do so in the following order:
-
-1. Upgrade `@opentelemetry/instrumentation-http` to the latest version
-2. Set `OTEL_SEMCONV_STABILITY_OPT_IN=http/dup` to emit both old and new semantic conventions
-3. Modify alerts, dashboards, metrics, and other processes to expect the new semantic conventions
-4. Set `OTEL_SEMCONV_STABILITY_OPT_IN=http` to emit only the new semantic conventions
-
-This will cause both the old and new semantic conventions to be emitted during the transition period.
+Versions of `@opentelemetry/instrumentation-http` to 0.221.0 used semantic conventions [v1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md) by default. Versions 0.54.0 - 0.220.0 supported [the `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable for migrating from old to stable semantic conventions](https://opentelemetry.io/docs/specs/semconv/non-normative/http-migration/).
 
 ## Useful links
 

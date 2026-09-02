@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/template",
-  "version": "2.9.0",
+  "version": "2.11.0",
   "description": "> TODO: description",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -75,7 +75,7 @@
   "sideEffects": false,
   "devDependencies": {
     "@types/node": "18.19.130",
-    "typescript": "5.0.4"
+    "typescript": "5.2.2"
   },
   "Add these to devDependencies for testing": {
     "@types/mocha": "10.0.10",

@@ -6,6 +6,7 @@ We'd love your help!
 - [Development Quick Start](#development-quick-start)
 - [Pull Request Merge Guidelines](#pull-request-merge-guidelines)
   - [General Merge Requirements](#general-merge-requirements)
+- [Backports](#backports)
 - [Report a bug or requesting feature](#report-a-bug-or-requesting-feature)
 - [How to contribute](#how-to-contribute)
   - [Before you start](#before-you-start)
@@ -83,6 +84,52 @@ If a PR has not been interacted with by a reviewer within one week, please ping 
 - Substantial changes should not be merged within 24 hours of opening in order to allow reviewers from all time zones to have a chance to review
 
 If all of the above requirements are met and there are no unresolved discussions, a pull request may be merged by either a maintainer or an approver.
+
+## Backports
+
+Bug and security fixes may be backported to the previous major version, which is maintained on a
+[maintenance branch](doc/contributing/releasing.md#maintenance-branches) named after it, for example
+`v2.x`. The previous major receives backports for **one year after the next major version is
+released**. After that the branch is no longer maintained and no further releases are cut from it.
+
+The concrete dates for the current transition are in the [SDK 3.0 announcement](doc/3.x/announcement.md).
+
+### What is eligible
+
+- Fixes for `priority:p1` bugs, as defined in [Bug Triage](doc/contributing/bug_triage.md#prioritize).
+- Security fixes.
+
+Fixes for bugs with any other priority label MAY be accepted or rejected at the discretion of the
+maintainers, based on the impact on end users. Features, refactors, dependency updates, and
+documentation-only changes are not backported.
+
+### Fixes MUST land on `main` first
+
+A fix MUST be merged into `main` before it can be backported.
+A backport pull request whose fix is not on `main` will be closed, unless the affected package or code
+no longer exists on `main` - in that case, say so in the pull request description.
+
+### Opening a backport pull request
+
+Anyone may open a backport pull request; maintainers decide whether it is eligible.
+Once the fix is merged into `main`, cherry-pick it onto a branch based on the maintenance branch,
+keeping the reference to the original commit:
+
+```sh
+git fetch upstream
+git checkout -b backport-v2.x-1234 upstream/v2.x
+git cherry-pick -x <sha of the commit on main>
+```
+
+Then:
+
+- Open the pull request against the maintenance branch, **not** `main`.
+- Apply the `backport` label and link the `main` pull request in the description.
+- Add a [changelog](#changelog) entry on the maintenance branch, referencing the backport pull
+  request's own number. Cherry-picking the entry from `main` usually conflicts, and the changelog CI
+  check does not run on maintenance branches, so this is not enforced automatically.
+
+The [General Merge Requirements](#general-merge-requirements) apply to backport pull requests as well.
 
 ## Report a bug or requesting feature
 

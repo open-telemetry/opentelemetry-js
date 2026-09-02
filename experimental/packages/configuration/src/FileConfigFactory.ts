@@ -4,7 +4,7 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { getStringFromEnv } from '@opentelemetry/core';
+import { getStringFromEnv, parseKeyPairsIntoRecord } from '@opentelemetry/core';
 import * as fs from 'fs';
 import * as yaml from 'yaml';
 import type { ConfigFactory } from './IConfigFactory';
@@ -12,6 +12,7 @@ import { substituteEnvVars } from './utils';
 import type {
   AttributeNameValue,
   ConfigurationModel,
+  NameStringValuePair,
   TextMapPropagator,
 } from './generated/types';
 // Pre-compiled ajv validator — eliminates runtime schema compilation on cold start.
@@ -129,7 +130,6 @@ export function mergeResourceAttributesConfig(
   const mergedAttrs = attributes ? attributes.slice() : [];
   const existingNames = new Set(mergedAttrs.map(a => a.name));
 
-  // TODO(6842): handle attribute limits, if any
   let discard = false;
   const listAttrs: Record<string, string> = {};
   for (const pair of attributes_list.split(',')) {
@@ -174,6 +174,27 @@ export function mergeResourceAttributesConfig(
   }
 
   return mergedAttrs;
+}
+
+/**
+ * Merge headers from `headers` and `headers_list` (comma-separated key=value
+ * pairs) into a record. Entries in `headers` take precedence.
+ */
+export function mergeHeadersConfig(
+  headers?: NameStringValuePair[],
+  headers_list?: string | null
+): Record<string, string> | undefined {
+  if (!headers && !headers_list) {
+    return undefined;
+  }
+
+  const mergedHeaders = parseKeyPairsIntoRecord(headers_list ?? undefined);
+  headers?.forEach(header => {
+    if (header.value !== null) {
+      mergedHeaders[header.name] = header.value;
+    }
+  });
+  return mergedHeaders;
 }
 
 /**

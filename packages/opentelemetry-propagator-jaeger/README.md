@@ -3,6 +3,8 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
+> **Deprecated:** The Jaeger propagator is deprecated by the OpenTelemetry specification in favor of the [W3C TraceContext propagator](https://opentelemetry.io/docs/specs/otel/context/api-propagators/#propagators-distribution). Use `W3CTraceContextPropagator` from `@opentelemetry/core` instead. This package will be removed in a future major release.
+
 OpenTelemetry Jaeger propagator provides HTTP header propagation for systems that are using Jaeger HTTP header format.
 
 Format:

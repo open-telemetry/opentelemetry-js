@@ -2,10 +2,13 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import type { Attributes, Span } from '@opentelemetry/api';
+import type { Span } from '@opentelemetry/api';
 import { SpanStatusCode, SpanKind, context, diag } from '@opentelemetry/api';
 import {
+  ATTR_ERROR_TYPE,
   ATTR_HTTP_ROUTE,
+  ATTR_URL_PATH,
+  ATTR_URL_QUERY,
   ATTR_USER_AGENT_ORIGINAL,
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
@@ -14,11 +17,6 @@ import type { Socket } from 'net';
 import * as sinon from 'sinon';
 import * as url from 'url';
 import {
-  ATTR_HTTP_REQUEST_CONTENT_LENGTH,
-  ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-  ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
-  ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-  ATTR_HTTP_TARGET,
   ATTR_USER_AGENT_SYNTHETIC_TYPE,
   USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT,
 } from '../../src/semconv';
@@ -29,9 +27,7 @@ import type {
 import * as utils from '../../src/utils';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
-import { SemconvStability } from '@opentelemetry/instrumentation';
 import { extractHostnameAndPort } from '../../src/utils';
-import { AttributeNames } from '../../src/enums/AttributeNames';
 import type { ParsedUrlQuery } from 'node:querystring';
 
 describe('Utility', () => {
@@ -255,6 +251,60 @@ describe('Utility', () => {
     });
   });
 
+  describe('redactQueryString()', () => {
+    it('redacts a matching parameter', () => {
+      assert.strictEqual(
+        utils.redactQueryString(new URLSearchParams('sig=secret&foo=bar'), [
+          'sig',
+        ]),
+        'sig=REDACTED&foo=bar'
+      );
+    });
+
+    it('leaves non-matching parameters unchanged', () => {
+      assert.strictEqual(
+        utils.redactQueryString(new URLSearchParams('foo=bar&baz=qux'), [
+          'sig',
+        ]),
+        'foo=bar&baz=qux'
+      );
+    });
+
+    it('redacts multiple parameters', () => {
+      assert.strictEqual(
+        utils.redactQueryString(
+          new URLSearchParams('sig=a&AWSAccessKeyId=b&keep=c'),
+          ['sig', 'AWSAccessKeyId']
+        ),
+        'sig=REDACTED&AWSAccessKeyId=REDACTED&keep=c'
+      );
+    });
+
+    it('returns the input unchanged when the list is empty', () => {
+      assert.strictEqual(
+        utils.redactQueryString(new URLSearchParams('sig=secret'), []),
+        'sig=secret'
+      );
+    });
+
+    it('redacts a param with an empty value', () => {
+      assert.strictEqual(
+        utils.redactQueryString(new URLSearchParams('sig=&foo=bar'), ['sig']),
+        'sig=REDACTED&foo=bar'
+      );
+    });
+
+    it('redacts all occurrences of a duplicated parameter', () => {
+      assert.strictEqual(
+        utils.redactQueryString(
+          new URLSearchParams('sig=SECRET1&sig=SECRET2&foo=bar'),
+          ['sig']
+        ),
+        'sig=REDACTED&foo=bar'
+      );
+    });
+  });
+
   describe('setSpanWithError()', () => {
     it('should have error attributes', () => {
       const errorMessage = 'test error';
@@ -265,19 +315,14 @@ describe('Utility', () => {
         recordException: () => undefined,
       } as unknown as Span;
       const mock = sinon.mock(span);
-      mock
-        .expects('setAttribute')
-        .calledWithExactly(AttributeNames.HTTP_ERROR_NAME, 'error');
-      mock
-        .expects('setAttribute')
-        .calledWithExactly(AttributeNames.HTTP_ERROR_MESSAGE, errorMessage);
+      mock.expects('setAttribute').calledWithExactly(ATTR_ERROR_TYPE, 'Error');
       mock.expects('setStatus').calledWithExactly({
         code: SpanStatusCode.ERROR,
         message: errorMessage,
       });
       mock.expects('recordException').calledWithExactly(error);
 
-      utils.setSpanWithError(span, error, SemconvStability.OLD);
+      utils.setSpanWithError(span, error);
       mock.verify();
     });
   });
@@ -306,9 +351,6 @@ describe('Utility', () => {
   describe('getIncomingRequestAttributesOnResponse()', () => {
     it('should correctly parse the middleware stack if present', done => {
       context.setGlobalContextManager(new AsyncHooksContextManager().enable());
-      const request = {
-        socket: {},
-      } as IncomingMessage;
       context.with(
         setRPCMetadata(context.active(), {
           type: RPCType.HTTP,
@@ -317,9 +359,7 @@ describe('Utility', () => {
         }),
         () => {
           const attributes = utils.getIncomingRequestAttributesOnResponse(
-            request,
-            {} as ServerResponse,
-            SemconvStability.OLD
+            {} as ServerResponse
           );
           assert.deepStrictEqual(attributes[ATTR_HTTP_ROUTE], '/user/:id');
           context.disable();
@@ -329,178 +369,10 @@ describe('Utility', () => {
     });
 
     it('should successfully process without middleware stack', () => {
-      const request = {
+      const attributes = utils.getIncomingRequestAttributesOnResponse({
         socket: {},
-      } as IncomingMessage;
-      const attributes = utils.getIncomingRequestAttributesOnResponse(
-        request,
-        {
-          socket: {},
-        } as ServerResponse & { socket: Socket },
-        SemconvStability.OLD
-      );
+      } as ServerResponse & { socket: Socket });
       assert.deepEqual(attributes[ATTR_HTTP_ROUTE], undefined);
-    });
-  });
-
-  describe('getIncomingRequestMetricAttributesOnResponse()', () => {
-    it('should correctly add http_route if span has it', () => {
-      const spanAttributes: Attributes = {
-        [ATTR_HTTP_ROUTE]: '/user/:id',
-      };
-      const metricAttributes =
-        utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes);
-
-      assert.deepStrictEqual(metricAttributes[ATTR_HTTP_ROUTE], '/user/:id');
-    });
-
-    it('should skip http_route if span does not have it', () => {
-      const spanAttributes: Attributes = {};
-      const metricAttributes =
-        utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes);
-      assert.deepEqual(metricAttributes[ATTR_HTTP_ROUTE], undefined);
-    });
-  });
-
-  // Verify the key in the given attributes is set to the given value,
-  // and that no other HTTP Content Length attributes are set.
-  function verifyValueInAttributes(
-    attributes: Attributes,
-    key: string | undefined,
-    value: number
-  ) {
-    const SemanticAttributess = [
-      ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-      ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
-      ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-      ATTR_HTTP_REQUEST_CONTENT_LENGTH,
-    ];
-
-    for (const attr of SemanticAttributess) {
-      if (attr === key) {
-        assert.strictEqual(attributes[attr], value);
-      } else {
-        assert.strictEqual(attributes[attr], undefined);
-      }
-    }
-  }
-
-  describe('setRequestContentLengthAttributes()', () => {
-    it('should set request content-length uncompressed attribute with no content-encoding header', () => {
-      const attributes: Attributes = {};
-      const request = {} as IncomingMessage;
-
-      request.headers = {
-        'content-length': '1200',
-      };
-      utils.setRequestContentLengthAttribute(request, attributes);
-
-      verifyValueInAttributes(
-        attributes,
-        ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-        1200
-      );
-    });
-
-    it('should set request content-length uncompressed attribute with "identity" content-encoding header', () => {
-      const attributes: Attributes = {};
-      const request = {} as IncomingMessage;
-      request.headers = {
-        'content-length': '1200',
-        'content-encoding': 'identity',
-      };
-      utils.setRequestContentLengthAttribute(request, attributes);
-
-      verifyValueInAttributes(
-        attributes,
-        ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-        1200
-      );
-    });
-
-    it('should set request content-length compressed attribute with "gzip" content-encoding header', () => {
-      const attributes: Attributes = {};
-      const request = {} as IncomingMessage;
-      request.headers = {
-        'content-length': '1200',
-        'content-encoding': 'gzip',
-      };
-      utils.setRequestContentLengthAttribute(request, attributes);
-
-      verifyValueInAttributes(
-        attributes,
-        ATTR_HTTP_REQUEST_CONTENT_LENGTH,
-        1200
-      );
-    });
-  });
-
-  describe('setResponseContentLengthAttributes()', () => {
-    it('should set response content-length uncompressed attribute with no content-encoding header', () => {
-      const attributes: Attributes = {};
-
-      const response = {} as IncomingMessage;
-
-      response.headers = {
-        'content-length': '1200',
-      };
-      utils.setResponseContentLengthAttribute(response, attributes);
-
-      verifyValueInAttributes(
-        attributes,
-        ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-        1200
-      );
-    });
-
-    it('should set response content-length uncompressed attribute with "identity" content-encoding header', () => {
-      const attributes: Attributes = {};
-
-      const response = {} as IncomingMessage;
-
-      response.headers = {
-        'content-length': '1200',
-        'content-encoding': 'identity',
-      };
-
-      utils.setResponseContentLengthAttribute(response, attributes);
-
-      verifyValueInAttributes(
-        attributes,
-        ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-        1200
-      );
-    });
-
-    it('should set response content-length compressed attribute with "gzip" content-encoding header', () => {
-      const attributes: Attributes = {};
-
-      const response = {} as IncomingMessage;
-
-      response.headers = {
-        'content-length': '1200',
-        'content-encoding': 'gzip',
-      };
-
-      utils.setResponseContentLengthAttribute(response, attributes);
-
-      verifyValueInAttributes(
-        attributes,
-        ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
-        1200
-      );
-    });
-
-    it('should set no attributes with no content-length header', () => {
-      const attributes: Attributes = {};
-      const message = {} as IncomingMessage;
-
-      message.headers = {
-        'content-encoding': 'gzip',
-      };
-      utils.setResponseContentLengthAttribute(message, attributes);
-
-      verifyValueInAttributes(attributes, undefined, 1200);
     });
   });
 
@@ -519,7 +391,6 @@ describe('Utility', () => {
         request,
         {
           component: 'http',
-          semconvStability: SemconvStability.OLD,
           enableSyntheticSourceDetection: false,
         },
         diag
@@ -540,12 +411,11 @@ describe('Utility', () => {
         request,
         {
           component: 'http',
-          semconvStability: SemconvStability.OLD,
           enableSyntheticSourceDetection: false,
         },
         diag
       );
-      assert.strictEqual(attributes[ATTR_HTTP_TARGET], '/user/?q=val');
+      assert.strictEqual(attributes[ATTR_URL_PATH], '/user/');
       assert.strictEqual(attributes[ATTR_USER_AGENT_SYNTHETIC_TYPE], undefined);
     });
 
@@ -562,7 +432,6 @@ describe('Utility', () => {
         request,
         {
           component: 'http',
-          semconvStability: SemconvStability.STABLE,
           enableSyntheticSourceDetection: true,
         },
         diag
@@ -573,20 +442,95 @@ describe('Utility', () => {
         USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT
       );
     });
+
+    describe('query parameter redaction', () => {
+      function makeRequest(query: string): IncomingMessage {
+        const req = {
+          url: `http://hostname/path?${query}`,
+          method: 'GET',
+          socket: {},
+        } as IncomingMessage;
+        req.headers = { host: 'hostname' };
+        return req;
+      }
+
+      it('redacts default sensitive params by default', () => {
+        const attributes = utils.getIncomingRequestAttributes(
+          makeRequest('sig=secret&foo=bar'),
+          { component: 'http', enableSyntheticSourceDetection: false },
+          diag
+        );
+        assert.strictEqual(attributes[ATTR_URL_QUERY], 'sig=REDACTED&foo=bar');
+      });
+
+      it('redacts all default params (AWSAccessKeyId, Signature, X-Goog-Signature)', () => {
+        const attributes = utils.getIncomingRequestAttributes(
+          makeRequest(
+            'AWSAccessKeyId=key&Signature=sig&X-Goog-Signature=gsig&keep=1'
+          ),
+          { component: 'http', enableSyntheticSourceDetection: false },
+          diag
+        );
+        assert.strictEqual(
+          attributes[ATTR_URL_QUERY],
+          'AWSAccessKeyId=REDACTED&Signature=REDACTED&X-Goog-Signature=REDACTED&keep=1'
+        );
+      });
+
+      it('redacts only params in the custom list when redactedQueryParams is provided', () => {
+        const attributes = utils.getIncomingRequestAttributes(
+          makeRequest('sig=secret&custom=sensitive&foo=bar'),
+          {
+            component: 'http',
+            enableSyntheticSourceDetection: false,
+            redactedQueryParams: ['custom'],
+          },
+          diag
+        );
+        assert.strictEqual(
+          attributes[ATTR_URL_QUERY],
+          'sig=secret&custom=REDACTED&foo=bar'
+        );
+      });
+
+      it('does not redact anything when redactedQueryParams is an empty array', () => {
+        const attributes = utils.getIncomingRequestAttributes(
+          makeRequest('sig=secret&foo=bar'),
+          {
+            component: 'http',
+            enableSyntheticSourceDetection: false,
+            redactedQueryParams: [],
+          },
+          diag
+        );
+        assert.strictEqual(attributes[ATTR_URL_QUERY], 'sig=secret&foo=bar');
+      });
+
+      it('does not set url.query when there is no query string', () => {
+        const req = {
+          url: 'http://hostname/path',
+          method: 'GET',
+          socket: {},
+        } as IncomingMessage;
+        req.headers = { host: 'hostname' };
+        const attributes = utils.getIncomingRequestAttributes(
+          req,
+          { component: 'http', enableSyntheticSourceDetection: false },
+          diag
+        );
+        assert.strictEqual(attributes[ATTR_URL_QUERY], undefined);
+      });
+    });
   });
 
   describe('headers to span attributes capture', () => {
     it('should capture attributes for request and response keys', () => {
-      const reqAttrs = utils.headerCapture(
-        'request',
-        ['Origin'],
-        SemconvStability.OLD
-      )(() => 'localhost');
-      const resAttrs = utils.headerCapture(
-        'response',
-        ['Cookie'],
-        SemconvStability.OLD
-      )(() => 'token=123');
+      const reqAttrs = utils.headerCapture('request', ['Origin'])(
+        () => 'localhost'
+      );
+      const resAttrs = utils.headerCapture('response', ['Cookie'])(
+        () => 'token=123'
+      );
 
       assert.deepStrictEqual(reqAttrs, {
         'http.request.header.origin': ['localhost'],
@@ -597,11 +541,10 @@ describe('Utility', () => {
     });
 
     it('should capture attributes for multiple values', () => {
-      const attrs = utils.headerCapture(
-        'request',
-        ['Origin'],
-        SemconvStability.OLD
-      )(() => ['localhost', 'www.example.com']);
+      const attrs = utils.headerCapture('request', ['Origin'])(() => [
+        'localhost',
+        'www.example.com',
+      ]);
 
       assert.deepStrictEqual(attrs, {
         'http.request.header.origin': ['localhost', 'www.example.com'],
@@ -609,21 +552,19 @@ describe('Utility', () => {
     });
 
     it('should capture attributes for multiple headers', () => {
-      const attrs = utils.headerCapture(
-        'request',
-        ['Origin', 'Foo'],
-        SemconvStability.OLD
-      )(header => {
-        if (header === 'origin') {
-          return 'localhost';
-        }
+      const attrs = utils.headerCapture('request', ['Origin', 'Foo'])(
+        header => {
+          if (header === 'origin') {
+            return 'localhost';
+          }
 
-        if (header === 'foo') {
-          return 42;
-        }
+          if (header === 'foo') {
+            return 42;
+          }
 
-        return undefined;
-      });
+          return undefined;
+        }
+      );
 
       assert.deepStrictEqual(attrs, {
         'http.request.header.origin': ['localhost'],
@@ -631,52 +572,25 @@ describe('Utility', () => {
       });
     });
 
-    it('should normalize header names (SemconvStability.OLD)', () => {
-      const attrs = utils.headerCapture(
-        'request',
-        ['X-Forwarded-For'],
-        SemconvStability.OLD
-      )(() => 'foo');
-      assert.deepStrictEqual(attrs, {
-        'http.request.header.x_forwarded_for': ['foo'],
-      });
-    });
-
-    it('should normalize header names (SemconvStability.STABLE)', () => {
-      const attrs = utils.headerCapture(
-        'request',
-        ['X-Forwarded-For'],
-        SemconvStability.STABLE
-      )(() => 'foo');
-      assert.deepStrictEqual(attrs, {
-        'http.request.header.x-forwarded-for': ['foo'],
-      });
-    });
-
-    it('should normalize header names (SemconvStability.DUPLICATE)', () => {
-      // STABLE semconv wins over OLD when "DUPLICATE" is selected.
-      const attrs = utils.headerCapture(
-        'request',
-        ['X-Forwarded-For'],
-        SemconvStability.DUPLICATE
-      )(() => 'foo');
+    it('should normalize header names', () => {
+      const attrs = utils.headerCapture('request', ['X-Forwarded-For'])(
+        () => 'foo'
+      );
       assert.deepStrictEqual(attrs, {
         'http.request.header.x-forwarded-for': ['foo'],
       });
     });
 
     it('ignores non-existent headers', () => {
-      const attrs = utils.headerCapture(
-        'request',
-        ['Origin', 'Accept'],
-        SemconvStability.OLD
-      )(header => {
-        if (header === 'origin') {
-          return 'localhost';
-        }
+      const attrs = utils.headerCapture('request', ['Origin', 'Accept'])(
+        header => {
+          if (header === 'origin') {
+            return 'localhost';
+          }
 
-        return undefined;
-      });
+          return undefined;
+        }
+      );
 
       assert.deepStrictEqual(attrs, {
         'http.request.header.origin': ['localhost'],

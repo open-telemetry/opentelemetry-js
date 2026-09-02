@@ -22,9 +22,6 @@
       "path": "../opentelemetry-propagator-b3"
     },
     {
-      "path": "../opentelemetry-propagator-jaeger"
-    },
-    {
       "path": "../sdk-trace"
     }
   ]

@@ -87,7 +87,11 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
   startIncomingSpanHook?: StartIncomingSpanCustomAttributeFunction;
   /** Function for adding custom attributes before a span is started in outgoingRequest */
   startOutgoingSpanHook?: StartOutgoingSpanCustomAttributeFunction;
-  /** The primary server name of the matched virtual host. */
+  /**
+   * The primary server name of the matched virtual host.
+   * @deprecated No longer used. Stable HTTP semantic conventions do not include
+   * the `http.server_name` attribute; this option has no effect.
+   */
   serverName?: string;
   /** Require parent to create span for outgoing requests */
   requireParentforOutgoingSpans?: boolean;
@@ -104,11 +108,21 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
    **/
   enableSyntheticSourceDetection?: boolean;
   /**
-   * [Optional] Additional query parameters to redact.
+   * [Optional] Query parameters to redact on outgoing (client) spans.
    * Use this to specify custom query strings that contain sensitive information.
    * These will replace/overwrite the default query strings that are to be redacted.
-   * @example default strings ['sig','Signature','AWSAccessKeyId','X-Goog-Signature']
+   * When omitted, defaults to a built-in list of known sensitive parameter
+   * names; see the package README for the current list.
+   * Set to an empty array to disable client-side query parameter redaction entirely.
    * @experimental
    */
   redactedQueryParams?: string[];
+  /**
+   * [Optional] Query parameters to redact on incoming (server) spans.
+   * When omitted, defaults to a built-in list of known sensitive parameter
+   * names; see the package README for the current list.
+   * Set to an empty array to disable server-side query parameter redaction entirely.
+   * @experimental
+   */
+  redactedQueryParamsServer?: string[];
 }

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-async-hooks",
-  "version": "2.9.0",
+  "version": "2.11.0",
   "description": "OpenTelemetry AsyncLocalStorage-based Context Manager",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -23,6 +23,7 @@
     "clean": "rimraf dist build",
     "test": "nyc mocha 'test/**/*.test.ts'",
     "tdd": "npm run test -- --watch-extensions ts --watch",
+    "test:bench": "node test/performance/benchmark/attach.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "version": "node ../../scripts/version-update.js",
@@ -53,11 +54,12 @@
   },
   "devDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.10.0",
+    "benchmark": "2.1.4",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
-    "mocha": "11.7.6",
+    "mocha": "11.8.0",
     "nyc": "17.1.0",
-    "typescript": "5.0.4"
+    "typescript": "5.2.2"
   },
   "peerDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.10.0"

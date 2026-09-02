@@ -1,5 +1,12 @@
 name: Create or Update Release PR
 
+# Run this from the branch you are releasing: either `main`, or a maintenance branch named
+# `v<major>.x` (e.g. `v2.x`). Each branch gets its own release PR, and the branch also
+# decides which of the bumps below are allowed - see doc/contributing/releasing.md.
+#
+# NOTE: workflow_dispatch runs the copy of this file on the selected branch, so this file
+# and the scripts it calls have to exist there too.
+
 on:
   workflow_dispatch:
     inputs:
@@ -11,6 +18,7 @@ on:
           - inherit # no release unless required by other settings
           - patch
           - minor
+          - major # `main` only; experimental packages inherit this as a minor bump
       experimental_release:
         type: choice
         description: 'Experimental packages (./experimental/packages/*)'
@@ -35,6 +43,17 @@ on:
           - inherit # no release
           - patch
           - minor
+      prerelease:
+        type: choice
+        description: 'Pre-release identifier - modifies the bumps above, selects nothing on its own'
+        default: 'none'
+        # Listed in semver precedence order: development < rc. An identifier can only
+        # be changed to a later one, so a `development` stream is promoted to `rc`,
+        # never the other way around.
+        options:
+          - none # normal release
+          - development # `main` only; regular cadence of builds off main
+          - rc # `main` only
 
 permissions:
   contents: read
@@ -46,24 +65,24 @@ jobs:
       - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: otelbot-token
         with:
-          app-id: ${{ vars.OTELBOT_JS_APP_ID }}
+          client-id: ${{ vars.OTELBOT_JS_CLIENT_ID }}
           private-key: ${{ secrets.OTELBOT_JS_PRIVATE_KEY }}
           # Scope to just the permissions required by the "Create/Update Release PR" step below.
           permission-contents: write
           permission-pull-requests: write
 
       - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           token: ${{ steps.otelbot-token.outputs.token }}
           # Credentials are used in 'Create/Update Release PR' git commands below.
           persist-credentials: true
 
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
           node-version: ^26.3.0
+          # Disable caching in release workflows (https://docs.zizmor.sh/audits/#cache-poisoning).
+          package-manager-cache: false
       - run: npm ci --ignore-scripts
 
       - name: Create/Update Release PR
@@ -77,4 +96,6 @@ jobs:
           EXPERIMENTAL_RELEASE: ${{ github.event.inputs.experimental_release }}
           API_RELEASE: ${{ github.event.inputs.api_release }}
           SEMCONV_RELEASE: ${{ github.event.inputs.semconv_release }}
+          PRERELEASE: ${{ github.event.inputs.prerelease }}
           RELEASE_PR_REMOTE: origin
+          RELEASE_BASE_BRANCH: ${{ github.ref_name }}
