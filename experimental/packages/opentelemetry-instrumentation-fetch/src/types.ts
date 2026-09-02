@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { HrTime } from '@opentelemetry/api';
-
 /**
  * Interface used to provide information to finish span on fetch response
  */
@@ -30,5 +28,5 @@ export interface SpanData {
   entries: PerformanceResourceTiming[];
   observer?: PerformanceObserver;
   spanUrl: string;
-  startTime: HrTime;
+  startTime: number;
 }
