@@ -7,10 +7,17 @@ For API changes, see the [API CHANGELOG](api/CHANGELOG.md).
 For experimental package changes, see the [experimental CHANGELOG](experimental/CHANGELOG.md).
 For semantic convention package changes, see the [semconv CHANGELOG](semantic-conventions/CHANGELOG.md).
 For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2.x.md).
+For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-guide.md).
 
 ## Unreleased
 
 ### :boom: Breaking Changes
+
+* feat(core)!: remove deprecated `getTimeOrigin`, `otperformance`, `_globalThis`, and `unrefTimer` from `@opentelemetry/core` [#7048](https://github.com/open-telemetry/opentelemetry-js/pull/7048)
+  * `getTimeOrigin()` — use `performance.timeOrigin` directly.
+  * `otperformance` — use the global `performance` object directly.
+  * `_globalThis` — use `globalThis` directly.
+  * `unrefTimer(timer)` — call `timer.unref()` directly in your own code.
 
 ### :rocket: Features
 
