@@ -33,6 +33,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :rocket: Features
 
+* feat(instrumentation-http): add an experimental `useDiagnosticsChannel` option (or `OTEL_INSTRUMENTATION_HTTP_USE_DIAGNOSTICS_CHANNEL` environment variable) to instrument `http`/`https` through the `node:http` diagnostics channels, falling back to module patching on runtimes without the channels (Node.js <22.12.0, or <23.2.0 on the 23.x line) [#6947](https://github.com/open-telemetry/opentelemetry-js/pull/6947) @YangJonghun
 * feat(sdk-logs): deprecate `SdkLogRecord` in favor of `ReadWriteLogRecord` [#6939](https://github.com/open-telemetry/opentelemetry-js/pull/6939) @pichlermarc
 
 ### :bug: Bug Fixes

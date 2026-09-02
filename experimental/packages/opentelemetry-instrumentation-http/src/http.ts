@@ -23,6 +23,7 @@ import {
 } from '@opentelemetry/api';
 import type { RPCMetadata } from '@opentelemetry/core';
 import {
+  getBooleanFromEnv,
   hrTime,
   hrTimeDuration,
   hrTimeToMilliseconds,
@@ -70,6 +71,14 @@ import {
 } from './utils';
 import type { Err, Func, Http, HttpRequestArgs, Https } from './internal-types';
 import { DEFAULT_QUERY_STRINGS_TO_REDACT } from './internal-types';
+import type {
+  HttpDiagnosticsChannelHost,
+  StartedOutgoingRequestSpan,
+} from './diagnostics-channel';
+import {
+  HttpDiagnosticsChannelSubscription,
+  isHttpDiagnosticsChannelSupported,
+} from './diagnostics-channel';
 
 /**
  * `node:http` and `node:https` instrumentation for OpenTelemetry
@@ -82,6 +91,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   private _httpsPatched: boolean = false;
   declare private _httpServerDurationHistogram: Histogram;
   declare private _httpClientDurationHistogram: Histogram;
+  declare private _useDiagnosticsChannel: boolean;
+  declare private _dcSubscription?: HttpDiagnosticsChannelSubscription;
 
   constructor(config: HttpInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-http', VERSION, config);
@@ -134,11 +145,65 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     this._headerCapture = this._createHeaderCapture();
   }
 
-  init(): [
-    InstrumentationNodeModuleDefinition,
-    InstrumentationNodeModuleDefinition,
-  ] {
+  init(): InstrumentationNodeModuleDefinition[] {
+    this._useDiagnosticsChannel = this._resolveUseDiagnosticsChannel();
+    if (this._useDiagnosticsChannel) {
+      // Spans are created from diagnostics channel messages; see `enable()`.
+      return [];
+    }
     return [this._getHttpsInstrumentation(), this._getHttpInstrumentation()];
+  }
+
+  private _resolveUseDiagnosticsChannel(): boolean {
+    const enabled =
+      this.getConfig().useDiagnosticsChannel ??
+      getBooleanFromEnv('OTEL_INSTRUMENTATION_HTTP_USE_DIAGNOSTICS_CHANNEL');
+    if (!enabled) {
+      return false;
+    }
+    if (!isHttpDiagnosticsChannelSupported()) {
+      this._diag.warn(
+        'Diagnostics channel instrumentation was requested, but the runtime does not publish the required channel (requires Node.js >=22.12.0, or >=23.2.0 on the 23.x line); falling back to patching the http/https modules.'
+      );
+      return false;
+    }
+    return true;
+  }
+
+  override enable(): void {
+    super.enable();
+    if (this._useDiagnosticsChannel) {
+      this._dcSubscription ??= new HttpDiagnosticsChannelSubscription(
+        this._createDiagnosticsChannelHost()
+      );
+      this._dcSubscription.subscribe();
+    }
+  }
+
+  override disable(): void {
+    super.disable();
+    this._dcSubscription?.unsubscribe();
+  }
+
+  private _createDiagnosticsChannelHost(): HttpDiagnosticsChannelHost {
+    return {
+      diag: this._diag,
+      getConfig: () => this.getConfig(),
+      startOutgoingHttpSpan: (component, optionsParsed, method) =>
+        this._startOutgoingHttpSpan(component, optionsParsed, method),
+      traceClientRequest: (request, span, startTime, metricAttributes) =>
+        this._traceClientRequest(request, span, startTime, metricAttributes),
+      wrapServerEmit: (server, component) => {
+        this._wrap(
+          server,
+          'emit',
+          this._getPatchIncomingRequestFunction(component)
+        );
+      },
+      unwrapServerEmit: server => {
+        this._unwrap(server, 'emit');
+      },
+    } satisfies HttpDiagnosticsChannelHost;
   }
 
   private _getHttpInstrumentation() {
@@ -646,6 +711,78 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     };
   }
 
+  /**
+   * Runs the ignore hooks and builds the span, contexts, and metric attributes
+   * shared by the module-patching and diagnostics-channel outgoing paths.
+   */
+  private _startOutgoingHttpSpan(
+    component: 'http' | 'https',
+    optionsParsed: http.RequestOptions,
+    method: string
+  ): StartedOutgoingRequestSpan | undefined {
+    if (
+      safeExecuteInTheMiddle(
+        () => this.getConfig().ignoreOutgoingRequestHook?.(optionsParsed),
+        (e: unknown) => {
+          if (e != null) {
+            this._diag.error('caught ignoreOutgoingRequestHook error: ', e);
+          }
+        },
+        true
+      )
+    ) {
+      return undefined;
+    }
+
+    const { hostname, port } = extractHostnameAndPort(optionsParsed);
+    const attributes = getOutgoingRequestAttributes(
+      optionsParsed,
+      {
+        component,
+        port,
+        hostname,
+        hookAttributes: this._callStartSpanHook(
+          optionsParsed,
+          this.getConfig().startOutgoingSpanHook
+        ),
+        redactedQueryParams: this.getConfig().redactedQueryParams, // Added config for adding custom query strings
+      },
+      this.getConfig().enableSyntheticSourceDetection || false
+    );
+
+    const startTime = hrTime();
+
+    // request method, server address, and server port are both required span attributes
+    const metricAttributes: Attributes = {
+      [ATTR_HTTP_REQUEST_METHOD]: attributes[ATTR_HTTP_REQUEST_METHOD],
+      [ATTR_SERVER_ADDRESS]: attributes[ATTR_SERVER_ADDRESS],
+      [ATTR_SERVER_PORT]: attributes[ATTR_SERVER_PORT],
+    };
+
+    // required if and only if one was sent, same as span requirement
+    if (attributes[ATTR_HTTP_RESPONSE_STATUS_CODE]) {
+      metricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] =
+        attributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
+    }
+
+    // recommended if and only if one was sent, same as span recommendation
+    if (attributes[ATTR_NETWORK_PROTOCOL_VERSION]) {
+      metricAttributes[ATTR_NETWORK_PROTOCOL_VERSION] =
+        attributes[ATTR_NETWORK_PROTOCOL_VERSION];
+    }
+
+    const spanOptions: SpanOptions = {
+      kind: SpanKind.CLIENT,
+      attributes,
+    };
+    const span = this._startHttpSpan(method, spanOptions);
+
+    const parentContext = context.active();
+    const requestContext = trace.setSpan(parentContext, span);
+
+    return { span, startTime, metricAttributes, parentContext, requestContext };
+  }
+
   private _outgoingRequestFunction(
     component: 'http' | 'https',
     original: Func<http.ClientRequest>
@@ -670,71 +807,21 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         extraOptions
       );
 
-      if (
-        safeExecuteInTheMiddle(
-          () =>
-            instrumentation
-              .getConfig()
-              .ignoreOutgoingRequestHook?.(optionsParsed),
-          (e: unknown) => {
-            if (e != null) {
-              instrumentation._diag.error(
-                'caught ignoreOutgoingRequestHook error: ',
-                e
-              );
-            }
-          },
-          true
-        )
-      ) {
+      const started = instrumentation._startOutgoingHttpSpan(
+        component,
+        optionsParsed,
+        method
+      );
+      if (started === undefined) {
         return original.apply(this, [optionsParsed, ...args]);
       }
-
-      const { hostname, port } = extractHostnameAndPort(optionsParsed);
-      const attributes = getOutgoingRequestAttributes(
-        optionsParsed,
-        {
-          component,
-          port,
-          hostname,
-          hookAttributes: instrumentation._callStartSpanHook(
-            optionsParsed,
-            instrumentation.getConfig().startOutgoingSpanHook
-          ),
-          redactedQueryParams: instrumentation.getConfig().redactedQueryParams, // Added config for adding custom query strings
-        },
-        instrumentation.getConfig().enableSyntheticSourceDetection || false
-      );
-
-      const startTime = hrTime();
-
-      // request method, server address, and server port are both required span attributes
-      const metricAttributes: Attributes = {
-        [ATTR_HTTP_REQUEST_METHOD]: attributes[ATTR_HTTP_REQUEST_METHOD],
-        [ATTR_SERVER_ADDRESS]: attributes[ATTR_SERVER_ADDRESS],
-        [ATTR_SERVER_PORT]: attributes[ATTR_SERVER_PORT],
-      };
-
-      // required if and only if one was sent, same as span requirement
-      if (attributes[ATTR_HTTP_RESPONSE_STATUS_CODE]) {
-        metricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] =
-          attributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
-      }
-
-      // recommended if and only if one was sent, same as span recommendation
-      if (attributes[ATTR_NETWORK_PROTOCOL_VERSION]) {
-        metricAttributes[ATTR_NETWORK_PROTOCOL_VERSION] =
-          attributes[ATTR_NETWORK_PROTOCOL_VERSION];
-      }
-
-      const spanOptions: SpanOptions = {
-        kind: SpanKind.CLIENT,
-        attributes,
-      };
-      const span = instrumentation._startHttpSpan(method, spanOptions);
-
-      const parentContext = context.active();
-      const requestContext = trace.setSpan(parentContext, span);
+      const {
+        span,
+        startTime,
+        metricAttributes,
+        parentContext,
+        requestContext,
+      } = started;
 
       if (!optionsParsed.headers) {
         optionsParsed.headers = {};

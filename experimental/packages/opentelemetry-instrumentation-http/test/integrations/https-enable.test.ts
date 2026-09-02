@@ -21,6 +21,7 @@ import {
 } from '@opentelemetry/sdk-trace';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { HttpInstrumentation } from '../../src';
+import { expectModulePatching } from '../utils/modulePatching';
 
 const instrumentation = new HttpInstrumentation();
 instrumentation.enable();
@@ -262,7 +263,10 @@ describe('HttpsInstrumentation Integration tests', () => {
         httpMethod: 'GET',
         pathname: '/',
         resHeaders: result.resHeaders,
-        reqHeaders: result.reqHeaders,
+        // With `Expect: 100-continue` the headers are already flushed when the
+        // diagnostics channel fires, so nothing can be injected; skip the
+        // propagation header checks then.
+        reqHeaders: expectModulePatching ? result.reqHeaders : undefined,
         component: 'https',
       };
 
@@ -324,8 +328,16 @@ describe('HttpsInstrumentation Integration tests', () => {
           assert.strictEqual(spans.length, 2);
           assert.strictEqual(span.name, 'GET');
           assert.ok(data);
-          assert.ok(validations.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);
-          assert.ok(validations.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]);
+          if (expectModulePatching || headers.Expect === undefined) {
+            // With `Expect: 100-continue` the headers are already flushed when the
+            // diagnostics channel fires, so nothing can be injected.
+            assert.ok(
+              validations.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]
+            );
+            assert.ok(
+              validations.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]
+            );
+          }
           done();
         });
       });
