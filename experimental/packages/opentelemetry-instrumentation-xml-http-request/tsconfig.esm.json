@@ -27,9 +27,6 @@
       "path": "../../../packages/opentelemetry-propagator-b3"
     },
     {
-      "path": "../../../packages/opentelemetry-sdk-trace-web"
-    },
-    {
       "path": "../../../packages/sdk-trace"
     },
     {
@@ -37,6 +34,9 @@
     },
     {
       "path": "../opentelemetry-instrumentation"
+    },
+    {
+      "path": "../web-common"
     }
   ]
 }

@@ -17,6 +17,8 @@ import {
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import * as core from '@opentelemetry/core';
+import * as web from '@opentelemetry/web-common';
+import { ATTR_HTTP_REQUEST_BODY_SIZE } from './semconv';
 import {
   ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
@@ -26,16 +28,7 @@ import {
   ATTR_SERVER_PORT,
   ATTR_URL_FULL,
 } from '@opentelemetry/semantic-conventions';
-import type { PropagateTraceHeaderCorsUrls } from '@opentelemetry/web-common';
-import {
-  PerformanceTimingNames,
-  addSpanNetworkEvents,
-  getResource,
-  parseUrl,
-  shouldPropagateTraceHeaders,
-} from '@opentelemetry/web-common';
 import type { FetchError, FetchResponse, SpanData } from './types';
-import { ATTR_HTTP_REQUEST_BODY_SIZE } from './semconv';
 import {
   getFetchBodyLength,
   normalizeHttpRequestMethod,
@@ -74,7 +67,7 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
   // is not available
   clearTimingResources?: boolean;
   // urls which should include trace headers when origin doesn't match
-  propagateTraceHeaderCorsUrls?: PropagateTraceHeaderCorsUrls;
+  propagateTraceHeaderCorsUrls?: web.PropagateTraceHeaderCorsUrls;
   /**
    * URLs that partially match any regex in ignoreUrls will not be traced.
    * In addition, URLs that are _exact matches_ of strings in ignoreUrls will
@@ -128,18 +121,20 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     const childSpan = this.tracer.startSpan(
       'CORS Preflight',
       {
-        startTime: corsPreFlightRequest[PerformanceTimingNames.FETCH_START],
+        startTime: corsPreFlightRequest[web.PerformanceTimingNames.FETCH_START],
       },
       trace.setSpan(context.active(), span)
     );
-    addSpanNetworkEvents(
+    web.addSpanNetworkEvents(
       childSpan,
       corsPreFlightRequest,
       this.getConfig().ignoreNetworkEvents,
       undefined,
       true
     );
-    childSpan.end(corsPreFlightRequest[PerformanceTimingNames.RESPONSE_END]);
+    childSpan.end(
+      corsPreFlightRequest[web.PerformanceTimingNames.RESPONSE_END]
+    );
   }
 
   /**
@@ -148,7 +143,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
    * @param response
    */
   private _addFinalSpanAttributes(span: Span, response: FetchResponse): void {
-    const parsedUrl = parseUrl(response.url);
+    const parsedUrl = web.parseUrl(response.url);
     span.setAttribute(ATTR_HTTP_RESPONSE_STATUS_CODE, response.status);
     // TODO: Set server.{address,port} at span creation for sampling decisions
     // (a "SHOULD" requirement in semconv).
@@ -166,7 +161,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
    */
   private _addHeaders(options: Request | RequestInit, spanUrl: string): void {
     if (
-      !shouldPropagateTraceHeaders(
+      !web.shouldPropagateTraceHeaders(
         spanUrl,
         this.getConfig().propagateTraceHeaderCorsUrls
       )
@@ -264,7 +259,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         'resource'
       ) as PerformanceResourceTiming[];
     }
-    const resource = getResource(
+    const resource = web.getResource(
       resourcesObserver.spanUrl,
       resourcesObserver.startTime,
       endTime,
@@ -282,7 +277,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         this._addChildSpan(span, corsPreFlightRequest);
         this._markResourceAsUsed(corsPreFlightRequest);
       }
-      addSpanNetworkEvents(
+      web.addSpanNetworkEvents(
         span,
         mainRequest,
         this.getConfig().ignoreNetworkEvents,
@@ -343,7 +338,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           return original.apply(this, args);
         }
         const self = this;
-        const url = parseUrl(
+        const url = web.parseUrl(
           args[0] instanceof Request ? args[0].url : String(args[0])
         ).href;
 
