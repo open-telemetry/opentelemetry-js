@@ -29,6 +29,7 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>>
   private _deltaMetricStorage: DeltaMetricProcessor<T>;
   private _temporalMetricStorage: TemporalMetricProcessor<T>;
   private _attributesProcessor?: IAttributesProcessor;
+  private _recordedInCurrentCollection = false;
 
   constructor(
     _instrumentDescriptor: InstrumentDescriptor,
@@ -51,13 +52,16 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>>
   }
 
   record(measurements: AttributeHashMap<number>, observationTime: HrTime) {
+    this._recordedInCurrentCollection = true;
+
     if (this._attributesProcessor === undefined) {
       this._deltaMetricStorage.batchCumulate(measurements, observationTime);
       return;
     }
     const processed = new AttributeHashMap<number>();
     for (const [attributes, value] of measurements.entries()) {
-      processed.set(this._attributesProcessor.process(attributes), value);
+      const processedAttributes = this._attributesProcessor.process(attributes);
+      processed.set(processedAttributes, value);
     }
     this._deltaMetricStorage.batchCumulate(processed, observationTime);
   }
@@ -74,12 +78,17 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>>
     collectionTime: HrTime
   ): Maybe<MetricData> {
     const accumulations = this._deltaMetricStorage.collect();
+    const recordedInCurrentCollection = this._recordedInCurrentCollection;
+    this._recordedInCurrentCollection = false;
 
     return this._temporalMetricStorage.buildMetrics(
       collector,
       this._instrumentDescriptor,
       accumulations,
-      collectionTime
+      collectionTime,
+      recordedInCurrentCollection
+        ? { attributeSetsToEmit: accumulations }
+        : undefined
     );
   }
 }
