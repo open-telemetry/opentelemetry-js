@@ -66,3 +66,22 @@ if (typeof timer !== 'number') {
   timer.unref();
 }
 ```
+
+---
+
+## `@opentelemetry/sdk-trace`
+
+### Removed: `TracerProviderOptions.forceFlushTimeoutMillis`
+
+`forceFlushTimeoutMillis` on `TracerProviderOptions` has been removed. Pass
+instead. The default timeout is 30000ms.
+
+```ts
+// before
+const provider = new TracerProvider({ forceFlushTimeoutMillis: 5000 });
+await provider.forceFlush();
+
+// after
+const provider = new TracerProvider();
+await provider.forceFlush({ timeoutMillis: 5000 });
+```
