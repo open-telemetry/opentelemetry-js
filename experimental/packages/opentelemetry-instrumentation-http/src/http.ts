@@ -66,6 +66,7 @@ import {
   isURLLike,
   headerCapture,
   isValidOptionsType,
+  parseErrorType,
   parseResponseStatus,
   setSpanWithError,
 } from './utils';
@@ -432,6 +433,13 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             status = {
               code: parseResponseStatus(SpanKind.CLIENT, response.statusCode),
             };
+            const errorType = parseErrorType(
+              SpanKind.CLIENT,
+              response.statusCode
+            );
+            if (errorType !== undefined) {
+              span.setAttribute(ATTR_ERROR_TYPE, errorType);
+            }
           }
 
           span.setStatus(status);
@@ -816,6 +824,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     span.setAttributes(attributes).setStatus({
       code: parseResponseStatus(SpanKind.SERVER, response.statusCode),
     });
+
+    const errorType = parseErrorType(SpanKind.SERVER, response.statusCode);
+    if (errorType !== undefined) {
+      span.setAttribute(ATTR_ERROR_TYPE, errorType);
+    }
 
     const route = attributes[ATTR_HTTP_ROUTE];
     if (route) {

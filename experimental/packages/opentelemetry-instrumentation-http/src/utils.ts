@@ -138,6 +138,27 @@ export const parseResponseStatus = (
 };
 
 /**
+ * Returns the `error.type` value for a response status code, or undefined when
+ * the code is not an error for this span kind. Semconv asks for the status code
+ * as a string once a response was received.
+ */
+export const parseErrorType = (
+  kind: SpanKind,
+  statusCode?: unknown
+): string | undefined => {
+  const lowerBound = kind === SpanKind.CLIENT ? 400 : 500;
+  if (
+    typeof statusCode === 'number' &&
+    statusCode >= lowerBound &&
+    statusCode < 600
+  ) {
+    return String(statusCode);
+  }
+
+  return undefined;
+};
+
+/**
  * Check whether the given obj match pattern
  * @param constant e.g URL of request
  * @param pattern Match pattern
@@ -529,12 +550,9 @@ export const getOutgoingStableRequestMetricAttributesOnResponse = (
   const statusCode = spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
   if (statusCode) {
     metricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] = statusCode;
-    if (
-      typeof statusCode === 'number' &&
-      statusCode >= 400 &&
-      statusCode < 600
-    ) {
-      metricAttributes[ATTR_ERROR_TYPE] ??= String(statusCode);
+    const errorType = parseErrorType(SpanKind.CLIENT, statusCode);
+    if (errorType !== undefined) {
+      metricAttributes[ATTR_ERROR_TYPE] ??= errorType;
     }
   }
   return metricAttributes;
@@ -860,12 +878,9 @@ export const getIncomingStableRequestMetricAttributesOnResponse = (
   const statusCode = spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
   if (statusCode) {
     metricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] = statusCode;
-    if (
-      typeof statusCode === 'number' &&
-      statusCode >= 500 &&
-      statusCode < 600
-    ) {
-      metricAttributes[ATTR_ERROR_TYPE] ??= String(statusCode);
+    const errorType = parseErrorType(SpanKind.SERVER, statusCode);
+    if (errorType !== undefined) {
+      metricAttributes[ATTR_ERROR_TYPE] ??= errorType;
     }
   }
 
