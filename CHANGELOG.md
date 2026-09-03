@@ -13,11 +13,13 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :boom: Breaking Changes
 
-* feat(core)!: remove deprecated `getTimeOrigin`, `otperformance`, `_globalThis`, and `unrefTimer` from `@opentelemetry/core` [#7048](https://github.com/open-telemetry/opentelemetry-js/pull/7048)
+* feat(core)!: remove deprecated `getTimeOrigin`, `otperformance`, `_globalThis`, and `unrefTimer` from `@opentelemetry/core` [#7053](https://github.com/open-telemetry/opentelemetry-js/pull/7053)
   * `getTimeOrigin()` — use `performance.timeOrigin` directly.
   * `otperformance` — use the global `performance` object directly.
   * `_globalThis` — use `globalThis` directly.
   * `unrefTimer(timer)` — call `timer.unref()` directly in your own code.
+* feat(sdk-trace)!: remove deprecated `TracerProviderOptions.forceFlushTimeoutMillis` [#7057](https://github.com/open-telemetry/opentelemetry-js/pull/7057)
+  * Pass `timeoutMillis` to `provider.forceFlush({ timeoutMillis })` instead. The default timeout is 30000ms.
 
 ### :rocket: Features
 

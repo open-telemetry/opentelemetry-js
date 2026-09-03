@@ -36,7 +36,6 @@ const DEFAULT_RATIO = 1;
 export function loadDefaultConfig() {
   return {
     sampler: buildSamplerFromEnv(),
-    forceFlushTimeoutMillis: 30000,
     generalLimits: {
       attributeValueLengthLimit:
         getNumberFromEnv('OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT') ?? Infinity,
