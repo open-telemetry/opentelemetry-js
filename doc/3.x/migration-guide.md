@@ -62,5 +62,7 @@ unrefTimer(timer);
 
 // after
 const timer = setTimeout(() => {}, 1000);
-timer.unref();
+if (typeof timer !== 'number') {
+  timer.unref();
+}
 ```
