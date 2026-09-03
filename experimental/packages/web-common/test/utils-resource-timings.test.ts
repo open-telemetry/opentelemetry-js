@@ -5,7 +5,7 @@
 
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import * as core from '@opentelemetry/core';
-import type * as tracing from '@opentelemetry/sdk-trace-base';
+import type { Span } from '@opentelemetry/sdk-trace';
 import type { HrTime } from '@opentelemetry/api';
 
 import * as assert from 'assert';
@@ -83,7 +83,7 @@ describe('utils', function () {
       const span = {
         addEvent: addEventSpy,
         setAttribute: setAttributeSpy,
-      } as unknown as tracing.Span;
+      } as unknown as Span;
       const entries = {
         [PTN.START_TIME]: 123,
         [PTN.FETCH_START]: 123,
@@ -112,7 +112,7 @@ describe('utils', function () {
       const span = {
         addEvent: addEventSpy,
         setAttribute: setAttributeSpy,
-      } as unknown as tracing.Span;
+      } as unknown as Span;
       const entries = {
         [PTN.START_TIME]: 123,
         [PTN.FETCH_START]: 123,
@@ -141,7 +141,7 @@ describe('utils', function () {
       const span = {
         addEvent: addEventSpy,
         setAttribute: setAttributeSpy,
-      } as unknown as tracing.Span;
+      } as unknown as Span;
       const entries = {
         [PTN.START_TIME]: 123,
         [PTN.FETCH_START]: 123,
@@ -170,7 +170,7 @@ describe('utils', function () {
       const span = {
         addEvent: addEventSpy,
         setAttribute: setAttributeSpy,
-      } as unknown as tracing.Span;
+      } as unknown as Span;
       const entries = {
         [PTN.START_TIME]: 0,
         [PTN.FETCH_START]: 0,
@@ -199,7 +199,7 @@ describe('utils', function () {
       const span = {
         addEvent: addEventSpy,
         setAttribute: setAttributeSpy,
-      } as unknown as tracing.Span;
+      } as unknown as Span;
       const entries = {
         [PTN.START_TIME]: 123,
         [PTN.FETCH_START]: 123,
@@ -228,7 +228,7 @@ describe('utils', function () {
       const span = {
         addEvent: addEventSpy,
         setAttribute: setAttributeSpy,
-      } as unknown as tracing.Span;
+      } as unknown as Span;
       const entries = {
         [PTN.DECODED_BODY_SIZE]: 123,
         [PTN.ENCODED_BODY_SIZE]: 123,
@@ -249,7 +249,7 @@ describe('utils', function () {
           const addEventSpy = sinon.spy();
           const span = {
             addEvent: addEventSpy,
-          } as unknown as tracing.Span;
+          } as unknown as Span;
           const entries = {
             [PTN.FETCH_START]: value,
           } as PerformanceEntries;
@@ -271,7 +271,7 @@ describe('utils', function () {
         const addEventSpy = sinon.spy();
         const span = {
           addEvent: addEventSpy,
-        } as unknown as tracing.Span;
+        } as unknown as Span;
         const entries = {
           [PTN.SECURE_CONNECTION_START]: 0,
         } as PerformanceEntries;
@@ -286,7 +286,7 @@ describe('utils', function () {
         const addEventSpy = sinon.spy();
         const span = {
           addEvent: addEventSpy,
-        } as unknown as tracing.Span;
+        } as unknown as Span;
         const entries = {
           [PTN.SECURE_CONNECTION_START]: 0,
         } as PerformanceEntries;
@@ -307,7 +307,7 @@ describe('utils', function () {
         const addEventSpy = sinon.spy();
         const span = {
           addEvent: addEventSpy,
-        } as unknown as tracing.Span;
+        } as unknown as Span;
         const entries = {
           [PTN.FETCH_START]: 'non-numeric',
         } as unknown;
@@ -328,7 +328,7 @@ describe('utils', function () {
         const addEventSpy = sinon.spy();
         const span = {
           addEvent: addEventSpy,
-        } as unknown as tracing.Span;
+        } as unknown as Span;
         const entries = {
           [PTN.FETCH_START]: 123,
         } as PerformanceEntries;
