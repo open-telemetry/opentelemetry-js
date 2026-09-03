@@ -9,7 +9,7 @@ import {
   InstrumentationBase,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
-import { hrTime, isUrlIgnored, otperformance } from '@opentelemetry/core';
+import { hrTime, isUrlIgnored } from '@opentelemetry/core';
 import {
   addSpanNetworkEvents,
   getResource,
@@ -241,7 +241,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    */
   private _clearResources() {
     if (this._tasksCount === 0 && this.getConfig().clearTimingResources) {
-      (otperformance as unknown as Performance).clearResourceTimings();
+      performance.clearResourceTimings();
       this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
       this._usedResources = new WeakSet<PerformanceResourceTiming>();
     }
@@ -269,7 +269,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       // then OBSERVER_WAIT_TIME_MS and observer didn't collect enough
       // information
       // ts thinks this is the perf_hooks module, but it is the browser performance api
-      resources = (otperformance as unknown as Performance).getEntriesByType(
+      resources = performance.getEntriesByType(
         'resource'
       ) as PerformanceResourceTiming[];
     }

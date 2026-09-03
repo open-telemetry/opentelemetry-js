@@ -10,7 +10,9 @@ We aim to eventually automate this process as much as possible.
 ## 1. Create a release PR
 
 1. Go to the [Release PR Workflow](https://github.com/open-telemetry/opentelemetry-js/actions/workflows/create-or-update-release-pr.yml)
-2. Click "Run workflow"
+2. Click "Run workflow" and pick the branch you are releasing under "Use workflow from" -
+   `main`, or a maintenance branch such as `v2.x` (see [Maintenance branches](#maintenance-branches)).
+   Each branch has its own release PR, so the two never interfere.
 3. Configure which packages to release and their version bump type:
    - **Stable SDK packages** (`./packages/*`): Select `major`, `minor`, `patch`, or `inherit` (no release unless required)
    - **Experimental packages** (`./experimental/packages/*`): Select `minor`, `patch`, or `inherit` (automatically inherits from Stable SDK if Stable SDK is released)
@@ -89,23 +91,130 @@ So a full 3.0.0 cycle looks like:
   Experimental packages pin stable SDK packages exactly, so this would publish a stable
   version depending on a pre-release. Finalize the Stable SDK first.
 
+#### Changelogs across a cycle
+
+Each pre-release rotates the `## Unreleased` section into its own `## 3.0.0-development.3` heading,
+so its GitHub release notes describe what changed since the previous pre-release.
+
+Finalizing collapses those sections back together: the pre-release headings are removed and their
+entries are merged, per category, into the single `## 3.0.0` section. The changelog then reads as if
+there were never any pre-releases, and the release notes for `3.0.0` cover the whole cycle rather
+than just the entries that landed after the last release candidate. Nothing is lost - the
+per-pre-release notes stay in the git history and in the GitHub pre-releases published from them.
+
+### Maintenance branches
+
+Once the next major version is being developed on `main`, the previous major keeps getting
+patch and minor releases from a maintenance branch named after it: `v2.x` for the `2.x`
+stable SDK line, and the `0.2xx.x` experimental line that tracks it. The `v` prefix matters -
+the repository's "release branches" ruleset targets `refs/heads/v[0-9]*.*`, so a branch named
+`2.x` would have no protections at all.
+
+The workflows and inputs are the same as for `main`, with three differences:
+
+1. **Dispatch both workflows from the maintenance branch.** The branch decides which release
+   line is bumped, which release PR is updated, and which npm dist-tag the packages end up
+   under. Dispatching either workflow from a branch we do not release from fails.
+2. **The release PR is a separate one.** `main` uses the head branch
+   `otelbot/prepare-next-version`; `v2.x` uses `otelbot/prepare-next-version-v2.x` and the PR
+   is titled `chore: prepare next v2.x release`. Both can be open at the same time.
+3. **The packages are published under a `latest-<major>` dist-tag rather than `latest`**, so
+   that a `2.10.1` published after a `3.0.0-development.4` does not pull `latest` back to the
+   older line. This follows the same convention as `express` (`latest` / `latest-4`). Users
+   opt in with `npm install @opentelemetry/sdk-trace-node@latest-2`.
+
+Publishing the GitHub release does **not** redeploy the API documentation site for a
+maintenance release. The site is built from a single tree and force-pushed to `gh-pages`, so
+it can only track one release line; `docs.yaml` skips the deploy unless the released commit is
+reachable from `main`.
+
+| Branch | `dist_tag` input | Stable release goes to | Pre-release goes to |
+| --- | --- | --- | --- |
+| `main` | `auto` | `latest` | `canary` |
+| `v2.x` | `auto` | `latest-2` | n/a - not supported, see below |
+| `v2.x` | `latest` | `latest` | n/a - not supported, see below |
+
+The publish workflow still passes a `canary-2` pre-dist-tag along on a maintenance branch,
+but only as a backstop: `lerna publish` applies it per package and only to versions that are
+pre-releases, and the release PR workflow refuses to mint one here in the first place. Should
+a `2.11.0-rc.0` reach the publish workflow anyway, that scoping keeps it off `canary`.
+
+> [!IMPORTANT]
+> While `main` publishes nothing but pre-releases, no release claims `latest` and it stays
+> pinned to the last release cut before the branch existed - so a plain `npm install` would
+> never pick up the maintenance fixes. **Until the next major is released, dispatch the
+> publish workflow from the maintenance branch with the `dist_tag` input set to `latest`.**
+> Switch back to `auto` once the new major has shipped and holds `latest` itself. The publish
+> workflow prints a reminder in the "Resolve npm dist-tags" step whenever a release is about
+> to skip `latest`.
+
+**Not supported from a maintenance branch.** The release PR workflow fails with an
+explanatory error rather than producing any of these:
+
+- A **`major`** bump - `v2.x` only releases `2.x` versions, a new major is released from `main`.
+- A **pre-release identifier** - maintenance releases are always normal releases, and a
+  pre-release cut here would compete for `main`'s pre-release dist-tag.
+- An **API** or **Semantic Conventions** release. Both are on a single version line shared by
+  every branch and independent of the SDK major, so `main` still carries the very same line;
+  from a maintenance branch they would be published under `latest-2` instead of `latest`.
+  Release them from `main`.
+
+#### Changelogs on a maintenance branch
+
+Every branch keeps its own `## Unreleased` section and its own release notes. Backporting a
+fix therefore needs a changelog entry *on the maintenance branch* - the entry the original
+PR added lives in `main`'s changelog, and cherry-picking the fix does not necessarily bring
+it along.
+
+Nothing is collapsed here. The pre-release folding described under
+[Changelogs across a cycle](#changelogs-across-a-cycle) only applies to a version that
+finalizes a pre-release cycle, and maintenance branches do not cut pre-releases - so every
+maintenance release is a plain `## Unreleased` -> `## 2.10.1` rotation.
+
+#### Cutting a maintenance branch
+
+Before the first release from a new maintenance branch:
+
+1. Cut the branch from the last release of that major (e.g. `v2.x` from the `v2.10.0` tag) -
+   not from a later commit on `main`. Cutting later copies `main`'s in-flight
+   `## 3.0.0-development.N` changelog sections onto the branch, where nothing will ever
+   collapse or remove them (see [Changelogs](#changelogs-on-a-maintenance-branch) above).
+2. **Reserve the experimental version band on `main`.** Experimental packages have no major
+   of their own, so both branches would otherwise mint `0.2xx.x` versions. If a version has
+   already been published from the other branch, `lerna publish from-package` *silently skips*
+   those packages and the workflow still succeeds - a partial release with no error. Do the
+   manual vanity bump on `main` (e.g. `0.221.0` -> `0.300.0`) so the two lines cannot overlap.
+   The workflow only ever applies a `semver.inc()` on top of the current version, so this one
+   is edited into the package manifests by hand.
+3. **Add the branch to the `npm-publish-environment` deployment branch policy** (repository
+   settings -> Environments). It is restricted to an explicit list of branches, and a
+   `workflow_dispatch` from any other branch is rejected before the first step runs.
+4. Make sure the release automation itself is on the branch. `workflow_dispatch` runs the copy
+   of the workflow file that lives on the selected branch, so the workflows and
+   `scripts/` need to be cherry-picked over.
+
 > [!TIP]
-> If there was a commit to `main`, after PR creation simply run the workflow again before merging it.
-> Re-running it will update the PR with the contents from `main` and will update the PR body too.
+> If there was a commit to the release branch, after PR creation simply run the workflow again before merging it.
+> Re-running it will update the PR with the contents of the release branch and will update the PR body too.
 
 ## 2. Review and merge the release PR
 
-1. Review the PR generated via the workflow (it will be titled `chore: prepare next release` and opened by [otelbot[bot]](https://github.com/apps/otelbot))
+1. Review the PR generated via the workflow (it will be titled `chore: prepare next release` -
+   or `chore: prepare next v2.x release` when released from a maintenance branch - and opened
+   by [otelbot[bot]](https://github.com/apps/otelbot))
 2. Once approved, merge the PR
 
 ## 3. Publish to NPM
 
 > [!IMPORTANT]
-> This step will publish anything that's on `main` IF AND ONLY IF the version has been bumped. If the version for a package
-> has not been bumped, it will not publish a new version of the package.
+> This step will publish anything that's on the branch you run it from IF AND ONLY IF the version has been bumped.
+> If the version for a package has not been bumped, it will not publish a new version of the package.
 
 1. Go to the [NPM publish workflow](https://github.com/open-telemetry/opentelemetry-js/actions/workflows/publish-to-npm.yml)
-2. Click "Run workflow" (from main)
+2. Click "Run workflow" and select the branch you released - the same one you created the release PR from
+   - On `main`, leave **`dist_tag`** at `auto`
+   - On a maintenance branch, see [Maintenance branches](#maintenance-branches) - while the
+     next major is still unreleased, this needs to be set to `latest`
 3. Get another maintainer to approve the workflow run
    1. Have them navigate to the workflow run, and then click on "Review pending deployments" ![workflow job waiting for deployment approval](./releasing/waiting-for-approvals.png)
    2. They should then check the box and select "Approve and deploy" ![approve and deploy button](./releasing/approve-and-deploy.png) to approve the deployment to NPM.
@@ -131,6 +240,10 @@ So a full 3.0.0 cycle looks like:
 4. Publish the releases
    - If you released with a pre-release identifier, the draft is already marked as a
      pre-release; leave `Pre-release` set for the `Release label`.
-   - If you published a stable `sdk` release, set `Latest` for the `Release label`.
+   - If you published a stable `sdk` release from `main`, set `Latest` for the `Release label`.
      This will ensure that the `stable` SDK release consistently shows up as latest under `Releases` when navigating to the project page.
+   - If you released from a maintenance branch, set `None` - GitHub picks its automatic
+     "latest" by creation date, so a `2.10.1` released after a `3.0.0` pre-release would
+     otherwise claim it. (The API documentation site is left alone either way, see
+     [Maintenance branches](#maintenance-branches).)
    - For all other releases, set `None` for the `Release label`.
