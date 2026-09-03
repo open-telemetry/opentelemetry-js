@@ -40,6 +40,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :bug: Bug Fixes
 
+* fix(sdk-trace-base): avoid a Webpack self-reference error in CommonJS output [#6981](https://github.com/open-telemetry/opentelemetry-js/issues/6981) @sansynx
 * fix(sdk-metrics): ignore `Infinity` in exponential histograms [#7015](https://github.com/open-telemetry/opentelemetry-js/pull/7015) @mwear
 
 ### :house: Internal
