@@ -7,6 +7,7 @@ For API changes, see the [API CHANGELOG](api/CHANGELOG.md).
 For experimental package changes, see the [experimental CHANGELOG](experimental/CHANGELOG.md).
 For semantic convention package changes, see the [semconv CHANGELOG](semantic-conventions/CHANGELOG.md).
 For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2.x.md).
+For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-guide.md).
 
 ## Unreleased
 
@@ -19,6 +20,11 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
   * `<package>/package.json` is no longer importable for the same reason. Read a package's version from your own dependency metadata, or use `SDK_INFO` from `@opentelemetry/core` for the SDK version.
   * The non-standard `esnext` entry point has been removed; tools that preferred it fall back to `module` (ESM) or `main` (CJS).
   * Packages that ship separate Node.js and browser implementations export them under explicit subpaths, for example `@opentelemetry/core/platform`. If you depend on something that is only reachable through a deep import, please open an issue so it can be considered for the public API.
+* feat(core)!: remove deprecated `getTimeOrigin`, `otperformance`, `_globalThis`, and `unrefTimer` from `@opentelemetry/core` [#7048](https://github.com/open-telemetry/opentelemetry-js/pull/7048)
+  * `getTimeOrigin()` — use `performance.timeOrigin` directly.
+  * `otperformance` — use the global `performance` object directly.
+  * `_globalThis` — use `globalThis` directly.
+  * `unrefTimer(timer)` — call `timer.unref()` directly in your own code.
 
 ### :rocket: Features
 
@@ -41,6 +47,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(sdk-trace-base): avoid a Webpack self-reference error in CommonJS output [#6981](https://github.com/open-telemetry/opentelemetry-js/issues/6981) @sansynx
 * fix(sdk-metrics): ignore `Infinity` in exponential histograms [#7015](https://github.com/open-telemetry/opentelemetry-js/pull/7015) @mwear
 
 ### :house: Internal
