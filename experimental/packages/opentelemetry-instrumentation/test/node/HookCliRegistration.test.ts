@@ -8,8 +8,12 @@ import { spawnSync } from 'child_process';
 import * as path from 'path';
 import { pathToFileURL } from 'url';
 
-const hookPath = path.join(__dirname, '..', '..', 'hook.mjs');
-const registerHookPath = path.join(__dirname, 'register-otel-hook.mjs');
+const hookUrl = pathToFileURL(
+  path.join(__dirname, '..', '..', 'hook.mjs')
+).href;
+const registerHookUrl = pathToFileURL(
+  path.join(__dirname, 'register-otel-hook.mjs')
+).href;
 const probePath = path.join(__dirname, 'fixtures', 'esm-hook-cli-probe.mjs');
 
 function runProbe(nodeArgs: string[]): {
@@ -42,7 +46,7 @@ describe('ESM hook CLI registration', function () {
   this.timeout(10000);
 
   it('should patch ESM exports with --experimental-loader', function () {
-    const result = runProbe([`--experimental-loader=${hookPath}`]);
+    const result = runProbe([`--experimental-loader=${hookUrl}`]);
     assert.strictEqual(
       result.status,
       0,
@@ -52,7 +56,7 @@ describe('ESM hook CLI registration', function () {
   });
 
   it('should not patch ESM exports when --import loads hook.mjs directly', function () {
-    const result = runProbe([`--import=${pathToFileURL(hookPath).href}`]);
+    const result = runProbe([`--import=${hookUrl}`]);
     assert.strictEqual(
       result.status,
       0,
@@ -62,9 +66,7 @@ describe('ESM hook CLI registration', function () {
   });
 
   it('should patch ESM exports when --import registers hook.mjs via module.register()', function () {
-    const result = runProbe([
-      `--import=${pathToFileURL(registerHookPath).href}`,
-    ]);
+    const result = runProbe([`--import=${registerHookUrl}`]);
     assert.strictEqual(
       result.status,
       0,
