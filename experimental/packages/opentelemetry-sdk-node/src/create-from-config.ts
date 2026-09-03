@@ -16,7 +16,7 @@ import { inspect } from 'util';
 import { readFileSync } from 'fs';
 import * as path from 'path';
 
-import type { Attributes, TextMapPropagator } from '@opentelemetry/api';
+import type { TextMapPropagator } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
 import type {
   IdGenerator,
@@ -49,6 +49,7 @@ import {
   processDetector,
   resourceFromAttributes,
   serviceInstanceIdDetector,
+  serviceNameEnvDetector,
 } from '@opentelemetry/resources';
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
@@ -129,7 +130,6 @@ import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import {
   CompositePropagator,
-  getStringFromEnv,
   W3CBaggagePropagator,
   W3CTraceContextPropagator,
 } from '@opentelemetry/core';
@@ -152,7 +152,6 @@ import {
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
-import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 
 // ---- internal utilities
 
@@ -434,21 +433,6 @@ export function createPropagatorFromConfig(
   }
 }
 
-class ServiceNameDetector implements ResourceDetector {
-  detect() {
-    const attributes: Attributes = {};
-    const serviceName = getStringFromEnv('OTEL_SERVICE_NAME');
-
-    if (serviceName) {
-      attributes[ATTR_SERVICE_NAME] = serviceName;
-    }
-
-    return { attributes };
-  }
-}
-
-const serviceNameDetector = new ServiceNameDetector();
-
 export function createResourceFromConfig(
   resourceConfig?: ResourceConfigModel
 ): Resource {
@@ -497,13 +481,7 @@ export function createResourceFromConfig(
             detectors.push(processDetector);
             break;
           case 'service':
-            // Note: The declarative schema defines the 'service' detector to
-            // handle `service.instance.id` and the `OTEL_SERVICE_NAME` envvar.
-            // https://opentelemetry.io/docs/specs/otel-config/types/#type-experimentalresourcedetector
-            // This is equivalent to the `serviceInstanceIdDetector` and
-            // *part* of the `envDetector`.  Using this `envDetector` would
-            // incorrectly read the `OTEL_RESOURCE_ATTRIBUTES` envvar.
-            detectors.push(serviceNameDetector);
+            detectors.push(serviceNameEnvDetector);
             detectors.push(serviceInstanceIdDetector);
             break;
           default:

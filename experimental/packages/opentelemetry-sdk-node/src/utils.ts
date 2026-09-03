@@ -42,10 +42,14 @@ import type {
   IMetricReader,
   PushMetricExporter,
 } from '@opentelemetry/sdk-metrics';
-import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
+import {
+  ConsoleMetricExporter,
+  PeriodicExportingMetricReader,
+} from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
 import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
+import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 import type {
   BatchLogRecordProcessorOptions,
   LogRecordExporter,
@@ -390,6 +394,51 @@ export function getOtlpMetricExporterFromEnv(): PushMetricExporter {
     `Unsupported OTLP metrics protocol: "${protocol}". Using http/protobuf.`
   );
   return new OTLPProtoMetricExporter();
+}
+
+/**
+ *
+ * @returns MetricReader[] if appropriate environment variables are configured
+ */
+export function getMetricReadersFromEnv(): IMetricReader[] {
+  const metricReaders: IMetricReader[] = [];
+  const enabledExporters = Array.from(
+    new Set(getStringListFromEnv('OTEL_METRICS_EXPORTER') ?? [])
+  );
+
+  if (enabledExporters.length === 0) {
+    diag.debug('OTEL_METRICS_EXPORTER is empty. Using default otlp exporter.');
+    enabledExporters.push('otlp');
+  }
+
+  if (enabledExporters.includes('none')) {
+    diag.info(
+      'OTEL_METRICS_EXPORTER contains "none". Metric provider will not be initialized.'
+    );
+    return metricReaders;
+  }
+
+  enabledExporters.forEach(exporter => {
+    if (exporter === 'otlp') {
+      metricReaders.push(
+        getPeriodicExportingMetricReaderFromEnv(getOtlpMetricExporterFromEnv())
+      );
+    } else if (exporter === 'console') {
+      metricReaders.push(
+        new PeriodicExportingMetricReader({
+          exporter: new ConsoleMetricExporter(),
+        })
+      );
+    } else if (exporter === 'prometheus') {
+      metricReaders.push(new PrometheusExporter());
+    } else {
+      diag.warn(
+        `Unsupported OTEL_METRICS_EXPORTER value: "${exporter}". Supported values are: otlp, console, prometheus, none.`
+      );
+    }
+  });
+
+  return metricReaders;
 }
 
 /**
