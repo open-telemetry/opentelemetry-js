@@ -7,7 +7,7 @@ import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { createFetchTransport } from '../../src/transport/fetch-transport';
 import { createRetryingTransport } from '../../src/retrying-transport';
-import { registerMockDiagLogger } from '../common/test-utils';
+import { registerMockDiagLogger, withResolvers } from '../common/test-utils';
 import type {
   ExportResponseRetryable,
   ExportResponseFailure,
@@ -41,11 +41,17 @@ function neverEndingBodyAbortedBy(
   return new ReadableStream({
     start(controller) {
       controller.enqueue(Uint8Array.from([1, 2, 3]));
-      signal?.addEventListener('abort', () =>
+      const abort = () =>
         controller.error(
           new DOMException('The user aborted a request.', 'AbortError')
-        )
-      );
+        );
+      // An abort that already happened fires no event, and the body would
+      // then stay open until the test times out instead of failing.
+      if (signal?.aborted) {
+        abort();
+        return;
+      }
+      signal?.addEventListener('abort', abort);
     },
   });
 }
@@ -275,6 +281,43 @@ describe('FetchTransport', function () {
       assert.strictEqual(result.status, 'success');
       assert.strictEqual(response.bodyUsed, true);
       assert.strictEqual(cancelled, false);
+    });
+
+    it('does not settle the export until the response body reaches its end', async function () {
+      // arrange - a body that stays open until this test closes it. Chromium
+      // returns the request's keepalive quota only once the body has been read
+      // to the end, so send() must not resolve before then. `bodyUsed` is no
+      // help here: it flips on the first read, not on completion, so it holds
+      // even if the drain is never awaited.
+      const bodyClosed = withResolvers<void>();
+      const body = new ReadableStream({
+        start(controller) {
+          controller.enqueue(Uint8Array.from([1, 2, 3]));
+          void bodyClosed.promise.then(() => controller.close());
+        },
+      });
+      sinon
+        .stub(globalThis, 'fetch')
+        .resolves(new Response(body, { status: 200 }));
+      const transport = createFetchTransport(testTransportParameters);
+
+      // act
+      let settled = false;
+      const sent = transport
+        .send(testPayload, requestTimeout)
+        .then(result => ((settled = true), result));
+      // a macrotask boundary drains every microtask the export could still
+      // have queued, so the drain is parked on the open body by now
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      // assert
+      assert.strictEqual(
+        settled,
+        false,
+        'export settled while the response body was still open'
+      );
+      bodyClosed.resolve();
+      assert.strictEqual((await sent).status, 'success');
     });
 
     it('reads the response body of a retryable export', async function () {
