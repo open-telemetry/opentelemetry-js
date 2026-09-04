@@ -30,6 +30,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 * fix(sdk-node)!: fail-fast on Propagator creation from config file [#6930](https://github.com/open-telemetry/opentelemetry-js/pull/6930) @trentm
 * fix(sdk-node)!: fail-fast on MeterProvider creation from config file [#6954](https://github.com/open-telemetry/opentelemetry-js/pull/6954) @trentm
+* fix(exporter-prometheus)!: stop reading Prometheus exporter host and port environment variables in the exporter constructor [#6966](https://github.com/open-telemetry/opentelemetry-js/pull/6966) @LarryHu0217
 * fix(sdk-node)!: fail-fast on TracerProvider creation from config file [#6962](https://github.com/open-telemetry/opentelemetry-js/pull/6962) @trentm
 * fix(sdk-node)!: fail-fast on Resource creation from config file [#6989](https://github.com/open-telemetry/opentelemetry-js/pull/6989) @trentm
   * This also breaks some usage of `startNodeSDK()` for *environment-based* config, i.e. when *not* using a config file. For example with `OTEL_NODE_RESOURCE_DETECTORS=all`, it results in an error message and a no-op SDK.

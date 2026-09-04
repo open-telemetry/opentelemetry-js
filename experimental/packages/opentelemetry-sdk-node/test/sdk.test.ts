@@ -119,6 +119,8 @@ describe('NodeSDK', () => {
 
   afterEach(() => {
     Sinon.restore();
+    delete process.env.OTEL_EXPORTER_PROMETHEUS_HOST;
+    delete process.env.OTEL_EXPORTER_PROMETHEUS_PORT;
   });
 
   describe('Basic Registration', () => {
@@ -1735,14 +1737,43 @@ describe('NodeSDK', () => {
 
     it('should use prometheus if that is set', async () => {
       process.env.OTEL_METRICS_EXPORTER = 'prometheus';
+      process.env.OTEL_EXPORTER_PROMETHEUS_HOST = '127.0.0.1';
+      process.env.OTEL_EXPORTER_PROMETHEUS_PORT = '1234';
       delete process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL;
+      const startServerStub = Sinon.stub(
+        PrometheusMetricExporter.prototype,
+        'startServer'
+      ).resolves();
       const sdk = new NodeSDK();
       sdk.start();
       const meterProvider = metrics.getMeterProvider();
       const sharedState = (meterProvider as any)['_sharedState'];
-      assert.ok(
-        sharedState.metricCollectors[0]._metricReader instanceof
-          PrometheusMetricExporter
+      const metricReader = sharedState.metricCollectors[0]._metricReader;
+      assert.ok(metricReader instanceof PrometheusMetricExporter);
+      assert.strictEqual(metricReader['_host'], '127.0.0.1');
+      assert.strictEqual(metricReader['_port'], 1234);
+      Sinon.assert.calledOnce(startServerStub);
+      await sdk.shutdown();
+    });
+
+    it('should use prometheus defaults for invalid environment values', async () => {
+      process.env.OTEL_METRICS_EXPORTER = 'prometheus';
+      process.env.OTEL_EXPORTER_PROMETHEUS_HOST = ' ';
+      process.env.OTEL_EXPORTER_PROMETHEUS_PORT = 'invalid';
+      delete process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL;
+      Sinon.stub(PrometheusMetricExporter.prototype, 'startServer').resolves();
+      const sdk = new NodeSDK();
+      sdk.start();
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      const metricReader = sharedState.metricCollectors[0]._metricReader;
+      assert.strictEqual(
+        metricReader['_host'],
+        PrometheusMetricExporter.DEFAULT_OPTIONS.host
+      );
+      assert.strictEqual(
+        metricReader['_port'],
+        PrometheusMetricExporter.DEFAULT_OPTIONS.port
       );
       await sdk.shutdown();
     });
