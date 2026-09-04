@@ -16,7 +16,7 @@ import {
   PerformanceTimingNames as PTN,
   shouldPropagateTraceHeaders,
   parseUrl,
-} from '@opentelemetry/sdk-trace-web';
+} from '@opentelemetry/web-common';
 import {
   ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,

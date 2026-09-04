@@ -18,9 +18,9 @@ import { ZoneContextManager } from '@opentelemetry/context-zone';
 import * as tracing from '@opentelemetry/sdk-trace';
 import {
   PerformanceTimingNames as PTN,
-  WebTracerProvider,
   parseUrl,
-} from '@opentelemetry/sdk-trace-web';
+} from '@opentelemetry/web-common';
+import { TracerProvider } from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { ATTR_HTTP_REQUEST_BODY_SIZE } from '../src/semconv';
@@ -293,7 +293,7 @@ describe('xhr', () => {
       let requests: any[] = [];
       let contextManager: ZoneContextManager;
       let webTracerWithZone: api.Tracer;
-      let webTracerProviderWithZone: WebTracerProvider;
+      let webTracerProviderWithZone: TracerProvider;
       let dummySpanExporter: DummySpanExporter;
       let spyEntries: any;
       let fakeNow = 0;
@@ -352,7 +352,7 @@ describe('xhr', () => {
           ...config,
         });
         dummySpanExporter = new DummySpanExporter();
-        webTracerProviderWithZone = new WebTracerProvider({
+        webTracerProviderWithZone = new TracerProvider({
           spanProcessors: [
             new tracing.SimpleSpanProcessor({ exporter: dummySpanExporter }),
           ],
