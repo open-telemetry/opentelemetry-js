@@ -31,10 +31,7 @@ const MAX_KEEPALIVE_BODY_SIZE = 60 * 1024;
 // 9 is the max concurrent keepalive requests
 const MAX_KEEPALIVE_REQUESTS = 9;
 
-/**
- * A response body that delivers one chunk and then stays open until the
- * request is aborted, at which point it fails the way a real fetch body does.
- */
+// Delivers one chunk, then stays open until the request is aborted.
 function neverEndingBodyAbortedBy(
   signal: AbortSignal | null | undefined
 ): ReadableStream<Uint8Array> {
@@ -56,9 +53,36 @@ function neverEndingBodyAbortedBy(
   });
 }
 
+// The drain settles after `send()` resolves; a macrotask turn flushes it.
+function flushBodyDrain(): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, 0));
+}
+
+// Body stays open until the test closes or errors it.
+function responseWithPendingBody(status = 200): {
+  response: Response;
+  closeBody: () => void;
+  failBody: (error: Error) => void;
+} {
+  let controller!: ReadableStreamDefaultController<Uint8Array>;
+  const body = new ReadableStream<Uint8Array>({
+    start(c) {
+      controller = c;
+    },
+  });
+  return {
+    response: new Response(body, { status }),
+    closeBody: () => controller.close(),
+    failBody: (error: Error) => controller.error(error),
+  };
+}
+
 describe('FetchTransport', function () {
-  afterEach(function () {
+  // Budget is module state, so an unsettled drain leaks into the next test.
+  afterEach(async function () {
+    // Restore first: a test's fake clock would swallow the flush.
     sinon.restore();
+    await flushBodyDrain();
   });
 
   describe('send', function () {
@@ -275,20 +299,19 @@ describe('FetchTransport', function () {
 
       // act
       const result = await transport.send(testPayload, requestTimeout);
+      await flushBodyDrain();
 
-      // assert - the body has to be read to its end, cancelling it does not
-      // release the keepalive quota the request holds
+      // assert - the body has to be read to its end, cancelling it releases
+      // the quota far more slowly
       assert.strictEqual(result.status, 'success');
       assert.strictEqual(response.bodyUsed, true);
       assert.strictEqual(cancelled, false);
     });
 
-    it('does not settle the export until the response body reaches its end', async function () {
-      // arrange - a body that stays open until this test closes it. Chromium
-      // returns the request's keepalive quota only once the body has been read
-      // to the end, so send() must not resolve before then. `bodyUsed` is no
-      // help here: it flips on the first read, not on completion, so it holds
-      // even if the drain is never awaited.
+    it('settles the export before the response body reaches its end', async function () {
+      // arrange - a body that stays open until this test closes it. The status
+      // already decides the outcome, so a collector that stalls mid-body must
+      // not hold up the caller.
       const bodyClosed = withResolvers<void>();
       const body = new ReadableStream({
         start(controller) {
@@ -302,22 +325,12 @@ describe('FetchTransport', function () {
       const transport = createFetchTransport(testTransportParameters);
 
       // act
-      let settled = false;
-      const sent = transport
-        .send(testPayload, requestTimeout)
-        .then(result => ((settled = true), result));
-      // a macrotask boundary drains every microtask the export could still
-      // have queued, so the drain is parked on the open body by now
-      await new Promise(resolve => setTimeout(resolve, 0));
+      const result = await transport.send(testPayload, requestTimeout);
 
       // assert
-      assert.strictEqual(
-        settled,
-        false,
-        'export settled while the response body was still open'
-      );
+      assert.strictEqual(result.status, 'success');
       bodyClosed.resolve();
-      assert.strictEqual((await sent).status, 'success');
+      await flushBodyDrain();
     });
 
     it('reads the response body of a retryable export', async function () {
@@ -331,6 +344,7 @@ describe('FetchTransport', function () {
 
       // act
       const result = await transport.send(testPayload, requestTimeout);
+      await flushBodyDrain();
 
       // assert
       assert.strictEqual(result.status, 'retryable');
@@ -346,7 +360,9 @@ describe('FetchTransport', function () {
 
       // act
       const first = await transport.send(testPayload, requestTimeout);
+      await flushBodyDrain();
       const second = await transport.send(testPayload, requestTimeout);
+      await flushBodyDrain();
 
       // assert
       assert.strictEqual(first.status, 'success');
@@ -367,6 +383,7 @@ describe('FetchTransport', function () {
 
       // act
       const result = await transport.send(testPayload, requestTimeout);
+      await flushBodyDrain();
 
       // assert
       assert.strictEqual(result.status, 'success');
@@ -388,23 +405,22 @@ describe('FetchTransport', function () {
 
       // act
       const result = await transport.send(testPayload, requestTimeout);
+      await flushBodyDrain();
 
-      // assert - the export already reached the collector, the read is best effort
+      // assert - the export reached the collector, the read is best effort
       assert.strictEqual(result.status, 'success');
       sinon.assert.calledWithMatch(debug, /error reading export response body/);
     });
 
     // The timeout keeps running while the body is drained, so a collector that
-    // holds the response open long enough gets the request aborted in the
-    // middle of the read. The headers are in by then, so the status the
-    // collector sent still decides the export outcome.
+    // holds the response open long enough gets the request aborted mid-read.
+    // The headers are in by then, so the collector's status still decides.
     for (const { status, expected } of [
       { status: 200, expected: 'success' },
       { status: 503, expected: 'retryable' },
     ]) {
       it(`returns ${expected} when the timeout aborts the export while its ${status} response body is being read`, async function () {
-        // arrange - a body that stays open until the request is aborted, which
-        // is what the reader sees when the timeout fires mid-drain
+        // arrange
         sinon
           .stub(globalThis, 'fetch')
           .callsFake(
@@ -416,6 +432,7 @@ describe('FetchTransport', function () {
 
         // act
         const result = await transport.send(testPayload, 1);
+        await new Promise(resolve => setTimeout(resolve, 20));
 
         // assert
         assert.strictEqual(result.status, expected);
@@ -571,15 +588,225 @@ describe('FetchTransport', function () {
       // Complete first request
       resolveFirst(new Response('', { status: 200 }));
       await p1;
+      await flushBodyDrain();
 
       // Third request after first completed - counter should be decremented
       await transport.send(largePayload, requestTimeout);
+      await flushBodyDrain();
       const thirdInit = fetchStub.thirdCall.args[1] as RequestInit;
       assert.strictEqual(
         thirdInit.keepalive,
         true,
         'keepalive should be re-enabled after pending request completes'
       );
+    });
+
+    it('holds keepalive budget until the response body drains', async function () {
+      // arrange
+      const { response, closeBody } = responseWithPendingBody();
+      const fetchStub = sinon.stub(globalThis, 'fetch');
+      fetchStub.onCall(0).resolves(response);
+      fetchStub.onCall(1).resolves(new Response('', { status: 200 }));
+      fetchStub.onCall(2).resolves(new Response('', { status: 200 }));
+
+      const largePayload = new Uint8Array(MAX_KEEPALIVE_BODY_SIZE / 2 + 1);
+      const transport = createFetchTransport(testTransportParameters);
+
+      // act - first request resolves while its body is still undrained
+      await transport.send(largePayload, requestTimeout);
+      // A bare macrotask turn, so the assertion cannot pass on a race.
+      await flushBodyDrain();
+      await transport.send(largePayload, requestTimeout);
+
+      // assert
+      const secondInit = fetchStub.secondCall.args[1] as RequestInit;
+      assert.strictEqual(
+        secondInit.keepalive,
+        false,
+        'budget should still be held while the first body is undrained'
+      );
+
+      // act - drain the body
+      closeBody();
+      await flushBodyDrain();
+      await transport.send(largePayload, requestTimeout);
+      await flushBodyDrain();
+
+      // assert
+      const thirdInit = fetchStub.thirdCall.args[1] as RequestInit;
+      assert.strictEqual(
+        thirdInit.keepalive,
+        true,
+        'budget should be released once the body drains'
+      );
+    });
+
+    it('releases keepalive budget when the response body drain fails', async function () {
+      // arrange
+      const { response, failBody } = responseWithPendingBody();
+      const fetchStub = sinon.stub(globalThis, 'fetch');
+      fetchStub.onCall(0).resolves(response);
+      fetchStub.onCall(1).resolves(new Response('', { status: 200 }));
+
+      const { debug } = registerMockDiagLogger();
+      const largePayload = new Uint8Array(MAX_KEEPALIVE_BODY_SIZE / 2 + 1);
+      const transport = createFetchTransport(testTransportParameters);
+
+      // act
+      await transport.send(largePayload, requestTimeout);
+      failBody(new Error('body errored'));
+      await flushBodyDrain();
+      await transport.send(largePayload, requestTimeout);
+      await flushBodyDrain();
+
+      // assert
+      const secondInit = fetchStub.secondCall.args[1] as RequestInit;
+      assert.strictEqual(
+        secondInit.keepalive,
+        true,
+        'budget should be released when the drain rejects'
+      );
+      sinon.assert.calledWithMatch(debug, /error reading export response body/);
+    });
+
+    it('lets the abort timer unstick a stalled response body', async function () {
+      // arrange
+      const { response, failBody } = responseWithPendingBody();
+      const fetchStub = sinon.stub(globalThis, 'fetch');
+      fetchStub.onCall(0).callsFake((_url, init) => {
+        // Mirror the browser: aborting errors the response body.
+        const abortError = new Error('aborted request');
+        abortError.name = 'AbortError';
+        (init as RequestInit).signal?.addEventListener('abort', () =>
+          failBody(abortError)
+        );
+        return Promise.resolve(response);
+      });
+      fetchStub.onCall(1).resolves(new Response('', { status: 200 }));
+
+      const largePayload = new Uint8Array(MAX_KEEPALIVE_BODY_SIZE / 2 + 1);
+      const transport = createFetchTransport(testTransportParameters);
+      const shortTimeout = 10;
+
+      // act - body never closes, so only the abort timer frees the budget
+      await transport.send(largePayload, shortTimeout);
+      await new Promise(resolve => setTimeout(resolve, shortTimeout + 10));
+      await flushBodyDrain();
+      await transport.send(largePayload, requestTimeout);
+      await flushBodyDrain();
+
+      // assert
+      const secondInit = fetchStub.secondCall.args[1] as RequestInit;
+      assert.strictEqual(
+        secondInit.keepalive,
+        true,
+        'a stalled body should not hold the budget past the request timeout'
+      );
+    });
+
+    it('clears the abort timer on return when keepalive is not used', async function () {
+      // arrange
+      const first = responseWithPendingBody();
+      const second = responseWithPendingBody();
+      const fetchStub = sinon.stub(globalThis, 'fetch');
+      fetchStub.onCall(0).resolves(first.response);
+      fetchStub.onCall(1).resolves(second.response);
+
+      const largePayload = new Uint8Array(MAX_KEEPALIVE_BODY_SIZE / 2 + 1);
+      const transport = createFetchTransport(testTransportParameters);
+      const shortTimeout = 10;
+
+      // act - first request holds the whole budget, so the second cannot
+      // use keepalive
+      await transport.send(largePayload, requestTimeout);
+      await transport.send(largePayload, shortTimeout);
+      const secondInit = fetchStub.secondCall.args[1] as RequestInit;
+      assert.strictEqual(secondInit.keepalive, false);
+
+      await new Promise(resolve => setTimeout(resolve, shortTimeout + 10));
+
+      // assert
+      assert.strictEqual(
+        secondInit.signal?.aborted,
+        false,
+        'a non-keepalive request should not stay abortable after it returns'
+      );
+
+      // cleanup
+      first.closeBody();
+      second.closeBody();
+      await flushBodyDrain();
+    });
+
+    it('releases keepalive budget for a non-2xx response', async function () {
+      // arrange
+      const fetchStub = sinon.stub(globalThis, 'fetch');
+      fetchStub.onCall(0).resolves(new Response('', { status: 503 }));
+      fetchStub.onCall(1).resolves(new Response('', { status: 200 }));
+
+      const largePayload = new Uint8Array(MAX_KEEPALIVE_BODY_SIZE / 2 + 1);
+      const transport = createFetchTransport(testTransportParameters);
+
+      // act
+      const result = await transport.send(largePayload, requestTimeout);
+      await flushBodyDrain();
+      await transport.send(largePayload, requestTimeout);
+
+      // assert
+      assert.strictEqual(result.status, 'retryable');
+      const secondInit = fetchStub.secondCall.args[1] as RequestInit;
+      assert.strictEqual(
+        secondInit.keepalive,
+        true,
+        'a retryable response should still free its budget'
+      );
+    });
+
+    it('releases keepalive budget exactly once per request', async function () {
+      // arrange
+      const pendingResolvers: Array<(value: Response) => void> = [];
+      const fetchStub = sinon.stub(globalThis, 'fetch').callsFake(() => {
+        return new Promise<Response>(resolve => {
+          pendingResolvers.push(resolve);
+        });
+      });
+      fetchStub.onCall(0).resolves(new Response('', { status: 200 }));
+
+      const transport = createFetchTransport(testTransportParameters);
+
+      // act - one released request, then saturate the request count
+      await transport.send(testPayload, requestTimeout);
+      await flushBodyDrain();
+
+      const pendingRequests: Promise<unknown>[] = [];
+      for (let i = 0; i < MAX_KEEPALIVE_REQUESTS; i++) {
+        pendingRequests.push(transport.send(testPayload, requestTimeout));
+      }
+      while (fetchStub.callCount < MAX_KEEPALIVE_REQUESTS + 1) {
+        await new Promise(r => setTimeout(r, 0));
+      }
+
+      const extraRequest = transport.send(testPayload, requestTimeout);
+      while (fetchStub.callCount < MAX_KEEPALIVE_REQUESTS + 2) {
+        await new Promise(r => setTimeout(r, 0));
+      }
+
+      // assert - a double release drives the count negative, letting this
+      // request slip past Chrome's concurrency cap
+      const extraInit = fetchStub.getCall(MAX_KEEPALIVE_REQUESTS + 1)
+        .args[1] as RequestInit;
+      assert.strictEqual(
+        extraInit.keepalive,
+        false,
+        'the pending count must not go negative after a released request'
+      );
+
+      // cleanup
+      pendingResolvers.forEach(resolve =>
+        resolve(new Response('', { status: 200 }))
+      );
+      await Promise.all([...pendingRequests, extraRequest]);
+      await flushBodyDrain();
     });
 
     it('decrements counters after request fails', async function () {
