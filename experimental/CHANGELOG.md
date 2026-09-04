@@ -3,11 +3,15 @@
 
 All notable changes to experimental packages in this project will be documented in this file.
 For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2.x.md).
+For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-guide.md).
 
 ## Unreleased
 
 ### :boom: Breaking Changes
 
+* feat(sdk-logs)!: remove deprecated `SdkLogRecord` type alias and `LoggerProviderConfig` type alias [#7062](https://github.com/open-telemetry/opentelemetry-js/pull/7062)
+  * `SdkLogRecord` — use `ReadWriteLogRecord` instead.
+  * `LoggerProviderConfig` — use `LoggerProviderOptions` instead.
 * feat!: migrate package builds from `tsc` to `tsdown`, emitting dual CJS/ESM output from a single `dist/` directory and declaring an `exports` map on every package [#6293](https://github.com/open-telemetry/opentelemetry-js/pull/6293) @overbalance
   * Importing a package by its name is unaffected in both CommonJS and ESM, as is every subpath listed in its `exports` map.
   * **Deep imports into the build output no longer resolve.** An `exports` map is an allowlist that Node.js and bundlers enforce, so specifiers such as `@opentelemetry/sdk-logs/build/src/...` or `@opentelemetry/sdk-logs/build/esm/...` now fail with `ERR_PACKAGE_PATH_NOT_EXPORTED`. Rewriting them to the new file layout does not help — unlisted subpaths are rejected whether or not the file exists.
