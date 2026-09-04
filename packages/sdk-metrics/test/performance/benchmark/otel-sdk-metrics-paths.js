@@ -6,17 +6,17 @@
 const Benchmark = require('benchmark');
 const { ROOT_CONTEXT } = require('@opentelemetry/api');
 
-const { AsyncMetricStorage } = require('../../../build/src/state/AsyncMetricStorage.js');
-const { MultiMetricStorage } = require('../../../build/src/state/MultiWritableMetricStorage.js');
-const { AttributeHashMap } = require('../../../build/src/state/HashMap.js');
+const { AsyncMetricStorage } = require('../../../dist/state/AsyncMetricStorage.cjs');
+const { MultiMetricStorage } = require('../../../dist/state/MultiWritableMetricStorage.cjs');
+const { AttributeHashMap } = require('../../../dist/state/HashMap.cjs');
 const {
   createAllowListAttributesProcessor,
-} = require('../../../build/src/view/AttributesProcessor.js');
-const { SumAggregator } = require('../../../build/src/aggregator/Sum.js');
+} = require('../../../dist/view/AttributesProcessor.cjs');
+const { SumAggregator } = require('../../../dist/aggregator/Sum.cjs');
 const {
   createInstrumentDescriptor,
-} = require('../../../build/src/InstrumentDescriptor.js');
-const { InstrumentType } = require('../../../build/src/export/MetricData.js');
+} = require('../../../dist/InstrumentDescriptor.cjs');
+const { InstrumentType } = require('../../../dist/export/MetricData.cjs');
 
 function createAttributes(index) {
   return {
