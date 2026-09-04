@@ -186,6 +186,7 @@ describe('HistogramAggregator', () => {
               min: 0,
               max: 1,
             },
+            exemplars: undefined,
           },
         ],
       };
@@ -228,6 +229,7 @@ describe('HistogramAggregator', () => {
               min: undefined,
               max: undefined,
             },
+            exemplars: undefined,
           },
         ],
       };
@@ -270,6 +272,7 @@ describe('HistogramAggregator', () => {
               min: undefined,
               max: undefined,
             },
+            exemplars: undefined,
           },
         ],
       };

@@ -145,6 +145,7 @@ describe('LastValueAggregator', () => {
             startTime,
             endTime,
             value: 4,
+            exemplars: undefined,
           },
         ],
       };

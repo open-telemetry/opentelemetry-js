@@ -5,6 +5,7 @@
 import { ValueType } from '@opentelemetry/api';
 import type {
   DataPoint,
+  Exemplar,
   ExponentialHistogram,
   Histogram,
   MetricData,
@@ -16,6 +17,7 @@ import {
   DataPointType,
 } from '@opentelemetry/sdk-metrics';
 import type {
+  IExemplar,
   IExponentialHistogramDataPoint,
   IExportMetricsServiceRequest,
   IHistogramDataPoint,
@@ -110,6 +112,7 @@ function toSingularDataPoint(
     attributes: toAttributes(dataPoint.attributes, encoder),
     startTimeUnixNano: encoder.encodeHrTime(dataPoint.startTime),
     timeUnixNano: encoder.encodeHrTime(dataPoint.endTime),
+    exemplars: toExemplars(dataPoint.exemplars, encoder),
   };
 
   switch (valueType) {
@@ -153,6 +156,7 @@ function toHistogramDataPoints(
       max: histogram.max,
       startTimeUnixNano: encoder.encodeHrTime(dataPoint.startTime),
       timeUnixNano: encoder.encodeHrTime(dataPoint.endTime),
+      exemplars: toExemplars(dataPoint.exemplars, encoder),
     };
   });
 }
@@ -181,7 +185,30 @@ function toExponentialHistogramDataPoints(
       zeroCount: histogram.zeroCount,
       startTimeUnixNano: encoder.encodeHrTime(dataPoint.startTime),
       timeUnixNano: encoder.encodeHrTime(dataPoint.endTime),
+      exemplars: toExemplars(dataPoint.exemplars, encoder),
     };
+  });
+}
+
+function toExemplars(
+  exemplars: Exemplar[] | undefined,
+  encoder: Encoder
+): IExemplar[] | undefined {
+  if (!exemplars || exemplars.length === 0) {
+    return undefined;
+  }
+  return exemplars.map(exemplar => {
+    const result: IExemplar = {
+      filteredAttributes: toAttributes(exemplar.filteredAttributes, encoder),
+      timeUnixNano: encoder.encodeHrTime(exemplar.timestamp),
+      asDouble: exemplar.value,
+      // span/trace ids are hex strings in the SDK; the protobuf wire format
+      // expects bytes, so they must go through the encoder like span ids in
+      // the trace transformer do (JSON encoding passes them through).
+      spanId: encoder.encodeOptionalSpanContext(exemplar.spanId),
+      traceId: encoder.encodeOptionalSpanContext(exemplar.traceId),
+    };
+    return result;
   });
 }
 

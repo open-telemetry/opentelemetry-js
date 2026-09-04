@@ -46,6 +46,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 * feat(context-async-hooks): implement `attach()` on `AsyncLocalStorageContextManager` [#6845](https://github.com/open-telemetry/opentelemetry-js/pull/6845) @pichlermarc
   * On Node.js 25.9+, delegates to `AsyncLocalStorage.withScope()` returning a native `RunScope`. On older Node.js, falls back to `enterWith()` with a manual disposable wrapper.
 * feat(sdk-trace): allow configuring the force flush timeout per call #6929 @LarryHu0217
+* feat(sdk-metrics): wire exemplar support into metrics pipeline [#6830](https://github.com/open-telemetry/opentelemetry-js/pull/6830) @CharlieTLe @rnavarro
 
 ### :bug: Bug Fixes
 

@@ -15,6 +15,7 @@ import type { Aggregation } from './Aggregation';
 import type { AggregationOption } from './AggregationOption';
 import { AggregationType, toAggregation } from './AggregationOption';
 import type { InstrumentType } from '../export/MetricData';
+import type { ExemplarReservoir } from '../exemplar/ExemplarReservoir';
 
 export type ViewOptions = {
   /**
@@ -65,6 +66,11 @@ export type ViewOptions = {
    * aggregationCardinalityLimit: 1000
    */
   aggregationCardinalityLimit?: number;
+  /**
+   * @experimental Factory function to create an ExemplarReservoir for a metric stream.
+   * If not provided, a default reservoir is selected based on the aggregation type.
+   */
+  exemplarReservoir?: () => ExemplarReservoir;
   /**
    * Instrument selection criteria:
    * The original type of the Instrument(s).
@@ -163,6 +169,7 @@ export class View {
   readonly instrumentSelector: InstrumentSelector;
   readonly meterSelector: MeterSelector;
   readonly aggregationCardinalityLimit?: number;
+  readonly exemplarReservoir?: () => ExemplarReservoir;
 
   /**
    * Create a new {@link View} instance.
@@ -248,5 +255,6 @@ export class View {
       schemaUrl: viewOptions.meterSchemaUrl,
     });
     this.aggregationCardinalityLimit = viewOptions.aggregationCardinalityLimit;
+    this.exemplarReservoir = viewOptions.exemplarReservoir;
   }
 }
