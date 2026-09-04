@@ -42,6 +42,7 @@ export default tseslint.config(
       // tsd-style negative type-check fixtures, intentionally outside tsconfig.
       'experimental/packages/configuration/test/fixtures/types/**',
       'experimental/packages/otlp-transformer/src/generated/**',
+      // protobufjs-generated test fixtures (npm run protos output, gitignored).
       'experimental/packages/otlp-transformer/test/generated/**',
       // protobuf-ts generated test fixtures (buf generate output, gitignored).
       'experimental/packages/opentelemetry-instrumentation-grpc/test/proto/**',
@@ -227,6 +228,25 @@ export default tseslint.config(
     files: [
       'experimental/packages/shim-opencensus/src/OpenCensusMetricProducer.ts',
     ],
+    rules: {
+      'yet-another-license-header/header': 'off',
+    },
+  },
+
+  // Build tooling configs (e.g. tsdown.config.ts) live outside each package's
+  // tsconfig include globs, so the project service can't resolve them. The
+  // root tsconfig includes them (no per-package rootDir, so the shared
+  // `../tsdown.config.ts` import resolves); point them at it via classic
+  // `project` and skip the license header.
+  {
+    files: ['**/*.config.ts'],
+    languageOptions: {
+      parserOptions: {
+        projectService: false,
+        project: ['tsconfig.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
     rules: {
       'yet-another-license-header/header': 'off',
     },

@@ -4,28 +4,42 @@
  */
 
 const Benchmark = require('benchmark');
-const { parsePairKeyValue } = require('../../../build/src/baggage/utils');
+// `parsePairKeyValue` is internal-only and not exported from dist chunks;
+// `parseBaggageHeaderString` is its public per-header wrapper.
+const { parseBaggageHeaderString } = require('../../../dist/baggage/utils.cjs');
 
 const suite = new Benchmark.Suite();
+
+// Accumulate results so V8 can't dead-code-eliminate the calls.
+let sink = 0;
 
 suite.on('cycle', event => {
   console.log(String(event.target));
 });
 
-suite.add('parsePairKeyValue simple', function() {
-  parsePairKeyValue('key1=value1');
+suite.add('parseBaggageHeaderString simple', function() {
+  sink += parseBaggageHeaderString('key1=value1', {}, 0, 0)[0];
 });
 
-suite.add('parsePairKeyValue with metadata', function() {
-  parsePairKeyValue('key1=value1;metadata=sample');
+suite.add('parseBaggageHeaderString with metadata', function() {
+  sink += parseBaggageHeaderString('key1=value1;metadata=sample', {}, 0, 0)[0];
 });
 
-suite.add('parsePairKeyValue URI encoded', function() {
-  parsePairKeyValue('user%20id=john%20doe');
+suite.add('parseBaggageHeaderString URI encoded', function() {
+  sink += parseBaggageHeaderString('user%20id=john%20doe', {}, 0, 0)[0];
 });
 
-suite.add('parsePairKeyValue complex', function() {
-  parsePairKeyValue('user%20id=john%20doe;metadata=user%20info;tenant=prod');
+suite.add('parseBaggageHeaderString complex', function() {
+  sink += parseBaggageHeaderString(
+    'user%20id=john%20doe;metadata=user%20info,tenant=prod',
+    {},
+    0,
+    0
+  )[0];
 });
 
 suite.run();
+
+if (sink < 0) {
+  console.log(sink);
+}
