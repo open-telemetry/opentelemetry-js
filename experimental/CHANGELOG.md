@@ -3,10 +3,15 @@
 
 All notable changes to experimental packages in this project will be documented in this file.
 For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2.x.md).
+For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-guide.md).
 
 ## Unreleased
 
 ### :boom: Breaking Changes
+
+* feat(sdk-logs)!: remove deprecated `SdkLogRecord` type alias and `LoggerProviderConfig` type alias [#7062](https://github.com/open-telemetry/opentelemetry-js/pull/7062)
+  * `SdkLogRecord` — use `ReadWriteLogRecord` instead.
+  * `LoggerProviderConfig` — use `LoggerProviderOptions` instead.
 
 ### :rocket: Features
 

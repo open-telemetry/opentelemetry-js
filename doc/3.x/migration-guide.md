@@ -85,3 +85,31 @@ await provider.forceFlush();
 const provider = new TracerProvider();
 await provider.forceFlush({ timeoutMillis: 5000 });
 ```
+
+---
+
+## `@opentelemetry/sdk-logs`
+
+### Removed: `SdkLogRecord` type alias
+
+`SdkLogRecord` was a type alias for `ReadWriteLogRecord`. Use `ReadWriteLogRecord` directly.
+
+```ts
+// before
+import type { SdkLogRecord } from '@opentelemetry/sdk-logs';
+
+// after
+import type { ReadWriteLogRecord } from '@opentelemetry/sdk-logs';
+```
+
+### Removed: `LoggerProviderConfig` type alias
+
+`LoggerProviderConfig` was a type alias for `LoggerProviderOptions`. Use `LoggerProviderOptions` directly.
+
+```ts
+// before
+import type { LoggerProviderConfig } from '@opentelemetry/sdk-logs';
+
+// after
+import type { LoggerProviderOptions } from '@opentelemetry/sdk-logs';
+```
