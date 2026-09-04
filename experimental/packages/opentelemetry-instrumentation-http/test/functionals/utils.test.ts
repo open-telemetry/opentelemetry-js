@@ -454,7 +454,9 @@ describe('Utility', () => {
 
     it('redacts a param with an empty value', () => {
       assert.strictEqual(
-        utils.redactQueryString(new URLSearchParams('sig=&foo=bar'), ['sig']),
+        utils.redactQueryString(new URLSearchParams('sig=&foo=bar'), [
+          'sig',
+        ]),
         'sig=REDACTED&foo=bar'
       );
     });
