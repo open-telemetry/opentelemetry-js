@@ -37,7 +37,7 @@ describe('FetchTransport', function () {
   });
 
   describe('send', function () {
-    it('it uses global fetch API and is not affected by patching', function (done) {
+    it('uses global fetch API and is not affected by patching', function (done) {
       // arrange
       const fetchStub = sinon
         .stub(globalThis, 'fetch')
@@ -61,6 +61,75 @@ describe('FetchTransport', function () {
         done();
       }, done /* catch any rejections */);
     });
+
+    it('uses provided fetch API and does not call global fetch', function (done) {
+      // arrange
+      const fetchStub = sinon
+        .stub(globalThis, 'fetch')
+        .resolves(new Response('test response', { status: 200 }));
+      const customStub = sinon
+        .stub()
+        .resolves(new Response('test response', { status: 200 }));
+      const transport = createFetchTransport({
+        ...testTransportParameters,
+        fetch: customStub as unknown as typeof globalThis.fetch,
+      });
+
+      //act
+      transport.send(testPayload, requestTimeout).then(response => {
+        // assert
+        try {
+          assert.strictEqual(response.status, 'success');
+          sinon.assert.called(customStub);
+          sinon.assert.notCalled(fetchStub);
+        } catch (e) {
+          done(e);
+        }
+        done();
+      }, done /* catch any rejections */);
+    });
+
+    it('uses provided fetch API as-is and does not unwrap __original', function (done) {
+      // arrange
+      const originalStub = sinon
+        .stub()
+        .resolves(new Response('original response', { status: 200 }));
+      const customStub = sinon
+        .stub()
+        .resolves(new Response('custom response', { status: 200 }));
+      // We attach `__original` simulating an instrumented fetch that the user
+      // has chosen to provide explicitly
+      (customStub as any).__original = originalStub;
+      const transport = createFetchTransport({
+        ...testTransportParameters,
+        fetch: customStub as unknown as typeof globalThis.fetch,
+      });
+
+      //act
+      transport.send(testPayload, requestTimeout).then(response => {
+        // assert
+        try {
+          assert.strictEqual(response.status, 'success');
+          sinon.assert.calledOnce(customStub);
+          sinon.assert.notCalled(originalStub);
+        } catch (e) {
+          done(e);
+        }
+        done();
+      }, done /* catch any rejections */);
+    });
+
+    it('throws when provided fetch is not a function', function () {
+      // arrange
+      const parameters = {
+        ...testTransportParameters,
+        fetch: 'not a function' as unknown as typeof globalThis.fetch,
+      };
+
+      //act + assert
+      assert.throws(() => createFetchTransport(parameters), TypeError);
+    });
+
     it('returns success when request succeeds', function (done) {
       // arrange
       const fetchStub = sinon
