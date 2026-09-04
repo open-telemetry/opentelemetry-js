@@ -8,7 +8,7 @@
 const Benchmark = require('benchmark');
 const {
   AsyncLocalStorageContextManager,
-} = require('../../../build/src');
+} = require('../../../dist/index.cjs');
 const { createContextKey, ROOT_CONTEXT } = require('@opentelemetry/api');
 
 const contextManager = new AsyncLocalStorageContextManager();
