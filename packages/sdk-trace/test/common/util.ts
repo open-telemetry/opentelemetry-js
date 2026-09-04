@@ -16,15 +16,16 @@ export const validAttributes = {
   'array<string>': ['str1', 'str2'],
   'array<number>': [1, 2],
   'array<bool>': [true, false],
+  object: { foo: 'bar' },
+  'non-homogeneous-array': [0, ''],
 };
 
 export const invalidAttributes = {
-  // invalid attribute type object
-  object: { foo: 'bar' },
-  // invalid attribute inhomogenous array
-  'non-homogeneous-array': [0, ''],
-  // This empty length attribute should not be set
   '': 'empty-key',
+  func: () => {},
+  uint32Array: new Uint32Array([1, 2, 3]),
+  bigInt: 1152921504606846976n,
+  bigInt64Array: new BigInt64Array([1n, 2n, 3n]),
 };
 
 export function assertAssignable<T>(val: T): asserts val is T {}
@@ -74,6 +75,8 @@ export function cheatResourceFromTracerProvider(
 ): Resource {
   return (tracerProvider as any)._resource;
 }
-export function cheatSpanLimitsFromTracer(tracer: ApiTracer): SpanLimits {
+export function cheatSpanLimitsFromTracer(
+  tracer: ApiTracer
+): Required<SpanLimits> {
   return (tracer as any)._spanLimits;
 }

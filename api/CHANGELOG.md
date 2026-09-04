@@ -12,6 +12,12 @@ All notable changes to this project will be documented in this file.
 * feat(api): add imperative `context.attach()` for setting context across callback boundaries that `with()` cannot wrap. [#6845](https://github.com/open-telemetry/opentelemetry-js/pull/6845) @pichlermarc
   * `attach()` returns a `Token` whose `dispose()` method restores the previous context. Use `token.dispose()` to detach.
   * `attach` is an optional method on the `ContextManager` interface; when the active context manager does not implement it, `context.attach()` logs a warning and returns a no-op token.
+* feat(api): add `AnyValue` type (of type `unknown`) and extend `Attributes` type values to use `AnyValue` [#6780](https://github.com/open-telemetry/opentelemetry-js/pull/6780) @trentm
+  * This is part of supporting [OTEP 4485](https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/4485-extending-attributes-to-support-complex-values.md#how).
+  * This is a **breaking change for SDK implementations**, in that they need to support more attribute types for any APIs that accept `attributes` or `LogRecord#body`.
+    However, this is not a breaking change for users of the `@opentelemetry/api` package.
+  * **Please note:** Simple attributes SHOULD be used whenever possible. Instrumentations SHOULD assume that backends do not index individual properties of complex attributes, that querying or aggregating on such properties is inefficient and complicated, and that reporting complex attributes carries higher performance overhead.
+  * It is *possible* this can break TypeScript users of the `Attributes` type, if code was using the `Attributes` type in their own code and using [TypeScript Narrowing](https://www.typescriptlang.org/docs/handbook/2/narrowing.html) to reduce an attribute value to an expected type. It is expected that this usage should be extremely rare and, likely, limited to SDK implementations, if at all. (If this impacted your code, [please let us know](https://github.com/open-telemetry/opentelemetry-js/issues/new).)
 
 ### :bug: Bug Fixes
 

@@ -2,6 +2,8 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
+
+import type { Attributes } from '@opentelemetry/api';
 import type {
   IAnyValue,
   IInstrumentationScope,
@@ -11,7 +13,6 @@ import type {
 import type { InstrumentationScope } from '@opentelemetry/core';
 import type { Resource as ISdkResource } from '@opentelemetry/resources';
 import type { Encoder } from './utils';
-import type { LogAttributes } from '@opentelemetry/api-logs';
 
 export function createResource(
   resource: ISdkResource,
@@ -30,7 +31,7 @@ export function createResource(
 
 export function createInstrumentationScope(
   scope: InstrumentationScope & {
-    attributes?: LogAttributes;
+    attributes?: Attributes;
     droppedAttributesCount?: number;
   },
   encoder: Encoder
@@ -49,7 +50,7 @@ export function createInstrumentationScope(
 }
 
 export function toAttributes(
-  attributes: LogAttributes,
+  attributes: Attributes,
   encoder: Encoder
 ): IKeyValue[] {
   return Object.keys(attributes).map(key =>
