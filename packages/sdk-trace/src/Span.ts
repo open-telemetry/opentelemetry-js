@@ -26,7 +26,6 @@ import {
   hrTimeDuration,
   isTimeInput,
   isTimeInputHrTime,
-  otperformance,
   AddAttributeDecision,
   maybeAddAttribute,
   cleanAttributes,
@@ -121,9 +120,9 @@ export class SpanImpl implements Span {
     const now = Date.now();
 
     this._spanContext = opts.spanContext;
-    this._performanceStartTime = otperformance.now();
+    this._performanceStartTime = performance.now();
     this._performanceOffset =
-      now - (this._performanceStartTime + otperformance.timeOrigin);
+      now - (this._performanceStartTime + performance.timeOrigin);
     this._startTimeProvided = opts.startTime != null;
     this._spanLimits = opts.spanLimits;
     this._spanProcessor = opts.spanProcessor;
@@ -349,7 +348,7 @@ export class SpanImpl implements Span {
   }
 
   private _getTime(inp?: TimeInput): HrTime {
-    if (typeof inp === 'number' && inp <= otperformance.now()) {
+    if (typeof inp === 'number' && inp <= performance.now()) {
       // must be a performance timestamp
       // apply correction and convert to hrtime
       return hrTime(inp + this._performanceOffset);
@@ -373,7 +372,7 @@ export class SpanImpl implements Span {
       return millisToHrTime(Date.now());
     }
 
-    const msDuration = otperformance.now() - this._performanceStartTime;
+    const msDuration = performance.now() - this._performanceStartTime;
     return addHrTimes(this.startTime, millisToHrTime(msDuration));
   }
 

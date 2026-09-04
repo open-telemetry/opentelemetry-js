@@ -62,7 +62,7 @@ import {
   createSpanLimitsFromConfig,
   createTracerProviderFromConfig,
 } from '../src/create-from-config';
-import { CompositePropagator } from '@opentelemetry/core';
+import { CompositePropagator, SDK_INFO } from '@opentelemetry/core';
 import {
   AggregationTemporality,
   AggregationType,
@@ -265,8 +265,9 @@ describe('create-from-config', () => {
   });
 
   describe('createResourceFromConfig', () => {
-    const SDK_VERSION =
-      require('@opentelemetry/resources/package.json').version;
+    // Read from SDK_INFO rather than `@opentelemetry/resources/package.json`:
+    // the package's `exports` map does not expose that subpath.
+    const SDK_VERSION = SDK_INFO['telemetry.sdk.version'];
     const defaultResAttrs = {
       'service.name': 'unknown_service:node',
       'telemetry.sdk.language': 'nodejs',
