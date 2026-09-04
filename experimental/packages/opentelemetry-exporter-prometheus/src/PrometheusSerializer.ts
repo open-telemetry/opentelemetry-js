@@ -48,6 +48,13 @@ function escapeAttributeValue(val: AnyValue = '') {
     //     Are we allowed to drop?
     //     Spec doesn't cover serialization of attributes at all that I can tell:
     //     https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/prometheus.md
+    //  XXX see Prom note at https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/4485-extending-attributes-to-support-complex-values.md#exporters
+    //  XXX also note this from there:
+    //    > When serializing AnyValue objects to JSON, it is RECOMMENDED to sort lists of key-value pairs lexicographically by key and apply additional settings that enhance serialization stability.
+    //    It might be nice to use that separate serializing lib?
+    //    Or we could document it as a limitation and perf decision. Because
+    //    JS objects maintain order, we rely on that and the user to provide
+    //    attributes in a stable order.
     str = JSON.stringify(val);
   } else {
     str = val;

@@ -4,7 +4,6 @@
  */
 
 import type { LogRecord, SeverityNumber } from '@opentelemetry/api-logs';
-// XXX convert to import of specific exports
 import * as api from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import { timeInputToHrTime } from '@opentelemetry/core';

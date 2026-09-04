@@ -22,6 +22,9 @@
  *    may/will drop attribute values not of the above types.
  *  - Using unknown and these rules allows supporting more
  *    anyvalue types later, say `BigInt`, if wanted.
+ *  - Point out that `undefined` value means drop the key.
+ *    That was the behaviour for `span.attributes` in sdk-trace, but
+ *    wasn't always handled so in other SDK components.
  *
  * @since XXX
  */

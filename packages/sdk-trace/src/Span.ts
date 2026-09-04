@@ -11,11 +11,11 @@ import type {
   Span as APISpan,
   SpanOptions as APISpanOptions,
   Attributes,
-  AttributeValue,
   SpanContext,
   SpanKind,
   SpanStatus,
   TimeInput,
+  AnyValue,
 } from '@opentelemetry/api';
 import { diag, SpanStatusCode } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
@@ -24,11 +24,12 @@ import {
   millisToHrTime,
   hrTime,
   hrTimeDuration,
-  isAttributeValue,
   isTimeInput,
   isTimeInputHrTime,
   otperformance,
-  sanitizeAttributes,
+  AddAttributeDecision,
+  maybeAddAttribute,
+  cleanAttributes,
 } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import {
@@ -66,8 +67,9 @@ type SpanOptions = Omit<APISpanOptions, 'root'> & {
   // SpanImpl assigns it unconditionally and ReadableSpan expects it to be set.
   kind: SpanKind;
   parentSpanContext?: SpanContext;
-  spanLimits: SpanLimits;
+  spanLimits: Required<SpanLimits>;
   spanProcessor: SpanProcessor;
+  droppedAttributesCount?: number;
   recordEndMetrics?: () => void;
 };
 
@@ -80,7 +82,7 @@ export class SpanImpl implements Span {
   private readonly _spanContext: SpanContext;
   readonly kind: SpanKind;
   readonly parentSpanContext?: SpanContext;
-  readonly attributes: Attributes = {};
+  readonly attributes: Attributes;
   readonly links: Link[] = [];
   readonly events: TimedEvent[] = [];
   readonly startTime: HrTime;
@@ -100,8 +102,7 @@ export class SpanImpl implements Span {
   private _ended = false;
   private _duration: HrTime = [-1, -1];
   private readonly _spanProcessor: SpanProcessor;
-  private readonly _spanLimits: SpanLimits;
-  private readonly _attributeValueLengthLimit: number;
+  private readonly _spanLimits: Required<SpanLimits>;
   private readonly _recordEndMetrics?: () => void;
 
   private readonly _performanceStartTime: number;
@@ -110,6 +111,11 @@ export class SpanImpl implements Span {
 
   /**
    * Constructs a new SpanImpl instance.
+   *
+   * `opts.attributes` must already have been sanitized by caller.
+   * `attributes` in `opts.links` must already have been sanitized by caller.
+   * These are typically required anyway to pass sanitized details to a
+   * *sampler* before span creation.
    */
   constructor(opts: SpanOptions) {
     const now = Date.now();
@@ -120,26 +126,31 @@ export class SpanImpl implements Span {
       now - (this._performanceStartTime + otperformance.timeOrigin);
     this._startTimeProvided = opts.startTime != null;
     this._spanLimits = opts.spanLimits;
-    this._attributeValueLengthLimit =
-      this._spanLimits.attributeValueLengthLimit ?? 0;
     this._spanProcessor = opts.spanProcessor;
 
     this.name = opts.name;
     this.parentSpanContext = opts.parentSpanContext;
     this.kind = opts.kind;
-    if (opts.links) {
-      for (const link of opts.links) {
-        this.addLink(link);
-      }
-    }
     this.startTime = this._getTime(opts.startTime ?? now);
     this.resource = opts.resource;
     this.instrumentationScope = opts.scope;
     this._recordEndMetrics = opts.recordEndMetrics;
 
-    if (opts.attributes != null) {
-      this.setAttributes(opts.attributes);
+    // Attributes in links have already be sanitized by the caller.
+    if (opts.links) {
+      const { linkCountLimit } = this._spanLimits;
+      if (opts.links.length > linkCountLimit) {
+        this.links = opts.links.slice(0, linkCountLimit);
+        this._droppedLinksCount = opts.links.length - linkCountLimit;
+      } else {
+        this.links = opts.links;
+        this._droppedLinksCount = 0;
+      }
     }
+
+    // `opts.attributes` have already been sanitized by caller.
+    this.attributes = opts.attributes ?? {};
+    this._droppedAttributesCount = opts.droppedAttributesCount ?? 0;
 
     this._spanProcessor.onStart(this, opts.context);
   }
@@ -148,37 +159,27 @@ export class SpanImpl implements Span {
     return this._spanContext;
   }
 
-  setAttribute(key: string, value?: AttributeValue): this;
-  setAttribute(key: string, value: unknown): this {
-    if (value == null || this._isSpanEnded()) return this;
-    if (key.length === 0) {
-      diag.warn(`Invalid attribute key: ${key}`);
-      return this;
-    }
-    if (!isAttributeValue(value)) {
-      diag.warn(`Invalid attribute value set for key: ${key}`);
-      return this;
-    }
+  public setAttribute(key: string, value: AnyValue) {
+    if (this._isSpanEnded()) return this;
 
-    const { attributeCountLimit } = this._spanLimits;
-    const isNewKey = !Object.prototype.hasOwnProperty.call(
-      this.attributes,
-      key
-    );
+    const decision = maybeAddAttribute({
+      key,
+      value,
+      attributes: this.attributes,
+      limits: this._spanLimits,
+      currentAttributesCount: this._attributesCount,
+    });
 
-    if (
-      attributeCountLimit !== undefined &&
-      this._attributesCount >= attributeCountLimit &&
-      isNewKey
-    ) {
+    if (decision === AddAttributeDecision.DROP_LIMIT_REACHED) {
       this._droppedAttributesCount++;
-      return this;
-    }
-
-    this.attributes[key] = this._truncateToSize(value);
-    if (isNewKey) {
+      if (this._droppedAttributesCount === 1) {
+        // Only warn once per LogRecord to avoid log spam
+        diag.warn('Dropping extra attributes.');
+      }
+    } else if (decision === AddAttributeDecision.ADD_NEW) {
       this._attributesCount++;
     }
+
     return this;
   }
 
@@ -231,33 +232,13 @@ export class SpanImpl implements Span {
       attributesOrStartTime = undefined;
     }
 
-    const sanitized = sanitizeAttributes(attributesOrStartTime);
-    const { attributePerEventCountLimit } = this._spanLimits;
-    const attributes: Attributes = {};
-    let droppedAttributesCount = 0;
-    let eventAttributesCount = 0;
-
-    for (const attr in sanitized) {
-      if (!Object.prototype.hasOwnProperty.call(sanitized, attr)) {
-        continue;
-      }
-      const attrVal = sanitized[attr];
-      if (
-        attributePerEventCountLimit !== undefined &&
-        eventAttributesCount >= attributePerEventCountLimit
-      ) {
-        droppedAttributesCount++;
-        continue;
-      }
-      attributes[attr] = this._truncateToSize(attrVal!);
-      eventAttributesCount++;
-    }
-
     this.events.push({
       name,
-      attributes,
       time: this._getTime(timeStamp),
-      droppedAttributesCount,
+      ...cleanAttributes(attributesOrStartTime, {
+        attributeCountLimit: this._spanLimits.attributePerEventCountLimit,
+        attributeValueLengthLimit: this._spanLimits.attributeValueLengthLimit,
+      }),
     });
     return this;
   }
@@ -280,37 +261,13 @@ export class SpanImpl implements Span {
       this._droppedLinksCount++;
     }
 
-    const { attributePerLinkCountLimit } = this._spanLimits;
-    const sanitized = sanitizeAttributes(link.attributes);
-    const attributes: Attributes = {};
-    let droppedAttributesCount = 0;
-    let linkAttributesCount = 0;
-
-    for (const attr in sanitized) {
-      if (!Object.prototype.hasOwnProperty.call(sanitized, attr)) {
-        continue;
-      }
-      const attrVal = sanitized[attr];
-      if (
-        attributePerLinkCountLimit !== undefined &&
-        linkAttributesCount >= attributePerLinkCountLimit
-      ) {
-        droppedAttributesCount++;
-        continue;
-      }
-      attributes[attr] = this._truncateToSize(attrVal!);
-      linkAttributesCount++;
-    }
-
-    const processedLink: Link = { context: link.context };
-    if (linkAttributesCount > 0) {
-      processedLink.attributes = attributes;
-    }
-    if (droppedAttributesCount > 0) {
-      processedLink.droppedAttributesCount = droppedAttributesCount;
-    }
-
-    this.links.push(processedLink);
+    this.links.push({
+      context: link.context,
+      ...cleanAttributes(link.attributes, {
+        attributeCountLimit: this._spanLimits.attributePerLinkCountLimit,
+        attributeValueLengthLimit: this._spanLimits.attributeValueLengthLimit,
+      }),
+    });
     return this;
   }
 
@@ -482,53 +439,6 @@ export class SpanImpl implements Span {
       );
     }
     return this._ended;
-  }
-
-  // Utility function to truncate given value within size
-  // for value type of string, will truncate to given limit
-  // for type of non-string, will return same value
-  private _truncateToLimitUtil(value: string, limit: number): string {
-    if (value.length <= limit) {
-      return value;
-    }
-    return value.substring(0, limit);
-  }
-
-  /**
-   * If the given attribute value is of type string and has more characters than given {@code attributeValueLengthLimit} then
-   * return string with truncated to {@code attributeValueLengthLimit} characters
-   *
-   * If the given attribute value is array of strings then
-   * return new array of strings with each element truncated to {@code attributeValueLengthLimit} characters
-   *
-   * Otherwise return same Attribute {@code value}
-   *
-   * @param value Attribute value
-   * @returns truncated attribute value if required, otherwise same value
-   */
-  private _truncateToSize(value: AttributeValue): AttributeValue {
-    const limit = this._attributeValueLengthLimit;
-    // Check limit
-    if (limit <= 0) {
-      // Negative values are invalid, so do not truncate
-      diag.warn(`Attribute value limit must be positive, got ${limit}`);
-      return value;
-    }
-
-    // String
-    if (typeof value === 'string') {
-      return this._truncateToLimitUtil(value, limit);
-    }
-
-    // Array of strings
-    if (Array.isArray(value)) {
-      return (value as []).map(val =>
-        typeof val === 'string' ? this._truncateToLimitUtil(val, limit) : val
-      );
-    }
-
-    // Other types, no need to apply value length limit
-    return value;
   }
 
   [inspectCustom](

@@ -65,7 +65,7 @@ export interface ForceFlushOptions {
 export interface TracerOptions {
   resource: Resource;
   sampler: Sampler;
-  spanLimits: SpanLimits;
+  spanLimits: Required<SpanLimits>;
   idGenerator: IdGenerator;
   spanProcessor: SpanProcessor;
   meterProvider: MeterProvider;
