@@ -35,8 +35,7 @@ export abstract class InstrumentationBase<
 {
   private _modules: InstrumentationModuleDefinition[];
   private _hooks: (Hooked | HookRequire)[] = [];
-  private _requireInTheMiddleSingleton: RequireInTheMiddleSingleton =
-    RequireInTheMiddleSingleton.getInstance();
+  private _requireInTheMiddleSingleton?: RequireInTheMiddleSingleton;
   private _enabled = false;
 
   constructor(
@@ -166,6 +165,14 @@ export abstract class InstrumentationBase<
     return undefined;
   }
 
+  private _getRequireInTheMiddleSingleton(): RequireInTheMiddleSingleton {
+    return (
+      this._requireInTheMiddleSingleton ??
+      (this._requireInTheMiddleSingleton =
+        RequireInTheMiddleSingleton.getInstance())
+    );
+  }
+
   private _onRequire<T>(
     module: InstrumentationModuleDefinition,
     exports: T,
@@ -276,6 +283,10 @@ export abstract class InstrumentationBase<
       return;
     }
 
+    if (this._modules.length === 0) {
+      return;
+    }
+
     this._warnOnPreloadedModules();
     for (const module of this._modules) {
       const hookFn: HookFn = (exports, name, baseDir) => {
@@ -298,7 +309,9 @@ export abstract class InstrumentationBase<
       // require-in-the-middle `Hook`.
       const hook = path.isAbsolute(module.name)
         ? new HookRequire([module.name], { internals: true }, onRequire)
-        : this._requireInTheMiddleSingleton.register(module.name, onRequire);
+        : this
+            ._getRequireInTheMiddleSingleton()
+            .register(module.name, onRequire);
 
       this._hooks.push(hook);
       const esmHook = new HookImport(
