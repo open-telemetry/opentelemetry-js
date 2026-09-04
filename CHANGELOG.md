@@ -51,6 +51,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 * fix(sdk-trace-base): avoid a Webpack self-reference error in CommonJS output [#6981](https://github.com/open-telemetry/opentelemetry-js/issues/6981) @sansynx
 * fix(sdk-metrics): ignore `Infinity` in exponential histograms [#7015](https://github.com/open-telemetry/opentelemetry-js/pull/7015) @mwear
+* fix(core): cap tracestate list-members when calling `TraceState.set()` so a 32-member list cannot grow past the W3C limit [#6964](https://github.com/open-telemetry/opentelemetry-js/pull/6964) @Zuhef
 
 ### :house: Internal
 
