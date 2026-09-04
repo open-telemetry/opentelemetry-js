@@ -13,6 +13,18 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :boom: Breaking Changes
 
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 3.0.0-development.0
+
+### :boom: Breaking Changes
+
 * feat!: migrate package builds from `tsc` to `tsdown`, emitting dual CJS/ESM output from a single `dist/` directory and declaring an `exports` map on every package [#6293](https://github.com/open-telemetry/opentelemetry-js/pull/6293) @overbalance
   * Importing a package by its name is unaffected in both CommonJS and ESM, as is every subpath listed in its `exports` map.
   * **Deep imports into the build output no longer resolve.** An `exports` map is an allowlist that Node.js and bundlers enforce, so specifiers such as `@opentelemetry/core/build/src/...` or `@opentelemetry/core/build/esm/...` now fail with `ERR_PACKAGE_PATH_NOT_EXPORTED`. Rewriting them to the new file layout does not help — unlisted subpaths are rejected whether or not the file exists.
@@ -27,12 +39,6 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
   * `unrefTimer(timer)` — call `timer.unref()` directly in your own code.
 * feat(sdk-trace)!: remove deprecated `TracerProviderOptions.forceFlushTimeoutMillis` [#7057](https://github.com/open-telemetry/opentelemetry-js/pull/7057)
   * Pass `timeoutMillis` to `provider.forceFlush({ timeoutMillis })` instead. The default timeout is 30000ms.
-
-### :rocket: Features
-
-### :bug: Bug Fixes
-
-### :books: Documentation
 
 ### :house: Internal
 

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-async-hooks",
-  "version": "2.11.0",
+  "version": "3.0.0-development.0",
   "description": "OpenTelemetry AsyncLocalStorage-based Context Manager",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
