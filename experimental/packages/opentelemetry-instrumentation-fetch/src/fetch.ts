@@ -580,8 +580,10 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     // without throwing per spec, so the observer would stay empty for the
     // lifetime of the page. Not attaching one lets the span fall through to
     // the `getEntriesByType` fallback instead.
-    if (!PerformanceObserver.supportedEntryTypes?.includes('resource')) {
-      return { entries, startTime, spanUrl };
+    if (
+      PerformanceObserver.supportedEntryTypes &&
+      !PerformanceObserver.supportedEntryTypes.includes('resource')
+    ) {
     }
 
     const observer = new PerformanceObserver(list => {
