@@ -20,11 +20,13 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
   * `<package>/package.json` is no longer importable for the same reason. Read a package's version from your own dependency metadata, or use `SDK_INFO` from `@opentelemetry/core` for the SDK version.
   * The non-standard `esnext` entry point has been removed; tools that preferred it fall back to `module` (ESM) or `main` (CJS).
   * Packages that ship separate Node.js and browser implementations export them under explicit subpaths, for example `@opentelemetry/core/platform`. If you depend on something that is only reachable through a deep import, please open an issue so it can be considered for the public API.
-* feat(core)!: remove deprecated `getTimeOrigin`, `otperformance`, `_globalThis`, and `unrefTimer` from `@opentelemetry/core` [#7048](https://github.com/open-telemetry/opentelemetry-js/pull/7048)
+* feat(core)!: remove deprecated `getTimeOrigin`, `otperformance`, `_globalThis`, and `unrefTimer` from `@opentelemetry/core` [#7053](https://github.com/open-telemetry/opentelemetry-js/pull/7053)
   * `getTimeOrigin()` — use `performance.timeOrigin` directly.
   * `otperformance` — use the global `performance` object directly.
   * `_globalThis` — use `globalThis` directly.
   * `unrefTimer(timer)` — call `timer.unref()` directly in your own code.
+* feat(sdk-trace)!: remove deprecated `TracerProviderOptions.forceFlushTimeoutMillis` [#7057](https://github.com/open-telemetry/opentelemetry-js/pull/7057)
+  * Pass `timeoutMillis` to `provider.forceFlush({ timeoutMillis })` instead. The default timeout is 30000ms.
 
 ### :rocket: Features
 
