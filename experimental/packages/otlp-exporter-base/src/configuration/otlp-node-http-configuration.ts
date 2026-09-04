@@ -36,21 +36,59 @@ export interface OtlpNodeHttpConfiguration extends OtlpHttpConfiguration {
   userAgent?: string;
 }
 
+function getEnvProxyAgentOptions():
+  | { proxyEnv: NodeJS.ProcessEnv }
+  | undefined {
+  if (
+    !process.env.HTTP_PROXY &&
+    !process.env.http_proxy &&
+    !process.env.HTTPS_PROXY &&
+    !process.env.https_proxy
+  ) {
+    return undefined;
+  }
+
+  return {
+    proxyEnv: {
+      HTTP_PROXY: process.env.HTTP_PROXY,
+      HTTPS_PROXY: process.env.HTTPS_PROXY,
+      NO_PROXY: process.env.NO_PROXY,
+      http_proxy: process.env.http_proxy,
+      https_proxy: process.env.https_proxy,
+      no_proxy: process.env.no_proxy,
+    },
+  };
+}
+
 export function httpAgentFactoryFromOptions(
   options: http.AgentOptions | https.AgentOptions
 ): HttpAgentFactory {
+  /**
+   * Node's native `proxyEnv` agent option is available from Node.js 22.21.0
+   * and 24.5.0. Earlier supported Node.js versions keep the option in the
+   * agent configuration but do not apply environment proxies to requests.
+   * Applications that need proxying on those versions should provide an
+   * agent factory with an explicit proxy implementation.
+   */
   return async protocol => {
     const isInsecure = protocol === 'http:';
     const module = isInsecure ? import('http') : import('https');
     const { Agent } = await module;
+    const envProxyAgentOptions = getEnvProxyAgentOptions();
 
     if (isInsecure) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars -- these props should not be used in agent options
       const { ca, cert, key, ...insecureOptions } =
         options as https.AgentOptions;
-      return new Agent(insecureOptions);
+      return new Agent({
+        ...envProxyAgentOptions,
+        ...insecureOptions,
+      } as http.AgentOptions);
     }
-    return new Agent(options);
+    return new Agent({
+      ...envProxyAgentOptions,
+      ...options,
+    } as https.AgentOptions);
   };
 }
 
