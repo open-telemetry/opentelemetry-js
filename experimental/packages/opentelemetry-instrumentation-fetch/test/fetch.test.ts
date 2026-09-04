@@ -18,10 +18,8 @@ import {
 } from '@opentelemetry/propagator-b3';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import * as tracing from '@opentelemetry/sdk-trace';
-import {
-  PerformanceTimingNames as PTN,
-  WebTracerProvider,
-} from '@opentelemetry/sdk-trace-web';
+import { PerformanceTimingNames as PTN } from '@opentelemetry/web-common';
+import { TracerProvider } from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import type {
@@ -334,7 +332,7 @@ describe('fetch', () => {
         const fetchInstrumentation: FetchInstrumentation =
           new FetchInstrumentation(config);
         const dummySpanExporter = new DummySpanExporter();
-        const webTracerProviderWithZone = new WebTracerProvider({
+        const webTracerProviderWithZone = new TracerProvider({
           spanProcessors: [
             new tracing.SimpleSpanProcessor({ exporter: dummySpanExporter }),
           ],
