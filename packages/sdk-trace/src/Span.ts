@@ -139,7 +139,7 @@ export class SpanImpl implements Span {
     if (opts.links) {
       const { linkCountLimit } = this._spanLimits;
       if (opts.links.length > linkCountLimit) {
-        this.links = opts.links.slice(0, linkCountLimit);
+        this.links = opts.links.slice(-linkCountLimit); // later ones win
         this._droppedLinksCount = opts.links.length - linkCountLimit;
       } else {
         this.links = opts.links;

@@ -1179,7 +1179,6 @@ describe('Span', () => {
       {
         attributes: { attr1: 'value', attr2: 123, attr3: true },
         context: linkContext,
-        droppedAttributesCount: 0,
       },
     ]);
 
