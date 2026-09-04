@@ -7,7 +7,7 @@ import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { createFetchTransport } from '../../src/transport/fetch-transport';
 import { createRetryingTransport } from '../../src/retrying-transport';
-import { registerMockDiagLogger } from '../common/test-utils';
+import { registerMockDiagLogger, withResolvers } from '../common/test-utils';
 import type {
   ExportResponseRetryable,
   ExportResponseFailure,
@@ -30,6 +30,31 @@ const testPayload = Uint8Array.from([1, 2, 3]);
 const MAX_KEEPALIVE_BODY_SIZE = 60 * 1024;
 // 9 is the max concurrent keepalive requests
 const MAX_KEEPALIVE_REQUESTS = 9;
+
+/**
+ * A response body that delivers one chunk and then stays open until the
+ * request is aborted, at which point it fails the way a real fetch body does.
+ */
+function neverEndingBodyAbortedBy(
+  signal: AbortSignal | null | undefined
+): ReadableStream<Uint8Array> {
+  return new ReadableStream({
+    start(controller) {
+      controller.enqueue(Uint8Array.from([1, 2, 3]));
+      const abort = () =>
+        controller.error(
+          new DOMException('The user aborted a request.', 'AbortError')
+        );
+      // An abort that already happened fires no event, and the body would
+      // then stay open until the test times out instead of failing.
+      if (signal?.aborted) {
+        abort();
+        return;
+      }
+      signal?.addEventListener('abort', abort);
+    },
+  });
+}
 
 describe('FetchTransport', function () {
   afterEach(function () {
@@ -229,6 +254,177 @@ describe('FetchTransport', function () {
         'Fetch request errored'
       );
     });
+  });
+
+  describe('response body handling', function () {
+    it('reads the response body of a successful export', async function () {
+      // arrange
+      let cancelled = false;
+      const body = new ReadableStream({
+        start(controller) {
+          controller.enqueue(Uint8Array.from([1, 2, 3]));
+          controller.close();
+        },
+        cancel() {
+          cancelled = true;
+        },
+      });
+      const response = new Response(body, { status: 200 });
+      sinon.stub(globalThis, 'fetch').resolves(response);
+      const transport = createFetchTransport(testTransportParameters);
+
+      // act
+      const result = await transport.send(testPayload, requestTimeout);
+
+      // assert - the body has to be read to its end, cancelling it does not
+      // release the keepalive quota the request holds
+      assert.strictEqual(result.status, 'success');
+      assert.strictEqual(response.bodyUsed, true);
+      assert.strictEqual(cancelled, false);
+    });
+
+    it('does not settle the export until the response body reaches its end', async function () {
+      // arrange - a body that stays open until this test closes it. Chromium
+      // returns the request's keepalive quota only once the body has been read
+      // to the end, so send() must not resolve before then. `bodyUsed` is no
+      // help here: it flips on the first read, not on completion, so it holds
+      // even if the drain is never awaited.
+      const bodyClosed = withResolvers<void>();
+      const body = new ReadableStream({
+        start(controller) {
+          controller.enqueue(Uint8Array.from([1, 2, 3]));
+          void bodyClosed.promise.then(() => controller.close());
+        },
+      });
+      sinon
+        .stub(globalThis, 'fetch')
+        .resolves(new Response(body, { status: 200 }));
+      const transport = createFetchTransport(testTransportParameters);
+
+      // act
+      let settled = false;
+      const sent = transport
+        .send(testPayload, requestTimeout)
+        .then(result => ((settled = true), result));
+      // a macrotask boundary drains every microtask the export could still
+      // have queued, so the drain is parked on the open body by now
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      // assert
+      assert.strictEqual(
+        settled,
+        false,
+        'export settled while the response body was still open'
+      );
+      bodyClosed.resolve();
+      assert.strictEqual((await sent).status, 'success');
+    });
+
+    it('reads the response body of a retryable export', async function () {
+      // arrange
+      const response = new Response('test response', {
+        status: 503,
+        headers: { 'Retry-After': '5' },
+      });
+      sinon.stub(globalThis, 'fetch').resolves(response);
+      const transport = createFetchTransport(testTransportParameters);
+
+      // act
+      const result = await transport.send(testPayload, requestTimeout);
+
+      // assert
+      assert.strictEqual(result.status, 'retryable');
+      assert.strictEqual(response.bodyUsed, true);
+    });
+
+    it('releases the reader lock after draining the body', async function () {
+      // arrange - a held reader would keep the body locked, and a later export
+      // handed the same response could then not drain it
+      const response = new Response('test response', { status: 200 });
+      sinon.stub(globalThis, 'fetch').resolves(response);
+      const transport = createFetchTransport(testTransportParameters);
+
+      // act
+      const first = await transport.send(testPayload, requestTimeout);
+      const second = await transport.send(testPayload, requestTimeout);
+
+      // assert
+      assert.strictEqual(first.status, 'success');
+      assert.strictEqual(second.status, 'success');
+      assert.strictEqual(response.bodyUsed, true);
+      assert.strictEqual(response.body?.locked, false);
+    });
+
+    it('returns success when the response body is locked by another reader', async function () {
+      // arrange - a fetch wrapper may hold the body's reader. The export
+      // already reached the collector, so a body that cannot be drained must
+      // not turn into a network error and have the export retried.
+      const response = new Response('test response', { status: 200 });
+      response.body?.getReader();
+      sinon.stub(globalThis, 'fetch').resolves(response);
+      const { debug } = registerMockDiagLogger();
+      const transport = createFetchTransport(testTransportParameters);
+
+      // act
+      const result = await transport.send(testPayload, requestTimeout);
+
+      // assert
+      assert.strictEqual(result.status, 'success');
+      sinon.assert.calledWithMatch(debug, /error reading export response body/);
+    });
+
+    it('returns success when the response body cannot be read', async function () {
+      // arrange
+      const erroringBody = new ReadableStream({
+        start(controller) {
+          controller.error(new Error('body read failed'));
+        },
+      });
+      sinon
+        .stub(globalThis, 'fetch')
+        .resolves(new Response(erroringBody, { status: 200 }));
+      const { debug } = registerMockDiagLogger();
+      const transport = createFetchTransport(testTransportParameters);
+
+      // act
+      const result = await transport.send(testPayload, requestTimeout);
+
+      // assert - the export already reached the collector, the read is best effort
+      assert.strictEqual(result.status, 'success');
+      sinon.assert.calledWithMatch(debug, /error reading export response body/);
+    });
+
+    // The timeout keeps running while the body is drained, so a collector that
+    // holds the response open long enough gets the request aborted in the
+    // middle of the read. The headers are in by then, so the status the
+    // collector sent still decides the export outcome.
+    for (const { status, expected } of [
+      { status: 200, expected: 'success' },
+      { status: 503, expected: 'retryable' },
+    ]) {
+      it(`returns ${expected} when the timeout aborts the export while its ${status} response body is being read`, async function () {
+        // arrange - a body that stays open until the request is aborted, which
+        // is what the reader sees when the timeout fires mid-drain
+        sinon
+          .stub(globalThis, 'fetch')
+          .callsFake(
+            async (_input, init) =>
+              new Response(neverEndingBodyAbortedBy(init?.signal), { status })
+          );
+        const { debug } = registerMockDiagLogger();
+        const transport = createFetchTransport(testTransportParameters);
+
+        // act
+        const result = await transport.send(testPayload, 1);
+
+        // assert
+        assert.strictEqual(result.status, expected);
+        sinon.assert.calledWithMatch(
+          debug,
+          /error reading export response body/
+        );
+      });
+    }
   });
 
   describe('keepalive queue tracking', function () {
