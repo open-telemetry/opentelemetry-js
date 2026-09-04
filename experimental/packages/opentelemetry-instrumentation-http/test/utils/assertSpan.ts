@@ -7,6 +7,7 @@ import { isValidSpanId, SpanKind } from '@opentelemetry/api';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import type { ReadableSpan } from '@opentelemetry/sdk-trace';
 import {
+  ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
   ATTR_NETWORK_PEER_ADDRESS,
@@ -78,6 +79,14 @@ export const assertSpan = (
       code: utils.parseResponseStatus(span.kind, validations.httpStatusCode),
     }
   );
+
+  // A forced status comes from an exception, which carries its own error.type.
+  if (!validations.forceStatus) {
+    assert.strictEqual(
+      span.attributes[ATTR_ERROR_TYPE],
+      utils.parseErrorType(span.kind, validations.httpStatusCode)
+    );
+  }
 
   assert.ok(span.endTime, 'must be finished');
   assert.ok(hrTimeToNanoseconds(span.duration), 'must have positive duration');
