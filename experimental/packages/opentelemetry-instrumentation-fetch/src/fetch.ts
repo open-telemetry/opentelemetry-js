@@ -576,14 +576,11 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     if (typeof PerformanceObserver !== 'function') {
       return { entries, startTime, spanUrl };
     }
-    // Where the 'resource' entry type is unsupported, `observe()` aborts
-    // without throwing per spec, so the observer would stay empty for the
-    // lifetime of the page. Not attaching one lets the span fall through to
-    // the `getEntriesByType` fallback instead.
     if (
       PerformanceObserver.supportedEntryTypes &&
       !PerformanceObserver.supportedEntryTypes.includes('resource')
     ) {
+      return { entries, startTime, spanUrl };
     }
 
     const observer = new PerformanceObserver(list => {
