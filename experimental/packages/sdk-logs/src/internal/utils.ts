@@ -73,7 +73,7 @@ export function getInstrumentationScopeKey(
     scope.name,
     scope.version || '',
     scope.schemaUrl || '',
-    normalizeAnyValue(scope.attributes),
+    normalizeAnyValue(scope.attributes ?? {}),
     // we include the dropped attributes count to avoid collisions between scopes with the same identifying
     // characteristics, but different dropped counts. While there still can be collisions this is the best we can do if
     // we want to resolve the same logger without relying on object identity.

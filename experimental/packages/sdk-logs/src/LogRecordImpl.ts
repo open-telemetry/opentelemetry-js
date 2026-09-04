@@ -6,7 +6,11 @@
 import type { LogRecord, SeverityNumber } from '@opentelemetry/api-logs';
 import * as api from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
-import { timeInputToHrTime } from '@opentelemetry/core';
+import {
+  AddAttributeDecision,
+  maybeAddAttribute,
+  timeInputToHrTime,
+} from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import {
   ATTR_EXCEPTION_MESSAGE,
@@ -16,7 +20,6 @@ import {
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
 import type { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
-import { addAttribute, AddAttributeDecision } from './utils/validation';
 
 export class LogRecordImpl implements ReadableLogRecord {
   readonly resource: Resource;
@@ -157,13 +160,13 @@ export class LogRecordImpl implements ReadableLogRecord {
       return this;
     }
 
-    const decision = addAttribute(
-      this.attributes,
-      this._logRecordLimits,
-      this._attributesCount,
+    const decision = maybeAddAttribute({
       key,
-      value
-    );
+      value,
+      attributes: this.attributes,
+      limits: this._logRecordLimits,
+      currentAttributesCount: this._attributesCount,
+    });
 
     if (decision === AddAttributeDecision.DROP_LIMIT_REACHED) {
       this._droppedAttributesCount++;
