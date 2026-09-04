@@ -37,7 +37,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 ### :bug: Bug Fixes
 
 * fix(instrumentation-http): set `error.type` on spans whose status code makes them an error [#7061](https://github.com/open-telemetry/opentelemetry-js/pull/7061) @mwear
-* fix(sdk-logs): accept log attributes with shared object references [#7040](https://github.com/open-telemetry/opentelemetry-js/pull/7040) @rajanpanth
+* fix(sdk-logs): accept log attributes with shared object references [#7068](https://github.com/open-telemetry/opentelemetry-js/pull/7068) @rajanpanth
 
 ### :books: Documentation
 
