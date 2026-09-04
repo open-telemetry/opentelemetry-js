@@ -40,8 +40,6 @@
   "browser": {
     "./dist/platform/node/environment.mjs": "./dist/platform/browser/environment.mjs",
     "./dist/platform/node/environment.cjs": "./dist/platform/browser/environment.cjs",
-    "./dist/platform/node/index.mjs": "./dist/platform/browser/index.mjs",
-    "./dist/platform/node/index.cjs": "./dist/platform/browser/index.cjs",
     "./dist/platform/node/sdk-info.mjs": "./dist/platform/browser/sdk-info.mjs",
     "./dist/platform/node/sdk-info.cjs": "./dist/platform/browser/sdk-info.cjs",
     "./dist/platform/index.mjs": "./dist/platform/browser/index.mjs",
