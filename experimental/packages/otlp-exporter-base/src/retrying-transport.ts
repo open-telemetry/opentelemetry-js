@@ -58,18 +58,22 @@ class RetryingTransport implements IExporterTransport {
       const retryInMillis = result.retryInMillis ?? backoff;
 
       // return when expected retry time is after the export deadline.
-      const remainingTimeoutMillis = deadline - Date.now();
-      if (retryInMillis > remainingTimeoutMillis) {
-        diag.info(
-          `Export retry time ${Math.round(retryInMillis)}ms exceeds remaining timeout ${Math.round(
-            remainingTimeoutMillis
-          )}ms, not retrying further.`
-        );
-        return result;
+      let nextTimeoutMillis = 0;
+      if (timeoutMillis > 0) {
+        const remainingTimeoutMillis = deadline - Date.now();
+        if (retryInMillis > remainingTimeoutMillis) {
+          diag.info(
+            `Export retry time ${Math.round(retryInMillis)}ms exceeds remaining timeout ${Math.round(
+              remainingTimeoutMillis
+            )}ms, not retrying further.`
+          );
+          return result;
+        }
+        nextTimeoutMillis = remainingTimeoutMillis;
       }
 
       diag.verbose(`Scheduling export retry in ${Math.round(retryInMillis)}ms`);
-      result = await this.retry(data, remainingTimeoutMillis, retryInMillis);
+      result = await this.retry(data, nextTimeoutMillis, retryInMillis);
     }
 
     if (result.status === 'success') {
