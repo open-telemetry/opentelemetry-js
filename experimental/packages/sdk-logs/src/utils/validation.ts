@@ -46,45 +46,56 @@ function isLogAttributeValueInternal(
     return true;
   }
 
-  // For objects and arrays, check for circular references
+  // For objects and arrays, check for circular references. Only the values on
+  // the path currently being walked are tracked, so a value that is referenced
+  // more than once without forming a cycle still serializes to a finite tree
+  // and remains valid.
   if (typeof val === 'object') {
     if (visited.has(val as object)) {
       // Circular reference detected - reject it
       return false;
     }
     visited.add(val as object);
+    const isValid = isLogAttributeObjectValue(val as object, visited);
+    visited.delete(val as object);
+    return isValid;
+  }
 
-    // Arrays (can contain any AnyValue, including heterogeneous)
-    if (Array.isArray(val)) {
-      for (const item of val) {
-        if (!isLogAttributeValueInternal(item, visited)) {
-          return false;
-        }
-      }
-      return true;
-    }
+  return false;
+}
 
-    // Only accept plain objects (not built-in objects like Date, RegExp, Error, etc.)
-    // Check if it's a plain object by verifying its constructor is Object or it has no constructor
-    const obj = val as Record<string, unknown>;
-    if (obj.constructor !== Object && obj.constructor !== undefined) {
-      return false;
-    }
-
-    // Objects/Maps (including empty objects)
-    // All object properties must be valid AnyValues
-    for (const key in obj) {
-      if (
-        Object.prototype.hasOwnProperty.call(obj, key) &&
-        !isLogAttributeValueInternal(obj[key], visited)
-      ) {
+function isLogAttributeObjectValue(
+  val: object,
+  visited: WeakSet<object>
+): boolean {
+  // Arrays (can contain any AnyValue, including heterogeneous)
+  if (Array.isArray(val)) {
+    for (const item of val) {
+      if (!isLogAttributeValueInternal(item, visited)) {
         return false;
       }
     }
     return true;
   }
 
-  return false;
+  // Only accept plain objects (not built-in objects like Date, RegExp, Error, etc.)
+  // Check if it's a plain object by verifying its constructor is Object or it has no constructor
+  const obj = val as Record<string, unknown>;
+  if (obj.constructor !== Object && obj.constructor !== undefined) {
+    return false;
+  }
+
+  // Objects/Maps (including empty objects)
+  // All object properties must be valid AnyValues
+  for (const key in obj) {
+    if (
+      Object.prototype.hasOwnProperty.call(obj, key) &&
+      !isLogAttributeValueInternal(obj[key], visited)
+    ) {
+      return false;
+    }
+  }
+  return true;
 }
 
 export const enum AddAttributeDecision {
