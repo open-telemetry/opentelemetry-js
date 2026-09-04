@@ -228,8 +228,8 @@ A `require()` call will cause Node.js to use the CommonJS module loader.
 An `import ...` statement or `import()` call will cause Node.js to use the ECMAScript module loader.
 
 If your application is written in JavaScript as ESM, or it must compile to ESM from TypeScript, then a loader hook is required to properly patch instrumentation.
-The custom hook for ESM instrumentation is `--experimental-loader=@opentelemetry/instrumentation/hook.mjs`.
-This flag must be passed to the `node` binary, which is often done as a startup command and/or in the `NODE_OPTIONS` environment variable.
+The custom hook for ESM instrumentation is `--import=@opentelemetry/instrumentation/register.mjs`, or you can `import '@opentelemetry/instrumentation/register.mjs` 
+in your instrumentation file. This flag must be passed to the `node` binary, which is often done as a startup command and/or in the `NODE_OPTIONS` environment variable.
 
 For more details on ECMAScript Modules vs CommonJS, refer to [esm-support](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-support.md).
 

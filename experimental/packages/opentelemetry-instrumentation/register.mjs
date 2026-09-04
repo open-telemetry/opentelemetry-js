@@ -8,8 +8,11 @@
 //
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2021 Datadog, Inc.
 
-export {
-  load,
-  resolve,
-  initialize,
-} from 'import-in-the-middle/hook.mjs';
+import module from 'node:module';
+import { register, supportsSyncHooks } from '@opentelemetry/instrumentation/register-hooks.mjs';
+
+if (supportsSyncHooks()) {
+  register();
+} else {
+  module.register("@opentelemetry/instrumentation/hook.mjs", import.meta.url);
+}
