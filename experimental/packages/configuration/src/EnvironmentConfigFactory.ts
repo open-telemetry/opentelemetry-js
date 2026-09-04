@@ -183,7 +183,10 @@ export function setAttributeLimits(config: ConfigurationModel): void {
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT'
   );
-  if (attributeValueLengthLimit && attributeValueLengthLimit > 0) {
+  if (
+    attributeValueLengthLimit !== undefined &&
+    attributeValueLengthLimit >= 0
+  ) {
     if (config.attribute_limits == null) {
       config.attribute_limits = { attribute_count_limit: 128 };
     }
@@ -192,7 +195,7 @@ export function setAttributeLimits(config: ConfigurationModel): void {
   }
 
   const attributeCountLimit = getNumberFromEnv('OTEL_ATTRIBUTE_COUNT_LIMIT');
-  if (attributeCountLimit) {
+  if (attributeCountLimit !== undefined) {
     if (config.attribute_limits == null) {
       config.attribute_limits = { attribute_count_limit: attributeCountLimit };
     } else {
@@ -295,7 +298,7 @@ export function setTracerProvider(
   const attributeValueLengthLimit = getNumberFromEnv(
     'OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT'
   );
-  if (attributeValueLengthLimit) {
+  if (attributeValueLengthLimit !== undefined) {
     config.tracer_provider.limits!.attribute_value_length_limit =
       attributeValueLengthLimit;
   }
@@ -303,24 +306,24 @@ export function setTracerProvider(
   const attributeCountLimit = getNumberFromEnv(
     'OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT'
   );
-  if (attributeCountLimit) {
+  if (attributeCountLimit !== undefined) {
     config.tracer_provider.limits!.attribute_count_limit = attributeCountLimit;
   }
 
   const eventCountLimit = getNumberFromEnv('OTEL_SPAN_EVENT_COUNT_LIMIT');
-  if (eventCountLimit) {
+  if (eventCountLimit !== undefined) {
     config.tracer_provider.limits!.event_count_limit = eventCountLimit;
   }
 
   const linkCountLimit = getNumberFromEnv('OTEL_SPAN_LINK_COUNT_LIMIT');
-  if (linkCountLimit) {
+  if (linkCountLimit !== undefined) {
     config.tracer_provider.limits!.link_count_limit = linkCountLimit;
   }
 
   const eventAttributeCountLimit = getNumberFromEnv(
     'OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT'
   );
-  if (eventAttributeCountLimit) {
+  if (eventAttributeCountLimit !== undefined) {
     config.tracer_provider.limits!.event_attribute_count_limit =
       eventAttributeCountLimit;
   }
@@ -328,7 +331,7 @@ export function setTracerProvider(
   const linkAttributeCountLimit = getNumberFromEnv(
     'OTEL_LINK_ATTRIBUTE_COUNT_LIMIT'
   );
-  if (linkAttributeCountLimit) {
+  if (linkAttributeCountLimit !== undefined) {
     config.tracer_provider.limits!.link_attribute_count_limit =
       linkAttributeCountLimit;
   }
@@ -599,13 +602,16 @@ export function setLoggerProvider(config: ConfigurationModel): void {
   const attributeCountLimit = getNumberFromEnv(
     'OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT'
   );
-  if (attributeValueLengthLimit || attributeCountLimit) {
-    if (attributeValueLengthLimit) {
+  if (
+    attributeValueLengthLimit !== undefined ||
+    attributeCountLimit !== undefined
+  ) {
+    if (attributeValueLengthLimit !== undefined) {
       config.logger_provider.limits!.attribute_value_length_limit =
         attributeValueLengthLimit;
     }
 
-    if (attributeCountLimit) {
+    if (attributeCountLimit !== undefined) {
       config.logger_provider.limits!.attribute_count_limit =
         attributeCountLimit;
     }
