@@ -93,6 +93,11 @@ class CompositeSampler implements Sampler {
         newTraceState = new CoreTraceState();
       }
       newTraceState = newTraceState.set('ot', otts);
+    } else if (newTraceState?.get('ot')) {
+      // Nothing new to write, but an inherited `ot` value (e.g. a parent's
+      // `th`) would otherwise pass through unchanged. That would misrepresent
+      // this sampler's decision, so clear it explicitly.
+      newTraceState = newTraceState.unset('ot');
     }
 
     return {
