@@ -196,12 +196,12 @@ function cleanAttributesInternal(
   attributes?: Attributes;
   droppedAttributesCount?: number;
 } {
-  const attributes: Attributes = {};
-  let droppedAttributesCount = 0;
-
   if (typeof inAttributes !== 'object' || inAttributes == null) {
     return {};
   }
+
+  const attributes: Attributes = {};
+  let droppedAttributesCount = 0;
 
   let attributeValueLengthLimit = limits.attributeValueLengthLimit;
   if (attributeValueLengthLimit <= 0) {
@@ -212,9 +212,7 @@ function cleanAttributesInternal(
   }
 
   let count = 0;
-  for (const key of Object.keys(inAttributes)) {
-    // XXX perf: vs `for (const [key, val] of Object.entries(inAttributes))`?
-    const val = (inAttributes as Record<string, unknown>)[key];
+  for (const [key, val] of Object.entries(inAttributes)) {
     if (val === undefined) {
       // Silently drop undefined values.
       continue;
@@ -233,7 +231,6 @@ function cleanAttributesInternal(
       droppedAttributesCount++;
       continue;
     }
-    // TODO(perf): if no limit (Infinity, common case), could `structuredClone` be used to be faster?
     attributes[key] = copyAndTruncAnyValue(val, attributeValueLengthLimit);
     count++;
   }
