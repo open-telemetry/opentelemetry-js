@@ -82,6 +82,33 @@ jobs:
 
       - name: Unit tests
         run: npm run test
+  verify-pack:
+    # Unit tests run against TS source via ts-node, so they never exercise
+    # the published dist/ artifact. This job packs every workspace package,
+    # loads the require/import targets of its `exports` map, and existence
+    # checks types/browser/main/module files in the tarball.
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+          node-version: ^26.3.0
+
+      - name: Bootstrap
+        run: npm ci --ignore-scripts
+
+      - name: Build 🔧
+        run: npm run compile
+
+      - name: Verify packed artifacts
+        run: npm run verify-pack
 
   browser-tests:
     runs-on: ubuntu-latest

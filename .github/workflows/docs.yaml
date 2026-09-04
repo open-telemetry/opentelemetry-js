@@ -8,7 +8,46 @@ permissions:
   contents: read
 
 jobs:
+  # The documentation site is built from a single tree and the deploy step force-pushes to
+  # `gh-pages`, so it can only ever track one release line. A release cut from a maintenance
+  # branch (e.g. `v2.x`) would replace the current API docs with the older line's.
+  #
+  # Every release in this repository is tagged on the commit that was merged (the
+  # `_github:draft_release:*` scripts pass `--target $(git rev-parse HEAD)`), so "does this
+  # release belong to `main`" is a plain reachability check. It holds for all four tag
+  # families - `vX.Y.Z`, `api/vX.Y.Z`, `experimental/vX.Y.Z` and `semconv/vX.Y.Z`.
+  check-released-commit:
+    runs-on: ubuntu-latest
+    outputs:
+      on-main: ${{ steps.check.outputs.on-main }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # Reachability needs the whole commit graph, but none of the file contents:
+          # `tree:0` keeps this a cheap clone despite `fetch-depth: 0`.
+          fetch-depth: 0
+          filter: tree:0
+
+      - name: Check whether the released commit is on main
+        id: check
+        env:
+          RELEASE_SHA: ${{ github.sha }}
+        run: |
+          # Fetched explicitly rather than relying on the checkout refspec, because a missing
+          # or stale `main` would silently reject a perfectly good release.
+          git fetch --no-tags --filter=tree:0 origin +refs/heads/main:refs/remotes/origin/main
+          if git merge-base --is-ancestor "$RELEASE_SHA" refs/remotes/origin/main; then
+            echo 'on-main=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'on-main=false' >> "$GITHUB_OUTPUT"
+            echo "::notice title=Skipping the API documentation deploy::$RELEASE_SHA is not on main, so this release is not from the line the documentation site tracks."
+          fi
+
   build-and-deploy:
+    needs: check-released-commit
+    if: needs.check-released-commit.outputs.on-main == 'true'
     permissions:
       contents: write # required for deploying documentation to gh-pages
     runs-on: ubuntu-latest

@@ -1,6 +1,10 @@
-# This action requires that any PR targeting the main and next branch should touch at
-# least one CHANGELOG file. If a CHANGELOG entry is not required, add the "Skip
-# Changelog" label to disable this action.
+# This action requires that any PR targeting the main or maintenance branch
+# (`v<major>.x`) should touch at least one CHANGELOG file. If a CHANGELOG entry is not
+# required, add the "Skip Changelog" label to disable this action.
+#
+# Maintenance branches are included because each branch keeps its own changelog, and
+# scripts/prepare-release.mjs rotates it into that branch's release notes - see
+# doc/contributing/releasing.md#changelogs-on-a-maintenance-branch.
 
 name: changelog
 
@@ -9,7 +13,7 @@ on:
     types: [opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - main
-      - next
+      - 'v[0-9]*.x'
 permissions:
   contents: read
 jobs:

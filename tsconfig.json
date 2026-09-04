@@ -1,6 +1,11 @@
 {
   "extends": "./tsconfig.base.json",
   "files": [],
+  "include": [
+    "tsdown.config.ts",
+    "**/tsdown.config.ts",
+    "**/tsdown.*.config.ts"
+  ],
   "typedocOptions": {
     "entryPointStrategy": "packages",
     "entryPoints": [

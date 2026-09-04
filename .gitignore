@@ -57,6 +57,7 @@ typings/
 
 # Output of 'npm pack'
 *.tgz
+.size-limit.json
 
 # Yarn Integrity file
 .yarn-integrity

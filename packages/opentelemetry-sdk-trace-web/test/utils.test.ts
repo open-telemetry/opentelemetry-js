@@ -3,10 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  hrTimeToNanoseconds,
-  otperformance as performance,
-} from '@opentelemetry/core';
+import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import * as core from '@opentelemetry/core';
 import type * as tracing from '@opentelemetry/sdk-trace-base';
 import type { HrTime } from '@opentelemetry/api';

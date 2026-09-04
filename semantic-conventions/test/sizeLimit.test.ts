@@ -15,15 +15,11 @@ const rValues =
 const entryPoints = [
   {
     name: 'cjs',
-    entry: './build/src/index.js',
+    entry: './dist/index.cjs',
   },
   {
     name: 'esm',
-    entry: './build/esm/index.js',
-  },
-  {
-    name: 'esnext',
-    entry: './build/esnext/index.js',
+    entry: './dist/index.mjs',
   },
 ];
 
@@ -44,7 +40,7 @@ describe('size-limits', function () {
       brotli?: ISizeResult | null;
     };
   } = {};
-  const debugPath = path.resolve('./build/size-limit');
+  const debugPath = path.resolve('./.tmp/size-limit');
 
   this.timeout(60000);
 
@@ -92,7 +88,7 @@ describe('size-limits', function () {
 
       assert.ok(true, 'running');
       const value = child_process.execSync(
-        'size-limit --save-bundle build/size-limit/' + name + ' --clean-dir'
+        'size-limit --save-bundle .tmp/size-limit/' + name + ' --clean-dir'
       );
 
       let output = value.toString();
