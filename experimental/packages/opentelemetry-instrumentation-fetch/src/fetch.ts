@@ -36,12 +36,6 @@ import {
 } from './utils';
 import { VERSION } from './version';
 
-// how long to wait for observer to collect information about resources
-// this is needed as event "load" is called before observer
-// hard to say how long it should really wait, seems like 300ms is
-// safe enough
-const OBSERVER_WAIT_TIME_MS = 300;
-
 const hasBrowserPerformanceAPI = typeof PerformanceObserver !== 'undefined';
 
 export interface FetchCustomAttributeFunction {
@@ -199,7 +193,17 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
    * @private
    */
   private _clearResources() {
-    if (this._tasksCount === 0 && this.getConfig().clearTimingResources) {
+    if (this._tasksCount < 0) {
+      // Should be unreachable: every increment has exactly one decrement in
+      // the `finally` of `_endSpan`. Surface it rather than letting the
+      // strict comparison below silently disable clearing forever.
+      this._diag.error(
+        'fetch instrumentation task count went negative, resetting',
+        this._tasksCount
+      );
+      this._tasksCount = 0;
+      return;
+    }
       performance.clearResourceTimings();
       this._usedResources = new WeakSet<PerformanceResourceTiming>();
     }
@@ -249,12 +253,30 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   ): void {
     let resources: PerformanceResourceTiming[] = resourcesObserver.entries;
     if (!resources.length) {
+      // Nothing came from this span's observer (or there was no observer for
+      // it at all). Consult the global resource timing buffer as a last
+      // resort: `web.getResource` below filters candidates by URL, by this
+      // span's start/end window and by `_usedResources`, so a stale or
+      // unrelated entry cannot be picked up here.
+      if (resourcesObserver.observer) {
+        // The observer delivers entries in a later task, and `takeRecords()`
+        // in `_endSpan` is a single, non-replayable drain, so an entry
+        // finalized after that point is unreachable from the observer. This
+        // is timing dependent and only actionable by maintainers.
+        this._diag.debug(
+          'PerformanceObserver collected no resource timing entries for this span, falling back to performance.getEntriesByType',
+          resourcesObserver.spanUrl
+        );
+      }
       if (!performance.getEntriesByType) {
+        // Unsupported environment: no fallback is possible, so the span ends
+        // without network events.
+        this._diag.debug(
+          'performance.getEntriesByType is not available, no network events will be added to this span',
+          resourcesObserver.spanUrl
+        );
         return;
       }
-      // fallback - either Observer is not available or it took longer
-      // then OBSERVER_WAIT_TIME_MS and observer didn't collect enough
-      // information
       resources = performance.getEntriesByType(
         'resource'
       ) as PerformanceResourceTiming[];
@@ -306,21 +328,46 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   private _endSpan(span: Span, spanData: SpanData, response: FetchResponse) {
     const endTime = core.millisToHrTime(Date.now());
     const performanceEndTime = core.hrTime();
-    this._addFinalSpanAttributes(span, response);
 
-    // https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#status
-    if (response.status >= 400) {
-      span.setStatus({ code: SpanStatusCode.ERROR });
-      span.setAttribute(ATTR_ERROR_TYPE, String(response.status));
-    }
+    // This now runs inside the fulfillment handler of the clone reader's
+    // `read()` promise rather than in a `setTimeout`, so nothing outside
+    // catches a throw from here. The statements that must always run
+    // (task accounting, observer cleanup, ending the span) are in `finally`
+    // so that a failure in any of the optional enrichment above cannot leak
+    // `_tasksCount` or leave the observer connected.
+    try {
+      this._addFinalSpanAttributes(span, response);
 
-    setTimeout(() => {
-      spanData.observer?.disconnect();
+      // https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#status
+      if (response.status >= 400) {
+        span.setStatus({ code: SpanStatusCode.ERROR });
+        span.setAttribute(ATTR_ERROR_TYPE, String(response.status));
+      }
+
+      if (spanData.observer) {
+        // Drain entries the observer has captured but not yet delivered to
+        // its callback — still the observer's own data. Applies the same
+        // filter as the observer callback in _prepareSpanData.
+        const pendingEntries =
+          spanData.observer.takeRecords() as PerformanceResourceTiming[];
+        pendingEntries.forEach(entry => {
+          if (
+            entry.initiatorType === 'fetch' &&
+            entry.name === spanData.spanUrl
+          ) {
+            spanData.entries.push(entry);
+          }
+        });
+      }
       this._findResourceAndAddNetworkEvents(span, spanData, performanceEndTime);
+    } catch (e) {
+      this._diag.error('failed to finalize fetch span', spanData.spanUrl, e);
+    } finally {
+      spanData.observer?.disconnect();
       this._tasksCount--;
       this._clearResources();
       span.end(endTime);
-    }, OBSERVER_WAIT_TIME_MS);
+    }
   }
 
   /**
@@ -394,6 +441,11 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         }
 
         function onSuccess(span: Span, response: Response): Response {
+          // Only the synchronous setup is guarded here. `_endSpan` is now
+          // internally exception-safe (its cleanup is in a `finally`), so it
+          // must not be reachable from this catch: doing so would end the
+          // span twice and drive `_tasksCount` negative.
+          let reader: ReadableStreamDefaultReader<Uint8Array> | undefined;
           try {
             // Clone the response and eagerly consume the clone to detect
             // when the body transfer completes.  The original response is
@@ -404,54 +456,48 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
             // Keeping eager consumption here to preserve current behavior and avoid breaking existing tests.
             // Context: discussion in PR #5894 → https://github.com/open-telemetry/opentelemetry-js/pull/5894
             const resClone = response.clone();
-            const body = resClone.body;
-            if (body) {
-              const reader = body.getReader();
-
-              const read = (): void => {
-                reader.read().then(
-                  ({ done }) => {
-                    if (done) {
-                      endSpanOnSuccess(span, response);
-                    } else {
-                      read();
-                    }
-                  },
-                  error => {
-                    endSpanOnError(span, error);
-                  }
-                );
-              };
-              read();
-            } else {
-              // some older browsers don't have .body implemented
-              endSpanOnSuccess(span, response);
-            }
+            reader = resClone.body?.getReader();
           } catch (error) {
-            // Setup failed (e.g. clone() or getReader() threw).
-            // End the span and clean up so _tasksCount doesn't leak.
+            // Setup failed (e.g. clone() or getReader() threw). The span has
+            // not been ended yet, so end it here and clean up so
+            // _tasksCount doesn't leak.
             plugin._diag.error('Failed to read fetch response body', error);
             plugin._endSpan(span, spanData, {
               status: 0,
               url,
             });
+            return response;
           }
+
+          if (!reader) {
+            // some older browsers don't have .body implemented
+            endSpanOnSuccess(span, response);
+            return response;
+          }
+
+          const consume = reader;
+          const read = (): void => {
+            consume.read().then(
+              ({ done }) => {
+                if (done) {
+                  endSpanOnSuccess(span, response);
+                } else {
+                  read();
+                }
+              },
+              error => {
+                endSpanOnError(span, error);
+              }
+            );
+          };
+          read();
           return response;
         }
 
         function onError(span: Span, error: FetchError): never {
-          try {
-            endSpanOnError(span, error);
-          } catch (e: unknown) {
-            // endSpanOnError failed — fall back to ending the span
-            // directly so _tasksCount doesn't leak.
-            plugin._diag.error('Failed to end span on fetch error', e);
-            plugin._endSpan(span, spanData, {
-              status: error.status || 0,
-              url,
-            });
-          }
-
+          // `_endSpan` performs its own cleanup in a `finally`, so there is
+          // no fallback call here: one would only end the span twice.
+          endSpanOnError(span, error);
           throw error;
         }
 
@@ -528,6 +574,12 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     const startTime = core.hrTime();
     const entries: PerformanceResourceTiming[] = [];
     if (typeof PerformanceObserver !== 'function') {
+      return { entries, startTime, spanUrl };
+    }
+    if (
+      PerformanceObserver.supportedEntryTypes &&
+      !PerformanceObserver.supportedEntryTypes.includes('resource')
+    ) {
       return { entries, startTime, spanUrl };
     }
 

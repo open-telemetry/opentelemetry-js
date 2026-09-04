@@ -48,6 +48,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(instrumentation-http): do not crash on or misdirect outgoing requests whose options Node.js itself accepts, such as a non-string `host` alongside a valid `hostname`, or a `URL` argument from another realm or a polyfill [#6969](https://github.com/open-telemetry/opentelemetry-js/pull/6969) @RaphaelManke
 * fix(instrumentation-http): redact sensitive query parameters on incoming (server) spans; add `redactedQueryParamsServer` config option @dyladan
 * fix(sdk-node): support `headers_list` when creating OTLP exporters from declarative configuration [#6953](https://github.com/open-telemetry/opentelemetry-js/issues/6953) @JacksonWeber
+* fix(instrumentation-fetch): end spans when the response body is consumed instead of after a fixed observer wait [#6971](https://github.com/open-telemetry/opentelemetry-js/pull/6971) @pacocartones
+  * (user-facing): `span.end()` now runs in the same microtask as the synchronous portion of `applyCustomAttributesOnSpan`, rather than up to 300 ms later. A hook that starts asynchronous work (for example `res.clone().json().then(b => span.setAttribute(...))`) previously had that window and the attribute landed; such a deferred `setAttribute` is now dropped, with only the SDK generic "Cannot execute the operation on ended Span" warning. The hook signature is synchronous, so only synchronous use is supported.
 
 ### :books: Documentation
 
