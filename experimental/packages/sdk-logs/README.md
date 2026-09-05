@@ -61,8 +61,16 @@ logger.emit({
 
 ## Config
 
-Logs configuration is a merge of both the user supplied configuration and the default
-configuration as specified in [LoggerConfigurators.ts](./src/config/LoggerConfigurators.ts)
+Logs configuration is a merge of the user supplied configuration and the defaults
+below, applied in the `LoggerProvider` constructor:
+
+| Option | Default |
+| --- | --- |
+| `resource` | `defaultResource()` |
+| `logRecordLimits.attributeCountLimit` | `128` |
+| `logRecordLimits.attributeValueLengthLimit` | `Infinity` |
+| `processors` | `[]` |
+| `loggerConfigurator` | all loggers enabled, no minimum severity, not trace based |
 
 ## Logger Configuration
 
