@@ -91,7 +91,7 @@
     "karma-chrome-launcher": "3.2.0",
     "karma-coverage": "2.2.1",
     "karma-mocha": "2.0.1",
-    "karma-spec-reporter": "0.0.36",
+    "karma-spec-reporter": "0.0.37",
     "karma-webpack": "5.0.1",
     "mocha": "11.8.0",
     "nyc": "17.1.0",

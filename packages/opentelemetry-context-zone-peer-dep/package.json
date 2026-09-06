@@ -68,7 +68,7 @@
     "karma-chrome-launcher": "3.2.0",
     "karma-coverage": "2.2.1",
     "karma-mocha": "2.0.1",
-    "karma-spec-reporter": "0.0.36",
+    "karma-spec-reporter": "0.0.37",
     "karma-webpack": "5.0.1",
     "mocha": "11.8.0",
     "nyc": "17.1.0",
@@ -77,7 +77,7 @@
     "typescript": "5.2.2",
     "webpack": "5.108.4",
     "webpack-cli": "7.2.3",
-    "zone.js": "0.16.2"
+    "zone.js": "0.16.3"
   },
   "peerDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.10.0",
