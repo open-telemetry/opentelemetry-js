@@ -69,6 +69,62 @@ if (typeof timer !== 'number') {
 
 ---
 
+## `@opentelemetry/propagator-jaeger` (package removed)
+
+The `@opentelemetry/propagator-jaeger` package has been removed. The Jaeger propagator is [deprecated by the OpenTelemetry specification](https://opentelemetry.io/docs/specs/otel/context/api-propagators/#propagators-distribution) in favour of the W3C TraceContext propagator.
+
+### Migrate to `W3CTraceContextPropagator`
+
+Replace any direct use of `JaegerPropagator` with `W3CTraceContextPropagator` from `@opentelemetry/core`:
+
+```ts
+// before
+import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
+import { propagation } from '@opentelemetry/api';
+
+propagation.setGlobalPropagator(new JaegerPropagator());
+
+// after
+import { W3CTraceContextPropagator } from '@opentelemetry/core';
+import { propagation } from '@opentelemetry/api';
+
+propagation.setGlobalPropagator(new W3CTraceContextPropagator());
+```
+
+### `OTEL_PROPAGATORS=jaeger` env var
+
+The `"jaeger"` value is no longer recognised by `@opentelemetry/sdk-node`. Replace it with `"tracecontext"`:
+
+```sh
+# before
+OTEL_PROPAGATORS=tracecontext,baggage,jaeger
+
+# after
+OTEL_PROPAGATORS=tracecontext,baggage
+```
+
+### `@opentelemetry/sdk-node` configuration object
+
+If you used the `jaeger` key in the `propagator.composite` configuration array, replace it with `tracecontext`:
+
+```ts
+// before
+const sdk = new NodeSDK({
+  textMapPropagator: createPropagatorFromConfig({
+    composite: [{ tracecontext: null }, { baggage: null }, { jaeger: null }],
+  }),
+});
+
+// after
+const sdk = new NodeSDK({
+  textMapPropagator: createPropagatorFromConfig({
+    composite: [{ tracecontext: null }, { baggage: null }],
+  }),
+});
+```
+
+---
+
 ## `@opentelemetry/sdk-trace`
 
 ### Removed: `TracerProviderOptions.forceFlushTimeoutMillis`
