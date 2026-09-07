@@ -18,7 +18,7 @@
  *
  * PRERELEASE is a modifier, not a selector: it changes how the selected groups are
  * bumped (2.10.0 -> 3.0.0-development.0) but never selects a group on its own. It cannot be
- * combined with an API or Semantic Conventions release - see resolveReleaseConfig().
+ * combined with a Semantic Conventions release - see resolveReleaseConfig().
  *
  * RELEASE_BASE_BRANCH decides which of those combinations are allowed at all: a maintenance
  * branch such as "v2.x" only cuts normal releases within its own major, while "main" is
@@ -35,7 +35,7 @@ import {
   getWorkspacePackagePaths
 } from './lib/package-utils.mjs';
 import { RELEASE_GROUPS } from './lib/release-groups.mjs';
-import { nextVersion } from './lib/bump-utils.mjs';
+import { nextVersion, releaseLineOfVersion } from './lib/bump-utils.mjs';
 import { parseReleaseBranch, resolveDistTags, RELEASE_BRANCH_HINT } from './lib/release-branch.mjs';
 import { rotateChangelog } from './lib/changelog-utils.mjs';
 
@@ -161,21 +161,20 @@ function resolveReleaseConfig(baseBranch) {
   // A pre-release version does not satisfy a caret or "<x.y.z" range, e.g.
   // semver.satisfies('1.44.0-rc.0', '^1.29.0') === false. Both the API and Semantic
   // Conventions packages are depended on through such ranges (rather than exact pins),
-  // so a pre-release of either would make npm resolve those dependencies to the last
-  // published release from the registry instead of linking the local workspace copy.
-  // The API has two further blockers: api/test/common/internal/version.test.ts bans
-  // pre-release VERSION strings, and api/src/internal/semver.ts requires exact equality
-  // when either side carries a pre-release tag, which would make a pre-release API
-  // incompatible with every other API version at runtime.
-  if (prereleaseId) {
-    for (const [name, value] of [['API_RELEASE', API_RELEASE], ['SEMCONV_RELEASE', SEMCONV_RELEASE]]) {
-      if (isSet(value)) {
-        console.error(`Error: ${name} cannot be combined with PRERELEASE="${PRERELEASE}".`);
-        console.error('Pre-releases are only supported for the Stable SDK and Experimental packages.');
-        console.error('Please release this package separately, as a normal release.');
-        process.exit(1);
-      }
-    }
+  // so a pre-release of either makes npm resolve those dependencies to the last published
+  // release from the registry instead of linking the local workspace copy.
+  //
+  // For the API that is handled: align-api-deps appends the exact pre-release version to
+  // every range as an alternative ("^1.3.0 || 1.10.0-rc.0") for the duration of the cycle -
+  // see scripts/lib/api-range-utils.mjs. Semantic Conventions has no equivalent, because
+  // scripts/lint-semconv-deps.mjs requires its dependents to keep a plain caret range, so a
+  // pre-release there stays unsupported.
+  if (prereleaseId && isSet(SEMCONV_RELEASE)) {
+    console.error(`Error: SEMCONV_RELEASE cannot be combined with PRERELEASE="${PRERELEASE}".`);
+    console.error('Dependents of @opentelemetry/semantic-conventions must keep a caret range, which a');
+    console.error('pre-release version does not satisfy.');
+    console.error('Please release this package separately, as a normal release.');
+    process.exit(1);
   }
 
   // Check for conflicting configuration
@@ -276,6 +275,24 @@ function resolveReleaseConfig(baseBranch) {
       console.error(`Error: cannot cut a normal Experimental release while the Stable SDK is at ${stableVersion}.`);
       console.error('Experimental packages pin stable SDK packages exactly, so the release would depend on a pre-release.');
       console.error('Please finalize the Stable SDK release first, or set PRERELEASE to match.');
+      process.exit(1);
+    }
+  }
+
+  // The API's version and the ranges every package depends on it through are only touched
+  // when API_RELEASE is set - see bumpApiVersion(). Cutting a normal release without it
+  // while the API is mid-pre-release would therefore publish final Stable SDK and
+  // Experimental versions still advertising a peer range widened for a pre-release nobody
+  // can install ("^1.3.0 || 1.10.0-rc.0"), and leave the pending pre-release API behind for
+  // lerna to publish alongside them. Iterating a pre-release without the API is fine, since
+  // everything involved stays on `canary`, so this only applies to normal releases.
+  if (!prereleaseId && !releaseTypeApi && (releaseTypeStable || releaseTypeExperimental)) {
+    const apiVersion = determineVersionFromPath(RELEASE_GROUPS['API'].packagePath);
+    if (semver.prerelease(apiVersion)) {
+      console.error(`Error: cannot cut a normal release while the API is at ${apiVersion}.`);
+      console.error('The API needs to be finalized in the same run, otherwise the released packages keep the');
+      console.error('peer dependency range that was widened for the pre-release.');
+      console.error(`Please set API_RELEASE to "${releaseLineOfVersion(apiVersion)}" to finalize it alongside.`);
       process.exit(1);
     }
   }
@@ -408,7 +425,7 @@ function bumpVersions(config) {
 // and tag as a side effect (the release branch makes its own commit further down) and
 // would bypass the checks in nextVersion(). api/src/version.ts is gitignored and
 // regenerated at build time, so nothing else needs updating here.
-function bumpApiVersion(releaseType) {
+function bumpApiVersion(releaseType, prereleaseId) {
   if (!releaseType) return;
 
   console.log(`\nBumping API version (${releaseType})...`);
@@ -417,8 +434,7 @@ function bumpApiVersion(releaseType) {
     const apiPackageJson = JSON.parse(fs.readFileSync(apiPackageJsonPath, 'utf-8'));
 
     const oldVersion = apiPackageJson.version;
-    // API pre-releases are rejected in resolveReleaseConfig(), so never a pre-release.
-    const newVersion = nextVersion(oldVersion, releaseType, null);
+    const newVersion = nextVersion(oldVersion, releaseType, prereleaseId);
     apiPackageJson.version = newVersion;
 
     fs.writeFileSync(apiPackageJsonPath, JSON.stringify(apiPackageJson, null, 2) + '\n');
@@ -552,7 +568,7 @@ function main() {
   // Step 3: Bump API version if needed (must be done before bumping other packages)
   if (config.RELEASE_TYPE_API) {
     console.log('Step 3: Bumping API version...');
-    bumpApiVersion(config.RELEASE_TYPE_API);
+    bumpApiVersion(config.RELEASE_TYPE_API, config.PRERELEASE_ID);
     console.log('  ✓ API version bumped\n');
   } else {
     console.log('Step 3: Skipping API version bump (not selected)\n');

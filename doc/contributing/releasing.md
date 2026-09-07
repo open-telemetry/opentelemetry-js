@@ -80,16 +80,60 @@ So a full 3.0.0 cycle looks like:
 
 **Not supported for pre-releases:**
 
-- The **API package** and **Semantic Conventions**. Both are depended on through version
-  *ranges* (`^1.29.0`, `>=1.0.0 <1.10.0`) rather than exact pins, and a pre-release
-  version does not satisfy such a range — npm would resolve those dependencies to the
-  last published release from the registry instead of linking the local workspace copy.
-  The API additionally bans pre-release versions outright, because
-  `@opentelemetry/api` requires an exact version match when either side carries a
-  pre-release tag. Release these packages separately, as normal releases.
+- **Semantic Conventions**. It is depended on through a caret range (`^1.29.0`), which a
+  pre-release version does not satisfy — npm would resolve the dependency to the last
+  published release from the registry instead of linking the local workspace copy, and
+  `scripts/lint-semconv-deps.mjs` requires dependents to keep that plain caret range.
+  Release it separately, as a normal release.
 - Cutting a **normal** Experimental release while the Stable SDK is mid-pre-release.
   Experimental packages pin stable SDK packages exactly, so this would publish a stable
   version depending on a pre-release. Finalize the Stable SDK first.
+- Cutting a **normal** Stable SDK or Experimental release while the *API* is
+  mid-pre-release, without finalizing the API in the same run — see below.
+
+#### Pre-releases of the API package
+
+The API is depended on through ranges too (`^1.3.0`, `>=1.0.0 <1.10.0`), which a pre-release
+does not satisfy either. `scripts/align-api-deps.mjs` handles that by appending the exact
+pre-release version to every range as an alternative, for as long as the API is a
+pre-release:
+
+| API version | Range in `package.json` |
+| --- | --- |
+| `1.9.1` | `>=1.0.0 <1.10.0` |
+| `1.10.0-rc.0` | `>=1.0.0 <1.11.0 \|\| 1.10.0-rc.0` |
+| `1.10.0-rc.1` | `>=1.0.0 <1.11.0 \|\| 1.10.0-rc.1` |
+| `1.10.0` | `>=1.0.0 <1.11.0` |
+
+The clause is rewritten on every iteration — expect it to churn across the whole
+release PR — and dropped when the cycle is finalized, so the range that ships with the
+final release is exactly the one a release without a cycle would have produced. The same
+applies to the exact pins in `devDependencies`. `npm run test:scripts` covers this in
+`scripts/test/api-range-utils.test.mjs`, and `scripts/peer-api-check.mjs` rejects a peer
+range whose clause has fallen out of step with the version under development.
+
+Because an API release makes the Stable SDK and Experimental packages inherit its bump,
+an API pre-release always cuts the whole tree as a pre-release to `canary`.
+
+Once a cycle has started, the API has to be **finalized in the same run** as the release
+that finalizes the Stable SDK — set "API package" to the bump the cycle was started with,
+alongside setting the identifier back to `none`. The workflow fails otherwise, naming the
+bump to select: the API version and the ranges are only touched when "API package" is set,
+so leaving it out would publish final SDK versions still advertising a range widened for a
+pre-release nobody can install. Iterating a pre-release *without* the API is fine — the API
+keeps the version it already has, and everything involved stays on `canary`.
+
+> [!IMPORTANT]
+> `_makeCompatibilityCheck()` in `api/src/internal/semver.ts` degrades to exact string
+> equality as soon as either side carries a pre-release tag, so a pre-release API is
+> incompatible with every other API version at runtime. A tree using one must therefore
+> contain exactly one copy of `@opentelemetry/api`, at exactly that version.
+>
+> This is opt-in rather than a trap: a plain `npm install @opentelemetry/sdk-trace-node@canary`
+> still resolves the API peer dependency to the latest *normal* version, because the widened
+> range admits it and npm does not pick a pre-release on its own. Testing against the
+> pre-release API takes an explicit `npm install @opentelemetry/api@canary`, and any
+> third-party package peer-depending on `^1.x` will report an `ERESOLVE` conflict against it.
 
 #### Changelogs across a cycle
 

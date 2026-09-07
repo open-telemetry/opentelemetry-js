@@ -9,7 +9,7 @@
     "zipkin:client": "cross-env EXPORTER=zipkin node ./client.js",
     "jaeger:server": "cross-env EXPORTER=jaeger node ./server.js",
     "jaeger:client": "cross-env EXPORTER=jaeger node ./client.js",
-    "align-api-deps": "node ../../scripts/align-api-deps.js"
+    "align-api-deps": "node ../../scripts/align-api-deps.mjs"
   },
   "repository": {
     "type": "git",

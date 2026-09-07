@@ -13,7 +13,7 @@
     "docker:start": "cd ./docker && docker-compose down && docker-compose up",
     "docker:startd": "cd ./docker && docker-compose down && docker-compose up -d",
     "docker:stop": "cd ./docker && docker-compose down",
-    "align-api-deps": "node ../../scripts/align-api-deps.js"
+    "align-api-deps": "node ../../scripts/align-api-deps.mjs"
   },
   "repository": {
     "type": "git",
