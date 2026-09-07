@@ -276,8 +276,9 @@ describe('FetchTransport', function () {
       // act
       const result = await transport.send(testPayload, requestTimeout);
 
-      // assert - the body has to be read to its end, cancelling it does not
-      // release the keepalive quota the request holds
+      // assert - the body has to be read to its end. Cancelling it takes the
+      // client-abort path instead, which releases the keepalive quota far
+      // more slowly (measured at about 1s against about 5ms for a full read)
       assert.strictEqual(result.status, 'success');
       assert.strictEqual(response.bodyUsed, true);
       assert.strictEqual(cancelled, false);

@@ -171,7 +171,9 @@ function isFetchNetworkErrorRetryable(error: unknown): boolean {
  * that would otherwise drain the body on its own when the response carries a
  * `Cache-Control: no-store` header, which collectors commonly send. Leaving the
  * body unread then leaks the quota until the document goes away and every
- * following keepalive export stays pending forever.
+ * following keepalive export stays pending forever. Cancelling the body is the
+ * client-abort path and releases the quota far more slowly than reading it to
+ * the end, so the body is read rather than cancelled.
  *
  * @see https://fetch.spec.whatwg.org/#fetch-processresponseendofbody
  */
