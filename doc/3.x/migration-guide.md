@@ -7,6 +7,35 @@ If you have questions, reach the OTel JS community on [#otel-js](https://cloud-n
 
 ---
 
+## `@opentelemetry/propagator-jaeger` (package removed)
+
+The `@opentelemetry/propagator-jaeger` package has been removed. The Jaeger propagator is deprecated in favour of the W3C TraceContext propagator.
+
+### Migrate to `W3CTraceContextPropagator`
+
+> [!IMPORTANT]
+> This migration requires updating **every service in your system** that sends or receives trace context. Switching only some services will break distributed traces — a service still emitting `uber-trace-id` headers will not be correlated with a service that only reads `traceparent`. Migrate all services together, or run both propagators in parallel using `CompositePropagator` during a transition period.
+>
+> If you cannot yet migrate all services, you may continue using `@opentelemetry/propagator-jaeger@^2` with SDK 3.x by registering it manually after SDK setup. However, `@opentelemetry/propagator-jaeger@^2` has a peer dependency of `@opentelemetry/api@>=1.0.0 <1.10.0`, so you will not be able to advance to `@opentelemetry/api@1.10.0` or later while it remains in use.
+
+Replace any direct use of `JaegerPropagator` with `W3CTraceContextPropagator` from `@opentelemetry/core`:
+
+```ts
+// before
+import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
+import { propagation } from '@opentelemetry/api';
+
+propagation.setGlobalPropagator(new JaegerPropagator());
+
+// after
+import { W3CTraceContextPropagator } from '@opentelemetry/core';
+import { propagation } from '@opentelemetry/api';
+
+propagation.setGlobalPropagator(new W3CTraceContextPropagator());
+```
+
+---
+
 ## `@opentelemetry/core`
 
 ### Removed: `getTimeOrigin()`
@@ -65,30 +94,6 @@ const timer = setTimeout(() => {}, 1000);
 if (typeof timer !== 'number') {
   timer.unref();
 }
-```
-
----
-
-## `@opentelemetry/propagator-jaeger` (package removed)
-
-The `@opentelemetry/propagator-jaeger` package has been removed. The Jaeger propagator is deprecated in favour of the W3C TraceContext propagator.
-
-### Migrate to `W3CTraceContextPropagator`
-
-Replace any direct use of `JaegerPropagator` with `W3CTraceContextPropagator` from `@opentelemetry/core`:
-
-```ts
-// before
-import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
-import { propagation } from '@opentelemetry/api';
-
-propagation.setGlobalPropagator(new JaegerPropagator());
-
-// after
-import { W3CTraceContextPropagator } from '@opentelemetry/core';
-import { propagation } from '@opentelemetry/api';
-
-propagation.setGlobalPropagator(new W3CTraceContextPropagator());
 ```
 
 ---
