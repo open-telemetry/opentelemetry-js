@@ -3,11 +3,15 @@
 
 All notable changes to experimental packages in this project will be documented in this file.
 For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2.x.md).
+For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-guide.md).
 
 ## Unreleased
 
 ### :boom: Breaking Changes
 
+* feat(sdk-logs)!: remove deprecated `SdkLogRecord` type alias and `LoggerProviderConfig` type alias [#7062](https://github.com/open-telemetry/opentelemetry-js/pull/7062)
+  * `SdkLogRecord` — use `ReadWriteLogRecord` instead.
+  * `LoggerProviderConfig` — use `LoggerProviderOptions` instead.
 * feat!: migrate package builds from `tsc` to `tsdown`, emitting dual CJS/ESM output from a single `dist/` directory and declaring an `exports` map on every package [#6293](https://github.com/open-telemetry/opentelemetry-js/pull/6293) @overbalance
   * Importing a package by its name is unaffected in both CommonJS and ESM, as is every subpath listed in its `exports` map.
   * **Deep imports into the build output no longer resolve.** An `exports` map is an allowlist that Node.js and bundlers enforce, so specifiers such as `@opentelemetry/sdk-logs/build/src/...` or `@opentelemetry/sdk-logs/build/esm/...` now fail with `ERR_PACKAGE_PATH_NOT_EXPORTED`. Rewriting them to the new file layout does not help — unlisted subpaths are rejected whether or not the file exists.
@@ -15,6 +19,10 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
   * `<package>/package.json` is no longer importable for the same reason. Read a package's version from your own dependency metadata, or use `SDK_INFO` from `@opentelemetry/core` for the SDK version.
   * The non-standard `esnext` entry point has been removed; tools that preferred it fall back to `module` (ESM) or `main` (CJS).
   * Packages that ship separate Node.js and browser implementations export them under explicit subpaths, for example `@opentelemetry/sdk-logs/platform`. If you depend on something that is only reachable through a deep import, please open an issue so it can be considered for the public API.
+* feat(sdk-node)!: remove `"jaeger"` propagator from `@opentelemetry/sdk-node` [#7077](https://github.com/open-telemetry/opentelemetry-js/pull/7077)
+  * `OTEL_PROPAGATORS=jaeger` and `{ jaeger: null }` in the configuration object are no longer recognised. Replace with `"tracecontext"`.
+  * See the [3.x migration guide](doc/3.x/migration-guide.md) for full instructions.
+* fix(opentelemetry-exporter-prometheus)!: default exporter host to localhost [#6599](https://github.com/open-telemetry/opentelemetry-js/pull/6599) @cjihrig
 
 ### :rocket: Features
 
