@@ -5,7 +5,6 @@
 
 export type {
   ForceFlushOptions,
-  LoggerProviderConfig,
   LoggerProviderOptions,
   LoggerConfig,
   LoggerConfigurator,
@@ -15,10 +14,7 @@ export type {
   BatchLogRecordProcessorBrowserOptions,
 } from './types';
 export { LoggerProvider } from './LoggerProvider';
-export type {
-  ReadWriteLogRecord,
-  SdkLogRecord,
-} from './export/ReadWriteLogRecord';
+export type { ReadWriteLogRecord } from './export/ReadWriteLogRecord';
 export type { LogRecordProcessor } from './LogRecordProcessor';
 export type { ReadableLogRecord } from './export/ReadableLogRecord';
 export { ConsoleLogRecordExporter } from './export/ConsoleLogRecordExporter';

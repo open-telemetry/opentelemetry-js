@@ -41,12 +41,10 @@ enum ForceFlushState {
 export class TracerProvider implements ApiTracerProvider {
   private readonly _resource: Resource;
   private readonly _activeSpanProcessor: MultiSpanProcessor;
-  private readonly _forceFlushTimeoutMillis: number;
   private readonly _tracerOptions: TracerOptions;
   private readonly _tracers: Map<string, Tracer> = new Map();
 
   constructor(options: TracerProviderOptions = {}) {
-    this._forceFlushTimeoutMillis = options.forceFlushTimeoutMillis ?? 30000;
     this._resource = options.resource ?? defaultResource();
     const spanProcessors = options.spanProcessors ?? [];
     this._activeSpanProcessor = new MultiSpanProcessor(spanProcessors);
@@ -99,7 +97,7 @@ export class TracerProvider implements ApiTracerProvider {
   }
 
   forceFlush(options?: ForceFlushOptions): Promise<void> {
-    const timeout = options?.timeoutMillis ?? this._forceFlushTimeoutMillis;
+    const timeout = options?.timeoutMillis ?? 30000;
     const promises = this._activeSpanProcessor['_spanProcessors'].map(
       (spanProcessor: SpanProcessor) => {
         return new Promise(resolve => {

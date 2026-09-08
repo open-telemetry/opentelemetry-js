@@ -21,7 +21,6 @@ import {
   hrTimeDuration,
   hrTimeToMilliseconds,
   hrTimeToNanoseconds,
-  otperformance as performance,
 } from '@opentelemetry/core';
 import {
   ATTR_EXCEPTION_MESSAGE,

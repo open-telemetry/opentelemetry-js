@@ -6,6 +6,7 @@ We'd love your help!
 - [Development Quick Start](#development-quick-start)
 - [Pull Request Merge Guidelines](#pull-request-merge-guidelines)
   - [General Merge Requirements](#general-merge-requirements)
+- [Backports](#backports)
 - [Report a bug or requesting feature](#report-a-bug-or-requesting-feature)
 - [How to contribute](#how-to-contribute)
   - [Before you start](#before-you-start)
@@ -83,6 +84,52 @@ If a PR has not been interacted with by a reviewer within one week, please ping 
 - Substantial changes should not be merged within 24 hours of opening in order to allow reviewers from all time zones to have a chance to review
 
 If all of the above requirements are met and there are no unresolved discussions, a pull request may be merged by either a maintainer or an approver.
+
+## Backports
+
+Bug and security fixes may be backported to the previous major version, which is maintained on a
+[maintenance branch](doc/contributing/releasing.md#maintenance-branches) named after it, for example
+`v2.x`. The previous major receives backports for **one year after the next major version is
+released**. After that the branch is no longer maintained and no further releases are cut from it.
+
+The concrete dates for the current transition are in the [SDK 3.0 announcement](doc/3.x/announcement.md).
+
+### What is eligible
+
+- Fixes for `priority:p1` bugs, as defined in [Bug Triage](doc/contributing/bug_triage.md#prioritize).
+- Security fixes.
+
+Fixes for bugs with any other priority label MAY be accepted or rejected at the discretion of the
+maintainers, based on the impact on end users. Features, refactors, dependency updates, and
+documentation-only changes are not backported.
+
+### Fixes MUST land on `main` first
+
+A fix MUST be merged into `main` before it can be backported.
+A backport pull request whose fix is not on `main` will be closed, unless the affected package or code
+no longer exists on `main` - in that case, say so in the pull request description.
+
+### Opening a backport pull request
+
+Anyone may open a backport pull request; maintainers decide whether it is eligible.
+Once the fix is merged into `main`, cherry-pick it onto a branch based on the maintenance branch,
+keeping the reference to the original commit:
+
+```sh
+git fetch upstream
+git checkout -b backport-v2.x-1234 upstream/v2.x
+git cherry-pick -x <sha of the commit on main>
+```
+
+Then:
+
+- Open the pull request against the maintenance branch, **not** `main`.
+- Apply the `backport` label and link the `main` pull request in the description.
+- Add a [changelog](#changelog) entry on the maintenance branch, referencing the backport pull
+  request's own number. Cherry-picking the entry from `main` usually conflicts, and the changelog CI
+  check does not run on maintenance branches, so this is not enforced automatically.
+
+The [General Merge Requirements](#general-merge-requirements) apply to backport pull requests as well.
 
 ## Report a bug or requesting feature
 
@@ -181,9 +228,7 @@ npm ci
 
 ### Compile modules
 
-All modules are managed as a composite typescript project using [Project References](https://www.typescriptlang.org/docs/handbook/project-references.html). This means that a breaking change in one module will be reflected in compilations of its dependent modules automatically.
-
-DO NOT use lerna to compile all modules unless you know what you are doing because this will cause a new typescript process to be spawned for every module in the project.
+All modules are built with [tsdown](https://tsdown.dev/), orchestrated by nx: `npm run compile` builds each package's workspace dependencies before the package itself and caches results between runs. Building requires Node.js >= 22.18 (CI builds on Node ^26.3.0); tests still run on every supported Node version.
 
 ```sh
 # Build all modules
@@ -308,9 +353,9 @@ The document will be available under `docs` path.
 
 ### Adding a package
 
-To add a new package, copy `packages/template` to your new package directory and modify the `package.json` file to reflect your desired package settings. If the package will not support browser, the `karma.conf` and `tsconfig.esm.json` files may be deleted. If the package will support es5 targets, the reference to `tsconfig.base.json` in `tsconfig.json` should be changed to `tsconfig.es5.json`.
+To add a new package, copy `packages/template` to your new package directory and modify the `package.json` file to reflect your desired package settings. If the package will not support browser, the `karma.conf.js` file may be deleted. Per-package compiler options live in `tsdown.config.ts`, which imports the shared options from the workspace root `tsdown.config.ts` and adds an `entry` list; override fields like `target` only when you have a concrete reason to (see `api/tsdown.config.ts` for an example).
 
-After adding the package, run `npm install` from the root of the project. This will update the `tsconfig.json` project references automatically and install all dependencies in your new package. For packages supporting browser, file `tsconfig.esm.json` needs to be manually updated to include reference to ES modules build.
+After adding the package, run `npm install` from the root of the project to install all dependencies in your new package. For packages with platform-conditional code (browser vs node), add a `browser` field to the `package.json` that path-swaps the relevant `./dist/*.mjs` and `./dist/*.cjs` files; see `@opentelemetry/core`'s `package.json` for a working example.
 
 ### Platform conditional exports
 

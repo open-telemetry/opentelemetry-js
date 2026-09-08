@@ -5,14 +5,17 @@ on:
       - main
     paths:
       - 'api/**'
+      - 'tsdown.config.ts'
       - '.github/workflows/backcompat.yml'
   pull_request:
     paths:
       - 'api/**'
+      - 'tsdown.config.ts'
       - '.github/workflows/backcompat.yml'
   merge_group:
     paths:
       - 'api/**'
+      - 'tsdown.config.ts'
       - '.github/workflows/backcompat.yml'
 
 permissions:

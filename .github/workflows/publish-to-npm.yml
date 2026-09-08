@@ -2,6 +2,19 @@ name: Publish packages to NPM
 
 on:
   workflow_dispatch:
+    inputs:
+      dist_tag:
+        type: choice
+        description: 'npm dist-tag - "auto" derives it from the branch this runs on'
+        default: 'auto'
+        # 'auto' resolves to `latest` on main and to `latest-<major>` on a maintenance
+        # branch (`v2.x` -> `latest-2`), so a maintenance release never takes `latest` from
+        # the newer line. Pick `latest` to deliberately hand it to a maintenance branch
+        # anyway, which is what you want while `main` publishes nothing but pre-releases -
+        # see doc/contributing/releasing.md#maintenance-branches.
+        options:
+          - auto
+          - latest
 
 permissions:
   contents: read
@@ -24,6 +37,14 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           # Disable caching in release workflows (https://docs.zizmor.sh/audits/#cache-poisoning).
           package-manager-cache: false
+      # Before `npm ci`, so that dispatching this workflow from a branch we do not release
+      # from fails immediately. scripts/lib/release-branch.mjs is dependency-free for this.
+      - name: Resolve npm dist-tags
+        id: dist-tags
+        env:
+          RELEASE_BASE_BRANCH: ${{ github.ref_name }}
+          DIST_TAG: ${{ inputs.dist_tag }}
+        run: node scripts/resolve-dist-tags.mjs >> "$GITHUB_OUTPUT"
       - run: npm ci --ignore-scripts
       - run: npm run compile
       # The release PR has already incremented versions, so we just need to publish all
@@ -32,15 +53,22 @@ jobs:
       #
       # NOTE: --pre-dist-tag is applied per package, but only to packages whose version
       # is a pre-release (lerna checks each version with semver). Everything else gets
-      # --dist-tag. So a pre-release goes to `canary` while a stable release published
-      # in the same run still goes to `latest`, and no package needs to opt in.
+      # --dist-tag. So a pre-release goes to the pre-dist-tag while a stable release
+      # published in the same run still goes to the dist-tag, and no package needs to opt in.
+      #
+      # Both tags are derived from the branch this workflow was dispatched from
+      # (main -> latest/canary, v2.x -> latest-2/canary-2), so that a maintenance release
+      # cannot move `latest` backwards over a newer line, and a pre-release cut from a
+      # maintenance branch cannot point `canary` away from main's pre-release stream.
       - name: Publish to npm
         env:
           NPM_CONFIG_PROVENANCE: true
+          LERNA_DIST_TAG: ${{ steps.dist-tags.outputs.dist_tag }}
+          LERNA_PRE_DIST_TAG: ${{ steps.dist-tags.outputs.pre_dist_tag }}
         # NOTE: using --concurrency 1 to reduce the likelihood of a race when publishing,
         # which happens when the npm registry is not fully consistent yet. This can cause the publishing of a package to be
         # rejected because dependencies are not available yet. `lerna` does ensure that this is not the case locally
         # (packages are in-fact published in the correct order), but the race on the registry still applies.
         # If this happens, run the workflow again - there should be enough time for everything to settle until this workflow
         # attempts to publish again.
-        run: npx lerna publish --concurrency 1 from-package --no-push --no-private --no-git-tag-version --dist-tag=latest --pre-dist-tag=canary --yes
+        run: npx lerna publish --concurrency 1 from-package --no-push --no-private --no-git-tag-version --dist-tag="$LERNA_DIST_TAG" --pre-dist-tag="$LERNA_PRE_DIST_TAG" --yes
