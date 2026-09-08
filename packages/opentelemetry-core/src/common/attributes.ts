@@ -259,7 +259,6 @@ function cleanAttributesInternal(
  * @returns true if the value is a valid AnyValue, false otherwise
  */
 export function isAnyValue(val: unknown): boolean {
-  // TODO(perf): Do we *need* a *weak* set? Faster with just Set()?
   return isAnyValueInternal(val, new WeakSet());
 }
 
