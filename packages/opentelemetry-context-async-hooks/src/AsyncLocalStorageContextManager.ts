@@ -27,7 +27,6 @@ const ADD_LISTENER_METHODS = [
   'prependOnceListener' as const,
 ];
 
-
 /**
  * Wrapper around a token and _asyncLocalStorage to mirror the behavior of
  * a Node.js RunScope
