@@ -11,7 +11,7 @@ import {
   SpanKind,
   trace,
 } from '@opentelemetry/api';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import type { ContextManager } from '@opentelemetry/api';
 import {
   TracerProvider,
@@ -80,7 +80,7 @@ describe('HttpsInstrumentation', () => {
   let contextManager: ContextManager;
 
   beforeEach(() => {
-    contextManager = new AsyncHooksContextManager().enable();
+    contextManager = new AsyncLocalStorageContextManager().enable();
     propagation.setGlobalPropagator(new DummyPropagation());
     context.setGlobalContextManager(contextManager);
   });

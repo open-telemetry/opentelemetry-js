@@ -42,7 +42,7 @@ import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
 import type { ContextManager } from '@opentelemetry/api';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import type {
   ClientRequest,
   IncomingMessage,
@@ -140,7 +140,7 @@ describe('HttpInstrumentation', () => {
   });
 
   beforeEach(() => {
-    contextManager = new AsyncHooksContextManager().enable();
+    contextManager = new AsyncLocalStorageContextManager().enable();
     context.setGlobalContextManager(contextManager);
   });
 

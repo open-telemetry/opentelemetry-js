@@ -26,7 +26,7 @@ import type {
 } from '../../src/internal-types';
 import * as utils from '../../src/utils';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { extractHostnameAndPort } from '../../src/utils';
 import type { ParsedUrlQuery } from 'node:querystring';
 
@@ -515,7 +515,9 @@ describe('Utility', () => {
 
   describe('getIncomingRequestAttributesOnResponse()', () => {
     it('should correctly parse the middleware stack if present', done => {
-      context.setGlobalContextManager(new AsyncHooksContextManager().enable());
+      context.setGlobalContextManager(
+        new AsyncLocalStorageContextManager().enable()
+      );
       context.with(
         setRPCMetadata(context.active(), {
           type: RPCType.HTTP,
