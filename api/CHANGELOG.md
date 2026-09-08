@@ -9,11 +9,24 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: Features
 
+* feat(api): add imperative `context.attach()` for setting context across callback boundaries that `with()` cannot wrap. [#6845](https://github.com/open-telemetry/opentelemetry-js/pull/6845) @pichlermarc
+  * `attach()` returns a `Token` whose `dispose()` method restores the previous context. Use `token.dispose()` to detach.
+  * `attach` is an optional method on the `ContextManager` interface; when the active context manager does not implement it, `context.attach()` logs a warning and returns a no-op token.
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
 
+* docs(api): complete `@since` annotations for the public API [#7023](https://github.com/open-telemetry/opentelemetry-js/pull/7023) @nabeelamjadsheikh
+  * Adds the three missing exported-type annotations and the member-level annotations for methods and properties introduced after their enclosing type.
+  * Corrects `Attributes`, `AttributeValue` and `TracerOptions` from `1.3.0` to `1.1.0`; all three were already importable in 1.1.0 via wildcard re-export.
+
 ### :house: Internal
+
+* build: migrate the package build from `tsc` to `tsdown`, emitting dual CJS/ESM output from a single `dist/` directory [#6293](https://github.com/open-telemetry/opentelemetry-js/pull/6293) @overbalance
+  * The public entry points are unchanged: `@opentelemetry/api` and `@opentelemetry/api/experimental`. This package already declared an `exports` map, so deep imports such as `@opentelemetry/api/build/src/...` were rejected before this change and continue to be.
+  * The emitted files moved out of `build/src` (CJS), `build/esm` and `build/esnext` (ESM) into `dist/`, using `.cjs`/`.mjs` extensions with matching `.d.cts`/`.d.mts` declarations. The non-standard `esnext` condition has been dropped in favour of the standard `import`/`require` conditions.
+* perf(api): add getGlobal fast-path [#6956](https://github.com/open-telemetry/opentelemetry-js/pull/6956) @legendecas
 
 ## 1.9.1
 

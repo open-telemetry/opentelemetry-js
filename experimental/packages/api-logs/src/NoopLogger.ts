@@ -14,3 +14,10 @@ export class NoopLogger implements Logger {
 }
 
 export const NOOP_LOGGER = new NoopLogger();
+
+/**
+ * Create a no-op Logger
+ */
+export function createNoopLogger(): Logger {
+  return NOOP_LOGGER;
+}

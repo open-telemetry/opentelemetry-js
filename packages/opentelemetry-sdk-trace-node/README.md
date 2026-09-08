@@ -105,7 +105,7 @@ registerInstrumentations({
 
 ## Examples
 
-See how to automatically instrument [http](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/http) and [gRPC](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/grpc) / [grpc-js](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/grpc-js) using node-sdk.
+See how to automatically instrument [http](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/http) and [grpc-js](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/grpc-js) using node-sdk.
 
 ## Useful links
 

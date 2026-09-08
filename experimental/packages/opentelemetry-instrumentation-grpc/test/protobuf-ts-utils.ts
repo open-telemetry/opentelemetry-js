@@ -9,7 +9,7 @@ import * as assert from 'assert';
 import type {
   InMemorySpanExporter,
   ReadableSpan,
-} from '@opentelemetry/sdk-trace-base';
+} from '@opentelemetry/sdk-trace';
 import { assertPropagation, assertSpan } from './utils/assertionUtils';
 
 import { ATTR_RPC_METHOD, ATTR_RPC_SERVICE } from '../src/semconv';

@@ -11,18 +11,20 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: '22'
+          node-version: ^26.3.0
 
       - name: Bootstrap
         run: npm ci --ignore-scripts
@@ -31,9 +33,3 @@ jobs:
         run: |
           npm run lint
           npm run lint:examples
-
-      - name: Lint doc files
-        run: |
-          npm run compile
-          NODE_OPTIONS=--max-old-space-size=6144 npm run docs
-          npm run docs:test

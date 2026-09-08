@@ -1,42 +1,45 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 const Benchmark = require('benchmark');
-const { parsePairKeyValue } = require('../../../build/src/baggage/utils');
+// `parsePairKeyValue` is internal-only and not exported from dist chunks;
+// `parseBaggageHeaderString` is its public per-header wrapper.
+const { parseBaggageHeaderString } = require('../../../dist/baggage/utils.cjs');
 
 const suite = new Benchmark.Suite();
+
+// Accumulate results so V8 can't dead-code-eliminate the calls.
+let sink = 0;
 
 suite.on('cycle', event => {
   console.log(String(event.target));
 });
 
-suite.add('parsePairKeyValue simple', function() {
-  parsePairKeyValue('key1=value1');
+suite.add('parseBaggageHeaderString simple', function() {
+  sink += parseBaggageHeaderString('key1=value1', {}, 0, 0)[0];
 });
 
-suite.add('parsePairKeyValue with metadata', function() {
-  parsePairKeyValue('key1=value1;metadata=sample');
+suite.add('parseBaggageHeaderString with metadata', function() {
+  sink += parseBaggageHeaderString('key1=value1;metadata=sample', {}, 0, 0)[0];
 });
 
-suite.add('parsePairKeyValue URI encoded', function() {
-  parsePairKeyValue('user%20id=john%20doe');
+suite.add('parseBaggageHeaderString URI encoded', function() {
+  sink += parseBaggageHeaderString('user%20id=john%20doe', {}, 0, 0)[0];
 });
 
-suite.add('parsePairKeyValue complex', function() {
-  parsePairKeyValue('user%20id=john%20doe;metadata=user%20info;tenant=prod');
+suite.add('parseBaggageHeaderString complex', function() {
+  sink += parseBaggageHeaderString(
+    'user%20id=john%20doe;metadata=user%20info,tenant=prod',
+    {},
+    0,
+    0
+  )[0];
 });
 
 suite.run();
+
+if (sink < 0) {
+  console.log(sink);
+}

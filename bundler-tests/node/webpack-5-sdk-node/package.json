@@ -1,0 +1,17 @@
+{
+  "name": "bundler-tests-node-webpack-5-sdk-node",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:bundle": "npm i && node test-bundle.mjs"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "file:../../../api",
+    "@opentelemetry/sdk-node": "file:../../../experimental/packages/opentelemetry-sdk-node"
+  },
+  "devDependencies": {
+    "@types/webpack": "^5",
+    "webpack": "^5",
+    "webpack-cli": "^6"
+  }
+}

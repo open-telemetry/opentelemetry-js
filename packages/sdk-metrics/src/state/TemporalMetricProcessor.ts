@@ -84,7 +84,6 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
     let aggregationTemporality: AggregationTemporality;
     // Check our last report time.
     if (this._reportHistory.has(collector)) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const last = this._reportHistory.get(collector)!;
       const lastCollectionTime = last.collectionTime;
       aggregationTemporality = last.aggregationTemporality;
@@ -183,7 +182,6 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
       if (last.has(key, hash)) {
         const lastAccumulation = last.get(key, hash);
         // last.has() returned true, lastAccumulation is present.
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const accumulation = aggregator.merge(lastAccumulation!, record);
         result.set(key, accumulation, hash);
       } else {

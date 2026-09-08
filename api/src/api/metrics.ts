@@ -17,6 +17,8 @@ const API_NAME = 'metrics';
 
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Metrics API
+ *
+ * @since 1.4.1
  */
 export class MetricsAPI {
   private static _instance?: MetricsAPI;

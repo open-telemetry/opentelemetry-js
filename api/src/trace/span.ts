@@ -75,6 +75,8 @@ export interface Span {
    * It is preferred span links be added at span creation.
    *
    * @param link the link to add.
+   *
+   * @since 1.9.0
    */
   addLink(link: Link): this;
 
@@ -85,6 +87,8 @@ export interface Span {
    * It is preferred span links be added at span creation.
    *
    * @param links the links to add.
+   *
+   * @since 1.9.0
    */
   addLinks(links: Link[]): this;
 

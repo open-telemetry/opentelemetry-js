@@ -79,8 +79,10 @@ describe('Global Utils', function () {
     api1.diag.setLogger(logger1);
     const globalInstance = getGlobal('diag');
     assert.ok(globalInstance);
+    // The registered version property is sealed, so simulate a version mismatch
+    // by swapping in a global api object with a different version.
     // @ts-expect-error we are modifying internals for testing purposes here
-    globalThis[Symbol.for(GLOBAL_API_SYMBOL_KEY)].version = '0.0.1';
+    globalThis[Symbol.for(GLOBAL_API_SYMBOL_KEY)] = { version: '0.0.1' };
 
     assert.equal(false, api1.diag.setLogger(logger2)); // won't happen
 
@@ -88,6 +90,12 @@ describe('Global Utils', function () {
     sinon.assert.notCalled(logger2.error);
     sinon.assert.notCalled(logger2.info);
     sinon.assert.notCalled(logger2.warn);
+  });
+
+  it('should return undefined when the global api object is null', function () {
+    // @ts-expect-error we are modifying internals for testing purposes here
+    globalThis[Symbol.for(GLOBAL_API_SYMBOL_KEY)] = null;
+    assert.strictEqual(getGlobal('context'), undefined);
   });
 
   it('should debug log registrations', function () {

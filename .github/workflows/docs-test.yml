@@ -1,0 +1,36 @@
+name: Documentation tests
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  docs-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+          node-version: ^26.3.0
+
+      - name: Bootstrap
+        run: npm ci --ignore-scripts
+
+      - name: Build documentation
+        run: |
+          npm run compile
+          NODE_OPTIONS=--max-old-space-size=6144 npm run docs
+
+      - name: Check documentation links
+        run: npm run docs:test

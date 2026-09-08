@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { context, diag } from '@opentelemetry/api';
+import { context, createNoopMeter, diag } from '@opentelemetry/api';
 import {
   ExportResultCode,
   globalErrorHandler,
@@ -11,15 +11,19 @@ import {
   suppressTracing,
 } from '@opentelemetry/core';
 
-import type { BufferConfig } from '../types';
-import type { SdkLogRecord } from './SdkLogRecord';
+import type { BatchLogRecordProcessorOptions } from '../types';
+import type { ReadWriteLogRecord } from './ReadWriteLogRecord';
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
+import { LogRecordProcessorMetrics } from './LogRecordProcessorMetrics';
+import { OTEL_COMPONENT_TYPE_VALUE_BATCHING_LOG_PROCESSOR } from '../semconv';
 
 /**
  * Waits for all pending async resources in the log records to be resolved.
  */
-async function waitForResources(logRecords: SdkLogRecord[]): Promise<void> {
+async function waitForResources(
+  logRecords: ReadWriteLogRecord[]
+): Promise<void> {
   const pendingResources: Array<Promise<void>> = [];
   for (let i = 0, len = logRecords.length; i < len; i++) {
     const logRecord = logRecords[i];
@@ -42,12 +46,14 @@ async function waitForResources(logRecords: SdkLogRecord[]): Promise<void> {
 class ExportOperation {
   private readonly _exportCompleted: Promise<void>;
   private readonly _exportScheduledPromise: Promise<void>;
+  private readonly _metrics: LogRecordProcessorMetrics;
   private _exportScheduledResolve!: () => void;
 
   constructor(
     exporter: LogRecordExporter,
-    logRecords: SdkLogRecord[],
-    exportTimeoutMillis: number
+    logRecords: ReadWriteLogRecord[],
+    exportTimeoutMillis: number,
+    metrics: LogRecordProcessorMetrics
   ) {
     this._exportScheduledPromise = new Promise<void>(resolve => {
       this._exportScheduledResolve = resolve;
@@ -57,6 +63,7 @@ class ExportOperation {
       logRecords,
       exportTimeoutMillis
     );
+    this._metrics = metrics;
   }
 
   /** Get the promise that resolves when the export completes */
@@ -71,7 +78,7 @@ class ExportOperation {
 
   private async _executeExport(
     exporter: LogRecordExporter,
-    logRecords: SdkLogRecord[],
+    logRecords: ReadWriteLogRecord[],
     exportTimeoutMillis: number
   ): Promise<void> {
     try {
@@ -96,7 +103,7 @@ class ExportOperation {
 
   private async _exportWithTimeout(
     exporter: LogRecordExporter,
-    logRecords: SdkLogRecord[],
+    logRecords: ReadWriteLogRecord[],
     exportTimeoutMillis: number
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
@@ -106,6 +113,7 @@ class ExportOperation {
 
       // Call exporter.export() and immediately resolve exportScheduled
       exporter.export(logRecords, result => {
+        this._metrics.finishLogs(logRecords.length, result.error);
         clearTimeout(timer);
         if (result.code === ExportResultCode.SUCCESS) {
           resolve();
@@ -123,27 +131,29 @@ class ExportOperation {
   }
 }
 
-export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
-  implements LogRecordProcessor
+export abstract class BatchLogRecordProcessorBase<
+  T extends BatchLogRecordProcessorOptions,
+> implements LogRecordProcessor
 {
   private readonly _maxExportBatchSize: number;
   private readonly _maxQueueSize: number;
   private readonly _scheduledDelayMillis: number;
   private readonly _exportTimeoutMillis: number;
   private readonly _exporter: LogRecordExporter;
+  private readonly _metrics: LogRecordProcessorMetrics;
 
   private _currentExport: ExportOperation | null = null;
-  private _finishedLogRecords: SdkLogRecord[] = [];
+  private _finishedLogRecords: ReadWriteLogRecord[] = [];
   private _timer: NodeJS.Timeout | number | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
   private _flushing: boolean = false;
 
-  constructor(exporter: LogRecordExporter, config?: T) {
-    this._exporter = exporter;
-    this._maxExportBatchSize = config?.maxExportBatchSize ?? 512;
-    this._maxQueueSize = config?.maxQueueSize ?? 2048;
-    this._scheduledDelayMillis = config?.scheduledDelayMillis ?? 5000;
-    this._exportTimeoutMillis = config?.exportTimeoutMillis ?? 30000;
+  constructor(options: T) {
+    this._exporter = options.exporter;
+    this._maxExportBatchSize = options.maxExportBatchSize ?? 512;
+    this._maxQueueSize = options.maxQueueSize ?? 2048;
+    this._scheduledDelayMillis = options.scheduledDelayMillis ?? 1000;
+    this._exportTimeoutMillis = options.exportTimeoutMillis ?? 30000;
 
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
 
@@ -153,9 +163,22 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
       );
       this._maxExportBatchSize = this._maxQueueSize;
     }
+
+    const meter = options?.selfObsMeterProvider
+      ? options.selfObsMeterProvider.getMeter('@opentelemetry/sdk-logs')
+      : createNoopMeter();
+
+    this._metrics = new LogRecordProcessorMetrics(
+      OTEL_COMPONENT_TYPE_VALUE_BATCHING_LOG_PROCESSOR,
+      meter,
+      {
+        capacity: this._maxQueueSize,
+        getQueueSize: () => this._finishedLogRecords.length,
+      }
+    );
   }
 
-  public onEmit(logRecord: SdkLogRecord): void {
+  public onEmit(logRecord: ReadWriteLogRecord): void {
     if (this._shutdownOnce.isCalled) {
       return;
     }
@@ -170,8 +193,9 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   }
 
   /** Add a LogRecord in the buffer. */
-  private _addToBuffer(logRecord: SdkLogRecord) {
+  private _addToBuffer(logRecord: ReadWriteLogRecord) {
     if (this._finishedLogRecords.length >= this._maxQueueSize) {
+      this._metrics.dropLogs(1);
       return;
     }
     this._finishedLogRecords.push(logRecord);
@@ -185,6 +209,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   private async _shutdown(): Promise<void> {
     this.onShutdown();
     await this._flushAll();
+    this._metrics.shutdown();
     await this._exporter.shutdown();
   }
 
@@ -209,11 +234,14 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
     // Clear timer to prevent concurrent exports
     this._clearTimer();
 
-    // Wait for any in-progress export to complete
-    if (this._currentExport !== null) {
+    // Wait for any in-progress export to complete. Capture the reference
+    // into a local because `_exportOneBatch` may null out `this._currentExport`
+    // from its completion handler while we are awaiting below.
+    const inFlight = this._currentExport;
+    if (inFlight !== null) {
       // speed up execution for current export
       await this._exporter.forceFlush();
-      await this._currentExport.exportCompleted;
+      await inFlight.exportCompleted;
       this._currentExport = null;
     }
 
@@ -230,7 +258,8 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
       const exportOp = new ExportOperation(
         this._exporter,
         batch,
-        this._exportTimeoutMillis
+        this._exportTimeoutMillis,
+        this._metrics
       );
       this._currentExport = exportOp;
 
@@ -254,7 +283,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
    * Extracts one batch from the buffer.
    * Returns null if buffer is empty.
    */
-  private _extractBatch(): SdkLogRecord[] | null {
+  private _extractBatch(): ReadWriteLogRecord[] | null {
     if (this._finishedLogRecords.length === 0) {
       return null;
     }
@@ -279,7 +308,8 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
     const exportOp = new ExportOperation(
       this._exporter,
       logRecords,
-      this._exportTimeoutMillis
+      this._exportTimeoutMillis,
+      this._metrics
     );
     this._currentExport = exportOp;
 

@@ -11,8 +11,14 @@ import type {
   ResourceDetectionConfig,
 } from '@opentelemetry/resources';
 import { emptyResource } from '@opentelemetry/resources';
+import { ATTR_USER_AGENT_ORIGINAL } from '@opentelemetry/semantic-conventions';
 import type { UserAgentData } from './types';
-import { BROWSER_ATTRIBUTES } from './types';
+import {
+  ATTR_BROWSER_LANGUAGE,
+  ATTR_BROWSER_PLATFORM,
+  ATTR_BROWSER_BRANDS,
+  ATTR_BROWSER_MOBILE,
+} from './semconv';
 
 /**
  * BrowserDetector will be used to detect the resources related to browser.
@@ -40,8 +46,8 @@ class BrowserDetector implements ResourceDetector {
     _config?: ResourceDetectionConfig
   ): DetectedResource {
     if (
-      !browserResource[BROWSER_ATTRIBUTES.USER_AGENT] &&
-      !browserResource[BROWSER_ATTRIBUTES.PLATFORM]
+      !browserResource[ATTR_USER_AGENT_ORIGINAL] &&
+      !browserResource[ATTR_BROWSER_PLATFORM]
     ) {
       diag.debug(
         'BrowserDetector failed: Unable to find required browser resources. '
@@ -60,15 +66,14 @@ function getBrowserAttributes(): Attributes {
     navigator as Navigator & { userAgentData?: UserAgentData }
   ).userAgentData;
   if (userAgentData) {
-    browserAttribs[BROWSER_ATTRIBUTES.PLATFORM] = userAgentData.platform;
-    browserAttribs[BROWSER_ATTRIBUTES.BRANDS] = userAgentData.brands.map(
+    browserAttribs[ATTR_BROWSER_PLATFORM] = userAgentData.platform;
+    browserAttribs[ATTR_BROWSER_BRANDS] = userAgentData.brands.map(
       b => `${b.brand} ${b.version}`
     );
-    browserAttribs[BROWSER_ATTRIBUTES.MOBILE] = userAgentData.mobile;
-  } else {
-    browserAttribs[BROWSER_ATTRIBUTES.USER_AGENT] = navigator.userAgent;
+    browserAttribs[ATTR_BROWSER_MOBILE] = userAgentData.mobile;
   }
-  browserAttribs[BROWSER_ATTRIBUTES.LANGUAGE] = navigator.language;
+  browserAttribs[ATTR_USER_AGENT_ORIGINAL] = navigator.userAgent;
+  browserAttribs[ATTR_BROWSER_LANGUAGE] = navigator.language;
   return browserAttribs;
 }
 

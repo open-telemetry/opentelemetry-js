@@ -69,6 +69,13 @@ function mergeTwoObjects(
       const keys = Object.keys(two);
       for (let i = 0, j = keys.length; i < j; i++) {
         const key = keys[i];
+        if (
+          key === '__proto__' ||
+          key === 'constructor' ||
+          key === 'prototype'
+        ) {
+          continue;
+        }
         result[key] = takeValue(two[key]);
       }
     }
@@ -82,6 +89,13 @@ function mergeTwoObjects(
 
       for (let i = 0, j = keys.length; i < j; i++) {
         const key = keys[i];
+        if (
+          key === '__proto__' ||
+          key === 'constructor' ||
+          key === 'prototype'
+        ) {
+          continue;
+        }
         const twoValue = two[key];
 
         if (isPrimitive(twoValue)) {

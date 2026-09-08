@@ -1,21 +1,32 @@
 {
   "name": "@opentelemetry/exporter-jaeger",
-  "version": "2.6.1",
+  "version": "2.11.0",
   "description": "OpenTelemetry Exporter Jaeger allows user to send collected traces to Jaeger",
-  "main": "build/src/index.js",
-  "types": "build/src/index.d.ts",
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build",
-    "clean": "tsc --build --clean",
+    "compile": "tsdown",
+    "clean": "rimraf dist build",
     "test": "nyc mocha 'test/**/*.test.ts'",
     "tdd": "npm run test -- --watch-extensions ts --watch",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "version": "node ../../scripts/version-update.js",
-    "watch": "tsc --build --watch",
-    "prewatch": "npm run precompile",
+    "watch": "tsdown --watch --no-clean",
     "peer-api-check": "node ../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../scripts/align-api-deps.js"
   },
@@ -32,34 +43,32 @@
     "node": "^18.19.0 || >=20.6.0"
   },
   "files": [
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
     "doc",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "dist"
   ],
   "publishConfig": {
     "access": "public"
   },
   "devDependencies": {
     "@opentelemetry/api": "^1.0.0",
-    "@opentelemetry/resources": "2.6.1",
+    "@opentelemetry/resources": "2.11.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
-    "mocha": "11.7.5",
+    "mocha": "11.8.0",
     "nock": "13.5.6",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
-    "typescript": "5.0.4"
+    "typescript": "5.2.2"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "2.6.1",
-    "@opentelemetry/sdk-trace-base": "2.6.1",
+    "@opentelemetry/core": "2.11.0",
+    "@opentelemetry/sdk-trace": "2.11.0",
     "@opentelemetry/semantic-conventions": "^1.29.0",
     "jaeger-client": "^3.15.0"
   },

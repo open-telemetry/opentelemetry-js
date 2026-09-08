@@ -12,64 +12,79 @@ import {
   diag,
   DiagConsoleLogger,
   metrics,
+  trace,
   propagation,
 } from '@opentelemetry/api';
-import {
-  getInstanceID,
-  getLogRecordProcessorsFromConfiguration,
-  getMeterReadersFromConfiguration,
-  getMeterViewsFromConfiguration,
-  getPropagatorFromConfiguration,
-  getResourceDetectorsFromConfiguration,
-  getResourceFromConfiguration,
-} from './utils';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import type { SDKComponents, SDKOptions } from './types';
-import { LoggerProvider } from '@opentelemetry/sdk-logs';
-import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { logs } from '@opentelemetry/api-logs';
-import type {
-  Resource,
-  ResourceDetectionConfig,
-  ResourceDetector,
-} from '@opentelemetry/resources';
-import {
-  defaultResource,
-  detectResources,
-  resourceFromAttributes,
-} from '@opentelemetry/resources';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
-import { ATTR_SERVICE_INSTANCE_ID } from './semconv';
+import { diagLogLevelFromSeverityNumberConfig } from './diag';
+import {
+  createLoggerProviderFromConfig,
+  createMeterProviderFromConfig,
+  createPropagatorFromConfig,
+  createResourceFromConfig,
+  createTracerProviderFromConfig,
+} from './create-from-config';
+
+// Exported for testing.
+export const NOOP_SDK = {
+  shutdown: async () => {},
+};
 
 /**
  * @experimental Function to start the OpenTelemetry Node SDK
  * @param sdkOptions
  */
-export function startNodeSDK(sdkOptions: SDKOptions): {
+export function startNodeSDK(sdkOptions?: SDKOptions): {
   shutdown: () => Promise<void>;
 } {
-  const configFactory: ConfigFactory = createConfigFactory();
-  const config = configFactory.getConfigModel();
-
-  if (config.disabled) {
-    diag.info('OpenTelemetry SDK is disabled');
+  let config: ConfigurationModel;
+  try {
+    const configFactory: ConfigFactory = createConfigFactory();
+    config = configFactory.getConfigModel();
+  } catch (configErr) {
+    // Set the diag logger, otherwise the diag.error will typically not be shown.
+    const logLevel = diagLogLevelFromSeverityNumberConfig();
+    diag.setLogger(new DiagConsoleLogger(), { logLevel });
+    diag.error(
+      `Could not load OpenTelemetry configuration, SDK will not be setup: ${configErr.message}`
+    );
     return NOOP_SDK;
   }
-  if (config.log_level != null) {
-    diag.setLogger(new DiagConsoleLogger(), { logLevel: config.log_level });
+
+  if (config.disabled) {
+    return NOOP_SDK;
   }
+
+  const logLevel = diagLogLevelFromSeverityNumberConfig(config.log_level);
+  diag.setLogger(new DiagConsoleLogger(), { logLevel });
 
   registerInstrumentations({
     instrumentations: sdkOptions?.instrumentations?.flat() ?? [],
   });
 
-  const components = create(config, sdkOptions);
-  context.setGlobalContextManager(components.contextManager);
+  let components: SDKComponents;
+  try {
+    components = create(config, sdkOptions);
+  } catch (createErr) {
+    diag.error(
+      `Could not create OpenTelemetry SDK from configuration, SDK will not be setup: ${createErr.message}`
+    );
+    return NOOP_SDK;
+  }
+  if (components.contextManager) {
+    context.setGlobalContextManager(components.contextManager);
+  }
   if (components.loggerProvider) {
     logs.setGlobalLoggerProvider(components.loggerProvider);
   }
   if (components.meterProvider) {
     metrics.setGlobalMeterProvider(components.meterProvider);
+  }
+  if (components.tracerProvider) {
+    trace.setGlobalTracerProvider(components.tracerProvider);
   }
   if (components.propagator) {
     propagation.setGlobalPropagator(components.propagator);
@@ -83,90 +98,73 @@ export function startNodeSDK(sdkOptions: SDKOptions): {
     if (components.meterProvider) {
       promises.push(components.meterProvider.shutdown());
     }
+    if (components.tracerProvider) {
+      promises.push(components.tracerProvider.shutdown());
+    }
     await Promise.all(promises);
   };
   return { shutdown: shutdownFn };
 }
-const NOOP_SDK = {
-  shutdown: async () => {},
-};
 
 /**
  * Interpret configuration model and return SDK components.
  */
 function create(
   config: ConfigurationModel,
-  sdkOptions: SDKOptions
+  sdkOptions?: SDKOptions
 ): SDKComponents {
-  const defaultContextManager = new AsyncLocalStorageContextManager();
-  defaultContextManager.enable();
-  const components: SDKComponents = {
-    contextManager: defaultContextManager,
-  };
-  const resource = setupResource(config, sdkOptions);
+  const components: SDKComponents = {};
 
-  const propagator =
-    sdkOptions?.textMapPropagator === null
-      ? null
-      : (sdkOptions?.textMapPropagator ??
-        getPropagatorFromConfiguration(config));
-  if (propagator) {
-    components.propagator = propagator;
+  try {
+    components.contextManager = new AsyncLocalStorageContextManager();
+    components.contextManager.enable();
+
+    const resource = createResourceFromConfig(config.resource);
+
+    if (sdkOptions?.textMapPropagator !== undefined) {
+      if (sdkOptions.textMapPropagator !== null) {
+        components.propagator = sdkOptions.textMapPropagator;
+      }
+    } else if (config.propagator) {
+      components.propagator = createPropagatorFromConfig(config.propagator);
+    }
+
+    if (config.logger_provider) {
+      components.loggerProvider = createLoggerProviderFromConfig(
+        resource,
+        config.logger_provider,
+        config.attribute_limits
+      );
+    }
+
+    if (config.meter_provider) {
+      components.meterProvider = createMeterProviderFromConfig(
+        resource,
+        config.meter_provider
+      );
+    }
+
+    if (config.tracer_provider) {
+      components.tracerProvider = createTracerProviderFromConfig(
+        resource,
+        config.tracer_provider,
+        config.attribute_limits
+      );
+    }
+
+    return components;
+  } catch (createErr) {
+    // Clean up any SDK components that were created before the error.
+    if (components.loggerProvider) {
+      void components.loggerProvider.shutdown();
+    }
+    if (components.meterProvider) {
+      void components.meterProvider.shutdown();
+    }
+    if (components.tracerProvider) {
+      void components.tracerProvider.shutdown();
+    }
+
+    throw createErr;
   }
-
-  const logProcessors = getLogRecordProcessorsFromConfiguration(config);
-  if (logProcessors) {
-    const loggerProvider = new LoggerProvider({
-      resource: resource,
-      processors: logProcessors,
-    });
-    components.loggerProvider = loggerProvider;
-  }
-
-  const meterReaders = getMeterReadersFromConfiguration(config);
-  if (meterReaders) {
-    const meterViews = getMeterViewsFromConfiguration(config);
-    const meterProvider = new MeterProvider({
-      resource: resource,
-      readers: meterReaders,
-      views: meterViews ?? [],
-    });
-    components.meterProvider = meterProvider;
-  }
-
-  return components;
-}
-
-export function setupResource(
-  config: ConfigurationModel,
-  sdkOptions: SDKOptions
-): Resource {
-  let resource: Resource =
-    getResourceFromConfiguration(config) ?? defaultResource();
-  let resourceDetectors: ResourceDetector[] = [];
-
-  if (sdkOptions.resourceDetectors != null) {
-    resourceDetectors = sdkOptions.resourceDetectors;
-  } else if (config.resource?.['detection/development']?.detectors) {
-    resourceDetectors = getResourceDetectorsFromConfiguration(config);
-  }
-
-  if (resourceDetectors.length > 0) {
-    const internalConfig: ResourceDetectionConfig = {
-      detectors: resourceDetectors,
-    };
-    resource = resource.merge(detectResources(internalConfig));
-  }
-
-  const instanceId = getInstanceID(config);
-  resource =
-    instanceId === undefined
-      ? resource
-      : resource.merge(
-          resourceFromAttributes({
-            [ATTR_SERVICE_INSTANCE_ID]: instanceId,
-          })
-        );
-
-  return resource;
 }

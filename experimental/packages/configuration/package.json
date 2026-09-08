@@ -1,20 +1,32 @@
 {
   "name": "@opentelemetry/configuration",
-  "version": "0.214.0",
+  "version": "0.222.0",
   "description": "OpenTelemetry Configuration",
-  "main": "build/src/index.js",
-  "types": "build/src/index.d.ts",
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build",
-    "clean": "tsc --build --clean",
+    "compile": "tsdown",
+    "clean": "rimraf dist build",
+    "generate:config": "node ./scripts/generate-config.js",
     "test": "nyc mocha test/**/*.test.ts",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "version": "node ../../../scripts/version-update.js",
-    "watch": "tsc --build --watch",
-    "prewatch": "npm run precompile",
+    "watch": "tsdown --watch --no-clean",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
   },
@@ -28,18 +40,16 @@
     "node": "^18.19.0 || >=20.6.0"
   },
   "files": [
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "dist"
   ],
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/core": "2.6.1",
-    "yaml": "^2.0.0"
+    "@opentelemetry/core": "2.11.0",
+    "yaml": "^2.8.3"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.9.0"
@@ -49,11 +59,13 @@
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
-    "mocha": "11.7.5",
+    "ajv": "^8.0.0",
+    "json-schema-to-typescript": "^15.0.0",
+    "mocha": "11.8.0",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
-    "ts-loader": "9.5.4",
-    "typescript": "5.0.4"
+    "ts-loader": "9.5.7",
+    "typescript": "5.2.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/configuration",
   "sideEffects": false

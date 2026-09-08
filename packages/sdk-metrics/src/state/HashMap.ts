@@ -64,7 +64,6 @@ export class HashMap<KeyType, ValueType, HashCodeType> {
     let next = valueIterator.next();
     while (next.done !== true) {
       // next.value[0] here can not be undefined
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       yield [this._keyMap.get(next.value[0])!, next.value[1], next.value[0]];
       next = valueIterator.next();
     }

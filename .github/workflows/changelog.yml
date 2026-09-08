@@ -1,6 +1,10 @@
-# This action requires that any PR targeting the main and next branch should touch at
-# least one CHANGELOG file. If a CHANGELOG entry is not required, add the "Skip
-# Changelog" label to disable this action.
+# This action requires that any PR targeting the main or maintenance branch
+# (`v<major>.x`) should touch at least one CHANGELOG file. If a CHANGELOG entry is not
+# required, add the "Skip Changelog" label to disable this action.
+#
+# Maintenance branches are included because each branch keeps its own changelog, and
+# scripts/prepare-release.mjs rotates it into that branch's release notes - see
+# doc/contributing/releasing.md#changelogs-on-a-maintenance-branch.
 
 name: changelog
 
@@ -9,7 +13,7 @@ on:
     types: [opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - main
-      - next
+      - 'v[0-9]*.x'
 permissions:
   contents: read
 jobs:
@@ -18,14 +22,16 @@ jobs:
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'dependencies') && !contains(github.event.pull_request.labels.*.name, 'Skip Changelog')}}
 
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Check for CHANGELOG changes
         run: |
           # Only the latest commit of the feature branch is available
           # automatically. To diff with the base branch, we need to
           # fetch that too (and we only need its latest commit).
-          git fetch origin ${{ github.base_ref }} --depth=1
+          git fetch origin ${GITHUB_BASE_REF} --depth=1
           if [[ $(git diff --name-only FETCH_HEAD | grep CHANGELOG) ]]
           then
             echo "A CHANGELOG was modified. Looks good!"

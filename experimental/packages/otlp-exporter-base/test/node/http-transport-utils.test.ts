@@ -26,14 +26,16 @@ describe('compressAndSend', function () {
 });
 
 describe('sendWithHttp', function () {
-  const requestFn: typeof http.request = (
-    opts: any,
-    cb: any
-  ): http.ClientRequest => {
-    sentUserAgent = opts.headers['User-Agent'];
-    return http.request(opts, cb).destroy();
-  };
   let sentUserAgent: string;
+
+  const requestFn: any = (
+    url: URL,
+    opts: http.RequestOptions,
+    cb?: (res: http.IncomingMessage) => void
+  ): http.ClientRequest => {
+    sentUserAgent = (opts.headers as Record<string, string>)['User-Agent'];
+    return http.request(url, opts, cb).destroy();
+  };
 
   beforeEach(function () {
     sentUserAgent = '';

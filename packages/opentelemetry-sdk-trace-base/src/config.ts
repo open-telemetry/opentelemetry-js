@@ -5,11 +5,13 @@
 
 import { diag } from '@opentelemetry/api';
 import { getNumberFromEnv, getStringFromEnv } from '@opentelemetry/core';
-import type { Sampler } from './Sampler';
-import { AlwaysOffSampler } from './sampler/AlwaysOffSampler';
-import { AlwaysOnSampler } from './sampler/AlwaysOnSampler';
-import { ParentBasedSampler } from './sampler/ParentBasedSampler';
-import { TraceIdRatioBasedSampler } from './sampler/TraceIdRatioBasedSampler';
+import type { Sampler } from '@opentelemetry/sdk-trace';
+import {
+  AlwaysOffSampler,
+  AlwaysOnSampler,
+  ParentBasedSampler,
+  TraceIdRatioBasedSampler,
+} from '@opentelemetry/sdk-trace';
 
 const enum TracesSamplerValues {
   AlwaysOff = 'always_off',
@@ -34,7 +36,6 @@ const DEFAULT_RATIO = 1;
 export function loadDefaultConfig() {
   return {
     sampler: buildSamplerFromEnv(),
-    forceFlushTimeoutMillis: 30000,
     generalLimits: {
       attributeValueLengthLimit:
         getNumberFromEnv('OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT') ?? Infinity,

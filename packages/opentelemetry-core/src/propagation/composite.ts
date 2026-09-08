@@ -34,14 +34,16 @@ export class CompositePropagator implements TextMapPropagator {
   constructor(config: CompositePropagatorConfig = {}) {
     this._propagators = config.propagators ?? [];
 
-    this._fields = Array.from(
-      new Set(
-        this._propagators
-          // older propagators may not have fields function, null check to be sure
-          .map(p => (typeof p.fields === 'function' ? p.fields() : []))
-          .reduce((x, y) => x.concat(y), [])
-      )
-    );
+    const fields = new Set<string>();
+    for (const propagator of this._propagators) {
+      // older propagators may not have fields function, null check to be sure
+      const propagatorFields =
+        typeof propagator.fields === 'function' ? propagator.fields() : [];
+      for (const field of propagatorFields) {
+        fields.add(field);
+      }
+    }
+    this._fields = Array.from(fields);
   }
 
   /**

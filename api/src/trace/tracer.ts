@@ -35,6 +35,11 @@ export interface Tracer {
    * Additionally the new span gets set in context and this context is activated
    * for the duration of the function call.
    *
+   * **Important**: The callback function is responsible for calling `span.end()`
+   * to finish the span. Unlike some other OpenTelemetry implementations, the span
+   * is NOT automatically ended when the callback returns. If `span.end()` is not
+   * called, the span will never be exported and will be silently lost.
+   *
    * @param name The name of the span
    * @param [options] SpanOptions used for span creation
    * @param [context] Context to use to extract parent

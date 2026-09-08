@@ -12,10 +12,16 @@ import type { DetectedResource, ResourceDetector } from '../../../types';
  * ServiceInstanceIdDetector detects the resources related to the service instance ID.
  */
 class ServiceInstanceIdDetector implements ResourceDetector {
+  // Multiple calls to ServiceInstanceIdDetector return the same ID.
+  private _serviceInstanceId: string | undefined;
+
   detect(_config?: ResourceDetectionConfig): DetectedResource {
+    if (!this._serviceInstanceId) {
+      this._serviceInstanceId = randomUUID();
+    }
     return {
       attributes: {
-        [ATTR_SERVICE_INSTANCE_ID]: randomUUID(),
+        [ATTR_SERVICE_INSTANCE_ID]: this._serviceInstanceId,
       },
     };
   }

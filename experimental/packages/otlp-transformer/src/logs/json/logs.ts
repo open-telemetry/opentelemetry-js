@@ -9,7 +9,7 @@ import type { IExportLogsServiceResponse } from '../export-response';
 import { JSON_ENCODER } from '../../common/utils';
 import { diag } from '@opentelemetry/api';
 
-/*
+/**
  * @experimental this serializer may receive breaking changes in minor versions, pin this package's version when using this constant
  */
 export const JsonLogsSerializer: ISerializer<

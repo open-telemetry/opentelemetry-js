@@ -51,6 +51,15 @@ export class ProtobufSizeEstimator implements IProtobufWriter {
     this.pos += estimateVarintSize(value);
   }
 
+  writeSint32(value: number): void {
+    // Zigzag encode: (n << 1) ^ (n >> 31)
+    this.pos += estimateVarintSize(((value << 1) ^ (value >> 31)) >>> 0);
+  }
+
+  writeSfixed64(_value: number): void {
+    this.pos += 8;
+  }
+
   writeFixed32(_value: number): void {
     this.pos += 4;
   }

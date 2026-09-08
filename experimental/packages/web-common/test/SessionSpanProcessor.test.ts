@@ -4,8 +4,8 @@
  */
 
 import * as assert from 'assert';
-import type { Span } from '@opentelemetry/sdk-trace-base';
-import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
+import type { Span } from '@opentelemetry/sdk-trace';
+import { TracerProvider } from '@opentelemetry/sdk-trace';
 import { SessionSpanProcessor } from '../src/SessionSpanProcessor';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
 
@@ -15,7 +15,7 @@ describe('SessionSpanProcessor', function () {
       'session.id': '12345678',
     };
 
-    const tracer = new BasicTracerProvider().getTracer('session-testing');
+    const tracer = new TracerProvider().getTracer('session-testing');
     const span = tracer.startSpan('test-span');
 
     const sessionProvider = {
@@ -31,7 +31,7 @@ describe('SessionSpanProcessor', function () {
   });
 
   it('does not add session.id attribute when there is no session', function () {
-    const tracer = new BasicTracerProvider().getTracer('session-testing');
+    const tracer = new TracerProvider().getTracer('session-testing');
     const span = tracer.startSpan('test-span');
 
     const sessionProvider = {
@@ -47,7 +47,7 @@ describe('SessionSpanProcessor', function () {
   });
 
   it('does not add session.id attribute when there is no provider', function () {
-    const tracer = new BasicTracerProvider().getTracer('session-testing');
+    const tracer = new TracerProvider().getTracer('session-testing');
     const span = tracer.startSpan('test-span');
 
     const processor = new SessionSpanProcessor(null as any);
@@ -66,7 +66,7 @@ describe('SessionSpanProcessor', function () {
   });
 
   it('onEnd is a no-op and does not throw error', async function () {
-    const tracer = new BasicTracerProvider().getTracer('session-testing');
+    const tracer = new TracerProvider().getTracer('session-testing');
     const span = tracer.startSpan('test-span');
 
     const processor = new SessionSpanProcessor({

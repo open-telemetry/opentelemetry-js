@@ -87,7 +87,7 @@ class EnvDetector implements ResourceDetector {
       if (keyValuePair.length !== 2) {
         throw new Error(
           `Invalid format for OTEL_RESOURCE_ATTRIBUTES: "${rawAttribute}". ` +
-            `Expected format: key=value. The ',' and '=' characters must be percent-encoded in keys and values.`
+            "Expected format: key=value. The ',' and '=' characters must be percent-encoded in keys and values."
         );
       }
 
@@ -108,7 +108,8 @@ class EnvDetector implements ResourceDetector {
         decodedValue = decodeURIComponent(value);
       } catch (e) {
         throw new Error(
-          `Failed to percent-decode OTEL_RESOURCE_ATTRIBUTES entry "${rawAttribute}": ${e instanceof Error ? e.message : e}`
+          `Failed to percent-decode OTEL_RESOURCE_ATTRIBUTES entry "${rawAttribute}": ${e instanceof Error ? e.message : e}`,
+          { cause: e }
         );
       }
 

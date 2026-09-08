@@ -24,6 +24,9 @@
     "strict": true,
     "strictNullChecks": true,
     "target": "es2022",
+    // The types used by most workspaces. A workspace that requires more can
+    // add its own.
+    "types": ["node", "mocha", "webpack-env"],
     "useUnknownInCatchVariables": false,
     "lib": [
       "es2022"

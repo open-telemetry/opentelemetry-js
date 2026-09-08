@@ -15,14 +15,14 @@ import {
   SimpleLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
-import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
+import { TracerProvider } from '@opentelemetry/sdk-trace';
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
 
 diag.setLogger(new DiagConsoleLogger());
 
 logs.setGlobalLoggerProvider(
   new LoggerProvider({
-    processors: [new SimpleLogRecordProcessor(new OTLPLogExporter())],
+    processors: [new SimpleLogRecordProcessor({ exporter: new OTLPLogExporter() })],
   })
 );
 
@@ -39,7 +39,7 @@ class TestInstrumentation extends InstrumentationBase {
 }
 
 new TestInstrumentation('test', '0.0.0');
-new BasicTracerProvider();
+new TracerProvider();
 new MeterProvider();
 new OTLPTraceExporter();
 new OTLPMetricExporter();

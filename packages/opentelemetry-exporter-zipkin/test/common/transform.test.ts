@@ -11,7 +11,7 @@ import {
   millisToHrTime,
 } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
-import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import {

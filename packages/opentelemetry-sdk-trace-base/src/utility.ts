@@ -3,50 +3,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { buildSamplerFromEnv, loadDefaultConfig } from './config';
-import type { Sampler } from './Sampler';
-import type { SpanLimits, TracerConfig, GeneralLimits } from './types';
+import type { TracerConfig } from './types-shim';
 import { getNumberFromEnv } from '@opentelemetry/core';
 
-export const DEFAULT_ATTRIBUTE_COUNT_LIMIT = 128;
-export const DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT = Infinity;
-
 /**
- * Function to merge Default configuration (as specified in './config') with
- * user provided configurations.
+ * Keep these declarations local. TypeScript's CommonJS output otherwise
+ * rewrites internal reads of `export const` to `exports.*`, which can trigger
+ * webpack's self-reference handling when the export is tree-shaken (#6981,
+ * webpack/webpack#21619).
  */
-export function mergeConfig(userConfig: TracerConfig): TracerConfig & {
-  sampler: Sampler;
-  spanLimits: SpanLimits;
-  generalLimits: GeneralLimits;
-} {
-  const perInstanceDefaults: Partial<TracerConfig> = {
-    sampler: buildSamplerFromEnv(),
-  };
-
-  const DEFAULT_CONFIG = loadDefaultConfig();
-
-  const target = Object.assign(
-    {},
-    DEFAULT_CONFIG,
-    perInstanceDefaults,
-    userConfig
-  );
-
-  target.generalLimits = Object.assign(
-    {},
-    DEFAULT_CONFIG.generalLimits,
-    userConfig.generalLimits || {}
-  );
-
-  target.spanLimits = Object.assign(
-    {},
-    DEFAULT_CONFIG.spanLimits,
-    userConfig.spanLimits || {}
-  );
-
-  return target;
-}
+const DEFAULT_ATTRIBUTE_COUNT_LIMIT = 128;
+const DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT = Infinity;
 
 /**
  * When general limits are provided and model specific limits are not,

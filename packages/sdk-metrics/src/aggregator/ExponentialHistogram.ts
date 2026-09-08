@@ -207,9 +207,9 @@ export class ExponentialHistogramAccumulation implements Accumulation {
    * @param increment
    */
   updateByIncrement(value: number, increment: number) {
-    // NaN does not fall into any bucket, is not zero and should not be counted,
-    // NaN is never greater than max nor less than min, therefore return as there's nothing for us to do.
-    if (Number.isNaN(value)) {
+    // Drop NaN and ±Infinity: they belong in no bucket, are not zero, and would
+    // corrupt sum/min/max.
+    if (!Number.isFinite(value)) {
       return;
     }
 

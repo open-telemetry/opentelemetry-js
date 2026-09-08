@@ -218,6 +218,88 @@ describe('W3CBaggagePropagator', () => {
 
       assert.deepStrictEqual(extractedBaggage, expected);
     });
+
+    it('should not extract more than 180 pairs from a string header', function () {
+      const pairs = Array.from({ length: 200 }, (_, i) => `k${i}=v`);
+      carrier[BAGGAGE_HEADER] = pairs.join(',');
+      const bag = propagation.getBaggage(
+        httpBaggagePropagator.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        )
+      );
+      assert.ok(bag);
+      assert.strictEqual(bag.getAllEntries().length, 180);
+    });
+
+    it('should not extract more than 180 pairs across multiple array header values', function () {
+      const first = Array.from({ length: 100 }, (_, i) => `a${i}=v`).join(',');
+      const second = Array.from({ length: 100 }, (_, i) => `b${i}=v`).join(',');
+      carrier[BAGGAGE_HEADER] = [first, second];
+      const bag = propagation.getBaggage(
+        httpBaggagePropagator.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        )
+      );
+      assert.ok(bag);
+      assert.strictEqual(bag.getAllEntries().length, 180);
+    });
+
+    it('should stop accepting entries once the extracted baggage exceeds 8192 bytes', function () {
+      // Each entry is 49 bytes ("kXXX=v...v" with 45 v's).
+      // Accepted-size accounting: first entry = 49, each subsequent = 1 (comma) + 49 = 50.
+      // After n entries: totalSize = 49 + (n-1)*50 = 50n - 1.
+      // The 164th entry would bring totalSize to 50*163 - 1 + 50 = 8199 > 8192, so we stop at 163
+      // — below the 180 pair limit, proving the extracted-size limit fires first.
+      const value = 'v'.repeat(45);
+      const pairs = Array.from(
+        { length: 200 },
+        (_, i) => `${String(i).padStart(3, '0')}=${value}`
+      );
+      carrier[BAGGAGE_HEADER] = pairs.join(',');
+      const bag = propagation.getBaggage(
+        httpBaggagePropagator.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        )
+      );
+      assert.ok(bag);
+      assert.strictEqual(bag.getAllEntries().length, 163);
+    });
+
+    it('should reject a header that is a single entry exceeding 4096 bytes', function () {
+      const longValue = 'v'.repeat(4093); // key=<longValue> = 4+1+4093 = 4098 bytes > 4096
+      carrier[BAGGAGE_HEADER] = `toolong=${longValue}`;
+      const bag = propagation.getBaggage(
+        httpBaggagePropagator.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        )
+      );
+      assert.strictEqual(bag, undefined);
+    });
+
+    it('should skip pairs exceeding 4096 bytes but still extract valid peers', function () {
+      const longValue = 'v'.repeat(4093); // key=<longValue> = 4+1+4093 = 4098 bytes > 4096
+      carrier[BAGGAGE_HEADER] = `good=value,toolong=${longValue},also=good`;
+      const bag = propagation.getBaggage(
+        httpBaggagePropagator.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        )
+      );
+      assert.ok(bag);
+      assert.strictEqual(bag.getAllEntries().length, 2);
+      assert.ok(bag.getEntry('good'));
+      assert.ok(bag.getEntry('also'));
+      assert.strictEqual(bag.getEntry('toolong'), undefined);
+    });
   });
 
   describe('fields()', () => {

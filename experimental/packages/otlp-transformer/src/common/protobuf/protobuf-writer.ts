@@ -127,6 +127,42 @@ export class ProtobufWriter implements IProtobufWriter {
   }
 
   /**
+   * Write a sint32 value using zigzag encoding
+   */
+  writeSint32(value: number): void {
+    // Zigzag encode: (n << 1) ^ (n >> 31)
+    this.writeVarint(((value << 1) ^ (value >> 31)) >>> 0);
+  }
+
+  /**
+   * Write a signed 64-bit fixed integer (sfixed64) from a JS number.
+   * Handles negative values via two's complement.
+   */
+  writeSfixed64(value: number): void {
+    let low: number;
+    let high: number;
+
+    if (value >= 0) {
+      low = value >>> 0;
+      high = (value / 0x100000000) >>> 0;
+    } else {
+      // Two's complement for negative values
+      const abs = Math.abs(value);
+      low = abs >>> 0;
+      high = (abs / 0x100000000) >>> 0;
+      // Invert bits and add 1
+      low = ~low >>> 0;
+      high = ~high >>> 0;
+      low = (low + 1) >>> 0;
+      if (low === 0) {
+        high = (high + 1) >>> 0;
+      }
+    }
+
+    this.writeFixed64(low, high);
+  }
+
+  /**
    * Write a varint (variable-length integer)
    */
   writeVarint(value: number): void {

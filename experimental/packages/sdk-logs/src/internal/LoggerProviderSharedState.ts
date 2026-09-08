@@ -38,30 +38,27 @@ export class LoggerProviderSharedState {
   activeProcessor: LogRecordProcessor;
   readonly registeredLogRecordProcessors: LogRecordProcessor[] = [];
   readonly resource: Resource;
-  readonly forceFlushTimeoutMillis: number;
   readonly logRecordLimits: Required<LogRecordLimits>;
   readonly processors: LogRecordProcessor[];
   readonly loggerMetrics: LoggerMetrics;
+  hasShutdown = false;
   private _loggerConfigurator: LoggerConfigurator;
   private _loggerConfigs: Map<string, Required<LoggerConfig>> = new Map();
 
   constructor(
     resource: Resource,
-    forceFlushTimeoutMillis: number,
     logRecordLimits: Required<LogRecordLimits>,
     processors: LogRecordProcessor[],
     loggerConfigurator?: LoggerConfigurator,
     meterProvider?: MeterProvider
   ) {
     this.resource = resource;
-    this.forceFlushTimeoutMillis = forceFlushTimeoutMillis;
     this.logRecordLimits = logRecordLimits;
     this.processors = processors;
     if (processors.length > 0) {
       this.registeredLogRecordProcessors = processors;
       this.activeProcessor = new MultiLogRecordProcessor(
-        this.registeredLogRecordProcessors,
-        this.forceFlushTimeoutMillis
+        this.registeredLogRecordProcessors
       );
     } else {
       this.activeProcessor = new NoopLogRecordProcessor();

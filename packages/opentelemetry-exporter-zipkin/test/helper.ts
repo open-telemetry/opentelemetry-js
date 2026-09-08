@@ -4,7 +4,7 @@
  */
 
 import { TraceFlags, SpanStatusCode } from '@opentelemetry/api';
-import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
 import type { Span } from '../src/types';
 import { resourceFromAttributes } from '@opentelemetry/resources';

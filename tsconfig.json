@@ -1,6 +1,11 @@
 {
   "extends": "./tsconfig.base.json",
   "files": [],
+  "include": [
+    "tsdown.config.ts",
+    "**/tsdown.config.ts",
+    "**/tsdown.*.config.ts"
+  ],
   "typedocOptions": {
     "entryPointStrategy": "packages",
     "entryPoints": [
@@ -23,6 +28,7 @@
       "experimental/packages/opentelemetry-instrumentation-grpc",
       "experimental/packages/opentelemetry-instrumentation-http",
       "experimental/packages/opentelemetry-instrumentation-xml-http-request",
+      "experimental/packages/opentelemetry-propagator-env-carrier",
       "experimental/packages/opentelemetry-sdk-node",
       "experimental/packages/otlp-exporter-base",
       "experimental/packages/otlp-grpc-exporter-base",
@@ -39,13 +45,13 @@
       "packages/opentelemetry-exporter-jaeger",
       "packages/opentelemetry-exporter-zipkin",
       "packages/opentelemetry-propagator-b3",
-      "packages/opentelemetry-propagator-jaeger",
       "packages/opentelemetry-resources",
       "packages/opentelemetry-sdk-trace-base",
       "packages/opentelemetry-sdk-trace-node",
       "packages/opentelemetry-sdk-trace-web",
       "packages/opentelemetry-shim-opentracing",
       "packages/sdk-metrics",
+      "packages/sdk-trace",
       "semantic-conventions"
     ],
     "out": "docs",
@@ -117,6 +123,9 @@
       "path": "experimental/packages/opentelemetry-instrumentation-xml-http-request"
     },
     {
+      "path": "experimental/packages/opentelemetry-propagator-env-carrier"
+    },
+    {
       "path": "experimental/packages/opentelemetry-sdk-node"
     },
     {
@@ -165,9 +174,6 @@
       "path": "packages/opentelemetry-propagator-b3"
     },
     {
-      "path": "packages/opentelemetry-propagator-jaeger"
-    },
-    {
       "path": "packages/opentelemetry-resources"
     },
     {
@@ -184,6 +190,9 @@
     },
     {
       "path": "packages/sdk-metrics"
+    },
+    {
+      "path": "packages/sdk-trace"
     },
     {
       "path": "packages/template"

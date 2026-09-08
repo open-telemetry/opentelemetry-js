@@ -1,0 +1,34 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": [
+      "es2022",
+      "dom",
+      "dom.iterable"
+    ],
+    "outDir": "build",
+    "rootDir": "."
+  },
+  "files": [],
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../../api"
+    },
+    {
+      "path": "../../semantic-conventions"
+    },
+    {
+      "path": "../opentelemetry-core"
+    },
+    {
+      "path": "../opentelemetry-resources"
+    },
+    {
+      "path": "../sdk-metrics"
+    }
+  ]
+}

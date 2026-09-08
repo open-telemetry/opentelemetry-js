@@ -5,12 +5,7 @@
 
 import type { Span } from '@opentelemetry/api';
 import { SpanKind, context, propagation } from '@opentelemetry/api';
-import {
-  HTTP_FLAVOR_VALUE_HTTP_1_1,
-  NET_TRANSPORT_VALUE_IP_TCP,
-  ATTR_HTTP_FLAVOR,
-  ATTR_NET_TRANSPORT,
-} from '../../src/semconv';
+import { ATTR_NETWORK_PROTOCOL_VERSION } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import type * as http from 'http';
 import * as fs from 'fs';
@@ -19,11 +14,11 @@ import type { Socket } from 'net';
 import { assertSpan } from '../utils/assertSpan';
 import { urlToHttpOptions } from 'url';
 import * as utils from '../utils/utils';
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
+  TracerProvider,
+} from '@opentelemetry/sdk-trace';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { HttpInstrumentation } from '../../src';
 
@@ -119,8 +114,8 @@ describe('HttpsInstrumentation Integration tests', () => {
         done();
       });
     });
-    const provider = new NodeTracerProvider({
-      spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+    const provider = new TracerProvider({
+      spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
     });
     instrumentation.setTracerProvider(provider);
     beforeEach(() => {
@@ -222,14 +217,7 @@ describe('HttpsInstrumentation Integration tests', () => {
       assert.strictEqual(spans.length, 2);
       assert.strictEqual(span.name, 'GET');
       assert.strictEqual(result.reqHeaders['x-foo'], 'foo');
-      assert.strictEqual(
-        span.attributes[ATTR_HTTP_FLAVOR],
-        HTTP_FLAVOR_VALUE_HTTP_1_1
-      );
-      assert.strictEqual(
-        span.attributes[ATTR_NET_TRANSPORT],
-        NET_TRANSPORT_VALUE_IP_TCP
-      );
+      assert.strictEqual(span.attributes[ATTR_NETWORK_PROTOCOL_VERSION], '1.1');
       assertSpan(span, SpanKind.CLIENT, validations);
     });
 

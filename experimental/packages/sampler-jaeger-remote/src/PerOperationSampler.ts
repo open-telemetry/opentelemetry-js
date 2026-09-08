@@ -9,8 +9,8 @@ import type {
   Link,
   SpanAttributes,
 } from '@opentelemetry/api';
-import type { Sampler, SamplingResult } from '@opentelemetry/sdk-trace-base';
-import { TraceIdRatioBasedSampler } from '@opentelemetry/sdk-trace-base';
+import type { Sampler, SamplingResult } from '@opentelemetry/sdk-trace';
+import { TraceIdRatioBasedSampler } from '@opentelemetry/sdk-trace';
 import type { PerOperationStrategy } from './types';
 
 interface PerOperationSamplerOptions {

@@ -2,10 +2,7 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import {
-  AlwaysOnSampler,
-  SamplingDecision,
-} from '@opentelemetry/sdk-trace-base';
+import { AlwaysOnSampler, SamplingDecision } from '@opentelemetry/sdk-trace';
 import { PerOperationSampler } from '../src/PerOperationSampler';
 import * as sinon from 'sinon';
 import * as api from '@opentelemetry/api';

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace';
 import * as oc from '@opencensus/core';
 import * as assert from 'assert';
 import { withTestTracer, setupNodeContextManager } from './util';

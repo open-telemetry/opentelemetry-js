@@ -26,7 +26,7 @@ describe('SessionLogRecordProcessor', function () {
     const exporter = new InMemoryLogRecordExporter();
     const processor = new SessionLogRecordProcessor(sessionProvider);
     const provider = new LoggerProvider({
-      processors: [processor, new SimpleLogRecordProcessor(exporter)],
+      processors: [processor, new SimpleLogRecordProcessor({ exporter })],
     });
 
     const logger = provider.getLogger('session-testing');
@@ -46,7 +46,7 @@ describe('SessionLogRecordProcessor', function () {
     const exporter = new InMemoryLogRecordExporter();
     const processor = new SessionLogRecordProcessor(sessionProvider);
     const provider = new LoggerProvider({
-      processors: [processor, new SimpleLogRecordProcessor(exporter)],
+      processors: [processor, new SimpleLogRecordProcessor({ exporter })],
     });
 
     const logger = provider.getLogger('session-testing');
@@ -60,7 +60,7 @@ describe('SessionLogRecordProcessor', function () {
     const exporter = new InMemoryLogRecordExporter();
     const processor = new SessionLogRecordProcessor(null as any);
     const provider = new LoggerProvider({
-      processors: [processor, new SimpleLogRecordProcessor(exporter)],
+      processors: [processor, new SimpleLogRecordProcessor({ exporter })],
     });
 
     const logger = provider.getLogger('session-testing');

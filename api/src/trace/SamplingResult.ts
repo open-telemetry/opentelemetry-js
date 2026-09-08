@@ -7,7 +7,7 @@ import type { SpanAttributes } from './attributes';
 import type { TraceState } from './trace_state';
 
 /**
- * @deprecated use the one declared in @opentelemetry/sdk-trace-base instead.
+ * @deprecated use the one declared in @opentelemetry/sdk-trace instead.
  * A sampling decision that determines how a {@link Span} will be recorded
  * and collected.
  *
@@ -32,7 +32,7 @@ export enum SamplingDecision {
 }
 
 /**
- * @deprecated use the one declared in @opentelemetry/sdk-trace-base instead.
+ * @deprecated use the one declared in @opentelemetry/sdk-trace instead.
  * A sampling result contains a decision for a {@link Span} and additional
  * attributes the sampler would like to added to the Span.
  *
@@ -54,6 +54,8 @@ export interface SamplingResult {
    * the new {@link SpanContext}. Samplers SHOULD return the TraceState from
    * the passed-in {@link Context} if they do not intend to change it. Leaving
    * the value undefined will also leave the TraceState unchanged.
+   *
+   * @since 1.4.1
    */
   traceState?: TraceState;
 }

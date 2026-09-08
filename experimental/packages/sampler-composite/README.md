@@ -24,7 +24,7 @@ import {
   createComposableAlwaysOffSampler,
   createComposableAlwaysOnSampler,
   createComposableParentThresholdSampler,
-  createComposableTraceIDRatioBasedSampler,
+  createComposableProbabilitySampler,
   createComposableRuleBasedSampler
 } from '@opentelemetry/sampler-composite';
 
@@ -34,7 +34,7 @@ const sampler = createCompositeSampler(createComposableAlwaysOffSampler());
 const sampler = createCompositeSampler(createComposableAlwaysOnSampler());
 // follow the parent, or otherwise sample with a probability if root
 const sampler = createCompositeSampler(
-    createComposableParentThresholdSampler(createComposableTraceIDRatioBasedSampler(0.3)));
+    createComposableParentThresholdSampler(createComposableProbabilitySampler(0.3)));
 
 // An example of a rule-based sampler implementing the example at
 // https://opentelemetry.io/docs/specs/otel/trace/sdk/#composablerulebased
@@ -53,7 +53,7 @@ const sampler = createCompositeSampler(
       // ...always sample `/checkout` requests.
       [isCheckout, createComposableAlwaysOnSampler()],
       // ...sample 10% of all other requests.
-      [() => true, createComposableTraceIDRatioBasedSampler(0.1)]
+      [() => true, createComposableProbabilitySampler(0.1)]
     ])
   )
 );
@@ -73,6 +73,6 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/sampler-composite
-[npm-img]: https://badge.fury.io/js/%40opentelemetry%sampler-composite.svg
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fsampler-composite.svg
 
 [probability-sampling]: https://opentelemetry.io/docs/specs/otel/trace/tracestate-probability-sampling/

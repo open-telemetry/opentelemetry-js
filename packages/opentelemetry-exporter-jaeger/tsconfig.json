@@ -22,7 +22,7 @@
       "path": "../opentelemetry-resources"
     },
     {
-      "path": "../opentelemetry-sdk-trace-base"
+      "path": "../sdk-trace"
     }
   ]
 }
