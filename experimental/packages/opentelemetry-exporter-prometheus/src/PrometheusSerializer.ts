@@ -7,7 +7,6 @@ import type { Attributes, AttributeValue } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
 import type {
   ResourceMetrics,
-  ScopeMetrics,
   MetricData,
   DataPoint,
   Histogram,
@@ -42,7 +41,10 @@ interface PrometheusMetadata {
 }
 
 interface PrometheusMetadataCollection {
-  metricNames: Map<MetricData, string>;
+  metricsByName: Map<
+    string,
+    { metric: MetricData; scope: InstrumentationScope }[]
+  >;
   metadataByName: Map<string, PrometheusMetadata>;
 }
 
@@ -236,8 +238,20 @@ export class PrometheusSerializer {
       metadata.metadataByName
     );
 
-    for (const scopeMetrics of resourceMetrics.scopeMetrics) {
-      str += this._serializeScopeMetrics(scopeMetrics, metadata);
+    // Preserve first-seen family order, with target_info first, and keep each
+    // family's samples together even when they originate from different scopes.
+    for (const name of metadata.metadataByName.keys()) {
+      for (const { metric, scope } of metadata.metricsByName.get(name) ?? []) {
+        const metricStr = this._serializeMetricData(
+          metric,
+          scope,
+          name,
+          metadata.metadataByName
+        );
+        if (metricStr) {
+          str += metricStr + '\n';
+        }
+      }
     }
 
     if (str === '') {
@@ -263,35 +277,13 @@ export class PrometheusSerializer {
     return;
   }
 
-  private _serializeScopeMetrics(
-    scopeMetrics: ScopeMetrics,
-    metadata?: PrometheusMetadataCollection
-  ) {
-    let str = '';
-    for (const metric of scopeMetrics.metrics) {
-      if (metadata && !metadata.metricNames.has(metric)) {
-        continue;
-      }
-      const metricStr = this._serializeMetricData(
-        metric,
-        scopeMetrics.scope,
-        metadata?.metricNames.get(metric),
-        metadata?.metadataByName
-      );
-
-      if (metricStr) {
-        str += metricStr + '\n';
-      }
-    }
-    return str;
-  }
-
   private _collectMetadata(
     resourceMetrics: ResourceMetrics
   ): PrometheusMetadataCollection {
     // A TYPE conflict requires dropping the entire family, so all metadata must
     // be resolved before any samples are serialized.
-    const metricNames = new Map<MetricData, string>();
+    const metricsByName: PrometheusMetadataCollection['metricsByName'] =
+      new Map();
     const metadataByName = new Map<string, PrometheusMetadata>();
 
     if (!this._withoutTargetInfo) {
@@ -308,7 +300,12 @@ export class PrometheusSerializer {
           continue;
         }
 
-        metricNames.set(metric, name);
+        const metrics = metricsByName.get(name);
+        if (metrics) {
+          metrics.push({ metric, scope: scope.scope });
+        } else {
+          metricsByName.set(name, [{ metric, scope: scope.scope }]);
+        }
         const currentMetadata = createPrometheusMetadata(
           metric.descriptor.description,
           metric.descriptor.unit,
@@ -344,7 +341,7 @@ export class PrometheusSerializer {
     }
 
     this._warnAboutMetadataConflicts(metadataByName);
-    return { metricNames, metadataByName };
+    return { metricsByName, metadataByName };
   }
 
   private _warnAboutMetadataConflicts(

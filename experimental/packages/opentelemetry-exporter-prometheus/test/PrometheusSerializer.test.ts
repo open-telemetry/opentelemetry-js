@@ -244,7 +244,11 @@ describe('PrometheusSerializer', () => {
           '_filterResourceConstantLabels'
         ](resourceAttributes, serializer['_withResourceConstantLabels']);
 
-        const result = serializer['_serializeScopeMetrics'](scopeMetrics);
+        const result =
+          serializer['_serializeMetricData'](
+            scopeMetrics.metrics[0],
+            scopeMetrics.scope
+          ) + '\n';
         return result;
       }
 
@@ -315,7 +319,12 @@ describe('PrometheusSerializer', () => {
           '_filterResourceConstantLabels'
         ](resourceAttributes, serializer['_withResourceConstantLabels']);
 
-        return serializer['_serializeScopeMetrics'](scopeMetrics);
+        return (
+          serializer['_serializeMetricData'](
+            scopeMetrics.metrics[0],
+            scopeMetrics.scope
+          ) + '\n'
+        );
       }
 
       it('should serialize metric record', async () => {
@@ -388,7 +397,12 @@ describe('PrometheusSerializer', () => {
           '_filterResourceConstantLabels'
         ](resourceAttributes, serializer['_withResourceConstantLabels']);
 
-        return serializer['_serializeScopeMetrics'](scopeMetrics);
+        return (
+          serializer['_serializeMetricData'](
+            scopeMetrics.metrics[0],
+            scopeMetrics.scope
+          ) + '\n'
+        );
       }
 
       it('should serialize metric record', async () => {
@@ -464,7 +478,11 @@ describe('PrometheusSerializer', () => {
           '_filterResourceConstantLabels'
         ](resourceAttributes, serializer['_withResourceConstantLabels']);
 
-        const result = serializer['_serializeScopeMetrics'](scopeMetrics);
+        const result =
+          serializer['_serializeMetricData'](
+            scopeMetrics.metrics[0],
+            scopeMetrics.scope
+          ) + '\n';
         return result;
       }
 
@@ -548,7 +566,11 @@ describe('PrometheusSerializer', () => {
           '_filterResourceConstantLabels'
         ](resourceAttributes, serializer['_withResourceConstantLabels']);
 
-        const result = serializer['_serializeScopeMetrics'](scopeMetrics);
+        const result =
+          serializer['_serializeMetricData'](
+            scopeMetrics.metrics[0],
+            scopeMetrics.scope
+          ) + '\n';
         assert.strictEqual(
           result,
           '# HELP test foobar\n' +
@@ -578,13 +600,131 @@ describe('PrometheusSerializer', () => {
       const firstMeter = meterProvider.getMeter('first-scope');
       const secondMeter = meterProvider.getMeter('second-scope');
 
-      createInstruments(firstMeter, secondMeter);
+      try {
+        createInstruments(firstMeter, secondMeter);
 
-      const { resourceMetrics, errors } = await reader.collect();
-      assert.strictEqual(errors.length, 0);
+        const { resourceMetrics, errors } = await reader.collect();
+        assert.strictEqual(errors.length, 0);
 
-      return serializer.serialize(resourceMetrics);
+        const result = serializer.serialize(resourceMetrics);
+        assert.strictEqual(serializer.serialize(resourceMetrics), result);
+        return result;
+      } finally {
+        await meterProvider.shutdown();
+      }
     }
+
+    it('keeps interleaved families contiguous across scopes after name translation', async () => {
+      for (const withoutScopeInfo of [false, true]) {
+        const result = await serializeScopedMetrics(
+          (firstMeter, secondMeter) => {
+            firstMeter.createCounter('requests').add(1, { plugin: 'first' });
+            firstMeter
+              .createUpDownCounter('queue.depth')
+              .add(3, { plugin: 'first' });
+            secondMeter
+              .createUpDownCounter('queue-depth')
+              .add(4, { plugin: 'second' });
+            secondMeter
+              .createCounter('requests_total')
+              .add(2, { plugin: 'second' });
+          },
+          new PrometheusSerializer(
+            'app',
+            false,
+            undefined,
+            true,
+            withoutScopeInfo
+          )
+        );
+
+        const firstScope = withoutScopeInfo
+          ? ''
+          : ',otel_scope_name="first-scope"';
+        const secondScope = withoutScopeInfo
+          ? ''
+          : ',otel_scope_name="second-scope"';
+        assert.strictEqual(
+          result,
+          '# HELP app_requests_total description missing\n' +
+            '# TYPE app_requests_total counter\n' +
+            `app_requests_total{plugin="first"${firstScope}} 1\n` +
+            `app_requests_total{plugin="second"${secondScope}} 2\n` +
+            '# HELP app_queue_depth description missing\n' +
+            '# TYPE app_queue_depth gauge\n' +
+            `app_queue_depth{plugin="first"${firstScope}} 3\n` +
+            `app_queue_depth{plugin="second"${secondScope}} 4\n`
+        );
+      }
+    });
+
+    it('keeps all histogram samples together across interleaved scopes', async () => {
+      const result = await serializeScopedMetrics((firstMeter, secondMeter) => {
+        firstMeter.createHistogram('duration').record(2);
+        firstMeter.createUpDownCounter('workers').add(1);
+        secondMeter.createUpDownCounter('workers').add(2);
+        secondMeter.createHistogram('duration').record(7);
+      });
+      const lines = result.trim().split('\n');
+      const workersStart = lines.indexOf('# HELP workers description missing');
+      const histogramLines = lines.filter(line => line.startsWith('duration_'));
+      assert(
+        histogramLines.some(line =>
+          line.includes('otel_scope_name="first-scope"')
+        )
+      );
+      assert(
+        histogramLines.some(line =>
+          line.includes('otel_scope_name="second-scope"')
+        )
+      );
+      assert.strictEqual(
+        lines.filter(line => line === '# TYPE duration histogram').length,
+        1
+      );
+      assert(histogramLines.every(line => lines.indexOf(line) < workersStart));
+      for (const scope of ['first-scope', 'second-scope']) {
+        assert(lines.includes(`duration_count{otel_scope_name="${scope}"} 1`));
+        assert(
+          lines.includes(
+            `duration_bucket{otel_scope_name="${scope}",le="+Inf"} 1`
+          )
+        );
+      }
+      assert(lines.includes('duration_sum{otel_scope_name="first-scope"} 2'));
+      assert(lines.includes('duration_sum{otel_scope_name="second-scope"} 7'));
+      assert.deepStrictEqual(lines.slice(workersStart), [
+        '# HELP workers description missing',
+        '# TYPE workers gauge',
+        'workers{otel_scope_name="first-scope"} 1',
+        'workers{otel_scope_name="second-scope"} 2',
+      ]);
+    });
+
+    it('keeps application target_info samples adjacent to the generated resource sample', async () => {
+      const result = await serializeScopedMetrics((firstMeter, secondMeter) => {
+        firstMeter.createUpDownCounter('workers').add(3);
+        firstMeter
+          .createUpDownCounter('target_info', {
+            description: 'Target metadata',
+          })
+          .add(1);
+        secondMeter
+          .createUpDownCounter('target_info', {
+            description: 'Target metadata',
+          })
+          .add(2);
+      });
+      assert.strictEqual(
+        result,
+        serializedDefaultResource +
+          'target_info{otel_scope_name="first-scope"} 1\n' +
+          'target_info{otel_scope_name="second-scope"} 2\n' +
+          '# HELP workers description missing\n' +
+          '# TYPE workers gauge\n' +
+          'workers{otel_scope_name="first-scope"} 3\n'
+      );
+    });
 
     it('emits metadata once for the same family in different scopes', async () => {
       const warn = sinon.stub(diag, 'warn');
