@@ -2,8 +2,8 @@
 # CHANGELOG
 
 All notable changes to experimental packages in this project will be documented in this file.
-For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2.x.md).
-For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-guide.md).
+For notes on migrating to 2.x / 0.200.x see [the upgrade guide](../doc/upgrade-to-2.x.md).
+For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration-guide.md).
 
 ## Unreleased
 
