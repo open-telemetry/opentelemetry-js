@@ -158,3 +158,81 @@ import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 // after
 import { AsynLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 ```
+
+---
+
+## `@opentelemetry/sdk-node`
+
+### Removed: `NodeSDKConfiguration.logRecordProcessor`
+
+The singular `logRecordProcessor` option on `NodeSDKConfiguration` has been removed. Use `logRecordProcessors` (array) instead.
+
+```ts
+// before
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import { SimpleLogRecordProcessor } from '@opentelemetry/sdk-logs';
+
+const sdk = new NodeSDK({
+  logRecordProcessor: new SimpleLogRecordProcessor({ exporter }),
+});
+
+// after
+const sdk = new NodeSDK({
+  logRecordProcessors: [new SimpleLogRecordProcessor({ exporter })],
+});
+```
+
+### Removed: `NodeSDKConfiguration.metricReader`
+
+The singular `metricReader` option on `NodeSDKConfiguration` has been removed. Use `metricReaders` (array) instead.
+
+```ts
+// before
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
+
+const sdk = new NodeSDK({
+  metricReader: new PeriodicExportingMetricReader({ exporter }),
+});
+
+// after
+const sdk = new NodeSDK({
+  metricReaders: [new PeriodicExportingMetricReader({ exporter })],
+});
+```
+
+### Removed: `NodeSDKConfiguration.spanProcessor`
+
+The singular `spanProcessor` option on `NodeSDKConfiguration` has been removed. Use `spanProcessors` (array) instead.
+
+```ts
+// before
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace';
+
+const sdk = new NodeSDK({
+  spanProcessor: new SimpleSpanProcessor(exporter),
+});
+
+// after
+const sdk = new NodeSDK({
+  spanProcessors: [new SimpleSpanProcessor(exporter)],
+});
+```
+
+### Removed: `node` and `tracing` namespace re-exports
+
+The deprecated namespace re-exports `node` (re-exporting `@opentelemetry/sdk-trace-node`) and `tracing` (re-exporting `@opentelemetry/sdk-trace-base`) have been removed from `@opentelemetry/sdk-node`. Import directly from the originating packages instead.
+
+```ts
+// before
+import { node, tracing } from '@opentelemetry/sdk-node';
+const provider = new node.NodeTracerProvider();
+const exporter = new tracing.ConsoleSpanExporter();
+
+// after
+import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-base';
+const provider = new NodeTracerProvider();
+const exporter = new ConsoleSpanExporter();
+```
