@@ -60,8 +60,8 @@
     "version": "node ../../scripts/version-update.js",
     "watch": "tsdown --watch --no-clean",
     "test:bench": "node test/performance/benchmark/public-benchmarks.js | tee .benchmark-results.txt",
-    "peer-api-check": "node ../../scripts/peer-api-check.js",
-    "align-api-deps": "node ../../scripts/align-api-deps.js"
+    "peer-api-check": "node ../../scripts/peer-api-check.mjs",
+    "align-api-deps": "node ../../scripts/align-api-deps.mjs"
   },
   "keywords": [
     "opentelemetry",

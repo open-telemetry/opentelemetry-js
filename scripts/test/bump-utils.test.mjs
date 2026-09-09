@@ -5,7 +5,7 @@
  */
 
 import assert from 'assert';
-import { nextVersion } from '../lib/bump-utils.mjs';
+import { nextVersion, releaseLineOfVersion } from '../lib/bump-utils.mjs';
 
 describe('nextVersion', function () {
   describe('normal releases', function () {
@@ -105,5 +105,32 @@ describe('nextVersion', function () {
     it('rejects an unparseable current version', function () {
       assert.throws(() => nextVersion('not-a-version', 'minor', null), /Not a valid version/);
     });
+  });
+});
+
+describe('releaseLineOfVersion', function () {
+  const cases = [
+    ['3.0.0-development.0', 'major'],
+    ['3.0.0-rc.2', 'major'],
+    ['0.222.0-rc.1', 'minor'],
+    ['1.10.0-rc.0', 'minor'],
+    ['2.10.1-rc.0', 'patch'],
+  ];
+
+  for (const [current, expected] of cases) {
+    it(`reports ${current} as an in-flight ${expected}`, function () {
+      assert.strictEqual(releaseLineOfVersion(current), expected);
+    });
+  }
+
+  it('names the bump that finalizes an in-flight pre-release', function () {
+    for (const [current] of cases) {
+      const line = releaseLineOfVersion(current);
+      assert.strictEqual(nextVersion(current, line, null), current.split('-')[0]);
+    }
+  });
+
+  it('rejects an unparseable version', function () {
+    assert.throws(() => releaseLineOfVersion('not-a-version'), /Cannot parse/);
   });
 });

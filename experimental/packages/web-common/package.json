@@ -38,13 +38,13 @@
     "compile": "tsdown",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "peer-api-check": "node ../../../scripts/peer-api-check.js",
+    "peer-api-check": "node ../../../scripts/peer-api-check.mjs",
     "prepublishOnly": "npm run compile",
     "tdd": "karma start",
     "test:browser": "karma start --single-run",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsdown --watch --no-clean",
-    "align-api-deps": "node ../../../scripts/align-api-deps.js"
+    "align-api-deps": "node ../../../scripts/align-api-deps.mjs"
   },
   "keywords": [
     "opentelemetry",

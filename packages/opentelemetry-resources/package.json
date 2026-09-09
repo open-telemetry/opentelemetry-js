@@ -61,8 +61,8 @@
     "test:webworker": "karma start karma.worker.js --single-run",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "version": "node ../../scripts/version-update.js",
-    "peer-api-check": "node ../../scripts/peer-api-check.js",
-    "align-api-deps": "node ../../scripts/align-api-deps.js"
+    "peer-api-check": "node ../../scripts/peer-api-check.mjs",
+    "align-api-deps": "node ../../scripts/align-api-deps.mjs"
   },
   "keywords": [
     "opentelemetry",
