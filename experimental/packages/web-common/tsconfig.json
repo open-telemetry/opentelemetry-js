@@ -18,6 +18,9 @@
       "path": "../../../api"
     },
     {
+      "path": "../../../packages/opentelemetry-core"
+    },
+    {
       "path": "../../../packages/sdk-trace"
     },
     {
