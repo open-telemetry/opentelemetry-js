@@ -63,33 +63,46 @@ export class TraceStateImpl implements TraceState {
   }
 
   private _parse(rawTraceState: string) {
-    if (rawTraceState.length > MAX_TRACE_STATE_LEN) return;
-    this._internalState = rawTraceState
-      .split(LIST_MEMBERS_SEPARATOR)
-      // Use reduceRight() so new keys (.set(...)) will be placed at the beginning
-      .reduceRight((agg: Map<string, string>, part: string) => {
-        const listMember = part.trim(); // Optional Whitespace (OWS) handling
-        const i = listMember.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
-        if (i !== -1) {
-          const key = listMember.slice(0, i);
-          const value = listMember.slice(i + 1, part.length);
-          if (validateKey(key) && validateValue(value)) {
-            agg.set(key, value);
-          } else {
-            // TODO: Consider to add warning log
-          }
-        }
-        return agg;
-      }, new Map());
+    const vendorMembers = rawTraceState.split(LIST_MEMBERS_SEPARATOR);
+    // This Map will have the order reversed (most recent member first)
+    const vendorEntries = new Map<string, string>();
+    let currentLength = 0;
 
-    // Because of the reverse() requirement, trunc must be done after map is created
-    if (this._internalState.size > MAX_TRACE_STATE_ITEMS) {
-      this._internalState = new Map(
-        Array.from(this._internalState.entries())
-          .reverse() // Use reverse same as original tracestate parse chain
-          .slice(0, MAX_TRACE_STATE_ITEMS)
-      );
+    for (const member of vendorMembers) {
+      const listMember = member.trim(); // Optional Whitespace (OWS) handling
+      const i = listMember.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
+      if (i === -1) {
+        continue;
+      }
+
+      const key = listMember.slice(0, i);
+      const value = listMember.slice(i + 1);
+      if (!validateKey(key) || !validateValue(value)) {
+        // TODO: Consider to add warning log
+        continue;
+      }
+
+      // Skip the member if adding it would exceed the max tracestate
+      // length, but keep checking the remaining (older) members.
+      const futureLength =
+        currentLength + listMember.length + (vendorEntries.size > 0 ? 1 : 0);
+      if (futureLength > MAX_TRACE_STATE_LEN) {
+        continue;
+      }
+
+      vendorEntries.set(key, value);
+      currentLength = futureLength;
+
+      if (vendorEntries.size >= MAX_TRACE_STATE_ITEMS) {
+        break;
+      }
     }
+
+    // Reverse to match the internal reverse-insertion-order convention
+    // (oldest first) used by get()/serialize().
+    this._internalState = new Map(
+      Array.from(vendorEntries.entries()).reverse()
+    );
   }
 
   // @ts-expect-error TS6133 Accessed in tests only.
