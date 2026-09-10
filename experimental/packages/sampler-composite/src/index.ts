@@ -10,4 +10,5 @@ export { createComposableParentThresholdSampler } from './parentthreshold';
 export { createComposableAnnotatingSampler } from './annotating';
 export { createComposableRuleBasedSampler } from './rulebased';
 export { createCompositeSampler } from './composite';
+export { createProbabilitySampler } from './probabilitysampler';
 export type { ComposableSampler, SamplingIntent } from './types';
