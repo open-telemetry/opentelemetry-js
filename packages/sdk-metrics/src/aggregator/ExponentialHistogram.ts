@@ -49,7 +49,7 @@ class HighLow {
   }
 }
 
-const MAX_SCALE = 20;
+const DEFAULT_MAX_SCALE = 20;
 const DEFAULT_MAX_SIZE = 160;
 const MIN_MAX_SIZE = 2;
 
@@ -57,6 +57,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
   public startTime;
   private _maxSize;
   private _recordMinMax;
+  private _maxScale;
   private _sum;
   private _count;
   private _zeroCount;
@@ -69,6 +70,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
   constructor(
     startTime: HrTime,
     maxSize = DEFAULT_MAX_SIZE,
+    maxScale = DEFAULT_MAX_SCALE,
     recordMinMax = true,
     sum = 0,
     count = 0,
@@ -77,11 +79,12 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     max = Number.NEGATIVE_INFINITY,
     positive = new Buckets(),
     negative = new Buckets(),
-    mapping: Mapping = getMapping(MAX_SCALE)
+    mapping?: Mapping
   ) {
     this.startTime = startTime;
     this._maxSize = maxSize;
     this._recordMinMax = recordMinMax;
+    this._maxScale = maxScale;
     this._sum = sum;
     this._count = count;
     this._zeroCount = zeroCount;
@@ -89,7 +92,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     this._max = max;
     this._positive = positive;
     this._negative = negative;
-    this._mapping = mapping;
+    this._mapping = mapping ?? getMapping(maxScale);
 
     if (this._maxSize < MIN_MAX_SIZE) {
       diag.warn(`Exponential Histogram Max Size set to ${this._maxSize}, \
@@ -293,6 +296,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     return new ExponentialHistogramAccumulation(
       this.startTime,
       this._maxSize,
+      this._maxScale,
       this._recordMinMax,
       this._sum,
       this._count,
@@ -536,21 +540,25 @@ export class ExponentialHistogramAggregator
 
   readonly _maxSize: number;
   private readonly _recordMinMax: boolean;
+  private readonly _maxScale: number;
   /**
    * @param _maxSize Maximum number of buckets for each of the positive
    *    and negative ranges, exclusive of the zero-bucket.
    * @param _recordMinMax If set to true, min and max will be recorded.
    *    Otherwise, min and max will not be recorded.
+   * @param _maxScale Maximum scale factor for the histogram. Defaults to 20.
    */
-  constructor(maxSize: number, recordMinMax: boolean) {
+  constructor(maxSize: number, recordMinMax: boolean, maxScale = DEFAULT_MAX_SCALE) {
     this._maxSize = maxSize;
     this._recordMinMax = recordMinMax;
+    this._maxScale = maxScale;
   }
 
   createAccumulation(startTime: HrTime) {
     return new ExponentialHistogramAccumulation(
       startTime,
       this._maxSize,
+      this._maxScale,
       this._recordMinMax
     );
   }
