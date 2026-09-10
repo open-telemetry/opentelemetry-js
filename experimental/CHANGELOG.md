@@ -55,6 +55,9 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
     Could not create OpenTelemetry SDK from configuration, SDK will not be setup: unknown ExperimentalResourceDetector name in configuration: "container"
     ```
 
+* fix(instrumentation-fetch, instrumentation-xml-http-request)!: remove the unreachable `CORS Preflight` span [#5122](https://github.com/open-telemetry/opentelemetry-js/issues/5122) @nabeelamjadsheikh
+  * Under Resource Timing Level 2, the preflight request is folded into the main request's `PerformanceResourceTiming` entry rather than reported as a separate one, so the branch that emitted the `CORS Preflight` child span could never be taken. No `CORS Preflight` span has been produced by either instrumentation in any browser that implements the current spec.
+
 ### :rocket: Features
 
 * feat(sdk-logs): deprecate `SdkLogRecord` in favor of `ReadWriteLogRecord` [#6939](https://github.com/open-telemetry/opentelemetry-js/pull/6939) @pichlermarc
