@@ -153,9 +153,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       addSpanNetworkEvents(
         childSpan,
         corsPreFlightRequest,
-        this.getConfig().ignoreNetworkEvents,
-        undefined,
-        true
+        this.getConfig().ignoreNetworkEvents
       );
       childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
     });
@@ -294,9 +292,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       addSpanNetworkEvents(
         span,
         mainRequest,
-        this.getConfig().ignoreNetworkEvents,
-        undefined,
-        true
+        this.getConfig().ignoreNetworkEvents
       );
     }
   }

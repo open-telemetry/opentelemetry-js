@@ -57,6 +57,41 @@ instrumentation.setConfig({
 
 ---
 
+## `@opentelemetry/sdk-trace-web`
+
+### Removed: `ATTR_HTTP_RESPONSE_CONTENT_LENGTH` and `ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED`
+
+These two deprecated constants (old HTTP semconv v1.7.0 attribute names) have been removed from `@opentelemetry/sdk-trace-web`. The `addSpanNetworkEvents` function no longer sets them on spans.
+
+To capture response content length with stable HTTP semantic conventions, use the `headersToSpanAttributes` option in `@opentelemetry/instrumentation-fetch` or `@opentelemetry/instrumentation-xml-http-request`:
+
+```ts
+// before — old attributes were set automatically on every span:
+// 'http.response_content_length'              → encodedBodySize
+// 'http.response_content_length_uncompressed' → decodedBodySize
+
+// after — opt in to the stable attribute via headersToSpanAttributes
+new FetchInstrumentation({
+  headersToSpanAttributes: {
+    responseHeaders: ['content-length'], // → http.response.header.content-length
+  },
+});
+```
+
+### Removed: `addSpanNetworkEvents` fifth parameter `skipOldSemconvContentLengthAttrs`
+
+The `skipOldSemconvContentLengthAttrs` fifth parameter of `addSpanNetworkEvents` has been removed along with the old-semconv block it controlled. Drop the fifth argument from any direct calls to this function.
+
+```ts
+// before
+addSpanNetworkEvents(span, resource, ignoreNetworkEvents, ignoreZeros, true);
+
+// after
+addSpanNetworkEvents(span, resource, ignoreNetworkEvents, ignoreZeros);
+```
+
+---
+
 ## `@opentelemetry/core`
 
 ### Removed: `getTimeOrigin()`

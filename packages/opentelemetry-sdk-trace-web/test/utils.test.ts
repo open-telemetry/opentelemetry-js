@@ -103,7 +103,7 @@ describe('utils', function () {
       assert.strictEqual(addEventSpy.callCount, 0);
 
       addSpanNetworkEvents(span, entries);
-      assert.strictEqual(setAttributeSpy.callCount, 2);
+      assert.strictEqual(setAttributeSpy.callCount, 0);
       assert.strictEqual(addEventSpy.callCount, 9);
     });
     it('should ignore network events when ignoreNetworkEvents is true', function () {
@@ -132,7 +132,7 @@ describe('utils', function () {
       assert.strictEqual(addEventSpy.callCount, 0);
 
       addSpanNetworkEvents(span, entries, true);
-      assert.strictEqual(setAttributeSpy.callCount, 2);
+      assert.strictEqual(setAttributeSpy.callCount, 0);
       assert.strictEqual(addEventSpy.callCount, 0);
     });
     it('should ignore zero timings by default', function () {
@@ -161,7 +161,7 @@ describe('utils', function () {
       assert.strictEqual(addEventSpy.callCount, 0);
 
       addSpanNetworkEvents(span, entries);
-      assert.strictEqual(setAttributeSpy.callCount, 1);
+      assert.strictEqual(setAttributeSpy.callCount, 0);
       assert.strictEqual(addEventSpy.callCount, 2);
     });
     it('should not ignore zero timings by default if startTime = 0', function () {
@@ -190,7 +190,7 @@ describe('utils', function () {
       assert.strictEqual(addEventSpy.callCount, 0);
 
       addSpanNetworkEvents(span, entries);
-      assert.strictEqual(setAttributeSpy.callCount, 2);
+      assert.strictEqual(setAttributeSpy.callCount, 0);
       assert.strictEqual(addEventSpy.callCount, 9);
     });
     it('should not ignore zero timings if ignoreZeros = false', function () {
@@ -219,27 +219,8 @@ describe('utils', function () {
       assert.strictEqual(addEventSpy.callCount, 0);
 
       addSpanNetworkEvents(span, entries, false, false);
-      assert.strictEqual(setAttributeSpy.callCount, 1);
-      assert.strictEqual(addEventSpy.callCount, 9);
-    });
-    it('should only include encoded size when content encoding is being used', function () {
-      const addEventSpy = sinon.spy();
-      const setAttributeSpy = sinon.spy();
-      const span = {
-        addEvent: addEventSpy,
-        setAttribute: setAttributeSpy,
-      } as unknown as tracing.Span;
-      const entries = {
-        [PTN.DECODED_BODY_SIZE]: 123,
-        [PTN.ENCODED_BODY_SIZE]: 123,
-      } as PerformanceEntries;
-
       assert.strictEqual(setAttributeSpy.callCount, 0);
-
-      addSpanNetworkEvents(span, entries);
-
-      assert.strictEqual(addEventSpy.callCount, 0);
-      assert.strictEqual(setAttributeSpy.callCount, 1);
+      assert.strictEqual(addEventSpy.callCount, 9);
     });
   });
   describe('addSpanNetworkEvent', function () {

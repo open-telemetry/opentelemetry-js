@@ -31,6 +31,10 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 * feat(propagator-jaeger)!: remove `@opentelemetry/propagator-jaeger` package [#7077](https://github.com/open-telemetry/opentelemetry-js/pull/7077)
   * The Jaeger propagator is deprecated by the OpenTelemetry specification in favour of `W3CTraceContextPropagator`. Use `W3CTraceContextPropagator` from `@opentelemetry/core` instead.
   * See the [3.x migration guide](doc/3.x/migration-guide.md) for full instructions.
+* feat(sdk-trace-web)!: remove deprecated `ATTR_HTTP_RESPONSE_CONTENT_LENGTH` and `ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED` constants and drop the `skipOldSemconvContentLengthAttrs` parameter from `addSpanNetworkEvents` [#7082](https://github.com/open-telemetry/opentelemetry-js/pull/7082)
+  * `ATTR_HTTP_RESPONSE_CONTENT_LENGTH` (`'http.response_content_length'`) — use `http.response.header.content-length` via `headersToSpanAttributes` in `@opentelemetry/instrumentation-fetch` or `@opentelemetry/instrumentation-xml-http-request`.
+  * `ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED` (`'http.response_content_length_uncompressed'`) — use `http.response.body.size` via `headersToSpanAttributes`.
+  * `addSpanNetworkEvents(span, resource, ignoreNetworkEvents, ignoreZeros, skipOldSemconvContentLengthAttrs)` — the fifth parameter has been removed; the function signature is now `addSpanNetworkEvents(span, resource, ignoreNetworkEvents?, ignoreZeros?)`.
 
 ### :rocket: Features
 
