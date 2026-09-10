@@ -56,6 +56,20 @@ export class TraceState implements TraceStateApi {
     const newState = new Map(currState);
     newState.delete(key);
     newState.set(key, value);
+
+    // Adding a new key can push the number of list-members over the max
+    // allowed by the spec. When that happens, drop the oldest entry (stored
+    // at the front of the map) to make room, same as the constructor does.
+    if (newState.size > MAX_TRACE_STATE_ITEMS) {
+      const oldestKey = newState.keys().next().value as string;
+      const oldestValue = newState.get(oldestKey) as string;
+      newState.delete(oldestKey);
+      newLength -= oldestKey.length + oldestValue.length + 1;
+      if (newState.size > 0) {
+        newLength -= 1;
+      }
+    }
+
     return this._fromState(newState, newLength);
   }
 

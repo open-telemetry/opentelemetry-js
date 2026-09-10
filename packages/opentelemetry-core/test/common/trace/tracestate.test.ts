@@ -62,6 +62,30 @@ describe('TraceState', () => {
         assert.strictEqual(orgState, state);
         assert.deepStrictEqual(orgState.serialize(), tracestate);
       });
+
+      it('must drop the oldest entry when exceeding the max number of items', () => {
+        // the first member in the list is the most recently updated one, so
+        // 'a31' (the last member) is the oldest entry.
+        const members = new Array(32)
+          .fill(0)
+          .map((_: null, num: number) => `a${num}=${num}`);
+        const orgState = new TraceState(members.join(','));
+
+        const state = orgState.set('new-key', 'new-value');
+
+        assert.deepStrictEqual(state.get('new-key'), 'new-value');
+        // oldest entry (a31) must be evicted to make room
+        assert.deepStrictEqual(state.get('a31'), undefined);
+        // the rest of the entries are preserved
+        for (let i = 0; i < 31; i++) {
+          assert.deepStrictEqual(state.get(`a${i}`), `${i}`);
+        }
+        assert.deepStrictEqual(
+          state.serialize().split(',').length,
+          32,
+          'must not exceed the max number of list-members'
+        );
+      });
     });
 
     describe('when updating a list member', () => {
