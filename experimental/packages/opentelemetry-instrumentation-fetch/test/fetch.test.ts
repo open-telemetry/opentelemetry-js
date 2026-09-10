@@ -1827,6 +1827,59 @@ describe('fetch', () => {
 
         assertDebugMessage();
       });
+
+      // fetch(Request, init) is spec-valid (used by clients such as ky).
+      // Merging init into a new Request consumes the original body; if that
+      // happens before the ignoreUrls check, the follow-up original.fetch()
+      // throws "Request object that has already been used".
+      it('should not throw when fetch(Request, init) is ignored', async () => {
+        await tracedFetch({
+          handlers: [
+            msw.http.post('/api/ignored.json', () => {
+              return msw.HttpResponse.json({ ok: true });
+            }),
+          ],
+          callback: () =>
+            fetch(
+              new Request('/api/ignored.json', {
+                method: 'POST',
+                body: JSON.stringify({ hello: 'world' }),
+              }),
+              { headers: { 'content-type': 'application/json' } }
+            ),
+          expectExport: false,
+        });
+
+        assertDebugMessage();
+      });
+
+      it('should not leave a span open if Request constructor throws', async () => {
+        let threw: unknown;
+        try {
+          await tracedFetch({
+            handlers: [
+              msw.http.post('/api/not-ignored.json', () => {
+                return msw.HttpResponse.json({ ok: true });
+              }),
+            ],
+            callback: () =>
+              fetch(
+                new Request('/api/not-ignored.json', {
+                  method: 'POST',
+                  body: JSON.stringify({ hello: 'world' }),
+                }),
+                { method: 'GET' }
+              ),
+            expectExport: false,
+          });
+        } catch (err) {
+          threw = err;
+        }
+
+        assert.ok(threw instanceof TypeError);
+        assert.strictEqual(exportedSpans.length, 0);
+        assertNoDebugMessages();
+      });
     });
 
     describe('unsuccessful request', () => {

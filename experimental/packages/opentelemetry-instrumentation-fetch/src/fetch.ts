@@ -342,6 +342,15 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           args[0] instanceof Request ? args[0].url : String(args[0])
         ).href;
 
+        // `new Request(existing, init)` consumes the original body. Check
+        // ignoreUrls first so ignored calls forward the caller's args
+        // untouched (#7037). Keep _createSpan after the Request clone so a
+        // constructor throw cannot leave a span open.
+        if (core.isUrlIgnored(url, plugin.getConfig().ignoreUrls)) {
+          plugin._diag.debug('ignoring span as url matches ignored url');
+          return original.apply(this, args);
+        }
+
         // Per the Fetch spec, when fetch() is called with a Request object
         // and a separate init object, the init properties override the
         // Request's properties. Merge them into a new Request so that
@@ -354,9 +363,18 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         } else {
           options = args[1] || {};
         }
-        const createdSpan = plugin._createSpan(url, options);
+
+        const createdSpan = plugin._createSpan(
+          url,
+          args[0] instanceof Request
+            ? { method: args[1]?.method ?? args[0].method }
+            : args[1] || {}
+        );
         if (!createdSpan) {
-          return original.apply(this, args);
+          return original.apply(
+            this,
+            options instanceof Request && args[1] != null ? [options] : args
+          );
         }
         const spanData = plugin._prepareSpanData(url);
 
