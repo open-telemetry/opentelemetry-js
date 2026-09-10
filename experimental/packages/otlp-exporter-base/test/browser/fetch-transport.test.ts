@@ -167,6 +167,41 @@ describe('FetchTransport', function () {
       clock.tick(requestTimeout + 100);
     });
 
+    it('returns failure when aborted during headers resolution', function (done) {
+      // arrange
+      const clock = sinon.useFakeTimers();
+      const headersPromise = new Promise<Record<string, string>>(resolve => {
+        setTimeout(() => {
+          resolve({ 'Content-Type': 'application/json' });
+        }, 200);
+      });
+      const transport = createFetchTransport({
+        url: 'http://example.test',
+        headers: () => headersPromise,
+      });
+
+      //act
+      transport.send(testPayload, 100).then(response => {
+        // assert
+        try {
+          assert.strictEqual(response.status, 'failure');
+          assert.strictEqual(
+            (response as ExportResponseFailure).error.message,
+            'Fetch request errored'
+          );
+          assert.strictEqual(
+            ((response as ExportResponseFailure).error.cause as Error).name,
+            'AbortError'
+          );
+        } catch (e) {
+          done(e);
+        }
+        done();
+      }, done /* catch any rejections */);
+      clock.tick(150);
+      clock.tick(100);
+    });
+
     it('returns failure when fetch throws non-network error', function (done) {
       // arrange
       sinon.stub(globalThis, 'fetch').throws(new Error('fetch failed'));

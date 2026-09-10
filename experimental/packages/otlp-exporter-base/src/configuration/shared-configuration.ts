@@ -20,11 +20,11 @@ export interface OtlpSharedConfiguration {
 }
 
 export function validateTimeoutMillis(timeoutMillis: number) {
-  if (Number.isFinite(timeoutMillis) && timeoutMillis > 0) {
+  if (Number.isFinite(timeoutMillis) && timeoutMillis >= 0) {
     return timeoutMillis;
   }
   throw new Error(
-    `Configuration: timeoutMillis is invalid, expected number greater than 0 (actual: '${timeoutMillis}')`
+    `Configuration: timeoutMillis is invalid, expected number greater than or equal to 0 (actual: '${timeoutMillis}')`
   );
 }
 
