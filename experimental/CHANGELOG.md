@@ -58,6 +58,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 ### :rocket: Features
 
 * feat(sdk-logs): deprecate `SdkLogRecord` in favor of `ReadWriteLogRecord` [#6939](https://github.com/open-telemetry/opentelemetry-js/pull/6939) @pichlermarc
+* feat(otlp-grpc-exporter): add gRPC channelOptions as config parameter [#6332](https://github.com/open-telemetry/opentelemetry-js/pull/6332) @vitorvasc
 
 ### :bug: Bug Fixes
 
