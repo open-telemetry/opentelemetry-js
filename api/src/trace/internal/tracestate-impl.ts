@@ -88,6 +88,7 @@ export class TraceStateImpl implements TraceState {
         Array.from(this._internalState.entries())
           .reverse() // Use reverse same as original tracestate parse chain
           .slice(0, MAX_TRACE_STATE_ITEMS)
+          .reverse() // Restore the internal reverse-insertion-order convention after truncation
       );
     }
   }
