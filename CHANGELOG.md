@@ -36,7 +36,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :bug: Bug Fixes
 
-* fix(core): enforce max number of `TraceState` entries in `set()`, not just on parse [#7091](https://github.com/open-telemetry/opentelemetry-js/pull/7091) @abhiyadav79
+* fix(core): enforce max number of `TraceState` entries in `set()`, not just on parse [#7080](https://github.com/open-telemetry/opentelemetry-js/pull/7080) @abhiyadav79
 
 ### :books: Documentation
 
