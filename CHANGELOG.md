@@ -13,6 +13,18 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :boom: Breaking Changes
 
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 3.0.0-development.0
+
+### :boom: Breaking Changes
+
 * chore(context-async-hooks)!: remove the unused class `AsyncHooksContextManager` [#7078](https://github.com/open-telemetry/opentelemetry-js/pull/7078)
 * feat!: migrate package builds from `tsc` to `tsdown`, emitting dual CJS/ESM output from a single `dist/` directory and declaring an `exports` map on every package [#6293](https://github.com/open-telemetry/opentelemetry-js/pull/6293) @overbalance
   * Importing a package by its name is unaffected in both CommonJS and ESM, as is every subpath listed in its `exports` map.
@@ -31,12 +43,6 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 * feat(propagator-jaeger)!: remove `@opentelemetry/propagator-jaeger` package [#7077](https://github.com/open-telemetry/opentelemetry-js/pull/7077)
   * The Jaeger propagator is deprecated by the OpenTelemetry specification in favour of `W3CTraceContextPropagator`. Use `W3CTraceContextPropagator` from `@opentelemetry/core` instead.
   * See the [3.x migration guide](doc/3.x/migration-guide.md) for full instructions.
-
-### :rocket: Features
-
-### :bug: Bug Fixes
-
-### :books: Documentation
 
 ### :house: Internal
 
