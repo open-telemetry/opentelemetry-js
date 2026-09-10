@@ -68,7 +68,6 @@ const serverPort = 22346;
 const protocol = 'http';
 const hostname = 'localhost';
 const pathname = '/test';
-const serverName = 'my.server.name';
 const memoryExporter = new InMemorySpanExporter();
 const provider = new TracerProvider({
   spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
@@ -303,7 +302,6 @@ describe('HttpInstrumentation', () => {
           responseHook: responseHookFunction,
           startIncomingSpanHook: startIncomingSpanHookFunction,
           startOutgoingSpanHook: startOutgoingSpanHookFunction,
-          serverName,
         });
         instrumentation.enable();
         server = http.createServer((request, response) => {
@@ -379,7 +377,6 @@ describe('HttpInstrumentation', () => {
           resHeaders: result.resHeaders,
           reqHeaders: result.reqHeaders,
           component: 'http',
-          serverName,
         };
 
         assert.strictEqual(spans.length, 2);

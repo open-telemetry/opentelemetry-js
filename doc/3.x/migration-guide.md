@@ -36,6 +36,27 @@ propagation.setGlobalPropagator(new W3CTraceContextPropagator());
 
 ---
 
+## `@opentelemetry/instrumentation-http`
+
+### Removed: `HttpInstrumentationConfig.serverName`
+
+The `serverName` option on `HttpInstrumentationConfig` has been removed. It had no effect — stable HTTP semantic conventions do not include the `http.server_name` attribute. Remove the option from any `setConfig()` or constructor call.
+
+```ts
+// before
+instrumentation.setConfig({
+  serverName: 'my.server.name',
+  // ... other options
+});
+
+// after
+instrumentation.setConfig({
+  // ... other options (serverName removed)
+});
+```
+
+---
+
 ## `@opentelemetry/core`
 
 ### Removed: `getTimeOrigin()`

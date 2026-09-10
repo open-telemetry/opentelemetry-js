@@ -34,7 +34,6 @@ export const assertSpan = (
     reqHeaders?: http.OutgoingHttpHeaders;
     path?: string | null;
     forceStatus?: SpanStatus;
-    serverName?: string;
     component: string;
     noNetPeer?: boolean; // we don't expect net peer info when request throw before being sent
     error?: Exception;
@@ -115,13 +114,6 @@ export const assertSpan = (
       validations.path || validations.pathname,
       'must have url.path'
     );
-    if (validations.serverName) {
-      assert.ok(span.attributes[ATTR_SERVER_PORT], 'must have server.port');
-      assert.ok(
-        span.attributes[ATTR_NETWORK_PEER_ADDRESS],
-        'must have network.peer.address'
-      );
-    }
     assert.strictEqual(
       span.attributes[ATTR_URL_SCHEME],
       validations.component,
