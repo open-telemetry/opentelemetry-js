@@ -395,6 +395,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 * feat(opentelemetry-sdk-node): set instrumentation and propagators for experimental start [#6148](https://github.com/open-telemetry/opentelemetry-js/pull/6148) @maryliag
 * refactor(configuration): set console exporter as empty object [#6164](https://github.com/open-telemetry/opentelemetry-js/pull/6164) @maryliag
 * feat(instrumentation-http, instrumentation-fetch, instrumentation-xml-http-request): support "QUERY" as a known HTTP method
+* feat(otlp-exporter-base): ensure that we retry for at least 80% of specified user timeout [#6260](https://github.com/open-telemetry/opentelemetry-js/pull/6260) @jsokol805
 
 ### :bug: Bug Fixes
 
