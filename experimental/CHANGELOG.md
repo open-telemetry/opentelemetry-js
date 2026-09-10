@@ -34,6 +34,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :rocket: Features
 
+* feat(otlp-exporter-base): accept `fetch` parameter in `createFetchTransport`, and export `createFetchTransport`, `createRetryingTransport` and `FetchTransportParameters` [#6377](https://github.com/open-telemetry/opentelemetry-js/pull/6377) @zakcutner
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation

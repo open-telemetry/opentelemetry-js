@@ -41,6 +41,16 @@ let pendingBodySize = 0;
 let pendingKeepaliveCount = 0;
 
 export interface FetchTransportParameters {
+  /**
+   * Optional custom `fetch` implementation. Defaults to `globalThis.fetch`.
+   *
+   * Note: when providing a custom `fetch`, the retry behavior of the transport
+   * relies on errors being thrown as `TypeError` (without a `cause`) to detect
+   * retryable network errors, matching the browser `fetch` contract. A custom
+   * implementation that throws different error types may not be retried as
+   * expected by `createRetryingTransport`.
+   */
+  fetch?: typeof globalThis.fetch;
   url: string;
   headers: HeadersFactory;
 }
@@ -49,23 +59,38 @@ class FetchTransport implements IExporterTransport {
   private _parameters: FetchTransportParameters;
 
   constructor(parameters: FetchTransportParameters) {
+    if (
+      parameters.fetch !== undefined &&
+      typeof parameters.fetch !== 'function'
+    ) {
+      throw new TypeError(
+        'FetchTransport: `fetch` parameter must be a function'
+      );
+    }
     this._parameters = parameters;
   }
 
   async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
     const abortController = new AbortController();
     const timeout = setTimeout(() => abortController.abort(), timeoutMillis);
-    // Fetch API may be wrapped by an instrumentation like `@opentelemetry/instrumentation-fetch`.
-    // In that case the instrumentation would create a new Span for this request
-    // because the context manager cannot keep the context after `await` calls.
-    // This creates an indirect endless loop Export -> Span -> Export
-    // By using the `__original` function the instrumentation can't intercept the call
-    // and no Span will be created breaking the vicious cycle
-    let fetchApi = globalThis.fetch;
-    // @ts-expect-error -- fetch could be wrapped
-    if (typeof fetchApi.__original === 'function') {
+    let fetchApi: typeof globalThis.fetch;
+    if (this._parameters.fetch !== undefined) {
+      // Use the user-provided fetch as-is; do not unwrap `__original` because
+      // the caller has explicitly asked for this implementation.
+      fetchApi = this._parameters.fetch;
+    } else {
+      // Fetch API may be wrapped by an instrumentation like `@opentelemetry/instrumentation-fetch`.
+      // In that case the instrumentation would create a new Span for this request
+      // because the context manager cannot keep the context after `await` calls.
+      // This creates an indirect endless loop Export -> Span -> Export
+      // By using the `__original` function the instrumentation can't intercept the call
+      // and no Span will be created breaking the vicious cycle
+      fetchApi = globalThis.fetch;
       // @ts-expect-error -- fetch could be wrapped
-      fetchApi = fetchApi.__original;
+      if (typeof fetchApi.__original === 'function') {
+        // @ts-expect-error -- fetch could be wrapped
+        fetchApi = fetchApi.__original;
+      }
     }
 
     const requestSize = data.byteLength;
