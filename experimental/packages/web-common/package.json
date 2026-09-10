@@ -1,17 +1,28 @@
 {
   "name": "@opentelemetry/web-common",
-  "version": "0.221.0",
+  "version": "0.222.0",
+  "description": "Common utilities for web instrumentation",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
   "publishConfig": {
     "access": "public"
   },
-  "description": "Common utilities for web instrumentation",
   "author": "OpenTelemetry Authors",
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/web-common",
   "license": "Apache-2.0",
-  "main": "build/src/index.js",
-  "module": "build/esm/index.js",
-  "esnext": "build/esnext/index.js",
-  "types": "build/src/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/open-telemetry/opentelemetry-js.git"
@@ -23,18 +34,17 @@
     "node": "^18.19.0 || >=20.6.0"
   },
   "scripts": {
-    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "clean": "rimraf dist build",
+    "compile": "tsdown",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "peer-api-check": "node ../../../scripts/peer-api-check.js",
+    "peer-api-check": "node ../../../scripts/peer-api-check.mjs",
     "prepublishOnly": "npm run compile",
-    "prewatch": "npm run precompile",
     "tdd": "karma start",
     "test:browser": "karma start --single-run",
     "version": "node ../../../scripts/version-update.js",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "align-api-deps": "node ../../../scripts/align-api-deps.js"
+    "watch": "tsdown --watch --no-clean",
+    "align-api-deps": "node ../../../scripts/align-api-deps.mjs"
   },
   "keywords": [
     "opentelemetry",
@@ -45,32 +55,24 @@
     "monitoring"
   ],
   "files": [
-    "build/esm/**/*.js",
-    "build/esm/**/*.js.map",
-    "build/esm/**/*.d.ts",
-    "build/esnext/**/*.js",
-    "build/esnext/**/*.js.map",
-    "build/esnext/**/*.d.ts",
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
     "doc",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "dist"
   ],
   "sideEffects": false,
   "peerDependencies": {
     "@opentelemetry/api": ">=1.4.0 <1.10.0"
   },
   "dependencies": {
-    "@opentelemetry/sdk-logs": "0.221.0",
-    "@opentelemetry/sdk-trace": "2.10.0",
+    "@opentelemetry/sdk-logs": "0.222.0",
+    "@opentelemetry/sdk-trace": "2.11.0",
     "@opentelemetry/semantic-conventions": "^1.29.0"
   },
   "devDependencies": {
     "@babel/core": "7.29.7",
     "@opentelemetry/api": "1.9.1",
-    "@opentelemetry/api-logs": "0.221.0",
+    "@opentelemetry/api-logs": "0.222.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
@@ -81,7 +83,7 @@
     "karma-chrome-launcher": "3.2.0",
     "karma-coverage": "2.2.1",
     "karma-mocha": "2.0.1",
-    "karma-spec-reporter": "0.0.36",
+    "karma-spec-reporter": "0.0.37",
     "karma-webpack": "5.0.1",
     "mocha": "11.8.0",
     "nyc": "17.1.0",
@@ -89,6 +91,6 @@
     "ts-loader": "9.5.7",
     "typescript": "5.2.2",
     "webpack": "5.108.4",
-    "webpack-cli": "7.2.2"
+    "webpack-cli": "7.2.3"
   }
 }

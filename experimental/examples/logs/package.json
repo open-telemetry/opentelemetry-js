@@ -4,12 +4,12 @@
   "private": true,
   "scripts": {
     "start": "ts-node index.ts",
-    "align-api-deps": "node ../../../scripts/align-api-deps.js"
+    "align-api-deps": "node ../../../scripts/align-api-deps.mjs"
   },
   "dependencies": {
     "@opentelemetry/api": "^1.7.0",
-    "@opentelemetry/api-logs": "0.221.0",
-    "@opentelemetry/sdk-logs": "0.221.0"
+    "@opentelemetry/api-logs": "0.222.0",
+    "@opentelemetry/sdk-logs": "0.222.0"
   },
   "devDependencies": {
     "@types/node": "18.19.130",

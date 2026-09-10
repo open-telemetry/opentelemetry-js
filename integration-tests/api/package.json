@@ -22,11 +22,12 @@
   "scripts": {
     "test": "nyc mocha test/**/*.test.js",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "align-api-deps": "node ../../scripts/align-api-deps.mjs"
   },
   "devDependencies": {
     "@opentelemetry/api": "^1.3.0",
-    "@opentelemetry/core": "2.10.0",
+    "@opentelemetry/core": "2.11.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "mocha": "11.8.0",

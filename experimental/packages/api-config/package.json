@@ -1,25 +1,24 @@
 {
   "name": "@opentelemetry/api-config",
-  "version": "0.221.0",
+  "version": "0.222.0",
   "description": "Public declarative configuration API for OpenTelemetry",
-  "main": "build/src/index.js",
-  "module": "build/esm/index.js",
-  "esnext": "build/esnext/index.js",
-  "types": "build/src/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
-    "prepublishOnly": "npm run compile",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "test": "nyc mocha test/**/*.test.ts",
-    "test:browser": "karma start --single-run",
+    "align-api-deps": "node ../../../scripts/align-api-deps.mjs",
     "build": "npm run compile",
+    "clean": "rimraf dist build",
+    "compile": "tsdown",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "version": "node ../../../scripts/version-update.js",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "prepublishOnly": "npm run compile",
     "prewatch": "node ../../../scripts/version-update.js",
-    "align-api-deps": "node ../../../scripts/align-api-deps.js"
+    "test": "nyc mocha test/**/*.test.ts",
+    "test:browser": "karma start --single-run",
+    "version": "node ../../../scripts/version-update.js",
+    "watch": "tsdown --watch --no-clean"
   },
   "keywords": [
     "opentelemetry",
@@ -34,18 +33,10 @@
     "node": ">=8.0.0"
   },
   "files": [
-    "build/esm/**/*.js",
-    "build/esm/**/*.js.map",
-    "build/esm/**/*.d.ts",
-    "build/esnext/**/*.js",
-    "build/esnext/**/*.js.map",
-    "build/esnext/**/*.d.ts",
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
     "doc",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "dist"
   ],
   "publishConfig": {
     "access": "public"
@@ -57,21 +48,33 @@
     "@types/mocha": "10.0.10",
     "@types/node": "^8.10.66",
     "@types/sinon": "17.0.4",
-    "@types/webpack-env": "1.16.3",
+    "@types/webpack-env": "1.18.8",
     "babel-plugin-istanbul": "8.0.0",
     "karma": "6.4.4",
-    "karma-chrome-launcher": "3.1.0",
+    "karma-chrome-launcher": "3.2.0",
     "karma-coverage": "2.2.1",
     "karma-mocha": "2.0.1",
-    "karma-spec-reporter": "0.0.36",
+    "karma-spec-reporter": "0.0.37",
     "karma-webpack": "5.0.1",
-    "mocha": "11.7.6",
+    "mocha": "11.8.0",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
     "ts-loader": "9.5.7",
-    "typescript": "5.0.4",
-    "webpack": "5.104.1"
+    "typescript": "5.2.2",
+    "webpack": "5.108.4"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/api-config",
-  "sideEffects": false
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  }
 }

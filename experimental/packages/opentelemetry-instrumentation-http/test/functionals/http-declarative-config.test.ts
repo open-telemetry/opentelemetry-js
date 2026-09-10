@@ -57,7 +57,6 @@ describe('HttpInstrumentation declarative config', function () {
             require_parent_for_incoming_spans: true,
             // Test warning for an invalid `boolean`.
             require_parent_for_outgoing_spans: 42,
-            server_name: 'my-server',
             enable_synthetic_source_detection: true,
             // Test warning for an invalid `string[]`.
             redacted_query_params: ['token', 42],
@@ -86,7 +85,6 @@ describe('HttpInstrumentation declarative config', function () {
     assert.strictEqual(config.disableIncomingRequestInstrumentation, true);
     assert.strictEqual(config.disableOutgoingRequestInstrumentation, true);
     assert.strictEqual(config.requireParentforIncomingSpans, true);
-    assert.strictEqual(config.serverName, 'my-server');
     assert.strictEqual(config.enableSyntheticSourceDetection, true);
 
     // Ensure the default value is kept when there is a type mismatch.
@@ -133,11 +131,11 @@ describe('HttpInstrumentation declarative config', function () {
       },
     });
     const config = makeInstrumentation(configProvider, {
-      serverName: 'keep-me',
+      redactedQueryParams: ['keep-me'],
     }).getConfig();
 
     assert.strictEqual(config.requireParentforIncomingSpans, true);
-    assert.strictEqual(config.serverName, 'keep-me');
+    assert.deepStrictEqual(config.redactedQueryParams, ['keep-me']);
   });
 
   it('keeps in-code header capture settings that declarative config does not set', function () {

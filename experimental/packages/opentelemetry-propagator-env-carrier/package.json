@@ -1,24 +1,34 @@
 {
   "name": "@opentelemetry/propagator-env-carrier",
-  "version": "0.221.0",
+  "version": "0.222.0",
   "description": "OpenTelemetry environment variable carrier helpers for context propagation",
-  "main": "build/src/index.js",
-  "module": "build/esm/index.js",
-  "esnext": "build/esnext/index.js",
-  "types": "build/src/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "compile": "tsdown",
+    "clean": "rimraf dist build",
     "test": "nyc mocha 'test/**/*.test.ts'",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "version": "node ../../../scripts/version-update.js",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "prewatch": "npm run precompile",
-    "peer-api-check": "node ../../../scripts/peer-api-check.js",
-    "align-api-deps": "node ../../../scripts/align-api-deps.js"
+    "watch": "tsdown --watch --no-clean",
+    "peer-api-check": "node ../../../scripts/peer-api-check.mjs",
+    "align-api-deps": "node ../../../scripts/align-api-deps.mjs"
   },
   "keywords": [
     "opentelemetry",
@@ -32,17 +42,9 @@
     "node": "^18.19.0 || >=20.6.0"
   },
   "files": [
-    "build/esm/**/*.js",
-    "build/esm/**/*.js.map",
-    "build/esm/**/*.d.ts",
-    "build/esnext/**/*.js",
-    "build/esnext/**/*.js.map",
-    "build/esnext/**/*.d.ts",
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "dist"
   ],
   "publishConfig": {
     "access": "public"
@@ -52,7 +54,7 @@
   },
   "devDependencies": {
     "@opentelemetry/api": "1.9.1",
-    "@opentelemetry/core": "2.10.0",
+    "@opentelemetry/core": "2.11.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "mocha": "11.8.0",

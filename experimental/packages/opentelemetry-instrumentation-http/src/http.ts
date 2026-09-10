@@ -34,7 +34,7 @@ import {
 import type * as http from 'http';
 import type * as https from 'https';
 import type { Socket } from 'net';
-import * as url from 'url';
+import type * as url from 'url';
 import type { HttpInstrumentationConfig } from './types';
 import { VERSION } from './version';
 import {
@@ -65,12 +65,15 @@ import {
   getOutgoingRequestAttributesOnResponse,
   getOutgoingStableRequestMetricAttributesOnResponse,
   getRequestInfo,
+  isURLLike,
   headerCapture,
   isValidOptionsType,
+  parseErrorType,
   parseResponseStatus,
   setSpanWithError,
 } from './utils';
 import type { Err, Func, Http, HttpRequestArgs, Https } from './internal-types';
+import { DEFAULT_QUERY_STRINGS_TO_REDACT } from './internal-types';
 
 /**
  * `node:http` and `node:https` instrumentation for OpenTelemetry
@@ -172,7 +175,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           'boolean',
           'enableSyntheticSourceDetection',
         ],
-        ['server_name', 'string', 'serverName'],
       ],
       generalProps: [
         [
@@ -504,6 +506,13 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             status = {
               code: parseResponseStatus(SpanKind.CLIENT, response.statusCode),
             };
+            const errorType = parseErrorType(
+              SpanKind.CLIENT,
+              response.statusCode
+            );
+            if (errorType !== undefined) {
+              span.setAttribute(ATTR_ERROR_TYPE, errorType);
+            }
           }
 
           span.setStatus(status);
@@ -623,6 +632,9 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           ),
           enableSyntheticSourceDetection:
             instrumentation.getConfig().enableSyntheticSourceDetection || false,
+          redactedQueryParams:
+            instrumentation.getConfig().redactedQueryParamsServer ??
+            Array.from(DEFAULT_QUERY_STRINGS_TO_REDACT),
         },
         instrumentation._diag
       );
@@ -731,7 +743,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       }
       const extraOptions =
         typeof args[0] === 'object' &&
-        (typeof options === 'string' || options instanceof url.URL)
+        (typeof options === 'string' || isURLLike(options))
           ? (args.shift() as http.RequestOptions)
           : undefined;
       const { method, invalidUrl, optionsParsed } = getRequestInfo(
@@ -885,6 +897,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     span.setAttributes(attributes).setStatus({
       code: parseResponseStatus(SpanKind.SERVER, response.statusCode),
     });
+
+    const errorType = parseErrorType(SpanKind.SERVER, response.statusCode);
+    if (errorType !== undefined) {
+      span.setAttribute(ATTR_ERROR_TYPE, errorType);
+    }
 
     const route = attributes[ATTR_HTTP_ROUTE];
     if (route) {

@@ -4,11 +4,11 @@
  */
 
 import * as assert from 'assert';
-import { AnchoredClock, otperformance } from '../../src';
+import { AnchoredClock } from '../../src';
 
 describe('AnchoredClock', () => {
   it('should keep time', done => {
-    const clock = new AnchoredClock(Date, otperformance);
+    const clock = new AnchoredClock(Date, performance);
     setTimeout(() => {
       // after about 100ms, the clocks are within 10ms of each other
       assert.ok(Math.abs(Date.now() - clock.now()) < 10);

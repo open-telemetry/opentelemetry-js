@@ -61,10 +61,51 @@ Options                                 | Type                                  
 `ignoreOutgoingRequestHook`             | `IgnoreOutgoingRequestFunction`            | Function for filtering outgoing requests. HTTP instrumentation will not trace outgoing requests for which the function returns `true`.
 `disableOutgoingRequestInstrumentation` | `boolean`                                  | Set to true to avoid instrumenting outgoing requests at all. This can be helpful when another instrumentation handles outgoing requests.
 `disableIncomingRequestInstrumentation` | `boolean`                                  | Set to true to avoid instrumenting incoming requests at all. This can be helpful when another instrumentation handles incoming requests.
-`serverName`                            | `string`                                   | **Deprecated.** No longer used. Stable HTTP semantic conventions do not include the `http.server_name` attribute; this option has no effect.
 `requireParentforOutgoingSpans`         | Boolean                                    | Require that is a parent span to create new span for outgoing requests.
 `requireParentforIncomingSpans`         | Boolean                                    | Require that is a parent span to create new span for incoming requests.
+`redactedQueryParams`                   | `string[]`                                 | **Experimental.** Query parameter names whose values are redacted on outgoing (client) spans. Replaces the built-in list. See [Query parameter redaction](#query-parameter-redaction).
+`redactedQueryParamsServer`             | `string[]`                                 | **Experimental.** Query parameter names whose values are redacted on incoming (server) spans. Replaces the built-in list. See [Query parameter redaction](#query-parameter-redaction).
 `headersToSpanAttributes`               | `object`                                   | Specify which HTTP headers should be captured as span attributes. This is an object of the form `{client: {requestHeaders: [...], responseHeaders: [...]}, server: {requestHeaders: [...], responseHeaders: [...]}}`, where each `[...]` is an array of HTTP header names (case-insensitive) to capture. Client (outgoing requests, incoming responses) and server (incoming requests, outgoing responses) headers will be converted to span attributes in the form of `http.{request,response}.header.$header_name`, e.g. `http.response.header.content_length`. By default hyphens in header names are converted to underscore. However, if stable semantic conventions are selected (see next section), then, hyphens in header names are not changed, e.g. `http.response.header.content-length`.
+
+#### Query parameter redaction
+
+Query parameters that commonly carry credentials are redacted before URLs are recorded as span attributes. On client spans the redacted URL is recorded as `url.full`; on server spans the redacted query string is recorded as `url.query`. Matching values are replaced with the literal string `REDACTED`.
+
+By default both sides redact the following parameters:
+
+```text
+sig, Signature, AWSAccessKeyId, X-Goog-Signature,
+X-Amz-Signature, X-Amz-Credential, X-Amz-Security-Token
+```
+
+`redactedQueryParams` controls the client side and `redactedQueryParamsServer` controls the server side, independently. For each option:
+
+- Omit it to use the built-in list above.
+- Supply an array to **replace** the built-in list entirely. The arrays are not merged, so include any built-in parameters you still want redacted.
+- Supply an empty array to disable redaction on that side.
+
+The two options do not fall back to each other: when `redactedQueryParamsServer` is omitted, server spans use the built-in list, *not* the value of `redactedQueryParams`. Setting `redactedQueryParams` alone therefore leaves custom parameters unredacted on server spans. To redact the same custom parameters on both sides, set both options to the same array.
+
+Parameter names are matched exactly and are case-sensitive, which is why the built-in list contains both `sig` and `Signature`.
+
+```js
+// The built-in list plus an application-specific parameter, applied to both sides.
+const redacted = [
+  'sig',
+  'Signature',
+  'AWSAccessKeyId',
+  'X-Goog-Signature',
+  'X-Amz-Signature',
+  'X-Amz-Credential',
+  'X-Amz-Security-Token',
+  'api_key',
+];
+
+new HttpInstrumentation({
+  redactedQueryParams: redacted,
+  redactedQueryParamsServer: redacted,
+});
+```
 
 #### Hook function signatures
 
@@ -97,7 +138,6 @@ Config property | Type | Instrumentation option
 `require_parent_for_outgoing_spans` | boolean | `requireParentforOutgoingSpans`
 `redacted_query_params` | string[] | `redactedQueryParams`
 `enable_synthetic_source_detection` | boolean | `enableSyntheticSourceDetection`
-`server_name` | string | `serverName`
 
 Header capture comes from the shared `instrumentation/development.general.http` section:
 
@@ -121,7 +161,6 @@ instrumentation/development:
           - content-type
   js:
     "@opentelemetry/instrumentation-http":
-      server_name: my-server
       require_parent_for_outgoing_spans: true
       redacted_query_params:
         - sig
@@ -148,7 +187,6 @@ v1.23.0 semconv                     | Short Description
 (not included)                      | The size of the uncompressed response payload body after transport decoding. (In semconv v1.23.0 this is defined by `http.response.body.size`, which is experimental and opt-in.)
 no change                           | The matched route (path template).
 `url.scheme`                        | The URI scheme identifying the used protocol
-`server.address`                    | The primary server name of the matched virtual host
 `http.response.status_code`         | HTTP response status code
 `url.path` and `url.query`          | The URI path and query component
 `url.full`                          | Full HTTP request URL in the form `scheme://host[:port]/path?query[#fragment]`

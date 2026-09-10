@@ -41,7 +41,7 @@ import type {
   ServerResponse,
 } from 'http';
 import { getRPCMetadata, RPCType } from '@opentelemetry/core';
-import * as url from 'url';
+import type * as url from 'url';
 import type {
   Err,
   IgnoreMatcher,
@@ -54,6 +54,25 @@ import {
 } from './internal-types';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import forwardedParse = require('forwarded-parse');
+
+const defaultQueryStringsToRedact = Array.from(DEFAULT_QUERY_STRINGS_TO_REDACT);
+
+/**
+ * Redacts sensitive query parameters from a query string (without leading '?').
+ * Returns the input unchanged if it cannot be parsed.
+ */
+export const redactQueryString = (
+  searchParams: URLSearchParams,
+  paramsToRedact: string[]
+): string => {
+  const params = new URLSearchParams(searchParams);
+  for (const param of paramsToRedact) {
+    if (params.has(param)) {
+      params.set(param, STR_REDACTED);
+    }
+  }
+  return params.toString();
+};
 
 /**
  * Get an absolute url
@@ -68,31 +87,30 @@ export const getAbsoluteUrl = (
   const protocol = reqUrlObject.protocol || fallbackProtocol;
   const port = (reqUrlObject.port || '').toString();
   let path = reqUrlObject.path || '/';
-  let host =
-    reqUrlObject.host || reqUrlObject.hostname || headers.host || 'localhost';
+  // `host`, `hostname` and the `host` header may hold values of unexpected
+  // types at runtime. Node.js itself ignores non-string values when it can
+  // derive the target from another option (e.g. it uses `hostname` when
+  // `host` is not a valid string), so skip non-string candidates instead of
+  // crashing on them.
+  let host: string =
+    (typeof reqUrlObject.host === 'string' && reqUrlObject.host) ||
+    (typeof reqUrlObject.hostname === 'string' && reqUrlObject.hostname) ||
+    (typeof headers.host === 'string' && headers.host) ||
+    'localhost';
   // if there is no port in host and there is a port
   // it should be displayed if it's not 80 and 443 (default ports)
-  if (
-    (host as string).indexOf(':') === -1 &&
-    port &&
-    port !== '80' &&
-    port !== '443'
-  ) {
+  if (host.indexOf(':') === -1 && port && port !== '80' && port !== '443') {
     host += `:${port}`;
   }
   // Redact sensitive query parameters
-  if (path.includes('?')) {
+  if (typeof path === 'string' && path.includes('?')) {
     try {
       const parsedUrl = new URL(path, 'http://localhost');
-      const sensitiveParamsToRedact: string[] = redactedQueryParams || [];
-
-      for (const sensitiveParam of sensitiveParamsToRedact) {
-        if (parsedUrl.searchParams.get(sensitiveParam)) {
-          parsedUrl.searchParams.set(sensitiveParam, STR_REDACTED);
-        }
-      }
-
-      path = `${parsedUrl.pathname}${parsedUrl.search}`;
+      const redacted = redactQueryString(
+        parsedUrl.searchParams,
+        redactedQueryParams
+      );
+      path = `${parsedUrl.pathname}?${redacted}`;
     } catch {
       // Ignore error, as the path was not a valid URL.
     }
@@ -117,6 +135,27 @@ export const parseResponseStatus = (
 
   // All other codes are error
   return SpanStatusCode.ERROR;
+};
+
+/**
+ * Returns the `error.type` value for a response status code, or undefined when
+ * the code is not an error for this span kind. Semconv asks for the status code
+ * as a string once a response was received.
+ */
+export const parseErrorType = (
+  kind: SpanKind,
+  statusCode?: unknown
+): string | undefined => {
+  const lowerBound = kind === SpanKind.CLIENT ? 400 : 500;
+  if (
+    typeof statusCode === 'number' &&
+    statusCode >= lowerBound &&
+    statusCode < 600
+  ) {
+    return String(statusCode);
+  }
+
+  return undefined;
 };
 
 /**
@@ -218,6 +257,30 @@ function stringUrlToHttpOptions(
 }
 
 /**
+ * Mirrors how Node.js detects WHATWG `URL` objects passed to `http.request`
+ * and `https.request`: by shape rather than by `instanceof`, so that URL
+ * objects from other realms (e.g. `vm` contexts) or WHATWG URL polyfills are
+ * handled the same way Node.js handles them.
+ *
+ * This mirrors Node's `isURL()` predicate exactly. The `auth`/`path` guards
+ * matter: they keep options objects and legacy `url.parse()` results (both
+ * carry `path`) off the URL code path.
+ *
+ * See https://github.com/nodejs/node/blob/2505e217bba05fc581b572c685c5cf280a16c5a3/lib/internal/url.js#L756-L773
+ */
+export const isURLLike = (value: unknown): value is url.URL => {
+  const candidate = value as
+    | (url.URL & { auth?: unknown; path?: unknown })
+    | undefined;
+  return Boolean(
+    candidate?.href &&
+      candidate.protocol &&
+      candidate.auth === undefined &&
+      candidate.path === undefined
+  );
+};
+
+/**
  * Makes sure options is an url object
  * return an object with default value and parsed options
  * @param logger component logger
@@ -261,7 +324,7 @@ export const getRequestInfo = (
     if (extraOptions !== undefined) {
       Object.assign(optionsParsed, extraOptions);
     }
-  } else if (options instanceof url.URL) {
+  } else if (isURLLike(options)) {
     optionsParsed = {
       protocol: options.protocol,
       hostname:
@@ -307,9 +370,12 @@ export const getRequestInfo = (
 
   // some packages return method in lowercase..
   // ensure upperCase for consistency
-  const method = optionsParsed.method
-    ? optionsParsed.method.toUpperCase()
-    : 'GET';
+  // Note: a non-string `method` is rejected by Node.js itself; skip it here
+  // so the resulting error comes from Node.js and not the instrumentation.
+  const method =
+    optionsParsed.method && typeof optionsParsed.method === 'string'
+      ? optionsParsed.method.toUpperCase()
+      : 'GET';
 
   return { origin, pathname, method, optionsParsed, invalidUrl };
 };
@@ -333,13 +399,29 @@ export const extractHostnameAndPort = (
     'hostname' | 'host' | 'port' | 'protocol'
   >
 ): { hostname: string; port: number | string } => {
-  if (requestOptions.hostname && requestOptions.port) {
-    return { hostname: requestOptions.hostname, port: requestOptions.port };
+  // `hostname`, `host` and `port` may hold values of unexpected types at
+  // runtime. Node.js itself ignores non-string values when it can derive the
+  // target from another option (e.g. it uses `hostname` when `host` is not a
+  // valid string), so skip non-string candidates instead of crashing on them.
+  const optionsHostname =
+    typeof requestOptions.hostname === 'string'
+      ? requestOptions.hostname
+      : undefined;
+  const optionsHost =
+    typeof requestOptions.host === 'string' ? requestOptions.host : undefined;
+  const optionsPort =
+    typeof requestOptions.port === 'string' ||
+    typeof requestOptions.port === 'number'
+      ? requestOptions.port
+      : undefined;
+
+  if (optionsHostname && optionsPort) {
+    return { hostname: optionsHostname, port: optionsPort };
   }
-  const matches = requestOptions.host?.match(/^([^:/ ]+)(:\d{1,5})?/) || null;
+  const matches = optionsHost?.match(/^([^:/ ]+)(:\d{1,5})?/) || null;
   const hostname =
-    requestOptions.hostname || (matches === null ? 'localhost' : matches[1]);
-  let port = requestOptions.port;
+    optionsHostname || (matches === null ? 'localhost' : matches[1]);
+  let port = optionsPort;
   if (!port) {
     if (matches && matches[2]) {
       // remove the leading ":". The extracted port would be something like ":8080"
@@ -468,12 +550,9 @@ export const getOutgoingStableRequestMetricAttributesOnResponse = (
   const statusCode = spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
   if (statusCode) {
     metricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] = statusCode;
-    if (
-      typeof statusCode === 'number' &&
-      statusCode >= 400 &&
-      statusCode < 600
-    ) {
-      metricAttributes[ATTR_ERROR_TYPE] ??= String(statusCode);
+    const errorType = parseErrorType(SpanKind.CLIENT, statusCode);
+    if (errorType !== undefined) {
+      metricAttributes[ATTR_ERROR_TYPE] ??= errorType;
     }
   }
   return metricAttributes;
@@ -700,10 +779,16 @@ export const getIncomingRequestAttributes = (
     component: 'http' | 'https';
     hookAttributes?: Attributes;
     enableSyntheticSourceDetection: boolean;
+    redactedQueryParams?: string[];
   },
   logger: DiagLogger
 ): Attributes => {
-  const { component, enableSyntheticSourceDetection, hookAttributes } = options;
+  const {
+    component,
+    enableSyntheticSourceDetection,
+    hookAttributes,
+    redactedQueryParams,
+  } = options;
   const { headers, method } = request;
   const { 'user-agent': userAgent } = headers;
   const parsedUrl = getInfoFromIncomingMessage(component, request, logger);
@@ -729,7 +814,11 @@ export const getIncomingRequestAttributes = (
 
   if (parsedUrl.search) {
     // Remove leading '?' from URL search (https://developer.mozilla.org/en-US/docs/Web/API/URL/search).
-    attributes[ATTR_URL_QUERY] = parsedUrl.search.slice(1);
+    const paramsToRedact = redactedQueryParams ?? defaultQueryStringsToRedact;
+    attributes[ATTR_URL_QUERY] = redactQueryString(
+      new URLSearchParams(parsedUrl.search.slice(1)),
+      paramsToRedact
+    );
   }
 
   if (remoteClientAddress != null) {
@@ -789,12 +878,9 @@ export const getIncomingStableRequestMetricAttributesOnResponse = (
   const statusCode = spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
   if (statusCode) {
     metricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] = statusCode;
-    if (
-      typeof statusCode === 'number' &&
-      statusCode >= 500 &&
-      statusCode < 600
-    ) {
-      metricAttributes[ATTR_ERROR_TYPE] ??= String(statusCode);
+    const errorType = parseErrorType(SpanKind.SERVER, statusCode);
+    if (errorType !== undefined) {
+      metricAttributes[ATTR_ERROR_TYPE] ??= errorType;
     }
   }
 
