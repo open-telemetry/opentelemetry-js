@@ -4,6 +4,8 @@
  */
 
 import * as assert from 'assert';
+import * as sinon from 'sinon';
+import { diag, DiagLogLevel } from '@opentelemetry/api';
 import type {
   ConfigurationModel,
   ExperimentalGeneralInstrumentationConfigModel,
@@ -99,5 +101,52 @@ describe('SdkConfigProvider', () => {
     } as unknown as ConfigurationModel);
 
     assert.deepStrictEqual(provider.getGeneralInstrumentationConfig(), {});
+  });
+
+  describe('non-mapping nodes', function () {
+    let warnings: string[];
+
+    beforeEach(function () {
+      warnings = [];
+      diag.setLogger(
+        {
+          verbose: () => {},
+          debug: () => {},
+          info: () => {},
+          warn: (m: string) => warnings.push(m),
+          error: () => {},
+        },
+        DiagLogLevel.WARN
+      );
+    });
+
+    afterEach(function () {
+      diag.disable();
+      sinon.restore();
+    });
+
+    it('warns and names the node', function () {
+      const provider = createConfigProvider({
+        'instrumentation/development': {
+          js: { '@otel/an-array': ['oops'] },
+          general: 'oops',
+        },
+      } as unknown as ConfigurationModel);
+
+      assert.deepStrictEqual(
+        provider.getInstrumentationConfig('@otel/an-array'),
+        {}
+      );
+      assert.deepStrictEqual(provider.getGeneralInstrumentationConfig(), {});
+      assert.strictEqual(warnings.length, 2);
+      assert.match(warnings[0], /js\.@otel\/an-array" is not a mapping.*array/);
+      assert.match(warnings[1], /general" is not a mapping.*string/);
+    });
+
+    it('is silent when a node is simply absent', function () {
+      const provider = createConfigProvider({} as ConfigurationModel);
+      assert.deepStrictEqual(provider.getGeneralInstrumentationConfig(), {});
+      assert.deepStrictEqual(warnings, []);
+    });
   });
 });
