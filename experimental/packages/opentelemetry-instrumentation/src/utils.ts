@@ -259,6 +259,35 @@ function validConfigPropertyType(
   return true;
 }
 
+/**
+ * Read an instrumentation's declarative config and map it onto config fields.
+ *
+ * Reads the instrumentation's own node (`instrumentation/development.js.<name>`)
+ * and the shared `general` node, and returns a partial config to merge over the
+ * current one. Each property is mapped by a `[fromPath, type, toPath]` tuple: a
+ * dotted path in the node, one of `boolean`, `string`, `number`, `boolean[]`,
+ * `string[]` or `number[]`, and a dotted path in the config.
+ *
+ * A missing or null property is skipped. A wrong type, an unknown type tag or an
+ * unwalkable target path warns and is skipped; reading never throws, because
+ * `setConfigProvider()` must not. Properties the instrumentation owns but did
+ * not map are reported together. Function-valued options cannot be mapped.
+ *
+ * ```ts
+ * setConfigProvider(configProvider: ConfigProvider): void {
+ *   const config = readConfigProperties({
+ *     configProvider,
+ *     instrumentationName: this.instrumentationName,
+ *     instrumentationProps: [['redacted_query_params', 'string[]', 'redactedQueryParams']],
+ *     currentConfig: this.getConfig() as Record<string, unknown>,
+ *     diag: this._diag,
+ *   });
+ *   if (Object.keys(config).length > 0) {
+ *     this.setConfig({ ...this.getConfig(), ...config });
+ *   }
+ * }
+ * ```
+ */
 export function readConfigProperties(opts: {
   configProvider: ConfigProvider;
   instrumentationName?: string;
