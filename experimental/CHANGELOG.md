@@ -9,6 +9,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :boom: Breaking Changes
 
+* feat(instrumentation-http)!: remove deprecated `serverName` field from `HttpInstrumentationConfig` [#7081](https://github.com/open-telemetry/opentelemetry-js/pull/7081)
+  * The `serverName` option had no effect; stable HTTP semantic conventions do not include `http.server_name`. Remove it from any `setConfig()` or constructor call.
 * feat(sdk-node)!: remove deprecated `NodeSDKConfiguration` fields `logRecordProcessor`, `metricReader`, `spanProcessor` and deprecated namespace re-exports `node`, `tracing`
   * `NodeSDKConfiguration.logRecordProcessor` — use `logRecordProcessors` instead.
   * `NodeSDKConfiguration.metricReader` — use `metricReaders` instead.
