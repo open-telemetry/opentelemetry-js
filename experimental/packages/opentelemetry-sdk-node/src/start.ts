@@ -6,7 +6,11 @@ import type {
   ConfigFactory,
   ConfigurationModel,
 } from '@opentelemetry/configuration';
-import { createConfigFactory } from '@opentelemetry/configuration';
+import {
+  createConfigFactory,
+  createConfigProvider,
+} from '@opentelemetry/configuration';
+import { config as configApi } from '@opentelemetry/api-config';
 import {
   context,
   diag,
@@ -61,10 +65,6 @@ export function startNodeSDK(sdkOptions?: SDKOptions): {
   const logLevel = diagLogLevelFromSeverityNumberConfig(config.log_level);
   diag.setLogger(new DiagConsoleLogger(), { logLevel });
 
-  registerInstrumentations({
-    instrumentations: sdkOptions?.instrumentations?.flat() ?? [],
-  });
-
   let components: SDKComponents;
   try {
     components = create(config, sdkOptions);
@@ -76,6 +76,9 @@ export function startNodeSDK(sdkOptions?: SDKOptions): {
   }
   if (components.contextManager) {
     context.setGlobalContextManager(components.contextManager);
+  }
+  if (components.configProvider) {
+    configApi.setGlobalConfigProvider(components.configProvider);
   }
   if (components.loggerProvider) {
     logs.setGlobalLoggerProvider(components.loggerProvider);
@@ -89,6 +92,10 @@ export function startNodeSDK(sdkOptions?: SDKOptions): {
   if (components.propagator) {
     propagation.setGlobalPropagator(components.propagator);
   }
+
+  registerInstrumentations({
+    instrumentations: sdkOptions?.instrumentations?.flat() ?? [],
+  });
 
   const shutdownFn = async () => {
     const promises: Promise<unknown>[] = [];
@@ -128,6 +135,8 @@ function create(
     } else if (config.propagator) {
       components.propagator = createPropagatorFromConfig(config.propagator);
     }
+
+    components.configProvider = createConfigProvider(config);
 
     if (config.logger_provider) {
       components.loggerProvider = createLoggerProviderFromConfig(
