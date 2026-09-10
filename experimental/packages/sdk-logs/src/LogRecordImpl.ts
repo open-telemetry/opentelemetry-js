@@ -3,16 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type {
-  AnyValue,
-  LogAttributes,
-  LogBody,
-  LogRecord,
-  SeverityNumber,
-} from '@opentelemetry/api-logs';
+import type { LogRecord, SeverityNumber } from '@opentelemetry/api-logs';
 import * as api from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
-import { timeInputToHrTime } from '@opentelemetry/core';
+import {
+  AddAttributeDecision,
+  maybeAddAttribute,
+  timeInputToHrTime,
+} from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import {
   ATTR_EXCEPTION_MESSAGE,
@@ -22,21 +20,20 @@ import {
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
 import type { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
-import { addAttribute, AddAttributeDecision } from './utils/validation';
 
 export class LogRecordImpl implements ReadableLogRecord {
   readonly resource: Resource;
   readonly instrumentationScope: InstrumentationScope & {
-    attributes?: LogAttributes;
+    attributes?: api.Attributes;
     droppedAttributesCount?: number;
   };
-  readonly attributes: LogAttributes = {};
+  readonly attributes: api.Attributes = {};
   private _hrTime: api.HrTime;
   private _hrTimeObserved: api.HrTime;
   private _spanContext?: api.SpanContext;
   private _severityText?: string;
   private _severityNumber?: SeverityNumber;
-  private _body?: LogBody;
+  private _body?: api.AnyValue;
   private _eventName?: string;
   private _attributesCount: number = 0;
   private _droppedAttributesCount: number = 0;
@@ -94,13 +91,13 @@ export class LogRecordImpl implements ReadableLogRecord {
     return this._severityNumber;
   }
 
-  set body(body: LogBody | undefined) {
+  set body(body: api.AnyValue | undefined) {
     if (this._isLogRecordReadonly()) {
       return;
     }
     this._body = body;
   }
-  get body(): LogBody | undefined {
+  get body(): api.AnyValue | undefined {
     return this._body;
   }
 
@@ -158,18 +155,18 @@ export class LogRecordImpl implements ReadableLogRecord {
     }
   }
 
-  public setAttribute(key: string, value?: AnyValue) {
+  public setAttribute(key: string, value?: api.AnyValue) {
     if (this._isLogRecordReadonly()) {
       return this;
     }
 
-    const decision = addAttribute(
-      this.attributes,
-      this._logRecordLimits,
-      this._attributesCount,
+    const decision = maybeAddAttribute({
       key,
-      value
-    );
+      value,
+      attributes: this.attributes,
+      limits: this._logRecordLimits,
+      currentAttributesCount: this._attributesCount,
+    });
 
     if (decision === AddAttributeDecision.DROP_LIMIT_REACHED) {
       this._droppedAttributesCount++;
@@ -184,14 +181,14 @@ export class LogRecordImpl implements ReadableLogRecord {
     return this;
   }
 
-  public setAttributes(attributes: LogAttributes) {
+  public setAttributes(attributes: api.Attributes) {
     for (const [k, v] of Object.entries(attributes)) {
       this.setAttribute(k, v);
     }
     return this;
   }
 
-  public setBody(body: LogBody) {
+  public setBody(body: api.AnyValue) {
     this.body = body;
     return this;
   }

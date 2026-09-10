@@ -2,7 +2,8 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import type { LogAttributes } from './LogRecord';
+
+import type { Attributes } from '@opentelemetry/api';
 
 export interface LoggerOptions {
   /**
@@ -15,5 +16,5 @@ export interface LoggerOptions {
    * The instrumentation scope attributes to associate with emitted telemetry.
    * These attributes also participate in logger identity.
    */
-  attributes?: LogAttributes;
+  attributes?: Attributes;
 }

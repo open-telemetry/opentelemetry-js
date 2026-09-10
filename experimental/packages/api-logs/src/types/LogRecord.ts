@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Context, TimeInput } from '@opentelemetry/api';
-import type { AnyValue, AnyValueMap } from './AnyValue';
-
-export type LogBody = AnyValue;
-export type LogAttributes = AnyValueMap;
+import type {
+  AnyValue,
+  Attributes,
+  Context,
+  TimeInput,
+} from '@opentelemetry/api';
 
 export enum SeverityNumber {
   UNSPECIFIED = 0,
@@ -66,12 +67,12 @@ export interface LogRecord {
   /**
    * A value containing the body of the log record.
    */
-  body?: LogBody;
+  body?: AnyValue;
 
   /**
    * Attributes that define the log record.
    */
-  attributes?: LogAttributes;
+  attributes?: Attributes;
 
   /**
    * An exception (or error) associated with the log record.

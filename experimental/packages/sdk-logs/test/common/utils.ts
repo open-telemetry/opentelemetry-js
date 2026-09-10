@@ -20,6 +20,7 @@ export const validAttributes = {
 export const invalidAttributes = {
   // This empty length attribute should not be set
   '': 'empty-key',
+  bigint: 42n,
 };
 
 export class TestMetricReader extends MetricReader {

@@ -26,6 +26,9 @@ export interface InstrumentationScope {
   readonly name: string;
   readonly version?: string;
   readonly schemaUrl?: string;
+  // XXX Add these? See experimental/packages/otlp-transformer/src/common/protobuf/common-serializer.ts
+  //     attributes?: LogAttributes;
+  //     droppedAttributesCount?: number;
 }
 
 /** Defines an error handler function */

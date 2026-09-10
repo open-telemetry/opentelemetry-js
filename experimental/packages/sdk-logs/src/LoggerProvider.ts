@@ -10,7 +10,7 @@ import type {
 } from '@opentelemetry/api-logs';
 import { createNoopLogger } from '@opentelemetry/api-logs';
 import { defaultResource } from '@opentelemetry/resources';
-import { BindOnceFuture } from '@opentelemetry/core';
+import { BindOnceFuture, cleanAttributes } from '@opentelemetry/core';
 
 import type { ForceFlushOptions, LoggerProviderOptions } from './types';
 import { Logger } from './Logger';
@@ -22,7 +22,6 @@ import {
   getInstrumentationScopeKey,
   type LogInstrumentationScope,
 } from './internal/utils';
-import { normalizeScopeAttributes } from './utils/validation';
 
 export const DEFAULT_LOGGER_NAME = 'unknown';
 
@@ -74,9 +73,9 @@ export class LoggerProvider implements ILoggerProvider {
       name: loggerName,
       version,
       schemaUrl: options?.schemaUrl,
-      ...normalizeScopeAttributes(
-        this._sharedState.logRecordLimits,
-        options?.attributes
+      ...cleanAttributes(
+        options?.attributes,
+        this._sharedState.logRecordLimits
       ),
     };
     const key = getInstrumentationScopeKey(instrumentationScope);

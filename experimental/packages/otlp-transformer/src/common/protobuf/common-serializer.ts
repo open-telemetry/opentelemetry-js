@@ -2,8 +2,7 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import type { Attributes, HrTime } from '@opentelemetry/api';
-import type { AnyValue, LogAttributes } from '@opentelemetry/api-logs';
+import type { AnyValue, Attributes, HrTime } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import type { IProtobufWriter } from './i-protobuf-writer';
@@ -81,7 +80,7 @@ export function writeHrTimeAsFixed64(
  */
 export function writeAttributes(
   writer: IProtobufWriter,
-  attributes: Attributes | LogAttributes,
+  attributes: Attributes,
   fieldNumber: number
 ): void {
   for (const key in attributes) {
@@ -120,6 +119,7 @@ export function writeKeyValue(
 const MIN_64_BIT_INT = -(2 ** 63);
 const MAX_64_BIT_INT = 2 ** 63;
 
+// XXX re-review writeAnyValue
 /**
  * Write an AnyValue directly from raw attribute value to protobuf
  */
@@ -200,13 +200,14 @@ export function writeAnyValue(writer: IProtobufWriter, value: AnyValue): void {
 export function writeInstrumentationScope(
   writer: IProtobufWriter,
   scope: InstrumentationScope &
+    // XXX revisit this, can InstrumentationScope get these? Or at least `attributes`?
     /**
      * Additional properties that are currently only part of the logs-specific type.
      * Once InstrumentationScope also includes `attributes` and `droppedAttributesCount`,
      * we should remove these extensions.
      */
     {
-      attributes?: LogAttributes;
+      attributes?: Attributes;
       droppedAttributesCount?: number;
     },
   fieldNumber: number
