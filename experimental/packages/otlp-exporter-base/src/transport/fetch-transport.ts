@@ -5,7 +5,8 @@
 
 import type { IExporterTransport } from '../exporter-transport';
 import type { ExportResponse } from '../export-response';
-import { diag } from '@opentelemetry/api';
+import { context, diag } from '@opentelemetry/api';
+import { suppressTracing } from '@opentelemetry/core';
 import {
   isExportHTTPErrorRetryable,
   parseRetryAfterToMills,
@@ -56,11 +57,10 @@ class FetchTransport implements IExporterTransport {
     const abortController = new AbortController();
     const timeout = setTimeout(() => abortController.abort(), timeoutMillis);
     // Fetch API may be wrapped by an instrumentation like `@opentelemetry/instrumentation-fetch`.
-    // In that case the instrumentation would create a new Span for this request
-    // because the context manager cannot keep the context after `await` calls.
-    // This creates an indirect endless loop Export -> Span -> Export
-    // By using the `__original` function the instrumentation can't intercept the call
-    // and no Span will be created breaking the vicious cycle
+    // In that case the instrumentation would create a new Span for this request,
+    // creating an indirect endless loop Export -> Span -> Export.
+    // `__original` lets the call bypass one wrapper; the suppressed context
+    // below covers a `fetch` that was wrapped more than once.
     let fetchApi = globalThis.fetch;
     // @ts-expect-error -- fetch could be wrapped
     if (typeof fetchApi.__original === 'function') {
@@ -87,20 +87,29 @@ class FetchTransport implements IExporterTransport {
       );
     }
 
+    // Captured before the first `await`, which a synchronous context manager
+    // would not survive.
+    const suppressedContext = suppressTracing(context.active());
+
     try {
       const url = new URL(this._parameters.url);
-      const response = await fetchApi(url.href, {
-        method: 'POST',
-        headers: await this._parameters.headers(),
-        body: data,
-        signal: abortController.signal,
-        keepalive: useKeepalive,
-        mode: globalThis.location
-          ? globalThis.location.origin === url.origin
-            ? 'same-origin'
-            : 'cors'
-          : 'no-cors',
-      });
+      // Unsuppressed on purpose: propagators skip injection under suppression,
+      // and `headers()` may inject propagation headers.
+      const headers = await this._parameters.headers();
+      const response = await context.with(suppressedContext, () =>
+        fetchApi(url.href, {
+          method: 'POST',
+          headers,
+          body: data,
+          signal: abortController.signal,
+          keepalive: useKeepalive,
+          mode: globalThis.location
+            ? globalThis.location.origin === url.origin
+              ? 'same-origin'
+              : 'cors'
+            : 'no-cors',
+        })
+      );
 
       if (response.status >= 200 && response.status <= 299) {
         diag.debug(`export response success (status: ${response.status})`);
