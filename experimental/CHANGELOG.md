@@ -36,6 +36,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :bug: Bug Fixes
 
+* fix(sdk-logs): accept log attributes with shared object references [#7068](https://github.com/open-telemetry/opentelemetry-js/pull/7068) @rajanpanth
+
 ### :books: Documentation
 
 ### :house: Internal
