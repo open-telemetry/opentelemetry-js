@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sdk-trace-node",
-  "version": "2.11.0",
+  "version": "3.0.0-development.0",
   "description": "OpenTelemetry Node SDK provides automatic telemetry (tracing, metrics, etc) for Node.js applications",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -53,8 +53,8 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/api": ">=1.0.0 <1.10.0",
-    "@opentelemetry/resources": "2.11.0",
+    "@opentelemetry/api": ">=1.0.0 <1.11.0 || 1.10.0-development.0",
+    "@opentelemetry/resources": "3.0.0-development.0",
     "@opentelemetry/semantic-conventions": "^1.29.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
@@ -65,12 +65,12 @@
     "typescript": "5.2.2"
   },
   "peerDependencies": {
-    "@opentelemetry/api": ">=1.0.0 <1.10.0"
+    "@opentelemetry/api": ">=1.0.0 <1.11.0 || 1.10.0-development.0"
   },
   "dependencies": {
-    "@opentelemetry/context-async-hooks": "2.11.0",
-    "@opentelemetry/core": "2.11.0",
-    "@opentelemetry/sdk-trace-base": "2.11.0"
+    "@opentelemetry/context-async-hooks": "3.0.0-development.0",
+    "@opentelemetry/core": "3.0.0-development.0",
+    "@opentelemetry/sdk-trace-base": "3.0.0-development.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node",
   "sideEffects": false

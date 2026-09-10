@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sampler-composite",
-  "version": "0.222.0",
+  "version": "0.223.0-development.0",
   "description": "Composite samplers for OpenTelemetry tracing",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -52,18 +52,18 @@
     "dist"
   ],
   "peerDependencies": {
-    "@opentelemetry/api": "^1.3.0"
+    "@opentelemetry/api": "^1.3.0 || 1.10.0-development.0"
   },
   "devDependencies": {
-    "@opentelemetry/api": "1.9.1",
+    "@opentelemetry/api": "1.10.0-development.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "mocha": "11.8.0",
     "nyc": "17.1.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "2.11.0",
-    "@opentelemetry/sdk-trace": "2.11.0"
+    "@opentelemetry/core": "3.0.0-development.0",
+    "@opentelemetry/sdk-trace": "3.0.0-development.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/sampler-composite",
   "sideEffects": false
