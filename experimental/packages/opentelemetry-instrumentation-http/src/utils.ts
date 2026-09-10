@@ -40,6 +40,7 @@ import type {
   RequestOptions,
   ServerResponse,
 } from 'http';
+import { isIPv6 } from 'net';
 import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 import type * as url from 'url';
 import type {
@@ -97,9 +98,21 @@ export const getAbsoluteUrl = (
     (typeof reqUrlObject.hostname === 'string' && reqUrlObject.hostname) ||
     (typeof headers.host === 'string' && headers.host) ||
     'localhost';
-  // if there is no port in host and there is a port
-  // it should be displayed if it's not 80 and 443 (default ports)
-  if (host.indexOf(':') === -1 && port && port !== '80' && port !== '443') {
+  let hostHasPort = false;
+  if (isIPv6(host)) {
+    host = `[${host}]`;
+  } else {
+    // Parse an already-bracketed IPv6 authority with an optional port.
+    const bracketedHost = /^\[([^\]]+)\](?::(\d+))?$/.exec(host);
+    const bracketedIpv6 = bracketedHost !== null && isIPv6(bracketedHost[1]);
+    hostHasPort = bracketedIpv6
+      ? bracketedHost[2] !== undefined
+      : host.includes(':');
+  }
+  const isDefaultPort =
+    (protocol === 'http:' && port === '80') ||
+    (protocol === 'https:' && port === '443');
+  if (!hostHasPort && port && !isDefaultPort) {
     host += `:${port}`;
   }
   // Redact sensitive query parameters
@@ -396,6 +409,25 @@ export const extractHostnameAndPort = (
 
   if (optionsHostname && optionsPort) {
     return { hostname: optionsHostname, port: optionsPort };
+  }
+  if (!optionsHostname && optionsHost) {
+    if (isIPv6(optionsHost)) {
+      return {
+        hostname: optionsHost,
+        port:
+          optionsPort || (requestOptions.protocol === 'https:' ? '443' : '80'),
+      };
+    }
+    const bracketedHost = /^\[([^\]]+)\](?::(\d{1,5}))?$/.exec(optionsHost);
+    if (bracketedHost && isIPv6(bracketedHost[1])) {
+      return {
+        hostname: bracketedHost[1],
+        port:
+          optionsPort ||
+          bracketedHost[2] ||
+          (requestOptions.protocol === 'https:' ? '443' : '80'),
+      };
+    }
   }
   const matches = optionsHost?.match(/^([^:/ ]+)(:\d{1,5})?/) || null;
   const hostname =

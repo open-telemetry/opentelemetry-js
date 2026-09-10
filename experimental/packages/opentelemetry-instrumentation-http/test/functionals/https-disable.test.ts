@@ -9,6 +9,7 @@ import type { AddressInfo } from 'net';
 import * as nock from 'nock';
 import * as sinon from 'sinon';
 import { HttpInstrumentation } from '../../src';
+import { expectModulePatching } from '../utils/modulePatching';
 import { isWrapped } from '@opentelemetry/instrumentation';
 
 const instrumentation = new HttpInstrumentation();
@@ -41,7 +42,10 @@ describe('HttpsInstrumentation', () => {
       nock.enableNetConnect();
 
       instrumentation.enable();
-      assert.strictEqual(isWrapped(https.Server.prototype.emit), true);
+      assert.strictEqual(
+        isWrapped(https.Server.prototype.emit),
+        expectModulePatching
+      );
       instrumentation.setTracerProvider(provider);
 
       server = https.createServer(
