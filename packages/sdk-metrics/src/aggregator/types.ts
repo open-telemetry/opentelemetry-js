@@ -8,6 +8,7 @@ import type { AggregationTemporality } from '../export/AggregationTemporality';
 import type { MetricData } from '../export/MetricData';
 import type { Maybe } from '../utils';
 import type { InstrumentDescriptor } from '../InstrumentDescriptor';
+import type { Exemplar } from '../exemplar/Exemplar';
 
 /** The kind of aggregator. */
 export enum AggregatorKind {
@@ -78,7 +79,7 @@ export interface Accumulation {
   record(value: number): void;
 }
 
-export type AccumulationRecord<T> = [Attributes, T];
+export type AccumulationRecord<T> = [Attributes, T, Exemplar[]?];
 
 /**
  * Base interface for aggregators. Aggregators are responsible for holding

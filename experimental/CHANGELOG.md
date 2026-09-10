@@ -58,6 +58,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 ### :rocket: Features
 
 * feat(sdk-logs): deprecate `SdkLogRecord` in favor of `ReadWriteLogRecord` [#6939](https://github.com/open-telemetry/opentelemetry-js/pull/6939) @pichlermarc
+* feat(otlp-transformer): serialize exemplars on all metric data point types [#6830](https://github.com/open-telemetry/opentelemetry-js/pull/6830) @CharlieTLe @rnavarro
 
 ### :bug: Bug Fixes
 

@@ -5,6 +5,7 @@
 
 import type { Context, HrTime, Attributes } from '@opentelemetry/api';
 import { context as contextApi } from '@opentelemetry/api';
+import { millisToHrTime } from '@opentelemetry/core';
 import type { WritableMetricStorage } from './WritableMetricStorage';
 import type { Accumulation, Aggregator } from '../aggregator/types';
 import type { InstrumentDescriptor } from '../InstrumentDescriptor';
@@ -15,6 +16,10 @@ import { DeltaMetricProcessor } from './DeltaMetricProcessor';
 import { TemporalMetricProcessor } from './TemporalMetricProcessor';
 import type { Maybe } from '../utils';
 import type { MetricCollectorHandle } from './MetricCollector';
+import type { ExemplarFilter } from '../exemplar/ExemplarFilter';
+import type { ExemplarReservoir } from '../exemplar/ExemplarReservoir';
+import { AttributeHashMap } from './HashMap';
+import type { Exemplar } from '../exemplar/Exemplar';
 
 /**
  * Internal interface.
@@ -29,13 +34,18 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>>
   private _deltaMetricStorage: DeltaMetricProcessor<T>;
   private _temporalMetricStorage: TemporalMetricProcessor<T>;
   private _attributesProcessor?: IAttributesProcessor;
+  private _exemplarFilter?: ExemplarFilter;
+  private _exemplarReservoirFactory?: () => ExemplarReservoir;
+  private _exemplarReservoirs = new AttributeHashMap<ExemplarReservoir>();
 
   constructor(
     instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<T>,
     attributesProcessor: IAttributesProcessor | undefined,
     collectorHandles: MetricCollectorHandle[],
-    aggregationCardinalityLimit?: number
+    aggregationCardinalityLimit?: number,
+    exemplarFilter?: ExemplarFilter,
+    exemplarReservoirFactory?: () => ExemplarReservoir
   ) {
     super(instrumentDescriptor);
     this._aggregationCardinalityLimit = aggregationCardinalityLimit;
@@ -49,6 +59,8 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>>
     );
     this._attributesProcessor = attributesProcessor;
     this.hasAttributeProcessor = attributesProcessor !== undefined;
+    this._exemplarFilter = exemplarFilter;
+    this._exemplarReservoirFactory = exemplarReservoirFactory;
   }
 
   readonly hasAttributeProcessor: boolean;
@@ -59,6 +71,11 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>>
     context: Context | undefined,
     recordTime: number
   ) {
+    // Keep the original measurement attributes for the exemplar reservoir:
+    // exemplars must retain attributes that the view configuration drops from
+    // the data point (the reservoir diffs them against the point attributes
+    // at collection time to compute filteredAttributes).
+    const measurementAttributes = attributes;
     if (this._attributesProcessor !== undefined) {
       attributes = this._attributesProcessor.process(
         attributes,
@@ -66,6 +83,30 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>>
       );
     }
     this._deltaMetricStorage.record(value, attributes, recordTime);
+
+    if (this._exemplarFilter && this._exemplarReservoirFactory) {
+      const exemplarContext = context ?? contextApi.active();
+      const exemplarTime = millisToHrTime(recordTime);
+      if (
+        this._exemplarFilter.shouldSample(
+          value,
+          exemplarTime,
+          attributes,
+          exemplarContext
+        )
+      ) {
+        const reservoir = this._exemplarReservoirs.getOrDefault(
+          attributes,
+          this._exemplarReservoirFactory
+        );
+        reservoir?.offer(
+          value,
+          exemplarTime,
+          measurementAttributes,
+          exemplarContext
+        );
+      }
+    }
   }
 
   /**
@@ -80,11 +121,27 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>>
   ): Maybe<MetricData> {
     const accumulations = this._deltaMetricStorage.collect();
 
+    // Collect exemplars for each attribute set
+    let exemplars: AttributeHashMap<Exemplar[]> | undefined;
+    if (this._exemplarFilter) {
+      exemplars = new AttributeHashMap<Exemplar[]>();
+      for (const [attributes] of this._exemplarReservoirs.keys()) {
+        const reservoir = this._exemplarReservoirs.get(attributes);
+        if (reservoir) {
+          const collected = reservoir.collect(attributes);
+          if (collected.length > 0) {
+            exemplars.set(attributes, collected);
+          }
+        }
+      }
+    }
+
     return this._temporalMetricStorage.buildMetrics(
       collector,
       this._instrumentDescriptor,
       accumulations,
-      collectionTime
+      collectionTime,
+      exemplars
     );
   }
 }

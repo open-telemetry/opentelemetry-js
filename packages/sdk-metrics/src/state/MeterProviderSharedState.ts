@@ -12,6 +12,8 @@ import type { MetricCollector, MetricCollectorHandle } from './MetricCollector';
 import { toAggregation } from '../view/AggregationOption';
 import type { Aggregation } from '../view/Aggregation';
 import type { InstrumentType } from '../export/MetricData';
+import type { ExemplarFilter } from '../exemplar/ExemplarFilter';
+import { WithTraceExemplarFilter } from '../exemplar/WithTraceExemplarFilter';
 
 /**
  * An internal record for shared meter provider states.
@@ -23,9 +25,11 @@ export class MeterProviderSharedState {
 
   meterSharedStates: Map<string, MeterSharedState> = new Map();
   public resource: Resource;
+  public exemplarFilter: ExemplarFilter;
 
-  constructor(resource: Resource) {
+  constructor(resource: Resource, exemplarFilter?: ExemplarFilter) {
     this.resource = resource;
+    this.exemplarFilter = exemplarFilter ?? new WithTraceExemplarFilter();
   }
 
   getMeterSharedState(instrumentationScope: InstrumentationScope) {
