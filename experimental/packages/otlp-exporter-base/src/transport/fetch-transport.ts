@@ -87,7 +87,7 @@ class FetchTransport implements IExporterTransport {
       );
     }
 
-    // Budget frees only once the body drains, so the drain owns cleanup.
+    // The budget frees only once the body drains, so the drain owns cleanup.
     const releaseKeepalive = () => {
       clearTimeout(timeout);
       pendingBodySize -= requestSize;
@@ -113,13 +113,13 @@ class FetchTransport implements IExporterTransport {
       // Not awaited: the status already decides the export outcome, and a
       // collector that stalls mid-body must not hold up the caller.
       const drained = drainResponseBody(response);
-      if (useKeepalive) {
-        // Set after the promise exists so an earlier throw still hits `finally`.
-        drainOwnsCleanup = true;
-        // The abort timer stays armed so a stalled body cannot hold the
-        // budget forever.
-        void drained.finally(releaseKeepalive);
-      }
+      // Set after the promise exists so an earlier throw still hits `finally`.
+      drainOwnsCleanup = true;
+      // Trailing the drain keeps the abort timer armed, so a stalled body can
+      // hold neither the budget nor the timer forever.
+      void drained.finally(
+        useKeepalive ? releaseKeepalive : () => clearTimeout(timeout)
+      );
 
       if (response.status >= 200 && response.status <= 299) {
         diag.debug(`export response success (status: ${response.status})`);
@@ -153,6 +153,8 @@ class FetchTransport implements IExporterTransport {
         error: new Error('Fetch request errored', { cause: error }),
       };
     } finally {
+      // Only a throw before the response reaches this: past that point the
+      // drain owns the cleanup.
       if (!drainOwnsCleanup) {
         if (useKeepalive) {
           releaseKeepalive();
@@ -178,14 +180,21 @@ export function createFetchTransport(
   return new FetchTransport(parameters);
 }
 
+function isFetchNetworkErrorRetryable(error: unknown): boolean {
+  return error instanceof TypeError && !error.cause;
+}
+
 /**
  * Reads the response body to its end and discards it.
  *
- * Chromium returns the request's share of the keepalive quota only once the
- * body has been read to the end, and it skips the buffering consumer that
- * would otherwise drain it when the response carries `Cache-Control: no-store`,
- * which collectors commonly send. Cancelling is the client-abort path and
- * measures far slower, so the body is read rather than cancelled.
+ * Chromium gives the request's share of the keepalive quota back only once the
+ * response body has been read to the end, and it skips the buffering consumer
+ * that would otherwise drain the body on its own when the response carries a
+ * `Cache-Control: no-store` header, which collectors commonly send. Leaving the
+ * body unread then leaks the quota until the document goes away and every
+ * following keepalive export stays pending forever. Cancelling the body is the
+ * client-abort path and releases the quota far more slowly than reading it to
+ * the end, so the body is read rather than cancelled.
  *
  * @see https://fetch.spec.whatwg.org/#fetch-processresponseendofbody
  * @see https://github.com/chromium/chromium/blob/1af7c3cde84323e827f77d8066ca23da811203b8/third_party/blink/renderer/core/fetch/fetch_manager.cc#L818-L836
@@ -203,14 +212,16 @@ async function drainResponseBody(response: Response): Promise<void> {
     const reader = body.getReader();
     try {
       // Chunks are dropped as they arrive: the payload is not used, and
-      // buffering it would keep a response of arbitrary size in memory.
+      // buffering it - with `response.arrayBuffer()` for instance - would keep
+      // a response of arbitrary size in memory.
       let chunk = await reader.read();
       while (!chunk.done) {
         chunk = await reader.read();
       }
     } finally {
-      // A held reader keeps the body locked, and a later export handed the
-      // same response could then not drain it.
+      // The reader keeps the body locked until it is released, which would
+      // make a later export handed the same response fail to acquire a reader
+      // and skip the drain.
       reader.releaseLock();
     }
   } catch (error) {
@@ -218,8 +229,4 @@ async function drainResponseBody(response: Response): Promise<void> {
     // be read must not change it.
     diag.debug(`error reading export response body: ${error}`);
   }
-}
-
-function isFetchNetworkErrorRetryable(error: unknown): boolean {
-  return error instanceof TypeError && !error.cause;
 }

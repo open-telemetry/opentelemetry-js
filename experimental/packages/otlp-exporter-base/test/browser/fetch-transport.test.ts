@@ -704,7 +704,7 @@ describe('FetchTransport', function () {
       );
     });
 
-    it('clears the abort timer on return when keepalive is not used', async function () {
+    it('lets the abort timer unstick a stalled body when keepalive is not used', async function () {
       // arrange
       const first = responseWithPendingBody();
       const second = responseWithPendingBody();
@@ -724,18 +724,20 @@ describe('FetchTransport', function () {
       assert.strictEqual(secondInit.keepalive, false);
 
       await new Promise(resolve => setTimeout(resolve, shortTimeout + 10));
+      const abortedWhileStalled = secondInit.signal?.aborted;
 
-      // assert
-      assert.strictEqual(
-        secondInit.signal?.aborted,
-        false,
-        'a non-keepalive request should not stay abortable after it returns'
-      );
-
-      // cleanup
+      // cleanup - before the assert, so a failure here cannot leave the budget
+      // held and cascade into the rest of the file
       first.closeBody();
       second.closeBody();
       await flushBodyDrain();
+
+      // assert
+      assert.strictEqual(
+        abortedWhileStalled,
+        true,
+        'a non-keepalive drain should stay bounded by the request timeout'
+      );
     });
 
     it('releases keepalive budget for a non-2xx response', async function () {
