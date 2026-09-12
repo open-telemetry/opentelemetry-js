@@ -7,7 +7,7 @@
 // bottoms out in a getGlobal lookup against the global registry.
 
 const Benchmark = require('benchmark');
-const { context, trace } = require('../../../build/src');
+const { context, trace } = require('../../../dist/index.cjs');
 
 const ROOT_CONTEXT = {
   getValue() {},

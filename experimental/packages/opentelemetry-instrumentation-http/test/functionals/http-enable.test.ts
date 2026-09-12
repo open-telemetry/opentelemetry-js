@@ -20,6 +20,7 @@ import {
 } from '@opentelemetry/sdk-trace';
 import {
   ATTR_CLIENT_ADDRESS,
+  ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
   ATTR_HTTP_ROUTE,
@@ -42,7 +43,7 @@ import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
 import type { ContextManager } from '@opentelemetry/api';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import type {
   ClientRequest,
   IncomingMessage,
@@ -68,7 +69,6 @@ const serverPort = 22346;
 const protocol = 'http';
 const hostname = 'localhost';
 const pathname = '/test';
-const serverName = 'my.server.name';
 const memoryExporter = new InMemorySpanExporter();
 const provider = new TracerProvider({
   spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
@@ -140,7 +140,7 @@ describe('HttpInstrumentation', () => {
   });
 
   beforeEach(() => {
-    contextManager = new AsyncHooksContextManager().enable();
+    contextManager = new AsyncLocalStorageContextManager().enable();
     context.setGlobalContextManager(contextManager);
   });
 
@@ -303,7 +303,6 @@ describe('HttpInstrumentation', () => {
           responseHook: responseHookFunction,
           startIncomingSpanHook: startIncomingSpanHookFunction,
           startOutgoingSpanHook: startOutgoingSpanHookFunction,
-          serverName,
         });
         instrumentation.enable();
         server = http.createServer((request, response) => {
@@ -344,6 +343,10 @@ describe('HttpInstrumentation', () => {
           if (request.url?.includes('/withQuery')) {
             assert.match(request.url, /withQuery\?foo=bar$/);
           }
+          const status = request.url?.match(/\/status\/(\d+)/);
+          if (status) {
+            response.statusCode = Number(status[1]);
+          }
           response.end('Test Server Response');
         });
 
@@ -379,7 +382,6 @@ describe('HttpInstrumentation', () => {
           resHeaders: result.resHeaders,
           reqHeaders: result.reqHeaders,
           component: 'http',
-          serverName,
         };
 
         assert.strictEqual(spans.length, 2);
@@ -416,6 +418,43 @@ describe('HttpInstrumentation', () => {
         assert.strictEqual(span.kind, SpanKind.SERVER);
         assert.strictEqual(span.attributes[ATTR_HTTP_ROUTE], 'TheRoute');
         assert.strictEqual(span.name, 'GET TheRoute');
+      });
+
+      it('should set error.type to the status code on a failing span', async () => {
+        await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}/status/500`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        const incomingSpan = spans.find(s => s.kind === SpanKind.SERVER);
+        const outgoingSpan = spans.find(s => s.kind === SpanKind.CLIENT);
+        assert.ok(incomingSpan);
+        assert.ok(outgoingSpan);
+
+        for (const span of [incomingSpan, outgoingSpan]) {
+          assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
+          assert.strictEqual(span.attributes[ATTR_ERROR_TYPE], '500');
+        }
+      });
+
+      it('should treat 4xx as an error on the client span only', async () => {
+        await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}/status/404`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        const incomingSpan = spans.find(s => s.kind === SpanKind.SERVER);
+        const outgoingSpan = spans.find(s => s.kind === SpanKind.CLIENT);
+        assert.ok(incomingSpan);
+        assert.ok(outgoingSpan);
+
+        assert.strictEqual(incomingSpan.status.code, SpanStatusCode.UNSET);
+        assert.strictEqual(
+          incomingSpan.attributes[ATTR_ERROR_TYPE],
+          undefined,
+          "a 4xx is the caller's error, not the server's"
+        );
+
+        assert.strictEqual(outgoingSpan.status.code, SpanStatusCode.ERROR);
+        assert.strictEqual(outgoingSpan.attributes[ATTR_ERROR_TYPE], '404');
       });
 
       const httpErrorCodes = [

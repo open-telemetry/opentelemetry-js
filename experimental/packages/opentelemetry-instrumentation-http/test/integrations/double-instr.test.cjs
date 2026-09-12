@@ -22,7 +22,7 @@ const {
   TracerProvider,
 } = require('@opentelemetry/sdk-trace');
 
-const { HttpInstrumentation } = require('../../build/src/index.js');
+const { HttpInstrumentation } = require('../../dist/index.cjs');
 
 const memoryExporter = new InMemorySpanExporter();
 const provider = new TracerProvider({

@@ -26,7 +26,7 @@ import type {
 } from '../../src/internal-types';
 import * as utils from '../../src/utils';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { extractHostnameAndPort } from '../../src/utils';
 import type { ParsedUrlQuery } from 'node:querystring';
 
@@ -57,6 +57,52 @@ describe('Utility', () => {
         const status = utils.parseResponseStatus(SpanKind.SERVER, index);
         assert.notStrictEqual(status, SpanStatusCode.UNSET);
       }
+    });
+  });
+
+  describe('parseErrorType()', () => {
+    it('should return the status code as a string for an error', () => {
+      assert.strictEqual(utils.parseErrorType(SpanKind.CLIENT, 404), '404');
+      assert.strictEqual(utils.parseErrorType(SpanKind.CLIENT, 500), '500');
+      assert.strictEqual(utils.parseErrorType(SpanKind.SERVER, 500), '500');
+    });
+
+    it('should return undefined for a successful status code', () => {
+      for (let index = 100; index < 400; index++) {
+        assert.strictEqual(
+          utils.parseErrorType(SpanKind.CLIENT, index),
+          undefined
+        );
+        assert.strictEqual(
+          utils.parseErrorType(SpanKind.SERVER, index),
+          undefined
+        );
+      }
+    });
+
+    it('should treat 4xx as an error on a client span only', () => {
+      for (let index = 400; index < 500; index++) {
+        assert.strictEqual(
+          utils.parseErrorType(SpanKind.CLIENT, index),
+          String(index)
+        );
+        assert.strictEqual(
+          utils.parseErrorType(SpanKind.SERVER, index),
+          undefined
+        );
+      }
+    });
+
+    it('should return undefined when no status code was received', () => {
+      assert.strictEqual(
+        utils.parseErrorType(SpanKind.CLIENT, undefined),
+        undefined
+      );
+      assert.strictEqual(
+        utils.parseErrorType(SpanKind.CLIENT, '500'),
+        undefined
+      );
+      assert.strictEqual(utils.parseErrorType(SpanKind.CLIENT, 600), undefined);
     });
   });
 
@@ -515,7 +561,9 @@ describe('Utility', () => {
 
   describe('getIncomingRequestAttributesOnResponse()', () => {
     it('should correctly parse the middleware stack if present', done => {
-      context.setGlobalContextManager(new AsyncHooksContextManager().enable());
+      context.setGlobalContextManager(
+        new AsyncLocalStorageContextManager().enable()
+      );
       context.with(
         setRPCMetadata(context.active(), {
           type: RPCType.HTTP,

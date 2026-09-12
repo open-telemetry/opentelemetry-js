@@ -15,15 +15,6 @@ export * as core from '@opentelemetry/core';
 export * as logs from '@opentelemetry/sdk-logs';
 export * as metrics from '@opentelemetry/sdk-metrics';
 export * as resources from '@opentelemetry/resources';
-
-/**
- * @deprecated Import directly from `@opentelemetry/sdk-trace` instead.
- */
-export * as node from '@opentelemetry/sdk-trace-node';
-/**
- * @deprecated Import directly from `@opentelemetry/sdk-trace` instead.
- */
-export * as tracing from '@opentelemetry/sdk-trace-base';
 /* eslint-enable no-restricted-syntax */
 
 export { NodeSDK } from './sdk';
