@@ -8,7 +8,13 @@
     ],
     "outDir": "build/esm",
     "rootDir": "src",
-    "tsBuildInfoFile": "build/esm/tsconfig.esm.tsbuildinfo"
+    "tsBuildInfoFile": "build/esm/tsconfig.esm.tsbuildinfo",
+    "types": [
+      "node",
+      "mocha",
+      "webpack-env",
+      "jquery"
+    ]
   },
   "include": [
     "src/**/*.ts"
@@ -16,6 +22,9 @@
   "references": [
     {
       "path": "../../../api"
+    },
+    {
+      "path": "../../../packages/opentelemetry-core"
     },
     {
       "path": "../../../packages/sdk-trace"
