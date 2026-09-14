@@ -95,7 +95,7 @@ The `instrumentation-xml-http-request` versions v0.220.0 and later emit the stab
 ![Screenshot of the running example](images/request.jpg)
 ![Screenshot of the running example](images/cors.jpg)
 
-See [examples/tracer-web](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/tracer-web) for a short example.
+See [examples/opentelemetry-web](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/opentelemetry-web) for a short example.
 
 ## Useful links
 

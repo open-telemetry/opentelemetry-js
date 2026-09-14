@@ -1,6 +1,11 @@
 {
   "extends": "./tsconfig.base.json",
   "files": [],
+  "include": [
+    "tsdown.config.ts",
+    "**/tsdown.config.ts",
+    "**/tsdown.*.config.ts"
+  ],
   "typedocOptions": {
     "entryPointStrategy": "packages",
     "entryPoints": [
@@ -40,7 +45,6 @@
       "packages/opentelemetry-exporter-jaeger",
       "packages/opentelemetry-exporter-zipkin",
       "packages/opentelemetry-propagator-b3",
-      "packages/opentelemetry-propagator-jaeger",
       "packages/opentelemetry-resources",
       "packages/opentelemetry-sdk-trace-base",
       "packages/opentelemetry-sdk-trace-node",
@@ -168,9 +172,6 @@
     },
     {
       "path": "packages/opentelemetry-propagator-b3"
-    },
-    {
-      "path": "packages/opentelemetry-propagator-jaeger"
     },
     {
       "path": "packages/opentelemetry-resources"

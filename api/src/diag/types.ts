@@ -57,6 +57,8 @@ export interface DiagLogger {
  * Defines the available internal logging levels for the diagnostic logger, the numeric values
  * of the levels are defined to match the original values from the initial LogLevel to avoid
  * compatibility/migration issues for any implementation that assume the numeric ordering.
+ *
+ * @since 1.0.0
  */
 export enum DiagLogLevel {
   /** Diagnostic Logging level setting to disable all logging (except and forced logs) */

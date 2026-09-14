@@ -29,12 +29,6 @@ export interface TracerProviderOptions {
   idGenerator?: IdGenerator;
 
   /**
-   * How long the forceFlush can run before it is cancelled.
-   * The default value is 30000ms
-   */
-  forceFlushTimeoutMillis?: number;
-
-  /**
    * List of SpanProcessor for the tracer
    */
   spanProcessors?: SpanProcessor[];
@@ -45,6 +39,14 @@ export interface TracerProviderOptions {
    * @experimental This option is experimental and is subject to breaking changes in minor releases.
    */
   meterProvider?: MeterProvider;
+}
+
+export interface ForceFlushOptions {
+  /**
+   * How long the force flush can run before it is cancelled.
+   * Defaults to 30000ms.
+   */
+  timeoutMillis?: number;
 }
 
 /**
