@@ -9,10 +9,10 @@
 // Each case batches the nanosecond-level calls and makes the result observable.
 
 const Benchmark = require('benchmark');
-const { getGlobal } = require('../../../build/src/internal/global-utils');
-const { isCompatible } = require('../../../build/src/internal/semver');
-const { VERSION } = require('../../../build/src/version');
-const { context, trace } = require('../../../build/src');
+const { getGlobal } = require('../../../dist/internal/global-utils.cjs');
+const { isCompatible } = require('../../../dist/internal/semver.cjs');
+const { VERSION } = require('../../../dist/version.cjs');
+const { context, trace } = require('../../../dist/index.cjs');
 
 // Register globals so getGlobal takes its steady-state path (the realistic
 // "SDK installed" case): version read + compatibility check + type read.

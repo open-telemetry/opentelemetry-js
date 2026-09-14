@@ -13,6 +13,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :boom: Breaking Changes
 
+* chore(context-async-hooks)!: remove the unused class `AsyncHooksContextManager` [#7078](https://github.com/open-telemetry/opentelemetry-js/pull/7078)
 * feat!: migrate package builds from `tsc` to `tsdown`, emitting dual CJS/ESM output from a single `dist/` directory and declaring an `exports` map on every package [#6293](https://github.com/open-telemetry/opentelemetry-js/pull/6293) @overbalance
   * Importing a package by its name is unaffected in both CommonJS and ESM, as is every subpath listed in its `exports` map.
   * **Deep imports into the build output no longer resolve.** An `exports` map is an allowlist that Node.js and bundlers enforce, so specifiers such as `@opentelemetry/core/build/src/...` or `@opentelemetry/core/build/esm/...` now fail with `ERR_PACKAGE_PATH_NOT_EXPORTED`. Rewriting them to the new file layout does not help — unlisted subpaths are rejected whether or not the file exists.
@@ -27,6 +28,9 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
   * `unrefTimer(timer)` — call `timer.unref()` directly in your own code.
 * feat(sdk-trace)!: remove deprecated `TracerProviderOptions.forceFlushTimeoutMillis` [#7057](https://github.com/open-telemetry/opentelemetry-js/pull/7057)
   * Pass `timeoutMillis` to `provider.forceFlush({ timeoutMillis })` instead. The default timeout is 30000ms.
+* feat(propagator-jaeger)!: remove `@opentelemetry/propagator-jaeger` package [#7077](https://github.com/open-telemetry/opentelemetry-js/pull/7077)
+  * The Jaeger propagator is deprecated by the OpenTelemetry specification in favour of `W3CTraceContextPropagator`. Use `W3CTraceContextPropagator` from `@opentelemetry/core` instead.
+  * See the [3.x migration guide](doc/3.x/migration-guide.md) for full instructions.
 
 ### :rocket: Features
 
@@ -38,6 +42,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 * feat(ci): support releasing from maintenance branches [#6767](https://github.com/open-telemetry/opentelemetry-js/issues/6767) @pichlermarc
   * The API documentation site is only redeployed for releases whose commit is reachable from `main`, so a maintenance release no longer overwrites it.
+* chore: don't close stale issues [#x](https://github.com/open-telemetry/opentelemetry-js/issues/x) @maryliag
 
 ## 2.11.0
 

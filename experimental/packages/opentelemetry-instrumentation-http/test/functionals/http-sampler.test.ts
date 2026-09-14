@@ -53,7 +53,7 @@ instrumentation.enable();
 instrumentation.disable();
 
 import * as http from 'http';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 
 const memoryExporter = new InMemorySpanExporter();
 const provider = new TracerProvider({
@@ -82,7 +82,7 @@ describe('HttpInstrumentation sampler integration', () => {
   });
 
   beforeEach(() => {
-    contextManager = new AsyncHooksContextManager();
+    contextManager = new AsyncLocalStorageContextManager();
     context.setGlobalContextManager(contextManager);
     memoryExporter.reset();
     sampler.capturedAttributes = undefined;

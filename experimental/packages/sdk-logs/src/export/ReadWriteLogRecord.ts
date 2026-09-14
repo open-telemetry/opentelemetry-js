@@ -85,8 +85,3 @@ export interface ReadWriteLogRecord {
    */
   setSeverityText(severityText: string): ReadWriteLogRecord;
 }
-
-/**
- * @deprecated - please use {@link ReadWriteLogRecord} instead.
- */
-export type SdkLogRecord = ReadWriteLogRecord;

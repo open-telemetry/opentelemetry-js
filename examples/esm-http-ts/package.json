@@ -8,7 +8,7 @@
   "scripts": {
     "build": "tsc --build",
     "start": "node --experimental-loader=@opentelemetry/instrumentation/hook.mjs ./build/index.js",
-    "align-api-deps": "node ../../scripts/align-api-deps.js"
+    "align-api-deps": "node ../../scripts/align-api-deps.mjs"
   },
   "repository": {
     "type": "git",

@@ -45,7 +45,6 @@
       "packages/opentelemetry-exporter-jaeger",
       "packages/opentelemetry-exporter-zipkin",
       "packages/opentelemetry-propagator-b3",
-      "packages/opentelemetry-propagator-jaeger",
       "packages/opentelemetry-resources",
       "packages/opentelemetry-sdk-trace-base",
       "packages/opentelemetry-sdk-trace-node",
@@ -173,9 +172,6 @@
     },
     {
       "path": "packages/opentelemetry-propagator-b3"
-    },
-    {
-      "path": "packages/opentelemetry-propagator-jaeger"
     },
     {
       "path": "packages/opentelemetry-resources"

@@ -44,8 +44,8 @@
     "compile": "tsdown",
     "version": "node ../../scripts/version-update.js",
     "clean": "rimraf dist build",
-    "peer-api-check": "node ../../scripts/peer-api-check.js",
-    "align-api-deps": "node ../../scripts/align-api-deps.js"
+    "peer-api-check": "node ../../scripts/peer-api-check.mjs",
+    "align-api-deps": "node ../../scripts/align-api-deps.mjs"
   },
   "Add these to scripts": {
     "test": "nyc mocha 'test/**/*.test.ts'",

@@ -27,8 +27,8 @@
     "lint:fix": "eslint . --fix",
     "version": "node ../../scripts/version-update.js",
     "watch": "tsdown --watch --no-clean",
-    "peer-api-check": "node ../../scripts/peer-api-check.js",
-    "align-api-deps": "node ../../scripts/align-api-deps.js"
+    "peer-api-check": "node ../../scripts/peer-api-check.mjs",
+    "align-api-deps": "node ../../scripts/align-api-deps.mjs"
   },
   "keywords": [
     "opentelemetry",

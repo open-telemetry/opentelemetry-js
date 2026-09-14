@@ -7,6 +7,56 @@ If you have questions, reach the OTel JS community on [#otel-js](https://cloud-n
 
 ---
 
+## `@opentelemetry/propagator-jaeger` (package removed)
+
+The `@opentelemetry/propagator-jaeger` package has been removed. The Jaeger propagator is deprecated in favour of the W3C TraceContext propagator.
+
+### Migrate to `W3CTraceContextPropagator`
+
+> [!IMPORTANT]
+> This migration requires updating **every service in your system** that sends or receives trace context. Switching only some services will break distributed traces — a service still emitting `uber-trace-id` headers will not be correlated with a service that only reads `traceparent`. Migrate all services together, or run both propagators in parallel using `CompositePropagator` during a transition period.
+>
+> If you cannot yet migrate all services, you may continue using `@opentelemetry/propagator-jaeger@^2` with SDK 3.x by registering it manually after SDK setup. However, `@opentelemetry/propagator-jaeger@^2` has a peer dependency of `@opentelemetry/api@>=1.0.0 <1.10.0`, so you will not be able to advance to `@opentelemetry/api@1.10.0` or later while it remains in use.
+
+Replace any direct use of `JaegerPropagator` with `W3CTraceContextPropagator` from `@opentelemetry/core`:
+
+```ts
+// before
+import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
+import { propagation } from '@opentelemetry/api';
+
+propagation.setGlobalPropagator(new JaegerPropagator());
+
+// after
+import { W3CTraceContextPropagator } from '@opentelemetry/core';
+import { propagation } from '@opentelemetry/api';
+
+propagation.setGlobalPropagator(new W3CTraceContextPropagator());
+```
+
+---
+
+## `@opentelemetry/instrumentation-http`
+
+### Removed: `HttpInstrumentationConfig.serverName`
+
+The `serverName` option on `HttpInstrumentationConfig` has been removed. It had no effect — stable HTTP semantic conventions do not include the `http.server_name` attribute. Remove the option from any `setConfig()` or constructor call.
+
+```ts
+// before
+instrumentation.setConfig({
+  serverName: 'my.server.name',
+  // ... other options
+});
+
+// after
+instrumentation.setConfig({
+  // ... other options (serverName removed)
+});
+```
+
+---
+
 ## `@opentelemetry/core`
 
 ### Removed: `getTimeOrigin()`
@@ -84,4 +134,126 @@ await provider.forceFlush();
 // after
 const provider = new TracerProvider();
 await provider.forceFlush({ timeoutMillis: 5000 });
+```
+
+---
+
+## `@opentelemetry/sdk-logs`
+
+### Removed: `SdkLogRecord` type alias
+
+`SdkLogRecord` was a type alias for `ReadWriteLogRecord`. Use `ReadWriteLogRecord` directly.
+
+```ts
+// before
+import type { SdkLogRecord } from '@opentelemetry/sdk-logs';
+
+// after
+import type { ReadWriteLogRecord } from '@opentelemetry/sdk-logs';
+```
+
+### Removed: `LoggerProviderConfig` type alias
+
+`LoggerProviderConfig` was a type alias for `LoggerProviderOptions`. Use `LoggerProviderOptions` directly.
+
+```ts
+// before
+import type { LoggerProviderConfig } from '@opentelemetry/sdk-logs';
+
+// after
+import type { LoggerProviderOptions } from '@opentelemetry/sdk-logs';
+```
+
+---
+
+## `@opentelemetry/context-async-hooks`
+
+### Removed: `AsyncHooksContextManager` context manager
+
+`AsyncHooksContextManager` is no longer used in the SDK and its the [recommended API](https://nodejs.org/api/async_context.html#class-asynclocalstorage) for context propagation.
+
+```ts
+// before
+import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+
+// after
+import { AsynLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
+```
+
+---
+
+## `@opentelemetry/sdk-node`
+
+### Removed: `NodeSDKConfiguration.logRecordProcessor`
+
+The singular `logRecordProcessor` option on `NodeSDKConfiguration` has been removed. Use `logRecordProcessors` (array) instead.
+
+```ts
+// before
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import { SimpleLogRecordProcessor } from '@opentelemetry/sdk-logs';
+
+const sdk = new NodeSDK({
+  logRecordProcessor: new SimpleLogRecordProcessor({ exporter }),
+});
+
+// after
+const sdk = new NodeSDK({
+  logRecordProcessors: [new SimpleLogRecordProcessor({ exporter })],
+});
+```
+
+### Removed: `NodeSDKConfiguration.metricReader`
+
+The singular `metricReader` option on `NodeSDKConfiguration` has been removed. Use `metricReaders` (array) instead.
+
+```ts
+// before
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
+
+const sdk = new NodeSDK({
+  metricReader: new PeriodicExportingMetricReader({ exporter }),
+});
+
+// after
+const sdk = new NodeSDK({
+  metricReaders: [new PeriodicExportingMetricReader({ exporter })],
+});
+```
+
+### Removed: `NodeSDKConfiguration.spanProcessor`
+
+The singular `spanProcessor` option on `NodeSDKConfiguration` has been removed. Use `spanProcessors` (array) instead.
+
+```ts
+// before
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace';
+
+const sdk = new NodeSDK({
+  spanProcessor: new SimpleSpanProcessor(exporter),
+});
+
+// after
+const sdk = new NodeSDK({
+  spanProcessors: [new SimpleSpanProcessor(exporter)],
+});
+```
+
+### Removed: `node` and `tracing` namespace re-exports
+
+The deprecated namespace re-exports `node` (re-exporting `@opentelemetry/sdk-trace-node`) and `tracing` (re-exporting `@opentelemetry/sdk-trace-base`) have been removed from `@opentelemetry/sdk-node`. Import directly from the originating packages instead.
+
+```ts
+// before
+import { node, tracing } from '@opentelemetry/sdk-node';
+const provider = new node.NodeTracerProvider();
+const exporter = new tracing.ConsoleSpanExporter();
+
+// after
+import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-base';
+const provider = new NodeTracerProvider();
+const exporter = new ConsoleSpanExporter();
 ```
