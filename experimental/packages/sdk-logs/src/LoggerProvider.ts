@@ -10,7 +10,7 @@ import type {
 } from '@opentelemetry/api-logs';
 import { createNoopLogger } from '@opentelemetry/api-logs';
 import { defaultResource } from '@opentelemetry/resources';
-import { BindOnceFuture, cleanAttributes } from '@opentelemetry/core';
+import { BindOnceFuture, cleanSimpleAttributes } from '@opentelemetry/core';
 
 import type { ForceFlushOptions, LoggerProviderOptions } from './types';
 import { Logger } from './Logger';
@@ -73,7 +73,11 @@ export class LoggerProvider implements ILoggerProvider {
       name: loggerName,
       version,
       schemaUrl: options?.schemaUrl,
-      ...cleanAttributes(
+      // Intentionally limit instrumentation scope attributes to *simple* value
+      // types. OTEP 4485 says:
+      // > OTel SDK MAY support setting complex attributes on [...] instrumentation scope.
+      // This limit could be lifted later if there is a demonstrated need.
+      ...cleanSimpleAttributes(
         options?.attributes,
         this._sharedState.logRecordLimits
       ),
