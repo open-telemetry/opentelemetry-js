@@ -29,6 +29,7 @@ import {
   AddAttributeDecision,
   maybeAddAttribute,
   cleanAttributes,
+  cleanSimpleAttributes,
 } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import {
@@ -193,9 +194,12 @@ export class SpanImpl implements Span {
 
   /**
    *
-   * @param name Span Name
-   * @param [attributesOrStartTime] Span attributes or start time
-   *     if type is {@type TimeInput} and 3rd param is undefined
+   * @param name Span event name
+   * @param [attributesOrStartTime] Attributes or start time
+   *     if type is {@type TimeInput} and 3rd param is undefined.
+   *     Only "simple" value types are supported for span event attributes
+   *     (string, number, boolean, homogeneous array of these primitive types).
+   *     See OTEP 4485 and `cleanSimpleAttributes()` in `@opentelemetry/core`.
    * @param [timeStamp] Specified time stamp for the event
    */
   addEvent(
@@ -234,7 +238,7 @@ export class SpanImpl implements Span {
     this.events.push({
       name,
       time: this._getTime(timeStamp),
-      ...cleanAttributes(attributesOrStartTime, {
+      ...cleanSimpleAttributes(attributesOrStartTime, {
         attributeCountLimit: this._spanLimits.attributePerEventCountLimit,
         attributeValueLengthLimit: this._spanLimits.attributeValueLengthLimit,
       }),

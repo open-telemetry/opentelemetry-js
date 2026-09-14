@@ -9,13 +9,19 @@ import type { Resource } from '@opentelemetry/resources';
 import type { SpanLimits, SpanProcessor } from '../../src';
 import type { TracerProvider } from '../../src';
 
-export const validAttributes = {
+export const validSimpleAttributes = {
   string: 'string',
   number: 0,
   bool: true,
   'array<string>': ['str1', 'str2'],
   'array<number>': [1, 2],
   'array<bool>': [true, false],
+};
+
+export const validAttributes = {
+  ...validSimpleAttributes,
+  null: null,
+  byteArray: new Uint8Array([104, 101, 108, 108, 111]), // 'hello' ords
   object: { foo: 'bar' },
   'non-homogeneous-array': [0, ''],
 };

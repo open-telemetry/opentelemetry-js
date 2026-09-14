@@ -32,7 +32,7 @@ import * as sinon from 'sinon';
 import type { Span, SpanProcessor } from '../../src';
 import { TracerProvider } from '../../src';
 import { SpanImpl } from '../../src/Span';
-import { invalidAttributes, validAttributes } from './util';
+import { invalidAttributes, validAttributes, validSimpleAttributes } from './util';
 import type { Tracer } from '../../src/Tracer';
 
 import { cheatSpanLimitsFromTracer } from './util';
@@ -526,7 +526,7 @@ describe('Span', () => {
 
       assert.strictEqual(span.events.length, 1);
       assert.deepStrictEqual(span.events[0].name, 'rev');
-      assert.deepStrictEqual(span.events[0].attributes, validAttributes);
+      assert.deepStrictEqual(span.events[0].attributes, validSimpleAttributes);
     });
   });
 
