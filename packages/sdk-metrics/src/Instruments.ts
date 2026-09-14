@@ -60,6 +60,10 @@ export class SyncInstrument {
         return;
       }
     }
+
+    // Intentionally *not* guarding the given attributes with `cleanAttributes`
+    // or similar, because of the performance impact. Users are strongly
+    // encouraged to use only simple attribute types with metrics.
     this._writableMetricStorage.record(value, attributes, context, Date.now());
   }
 }

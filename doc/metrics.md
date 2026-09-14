@@ -328,12 +328,20 @@ all successful POST requests.
 
 While name and measurement are the minimum required to record a metric measurement,
 most of the time they will not be enough information on their own to effectively observe
-an application. To solve this, OpenTelemetry uses _Metric Attributes_. Metric attributes are object with
-string keys and string values which add more context to the measurement.
+an application. To solve this, OpenTelemetry uses _Metric Attributes_. Metric attributes are an object with
+(non-empty) string keys and values which add more context to the measurement.
 
 For example, when you are measuring the number of inflight requests, you might want to be able to count
-the number of POST, or GET requests. You can add the a metric attribute for `http.method` to allow more
+the number of POST, or GET requests. You can add the a metric attribute for `http.request.method` to allow more
 flexibility when leveraging your metric measurement like in Grafana dashboards.
+
+> [!WARNING]
+> Simple attributes values (string, number, boolean) SHOULD be used whenever possible.
+> Using complex attribute values (arrays, nested objects, etc.) can have significant
+> negative performance overhead on the Metrics SDK, and possibly on observability backends.
+> As well, for performance reasons, the OTel JS Metrics SDK does *not* guard against
+> unserializable values (e.g. a BigInt, a circular reference).
+> Incorrect usage can *crash* the application.
 
 ### Semantic Conventions
 

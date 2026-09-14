@@ -64,6 +64,14 @@ async function batchObservableCallback(batchObservableResult) {
 }
 ```
 
+> [!WARNING]
+> Simple attributes values (string, number, boolean) SHOULD be used whenever possible.
+> Using complex attribute values (arrays, nested objects, etc.) can have significant
+> negative performance overhead on the Metrics SDK, and possibly on observability backends.
+> As well, for performance reasons, the OTel JS Metrics SDK does *not* guard against
+> unserializable values (e.g. a BigInt, a circular reference).
+> Incorrect usage can *crash* the application.
+
 Views can be registered when instantiating a `MeterProvider`:
 
 ```js
