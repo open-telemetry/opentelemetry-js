@@ -30,7 +30,6 @@ export { PerformanceTimingNames } from './enums/PerformanceTimingNames';
 export {
   addSpanNetworkEvent,
   addSpanNetworkEvents,
-  getElementXPath,
   getResource,
   hasKey,
   normalizeUrl,
