@@ -7,6 +7,12 @@ If you have questions, reach the OTel JS community on [#otel-js](https://cloud-n
 
 ---
 
+## Raised minimum Node.js version
+
+The minimum supported Node.js version has been raised from `^18.19.0 || >=20.6.0` to `>=22.15.0` for all packages except `@opentelemetry/api`, `@opentelemetry/api-logs`, and `@opentelemetry/semantic-conventions`, which keep their existing, wider minimum versions. Node.js v18 and v20 reached end-of-life; upgrade your runtime to Node.js `>=22.15.0` before adopting SDK 3.0.
+
+---
+
 ## `@opentelemetry/propagator-jaeger` (package removed)
 
 The `@opentelemetry/propagator-jaeger` package has been removed. The Jaeger propagator is deprecated in favour of the W3C TraceContext propagator.

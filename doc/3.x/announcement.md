@@ -17,7 +17,7 @@ We plan to **release SDK 3.0 on September 30, 2026**.
 ### Why we're releasing SDK 3.0
 
 - **Dual CJS/ESM exports**: packages will ship proper ESM and CJS dual exports via a migration to `tsdown` ([#6293](https://github.com/open-telemetry/opentelemetry-js/pull/6293)).
-- **Raise minimum Node.js version**: Node.js v20 reached EOL on April 30, 2026. SDK 3.0 will require Node.js v22+ (exact minimum TBD, discussion tracked in [#6420](https://github.com/open-telemetry/opentelemetry-js/issues/6420)).
+- **Raise minimum Node.js version**: Node.js v20 reached EOL on April 30, 2026. SDK 3.0 requires Node.js `>=22.15.0` for all packages except `@opentelemetry/api`, `@opentelemetry/api-logs`, and `@opentelemetry/semantic-conventions`, whose minimum versions are unchanged (discussion tracked in [#6420](https://github.com/open-telemetry/opentelemetry-js/issues/6420)).
 - **Consolidated tracing SDK**: `@opentelemetry/sdk-trace-base`, `@opentelemetry/sdk-trace-node`, and `@opentelemetry/sdk-trace-web` are replaced by a single `@opentelemetry/sdk-trace` package. The split into three packages has caused confusion and inconsistencies: `NodeTracerProvider` and `WebTracerProvider` exposed a `.register()` convenience method that doesn't exist in the logs and metrics SDKs, and the trace SDK supported env-var based configuration ([#6595](https://github.com/open-telemetry/opentelemetry-js/issues/6595)) that the other SDKs do not. The new package removes these inconsistencies and aligns the trace SDK with the rest of the SDK. See the [`sdk-trace` README](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-trace#readme) for migration instructions.
 - **Drop unmaintained and deprecated packages**: packages such as `@opentelemetry/propagator-jaeger`, `@opentelemetry/exporter-jaeger`, `@opentelemetry/instrumentation-restify`, `@opentelemetry/shim-opentracing`, and `@opentelemetry/shim-opencensus` are being removed to reduce maintenance burden.
 - **Clean up public API surface**: removal of unintentional re-exports (e.g., `export *` in `sdk-node`) and the `merge` export from `@opentelemetry/core`.
@@ -57,7 +57,7 @@ There will be no breaking changes in `@opentelemetry/api`. Any code written agai
 Upon release, you may need to adjust your SDK setup code to the new interface. To prepare:
 
 - Keep `@opentelemetry/*` packages up-to-date and follow the migration paths for any `@deprecated` APIs.
-- Ensure you're on Node.js v22 or later before upgrading to SDK 3.0.
+- Ensure you're on Node.js `>=22.15.0` before upgrading to SDK 3.0.
 - If you use `@opentelemetry/sdk-trace-base`, `sdk-trace-node`, or `sdk-trace-web`, migrate to `@opentelemetry/sdk-trace`. See the [`sdk-trace` README](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-trace#readme) for a detailed migration guide.
 - If you depend on any of the other packages being dropped (`propagator-jaeger`, `instrumentation-restify`, `shim-opencensus`), plan your migration ahead of time.
 
