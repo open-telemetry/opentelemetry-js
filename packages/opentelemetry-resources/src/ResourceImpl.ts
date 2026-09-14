@@ -5,7 +5,7 @@
 
 import type { Attributes, AttributeValue } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
-import { SDK_INFO } from '@opentelemetry/core';
+import { isSimpleAttributeValue, SDK_INFO } from '@opentelemetry/core';
 import {
   ATTR_SERVICE_NAME,
   ATTR_TELEMETRY_SDK_LANGUAGE,
@@ -98,8 +98,15 @@ class ResourceImpl implements Resource {
         diag.debug(`Unsettled resource attribute ${k} skipped`);
         continue;
       }
-      if (v != null) {
-        attrs[k] ??= v;
+      if (Object.hasOwn(attrs, k)) {
+        // Pass. First res attribute wins.
+      } else if (k.length === 0) {
+        diag.warn('dropping invalid resource attribute key: <empty string>');
+      } else if (!isSimpleAttributeValue(v)) {
+        // XXX Still discussing if we want to allow complex resource attr values.
+        diag.warn(`dropping invalid resource attribute value for key "${k}"`);
+      } else {
+        attrs[k] = v;
       }
     }
 
@@ -139,6 +146,7 @@ class ResourceImpl implements Resource {
 /**
  * Create a `Resource` from the given attributes object.
  *
+ * XXX change
  * It is the responsibility of callers to limit attribute values to the
  * set of allowed by AnyValue (https://opentelemetry.io/docs/specs/otel/common/#anyvalue).
  * This can be done with `cleanAttributes` and/or `isAnyValue` from `@opentelemetry/core`.
