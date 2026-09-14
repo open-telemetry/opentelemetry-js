@@ -11,7 +11,7 @@
 export const ATTR_SESSION_ID = 'session.id' as const;
 
 /*
- * This file contains a copy of unstable semantic convention definitions
+ * The definitions below are a copy of unstable semantic convention definitions
  * used by this package.
  * @see https://github.com/open-telemetry/opentelemetry-js/tree/main/semantic-conventions#unstable-semconv
  */
