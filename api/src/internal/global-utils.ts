@@ -32,17 +32,26 @@ const _global = (
           : {}
 ) as OTelGlobal;
 
+function _makeGlobalApi(): OTelGlobalAPI {
+  // The version property is sealed (non-writable, non-configurable) so it stays
+  // constant for the api object's lifetime. getGlobal caches its compatibility
+  // check per api-object identity and relies on that invariant.
+  return Object.defineProperty({} as OTelGlobalAPI, 'version', {
+    value: VERSION,
+    enumerable: true,
+    writable: false,
+    configurable: false,
+  });
+}
+
 export function registerGlobal<Type extends keyof OTelGlobalAPI>(
   type: Type,
   instance: OTelGlobalAPI[Type],
   diag: DiagLogger,
   allowOverride = false
 ): boolean {
-  const api = (_global[GLOBAL_OPENTELEMETRY_API_KEY] = _global[
-    GLOBAL_OPENTELEMETRY_API_KEY
-  ] ?? {
-    version: VERSION,
-  });
+  const api = (_global[GLOBAL_OPENTELEMETRY_API_KEY] =
+    _global[GLOBAL_OPENTELEMETRY_API_KEY] ?? _makeGlobalApi());
 
   if (!allowOverride && api[type]) {
     // already registered an API of this type
@@ -70,14 +79,27 @@ export function registerGlobal<Type extends keyof OTelGlobalAPI>(
   return true;
 }
 
+// The api object whose compatibility has already been verified. Its version is
+// sealed at registerGlobal, so a full compatibility check is only needed when
+// the object identity changes, letting the steady-state hot path skip it.
+let _compatibleGlobalApi: OTelGlobalAPI | undefined;
+
 export function getGlobal<Type extends keyof OTelGlobalAPI>(
   type: Type
 ): OTelGlobalAPI[Type] | undefined {
-  const globalVersion = _global[GLOBAL_OPENTELEMETRY_API_KEY]?.version;
-  if (!globalVersion || !isCompatible(globalVersion)) {
+  const api = _global[GLOBAL_OPENTELEMETRY_API_KEY];
+  if (api == null) {
     return;
   }
-  return _global[GLOBAL_OPENTELEMETRY_API_KEY]?.[type];
+  if (api !== _compatibleGlobalApi) {
+    // A new api object has been registered since the last time we checked, so
+    // verify its compatibility again.
+    if (!api.version || !isCompatible(api.version)) {
+      return;
+    }
+    _compatibleGlobalApi = api;
+  }
+  return api[type];
 }
 
 export function unregisterGlobal(type: keyof OTelGlobalAPI, diag: DiagLogger) {

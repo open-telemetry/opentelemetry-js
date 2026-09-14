@@ -2,7 +2,7 @@ version: "3.8"
 services:
   # Jaeger
   jaeger-all-in-one:
-    image: jaegertracing/all-in-one:1.37.0
+    image: jaegertracing/jaeger:2.20.0
     ports:
       - "16686:16686" # frontend
       - "14268:14268" # jaeger.thrift via HTTP

@@ -198,25 +198,10 @@ export class NodeSDK {
 
     this._serviceName = configuration.serviceName;
 
-    if (configuration.spanProcessor) {
-      diag.warn(
-        "The 'spanProcessor' option is deprecated. Please use 'spanProcessors' instead."
-      );
-    }
-
     if (configuration.logRecordProcessors) {
       this._loggerProviderConfig = {
         logRecordProcessors: configuration.logRecordProcessors,
       };
-    } else if (configuration.logRecordProcessor) {
-      this._loggerProviderConfig = {
-        logRecordProcessors: [configuration.logRecordProcessor],
-      };
-      diag.warn(
-        "The 'logRecordProcessor' option is deprecated. Please use 'logRecordProcessors' instead."
-      );
-    } else {
-      this.configureLoggerProviderFromEnv();
     }
 
     if (configuration.metricReaders) {
@@ -224,14 +209,6 @@ export class NodeSDK {
         readers: configuration.metricReaders,
         views: configuration.views,
       };
-    } else if (configuration.metricReader) {
-      this._meterProviderConfig = {
-        readers: [configuration.metricReader],
-        views: configuration.views,
-      };
-      diag.warn(
-        "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
-      );
     } else {
       this._meterProviderConfig = {
         readers: getMetricReadersFromEnv(),
@@ -307,12 +284,10 @@ export class NodeSDK {
       }
     }
 
-    // Determine `spanProcessors` from multiple possible options.
+    // Determine `spanProcessors` from configuration options.
     let spanProcessors: SpanProcessor[];
     if (this._configuration?.spanProcessors) {
       spanProcessors = this._configuration.spanProcessors;
-    } else if (this._configuration?.spanProcessor) {
-      spanProcessors = [this._configuration.spanProcessor];
     } else if (this._configuration?.traceExporter) {
       spanProcessors = [
         createBatchSpanProcessorFromEnv(
@@ -340,6 +315,12 @@ export class NodeSDK {
         spanProcessors,
       });
       trace.setGlobalTracerProvider(this._tracerProvider);
+    }
+
+    if (!this._loggerProviderConfig) {
+      this.configureLoggerProviderFromEnv(
+        sdkMetricsEnabled ? this._meterProvider : undefined
+      );
     }
 
     if (this._loggerProviderConfig) {
@@ -375,7 +356,9 @@ export class NodeSDK {
     );
   }
 
-  private configureLoggerProviderFromEnv(): void {
+  private configureLoggerProviderFromEnv(
+    meterProvider: MeterProvider | undefined
+  ): void {
     const enabledExporters = Array.from(
       new Set(getStringListFromEnv('OTEL_LOGS_EXPORTER') ?? [])
     );
@@ -431,9 +414,12 @@ export class NodeSDK {
       this._loggerProviderConfig = {
         logRecordProcessors: exporters.map(exporter => {
           if (exporter instanceof ConsoleLogRecordExporter) {
-            return new SimpleLogRecordProcessor({ exporter });
+            return new SimpleLogRecordProcessor({
+              exporter,
+              selfObsMeterProvider: meterProvider,
+            });
           } else {
-            return getBatchLogRecordProcessorFromEnv(exporter);
+            return getBatchLogRecordProcessorFromEnv(exporter, meterProvider);
           }
         }),
       };

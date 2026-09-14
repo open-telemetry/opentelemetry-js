@@ -4,7 +4,7 @@
  */
 
 const Benchmark = require('benchmark');
-const { RandomIdGenerator } = require('../../../build/src');
+const { RandomIdGenerator } = require('../../../dist/index.cjs');
 
 const idGenerator = new RandomIdGenerator();
 

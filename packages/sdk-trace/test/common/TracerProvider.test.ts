@@ -363,6 +363,48 @@ describe('TracerProvider', () => {
           done();
         });
     });
+
+    it('should use the timeout passed to forceFlush', async () => {
+      const clock = sinon.useFakeTimers();
+      const spanProcessor = new NoopSpanProcessor();
+      sinon.stub(spanProcessor, 'forceFlush').returns(new Promise(() => {}));
+      const tracerProvider = new TracerProvider({
+        spanProcessors: [spanProcessor],
+      });
+
+      const flush = tracerProvider
+        .forceFlush({ timeoutMillis: 10 })
+        .catch(error => error);
+      await clock.tickAsync(10);
+
+      const rejection: unknown = await flush;
+      assert.ok(Array.isArray(rejection));
+      assert.ok(rejection[0] instanceof Error);
+      assert.strictEqual(
+        rejection[0].message,
+        'Span processor did not completed within timeout period of 10 ms'
+      );
+    });
+
+    it('should use the default 30000ms timeout when none is passed to forceFlush', async () => {
+      const clock = sinon.useFakeTimers();
+      const spanProcessor = new NoopSpanProcessor();
+      sinon.stub(spanProcessor, 'forceFlush').returns(new Promise(() => {}));
+      const tracerProvider = new TracerProvider({
+        spanProcessors: [spanProcessor],
+      });
+
+      const flush = tracerProvider.forceFlush().catch(error => error);
+      await clock.tickAsync(30000);
+
+      const rejection: unknown = await flush;
+      assert.ok(Array.isArray(rejection));
+      assert.ok(rejection[0] instanceof Error);
+      assert.strictEqual(
+        rejection[0].message,
+        'Span processor did not completed within timeout period of 30000 ms'
+      );
+    });
   });
 
   describe('.bind()', () => {

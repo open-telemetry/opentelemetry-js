@@ -7,7 +7,7 @@ import * as assert from 'assert';
 
 import type { ContextManager } from '@opentelemetry/api';
 import { context, ROOT_CONTEXT, trace, TraceFlags } from '@opentelemetry/api';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import type { Span } from '@opentelemetry/sdk-trace-base';
 import {
   AlwaysOffSampler,
@@ -27,7 +27,7 @@ describe('NodeTracerProvider', function () {
   let contextManager: ContextManager;
 
   beforeEach(() => {
-    contextManager = new AsyncHooksContextManager();
+    contextManager = new AsyncLocalStorageContextManager();
     context.setGlobalContextManager(contextManager.enable());
   });
 
@@ -130,7 +130,7 @@ describe('NodeTracerProvider', function () {
   });
 
   describe('.withSpan()', function () {
-    it('should run context with AsyncHooksContextManager context manager', done => {
+    it('should run context with AsyncLocalStorageContextManager context manager', done => {
       provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');
       context.with(trace.setSpan(context.active(), span), () => {
@@ -140,7 +140,7 @@ describe('NodeTracerProvider', function () {
       assert.deepStrictEqual(trace.getSpan(context.active()), undefined);
     });
 
-    it('should run context with AsyncHooksContextManager context manager with multiple spans', done => {
+    it('should run context with AsyncLocalStorageContextManager context manager with multiple spans', done => {
       provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');
       context.with(trace.setSpan(context.active(), span), () => {
@@ -177,7 +177,7 @@ describe('NodeTracerProvider', function () {
   });
 
   describe('.bind()', function () {
-    it('should bind context with AsyncHooksContextManager context manager', done => {
+    it('should bind context with AsyncLocalStorageContextManager context manager', done => {
       const provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');
       const fn = () => {

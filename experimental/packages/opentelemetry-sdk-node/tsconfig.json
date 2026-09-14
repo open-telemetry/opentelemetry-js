@@ -25,9 +25,6 @@
       "path": "../../../packages/opentelemetry-propagator-b3"
     },
     {
-      "path": "../../../packages/opentelemetry-propagator-jaeger"
-    },
-    {
       "path": "../../../packages/opentelemetry-resources"
     },
     {

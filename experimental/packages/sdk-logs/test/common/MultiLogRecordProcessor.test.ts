@@ -38,10 +38,7 @@ class TestProcessor implements LogRecordProcessor {
 
 const setup = (processors: LogRecordProcessor[] = []) => {
   const forceFlushTimeoutMillis = 30_000;
-  const multiProcessor = new MultiLogRecordProcessor(
-    processors,
-    forceFlushTimeoutMillis
-  );
+  const multiProcessor = new MultiLogRecordProcessor(processors);
   return { multiProcessor, forceFlushTimeoutMillis };
 };
 
