@@ -51,6 +51,10 @@ class ExemplarBucket {
     if (spanContext && isSpanContextValid(spanContext)) {
       this.spanId = spanContext.spanId;
       this.traceId = spanContext.traceId;
+    } else {
+      // Clear IDs from a prior offer so this measurement is not reported with a stale span.
+      this.spanId = undefined;
+      this.traceId = undefined;
     }
     this._offered = true;
   }

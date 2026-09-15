@@ -9,6 +9,7 @@ import type {
   MeterOptions,
 } from '@opentelemetry/api';
 import { diag, createNoopMeter } from '@opentelemetry/api';
+import { getStringFromEnv } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import { defaultResource } from '@opentelemetry/resources';
 import { MetricReader, type IMetricReader } from './export/MetricReader';
@@ -130,10 +131,7 @@ export class MeterProvider implements IMeterProvider {
 }
 
 function resolveExemplarFilterFromEnv(): ExemplarFilter {
-  const envValue =
-    (typeof process !== 'undefined' &&
-      process.env.OTEL_METRICS_EXEMPLAR_FILTER) ||
-    undefined;
+  const envValue = getStringFromEnv('OTEL_METRICS_EXEMPLAR_FILTER');
   switch (envValue) {
     case 'always_on':
       return new AlwaysSampleExemplarFilter();

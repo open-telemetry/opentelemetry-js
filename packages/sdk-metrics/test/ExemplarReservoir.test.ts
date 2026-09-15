@@ -38,6 +38,25 @@ describe('ExemplarReservoir', () => {
       assert.strictEqual(exemplars[0].traceId, TRACE_ID);
       assert.strictEqual(exemplars[0].spanId, SPAN_ID);
     });
+
+    it('should not carry trace context from a prior offer without a span', () => {
+      const reservoir = new SimpleFixedSizeExemplarReservoir(1);
+      const spanContext: SpanContext = {
+        traceId: TRACE_ID,
+        spanId: SPAN_ID,
+        traceFlags: TraceFlags.SAMPLED,
+      };
+      const ctx = trace.setSpanContext(ROOT_CONTEXT, spanContext);
+
+      reservoir.offer(1, hrTime(), {}, ctx);
+      // A later measurement with no active span must overwrite the trace IDs.
+      reservoir.offer(2, hrTime(), {}, ROOT_CONTEXT);
+      const exemplars = reservoir.collect({});
+      assert.strictEqual(exemplars.length, 1);
+      assert.strictEqual(exemplars[0].value, 2);
+      assert.strictEqual(exemplars[0].traceId, undefined);
+      assert.strictEqual(exemplars[0].spanId, undefined);
+    });
   });
 
   it('should filter the attributes', () => {
