@@ -2,8 +2,8 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
+import type { Attributes } from '@opentelemetry/api';
 import { logs } from '@opentelemetry/api-logs';
-import type { LogAttributes } from '@opentelemetry/api-logs';
 import { diag } from '@opentelemetry/api';
 import {
   defaultResource,
@@ -276,7 +276,7 @@ describe('LoggerProvider', () => {
         valid: 'payments',
         invalid: circular,
         '': 'empty-key',
-      } as unknown as LogAttributes;
+      } as unknown as Attributes;
 
       // act
       const logger1 = provider.getLogger(testName, testVersion, {

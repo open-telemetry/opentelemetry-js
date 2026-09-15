@@ -1238,6 +1238,7 @@ describe('Span', () => {
       },
       {
         attributes: { attr1: 'value', attr2: 123, attr3: true },
+        droppedAttributesCount: 0,
         context: linkContext,
       },
     ]);
@@ -1258,14 +1259,14 @@ describe('Span', () => {
     assert.strictEqual(span.events.length, 1);
     const [event] = span.events;
     assert.deepStrictEqual(event.name, 'sent');
-    assert.deepStrictEqual(event.attributes, {});
+    assert.deepStrictEqual(event.attributes, undefined);
     assert.ok(event.time[0] > 0);
 
     span.addEvent('rev', { attr1: 'value', attr2: 123, attr3: true });
     assert.strictEqual(span.events.length, 2);
     const [event1, event2] = span.events;
     assert.deepStrictEqual(event1.name, 'sent');
-    assert.deepStrictEqual(event1.attributes, {});
+    assert.deepStrictEqual(event1.attributes, undefined);
     assert.ok(event1.time[0] > 0);
     assert.deepStrictEqual(event2.name, 'rev');
     assert.deepStrictEqual(event2.attributes, {
@@ -1273,6 +1274,7 @@ describe('Span', () => {
       attr2: 123,
       attr3: true,
     });
+    assert.deepStrictEqual(event2.droppedAttributesCount, 0);
     assert.ok(event2.time[0] > 0);
 
     span.end();

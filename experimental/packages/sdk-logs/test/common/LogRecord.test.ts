@@ -7,8 +7,7 @@ import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { diag, ROOT_CONTEXT, trace, TraceFlags } from '@opentelemetry/api';
 import * as logsAPI from '@opentelemetry/api-logs';
-import type { AnyValue } from '@opentelemetry/api-logs';
-import type { HrTime, Attributes, AttributeValue } from '@opentelemetry/api';
+import type { HrTime, AnyValue, Attributes } from '@opentelemetry/api';
 import { hrTimeToMilliseconds, timeInputToHrTime } from '@opentelemetry/core';
 import { defaultResource } from '@opentelemetry/resources';
 import {
@@ -229,7 +228,7 @@ describe('LogRecord', () => {
           logRecord.setAttribute(k, v);
         }
         for (const [k, v] of Object.entries(invalidAttributes)) {
-          logRecord.setAttribute(k, v as unknown as AttributeValue);
+          logRecord.setAttribute(k, v as unknown as AnyValue);
         }
         assert.deepStrictEqual(logRecord.attributes, validAttributes);
       });
@@ -640,11 +639,8 @@ describe('LogRecord', () => {
             ],
           },
           bytes: new Uint8Array([255, 254, 253]),
-          nullish: {
-            nullValue: null,
-            undefinedValue: undefined,
-          },
-          empty: {},
+          nullValue: null,
+          emptyObj: {},
         };
         logRecord.setAttribute('complex', complexValue);
 
@@ -689,13 +685,16 @@ describe('LogRecord', () => {
         assert.deepStrictEqual(logRecord.attributes.mixed, expected);
       });
 
-      it('should not truncate non-string values', () => {
+      it('should truncate byte arrays', () => {
         const { logRecord } = setup({ attributeValueLengthLimit: 5 });
         const byteArray = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]);
         logRecord.setAttribute('bytes', byteArray);
 
         // Byte arrays should not be truncated
-        assert.deepStrictEqual(logRecord.attributes.bytes, byteArray);
+        assert.deepStrictEqual(
+          logRecord.attributes.bytes,
+          new Uint8Array([1, 2, 3, 4, 5])
+        );
       });
     });
 

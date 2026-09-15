@@ -136,6 +136,23 @@ class ResourceImpl implements Resource {
   }
 }
 
+/**
+ * Create a `Resource` from the given attributes object.
+ *
+ * It is the responsibility of callers to limit attribute values to the
+ * set of allowed by AnyValue (https://opentelemetry.io/docs/specs/otel/common/#anyvalue).
+ * This can be done with `cleanAttributes` and/or `isAnyValue` from `@opentelemetry/core`.
+ *
+ * This is made the responsibility of callers because (a) resource detectors
+ * typically should only produce simple attribute values, and (b) the
+ * complexity of *async* resource attributes adds complexity.
+ *
+ * **Note**:
+ * Simple attributes SHOULD be used whenever possible. Assume that backends do
+ * not index individual properties of complex attributes, that querying or
+ * aggregating on such properties is inefficient and complicated, and that
+ * reporting complex attributes carries higher performance overhead.
+ */
 export function resourceFromAttributes(
   attributes: DetectedResourceAttributes,
   options?: ResourceOptions
@@ -170,14 +187,17 @@ function guardedRawAttributes(
     if (isPromiseLike(v)) {
       return [
         k,
-        v.catch(err => {
-          diag.debug(
-            'promise rejection for resource attribute: %s - %s',
-            k,
-            err
-          );
-          return undefined;
-        }),
+        v.then(
+          val => val,
+          err => {
+            diag.debug(
+              'promise rejection for resource attribute: %s - %s',
+              k,
+              err
+            );
+            return undefined;
+          }
+        ),
       ];
     }
     return [k, v];

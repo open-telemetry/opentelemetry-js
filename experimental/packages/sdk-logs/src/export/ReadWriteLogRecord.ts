@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { HrTime, SpanContext } from '@opentelemetry/api';
-import type { InstrumentationScope } from '@opentelemetry/core';
 import type {
   AnyValue,
-  LogBody,
-  LogAttributes,
-  SeverityNumber,
-} from '@opentelemetry/api-logs';
+  Attributes,
+  HrTime,
+  SpanContext,
+} from '@opentelemetry/api';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import type { SeverityNumber } from '@opentelemetry/api-logs';
 import type { Resource } from '@opentelemetry/resources';
 
 /**
@@ -35,10 +35,10 @@ export interface ReadWriteLogRecord {
    * instead of reusing an existing one.
    */
   readonly instrumentationScope: InstrumentationScope;
-  readonly attributes: LogAttributes;
+  readonly attributes: Attributes;
   severityText?: string;
   severityNumber?: SeverityNumber;
-  body?: LogBody;
+  body?: AnyValue;
   eventName?: string;
   droppedAttributesCount: number;
 
@@ -55,14 +55,14 @@ export interface ReadWriteLogRecord {
    * @param attributes The attributes to set.
    * @returns The updated ReadWriteLogRecord.
    */
-  setAttributes(attributes: LogAttributes): ReadWriteLogRecord;
+  setAttributes(attributes: Attributes): ReadWriteLogRecord;
 
   /**
    * Sets the body of the log record.
    * @param body The log body.
    * @returns The updated ReadWriteLogRecord.
    */
-  setBody(body: LogBody): ReadWriteLogRecord;
+  setBody(body: AnyValue): ReadWriteLogRecord;
 
   /**
    * Sets the event name for the log record.

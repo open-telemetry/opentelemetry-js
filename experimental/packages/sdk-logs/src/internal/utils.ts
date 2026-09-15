@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { AnyValue, LogAttributes } from '@opentelemetry/api-logs';
+import type { AnyValue, Attributes } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 
 export type LogInstrumentationScope = InstrumentationScope & {
-  readonly attributes?: LogAttributes;
+  readonly attributes?: Attributes;
   readonly droppedAttributesCount?: number;
 };
 
@@ -73,7 +73,7 @@ export function getInstrumentationScopeKey(
     scope.name,
     scope.version || '',
     scope.schemaUrl || '',
-    normalizeAnyValue(scope.attributes),
+    normalizeAnyValue(scope.attributes ?? {}),
     // we include the dropped attributes count to avoid collisions between scopes with the same identifying
     // characteristics, but different dropped counts. While there still can be collisions this is the best we can do if
     // we want to resolve the same logger without relying on object identity.
