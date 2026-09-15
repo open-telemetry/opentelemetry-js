@@ -52,6 +52,27 @@ describe('ExemplarReservoir', () => {
     assert.notStrictEqual(exemplars[0].filteredAttributes, { key1: 'value1' });
   });
 
+  it('should not carry trace context from a prior offer without a span', () => {
+    // AlignedHistogram keeps the last measurement per bucket deterministically,
+    // so both values land in bucket 0 and the second offer overwrites the first.
+    const reservoir = new AlignedHistogramBucketExemplarReservoir([10]);
+    const spanContext: SpanContext = {
+      traceId: TRACE_ID,
+      spanId: SPAN_ID,
+      traceFlags: TraceFlags.SAMPLED,
+    };
+    const ctx = trace.setSpanContext(ROOT_CONTEXT, spanContext);
+
+    reservoir.offer(1, hrTime(), {}, ctx);
+    // A later measurement with no active span must overwrite the trace IDs.
+    reservoir.offer(2, hrTime(), {}, ROOT_CONTEXT);
+    const exemplars = reservoir.collect({});
+    assert.strictEqual(exemplars.length, 1);
+    assert.strictEqual(exemplars[0].value, 2);
+    assert.strictEqual(exemplars[0].traceId, undefined);
+    assert.strictEqual(exemplars[0].spanId, undefined);
+  });
+
   describe('AlignedHistogramBucketExemplarReservoir', () => {
     it('should put measurements into buckets', () => {
       const reservoir = new AlignedHistogramBucketExemplarReservoir([
