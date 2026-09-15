@@ -125,12 +125,16 @@ describe('mergeOtlpSharedConfigurationWithDefaults', function () {
 
 describe('validateTimeoutMillis', function () {
   it('throws if timeout is not a positive number', () => {
-    const values = [null, '1', true, NaN, Infinity, -Infinity, -1, 0];
+    const values = [null, '1', true, NaN, Infinity, -Infinity, -1];
 
     for (let i = 0; i < values.length; ++i) {
       assert.throws(() => {
         validateTimeoutMillis(values[i] as any);
       }, /Configuration: timeoutMillis is invalid/);
     }
+  });
+
+  it('does not throw if timeout is 0', () => {
+    assert.strictEqual(validateTimeoutMillis(0), 0);
   });
 });
