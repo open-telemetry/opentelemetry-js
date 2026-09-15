@@ -328,6 +328,30 @@ describe('isLogAttributeValue', () => {
       assert.strictEqual(typeof result, 'boolean');
     });
 
+    it('should accept a value referenced more than once', () => {
+      const shared = { a: 'test' };
+
+      assert.strictEqual(isLogAttributeValue([shared, shared]), true);
+      assert.strictEqual(
+        isLogAttributeValue({ first: shared, second: shared }),
+        true
+      );
+    });
+
+    it('should accept an array referenced more than once', () => {
+      const shared = ['a', 'b'];
+
+      assert.strictEqual(isLogAttributeValue([shared, shared]), true);
+    });
+
+    it('should still reject a cycle through a shared value', () => {
+      const shared: Record<string, unknown> = { a: 'test' };
+      const outer: Record<string, unknown> = { first: shared, second: shared };
+      shared.parent = outer;
+
+      assert.strictEqual(isLogAttributeValue(outer), false);
+    });
+
     it('should handle very deep nesting', () => {
       let deep: any = 'bottom';
       for (let i = 0; i < 100; i++) {
