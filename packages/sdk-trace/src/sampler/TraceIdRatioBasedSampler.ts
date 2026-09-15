@@ -7,7 +7,21 @@ import { isValidTraceId } from '@opentelemetry/api';
 import type { Sampler, SamplingResult } from '../Sampler';
 import { SamplingDecision } from '../Sampler';
 
-/** Sampler that samples a given fraction of traces based of trace id deterministically. */
+/**
+ * Sampler that samples a given fraction of traces based of trace id deterministically.
+ *
+ * @deprecated Use `createProbabilitySampler()` from `@opentelemetry/sampler-composite`
+ * instead. The exact algorithm used here was never specified, so it is not
+ * compatible with other OpenTelemetry SDKs and may sample a different set of
+ * traces for the same input. `ProbabilitySampler` is consistent across SDKs, as
+ * it uses the randomness features of W3C Trace Context Level 2.
+ *
+ * The behavior of this sampler is unchanged and will remain so; the
+ * specification requires that it is neither removed nor modified before
+ * January 1, 2027.
+ *
+ * https://opentelemetry.io/docs/specs/otel/trace/sdk/#traceidratiobased
+ */
 export class TraceIdRatioBasedSampler implements Sampler {
   private readonly _ratio;
   private _upperBound: number;
