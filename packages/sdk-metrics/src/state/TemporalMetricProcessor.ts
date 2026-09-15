@@ -227,5 +227,9 @@ function AttributesMapToAccumulationRecords<T>(
       }
     ) as AccumulationRecord<T>[];
   }
-  return Array.from(map.entries()) as unknown as AccumulationRecord<T>[];
+  // Drop the trailing hash code; without exemplars it would land in the exemplar slot.
+  return Array.from(map.entries()).map(([attributes, accumulation]) => [
+    attributes,
+    accumulation,
+  ]) as AccumulationRecord<T>[];
 }
