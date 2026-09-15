@@ -28,6 +28,12 @@
       "path": "../../../semantic-conventions"
     },
     {
+      "path": "../api-config"
+    },
+    {
+      "path": "../configuration"
+    },
+    {
       "path": "../opentelemetry-instrumentation"
     }
   ]
