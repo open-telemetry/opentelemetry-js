@@ -7,7 +7,20 @@ import { isValidTraceId } from '@opentelemetry/api';
 import type { Sampler, SamplingResult } from '../Sampler';
 import { SamplingDecision } from '../Sampler';
 
-/** Sampler that samples a given fraction of traces based of trace id deterministically. */
+/**
+ * Creates a sampler that samples a given fraction of traces based of trace ID
+ * deterministically.
+ */
+export function createTraceIdRatioBasedSampler(ratio?: number): Sampler {
+  return new TraceIdRatioBasedSampler(ratio);
+}
+
+/**
+ * Sampler that samples a given fraction of traces based of trace ID
+ * deterministically.
+ *
+ * @deprecated Use {@link createTraceIdRatioBasedSampler} instead.
+ */
 export class TraceIdRatioBasedSampler implements Sampler {
   private readonly _ratio;
   private _upperBound: number;
