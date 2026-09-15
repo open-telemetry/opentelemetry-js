@@ -40,6 +40,13 @@ let pendingBodySize = 0;
  */
 let pendingKeepaliveCount = 0;
 
+/**
+ * Sentinel abort reason that marks an abort as caused by the transport's own
+ * send timeout, so the catch block can tell it apart from external aborts
+ * without allocating an Error on every send().
+ */
+const TIMEOUT_ABORT_REASON = Symbol('OTLP fetch request timed out');
+
 export interface FetchTransportParameters {
   url: string;
   headers: HeadersFactory;
@@ -54,7 +61,10 @@ class FetchTransport implements IExporterTransport {
 
   async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
     const abortController = new AbortController();
-    const timeout = setTimeout(() => abortController.abort(), timeoutMillis);
+    const timeout = setTimeout(
+      () => abortController.abort(TIMEOUT_ABORT_REASON),
+      timeoutMillis
+    );
     // Fetch API may be wrapped by an instrumentation like `@opentelemetry/instrumentation-fetch`.
     // In that case the instrumentation would create a new Span for this request
     // because the context manager cannot keep the context after `await` calls.
@@ -119,6 +129,15 @@ class FetchTransport implements IExporterTransport {
         ),
       };
     } catch (error) {
+      // Surface our own timeout as a clean failure rather than letting the
+      // AbortError reach error monitors via the cause chain.
+      if (abortController.signal.reason === TIMEOUT_ABORT_REASON) {
+        diag.warn(`export request timed out after ${timeoutMillis}ms`);
+        return {
+          status: 'failure',
+          error: new Error(`Fetch request timed out after ${timeoutMillis}ms`),
+        };
+      }
       if (isFetchNetworkErrorRetryable(error)) {
         diag.warn(`export request retryable (network error: ${error})`);
         return {
