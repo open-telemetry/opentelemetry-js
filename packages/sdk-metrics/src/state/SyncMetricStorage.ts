@@ -5,7 +5,6 @@
 
 import type { Context, HrTime, Attributes } from '@opentelemetry/api';
 import { context as contextApi } from '@opentelemetry/api';
-import { millisToHrTime } from '@opentelemetry/core';
 import type { WritableMetricStorage } from './WritableMetricStorage';
 import type { Accumulation, Aggregator } from '../aggregator/types';
 import type { InstrumentDescriptor } from '../InstrumentDescriptor';
@@ -86,11 +85,10 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>>
 
     if (this._exemplarFilter && this._exemplarReservoirFactory) {
       const exemplarContext = context ?? contextApi.active();
-      const exemplarTime = millisToHrTime(recordTime);
       if (
         this._exemplarFilter.shouldSample(
           value,
-          exemplarTime,
+          recordTime,
           attributes,
           exemplarContext
         )
@@ -101,7 +99,7 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>>
         );
         reservoir?.offer(
           value,
-          exemplarTime,
+          recordTime,
           measurementAttributes,
           exemplarContext
         );

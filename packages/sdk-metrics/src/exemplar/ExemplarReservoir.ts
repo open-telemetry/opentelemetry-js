@@ -5,6 +5,7 @@
 
 import type { Context, HrTime, Attributes } from '@opentelemetry/api';
 import { isSpanContextValid, trace } from '@opentelemetry/api';
+import { millisToHrTime } from '@opentelemetry/core';
 import type { Exemplar } from './Exemplar';
 
 /**
@@ -14,7 +15,7 @@ export interface ExemplarReservoir {
   /** Offers a measurement to be sampled. */
   offer(
     value: number,
-    timestamp: HrTime,
+    timestamp: number,
     attributes: Attributes,
     ctx: Context
   ): void;
@@ -40,12 +41,13 @@ class ExemplarBucket {
 
   offer(
     value: number,
-    timestamp: HrTime,
+    timestamp: number,
     attributes: Attributes,
     ctx: Context
   ) {
     this.value = value;
-    this.timestamp = timestamp;
+    // Convert to HrTime only here, on the sampled path, rather than on every record.
+    this.timestamp = millisToHrTime(timestamp);
     this.attributes = attributes;
     const spanContext = trace.getSpanContext(ctx);
     if (spanContext && isSpanContextValid(spanContext)) {
@@ -101,7 +103,7 @@ export abstract class FixedSizeExemplarReservoirBase
 
   abstract offer(
     value: number,
-    timestamp: HrTime,
+    timestamp: number,
     attributes: Attributes,
     ctx: Context
   ): void;

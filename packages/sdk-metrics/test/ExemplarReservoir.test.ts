@@ -5,7 +5,6 @@
 
 import type { SpanContext } from '@opentelemetry/api';
 import { ROOT_CONTEXT, TraceFlags, trace } from '@opentelemetry/api';
-import { hrTime } from '@opentelemetry/core';
 import * as assert from 'assert';
 
 import {
@@ -32,7 +31,7 @@ describe('ExemplarReservoir', () => {
       };
       const ctx = trace.setSpanContext(ROOT_CONTEXT, spanContext);
 
-      reservoir.offer(1, hrTime(), {}, ctx);
+      reservoir.offer(1, 0, {}, ctx);
       const exemplars = reservoir.collect({});
       assert.strictEqual(exemplars.length, 1);
       assert.strictEqual(exemplars[0].traceId, TRACE_ID);
@@ -42,12 +41,7 @@ describe('ExemplarReservoir', () => {
 
   it('should filter the attributes', () => {
     const reservoir = new SimpleFixedSizeExemplarReservoir(1);
-    reservoir.offer(
-      1,
-      hrTime(),
-      { key1: 'value1', key2: 'value2' },
-      ROOT_CONTEXT
-    );
+    reservoir.offer(1, 0, { key1: 'value1', key2: 'value2' }, ROOT_CONTEXT);
     const exemplars = reservoir.collect({ key2: 'value2', key3: 'value3' });
     assert.notStrictEqual(exemplars[0].filteredAttributes, { key1: 'value1' });
   });
@@ -63,9 +57,9 @@ describe('ExemplarReservoir', () => {
     };
     const ctx = trace.setSpanContext(ROOT_CONTEXT, spanContext);
 
-    reservoir.offer(1, hrTime(), {}, ctx);
+    reservoir.offer(1, 0, {}, ctx);
     // A later measurement with no active span must overwrite the trace IDs.
-    reservoir.offer(2, hrTime(), {}, ROOT_CONTEXT);
+    reservoir.offer(2, 0, {}, ROOT_CONTEXT);
     const exemplars = reservoir.collect({});
     assert.strictEqual(exemplars.length, 1);
     assert.strictEqual(exemplars[0].value, 2);
@@ -78,9 +72,9 @@ describe('ExemplarReservoir', () => {
       const reservoir = new AlignedHistogramBucketExemplarReservoir([
         0, 5, 10, 25, 50, 75,
       ]);
-      reservoir.offer(52, hrTime(), { bucket: '5' }, ROOT_CONTEXT);
-      reservoir.offer(7, hrTime(), { bucket: '3' }, ROOT_CONTEXT);
-      reservoir.offer(6, hrTime(), { bucket: '3' }, ROOT_CONTEXT);
+      reservoir.offer(52, 0, { bucket: '5' }, ROOT_CONTEXT);
+      reservoir.offer(7, 0, { bucket: '3' }, ROOT_CONTEXT);
+      reservoir.offer(6, 0, { bucket: '3' }, ROOT_CONTEXT);
       const exemplars = reservoir.collect({ bucket: '3' });
       assert.strictEqual(exemplars.length, 2);
       assert.strictEqual(exemplars[0].value, 6);
