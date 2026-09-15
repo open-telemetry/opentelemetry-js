@@ -592,16 +592,21 @@ describe('PrometheusSerializer', () => {
 
   describe('metric metadata', () => {
     async function serializeScopedMetrics(
-      createInstruments: (firstMeter: Meter, secondMeter: Meter) => void,
+      createInstruments: (
+        firstMeter: Meter,
+        secondMeter: Meter,
+        thirdMeter: Meter
+      ) => void,
       serializer = new PrometheusSerializer()
     ) {
       const reader = new TestMetricReader();
       const meterProvider = new MeterProvider({ readers: [reader] });
       const firstMeter = meterProvider.getMeter('first-scope');
       const secondMeter = meterProvider.getMeter('second-scope');
+      const thirdMeter = meterProvider.getMeter('third-scope');
 
       try {
-        createInstruments(firstMeter, secondMeter);
+        createInstruments(firstMeter, secondMeter, thirdMeter);
 
         const { resourceMetrics, errors } = await reader.collect();
         assert.strictEqual(errors.length, 0);
@@ -955,6 +960,44 @@ describe('PrometheusSerializer', () => {
         'Conflicting HELP comments for metric "jobs": "First description", "Second description"; exporting "First description".',
       ]);
       assert.deepStrictEqual(warn.secondCall.args, warn.firstCall.args);
+    });
+
+    it('warns once when more than two metadata values conflict', async () => {
+      const warn = sinon.stub(diag, 'warn');
+      await serializeScopedMetrics((firstMeter, secondMeter, thirdMeter) => {
+        firstMeter
+          .createUpDownCounter('jobs', { description: 'First description' })
+          .add(1);
+        secondMeter
+          .createUpDownCounter('jobs', { description: 'Second description' })
+          .add(2);
+        thirdMeter
+          .createUpDownCounter('jobs', { description: 'Third description' })
+          .add(3);
+      });
+
+      sinon.assert.calledOnceWithExactly(
+        warn,
+        'Conflicting HELP comments for metric "jobs": "First description", "Second description"; exporting "First description".'
+      );
+    });
+
+    it('only warns about TYPE when a later conflict drops the family', async () => {
+      const warn = sinon.stub(diag, 'warn');
+      await serializeScopedMetrics((firstMeter, secondMeter, thirdMeter) => {
+        firstMeter
+          .createUpDownCounter('jobs', { description: 'First description' })
+          .add(1);
+        secondMeter
+          .createUpDownCounter('jobs', { description: 'Second description' })
+          .add(2);
+        thirdMeter.createHistogram('jobs').record(3);
+      });
+
+      sinon.assert.calledOnceWithExactly(
+        warn,
+        'Conflicting TYPE comments for metric "jobs": "gauge", "histogram"; dropping the metric.'
+      );
     });
   });
 

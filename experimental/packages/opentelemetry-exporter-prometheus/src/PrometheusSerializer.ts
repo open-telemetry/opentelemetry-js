@@ -34,18 +34,12 @@ interface PrometheusMetadata {
   help: string;
   unit: string;
   type: PrometheusDataTypeLiteral;
-  state: 'pending' | 'emitted' | 'dropped';
-  helpValues: Set<string>;
-  unitValues: Set<string>;
-  typeValues: Set<PrometheusDataTypeLiteral>;
 }
 
-interface PrometheusMetadataCollection {
-  metricsByName: Map<
-    string,
-    { metric: MetricData; scope: InstrumentationScope }[]
-  >;
-  metadataByName: Map<string, PrometheusMetadata>;
+interface PrometheusMetricFamily {
+  metadata: PrometheusMetadata | undefined;
+  metrics: { metric: MetricData; scope: InstrumentationScope }[];
+  resource?: Resource;
 }
 
 function createPrometheusMetadata(
@@ -57,10 +51,6 @@ function createPrometheusMetadata(
     help,
     unit,
     type,
-    state: 'pending',
-    helpValues: new Set(help ? [help] : []),
-    unitValues: new Set(unit ? [unit] : []),
-    typeValues: new Set([type]),
   };
 }
 
@@ -226,30 +216,42 @@ export class PrometheusSerializer {
 
   serialize(resourceMetrics: ResourceMetrics): string {
     let str = '';
-    const metadata = this._collectMetadata(resourceMetrics);
+    let resource = '';
+    const metricFamilies = this._collectMetricFamilies(resourceMetrics);
 
     this._additionalAttributes = this._filterResourceConstantLabels(
       resourceMetrics.resource.attributes,
       this._withResourceConstantLabels
     );
 
-    const resource = this._serializeResource(
-      resourceMetrics.resource,
-      metadata.metadataByName
-    );
-
     // Preserve first-seen family order, with target_info first, and keep each
     // family's samples together even when they originate from different scopes.
-    for (const name of metadata.metadataByName.keys()) {
-      for (const { metric, scope } of metadata.metricsByName.get(name) ?? []) {
+    for (const [name, family] of metricFamilies) {
+      if (family.metadata === undefined) {
+        continue;
+      }
+
+      let writeMetadata = true;
+      if (family.resource) {
+        resource = this._serializeResource(
+          family.resource,
+          family.metadata,
+          writeMetadata
+        );
+        writeMetadata = false;
+      }
+
+      for (const { metric, scope } of family.metrics) {
         const metricStr = this._serializeMetricData(
           metric,
           scope,
           name,
-          metadata.metadataByName
+          family.metadata,
+          writeMetadata
         );
         if (metricStr) {
           str += metricStr + '\n';
+          writeMetadata = false;
         }
       }
     }
@@ -277,91 +279,29 @@ export class PrometheusSerializer {
     return;
   }
 
-  private _collectMetadata(
-    resourceMetrics: ResourceMetrics
-  ): PrometheusMetadataCollection {
+  private _collectMetricFamilies(resourceMetrics: ResourceMetrics) {
     // A TYPE conflict requires dropping the entire family, so all metadata must
     // be resolved before any samples are serialized.
-    const metricsByName: PrometheusMetadataCollection['metricsByName'] =
-      new Map();
-    const metadataByName = new Map<string, PrometheusMetadata>();
-
-    if (!this._withoutTargetInfo) {
-      metadataByName.set(
-        'target_info',
-        createPrometheusMetadata('Target metadata', '', 'gauge')
-      );
-    }
-
-    for (const scope of resourceMetrics.scopeMetrics) {
-      for (const metric of scope.metrics) {
-        const name = this._getPrometheusMetricName(metric);
-        if (name === undefined) {
-          continue;
-        }
-
-        const metrics = metricsByName.get(name);
-        if (metrics) {
-          metrics.push({ metric, scope: scope.scope });
-        } else {
-          metricsByName.set(name, [{ metric, scope: scope.scope }]);
-        }
-        const currentMetadata = createPrometheusMetadata(
-          metric.descriptor.description,
-          metric.descriptor.unit,
-          toPrometheusType(metric)
-        );
-        const previousMetadata = metadataByName.get(name);
-
-        if (previousMetadata === undefined) {
-          metadataByName.set(name, currentMetadata);
-          continue;
-        }
-
-        previousMetadata.typeValues.add(currentMetadata.type);
-        if (previousMetadata.typeValues.size > 1) {
-          previousMetadata.state = 'dropped';
-          continue;
-        }
-
-        if (currentMetadata.help) {
-          previousMetadata.helpValues.add(currentMetadata.help);
-          if (!previousMetadata.help) {
-            previousMetadata.help = currentMetadata.help;
-          }
-        }
-
-        if (currentMetadata.unit) {
-          previousMetadata.unitValues.add(currentMetadata.unit);
-          if (!previousMetadata.unit) {
-            previousMetadata.unit = currentMetadata.unit;
-          }
-        }
-      }
-    }
-
-    this._warnAboutMetadataConflicts(metadataByName);
-    return { metricsByName, metadataByName };
-  }
-
-  private _warnAboutMetadataConflicts(
-    metadataByName: Map<string, PrometheusMetadata>
-  ) {
+    const metricFamilies = new Map<string, PrometheusMetricFamily>();
     const activeConflicts = new Set<string>();
     const warn = (
       kind: 'HELP' | 'UNIT' | 'TYPE',
       name: string,
-      values: Set<string>,
+      firstValue: string,
+      secondValue: string,
       selected?: string
     ) => {
-      const sortedValues = [...values].sort();
-      const key = JSON.stringify([kind, name, selected, sortedValues]);
+      const key = JSON.stringify([kind, name, selected]);
+      if (activeConflicts.has(key)) {
+        return;
+      }
       activeConflicts.add(key);
       if (this._activeMetadataConflicts.has(key)) {
         return;
       }
 
-      const formattedValues = sortedValues
+      const formattedValues = [firstValue, secondValue]
+        .sort()
         .map(value => JSON.stringify(value))
         .join(', ');
       if (kind === 'TYPE') {
@@ -377,27 +317,87 @@ export class PrometheusSerializer {
       }
     };
 
-    for (const [name, metadata] of metadataByName) {
-      if (metadata.typeValues.size > 1) {
-        warn('TYPE', name, metadata.typeValues);
+    if (!this._withoutTargetInfo) {
+      metricFamilies.set('target_info', {
+        metadata: createPrometheusMetadata('Target metadata', '', 'gauge'),
+        metrics: [],
+        resource: resourceMetrics.resource,
+      });
+    }
+
+    for (const scopeMetrics of resourceMetrics.scopeMetrics) {
+      for (const metric of scopeMetrics.metrics) {
+        const name = this._getPrometheusMetricName(metric);
+        if (name === undefined) {
+          continue;
+        }
+
+        const type = toPrometheusType(metric);
+        const family = metricFamilies.get(name);
+
+        if (family === undefined) {
+          metricFamilies.set(name, {
+            metadata: createPrometheusMetadata(
+              metric.descriptor.description,
+              metric.descriptor.unit,
+              type
+            ),
+            metrics: [{ metric, scope: scopeMetrics.scope }],
+          });
+          continue;
+        }
+
+        const metadata = family.metadata;
+        if (metadata === undefined) {
+          continue;
+        }
+
+        if (metadata.type !== type) {
+          warn('TYPE', name, metadata.type, type);
+          family.metadata = undefined;
+          family.metrics = [];
+          continue;
+        }
+
+        family.metrics.push({ metric, scope: scopeMetrics.scope });
+      }
+    }
+
+    for (const [name, family] of metricFamilies) {
+      const metadata = family.metadata;
+      if (metadata === undefined) {
         continue;
       }
-      if (metadata.helpValues.size > 1) {
-        warn('HELP', name, metadata.helpValues, metadata.help);
-      }
-      if (metadata.unitValues.size > 1) {
-        warn('UNIT', name, metadata.unitValues, metadata.unit);
+
+      for (const { metric } of family.metrics) {
+        const { description: help, unit } = metric.descriptor;
+        if (help) {
+          if (!metadata.help) {
+            metadata.help = help;
+          } else if (metadata.help !== help) {
+            warn('HELP', name, metadata.help, help, metadata.help);
+          }
+        }
+        if (unit) {
+          if (!metadata.unit) {
+            metadata.unit = unit;
+          } else if (metadata.unit !== unit) {
+            warn('UNIT', name, metadata.unit, unit, metadata.unit);
+          }
+        }
       }
     }
 
     this._activeMetadataConflicts = activeConflicts;
+    return metricFamilies;
   }
 
   private _serializeMetricData(
     metricData: MetricData,
     scope: InstrumentationScope,
     normalizedName?: string,
-    metadataByName?: Map<string, PrometheusMetadata>
+    metadata?: PrometheusMetadata,
+    writeMetadata = true
   ) {
     const name = normalizedName ?? this._getPrometheusMetricName(metricData);
     if (name === undefined) {
@@ -405,17 +405,12 @@ export class PrometheusSerializer {
     }
 
     const currentMetadata =
-      metadataByName?.get(name) ??
+      metadata ??
       createPrometheusMetadata(
         metricData.descriptor.description,
         metricData.descriptor.unit,
         toPrometheusType(metricData)
       );
-    if (currentMetadata.state === 'dropped') {
-      return '';
-    }
-    const writeMetadata = currentMetadata.state === 'pending';
-    currentMetadata.state = 'emitted';
 
     const help = `# HELP ${name} ${escapeString(
       currentMetadata.help || 'description missing'
@@ -591,22 +586,14 @@ export class PrometheusSerializer {
 
   protected _serializeResource(
     resource: Resource,
-    metadataByName?: Map<string, PrometheusMetadata>
+    metadata = createPrometheusMetadata('Target metadata', '', 'gauge'),
+    writeMetadata = true
   ): string {
     if (this._withoutTargetInfo === true) {
       return '';
     }
 
     const name = 'target_info';
-    const metadata =
-      metadataByName?.get(name) ??
-      createPrometheusMetadata('Target metadata', '', 'gauge');
-    if (metadata.state === 'dropped') {
-      return '';
-    }
-
-    const writeMetadata = metadata.state === 'pending';
-    metadata.state = 'emitted';
     const help = `# HELP ${name} ${escapeString(metadata.help)}`;
     const unit = metadata.unit
       ? `\n# UNIT ${name} ${escapeString(metadata.unit)}`
