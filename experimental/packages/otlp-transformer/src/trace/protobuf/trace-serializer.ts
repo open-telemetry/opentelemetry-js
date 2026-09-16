@@ -2,7 +2,7 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import type { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace';
 import type { Link, SpanStatus } from '@opentelemetry/api';
 import { ProtobufWriter } from '../../common/protobuf/protobuf-writer';
 import { hexToBinary } from '../../common/hex-to-binary';

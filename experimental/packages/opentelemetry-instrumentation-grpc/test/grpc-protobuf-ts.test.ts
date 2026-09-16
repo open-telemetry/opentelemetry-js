@@ -13,16 +13,16 @@ import * as grpc from '@grpc/grpc-js';
 import { GrpcTesterClient } from './proto/ts/fixtures/grpc-test.client';
 import {
   InMemorySpanExporter,
-  NodeTracerProvider,
+  TracerProvider,
   SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace-node';
+} from '@opentelemetry/sdk-trace';
 import * as protoLoader from '@grpc/proto-loader';
 import * as path from 'path';
 import * as assert from 'assert';
 import type { ContextManager } from '@opentelemetry/api';
 import { context, propagation, SpanKind, trace } from '@opentelemetry/api';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { startServer } from './helper';
 import type { SpanAssertionFunction, TestFunction } from './protobuf-ts-utils';
 import {
@@ -138,8 +138,8 @@ describe('#grpc-protobuf', () => {
   let client: GrpcTesterClient;
   let server: grpc.Server;
   let contextManager: ContextManager;
-  const provider = new NodeTracerProvider({
-    spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+  const provider = new TracerProvider({
+    spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
   });
 
   before(() => {
@@ -149,7 +149,7 @@ describe('#grpc-protobuf', () => {
 
   beforeEach(() => {
     memoryExporter.reset();
-    contextManager = new AsyncHooksContextManager().enable();
+    contextManager = new AsyncLocalStorageContextManager().enable();
     context.setGlobalContextManager(contextManager);
   });
 

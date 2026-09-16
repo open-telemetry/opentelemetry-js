@@ -13,6 +13,7 @@ import { MetricReader } from './MetricReader';
 import type { PushMetricExporter } from './MetricExporter';
 import { callWithTimeout, TimeoutError } from '../utils';
 import { InstrumentType } from './MetricData';
+import { splitMetricData } from './MetricDataSplitter';
 import type { MetricProducer } from './MetricProducer';
 import { OTEL_COMPONENT_TYPE_VALUE_PERIODIC_METRIC_READER } from '../semconv';
 
@@ -51,6 +52,12 @@ export type PeriodicExportingMetricReaderOptions = {
     observableUpDownCounter?: number;
     default?: number;
   };
+  /**
+   * The maximum batch size for exports. If configured, the reader will split
+   * batches larger than this size into smaller batches.
+   * @experimental
+   */
+  maxExportBatchSize?: number;
 };
 
 /**
@@ -62,6 +69,8 @@ export class PeriodicExportingMetricReader extends MetricReader {
   private _exporter: PushMetricExporter;
   private readonly _exportInterval: number;
   private readonly _exportTimeout: number;
+  private readonly _maxExportBatchSize?: number;
+  private _ongoingExportPromise: Promise<void> | null = null;
 
   constructor(options: PeriodicExportingMetricReaderOptions) {
     const {
@@ -69,6 +78,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
       exportIntervalMillis = 60000,
       metricProducers,
       cardinalityLimits,
+      maxExportBatchSize,
     } = options;
     let { exportTimeoutMillis = 30000 } = options;
 
@@ -113,6 +123,13 @@ export class PeriodicExportingMetricReader extends MetricReader {
       throw Error('exportTimeoutMillis must be greater than 0');
     }
 
+    if (
+      maxExportBatchSize !== undefined &&
+      (!Number.isInteger(maxExportBatchSize) || maxExportBatchSize <= 0)
+    ) {
+      throw Error('maxExportBatchSize must be a positive integer');
+    }
+
     if (exportIntervalMillis < exportTimeoutMillis) {
       if (
         'exportIntervalMillis' in options &&
@@ -134,54 +151,95 @@ export class PeriodicExportingMetricReader extends MetricReader {
     this._exportInterval = exportIntervalMillis;
     this._exportTimeout = exportTimeoutMillis;
     this._exporter = exporter;
+    this._maxExportBatchSize = maxExportBatchSize;
   }
 
   private async _runOnce(): Promise<void> {
     try {
-      await callWithTimeout(this._doRun(), this._exportTimeout);
+      await this._doRun();
     } catch (err) {
-      if (err instanceof TimeoutError) {
-        api.diag.error(
-          'Export took longer than %s milliseconds and timed out.',
-          this._exportTimeout
-        );
-        return;
-      }
-
       globalErrorHandler(err);
     }
   }
 
   private async _doRun(): Promise<void> {
-    const { resourceMetrics, errors } = await this.collect({
-      timeoutMillis: this._exportTimeout,
-    });
-
-    if (errors.length > 0) {
-      api.diag.error(
-        'PeriodicExportingMetricReader: metrics collection errors',
-        ...errors
+    if (this._ongoingExportPromise) {
+      api.diag.debug(
+        'PeriodicExportingMetricReader: export already in progress, skipping'
       );
-    }
-
-    if (resourceMetrics.resource.asyncAttributesPending) {
-      try {
-        await resourceMetrics.resource.waitForAsyncAttributes?.();
-      } catch (e) {
-        api.diag.debug('Error while resolving async portion of resource: ', e);
-        globalErrorHandler(e);
-      }
-    }
-
-    if (resourceMetrics.scopeMetrics.length === 0) {
       return;
     }
 
-    const result = await internal._export(this._exporter, resourceMetrics);
-    if (result.code !== ExportResultCode.SUCCESS) {
-      throw new Error(
-        `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`
-      );
+    const currentRun = async () => {
+      const { resourceMetrics, errors } = await this.collect({
+        timeoutMillis: this._exportTimeout,
+      });
+
+      if (errors.length > 0) {
+        api.diag.error(
+          'PeriodicExportingMetricReader: metrics collection errors',
+          ...errors
+        );
+      }
+
+      if (resourceMetrics.resource.asyncAttributesPending) {
+        try {
+          await resourceMetrics.resource.waitForAsyncAttributes?.();
+        } catch (e) {
+          api.diag.debug(
+            'Error while resolving async portion of resource: ',
+            e
+          );
+          globalErrorHandler(e);
+        }
+      }
+
+      if (resourceMetrics.scopeMetrics.length === 0) {
+        return;
+      }
+
+      const batches = this._maxExportBatchSize
+        ? splitMetricData(resourceMetrics, this._maxExportBatchSize)
+        : [resourceMetrics];
+
+      let anyErr: Error | null = null;
+      for (const batch of batches) {
+        try {
+          const result = await callWithTimeout(
+            internal._export(this._exporter, batch),
+            this._exportTimeout
+          );
+          if (result.code !== ExportResultCode.SUCCESS) {
+            const err = new Error(
+              `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`
+            );
+            anyErr = err;
+          }
+        } catch (e) {
+          if (e instanceof TimeoutError) {
+            api.diag.error(
+              `PeriodicExportingMetricReader: metrics export timed out after ${this._exportTimeout}ms`
+            );
+            break;
+          } else {
+            api.diag.error(
+              'PeriodicExportingMetricReader: metrics export threw error',
+              e
+            );
+            anyErr = e instanceof Error ? e : new Error(String(e));
+          }
+        }
+      }
+      if (anyErr) {
+        throw anyErr;
+      }
+    };
+
+    this._ongoingExportPromise = currentRun();
+    try {
+      await this._ongoingExportPromise;
+    } finally {
+      this._ongoingExportPromise = null;
     }
   }
 
@@ -199,8 +257,36 @@ export class PeriodicExportingMetricReader extends MetricReader {
   }
 
   protected async onForceFlush(): Promise<void> {
-    await this._runOnce();
+    // Wait for any in-progress export to finish first so that we never run
+    // collect + export concurrently with it.
+    await this._awaitOngoingExport();
+    // forceFlush SHOULD collect and export the latest metrics. If a concurrent
+    // caller already started a fresh export while we were waiting above, await
+    // that one instead of starting yet another collect + export cycle;
+    // otherwise run our own.
+    if (this._ongoingExportPromise) {
+      await this._awaitOngoingExport();
+    } else {
+      await this._runOnce();
+    }
     await this._exporter.forceFlush();
+  }
+
+  /**
+   * Helper function to wait for an ongoing export to complete.
+   * Errors are swallowed and handled by the original _runOnce().
+   */
+  private async _awaitOngoingExport(): Promise<void> {
+    if (this._ongoingExportPromise) {
+      api.diag.debug(
+        'PeriodicExportingMetricReader: export already in progress, awaiting ongoing export'
+      );
+      try {
+        await this._ongoingExportPromise;
+      } catch {
+        // Error is handled by the _runOnce() that initiated the export.
+      }
+    }
   }
 
   protected async onShutdown(): Promise<void> {

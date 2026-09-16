@@ -9,7 +9,7 @@ import type { ExportResult } from '@opentelemetry/core';
 import { ExportResultCode } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
 import type { ThriftProcess } from '../src/types';
-import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace';
 import { TraceFlags } from '@opentelemetry/api';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import * as nock from 'nock';

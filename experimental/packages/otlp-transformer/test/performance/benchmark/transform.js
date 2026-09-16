@@ -4,7 +4,7 @@
  */
 
 const Benchmark = require('benchmark');
-const { BasicTracerProvider } = require('@opentelemetry/sdk-trace-base');
+const { TracerProvider } = require('@opentelemetry/sdk-trace');
 const {
   ProtobufTraceSerializer,
   JsonTraceSerializer,
@@ -12,7 +12,7 @@ const {
   JsonLogsSerializer,
   ProtobufMetricsSerializer,
   JsonMetricsSerializer,
-} = require('../../../build/src');
+} = require('../../../dist/index.cjs');
 const { resourceFromAttributes } = require('@opentelemetry/resources');
 const { TraceFlags } = require('@opentelemetry/api');
 const { SeverityNumber } = require('@opentelemetry/api-logs');
@@ -43,7 +43,7 @@ const attributes = {
 };
 
 // setup traces
-const tracerProvider = new BasicTracerProvider({
+const tracerProvider = new TracerProvider({
   resource,
 });
 const tracer = tracerProvider.getTracer(

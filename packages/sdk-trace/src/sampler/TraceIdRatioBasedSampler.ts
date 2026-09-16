@@ -14,7 +14,8 @@ export class TraceIdRatioBasedSampler implements Sampler {
 
   constructor(ratio = 0) {
     this._ratio = this._normalize(ratio);
-    this._upperBound = Math.floor(this._ratio * 0xffffffff);
+    this._upperBound =
+      this._ratio === 1 ? 0x100000000 : Math.floor(this._ratio * 0xffffffff);
   }
 
   shouldSample(context: unknown, traceId: string): SamplingResult {

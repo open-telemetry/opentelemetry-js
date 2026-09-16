@@ -244,7 +244,7 @@ export const METRIC_CICD_PIPELINE_RUN_DURATION = 'cicd.pipeline.run.duration' as
 export const METRIC_CICD_PIPELINE_RUN_ERRORS = 'cicd.pipeline.run.errors' as const;
 
 /**
- * The number of errors in a component of the CICD system (eg. controller, scheduler, agent).
+ * The number of errors in a component of the CI/CD system (eg. controller, scheduler, agent).
  *
  * @note Errors in pipeline run execution are explicitly excluded. Ie a test failure is not counted in this metric.
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -252,16 +252,16 @@ export const METRIC_CICD_PIPELINE_RUN_ERRORS = 'cicd.pipeline.run.errors' as con
 export const METRIC_CICD_SYSTEM_ERRORS = 'cicd.system.errors' as const;
 
 /**
- * The number of workers on the CICD system by state.
+ * The number of workers on the CI/CD system by state.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_CICD_WORKER_COUNT = 'cicd.worker.count' as const;
 
 /**
- * Total CPU time consumed.
+ * CPU time consumed.
  *
- * @note Total CPU time consumed by the specific container on all available CPU cores
+ * @note CPU time consumed by the specific container on all available CPU cores
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -689,6 +689,8 @@ export const METRIC_FAAS_TIMEOUTS = 'faas.timeouts' as const;
  * GenAI operation duration.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const METRIC_GEN_AI_CLIENT_OPERATION_DURATION = 'gen_ai.client.operation.duration' as const;
 
@@ -698,6 +700,8 @@ export const METRIC_GEN_AI_CLIENT_OPERATION_DURATION = 'gen_ai.client.operation.
  * @note This metrics **SHOULD** be reported for streaming calls and **SHOULD NOT** be reported otherwise.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const METRIC_GEN_AI_CLIENT_OPERATION_TIME_PER_OUTPUT_CHUNK = 'gen_ai.client.operation.time_per_output_chunk' as const;
 
@@ -707,6 +711,8 @@ export const METRIC_GEN_AI_CLIENT_OPERATION_TIME_PER_OUTPUT_CHUNK = 'gen_ai.clie
  * @note This metrics **SHOULD** be reported for streaming calls and **SHOULD NOT** be reported otherwise.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const METRIC_GEN_AI_CLIENT_OPERATION_TIME_TO_FIRST_CHUNK = 'gen_ai.client.operation.time_to_first_chunk' as const;
 
@@ -714,6 +720,8 @@ export const METRIC_GEN_AI_CLIENT_OPERATION_TIME_TO_FIRST_CHUNK = 'gen_ai.client
  * Number of input and output tokens used.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const METRIC_GEN_AI_CLIENT_TOKEN_USAGE = 'gen_ai.client.token.usage' as const;
 
@@ -721,6 +729,8 @@ export const METRIC_GEN_AI_CLIENT_TOKEN_USAGE = 'gen_ai.client.token.usage' as c
  * Generative AI server request duration such as time-to-last byte or last output token.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const METRIC_GEN_AI_SERVER_REQUEST_DURATION = 'gen_ai.server.request.duration' as const;
 
@@ -728,6 +738,8 @@ export const METRIC_GEN_AI_SERVER_REQUEST_DURATION = 'gen_ai.server.request.dura
  * Time per output token generated after the first token for successful responses.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const METRIC_GEN_AI_SERVER_TIME_PER_OUTPUT_TOKEN = 'gen_ai.server.time_per_output_token' as const;
 
@@ -735,6 +747,8 @@ export const METRIC_GEN_AI_SERVER_TIME_PER_OUTPUT_TOKEN = 'gen_ai.server.time_pe
  * Time to generate first token for successful responses.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const METRIC_GEN_AI_SERVER_TIME_TO_FIRST_TOKEN = 'gen_ai.server.time_to_first_token' as const;
 
@@ -1378,7 +1392,7 @@ export const METRIC_K8S_CONTAINER_CPU_REQUEST_UTILIZATION = 'k8s.container.cpu.r
 /**
  * Maximum ephemeral storage resource limit set for the container.
  *
- * @note See https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#resourcerequirements-v1-core for details.
+ * @note See https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core for details.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1387,11 +1401,20 @@ export const METRIC_K8S_CONTAINER_EPHEMERAL_STORAGE_LIMIT = 'k8s.container.ephem
 /**
  * Ephemeral storage resource requested for the container.
  *
- * @note See https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#resourcerequirements-v1-core for details.
+ * @note See https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core for details.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_K8S_CONTAINER_EPHEMERAL_STORAGE_REQUEST = 'k8s.container.ephemeral_storage.request' as const;
+
+/**
+ * The ephemeral storage used by a container.
+ *
+ * @note The value for this metric can be compared against `metric.k8s.container.ephemeral_storage.request` and `metric.k8s.container.ephemeral_storage.limit`.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_CONTAINER_EPHEMERAL_STORAGE_USAGE = 'k8s.container.ephemeral_storage.usage' as const;
 
 /**
  * Deprecated, use `k8s.container.memory.limit.desired` and `k8s.container.memory.limit.current` instead.
@@ -1467,7 +1490,7 @@ export const METRIC_K8S_CONTAINER_MEMORY_REQUEST_DESIRED = 'k8s.container.memory
  * Indicates whether the container is currently marked as ready to accept traffic, based on its readiness probe (1 = ready, 0 = not ready).
  *
  * @note This metric **SHOULD** reflect the value of the `ready` field in the
- * [K8s ContainerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#containerstatus-v1-core).
+ * [K8s ContainerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#containerstatus-v1-core).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1509,7 +1532,7 @@ export const METRIC_K8S_CONTAINER_STATUS_STATE = 'k8s.container.status.state' as
 /**
  * Maximum storage resource limit set for the container.
  *
- * @note See https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#resourcerequirements-v1-core for details.
+ * @note See https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core for details.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1518,7 +1541,7 @@ export const METRIC_K8S_CONTAINER_STORAGE_LIMIT = 'k8s.container.storage.limit' 
 /**
  * Storage resource requested for the container.
  *
- * @note See https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#resourcerequirements-v1-core for details.
+ * @note See https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core for details.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1528,7 +1551,7 @@ export const METRIC_K8S_CONTAINER_STORAGE_REQUEST = 'k8s.container.storage.reque
  * Deprecated, use `k8s.cronjob.job.active` instead.
  *
  * @note This metric aligns with the `active` field of the
- * [K8s CronJobStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#cronjobstatus-v1-batch).
+ * [K8s CronJobStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#cronjobstatus-v1-batch).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -1540,7 +1563,7 @@ export const METRIC_K8S_CRONJOB_ACTIVE_JOBS = 'k8s.cronjob.active_jobs' as const
  * The number of actively running jobs for a cronjob.
  *
  * @note This metric aligns with the `active` field of the
- * [K8s CronJobStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#cronjobstatus-v1-batch).
+ * [K8s CronJobStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#cronjobstatus-v1-batch).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1550,7 +1573,7 @@ export const METRIC_K8S_CRONJOB_JOB_ACTIVE = 'k8s.cronjob.job.active' as const;
  * Deprecated, use `k8s.daemonset.node.current_scheduled` instead.
  *
  * @note This metric aligns with the `currentNumberScheduled` field of the
- * [K8s DaemonSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps).
+ * [K8s DaemonSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#daemonsetstatus-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -1562,7 +1585,7 @@ export const METRIC_K8S_DAEMONSET_CURRENT_SCHEDULED_NODES = 'k8s.daemonset.curre
  * Deprecated, use `k8s.daemonset.node.desired_scheduled` instead.
  *
  * @note This metric aligns with the `desiredNumberScheduled` field of the
- * [K8s DaemonSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps).
+ * [K8s DaemonSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#daemonsetstatus-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -1574,7 +1597,7 @@ export const METRIC_K8S_DAEMONSET_DESIRED_SCHEDULED_NODES = 'k8s.daemonset.desir
  * Deprecated, use `k8s.daemonset.node.misscheduled` instead.
  *
  * @note This metric aligns with the `numberMisscheduled` field of the
- * [K8s DaemonSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps).
+ * [K8s DaemonSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#daemonsetstatus-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -1586,7 +1609,7 @@ export const METRIC_K8S_DAEMONSET_MISSCHEDULED_NODES = 'k8s.daemonset.misschedul
  * Number of nodes that are running at least 1 daemon pod and are supposed to run the daemon pod.
  *
  * @note This metric aligns with the `currentNumberScheduled` field of the
- * [K8s DaemonSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps).
+ * [K8s DaemonSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#daemonsetstatus-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1596,7 +1619,7 @@ export const METRIC_K8S_DAEMONSET_NODE_CURRENT_SCHEDULED = 'k8s.daemonset.node.c
  * Number of nodes that should be running the daemon pod (including nodes currently running the daemon pod).
  *
  * @note This metric aligns with the `desiredNumberScheduled` field of the
- * [K8s DaemonSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps).
+ * [K8s DaemonSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#daemonsetstatus-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1606,7 +1629,7 @@ export const METRIC_K8S_DAEMONSET_NODE_DESIRED_SCHEDULED = 'k8s.daemonset.node.d
  * Number of nodes that are running the daemon pod, but are not supposed to run the daemon pod.
  *
  * @note This metric aligns with the `numberMisscheduled` field of the
- * [K8s DaemonSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps).
+ * [K8s DaemonSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#daemonsetstatus-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1616,7 +1639,7 @@ export const METRIC_K8S_DAEMONSET_NODE_MISSCHEDULED = 'k8s.daemonset.node.missch
  * Number of nodes that should be running the daemon pod and have one or more of the daemon pod running and ready.
  *
  * @note This metric aligns with the `numberReady` field of the
- * [K8s DaemonSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps).
+ * [K8s DaemonSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#daemonsetstatus-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1626,7 +1649,7 @@ export const METRIC_K8S_DAEMONSET_NODE_READY = 'k8s.daemonset.node.ready' as con
  * Deprecated, use `k8s.daemonset.node.ready` instead.
  *
  * @note This metric aligns with the `numberReady` field of the
- * [K8s DaemonSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps).
+ * [K8s DaemonSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#daemonsetstatus-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -1638,7 +1661,7 @@ export const METRIC_K8S_DAEMONSET_READY_NODES = 'k8s.daemonset.ready_nodes' as c
  * Deprecated, use `k8s.deployment.pod.available` instead.
  *
  * @note This metric aligns with the `availableReplicas` field of the
- * [K8s DeploymentStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#deploymentstatus-v1-apps).
+ * [K8s DeploymentStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#deploymentstatus-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -1650,7 +1673,7 @@ export const METRIC_K8S_DEPLOYMENT_AVAILABLE_PODS = 'k8s.deployment.available_po
  * Deprecated, use `k8s.deployment.pod.desired` instead.
  *
  * @note This metric aligns with the `replicas` field of the
- * [K8s DeploymentSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#deploymentspec-v1-apps).
+ * [K8s DeploymentSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#deploymentspec-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -1662,7 +1685,7 @@ export const METRIC_K8S_DEPLOYMENT_DESIRED_PODS = 'k8s.deployment.desired_pods' 
  * Total number of available replica pods (ready for at least minReadySeconds) targeted by this deployment.
  *
  * @note This metric aligns with the `availableReplicas` field of the
- * [K8s DeploymentStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#deploymentstatus-v1-apps).
+ * [K8s DeploymentStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#deploymentstatus-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1672,7 +1695,7 @@ export const METRIC_K8S_DEPLOYMENT_POD_AVAILABLE = 'k8s.deployment.pod.available
  * Number of desired replica pods in this deployment.
  *
  * @note This metric aligns with the `replicas` field of the
- * [K8s DeploymentSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#deploymentspec-v1-apps).
+ * [K8s DeploymentSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#deploymentspec-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1682,7 +1705,7 @@ export const METRIC_K8S_DEPLOYMENT_POD_DESIRED = 'k8s.deployment.pod.desired' as
  * Deprecated, use `k8s.hpa.pod.current` instead.
  *
  * @note This metric aligns with the `currentReplicas` field of the
- * [K8s HorizontalPodAutoscalerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerstatus-v2-autoscaling)
+ * [K8s HorizontalPodAutoscalerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#horizontalpodautoscalerstatus-v2-autoscaling)
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -1694,7 +1717,7 @@ export const METRIC_K8S_HPA_CURRENT_PODS = 'k8s.hpa.current_pods' as const;
  * Deprecated, use `k8s.hpa.pod.desired` instead.
  *
  * @note This metric aligns with the `desiredReplicas` field of the
- * [K8s HorizontalPodAutoscalerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerstatus-v2-autoscaling)
+ * [K8s HorizontalPodAutoscalerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#horizontalpodautoscalerstatus-v2-autoscaling)
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -1706,7 +1729,7 @@ export const METRIC_K8S_HPA_DESIRED_PODS = 'k8s.hpa.desired_pods' as const;
  * Deprecated, use `k8s.hpa.pod.max` instead.
  *
  * @note This metric aligns with the `maxReplicas` field of the
- * [K8s HorizontalPodAutoscalerSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerspec-v2-autoscaling)
+ * [K8s HorizontalPodAutoscalerSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#horizontalpodautoscalerspec-v2-autoscaling)
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -1718,7 +1741,7 @@ export const METRIC_K8S_HPA_MAX_PODS = 'k8s.hpa.max_pods' as const;
  * Target average utilization, in percentage, for CPU resource in HPA config.
  *
  * @note This metric aligns with the `averageUtilization` field of the
- * [K8s HPA MetricTarget](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#metrictarget-v2-autoscaling).
+ * [K8s HPA MetricTarget](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#metrictarget-v2-autoscaling).
  * If the type of the metric is [`ContainerResource`](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#support-for-metrics-apis),
  * the `k8s.container.name` attribute **MUST** be set to identify the specific container within the pod to which the metric applies.
  *
@@ -1730,7 +1753,7 @@ export const METRIC_K8S_HPA_METRIC_TARGET_CPU_AVERAGE_UTILIZATION = 'k8s.hpa.met
  * Target average value for CPU resource in HPA config.
  *
  * @note This metric aligns with the `averageValue` field of the
- * [K8s HPA MetricTarget](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#metrictarget-v2-autoscaling).
+ * [K8s HPA MetricTarget](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#metrictarget-v2-autoscaling).
  * If the type of the metric is [`ContainerResource`](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#support-for-metrics-apis),
  * the `k8s.container.name` attribute **MUST** be set to identify the specific container within the pod to which the metric applies.
  *
@@ -1742,7 +1765,7 @@ export const METRIC_K8S_HPA_METRIC_TARGET_CPU_AVERAGE_VALUE = 'k8s.hpa.metric.ta
  * Target value for CPU resource in HPA config.
  *
  * @note This metric aligns with the `value` field of the
- * [K8s HPA MetricTarget](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#metrictarget-v2-autoscaling).
+ * [K8s HPA MetricTarget](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#metrictarget-v2-autoscaling).
  * If the type of the metric is [`ContainerResource`](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#support-for-metrics-apis),
  * the `k8s.container.name` attribute **MUST** be set to identify the specific container within the pod to which the metric applies.
  *
@@ -1754,7 +1777,7 @@ export const METRIC_K8S_HPA_METRIC_TARGET_CPU_VALUE = 'k8s.hpa.metric.target.cpu
  * Deprecated, use `k8s.hpa.pod.min` instead.
  *
  * @note This metric aligns with the `minReplicas` field of the
- * [K8s HorizontalPodAutoscalerSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerspec-v2-autoscaling)
+ * [K8s HorizontalPodAutoscalerSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#horizontalpodautoscalerspec-v2-autoscaling)
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -1766,7 +1789,7 @@ export const METRIC_K8S_HPA_MIN_PODS = 'k8s.hpa.min_pods' as const;
  * Current number of replica pods managed by this horizontal pod autoscaler, as last seen by the autoscaler.
  *
  * @note This metric aligns with the `currentReplicas` field of the
- * [K8s HorizontalPodAutoscalerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerstatus-v2-autoscaling)
+ * [K8s HorizontalPodAutoscalerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#horizontalpodautoscalerstatus-v2-autoscaling)
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1776,7 +1799,7 @@ export const METRIC_K8S_HPA_POD_CURRENT = 'k8s.hpa.pod.current' as const;
  * Desired number of replica pods managed by this horizontal pod autoscaler, as last calculated by the autoscaler.
  *
  * @note This metric aligns with the `desiredReplicas` field of the
- * [K8s HorizontalPodAutoscalerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerstatus-v2-autoscaling)
+ * [K8s HorizontalPodAutoscalerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#horizontalpodautoscalerstatus-v2-autoscaling)
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1786,7 +1809,7 @@ export const METRIC_K8S_HPA_POD_DESIRED = 'k8s.hpa.pod.desired' as const;
  * The upper limit for the number of replica pods to which the autoscaler can scale up.
  *
  * @note This metric aligns with the `maxReplicas` field of the
- * [K8s HorizontalPodAutoscalerSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerspec-v2-autoscaling)
+ * [K8s HorizontalPodAutoscalerSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#horizontalpodautoscalerspec-v2-autoscaling)
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1796,7 +1819,7 @@ export const METRIC_K8S_HPA_POD_MAX = 'k8s.hpa.pod.max' as const;
  * The lower limit for the number of replica pods to which the autoscaler can scale down.
  *
  * @note This metric aligns with the `minReplicas` field of the
- * [K8s HorizontalPodAutoscalerSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerspec-v2-autoscaling)
+ * [K8s HorizontalPodAutoscalerSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#horizontalpodautoscalerspec-v2-autoscaling)
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1806,7 +1829,7 @@ export const METRIC_K8S_HPA_POD_MIN = 'k8s.hpa.pod.min' as const;
  * Deprecated, use `k8s.job.pod.active` instead.
  *
  * @note This metric aligns with the `active` field of the
- * [K8s JobStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobstatus-v1-batch).
+ * [K8s JobStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#jobstatus-v1-batch).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -1818,7 +1841,7 @@ export const METRIC_K8S_JOB_ACTIVE_PODS = 'k8s.job.active_pods' as const;
  * Deprecated, use `k8s.job.pod.desired_successful` instead.
  *
  * @note This metric aligns with the `completions` field of the
- * [K8s JobSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobspec-v1-batch)..
+ * [K8s JobSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#jobspec-v1-batch)..
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -1830,7 +1853,7 @@ export const METRIC_K8S_JOB_DESIRED_SUCCESSFUL_PODS = 'k8s.job.desired_successfu
  * Deprecated, use `k8s.job.pod.failed` instead.
  *
  * @note This metric aligns with the `failed` field of the
- * [K8s JobStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobstatus-v1-batch).
+ * [K8s JobStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#jobstatus-v1-batch).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -1842,7 +1865,7 @@ export const METRIC_K8S_JOB_FAILED_PODS = 'k8s.job.failed_pods' as const;
  * Deprecated, use `k8s.job.pod.max_parallel` instead.
  *
  * @note This metric aligns with the `parallelism` field of the
- * [K8s JobSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobspec-v1-batch).
+ * [K8s JobSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#jobspec-v1-batch).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -1854,7 +1877,7 @@ export const METRIC_K8S_JOB_MAX_PARALLEL_PODS = 'k8s.job.max_parallel_pods' as c
  * The number of pending and actively running pods for a job.
  *
  * @note This metric aligns with the `active` field of the
- * [K8s JobStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobstatus-v1-batch).
+ * [K8s JobStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#jobstatus-v1-batch).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1864,7 +1887,7 @@ export const METRIC_K8S_JOB_POD_ACTIVE = 'k8s.job.pod.active' as const;
  * The desired number of successfully finished pods the job should be run with.
  *
  * @note This metric aligns with the `completions` field of the
- * [K8s JobSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobspec-v1-batch)..
+ * [K8s JobSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#jobspec-v1-batch)..
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1874,7 +1897,7 @@ export const METRIC_K8S_JOB_POD_DESIRED_SUCCESSFUL = 'k8s.job.pod.desired_succes
  * The number of pods which reached phase Failed for a job.
  *
  * @note This metric aligns with the `failed` field of the
- * [K8s JobStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobstatus-v1-batch).
+ * [K8s JobStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#jobstatus-v1-batch).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1884,7 +1907,7 @@ export const METRIC_K8S_JOB_POD_FAILED = 'k8s.job.pod.failed' as const;
  * The max desired number of pods the job should run at any given time.
  *
  * @note This metric aligns with the `parallelism` field of the
- * [K8s JobSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobspec-v1-batch).
+ * [K8s JobSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#jobspec-v1-batch).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1894,7 +1917,7 @@ export const METRIC_K8S_JOB_POD_MAX_PARALLEL = 'k8s.job.pod.max_parallel' as con
  * The number of pods which reached phase Succeeded for a job.
  *
  * @note This metric aligns with the `succeeded` field of the
- * [K8s JobStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobstatus-v1-batch).
+ * [K8s JobStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#jobstatus-v1-batch).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1904,7 +1927,7 @@ export const METRIC_K8S_JOB_POD_SUCCESSFUL = 'k8s.job.pod.successful' as const;
  * Deprecated, use `k8s.job.pod.successful` instead.
  *
  * @note This metric aligns with the `succeeded` field of the
- * [K8s JobStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobstatus-v1-batch).
+ * [K8s JobStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#jobstatus-v1-batch).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -2437,7 +2460,7 @@ export const METRIC_K8S_POD_VOLUME_USAGE = 'k8s.pod.volume.usage' as const;
  * Deprecated, use `k8s.replicaset.pod.available` instead.
  *
  * @note This metric aligns with the `availableReplicas` field of the
- * [K8s ReplicaSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicasetstatus-v1-apps).
+ * [K8s ReplicaSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#replicasetstatus-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -2449,7 +2472,7 @@ export const METRIC_K8S_REPLICASET_AVAILABLE_PODS = 'k8s.replicaset.available_po
  * Deprecated, use `k8s.replicaset.pod.desired` instead.
  *
  * @note This metric aligns with the `replicas` field of the
- * [K8s ReplicaSetSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicasetspec-v1-apps).
+ * [K8s ReplicaSetSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#replicasetspec-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -2461,7 +2484,7 @@ export const METRIC_K8S_REPLICASET_DESIRED_PODS = 'k8s.replicaset.desired_pods' 
  * Total number of available replica pods (ready for at least minReadySeconds) targeted by this replicaset.
  *
  * @note This metric aligns with the `availableReplicas` field of the
- * [K8s ReplicaSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicasetstatus-v1-apps).
+ * [K8s ReplicaSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#replicasetstatus-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2471,7 +2494,7 @@ export const METRIC_K8S_REPLICASET_POD_AVAILABLE = 'k8s.replicaset.pod.available
  * Number of desired replica pods in this replicaset.
  *
  * @note This metric aligns with the `replicas` field of the
- * [K8s ReplicaSetSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicasetspec-v1-apps).
+ * [K8s ReplicaSetSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#replicasetspec-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2517,7 +2540,7 @@ export const METRIC_K8S_REPLICATIONCONTROLLER_DESIRED_PODS = 'k8s.replicationcon
  * Total number of available replica pods (ready for at least minReadySeconds) targeted by this replication controller.
  *
  * @note This metric aligns with the `availableReplicas` field of the
- * [K8s ReplicationControllerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicationcontrollerstatus-v1-core)
+ * [K8s ReplicationControllerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#replicationcontrollerstatus-v1-core)
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2527,7 +2550,7 @@ export const METRIC_K8S_REPLICATIONCONTROLLER_POD_AVAILABLE = 'k8s.replicationco
  * Number of desired replica pods in this replication controller.
  *
  * @note This metric aligns with the `replicas` field of the
- * [K8s ReplicationControllerSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicationcontrollerspec-v1-core)
+ * [K8s ReplicationControllerSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#replicationcontrollerspec-v1-core)
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2538,7 +2561,7 @@ export const METRIC_K8S_REPLICATIONCONTROLLER_POD_DESIRED = 'k8s.replicationcont
  * The value represents the configured quota limit of the resource in the namespace.
  *
  * @note This metric is retrieved from the `hard` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core).
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2549,7 +2572,7 @@ export const METRIC_K8S_RESOURCEQUOTA_CPU_LIMIT_HARD = 'k8s.resourcequota.cpu.li
  * The value represents the current observed total usage of the resource in the namespace.
  *
  * @note This metric is retrieved from the `used` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core).
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2560,7 +2583,7 @@ export const METRIC_K8S_RESOURCEQUOTA_CPU_LIMIT_USED = 'k8s.resourcequota.cpu.li
  * The value represents the configured quota limit of the resource in the namespace.
  *
  * @note This metric is retrieved from the `hard` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core).
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2571,7 +2594,7 @@ export const METRIC_K8S_RESOURCEQUOTA_CPU_REQUEST_HARD = 'k8s.resourcequota.cpu.
  * The value represents the current observed total usage of the resource in the namespace.
  *
  * @note This metric is retrieved from the `used` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core).
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2582,7 +2605,7 @@ export const METRIC_K8S_RESOURCEQUOTA_CPU_REQUEST_USED = 'k8s.resourcequota.cpu.
  * The value represents the configured quota limit of the resource in the namespace.
  *
  * @note This metric is retrieved from the `hard` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core).
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2593,7 +2616,7 @@ export const METRIC_K8S_RESOURCEQUOTA_EPHEMERAL_STORAGE_LIMIT_HARD = 'k8s.resour
  * The value represents the current observed total usage of the resource in the namespace.
  *
  * @note This metric is retrieved from the `used` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core).
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2604,7 +2627,7 @@ export const METRIC_K8S_RESOURCEQUOTA_EPHEMERAL_STORAGE_LIMIT_USED = 'k8s.resour
  * The value represents the configured quota limit of the resource in the namespace.
  *
  * @note This metric is retrieved from the `hard` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core).
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2615,7 +2638,7 @@ export const METRIC_K8S_RESOURCEQUOTA_EPHEMERAL_STORAGE_REQUEST_HARD = 'k8s.reso
  * The value represents the current observed total usage of the resource in the namespace.
  *
  * @note This metric is retrieved from the `used` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core).
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2626,7 +2649,7 @@ export const METRIC_K8S_RESOURCEQUOTA_EPHEMERAL_STORAGE_REQUEST_USED = 'k8s.reso
  * The value represents the configured quota limit of the resource in the namespace.
  *
  * @note This metric is retrieved from the `hard` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core).
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2637,7 +2660,7 @@ export const METRIC_K8S_RESOURCEQUOTA_HUGEPAGE_COUNT_REQUEST_HARD = 'k8s.resourc
  * The value represents the current observed total usage of the resource in the namespace.
  *
  * @note This metric is retrieved from the `used` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core).
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2648,7 +2671,7 @@ export const METRIC_K8S_RESOURCEQUOTA_HUGEPAGE_COUNT_REQUEST_USED = 'k8s.resourc
  * The value represents the configured quota limit of the resource in the namespace.
  *
  * @note This metric is retrieved from the `hard` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core).
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2659,7 +2682,7 @@ export const METRIC_K8S_RESOURCEQUOTA_MEMORY_LIMIT_HARD = 'k8s.resourcequota.mem
  * The value represents the current observed total usage of the resource in the namespace.
  *
  * @note This metric is retrieved from the `used` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core).
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2670,7 +2693,7 @@ export const METRIC_K8S_RESOURCEQUOTA_MEMORY_LIMIT_USED = 'k8s.resourcequota.mem
  * The value represents the configured quota limit of the resource in the namespace.
  *
  * @note This metric is retrieved from the `hard` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core).
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2681,7 +2704,7 @@ export const METRIC_K8S_RESOURCEQUOTA_MEMORY_REQUEST_HARD = 'k8s.resourcequota.m
  * The value represents the current observed total usage of the resource in the namespace.
  *
  * @note This metric is retrieved from the `used` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core).
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2692,7 +2715,7 @@ export const METRIC_K8S_RESOURCEQUOTA_MEMORY_REQUEST_USED = 'k8s.resourcequota.m
  * The value represents the configured quota limit of the resource in the namespace.
  *
  * @note This metric is retrieved from the `hard` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core).
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2703,7 +2726,7 @@ export const METRIC_K8S_RESOURCEQUOTA_OBJECT_COUNT_HARD = 'k8s.resourcequota.obj
  * The value represents the current observed total usage of the resource in the namespace.
  *
  * @note This metric is retrieved from the `used` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core).
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2714,7 +2737,7 @@ export const METRIC_K8S_RESOURCEQUOTA_OBJECT_COUNT_USED = 'k8s.resourcequota.obj
  * The value represents the configured quota limit of the resource in the namespace.
  *
  * @note This metric is retrieved from the `hard` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core).
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core).
  *
  * The `k8s.storageclass.name` should be required when a resource quota is defined for a specific
  * storage class.
@@ -2728,7 +2751,7 @@ export const METRIC_K8S_RESOURCEQUOTA_PERSISTENTVOLUMECLAIM_COUNT_HARD = 'k8s.re
  * The value represents the current observed total usage of the resource in the namespace.
  *
  * @note This metric is retrieved from the `used` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core).
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core).
  *
  * The `k8s.storageclass.name` should be required when a resource quota is defined for a specific
  * storage class.
@@ -2742,7 +2765,7 @@ export const METRIC_K8S_RESOURCEQUOTA_PERSISTENTVOLUMECLAIM_COUNT_USED = 'k8s.re
  * The value represents the configured quota limit of the resource in the namespace.
  *
  * @note This metric is retrieved from the `hard` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core).
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core).
  *
  * The `k8s.storageclass.name` should be required when a resource quota is defined for a specific
  * storage class.
@@ -2756,7 +2779,7 @@ export const METRIC_K8S_RESOURCEQUOTA_STORAGE_REQUEST_HARD = 'k8s.resourcequota.
  * The value represents the current observed total usage of the resource in the namespace.
  *
  * @note This metric is retrieved from the `used` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core).
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core).
  *
  * The `k8s.storageclass.name` should be required when a resource quota is defined for a specific
  * storage class.
@@ -2816,7 +2839,7 @@ export const METRIC_K8S_SERVICE_LOAD_BALANCER_INGRESS_COUNT = 'k8s.service.load_
  * Deprecated, use `k8s.statefulset.pod.current` instead.
  *
  * @note This metric aligns with the `currentReplicas` field of the
- * [K8s StatefulSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps).
+ * [K8s StatefulSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#statefulsetstatus-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -2828,7 +2851,7 @@ export const METRIC_K8S_STATEFULSET_CURRENT_PODS = 'k8s.statefulset.current_pods
  * Deprecated, use `k8s.statefulset.pod.desired` instead.
  *
  * @note This metric aligns with the `replicas` field of the
- * [K8s StatefulSetSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetspec-v1-apps).
+ * [K8s StatefulSetSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#statefulsetspec-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -2840,7 +2863,7 @@ export const METRIC_K8S_STATEFULSET_DESIRED_PODS = 'k8s.statefulset.desired_pods
  * The number of replica pods created by the statefulset controller from the statefulset version indicated by currentRevision.
  *
  * @note This metric aligns with the `currentReplicas` field of the
- * [K8s StatefulSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps).
+ * [K8s StatefulSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#statefulsetstatus-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2850,7 +2873,7 @@ export const METRIC_K8S_STATEFULSET_POD_CURRENT = 'k8s.statefulset.pod.current' 
  * Number of desired replica pods in this statefulset.
  *
  * @note This metric aligns with the `replicas` field of the
- * [K8s StatefulSetSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetspec-v1-apps).
+ * [K8s StatefulSetSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#statefulsetspec-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2860,7 +2883,7 @@ export const METRIC_K8S_STATEFULSET_POD_DESIRED = 'k8s.statefulset.pod.desired' 
  * The number of replica pods created for this statefulset with a Ready Condition.
  *
  * @note This metric aligns with the `readyReplicas` field of the
- * [K8s StatefulSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps).
+ * [K8s StatefulSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#statefulsetstatus-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2870,7 +2893,7 @@ export const METRIC_K8S_STATEFULSET_POD_READY = 'k8s.statefulset.pod.ready' as c
  * Number of replica pods created by the statefulset controller from the statefulset version indicated by updateRevision.
  *
  * @note This metric aligns with the `updatedReplicas` field of the
- * [K8s StatefulSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps).
+ * [K8s StatefulSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#statefulsetstatus-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2880,7 +2903,7 @@ export const METRIC_K8S_STATEFULSET_POD_UPDATED = 'k8s.statefulset.pod.updated' 
  * Deprecated, use `k8s.statefulset.pod.ready` instead.
  *
  * @note This metric aligns with the `readyReplicas` field of the
- * [K8s StatefulSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps).
+ * [K8s StatefulSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#statefulsetstatus-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -2892,7 +2915,7 @@ export const METRIC_K8S_STATEFULSET_READY_PODS = 'k8s.statefulset.ready_pods' as
  * Deprecated, use `k8s.statefulset.pod.updated` instead.
  *
  * @note This metric aligns with the `updatedReplicas` field of the
- * [K8s StatefulSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps).
+ * [K8s StatefulSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#statefulsetstatus-v1-apps).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -2904,6 +2927,8 @@ export const METRIC_K8S_STATEFULSET_UPDATED_PODS = 'k8s.statefulset.updated_pods
  * The duration of the MCP request or notification as observed on the sender from the time it was sent until the response or ack is received.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const METRIC_MCP_CLIENT_OPERATION_DURATION = 'mcp.client.operation.duration' as const;
 
@@ -2911,6 +2936,8 @@ export const METRIC_MCP_CLIENT_OPERATION_DURATION = 'mcp.client.operation.durati
  * The duration of the MCP session as observed on the MCP client.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const METRIC_MCP_CLIENT_SESSION_DURATION = 'mcp.client.session.duration' as const;
 
@@ -2918,6 +2945,8 @@ export const METRIC_MCP_CLIENT_SESSION_DURATION = 'mcp.client.session.duration' 
  * MCP request or notification duration as observed on the receiver from the time it was received until the result or ack is sent.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const METRIC_MCP_SERVER_OPERATION_DURATION = 'mcp.server.operation.duration' as const;
 
@@ -2925,6 +2954,8 @@ export const METRIC_MCP_SERVER_OPERATION_DURATION = 'mcp.server.operation.durati
  * The duration of the MCP session as observed on the MCP server.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
  */
 export const METRIC_MCP_SERVER_SESSION_DURATION = 'mcp.server.session.duration' as const;
 
@@ -3157,7 +3188,7 @@ export const METRIC_NFS_SERVER_THREAD_COUNT = 'nfs.server.thread.count' as const
 /**
  * Event loop maximum delay.
  *
- * @note Value can be retrieved from value `histogram.max` of [`perf_hooks.monitorEventLoopDelay([options])`](https://nodejs.org/api/perf_hooks.html#perf-hooksmonitoreventloopdelayoptions)
+ * @note Value can be retrieved from value `histogram.max` of [`perf_hooks.monitorEventLoopDelay([options])`](https://nodejs.org/api/perf_hooks.html#perf_hooksmonitoreventloopdelayoptions)
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -3166,7 +3197,7 @@ export const METRIC_NODEJS_EVENTLOOP_DELAY_MAX = 'nodejs.eventloop.delay.max' as
 /**
  * Event loop mean delay.
  *
- * @note Value can be retrieved from value `histogram.mean` of [`perf_hooks.monitorEventLoopDelay([options])`](https://nodejs.org/api/perf_hooks.html#perf-hooksmonitoreventloopdelayoptions)
+ * @note Value can be retrieved from value `histogram.mean` of [`perf_hooks.monitorEventLoopDelay([options])`](https://nodejs.org/api/perf_hooks.html#perf_hooksmonitoreventloopdelayoptions)
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -3175,7 +3206,7 @@ export const METRIC_NODEJS_EVENTLOOP_DELAY_MEAN = 'nodejs.eventloop.delay.mean' 
 /**
  * Event loop minimum delay.
  *
- * @note Value can be retrieved from value `histogram.min` of [`perf_hooks.monitorEventLoopDelay([options])`](https://nodejs.org/api/perf_hooks.html#perf-hooksmonitoreventloopdelayoptions)
+ * @note Value can be retrieved from value `histogram.min` of [`perf_hooks.monitorEventLoopDelay([options])`](https://nodejs.org/api/perf_hooks.html#perf_hooksmonitoreventloopdelayoptions)
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -3184,7 +3215,7 @@ export const METRIC_NODEJS_EVENTLOOP_DELAY_MIN = 'nodejs.eventloop.delay.min' as
 /**
  * Event loop 50 percentile delay.
  *
- * @note Value can be retrieved from value `histogram.percentile(50)` of [`perf_hooks.monitorEventLoopDelay([options])`](https://nodejs.org/api/perf_hooks.html#perf-hooksmonitoreventloopdelayoptions)
+ * @note Value can be retrieved from value `histogram.percentile(50)` of [`perf_hooks.monitorEventLoopDelay([options])`](https://nodejs.org/api/perf_hooks.html#perf_hooksmonitoreventloopdelayoptions)
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -3193,7 +3224,7 @@ export const METRIC_NODEJS_EVENTLOOP_DELAY_P50 = 'nodejs.eventloop.delay.p50' as
 /**
  * Event loop 90 percentile delay.
  *
- * @note Value can be retrieved from value `histogram.percentile(90)` of [`perf_hooks.monitorEventLoopDelay([options])`](https://nodejs.org/api/perf_hooks.html#perf-hooksmonitoreventloopdelayoptions)
+ * @note Value can be retrieved from value `histogram.percentile(90)` of [`perf_hooks.monitorEventLoopDelay([options])`](https://nodejs.org/api/perf_hooks.html#perf_hooksmonitoreventloopdelayoptions)
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -3202,7 +3233,7 @@ export const METRIC_NODEJS_EVENTLOOP_DELAY_P90 = 'nodejs.eventloop.delay.p90' as
 /**
  * Event loop 99 percentile delay.
  *
- * @note Value can be retrieved from value `histogram.percentile(99)` of [`perf_hooks.monitorEventLoopDelay([options])`](https://nodejs.org/api/perf_hooks.html#perf-hooksmonitoreventloopdelayoptions)
+ * @note Value can be retrieved from value `histogram.percentile(99)` of [`perf_hooks.monitorEventLoopDelay([options])`](https://nodejs.org/api/perf_hooks.html#perf_hooksmonitoreventloopdelayoptions)
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -3211,7 +3242,7 @@ export const METRIC_NODEJS_EVENTLOOP_DELAY_P99 = 'nodejs.eventloop.delay.p99' as
 /**
  * Event loop standard deviation delay.
  *
- * @note Value can be retrieved from value `histogram.stddev` of [`perf_hooks.monitorEventLoopDelay([options])`](https://nodejs.org/api/perf_hooks.html#perf-hooksmonitoreventloopdelayoptions)
+ * @note Value can be retrieved from value `histogram.stddev` of [`perf_hooks.monitorEventLoopDelay([options])`](https://nodejs.org/api/perf_hooks.html#perf_hooksmonitoreventloopdelayoptions)
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -3239,7 +3270,7 @@ export const METRIC_NODEJS_EVENTLOOP_UTILIZATION = 'nodejs.eventloop.utilization
  * The enforced hard limit of the resource across all projects.
  *
  * @note This metric is retrieved from the `Status.Total.Hard` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core)
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core)
  * of the
  * [ClusterResourceQuota](https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/schedule_and_quota_apis/clusterresourcequota-quota-openshift-io-v1#status-total).
  *
@@ -3251,7 +3282,7 @@ export const METRIC_OPENSHIFT_CLUSTERQUOTA_CPU_LIMIT_HARD = 'openshift.clusterqu
  * The current observed total usage of the resource across all projects.
  *
  * @note This metric is retrieved from the `Status.Total.Used` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core)
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core)
  * of the
  * [ClusterResourceQuota](https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/schedule_and_quota_apis/clusterresourcequota-quota-openshift-io-v1#status-total).
  *
@@ -3263,7 +3294,7 @@ export const METRIC_OPENSHIFT_CLUSTERQUOTA_CPU_LIMIT_USED = 'openshift.clusterqu
  * The enforced hard limit of the resource across all projects.
  *
  * @note This metric is retrieved from the `Status.Total.Hard` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core)
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core)
  * of the
  * [ClusterResourceQuota](https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/schedule_and_quota_apis/clusterresourcequota-quota-openshift-io-v1#status-total).
  *
@@ -3275,7 +3306,7 @@ export const METRIC_OPENSHIFT_CLUSTERQUOTA_CPU_REQUEST_HARD = 'openshift.cluster
  * The current observed total usage of the resource across all projects.
  *
  * @note This metric is retrieved from the `Status.Total.Used` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core)
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core)
  * of the
  * [ClusterResourceQuota](https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/schedule_and_quota_apis/clusterresourcequota-quota-openshift-io-v1#status-total).
  *
@@ -3287,7 +3318,7 @@ export const METRIC_OPENSHIFT_CLUSTERQUOTA_CPU_REQUEST_USED = 'openshift.cluster
  * The enforced hard limit of the resource across all projects.
  *
  * @note This metric is retrieved from the `Status.Total.Hard` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core)
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core)
  * of the
  * [ClusterResourceQuota](https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/schedule_and_quota_apis/clusterresourcequota-quota-openshift-io-v1#status-total).
  *
@@ -3299,7 +3330,7 @@ export const METRIC_OPENSHIFT_CLUSTERQUOTA_EPHEMERAL_STORAGE_LIMIT_HARD = 'opens
  * The current observed total usage of the resource across all projects.
  *
  * @note This metric is retrieved from the `Status.Total.Used` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core)
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core)
  * of the
  * [ClusterResourceQuota](https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/schedule_and_quota_apis/clusterresourcequota-quota-openshift-io-v1#status-total).
  *
@@ -3311,7 +3342,7 @@ export const METRIC_OPENSHIFT_CLUSTERQUOTA_EPHEMERAL_STORAGE_LIMIT_USED = 'opens
  * The enforced hard limit of the resource across all projects.
  *
  * @note This metric is retrieved from the `Status.Total.Hard` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core)
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core)
  * of the
  * [ClusterResourceQuota](https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/schedule_and_quota_apis/clusterresourcequota-quota-openshift-io-v1#status-total).
  *
@@ -3323,7 +3354,7 @@ export const METRIC_OPENSHIFT_CLUSTERQUOTA_EPHEMERAL_STORAGE_REQUEST_HARD = 'ope
  * The current observed total usage of the resource across all projects.
  *
  * @note This metric is retrieved from the `Status.Total.Used` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core)
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core)
  * of the
  * [ClusterResourceQuota](https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/schedule_and_quota_apis/clusterresourcequota-quota-openshift-io-v1#status-total).
  *
@@ -3335,7 +3366,7 @@ export const METRIC_OPENSHIFT_CLUSTERQUOTA_EPHEMERAL_STORAGE_REQUEST_USED = 'ope
  * The enforced hard limit of the resource across all projects.
  *
  * @note This metric is retrieved from the `Status.Total.Hard` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core)
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core)
  * of the
  * [ClusterResourceQuota](https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/schedule_and_quota_apis/clusterresourcequota-quota-openshift-io-v1#status-total).
  *
@@ -3347,7 +3378,7 @@ export const METRIC_OPENSHIFT_CLUSTERQUOTA_HUGEPAGE_COUNT_REQUEST_HARD = 'opensh
  * The current observed total usage of the resource across all projects.
  *
  * @note This metric is retrieved from the `Status.Total.Used` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core)
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core)
  * of the
  * [ClusterResourceQuota](https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/schedule_and_quota_apis/clusterresourcequota-quota-openshift-io-v1#status-total).
  *
@@ -3359,7 +3390,7 @@ export const METRIC_OPENSHIFT_CLUSTERQUOTA_HUGEPAGE_COUNT_REQUEST_USED = 'opensh
  * The enforced hard limit of the resource across all projects.
  *
  * @note This metric is retrieved from the `Status.Total.Hard` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core)
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core)
  * of the
  * [ClusterResourceQuota](https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/schedule_and_quota_apis/clusterresourcequota-quota-openshift-io-v1#status-total).
  *
@@ -3371,7 +3402,7 @@ export const METRIC_OPENSHIFT_CLUSTERQUOTA_MEMORY_LIMIT_HARD = 'openshift.cluste
  * The current observed total usage of the resource across all projects.
  *
  * @note This metric is retrieved from the `Status.Total.Used` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core)
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core)
  * of the
  * [ClusterResourceQuota](https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/schedule_and_quota_apis/clusterresourcequota-quota-openshift-io-v1#status-total).
  *
@@ -3383,7 +3414,7 @@ export const METRIC_OPENSHIFT_CLUSTERQUOTA_MEMORY_LIMIT_USED = 'openshift.cluste
  * The enforced hard limit of the resource across all projects.
  *
  * @note This metric is retrieved from the `Status.Total.Hard` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core)
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core)
  * of the
  * [ClusterResourceQuota](https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/schedule_and_quota_apis/clusterresourcequota-quota-openshift-io-v1#status-total).
  *
@@ -3395,7 +3426,7 @@ export const METRIC_OPENSHIFT_CLUSTERQUOTA_MEMORY_REQUEST_HARD = 'openshift.clus
  * The current observed total usage of the resource across all projects.
  *
  * @note This metric is retrieved from the `Status.Total.Used` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core)
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core)
  * of the
  * [ClusterResourceQuota](https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/schedule_and_quota_apis/clusterresourcequota-quota-openshift-io-v1#status-total).
  *
@@ -3407,7 +3438,7 @@ export const METRIC_OPENSHIFT_CLUSTERQUOTA_MEMORY_REQUEST_USED = 'openshift.clus
  * The enforced hard limit of the resource across all projects.
  *
  * @note This metric is retrieved from the `Status.Total.Hard` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core)
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core)
  * of the
  * [ClusterResourceQuota](https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/schedule_and_quota_apis/clusterresourcequota-quota-openshift-io-v1#status-total).
  *
@@ -3419,7 +3450,7 @@ export const METRIC_OPENSHIFT_CLUSTERQUOTA_OBJECT_COUNT_HARD = 'openshift.cluste
  * The current observed total usage of the resource across all projects.
  *
  * @note This metric is retrieved from the `Status.Total.Used` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core)
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core)
  * of the
  * [ClusterResourceQuota](https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/schedule_and_quota_apis/clusterresourcequota-quota-openshift-io-v1#status-total).
  *
@@ -3431,7 +3462,7 @@ export const METRIC_OPENSHIFT_CLUSTERQUOTA_OBJECT_COUNT_USED = 'openshift.cluste
  * The enforced hard limit of the resource across all projects.
  *
  * @note This metric is retrieved from the `Status.Total.Hard` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core)
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core)
  * of the
  * [ClusterResourceQuota](https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/schedule_and_quota_apis/clusterresourcequota-quota-openshift-io-v1#status-total).
  *
@@ -3446,7 +3477,7 @@ export const METRIC_OPENSHIFT_CLUSTERQUOTA_PERSISTENTVOLUMECLAIM_COUNT_HARD = 'o
  * The current observed total usage of the resource across all projects.
  *
  * @note This metric is retrieved from the `Status.Total.Used` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core)
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core)
  * of the
  * [ClusterResourceQuota](https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/schedule_and_quota_apis/clusterresourcequota-quota-openshift-io-v1#status-total).
  *
@@ -3461,7 +3492,7 @@ export const METRIC_OPENSHIFT_CLUSTERQUOTA_PERSISTENTVOLUMECLAIM_COUNT_USED = 'o
  * The enforced hard limit of the resource across all projects.
  *
  * @note This metric is retrieved from the `Status.Total.Hard` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core)
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core)
  * of the
  * [ClusterResourceQuota](https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/schedule_and_quota_apis/clusterresourcequota-quota-openshift-io-v1#status-total).
  *
@@ -3476,7 +3507,7 @@ export const METRIC_OPENSHIFT_CLUSTERQUOTA_STORAGE_REQUEST_HARD = 'openshift.clu
  * The current observed total usage of the resource across all projects.
  *
  * @note This metric is retrieved from the `Status.Total.Used` field of the
- * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core)
+ * [K8s ResourceQuotaStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core)
  * of the
  * [ClusterResourceQuota](https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/schedule_and_quota_apis/clusterresourcequota-quota-openshift-io-v1#status-total).
  *
@@ -3493,6 +3524,9 @@ export const METRIC_OPENSHIFT_CLUSTERQUOTA_STORAGE_REQUEST_USED = 'openshift.clu
  * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` **MUST** contain the failure cause.
  * For exporters with partial success semantics (e.g. OTLP with `rejected_log_records`), rejected log records **MUST** count as failed and only non-rejected log records count as success.
  * If no rejection reason is available, `rejected` **SHOULD** be used as value for `error.type`.
+ * If the exporter retries failed export attempts, the export operation is considered finished only after the final attempt has concluded.
+ * Each log record **MUST** be counted exactly once per export operation: intermediate failed attempts that are followed by a retry **MUST NOT** increment the counter,
+ * and `error.type` reflects the cause of the final attempt.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -3501,7 +3535,8 @@ export const METRIC_OTEL_SDK_EXPORTER_LOG_EXPORTED = 'otel.sdk.exporter.log.expo
 /**
  * The number of log records which were passed to the exporter, but that have not been exported yet (neither successful, nor failed).
  *
- * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` **MUST** contain the failure cause.
+ * @note Log records are counted as inflight from when they are passed to the exporter until the export operation has concluded.
+ * If the exporter retries failed export attempts, log records remain inflight across all retry attempts and any backoff between them.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -3513,6 +3548,9 @@ export const METRIC_OTEL_SDK_EXPORTER_LOG_INFLIGHT = 'otel.sdk.exporter.log.infl
  * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` **MUST** contain the failure cause.
  * For exporters with partial success semantics (e.g. OTLP with `rejected_data_points`), rejected data points **MUST** count as failed and only non-rejected data points count as success.
  * If no rejection reason is available, `rejected` **SHOULD** be used as value for `error.type`.
+ * If the exporter retries failed export attempts, the export operation is considered finished only after the final attempt has concluded.
+ * Each metric data point **MUST** be counted exactly once per export operation: intermediate failed attempts that are followed by a retry **MUST NOT** increment the counter,
+ * and `error.type` reflects the cause of the final attempt.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -3521,7 +3559,8 @@ export const METRIC_OTEL_SDK_EXPORTER_METRIC_DATA_POINT_EXPORTED = 'otel.sdk.exp
 /**
  * The number of metric data points which were passed to the exporter, but that have not been exported yet (neither successful, nor failed).
  *
- * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` **MUST** contain the failure cause.
+ * @note Metric data points are counted as inflight from when they are passed to the exporter until the export operation has concluded.
+ * If the exporter retries failed export attempts, metric data points remain inflight across all retry attempts and any backoff between them.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -3533,6 +3572,9 @@ export const METRIC_OTEL_SDK_EXPORTER_METRIC_DATA_POINT_INFLIGHT = 'otel.sdk.exp
  * @note This metric defines successful operations using the full success definitions for [http](https://github.com/open-telemetry/opentelemetry-proto/blob/v1.5.0/docs/specification.md#full-success-1)
  * and [grpc](https://github.com/open-telemetry/opentelemetry-proto/blob/v1.5.0/docs/specification.md#full-success). Anything else is defined as an unsuccessful operation. For successful
  * operations, `error.type` **MUST NOT** be set. For unsuccessful export operations, `error.type` **MUST** contain a relevant failure cause.
+ * If the exporter retries failed export attempts, exactly one observation **MUST** be recorded per export operation,
+ * covering the wall-clock duration from the start of the first attempt through the conclusion of the final attempt (including any backoff between attempts).
+ * `error.type` reflects the cause of the final attempt.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -3544,6 +3586,9 @@ export const METRIC_OTEL_SDK_EXPORTER_OPERATION_DURATION = 'otel.sdk.exporter.op
  * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` **MUST** contain the failure cause.
  * For exporters with partial success semantics (e.g. OTLP with `rejected_spans`), rejected spans **MUST** count as failed and only non-rejected spans count as success.
  * If no rejection reason is available, `rejected` **SHOULD** be used as value for `error.type`.
+ * If the exporter retries failed export attempts, the export operation is considered finished only after the final attempt has concluded.
+ * Each span **MUST** be counted exactly once per export operation: intermediate failed attempts that are followed by a retry **MUST NOT** increment the counter,
+ * and `error.type` reflects the cause of the final attempt.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -3561,7 +3606,8 @@ export const METRIC_OTEL_SDK_EXPORTER_SPAN_EXPORTED_COUNT = 'otel.sdk.exporter.s
 /**
  * The number of spans which were passed to the exporter, but that have not been exported yet (neither successful, nor failed).
  *
- * @note For successful exports, `error.type` **MUST NOT** be set. For failed exports, `error.type` **MUST** contain the failure cause.
+ * @note Spans are counted as inflight from when they are passed to the exporter until the export operation has concluded.
+ * If the exporter retries failed export attempts, spans remain inflight across all retry attempts and any backoff between them.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -3597,6 +3643,8 @@ export const METRIC_OTEL_SDK_METRIC_READER_COLLECTION_DURATION = 'otel.sdk.metri
  * The number of log records for which the processing has finished, either successful or failed.
  *
  * @note For successful processing, `error.type` **MUST NOT** be set. For failed processing, `error.type` **MUST** contain the failure cause.
+ * SDK Batching Log Record Processors **MUST** use `queue_full` as the value of `error.type` for log records dropped due to a full queue.
+ * SDK Log Record Processors **MUST** use `already_shutdown` as the value of `error.type` for log records dropped because the processor has already been shut down.
  * For the SDK Simple and Batching Log Record Processor a log record is considered to be processed already when it has been submitted to the exporter,
  * not when the corresponding export call has finished.
  *
@@ -3626,6 +3674,8 @@ export const METRIC_OTEL_SDK_PROCESSOR_LOG_QUEUE_SIZE = 'otel.sdk.processor.log.
  * The number of spans for which the processing has finished, either successful or failed.
  *
  * @note For successful processing, `error.type` **MUST NOT** be set. For failed processing, `error.type` **MUST** contain the failure cause.
+ * SDK Batching Span Processors **MUST** use `queue_full` as the value of `error.type` for spans dropped due to a full queue.
+ * SDK Span Processors **MUST** use `already_shutdown` as the value of `error.type` for spans dropped because the processor has already been shut down.
  * For the SDK Simple and Batching Span Processor a span is considered to be processed already when it has been submitted to the exporter, not when the corresponding export call has finished.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -3679,6 +3729,8 @@ export const METRIC_OTEL_SDK_SPAN_ENDED_COUNT = 'otel.sdk.span.ended.count' as c
 
 /**
  * The number of created spans with `recording=true` for which the end operation has not been called yet.
+ *
+ * @note Non-recording spans are not counted, hence `otel.span.sampling_result` can only take values `RECORD_ONLY` and `RECORD_AND_SAMPLE`, not `DROP`.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -4041,6 +4093,13 @@ export const METRIC_SYSTEM_DISK_OPERATIONS = 'system.disk.operations' as const;
 export const METRIC_SYSTEM_FILESYSTEM_LIMIT = 'system.filesystem.limit' as const;
 
 /**
+ * Filesystem lock counts.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_SYSTEM_FILESYSTEM_LOCK_COUNT = 'system.filesystem.lock.count' as const;
+
+/**
  * Reports a filesystem's space usage across different states.
  *
  * @note The sum of all `system.filesystem.usage` values over the different `system.filesystem.state` attributes
@@ -4349,11 +4408,11 @@ export const METRIC_V8JS_HEAP_SPACE_AVAILABLE_SIZE = 'v8js.heap.space.available_
 export const METRIC_V8JS_HEAP_SPACE_PHYSICAL_SIZE = 'v8js.heap.space.physical_size' as const;
 
 /**
- * Total heap memory size pre-allocated.
- *
- * @note The value can be retrieved from value `space_size` of [`v8.getHeapSpaceStatistics()`](https://nodejs.org/api/v8.html#v8getheapspacestatistics)
+ * Deprecated, use `v8js.memory.heap.space.size` instead.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `v8js.memory.heap.space.size`.
  */
 export const METRIC_V8JS_MEMORY_HEAP_LIMIT = 'v8js.memory.heap.limit' as const;
 
@@ -4374,6 +4433,15 @@ export const METRIC_V8JS_MEMORY_HEAP_SPACE_AVAILABLE_SIZE = 'v8js.memory.heap.sp
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_V8JS_MEMORY_HEAP_SPACE_PHYSICAL_SIZE = 'v8js.memory.heap.space.physical_size' as const;
+
+/**
+ * Total heap memory size pre-allocated for a heap space.
+ *
+ * @note The value can be retrieved from value `space_size` of [`v8.getHeapSpaceStatistics()`](https://nodejs.org/api/v8.html#v8getheapspacestatistics)
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_V8JS_MEMORY_HEAP_SPACE_SIZE = 'v8js.memory.heap.space.size' as const;
 
 /**
  * Heap Memory size allocated.

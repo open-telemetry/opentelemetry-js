@@ -44,7 +44,7 @@ describe('ConsoleSpanExporter', () => {
         const spyConsole = sinon.spy(console, 'dir');
         const spyExport = sinon.spy(consoleExporter, 'export');
 
-        const instrumentationScopeName = '@opentelemetry/sdk-trace-base/test';
+        const instrumentationScopeName = '@opentelemetry/sdk-trace/test';
         const instrumentationScopeVersion = '1.2.3';
         const tracer = basicTracerProvider.getTracer(
           instrumentationScopeName,

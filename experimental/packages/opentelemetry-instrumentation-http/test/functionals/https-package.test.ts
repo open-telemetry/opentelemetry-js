@@ -5,12 +5,12 @@
 
 import type { Span } from '@opentelemetry/api';
 import { context, SpanKind, propagation } from '@opentelemetry/api';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
+  TracerProvider,
+} from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
 import * as path from 'path';
 import { HttpInstrumentation } from '../../src/http';
@@ -34,15 +34,17 @@ const customAttributeFunction = (span: Span): void => {
 describe('Packages', () => {
   beforeEach(() => {
     memoryExporter.reset();
-    context.setGlobalContextManager(new AsyncHooksContextManager().enable());
+    context.setGlobalContextManager(
+      new AsyncLocalStorageContextManager().enable()
+    );
   });
 
   afterEach(() => {
     context.disable();
   });
   describe('get', () => {
-    const provider = new NodeTracerProvider({
-      spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+    const provider = new TracerProvider({
+      spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
     });
     instrumentation.setTracerProvider(provider);
     beforeEach(() => {

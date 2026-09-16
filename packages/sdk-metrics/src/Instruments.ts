@@ -16,8 +16,7 @@ import type {
   ObservableGauge,
   ObservableUpDownCounter,
 } from '@opentelemetry/api';
-import { context as contextApi, diag, ValueType } from '@opentelemetry/api';
-import { millisToHrTime } from '@opentelemetry/core';
+import { diag, ValueType } from '@opentelemetry/api';
 import type { InstrumentDescriptor } from './InstrumentDescriptor';
 import type { ObservableRegistry } from './state/ObservableRegistry';
 import type {
@@ -40,7 +39,7 @@ export class SyncInstrument {
   protected _record(
     value: number,
     attributes: Attributes = {},
-    context: Context = contextApi.active()
+    context?: Context
   ) {
     if (typeof value !== 'number') {
       diag.warn(
@@ -61,12 +60,7 @@ export class SyncInstrument {
         return;
       }
     }
-    this._writableMetricStorage.record(
-      value,
-      attributes,
-      context,
-      millisToHrTime(Date.now())
-    );
+    this._writableMetricStorage.record(value, attributes, context, Date.now());
   }
 }
 

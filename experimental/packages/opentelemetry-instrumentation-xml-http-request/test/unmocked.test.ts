@@ -4,11 +4,8 @@
  */
 import type { Span } from '@opentelemetry/api';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
-import type {
-  ReadableSpan,
-  SpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
-import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
+import type { ReadableSpan, SpanProcessor } from '@opentelemetry/sdk-trace';
+import { TracerProvider } from '@opentelemetry/sdk-trace';
 import { XMLHttpRequestInstrumentation } from '../src';
 import * as assert from 'assert';
 
@@ -30,18 +27,14 @@ class TestSpanProcessor implements SpanProcessor {
 
 describe('unmocked xhr', () => {
   let testSpans: TestSpanProcessor;
-  let provider: WebTracerProvider;
+  let provider: TracerProvider;
   beforeEach(() => {
     testSpans = new TestSpanProcessor();
-    provider = new WebTracerProvider({
+    provider = new TracerProvider({
       spanProcessors: [testSpans],
     });
     registerInstrumentations({
-      instrumentations: [
-        new XMLHttpRequestInstrumentation({
-          semconvStabilityOptIn: 'http',
-        }),
-      ],
+      instrumentations: [new XMLHttpRequestInstrumentation({})],
       tracerProvider: provider,
     });
   });

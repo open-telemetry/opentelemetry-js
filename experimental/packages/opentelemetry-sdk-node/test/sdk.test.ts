@@ -12,10 +12,7 @@ import {
   metrics,
   DiagConsoleLogger,
 } from '@opentelemetry/api';
-import {
-  AsyncHooksContextManager,
-  AsyncLocalStorageContextManager,
-} from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
 import {
   AggregationTemporality,
@@ -279,7 +276,7 @@ describe('NodeSDK', () => {
       });
 
       const sdk = new NodeSDK({
-        metricReader: metricReader,
+        metricReaders: [metricReader],
         autoDetectResources: false,
       });
 
@@ -339,62 +336,6 @@ describe('NodeSDK', () => {
       await sdk.shutdown();
     });
 
-    it('should show deprecation warning when using metricReader option', async () => {
-      const exporter = new ConsoleMetricExporter();
-      const metricReader = new PeriodicExportingMetricReader({
-        exporter: exporter,
-        exportIntervalMillis: 100,
-        exportTimeoutMillis: 100,
-      });
-
-      const warnSpy = Sinon.spy(diag, 'warn');
-
-      const sdk = new NodeSDK({
-        metricReader: metricReader,
-        autoDetectResources: false,
-      });
-
-      sdk.start();
-
-      // Verify deprecation warning was shown
-      Sinon.assert.calledWith(
-        warnSpy,
-        "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
-      );
-
-      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
-
-      await sdk.shutdown();
-    });
-
-    it('should not show deprecation warning when using metricReaders option', async () => {
-      const exporter = new ConsoleMetricExporter();
-      const metricReader = new PeriodicExportingMetricReader({
-        exporter: exporter,
-        exportIntervalMillis: 100,
-        exportTimeoutMillis: 100,
-      });
-
-      const warnSpy = Sinon.spy(diag, 'warn');
-
-      const sdk = new NodeSDK({
-        metricReaders: [metricReader],
-        autoDetectResources: false,
-      });
-
-      sdk.start();
-
-      // Verify no metricReader deprecation warning was shown
-      Sinon.assert.neverCalledWith(
-        warnSpy,
-        "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
-      );
-
-      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
-
-      await sdk.shutdown();
-    });
-
     it('should not register meter provider when metricReaders is empty array', async () => {
       const sdk = new NodeSDK({
         metricReaders: [],
@@ -418,28 +359,13 @@ describe('NodeSDK', () => {
 
     it('should configure components for SDK metrics if enabled', async () => {
       process.env.OTEL_NODE_EXPERIMENTAL_SDK_METRICS = 'true';
-      const exporter = new ConsoleMetricExporter();
-      const metricReader = new PeriodicExportingMetricReader({
-        exporter: exporter,
-        exportIntervalMillis: 100,
-        exportTimeoutMillis: 100,
-      });
+      process.env.OTEL_TRACES_EXPORTER = 'console';
+      process.env.OTEL_LOGS_EXPORTER = 'console';
+      process.env.OTEL_METRICS_EXPORTER = 'console';
 
-      const sdk = new NodeSDK({
-        metricReaders: [metricReader],
-        traceExporter: new ConsoleSpanExporter(),
-        logRecordProcessors: [
-          new SimpleLogRecordProcessor({
-            exporter: new InMemoryLogRecordExporter(),
-          }),
-        ],
-        autoDetectResources: false,
-      });
+      const sdk = new NodeSDK();
 
       sdk.start();
-
-      assertDefaultContextManagerRegistered();
-      assertDefaultPropagatorRegistered();
 
       assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
       const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
@@ -457,6 +383,56 @@ describe('NodeSDK', () => {
       const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
       assert.notDeepEqual(
         (loggerProvider as any)['_sharedState'].loggerMetrics.createdLogs,
+        NOOP_COUNTER_METRIC
+      );
+      assert.notDeepEqual(
+        (loggerProvider as any)['_sharedState'].registeredLogRecordProcessors[0]
+          ._metrics.processedLogs,
+        NOOP_COUNTER_METRIC
+      );
+
+      const meterProvider = metrics.getMeterProvider();
+      assert.ok(meterProvider instanceof MeterProvider);
+      assert.notDeepEqual(
+        (meterProvider as any)['_sharedState'].metricCollectors[0]._metricReader
+          ._selfObsMetrics.collectionDuration,
+        NOOP_HISTOGRAM_METRIC
+      );
+
+      await sdk.shutdown();
+    });
+
+    it('should configure initialized components for SDK metrics if enabled', async () => {
+      process.env.OTEL_NODE_EXPERIMENTAL_SDK_METRICS = 'true';
+      process.env.OTEL_LOGS_EXPORTER = 'console';
+
+      const exporter = new ConsoleMetricExporter();
+      const metricReader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+
+      const sdk = new NodeSDK({
+        metricReaders: [metricReader],
+        traceExporter: new ConsoleSpanExporter(),
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
+      const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
+      assert.ok(tracerProvider instanceof TracerProvider);
+
+      const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
+      assert.notDeepEqual(
+        (loggerProvider as any)['_sharedState'].loggerMetrics.createdLogs,
+        NOOP_COUNTER_METRIC
+      );
+      assert.notDeepEqual(
+        (loggerProvider as any)['_sharedState'].registeredLogRecordProcessors[0]
+          ._metrics.processedLogs,
         NOOP_COUNTER_METRIC
       );
 
@@ -490,9 +466,6 @@ describe('NodeSDK', () => {
 
       sdk.start();
 
-      assertDefaultContextManagerRegistered();
-      assertDefaultPropagatorRegistered();
-
       assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
       const tracerProvider = setGlobalTracerProviderSpy.lastCall.args[0];
       const tracer = tracerProvider.getTracer('testing');
@@ -504,6 +477,11 @@ describe('NodeSDK', () => {
       const loggerProvider = setGlobalLoggerProviderSpy.lastCall.args[0];
       assert.deepEqual(
         (loggerProvider as any)['_sharedState'].loggerMetrics.createdLogs,
+        NOOP_COUNTER_METRIC
+      );
+      assert.deepEqual(
+        (loggerProvider as any)['_sharedState'].registeredLogRecordProcessors[0]
+          ._metrics.processedLogs,
         NOOP_COUNTER_METRIC
       );
 
@@ -522,7 +500,7 @@ describe('NodeSDK', () => {
         exporter: logRecordExporter,
       });
       const sdk = new NodeSDK({
-        logRecordProcessor: logRecordProcessor,
+        logRecordProcessors: [logRecordProcessor],
         autoDetectResources: false,
       });
 
@@ -583,7 +561,8 @@ describe('NodeSDK', () => {
 
     it('should register a context manager if only a context manager is provided', async () => {
       // arrange
-      const expectedContextManager = new AsyncHooksContextManager();
+      class MycontextManager extends AsyncLocalStorageContextManager {}
+      const expectedContextManager = new MycontextManager();
       const sdk = new NodeSDK({
         contextManager: expectedContextManager,
       });
@@ -698,7 +677,7 @@ describe('NodeSDK', () => {
     });
 
     const sdk = new NodeSDK({
-      metricReader: metricReader,
+      metricReaders: [metricReader],
       views: [
         {
           name: 'test-view',
@@ -1157,7 +1136,7 @@ describe('NodeSDK', () => {
       });
 
       const sdk = new NodeSDK({
-        metricReader: metricReader,
+        metricReaders: [metricReader],
         autoDetectResources: false,
       });
       sdk.start();
@@ -1220,7 +1199,7 @@ describe('NodeSDK', () => {
       });
       const sdk = new NodeSDK({
         idGenerator,
-        spanProcessor,
+        spanProcessors: [spanProcessor],
       });
       sdk.start();
 
@@ -1808,7 +1787,7 @@ describe('NodeSDK', () => {
       const exporter = new ConsoleSpanExporter();
       const spanProcessor = new SimpleSpanProcessor({ exporter });
       const sdk = new NodeSDK({
-        spanProcessor,
+        spanProcessors: [spanProcessor],
       });
       sdk.start();
       const listOfProcessors = getSdkSpanProcessors(sdk);

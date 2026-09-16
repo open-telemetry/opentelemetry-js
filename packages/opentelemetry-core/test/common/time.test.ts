@@ -4,11 +4,9 @@
  */
 
 import * as assert from 'assert';
-import { otperformance as performance } from '../../src/platform';
 import * as sinon from 'sinon';
 import type * as api from '@opentelemetry/api';
 import {
-  getTimeOrigin,
   hrTime,
   timeInputToHrTime,
   hrTimeDuration,
@@ -24,13 +22,6 @@ import {
 describe('time', () => {
   afterEach(() => {
     sinon.restore();
-  });
-
-  describe('#getTimeOrigin', () => {
-    it('should return performance.timeOrigin', () => {
-      sinon.stub(performance, 'timeOrigin').value(1234567890.123);
-      assert.strictEqual(getTimeOrigin(), 1234567890.123);
-    });
   });
 
   describe('#hrTime', () => {
@@ -119,6 +110,21 @@ describe('time', () => {
       const output = timeInputToHrTime(timeInput);
 
       assert.deepStrictEqual(output, [0, 123400000]);
+    });
+
+    it('should treat an epoch-ms timestamp as epoch even when it falls just below performance.timeOrigin due to clock skew', () => {
+      // Simulate the scenario reported in issue #6772: performance.timeOrigin
+      // uses a monotonic clock and can be slightly ahead of Date.now() at page
+      // load, causing a real epoch-ms value to be misclassified as a relative
+      // performance.now() reading and doubled.
+      const epochMs = 1779958953234; // a real Date.now()-style timestamp
+      // Set timeOrigin to a value slightly larger than epochMs to reproduce
+      // the clock-skew window.
+      sinon.stub(performance, 'timeOrigin').value(epochMs + 100);
+
+      const output = timeInputToHrTime(epochMs);
+      // Should decode as epoch seconds + remainder nanoseconds, NOT doubled.
+      assert.deepStrictEqual(output, [1779958953, 234000000]);
     });
 
     it('should not convert hrtime hrTime', () => {

@@ -11,7 +11,7 @@ import {
   getNumberFromEnv,
   getStringFromEnv,
 } from '@opentelemetry/core';
-import type { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace';
 import { Socket } from 'dgram';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { spanToThrift } from './transform';

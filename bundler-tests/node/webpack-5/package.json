@@ -17,7 +17,7 @@
     "@opentelemetry/resources": "file:../../../packages/opentelemetry-resources",
     "@opentelemetry/sdk-logs": "file:../../../experimental/packages/sdk-logs",
     "@opentelemetry/sdk-metrics": "file:../../../packages/sdk-metrics",
-    "@opentelemetry/sdk-trace-base": "file:../../../packages/opentelemetry-sdk-trace-base"
+    "@opentelemetry/sdk-trace": "file:../../../packages/sdk-trace"
   },
   "devDependencies": {
     "@types/webpack": "^5",

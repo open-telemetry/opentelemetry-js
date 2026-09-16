@@ -11,7 +11,7 @@ This section refers to `"dependencies"` and `"devDependencies"` entries in `pack
 **Example:** `^1.2.3` might inadvertently lead to version `1.2.6` which includes unintended breaking changes).
 
 > [!NOTE]
-> As this approach might leave our project with outdated tooling, we adopt `renovate-bot`. This automated dependency update tool proactively opens pull requests upon the release of new patch/minor/major versions. The complete configuration for renovate-bot can be found in [renovate.json](../../renovate.json) file.
+> As this approach might leave our project with outdated tooling, we adopt `renovate-bot`. This automated dependency update tool proactively opens pull requests upon the release of new patch/minor/major versions. The complete configuration for renovate-bot can be found in [renovate.json5](../../renovate.json5) file.
 
 ## @opentelemetry/* dependencies
 
@@ -20,6 +20,8 @@ All packages from the `@opentelemetry/` namespace MUST have the same pinned vers
 **Example:** all packages under `packages/` should consistently maintain the same version, as should those under `experimental/packages/`.
 
 An exception is granted for dependencies on `@opentelemetry/api`, which, if used by the package SHOULD NOT be included as a `dependency`. `@opentelemetry/api` SHOULD be included as a `peerDependency` instead. The version range of the `peerDependency` SHOULD reflect the minimum supported, and SHOULD NOT allow versions greater than the latest released minor version.
+
+These ranges are maintained by `scripts/align-api-deps.mjs` on each API release and enforced by `scripts/peer-api-check.mjs`, so they should not be edited by hand. While the API is mid-pre-release they additionally carry the exact pre-release version as an alternative (`^1.3.0 || 1.10.0-rc.0`), which is removed again when the cycle is finalized - see [releasing.md](./releasing.md#pre-releases-of-the-api-package).
 
 ## Third-Party Library Dependencies
 

@@ -4,7 +4,7 @@
  */
 import type { Link } from '@opentelemetry/api';
 import type { Resource } from '@opentelemetry/resources';
-import type { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace';
 import type { Encoder } from '../common/utils';
 import {
   createInstrumentationScope,

@@ -106,6 +106,7 @@ export class PropagationAPI {
 
   public getBaggage = getBaggage;
 
+  /** @since 1.4.0 */
   public getActiveBaggage = getActiveBaggage;
 
   public setBaggage = setBaggage;

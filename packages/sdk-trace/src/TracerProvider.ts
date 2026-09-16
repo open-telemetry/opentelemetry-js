@@ -13,7 +13,11 @@ import { defaultResource } from '@opentelemetry/resources';
 import type { SpanProcessor } from './SpanProcessor';
 import { Tracer } from './Tracer';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
-import type { TracerProviderOptions, TracerOptions } from './types';
+import type {
+  ForceFlushOptions,
+  TracerProviderOptions,
+  TracerOptions,
+} from './types';
 import { ParentBasedSampler } from './sampler/ParentBasedSampler';
 import { AlwaysOnSampler } from './sampler/AlwaysOnSampler';
 import { RandomIdGenerator } from './platform';
@@ -37,12 +41,10 @@ enum ForceFlushState {
 export class TracerProvider implements ApiTracerProvider {
   private readonly _resource: Resource;
   private readonly _activeSpanProcessor: MultiSpanProcessor;
-  private readonly _forceFlushTimeoutMillis: number;
   private readonly _tracerOptions: TracerOptions;
   private readonly _tracers: Map<string, Tracer> = new Map();
 
   constructor(options: TracerProviderOptions = {}) {
-    this._forceFlushTimeoutMillis = options.forceFlushTimeoutMillis ?? 30000;
     this._resource = options.resource ?? defaultResource();
     const spanProcessors = options.spanProcessors ?? [];
     this._activeSpanProcessor = new MultiSpanProcessor(spanProcessors);
@@ -94,8 +96,8 @@ export class TracerProvider implements ApiTracerProvider {
     return this._tracers.get(key)!;
   }
 
-  forceFlush(): Promise<void> {
-    const timeout = this._forceFlushTimeoutMillis;
+  forceFlush(options?: ForceFlushOptions): Promise<void> {
+    const timeout = options?.timeoutMillis ?? 30000;
     const promises = this._activeSpanProcessor['_spanProcessors'].map(
       (spanProcessor: SpanProcessor) => {
         return new Promise(resolve => {

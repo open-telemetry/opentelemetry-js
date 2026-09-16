@@ -16,10 +16,35 @@ module.exports = {
       // Enable the assert library polyfill because that is used in tests
       "assert": require.resolve('assert/'),
       "util": require.resolve('util/'),
+      // Only node-only platform code uses `path`; browser code paths never reach
+      // it. If that breaks: `TypeError: path.normalize is not a function`.
+      "path": false,
     },
   },
   devtool: 'eval-source-map',
   plugins: [
+    // Karma+webpack bundles each package's src/ directly, so package.json#browser
+    // doesn't apply; rewrite platform(/index) requests to /browser/ equivalents.
+    new webpack.NormalModuleReplacementPlugin(
+      /(^|[\\/])(?:detectors[\\/])?platform([\\/]index(\.ts)?)?$/,
+      function (resource) {
+        if (/[\\/]browser([\\/]|$)/.test(resource.request)) return;
+        const issuer = resource.contextInfo && resource.contextInfo.issuer;
+        if (!issuer || /[\\/]node_modules[\\/]/.test(issuer)) return;
+        const original = resource.request;
+        const rewritten = original.replace(
+          /platform([\\/]index(?:\.ts)?)?$/,
+          'platform/browser$1'
+        );
+        if (rewritten === original) {
+          throw new Error(
+            `karma platform-swap: outer regex matched ${JSON.stringify(original)} ` +
+            `but inner replace did not rewrite it. The two regexes have drifted out of sync.`
+          );
+        }
+        resource.request = rewritten;
+      }
+    ),
     new webpack.ProvidePlugin({
       // Make a global `process` variable that points to the `process` package,
       // because the `util` package expects there to be a global variable named `process`.
@@ -36,7 +61,12 @@ module.exports = {
   ],
   module: {
     rules: [
-      {test: /\.ts$/, use: 'ts-loader'},
+      {
+        test: /\.ts$/,
+        // transpileOnly: tsconfig.base.json sets `composite` but we never run
+        // `tsc -b`, so no `.tsbuildinfo` exists; ts-loader's default mode wants one.
+        use: { loader: 'ts-loader', options: { transpileOnly: true } },
+      },
       {
         test: /\.js$/,
         exclude: {
