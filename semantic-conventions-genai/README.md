@@ -3,9 +3,9 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-Generative AI (GenAI) Semantic Convention constants for use with the OpenTelemetry SDK/APIs. [These conventions][genai-semconv-docs] define standard attributes, metrics, and events for instrumenting GenAI systems — models, agents, frameworks, and the providers they call.
+This package provides Generative AI (GenAI) semantic convention constants for the OpenTelemetry SDK and API. [The GenAI semantic conventions][genai-semconv-docs] define attributes, metrics, and events for GenAI systems: models, agents, frameworks, and providers.
 
-The GenAI conventions are developed in the [open-telemetry/semantic-conventions-genai][genai-semconv-repo] repository, separate from the [core semantic conventions][semconv-repo], so that they can evolve on their own schedule. This package mirrors that split: it is versioned to match the GenAI schema version and is released independently of `@opentelemetry/semantic-conventions`.
+The [open-telemetry/semantic-conventions-genai][genai-semconv-repo] repository defines the GenAI conventions. This repository is separate from [open-telemetry/semantic-conventions][semconv-repo]. This package tracks the version of the GenAI registry. See [Versioning](#versioning).
 
 ## Installation
 
@@ -15,14 +15,10 @@ npm install --save @opentelemetry/semantic-conventions-genai
 
 ## Import Structure
 
-This package has 2 separate entry-points, matching [`@opentelemetry/semantic-conventions`][semconv-pkg]:
+This package has two entry points:
 
-- The main entry-point, `@opentelemetry/semantic-conventions-genai`, includes only stable semantic conventions.
-  This entry-point follows semantic versioning 2.0: it will not include breaking changes except with a change in the major version number.
-- The "incubating" entry-point, `@opentelemetry/semantic-conventions-genai/incubating`, contains unstable semantic conventions (sometimes called "experimental") and, for convenience, a re-export of the stable semantic conventions.
-  This entry-point is _NOT_ subject to the restrictions of semantic versioning and _MAY_ contain breaking changes in minor releases. See below for suggested usage of this entry-point.
-
-Note that **every GenAI semantic convention is currently in development**, so the main entry-point exports nothing yet. All constants are available from the "incubating" entry-point. As conventions stabilize they will begin to appear in the main entry-point as well.
+- `@opentelemetry/semantic-conventions-genai` exports stable conventions. This entry point follows semantic versioning. A breaking change requires a major version change.
+- `@opentelemetry/semantic-conventions-genai/incubating` exports unstable conventions and all stable conventions. This entry point does not follow semantic versioning. A minor release can include a breaking change. See [Usage](#usage) for the recommended pattern.
 
 Exported constants follow this naming scheme:
 
@@ -31,15 +27,13 @@ Exported constants follow this naming scheme:
 - `METRIC_${metricName}` for metric names
 - `EVENT_${eventName}` for event names
 
-The `ATTR`, `METRIC`, `EVENT`, and `VALUE` static strings were used to facilitate readability and filtering in auto-complete lists in IDEs.
-
 ## Relationship to `@opentelemetry/semantic-conventions`
 
-GenAI instrumentation almost always needs conventions from both registries: GenAI-specific ones such as `gen_ai.provider.name` from this package, and general-purpose ones such as `error.type` and `server.address` from `@opentelemetry/semantic-conventions`. The GenAI registry references those core attributes rather than redefining them, so this package does **not** re-export them — install and import both packages.
+This package does not re-export core attributes. GenAI instrumentation uses conventions from both registries. GenAI attributes, such as `gen_ai.provider.name`, come from this package. Core attributes, such as `error.type` and `server.address`, come from `@opentelemetry/semantic-conventions`.
 
 ```ts
 import { ATTR_SERVER_ADDRESS } from '@opentelemetry/semantic-conventions';
-import { ATTR_GEN_AI_PROVIDER_NAME } from './semconv'; // see below
+import { ATTR_GEN_AI_PROVIDER_NAME } from './semconv'; // see Usage below
 ```
 
 ## Usage
@@ -48,9 +42,9 @@ import { ATTR_GEN_AI_PROVIDER_NAME } from './semconv'; // see below
 
 <!-- Dev Note: ^^ This '#unstable-semconv' anchor is being used in jsdoc links in the code. -->
 
-Because the "incubating" entry-point may include breaking changes in minor versions, it is recommended that instrumentation libraries **not** import `@opentelemetry/semantic-conventions-genai/incubating` in runtime code, but instead **copy relevant definitions into their own code base**. (This is the same [recommendation](https://opentelemetry.io/docs/specs/semconv/non-normative/code-generation/#stability-and-versioning) as for other languages.)
+The incubating entry point can include breaking changes in a minor release. Do not import `@opentelemetry/semantic-conventions-genai/incubating` in runtime code. Copy the definitions you need into your own code base. This method matches the [recommendation for other languages][stability-versioning-doc].
 
-For example, create a "src/semconv.ts" (or "lib/semconv.js" if implementing in JavaScript) file that copies from [experimental_attributes.ts](./src/experimental_attributes.ts) or [experimental_metrics.ts](./src/experimental_metrics.ts):
+Create a `src/semconv.ts` file (or `lib/semconv.js` in JavaScript). Copy definitions from [experimental_attributes.ts](./src/experimental_attributes.ts) or [experimental_metrics.ts](./src/experimental_metrics.ts):
 
 ```ts
 // src/semconv.ts
@@ -73,34 +67,23 @@ span.setAttributes({
 })
 ```
 
-Occasionally, one should review changes to `@opentelemetry/semantic-conventions-genai` to see if any used unstable conventions have changed or been stabilized. However, an update to a newer minor version of the package will never be breaking.
-
-#### Why not pin the version?
-
-A considered alternative for using unstable exports is to **pin** the version. I.e., depend on an exact version, rather than on a version range.
-
-```bash
-npm install --save-exact @opentelemetry/semantic-conventions-genai  # Don't do this.
-```
-
-Then, import directly from `@opentelemetry/semantic-conventions-genai/incubating`.
-This is **not** recommended.
-
-In some languages having multiple versions of a package in a single application is not possible. This _is_ possible in JavaScript. The primary argument against pinning this package is that it can easily lead to many copies being installed in an application's `node_modules/...`, which can cause significant disk usage. In a disk-constrained environment, such as AWS Lambda Layers, that can be a blocker.
+Read the [CHANGELOG](./CHANGELOG.md) for `@opentelemetry/semantic-conventions-genai` to find changes to the definitions you copied.
 
 ## Versioning
 
-This package's version tracks the schema version of the GenAI semantic conventions registry it was generated from, in the same way `@opentelemetry/semantic-conventions` tracks the core semantic conventions version. Because the two registries are versioned independently, the version numbers of the two packages are not expected to match.
+The [`@opentelemetry/semantic-conventions`][semconv-pkg] and [GenAI semantic conventions registry][genai-semconv-repo] are versioned independently. This package's version tracks the schema version.
 
 ## Regenerating
 
-The `src/{stable,experimental}_{attributes,metrics,events}.ts` files are generated from the GenAI semantic conventions registry with [OTel Weaver][weaver-repo]. To regenerate them, run:
+[OTel Weaver][weaver-repo] generates the `src/{stable,experimental}_{attributes,metrics,events}.ts` files from the GenAI semantic conventions registry.
+
+Run this command from the root of the repository to regenerate the files:
 
 ```bash
 ./semantic-conventions-genai/scripts/generate.sh
 ```
 
-from the root of this repository. The registry commit and Weaver version are pinned at the top of that script.
+The script pins the registry commit in [`SPEC_VERSION`][generate-script-spec-version] and the Weaver version in [`GENERATOR_VERSION`][generate-script-weaver-version].
 
 ## Useful links
 
@@ -119,6 +102,9 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fsemantic-conventions-genai.svg
 [genai-semconv-docs]: https://opentelemetry.io/docs/specs/semconv/gen-ai/
 [genai-semconv-repo]: https://github.com/open-telemetry/semantic-conventions-genai
+[generate-script-spec-version]: https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions-genai/scripts/generate.sh#L12
+[generate-script-weaver-version]: https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions-genai/scripts/generate.sh#L17
 [semconv-repo]: https://github.com/open-telemetry/semantic-conventions
 [semconv-pkg]: https://github.com/open-telemetry/opentelemetry-js/tree/main/semantic-conventions
+[stability-versioning-doc]: https://opentelemetry.io/docs/specs/semconv/non-normative/code-generation/#stability-and-versioning
 [weaver-repo]: https://github.com/open-telemetry/weaver
