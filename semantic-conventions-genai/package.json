@@ -35,7 +35,6 @@
     "version": "node ../scripts/version-update.js",
     "watch": "tsdown --watch --no-clean",
     "peer-api-check": "node ../scripts/peer-api-check.mjs",
-    "size-check": "npm run compile && mocha 'test/**/*.test.ts'",
     "align-api-deps": "node ../scripts/align-api-deps.mjs"
   },
   "keywords": [
@@ -62,14 +61,6 @@
     "access": "public"
   },
   "devDependencies": {
-    "@size-limit/file": "^13.0.0",
-    "@size-limit/time": "^13.0.0",
-    "@size-limit/webpack": "^13.0.0",
-    "@types/mocha": "10.0.10",
-    "@types/node": "^14.18.63",
-    "mocha": "11.8.0",
-    "size-limit": "^13.0.0",
-    "ts-node": "10.9.2",
     "typescript": "5.2.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/semantic-conventions-genai",
