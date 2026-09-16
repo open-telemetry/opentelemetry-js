@@ -549,6 +549,7 @@ const meterProvider = new MeterProvider({
     new PeriodicExportingMetricReader({
       exporter,
       exportIntervalMillis: 1000,
+      maxExportBatchSize: 200, // optional: maximum number of data points per export batch
     }),
   ],
 });

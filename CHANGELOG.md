@@ -34,6 +34,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :rocket: Features
 
+* feat(sdk-metrics): stabilize `maxExportBatchSize` option in `PeriodicExportingMetricReader`
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
