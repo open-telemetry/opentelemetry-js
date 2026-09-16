@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/semantic-conventions-genai",
-  "version": "1.42.0",
+  "version": "0.0.0",
   "description": "OpenTelemetry generative AI semantic conventions",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -60,9 +60,6 @@
   ],
   "publishConfig": {
     "access": "public"
-  },
-  "dependencies": {
-    "@opentelemetry/semantic-conventions": "^1.43.0"
   },
   "devDependencies": {
     "@size-limit/file": "^13.0.0",
