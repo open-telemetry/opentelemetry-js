@@ -116,11 +116,3 @@ Startup command for compiled ESM:
 ```sh
 node --experimental-loader=@opentelemetry/instrumentation/hook.mjs --import ./telemetry.js app.js
 ```
-
-### ESM Options for Different Versions of Node.js
-
-All supported Node.js versions use the same `NODE_OPTIONS`:
-
-```text
---import ./telemetry.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs
-```
