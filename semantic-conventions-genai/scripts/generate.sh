@@ -3,7 +3,7 @@
 set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-ROOT_DIR="${SCRIPT_DIR}/../../"
+PACKAGE_DIR="${SCRIPT_DIR}/.."
 
 # The GenAI semantic conventions repository has no tags or releases yet, so this
 # pins a commit on `main` instead of a version tag. Get the current commit by
@@ -41,7 +41,7 @@ docker run --rm --platform linux/amd64 \
   -u $(id -u):$(id -g) -e HOME=/tmp \
   -v ${SCRIPT_DIR}/semantic-conventions-genai/model:/source \
   -v ${SCRIPT_DIR}/templates:/weaver/templates \
-  -v ${ROOT_DIR}/semantic-conventions-genai/src/:/output \
+  -v ${PACKAGE_DIR}/src/:/output \
   otel/weaver:$GENERATOR_VERSION \
   registry generate \
   --v2 \
@@ -55,7 +55,7 @@ docker run --rm --platform linux/amd64 \
   -u $(id -u):$(id -g) -e HOME=/tmp \
   -v ${SCRIPT_DIR}/semantic-conventions-genai/model:/source \
   -v ${SCRIPT_DIR}/templates:/weaver/templates \
-  -v ${ROOT_DIR}/semantic-conventions-genai/src/:/output \
+  -v ${PACKAGE_DIR}/src/:/output \
   otel/weaver:$GENERATOR_VERSION \
   registry generate \
   --v2 \
@@ -65,5 +65,5 @@ docker run --rm --platform linux/amd64 \
   /output/
 
 # Ensure semconv-genai compiles
-cd "${ROOT_DIR}/semantic-conventions-genai"
+cd "${PACKAGE_DIR}"
 npm run compile

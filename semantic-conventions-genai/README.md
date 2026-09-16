@@ -97,7 +97,7 @@ This package's version tracks the schema version of the GenAI semantic conventio
 The `src/{stable,experimental}_{attributes,metrics,events}.ts` files are generated from the GenAI semantic conventions registry with [OTel Weaver][weaver-repo]. To regenerate them, run:
 
 ```bash
-./scripts/semconv-genai/generate.sh
+./semantic-conventions-genai/scripts/generate.sh
 ```
 
 from the root of this repository. The registry commit and Weaver version are pinned at the top of that script.

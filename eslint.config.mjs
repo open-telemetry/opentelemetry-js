@@ -55,7 +55,7 @@ export default tseslint.config(
       'semantic-conventions/src/stable_attributes.ts',
       'semantic-conventions/src/stable_events.ts',
       'semantic-conventions/src/stable_metrics.ts',
-      // weaver-generated output, see "scripts/semconv-genai/generate.sh". The
+      // weaver-generated output, see "semantic-conventions-genai/scripts/generate.sh". The
       // "stable_*" files are currently empty (every GenAI convention is still
       // in development), but are listed so they stay ignored once GenAI
       // conventions begin to stabilize.

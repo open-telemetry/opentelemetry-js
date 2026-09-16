@@ -4,7 +4,7 @@
  */
 
 //------------------------------------------------------------------------------------------------------------------
-// DO NOT EDIT, this is an Auto-generated file from scripts/semconv-genai/templates/registry/ts-stable/metrics.ts.j2
+// DO NOT EDIT, this is an Auto-generated file from semantic-conventions-genai/scripts/templates/registry/ts-stable/metrics.ts.j2
 //------------------------------------------------------------------------------------------------------------------
 
 // There are no stable GenAI metrics yet. This keeps the file a valid ES

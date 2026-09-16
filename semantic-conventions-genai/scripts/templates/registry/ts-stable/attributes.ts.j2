@@ -4,13 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-//---------------------------------------------------------------------------------------------------------------------------
-// DO NOT EDIT, this is an Auto-generated file from scripts/semconv-genai/templates/registry/ts-experimental/attributes.ts.j2
-//---------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
+// DO NOT EDIT, this is an Auto-generated file from semantic-conventions-genai/scripts/templates/registry/ts-stable/attributes.ts.j2
+//---------------------------------------------------------------------------------------------------------------------
 
 {% for attribute in ctx.attributes | attribute_sort %}
 {% if attribute.key not in params.excluded_attributes %}
-{% if attribute is not stable %}
 {{d.docstring(attribute, "attribute")}}
 {% if attribute.type is not template_type %}
 export const ATTR_{{ attribute.key | screaming_snake_case }} = '{{attribute.key}}' as const;
@@ -19,10 +18,9 @@ export const ATTR_{{ attribute.key | screaming_snake_case }} = '{{attribute.key}
 export const ATTR_{{ attribute.key | screaming_snake_case }} = (key: string) => `{{attribute.key}}.${key}`;
 
 {% endif %}
-{% endif %}
 {% if attribute.type is mapping %}
 {% for member in attribute.type.members | sort(attribute='value') %}
-{% if member is not stable %}
+{% if member is stable %}
 {{d.docstring_enum_value(member, attribute)}}
 export const {{ attribute.key | screaming_snake_case }}_VALUE_{{ member.id | screaming_snake_case }} = {{ member.value | print_member_value }} as const;
 
@@ -32,7 +30,7 @@ export const {{ attribute.key | screaming_snake_case }}_VALUE_{{ member.id | scr
 {% endif %}
 {% endfor %}
 {% if (ctx.attributes | length) == 0 %}
-// There are no experimental GenAI attributes. This keeps the file a valid ES
-// module, so that `export * from './experimental_attributes'` compiles.
+// There are no stable GenAI attributes yet. This keeps the file a valid ES
+// module, so that `export * from './stable_attributes'` compiles.
 export {};
 {% endif %}
