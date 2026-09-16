@@ -50,8 +50,10 @@ export default tseslint.config(
       'examples/grpc-js/helloworld_pb.js',
       'examples/grpc-js/helloworld_grpc_pb.js',
       'semantic-conventions/src/experimental_attributes.ts',
+      'semantic-conventions/src/experimental_events.ts',
       'semantic-conventions/src/experimental_metrics.ts',
       'semantic-conventions/src/stable_attributes.ts',
+      'semantic-conventions/src/stable_events.ts',
       'semantic-conventions/src/stable_metrics.ts',
       // weaver-generated output, see "scripts/semconv-genai/generate.sh". The
       // "stable_*" files are currently empty (every GenAI convention is still
