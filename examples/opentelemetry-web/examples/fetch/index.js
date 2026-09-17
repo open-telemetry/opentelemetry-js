@@ -1,7 +1,6 @@
 const { context, trace, propagation } = require('@opentelemetry/api' );
-const { ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
-const { TracerProvider } = require('@opentelemetry/sdk-trace');
+const { ConsoleSpanExporter, SimpleSpanProcessor, TracerProvider } = require("@opentelemetry/sdk-trace");
 const { FetchInstrumentation } = require('@opentelemetry/instrumentation-fetch');
 const { ZoneContextManager } = require('@opentelemetry/context-zone');
 const { B3Propagator } = require('@opentelemetry/propagator-b3');
@@ -17,8 +16,8 @@ const provider = new TracerProvider({
   // to your exporter. Using the SimpleSpanProcessor here as it sends the spans immediately to the
   // exporter without delay
   spanProcessors:[
-    new SimpleSpanProcessor(new ConsoleSpanExporter()),
-    new SimpleSpanProcessor(new OTLPTraceExporter()),
+    new SimpleSpanProcessor({ exporter: new ConsoleSpanExporter() }),
+    new SimpleSpanProcessor({ exporter: new OTLPTraceExporter() }),
   ]
 });
 

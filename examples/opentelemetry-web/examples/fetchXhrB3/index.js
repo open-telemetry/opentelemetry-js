@@ -1,11 +1,11 @@
-const { context, trace, propagation } = require( '@opentelemetry/api');
-const { OTLPTraceExporter } = require( '@opentelemetry/exporter-trace-otlp-http');
-const { ConsoleSpanExporter, SimpleSpanProcessor, TracerProvider } = require( '@opentelemetry/sdk-trace');
-const { FetchInstrumentation } = require( '@opentelemetry/instrumentation-fetch');
-const { XMLHttpRequestInstrumentation } = require( '@opentelemetry/instrumentation-xml-http-request');
-const { ZoneContextManager } = require( '@opentelemetry/context-zone');
-const { B3Propagator } = require( '@opentelemetry/propagator-b3');
-const { registerInstrumentations } = require( '@opentelemetry/instrumentation');
+const { context, trace, propagation } = require('@opentelemetry/api');
+const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
+const { ConsoleSpanExporter, SimpleSpanProcessor, TracerProvider } = require('@opentelemetry/sdk-trace');
+const { FetchInstrumentation } = require('@opentelemetry/instrumentation-fetch');
+const { XMLHttpRequestInstrumentation } = require('@opentelemetry/instrumentation-xml-http-request');
+const { ZoneContextManager } = require('@opentelemetry/context-zone');
+const { B3Propagator } = require('@opentelemetry/propagator-b3');
+const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 const { resourceFromAttributes } = require('@opentelemetry/resources');
 const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 
@@ -22,9 +22,9 @@ const provider = new TracerProvider({
   ]
 });
 
+trace.setGlobalTracerProvider(provider);
 propagation.setGlobalPropagator(new B3Propagator());
 context.setGlobalContextManager(new ZoneContextManager().enable());
-trace.setGlobalTracerProvider(provider);
 
 registerInstrumentations({
   instrumentations: [
