@@ -36,7 +36,7 @@ registerInstrumentations({
   ],
 });
 
-const webTracerWithZone = providerWithZone.getTracer('example-tracer-web');
+const tracerWithZone = providerWithZone.getTracer('example-tracer-web');
 
 const getData = (url) => new Promise((resolve, reject) => {
   const req = new XMLHttpRequest();
@@ -60,7 +60,7 @@ const prepareClickEvent = () => {
 
   const onClick = () => {
     for (let i = 0, j = 5; i < j; i += 1) {
-      const span1 = webTracerWithZone.startSpan(`files-series-info-${i}`);
+      const span1 = tracerWithZone.startSpan(`files-series-info-${i}`);
       context.with(trace.setSpan(context.active(), span1), () => {
         getData(url1).then((_data) => {
           trace.getSpan(context.active()).addEvent('fetching-span1-completed');

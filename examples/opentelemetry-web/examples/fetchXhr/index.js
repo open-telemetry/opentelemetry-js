@@ -1,7 +1,6 @@
 const { context, trace } = require('@opentelemetry/api');
-const { ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
-const { TracerProvider } = require('@opentelemetry/sdk-trace');
+const { ConsoleSpanExporter, SimpleSpanProcessor, TracerProvider } = require('@opentelemetry/sdk-trace');
 const { FetchInstrumentation } = require('@opentelemetry/instrumentation-fetch');
 const { XMLHttpRequestInstrumentation } = require('@opentelemetry/instrumentation-xml-http-request');
 const { ZoneContextManager } = require('@opentelemetry/context-zone');
@@ -22,8 +21,8 @@ const provider = new TracerProvider({
   ]
 });
 
-context.setGlobalContextManager(new ZoneContextManager());
 trace.setGlobalTracerProvider(provider);
+context.setGlobalContextManager(new ZoneContextManager().enable());
 
 registerInstrumentations({
   instrumentations: [

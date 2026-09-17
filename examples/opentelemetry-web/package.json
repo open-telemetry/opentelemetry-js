@@ -56,7 +56,8 @@
     "@opentelemetry/propagator-b3": "2.11.0",
     "@opentelemetry/sdk-metrics": "2.11.0",
     "@opentelemetry/sdk-trace": "2.11.0",
-    "@opentelemetry/semantic-conventions": "^1.29.0"
+    "@opentelemetry/semantic-conventions": "^1.29.0",
+    "path-browserify": "^1.0.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/opentelemetry-web"
 }

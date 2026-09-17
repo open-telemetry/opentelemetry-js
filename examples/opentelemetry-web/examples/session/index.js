@@ -9,14 +9,14 @@ const {
   createSessionLogRecordProcessor,
   createSessionManager,
   createDefaultSessionIdGenerator,
-  LocalStorageSessionStore
+  createLocalStorageSessionStore,
 } = require('@opentelemetry/web-common');
 const { trace } = require('@opentelemetry/api');
 
 // session manager
 const sessionManager = createSessionManager({
   sessionIdGenerator: createDefaultSessionIdGenerator(),
-  sessionStore: new LocalStorageSessionStore(),
+  sessionStore: createLocalStorageSessionStore(),
   maxDuration: 20,
   inactivityTimeout: 10
 });
@@ -37,7 +37,7 @@ sessionManager.start();
 const tracerProvider = new TracerProvider({
   spanProcessors: [
     createSessionSpanProcessor(sessionManager),
-    new SimpleSpanProcessor(new ConsoleSpanExporter())
+    new SimpleSpanProcessor({ exporter: new ConsoleSpanExporter() })
   ]
 });
 
