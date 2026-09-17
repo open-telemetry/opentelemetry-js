@@ -40,6 +40,9 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :books: Documentation
 
+* docs(sdk-trace): deprecate `TraceIdRatioBasedSampler` in favour of `ProbabilitySampler` [#6541](https://github.com/open-telemetry/opentelemetry-js/issues/6541) @nabeelamjadsheikh
+  * Documentation only. The specification requires that the behavior of this sampler is neither removed nor modified before January 1, 2027, so it is unchanged.
+
 ### :house: Internal
 
 * chore(sdk-trace): add `StachContextManager` in `@opentelemetry/sdk-trace` package [#7086](https://github.com/open-telemetry/opentelemetry-js/pull/7086)
