@@ -40,10 +40,10 @@ Run the client
 npm run client
 ```
 
-#### Zipkin UI
+## Zipkin UI
 
-`npm run server` should output the trace ID in the terminal (e.g `traceId: 4815c3d576d930189725f1f1d1bdfcc6`).
-- Go to Zipkin at <http://localhost:9411/zipkin>
+- `npm run server` should output the trace ID in the terminal (e.g `traceId: 4815c3d576d930189725f1f1d1bdfcc6`).
+- Go to Zipkin at <http://localhost:9411/zipkin>.
 - Enter the trace ID in the "Search by trace ID" form (top right).
 
 <p align="center"><img alt="Zipkin UI showing a trace" src="./images/zipkin-ui.png?raw=true"/></p>
