@@ -171,7 +171,6 @@ export default tseslint.config(
       'experimental/examples/**/*.{js,mjs,cjs}',
     ],
     languageOptions: {
-      sourceType: 'commonjs',
       globals: {
         ...globals.node,
         ...globals.mocha,

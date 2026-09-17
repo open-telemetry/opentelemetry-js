@@ -9,12 +9,6 @@ Used standalone, this module provides methods for manual instrumentation of code
 
 It does **not** provide automated instrumentation of known libraries, context propagation or distributed-context out-of-the-box.
 
-For a `TracerProvider` that includes default context management and propagation for Node.js, please see
-[@opentelemetry/sdk-trace-node](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node).
-
-For a `TracerProvider` that includes default context management and propagation for Browser, please see
-[@opentelemetry/sdk-trace-web](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-web).
-
 ## Installation
 
 ```bash

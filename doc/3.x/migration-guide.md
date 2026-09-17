@@ -188,6 +188,37 @@ import { AsynLocalStorageContextManager } from '@opentelemetry/context-async-hoo
 
 ---
 
+## `@opentelemetry/sdk-trace-node` (package removed)
+
+The `@opentelemetry/sdk-trace-node` package has been removed in favor of the `@opentelemetry/sdk-trace` package.
+The sdk-trace-node package provided two primary features:
+
+1. A `NodeTracerProvider#register(...)` method to register context-manager and propagators.
+   It is recommended that user code do this manually now.
+2. Reading environment variables for some tracer provider defaults (inherited from `BasicTracerProvider` from the sdk-trace-base package).
+   It is recommended that user code use the [sdk-node](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-sdk-node/) package for environment variable-based or file-based SDK configuration.
+
+```ts
+// before
+import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+const tracerProvider = new NodeTracerProvider(/* ... */);
+tracerProvider.register(/* ... */);
+
+// after
+import { context, propagation, trace } from '@opentelemetry/api';
+import { TracerProvider } from '@opentelemetry/sdk-trace';
+import { CompositePropagator, W3CBaggagePropagator, W3CTraceContextPropagator } from '@opentelemetry/core';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
+
+// Manually handle `OTEL_` envvars as necessary, or use "sdk-node" package.
+const tracerProvider = new TracerProvider(/* ... */);
+trace.setGlobalTracerProvider(tracerProvider);
+context.setGlobalContextManager(new AsyncLocalStorageContextManager());
+propagation.setGlobalPropagator(new CompositePropagator({
+  propagators: [new W3CTraceContextPropagator(), new W3CBaggagePropagator()],
+}));
+```
+
 ## `@opentelemetry/sdk-node`
 
 ### Removed: `NodeSDKConfiguration.logRecordProcessor`
@@ -247,19 +278,34 @@ const sdk = new NodeSDK({
 });
 ```
 
-### Removed: `node` and `tracing` namespace re-exports
+### Removed: `tracing` namespace re-export
 
-The deprecated namespace re-exports `node` (re-exporting `@opentelemetry/sdk-trace-node`) and `tracing` (re-exporting `@opentelemetry/sdk-trace-base`) have been removed from `@opentelemetry/sdk-node`. Import directly from the originating packages instead.
+The deprecated namespace re-export `tracing` (re-exporting `@opentelemetry/sdk-trace-base`) has been removed from `@opentelemetry/sdk-node`.
+Import directly from the sdk-trace-base package.
+<!-- TODO: replace this advice with a sdk-trace-base migration section once sdk-trace-base package is removed -->
 
 ```ts
 // before
-import { node, tracing } from '@opentelemetry/sdk-node';
-const provider = new node.NodeTracerProvider();
+import { tracing } from '@opentelemetry/sdk-node';
 const exporter = new tracing.ConsoleSpanExporter();
 
 // after
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-base';
-const provider = new NodeTracerProvider();
 const exporter = new ConsoleSpanExporter();
+```
+
+### Removed: `node` namespace re-export
+
+The deprecated namespace re-export `node` (re-exporting `@opentelemetry/sdk-trace-node`) has been removed from `@opentelemetry/sdk-node`.
+As well, the sdk-trace-node package has been *removed*, in favor of the sdk-trace package.
+See the section on sdk-trace-node removal above.
+
+```ts
+// before
+import { node } from '@opentelemetry/sdk-node';
+const provider = new node.NodeTracerProvider();
+
+// after
+import { TracerProvider } from '@opentelemetry/sdk-trace';
+// See sdk-trace-node section above for migration to sdk-trace.
 ```
