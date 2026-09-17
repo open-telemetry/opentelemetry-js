@@ -95,7 +95,6 @@
     "experimental/packages/*",
     "experimental/examples/*",
     "integration-tests/*",
-    "examples/otlp-exporter-node",
     "examples/opentelemetry-web",
     "examples/http",
     "examples/https",
