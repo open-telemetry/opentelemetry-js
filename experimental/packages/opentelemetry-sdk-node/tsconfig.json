@@ -28,12 +28,6 @@
       "path": "../../../packages/opentelemetry-resources"
     },
     {
-      "path": "../../../packages/opentelemetry-sdk-trace-base"
-    },
-    {
-      "path": "../../../packages/opentelemetry-sdk-trace-node"
-    },
-    {
       "path": "../../../packages/sdk-metrics"
     },
     {
