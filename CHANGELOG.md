@@ -46,6 +46,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :books: Documentation
 
+* chore(examples): drop examples/{otlp-exporter-node,grpc-js} [#7096](https://github.com/open-telemetry/opentelemetry-js/pull/7096)
+
 ### :house: Internal
 
 * chore: remove `@opentelemetry/sdk-trace-web` package from examples and bundler tests [#7095](https://github.com/open-telemetry/opentelemetry-js/pull/7095)
