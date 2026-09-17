@@ -31,7 +31,7 @@ const provider = new TracerProvider({
   spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
 });
 
-context.setGlobalContextManager(new ZoneContextManager());
+context.setGlobalContextManager(new ZoneContextManager().enable());
 trace.setGlobalTracerProvider(provider);
 
 registerInstrumentations({
@@ -43,7 +43,7 @@ const fetchInstrumentation = new FetchInstrumentation();
 const provider = new TracerProvider({
   spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
 });
-context.setGlobalContextManager(new ZoneContextManager());
+context.setGlobalContextManager(new ZoneContextManager().enable());
 trace.setGlobalTracerProvider(provider);
 fetchInstrumentation.setTracerProvider(provider);
 

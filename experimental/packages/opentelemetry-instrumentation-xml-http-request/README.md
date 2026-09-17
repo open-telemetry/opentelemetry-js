@@ -30,7 +30,7 @@ const providerWithZone = new TracerProvider({
   spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
 });
 
-context.setGlobalContextManager(new ZoneContextManager());
+context.setGlobalContextManager(new ZoneContextManager().enable());
 trace.setGlobalTracerProvider(providerWithZone);
 
 registerInstrumentations({
@@ -51,7 +51,7 @@ const xmlHttpRequestInstrumentation = new XMLHttpRequestInstrumentation({
   propagateTraceHeaderCorsUrls: ['http://localhost:8090']
 });
 const providerWithZone = new TracerProvider();
-context.setGlobalContextManager(new ZoneContextManager());
+context.setGlobalContextManager(new ZoneContextManager().enable());
 xmlHttpRequestInstrumentation.setTracerProvider(providerWithZone);
 /////////////////////////////////////////
 

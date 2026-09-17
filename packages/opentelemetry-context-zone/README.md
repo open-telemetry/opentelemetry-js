@@ -27,7 +27,7 @@ import { ZoneContextManager } from '@opentelemetry/context-zone';
 const providerWithZone = new TracerProvider({
   spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
 });
-context.setGlobalContextManager(new ZoneContextManager());
+context.setGlobalContextManager(new ZoneContextManager().enable());
 trace.setGlobalTracerProvider(providerWithZone);
 
 

@@ -40,7 +40,7 @@ async function start(){
   });
 
   // Changing default contextManager to use ZoneContextManager - supports asynchronous operations - optional
-  context.setGlobalContextManager(new ZoneContextManager());
+  context.setGlobalContextManager(new ZoneContextManager().enable());
   trace.setGlobalTracerProvider(provider);
 
   // Registering instrumentations
