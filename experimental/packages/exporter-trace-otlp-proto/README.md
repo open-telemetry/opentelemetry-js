@@ -91,12 +91,6 @@ This retry policy first checks if the response has a `'Retry-After'` header. If 
 
   > The exporter will retry exporting within the [exporter timeout configuration](#exporter-timeout-configuration) time.
 
-## Running opentelemetry-collector locally to see the traces
-
-1. Go to examples/otlp-exporter-node
-2. run `npm run docker:start`
-3. Open page at `http://localhost:9411/zipkin/` to observe the traces
-
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
