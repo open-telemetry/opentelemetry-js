@@ -36,6 +36,9 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :rocket: Features
 
+* feat(semantic-conventions-genai): add new `@opentelemetry/semantic-conventions-genai` package #6783 @wolfgangcodes
+  * Generated from the [GenAI semantic conventions registry](https://github.com/open-telemetry/semantic-conventions-genai), which is versioned independently of the core semantic conventions. All GenAI conventions are currently in development, so they are exported from the `@opentelemetry/semantic-conventions-genai/incubating` entry-point.
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation

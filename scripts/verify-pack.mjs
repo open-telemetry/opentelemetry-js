@@ -25,6 +25,17 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
+// Entry points that are expected to resolve empty right now, keyed by
+// "<package name>:<exports subpath>". An empty module usually means a broken
+// `exports` map, but this one is intentional: every GenAI semantic convention
+// is still in development, so the stable entry-point re-exports only
+// `export {}` guards until the GenAI registry starts stabilizing conventions -
+// see semantic-conventions-genai/src/stable_attributes.ts. Remove this entry
+// once that package has real stable exports.
+const EXPECTED_EMPTY = new Set([
+  '@opentelemetry/semantic-conventions-genai:.',
+]);
+
 const failures = [];
 const targets = [];
 walk(REPO_ROOT, targets, 0);
@@ -54,12 +65,13 @@ for (const { dir, pkg } of targets) {
         failures.push(`${label} :: ${kind} "${subpath}" -> ${file} (missing in tarball)`);
         continue;
       }
+      const expectedEmpty = EXPECTED_EMPTY.has(`${pkg.name}:${subpath}`);
       if (kind === 'require') {
         try {
           const req = createRequire(path.join(extracted, 'package.json'));
           const mod = req(filePath);
           // A bare `module.exports = fn/class` has no enumerable keys but is valid.
-          if (!mod || (typeof mod !== 'function' && Object.keys(mod).length === 0)) {
+          if (!expectedEmpty && (!mod || (typeof mod !== 'function' && Object.keys(mod).length === 0))) {
             failures.push(`${label} :: require("${subpath}") resolved an empty module`);
           }
         } catch (err) {
@@ -68,7 +80,7 @@ for (const { dir, pkg } of targets) {
       } else if (kind === 'import') {
         try {
           const mod = await import(pathToFileURL(filePath).href);
-          if (!mod || Object.keys(mod).length === 0) {
+          if (!expectedEmpty && (!mod || Object.keys(mod).length === 0)) {
             failures.push(`${label} :: import("${subpath}") resolved an empty module`);
           }
         } catch (err) {
