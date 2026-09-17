@@ -1,6 +1,5 @@
-const { context, trace } = require('@opentelemetry/api');
-const { ConsoleSpanExporter, SimpleSpanProcessor } = require( '@opentelemetry/sdk-trace-base');
-const { WebTracerProvider } = require( '@opentelemetry/sdk-trace-web');
+const { context, trace, propagation } = require('@opentelemetry/api');
+const { ConsoleSpanExporter, SimpleSpanProcessor, TracerProvider } = require( '@opentelemetry/sdk-trace');
 const { XMLHttpRequestInstrumentation } = require( '@opentelemetry/instrumentation-xml-http-request');
 const { ZoneContextManager } = require( '@opentelemetry/context-zone');
 const { OTLPTraceExporter } = require( '@opentelemetry/exporter-trace-otlp-http');
@@ -9,7 +8,7 @@ const { registerInstrumentations } = require( '@opentelemetry/instrumentation');
 const { resourceFromAttributes } = require('@opentelemetry/resources');
 const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 
-const providerWithZone = new WebTracerProvider({
+const providerWithZone = new TracerProvider({
   resource: resourceFromAttributes({
     [ATTR_SERVICE_NAME]: 'xml-http-web-service'
   }),
@@ -22,10 +21,9 @@ const providerWithZone = new WebTracerProvider({
   ]
 });
 
-providerWithZone.register({
-  contextManager: new ZoneContextManager(),
-  propagator: new B3Propagator(),
-});
+propagation.setGlobalPropagator(new B3Propagator());
+context.setGlobalContextManager(new ZoneContextManager());
+trace.setGlobalTracerProvider(providerWithZone);
 
 registerInstrumentations({
   instrumentations: [

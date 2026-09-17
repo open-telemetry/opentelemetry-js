@@ -48,7 +48,7 @@ Included Components
 - XMLHttpRequestInstrumentation
 - ZoneContextManager
 - OTLPTraceExporter
-- WebTracerProvider
+- TracerProvider
 - B3Propagator
 
 To see the results, open the browser at <http://localhost:8090/xml-http-request/> and make sure you have the browser
@@ -67,7 +67,7 @@ Included Components
 - FetchInstrumentation
 - ZoneContextManager
 - OTLPTraceExporter
-- WebTracerProvider
+- TracerProvider
 - B3Propagator
 
 To see the results, open the browser at <http://localhost:8090/fetch/> and make sure you have the browser console open.
@@ -84,7 +84,7 @@ Included Components
 - FetchInstrumentation
 - ZoneContextManager
 - OTLPTraceExporter
-- WebTracerProvider
+- TracerProvider
 
 ### FetchXhrB3
 
@@ -97,7 +97,7 @@ Included Components
 - FetchInstrumentation
 - ZoneContextManager
 - OTLPTraceExporter
-- WebTracerProvider
+- TracerProvider
 - B3Propagator
 
 ### Metrics
@@ -117,7 +117,7 @@ This example show a simple usage of the ZipKin Exporter with the Web Tracer Prov
 
 Included Components
 
-- WebTracerProvider
+- TracerProvider
 - ZipkinExporter
 
 ## Useful links

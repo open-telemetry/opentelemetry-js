@@ -23,13 +23,16 @@ import { context, trace } from '@opentelemetry/api';
 import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,
-  WebTracerProvider,
-} from '@opentelemetry/sdk-trace-web';
+  TracerProvider,
+} from '@opentelemetry/sdk-trace';
 import { ZoneContextManager } from '@opentelemetry/context-zone-peer-dep';
 
-const providerWithZone = new WebTracerProvider({
+const providerWithZone = new TracerProvider({
   spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
 });
+context.setGlobalContextManager(new ZoneContextManager());
+trace.setGlobalTracerProvider(providerWithZone);
+
 providerWithZone.register({
   contextManager: new ZoneContextManager()
 });

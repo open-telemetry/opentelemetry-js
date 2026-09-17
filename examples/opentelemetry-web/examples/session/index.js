@@ -1,5 +1,4 @@
-const { ConsoleSpanExporter, SimpleSpanProcessor } = require( '@opentelemetry/sdk-trace-base');
-const { WebTracerProvider } = require( '@opentelemetry/sdk-trace-web');
+const { TracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require( '@opentelemetry/sdk-trace');
 const {
   LoggerProvider,
   SimpleLogRecordProcessor,
@@ -12,6 +11,7 @@ const {
   createDefaultSessionIdGenerator,
   LocalStorageSessionStore
 } = require('@opentelemetry/web-common');
+const { trace } = require('@opentelemetry/api');
 
 // session manager
 const sessionManager = createSessionManager({
@@ -34,14 +34,14 @@ sessionManager.addObserver({
 sessionManager.start();
 
 // configure tracer
-const tracerProvider = new WebTracerProvider({
+const tracerProvider = new TracerProvider({
   spanProcessors: [
     createSessionSpanProcessor(sessionManager),
     new SimpleSpanProcessor(new ConsoleSpanExporter())
   ]
 });
 
-tracerProvider.register();
+trace.setGlobalTracerProvider(tracerProvider);
 const tracer = tracerProvider.getTracer('example');
 
 // configure logger
