@@ -7,8 +7,15 @@ import type { Context, ContextManager } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
 
 /**
- * Stack Context Manager for managing the state in web
- * it doesn't fully support the async calls though
+ * StackContextManager can track context for synchronous code (the call
+ * "stack"). It does not track context for asynchronous code (Promises,
+ * async/await).
+ *
+ * This can be useful as a minimal ContextManager in the web/browser
+ * environment, which does not provide a native system for async context
+ * tracking. Web users might consider `@opentelemetry/context-zone` as
+ * an alternative. Node.js users will almost certainly want to use
+ * `AsyncLocalStorageContextManager`.
  */
 export class StackContextManager implements ContextManager {
   /**
