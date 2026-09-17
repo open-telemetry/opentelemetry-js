@@ -24,7 +24,7 @@
     "web"
   ],
   "engines": {
-    "node": "^18.19.0 || >=20.6.0"
+    "node": ">=22.15.0"
   },
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
@@ -55,9 +55,9 @@
     "@opentelemetry/instrumentation-xml-http-request": "0.222.0",
     "@opentelemetry/propagator-b3": "2.11.0",
     "@opentelemetry/sdk-metrics": "2.11.0",
-    "@opentelemetry/sdk-trace-base": "2.11.0",
-    "@opentelemetry/sdk-trace-web": "2.11.0",
-    "@opentelemetry/semantic-conventions": "^1.29.0"
+    "@opentelemetry/sdk-trace": "2.11.0",
+    "@opentelemetry/semantic-conventions": "^1.29.0",
+    "path-browserify": "^1.0.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/opentelemetry-web"
 }

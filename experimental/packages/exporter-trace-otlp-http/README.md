@@ -29,10 +29,11 @@ To see documentation and sample code for the metric exporter, see the [exporter-
 The OTLPTraceExporter in Web expects the endpoint to end in `/v1/traces`.
 
 ```js
+import { trace } from '@opentelemetry/api';
 import {
   BatchSpanProcessor,
-  WebTracerProvider,
-} from '@opentelemetry/sdk-trace-web';
+  TracerProvider,
+} from '@opentelemetry/sdk-trace';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 
 const collectorOptions = {
@@ -42,7 +43,7 @@ const collectorOptions = {
 };
 
 const exporter = new OTLPTraceExporter(collectorOptions);
-const provider = new WebTracerProvider({
+const provider = new TracerProvider({
   spanProcessors: [
     new BatchSpanProcessor(exporter, {
       // The maximum queue size. After the size is reached spans are dropped.
@@ -57,7 +58,7 @@ const provider = new WebTracerProvider({
   ]
 });
 
-provider.register();
+trace.setGlobalTracerProvider(provider);
 
 ```
 

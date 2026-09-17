@@ -33,6 +33,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
   * `OTEL_PROPAGATORS=jaeger` and `{ jaeger: null }` in the configuration object are no longer recognised. Replace with `"tracecontext"`.
   * See the [3.x migration guide](doc/3.x/migration-guide.md) for full instructions.
 * fix(opentelemetry-exporter-prometheus)!: default exporter host to localhost [#6599](https://github.com/open-telemetry/opentelemetry-js/pull/6599) @cjihrig
+* chore!: bump minimum node.js version to >=22.15.0
 
 ### :rocket: Features
 
@@ -72,6 +73,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 * fix(instrumentation-http): do not crash on or misdirect outgoing requests whose options Node.js itself accepts, such as a non-string `host` alongside a valid `hostname`, or a `URL` argument from another realm or a polyfill [#6969](https://github.com/open-telemetry/opentelemetry-js/pull/6969) @RaphaelManke
 * fix(instrumentation-http): redact sensitive query parameters on incoming (server) spans; add `redactedQueryParamsServer` config option @dyladan
 * fix(sdk-node): support `headers_list` when creating OTLP exporters from declarative configuration [#6953](https://github.com/open-telemetry/opentelemetry-js/issues/6953) @JacksonWeber
+* fix(otlp-exporter-base): drain the fetch response body so that browsers release the keepalive quota [#7002](https://github.com/open-telemetry/opentelemetry-js/pull/7002) @anneheartrecord
 
 ### :books: Documentation
 

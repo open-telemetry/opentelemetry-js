@@ -128,7 +128,7 @@
     "webpack-cli": "7.2.3"
   },
   "engines": {
-    "node": "^18.19.0 || >=20.6.0"
+    "node": ">=22.15.0"
   },
   "sideEffects": false
 }
