@@ -31,13 +31,16 @@ const MAX_KEEPALIVE_BODY_SIZE = 60 * 1024;
 const MAX_KEEPALIVE_REQUESTS = 9;
 
 /**
- * Track cumulative pending body size across all in-flight keepalive requests.
+ * Track cumulative body size charged against the keepalive budget.
  * This is necessary because the 64KiB limit is cumulative, not per-request.
+ * Charged from request start until the response body drains, which is later
+ * than the request completing: that is when the browser gives the quota back.
  */
 let pendingBodySize = 0;
 
 /**
- * Track number of pending keepalive requests.
+ * Track number of requests holding keepalive budget, on the same terms as
+ * {@link pendingBodySize}.
  */
 let pendingKeepaliveCount = 0;
 
@@ -91,6 +94,22 @@ class FetchTransport implements IExporterTransport {
     // would not survive.
     const suppressedContext = suppressTracing(context.active());
 
+    // Idempotent so that a double call cannot drive the counters negative,
+    // which would defeat the cap check above for every later request.
+    let released = false;
+    const release = () => {
+      if (released) {
+        return;
+      }
+      released = true;
+      if (useKeepalive) {
+        pendingBodySize -= requestSize;
+        pendingKeepaliveCount--;
+      }
+      clearTimeout(timeout);
+    };
+    let drainOwnsCleanup = false;
+
     try {
       const url = new URL(this._parameters.url);
       // Resolve headers before entering the suppressed fetch context.
@@ -110,7 +129,15 @@ class FetchTransport implements IExporterTransport {
         })
       );
 
-      await drainResponseBody(response);
+      // Not awaited: the status already decides the export outcome, and a
+      // collector that stalls mid-body must not hold up the caller.
+      const drained = drainResponseBody(response);
+      // Timer stays armed through the drain: an abort errors the body, so a
+      // stalled drain still settles rather than holding the budget forever.
+      // The slower client-abort release is the escape hatch, not the norm.
+      void drained.then(release, release);
+      // Must be set before any return below, or `finally` releases a second time.
+      drainOwnsCleanup = true;
 
       if (response.status >= 200 && response.status <= 299) {
         diag.debug(`export response success (status: ${response.status})`);
@@ -144,10 +171,10 @@ class FetchTransport implements IExporterTransport {
         error: new Error('Fetch request errored', { cause: error }),
       };
     } finally {
-      clearTimeout(timeout);
-      if (useKeepalive) {
-        pendingBodySize -= requestSize;
-        pendingKeepaliveCount--;
+      // Cleanup here only for a failure before the response arrived; past that
+      // point the drain owns it.
+      if (!drainOwnsCleanup) {
+        release();
       }
     }
   }
@@ -183,7 +210,12 @@ function isFetchNetworkErrorRetryable(error: unknown): boolean {
  * client-abort path and releases the quota far more slowly than reading it to
  * the end, so the body is read rather than cancelled.
  *
+ * Never rejects. Its settlement, not its outcome, is what releases the
+ * request's keepalive budget, so a caller that ignores it leaks that budget
+ * for the life of the document.
+ *
  * @see https://fetch.spec.whatwg.org/#fetch-processresponseendofbody
+ * @see https://issues.chromium.org/issues/546438373
  */
 async function drainResponseBody(response: Response): Promise<void> {
   try {
