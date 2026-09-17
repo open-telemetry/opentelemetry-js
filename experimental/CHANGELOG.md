@@ -43,6 +43,10 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :house: Internal
 
+* refactor(web-common, instrumentation-fetch, instrumentation-xml-http-request): move utils from `@opentelemetry/sdk-trace-web`
+  into `@opentelemetry/web-common` and use them in `@opentelemetry/instrumentation-fetch` and `@opentelemetry/instrumentation-xml-http-request`.
+  With this change the instrumentations do not depend on SDK packages and the utils are kept in a shared package so we avoid code duplication.
+
 ## 0.222.0
 
 ### :boom: Breaking Changes
@@ -67,6 +71,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 * fix(instrumentation-http): do not crash on or misdirect outgoing requests whose options Node.js itself accepts, such as a non-string `host` alongside a valid `hostname`, or a `URL` argument from another realm or a polyfill [#6969](https://github.com/open-telemetry/opentelemetry-js/pull/6969) @RaphaelManke
 * fix(instrumentation-http): redact sensitive query parameters on incoming (server) spans; add `redactedQueryParamsServer` config option @dyladan
 * fix(sdk-node): support `headers_list` when creating OTLP exporters from declarative configuration [#6953](https://github.com/open-telemetry/opentelemetry-js/issues/6953) @JacksonWeber
+* fix(otlp-exporter-base): drain the fetch response body so that browsers release the keepalive quota [#7002](https://github.com/open-telemetry/opentelemetry-js/pull/7002) @anneheartrecord
 
 ### :books: Documentation
 
@@ -128,6 +133,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :books: Documentation
 
+* docs(configuration): add declarative config example (`experimental/examples/declarative-config/`) [#6807](https://github.com/open-telemetry/opentelemetry-js/issues/6807) @MikeGoldsmith
 * docs(configuration): link the configuration README to the cross-SDK declarative config language support status doc [#6809](https://github.com/open-telemetry/opentelemetry-js/issues/6809) @MikeGoldsmith
 
 ### :house: Internal
