@@ -31,6 +31,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
   * `OTEL_PROPAGATORS=jaeger` and `{ jaeger: null }` in the configuration object are no longer recognised. Replace with `"tracecontext"`.
   * See the [3.x migration guide](doc/3.x/migration-guide.md) for full instructions.
 * fix(opentelemetry-exporter-prometheus)!: default exporter host to localhost [#6599](https://github.com/open-telemetry/opentelemetry-js/pull/6599) @cjihrig
+* chore!: bump minimum node.js version to >=22.15.0
 
 ### :rocket: Features
 

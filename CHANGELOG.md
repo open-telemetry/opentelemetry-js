@@ -36,6 +36,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 * feat(propagator-jaeger)!: remove `@opentelemetry/propagator-jaeger` package [#7077](https://github.com/open-telemetry/opentelemetry-js/pull/7077)
   * The Jaeger propagator is deprecated by the OpenTelemetry specification in favour of `W3CTraceContextPropagator`. Use `W3CTraceContextPropagator` from `@opentelemetry/core` instead.
   * See the [3.x migration guide](doc/3.x/migration-guide.md) for full instructions.
+* chore!: bump minimum node.js version to >=22.15.0
 
 ### :rocket: Features
 
