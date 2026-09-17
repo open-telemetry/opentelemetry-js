@@ -40,6 +40,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :house: Internal
 
+* chore: remove `@opentelemetry/sdk-trace-web` package from examples and bundler tests [#7095](https://github.com/open-telemetry/opentelemetry-js/pull/7095)
 * chore(sdk-trace): add `StachContextManager` in `@opentelemetry/sdk-trace` package [#7086](https://github.com/open-telemetry/opentelemetry-js/pull/7086)
 * feat(ci): support releasing from maintenance branches [#6767](https://github.com/open-telemetry/opentelemetry-js/issues/6767) @pichlermarc
   * The API documentation site is only redeployed for releases whose commit is reachable from `main`, so a maintenance release no longer overwrites it.
