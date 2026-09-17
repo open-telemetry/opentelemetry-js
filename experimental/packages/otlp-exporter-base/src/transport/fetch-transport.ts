@@ -134,9 +134,8 @@ class FetchTransport implements IExporterTransport {
       const drained = drainResponseBody(response);
       // Timer stays armed through the drain: an abort errors the body, so a
       // stalled drain still settles rather than holding the budget forever.
-      // The slower client-abort release is the escape hatch, not the norm.
       void drained.then(release, release);
-      // Must be set before any return below, or `finally` releases a second time.
+      // Set before any return, or `finally` frees the budget before it drains.
       drainOwnsCleanup = true;
 
       if (response.status >= 200 && response.status <= 299) {
