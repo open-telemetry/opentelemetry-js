@@ -616,17 +616,12 @@ describe('FetchTransport', function () {
 
       // act - first request resolves while its body is still undrained
       await transport.send(largePayload, requestTimeout);
-      // A bare macrotask turn, so the assertion cannot pass on a race.
+      // A full macrotask turn: the budget is still held, not merely not-yet-released.
       await flushBodyDrain();
       await transport.send(largePayload, requestTimeout);
-
-      // assert
-      const secondInit = fetchStub.secondCall.args[1] as RequestInit;
-      assert.strictEqual(
-        secondInit.keepalive,
-        false,
-        'budget should still be held while the first body is undrained'
-      );
+      const keepaliveWhileUndrained = (
+        fetchStub.secondCall.args[1] as RequestInit
+      ).keepalive;
 
       // act - drain the body
       closeBody();
@@ -634,7 +629,18 @@ describe('FetchTransport', function () {
       await transport.send(largePayload, requestTimeout);
       await flushBodyDrain();
 
-      // assert
+      // assert - the first request has to have taken the budget, or the
+      // undrained check below would hold for the wrong reason
+      assert.strictEqual(
+        (fetchStub.firstCall.args[1] as RequestInit).keepalive,
+        true,
+        'the first request should have charged the budget'
+      );
+      assert.strictEqual(
+        keepaliveWhileUndrained,
+        false,
+        'budget should still be held while the first body is undrained'
+      );
       const thirdInit = fetchStub.thirdCall.args[1] as RequestInit;
       assert.strictEqual(
         thirdInit.keepalive,
@@ -739,7 +745,7 @@ describe('FetchTransport', function () {
       await transport.send(largePayload, requestTimeout);
       await transport.send(largePayload, shortTimeout);
       const secondInit = fetchStub.secondCall.args[1] as RequestInit;
-      assert.strictEqual(secondInit.keepalive, false);
+      const keepaliveWhileSaturated = secondInit.keepalive;
 
       await new Promise(resolve => setTimeout(resolve, shortTimeout + 10));
       await flushBodyDrain();
@@ -758,6 +764,7 @@ describe('FetchTransport', function () {
       await flushBodyDrain();
 
       // assert
+      assert.strictEqual(keepaliveWhileSaturated, false);
       assert.strictEqual(abortedWhileStalled, true);
       assert.strictEqual(
         drainSettled,
@@ -787,6 +794,42 @@ describe('FetchTransport', function () {
         secondInit.keepalive,
         true,
         'a retryable response should still free its budget'
+      );
+    });
+
+    // The retrying transport re-sends as soon as it sees `retryable`, which is
+    // now before the failed attempt's body has drained and given its budget back.
+    it('sends a retry without keepalive while the previous attempt drains', async function () {
+      // arrange
+      const { response, closeBody } = responseWithPendingBody(503);
+      const fetchStub = sinon.stub(globalThis, 'fetch');
+      fetchStub.onCall(0).resolves(response);
+      fetchStub.onCall(1).resolves(new Response('', { status: 200 }));
+
+      const largePayload = new Uint8Array(MAX_KEEPALIVE_BODY_SIZE / 2 + 1);
+      const transport = createFetchTransport(testTransportParameters);
+
+      // act
+      const first = await transport.send(largePayload, requestTimeout);
+      await transport.send(largePayload, requestTimeout);
+      const retryKeepalive = (fetchStub.secondCall.args[1] as RequestInit)
+        .keepalive;
+
+      // cleanup - before the asserts, so a failure cannot hold the budget
+      closeBody();
+      await flushBodyDrain();
+
+      // assert
+      assert.strictEqual(first.status, 'retryable');
+      assert.strictEqual(
+        (fetchStub.firstCall.args[1] as RequestInit).keepalive,
+        true,
+        'the first attempt should have charged the budget'
+      );
+      assert.strictEqual(
+        retryKeepalive,
+        false,
+        'a retry cannot use keepalive until the failed attempt drains'
       );
     });
 
