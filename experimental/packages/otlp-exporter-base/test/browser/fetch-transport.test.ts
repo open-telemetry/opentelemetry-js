@@ -6,7 +6,7 @@
 import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { context, propagation } from '@opentelemetry/api';
-import { isTracingSuppressed, suppressTracing } from '@opentelemetry/core';
+import { isTracingSuppressed } from '@opentelemetry/core';
 import { TestStackContextManager } from './TestStackContextManager';
 import { createFetchTransport } from '../../src/transport/fetch-transport';
 import { createRetryingTransport } from '../../src/retrying-transport';
@@ -294,10 +294,7 @@ describe('FetchTransport', function () {
       });
 
       const transport = createFetchTransport(testTransportParameters);
-      const response = await context.with(
-        suppressTracing(context.active()),
-        () => transport.send(testPayload, requestTimeout)
-      );
+      const response = await transport.send(testPayload, requestTimeout);
 
       assert.strictEqual(response.status, 'success');
       assert.strictEqual(
