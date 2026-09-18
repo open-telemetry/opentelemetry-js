@@ -219,16 +219,6 @@ export default tseslint.config(
     },
   },
 
-  // shim-opencensus carries an upstream OpenCensus header for one file.
-  {
-    files: [
-      'experimental/packages/shim-opencensus/src/OpenCensusMetricProducer.ts',
-    ],
-    rules: {
-      'yet-another-license-header/header': 'off',
-    },
-  },
-
   // Build tooling configs (e.g. tsdown.config.ts) live outside each package's
   // tsconfig include globs, so the project service can't resolve them. The
   // root tsconfig includes them (no per-package rootDir, so the shared

@@ -9,6 +9,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :boom: Breaking Changes
 
+* chore(shim-opencensus)!: remove the `@opentelemetry/shim-opencensus` package
+  * In the [OpenTelemetry Specification v1.58.0](https://github.com/open-telemetry/opentelemetry-specification/releases/tag/v1.58.0) the [OpenCensus compatibility requirements were deprecated](https://github.com/open-telemetry/opentelemetry-specification/pull/5138). The JavaScript OpenCensus shim package will not receive any more releases after the current [0.222.0 release](https://www.npmjs.com/package/@opentelemetry/shim-opencensus/v/0.222.0) ([source code for last release](https://github.com/open-telemetry/opentelemetry-js/tree/experimental/v0.222.0/experimental/packages/shim-opencensus/)).
 * feat(instrumentation-http)!: remove deprecated `serverName` field from `HttpInstrumentationConfig` [#7081](https://github.com/open-telemetry/opentelemetry-js/pull/7081)
   * The `serverName` option had no effect; stable HTTP semantic conventions do not include `http.server_name`. Remove it from any `setConfig()` or constructor call.
 * feat(sdk-node)!: remove deprecated `NodeSDKConfiguration` fields `logRecordProcessor`, `metricReader`, `spanProcessor` and deprecated namespace re-exports `node`, `tracing`
