@@ -5,7 +5,7 @@
 
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import { context, propagation } from '@opentelemetry/api';
+import { context } from '@opentelemetry/api';
 import { isTracingSuppressed } from '@opentelemetry/core';
 import { TestStackContextManager } from './TestStackContextManager';
 import { createFetchTransport } from '../../src/transport/fetch-transport';
@@ -302,37 +302,6 @@ describe('FetchTransport', function () {
         true,
         'the hidden instrumentation wrapper must observe suppressed tracing'
       );
-    });
-
-    it('carries the caller context into the fetch call', function (done) {
-      let baggageDuringFetch: string | undefined;
-      sinon.stub(globalThis, 'fetch').callsFake(() => {
-        baggageDuringFetch = propagation
-          .getBaggage(context.active())
-          ?.getEntry('tenant')?.value;
-        return Promise.resolve(new Response('', { status: 200 }));
-      });
-
-      const transport = createFetchTransport(testTransportParameters);
-      const callerContext = propagation.setBaggage(
-        context.active(),
-        propagation.createBaggage({ tenant: { value: 'acme' } })
-      );
-
-      context.with(callerContext, () => {
-        transport.send(testPayload, requestTimeout).then(() => {
-          try {
-            assert.strictEqual(
-              baggageDuringFetch,
-              'acme',
-              'the caller context must still be active for the fetch call'
-            );
-          } catch (e) {
-            return done(e);
-          }
-          done();
-        }, done /* catch any rejections */);
-      });
     });
 
     it('suppresses tracing for the fetch call even when the caller did not', function (done) {

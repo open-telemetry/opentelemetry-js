@@ -93,8 +93,7 @@ class FetchTransport implements IExporterTransport {
 
     try {
       const url = new URL(this._parameters.url);
-      // Unsuppressed on purpose: propagators skip injection under suppression,
-      // and `headers()` may inject propagation headers.
+      // Resolve headers before entering the suppressed fetch context.
       const headers = await this._parameters.headers();
       const response = await context.with(suppressedContext, () =>
         fetchApi(url.href, {
