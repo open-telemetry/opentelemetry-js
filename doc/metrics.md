@@ -339,9 +339,9 @@ flexibility when leveraging your metric measurement like in Grafana dashboards.
 > Simple attributes values (string, number, boolean) SHOULD be used whenever possible.
 > Using complex attribute values (arrays, nested objects, etc.) can have significant
 > negative performance overhead on the Metrics SDK, and possibly on observability backends.
-> As well, for performance reasons, the OTel JS Metrics SDK does *not* guard against
+> As well, for performance reasons, the OTel JS Metrics SDK does _not_ guard against
 > unserializable values (e.g. a BigInt, a circular reference).
-> Incorrect usage can *crash* the application.
+> Incorrect usage can _crash_ the application.
 
 ### Semantic Conventions
 
