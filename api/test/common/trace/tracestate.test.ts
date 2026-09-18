@@ -61,6 +61,13 @@ describe('TraceState', function () {
       assert.deepStrictEqual(state.serialize(), '');
     });
 
+    it('must skip list-members when the value is too long, but keep the remaining ones', function () {
+      const state = createTraceState('a=' + 'b'.repeat(512) + ',c=d');
+      assert.deepStrictEqual(state.get('a'), undefined);
+      assert.deepStrictEqual(state.get('c'), 'd');
+      assert.deepStrictEqual(state.serialize(), 'c=d');
+    });
+
     it('must drop states which cannot be parsed', function () {
       const state = createTraceState('a=1,b,c=3');
       assert.deepStrictEqual(state.get('a'), '1');
