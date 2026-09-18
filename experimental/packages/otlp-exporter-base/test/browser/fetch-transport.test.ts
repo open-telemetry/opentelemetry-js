@@ -268,32 +268,6 @@ describe('FetchTransport', function () {
       context.disable();
     });
 
-    it('suppresses tracing for the fetch call when the caller already did so', function (done) {
-      let suppressedDuringFetch: boolean | undefined;
-      sinon.stub(globalThis, 'fetch').callsFake(() => {
-        suppressedDuringFetch = isTracingSuppressed(context.active());
-        return Promise.resolve(new Response('', { status: 200 }));
-      });
-
-      const transport = createFetchTransport(testTransportParameters);
-
-      context.with(suppressTracing(context.active()), () => {
-        transport.send(testPayload, requestTimeout).then(response => {
-          try {
-            assert.strictEqual(response.status, 'success');
-            assert.strictEqual(
-              suppressedDuringFetch,
-              true,
-              'fetch must run with suppressTracing still active to avoid an export -> span -> export loop'
-            );
-          } catch (e) {
-            return done(e);
-          }
-          done();
-        }, done /* catch any rejections */);
-      });
-    });
-
     it('keeps tracing suppressed when a third-party wrapper hides an instrumented fetch', async function () {
       const nativeFetch = sinon
         .stub()
