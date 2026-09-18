@@ -559,6 +559,3 @@ const meter = meterProvider.getMeter('example-meter');
 const counter = meter.createCounter('metric_name');
 counter.add(10, { 'key': 'value' });
 ```
-
-For a fully functioning code example for using this exporter, please have a look
-at: <https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/otlp-exporter-node>
