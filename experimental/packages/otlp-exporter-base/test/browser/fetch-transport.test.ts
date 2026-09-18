@@ -5,6 +5,9 @@
 
 import * as sinon from 'sinon';
 import * as assert from 'assert';
+import { context } from '@opentelemetry/api';
+import { isTracingSuppressed } from '@opentelemetry/core';
+import { StackContextManager } from '@opentelemetry/sdk-trace';
 import { createFetchTransport } from '../../src/transport/fetch-transport';
 import { createRetryingTransport } from '../../src/retrying-transport';
 import { registerMockDiagLogger, withResolvers } from '../common/test-utils';
@@ -253,6 +256,108 @@ describe('FetchTransport', function () {
         (result as ExportResponseFailure).error.message,
         'Fetch request errored'
       );
+    });
+  });
+
+  describe('suppressTracing context', function () {
+    beforeEach(function () {
+      context.setGlobalContextManager(new StackContextManager().enable());
+    });
+
+    afterEach(function () {
+      context.disable();
+    });
+
+    it('keeps tracing suppressed when a third-party wrapper hides an instrumented fetch', async function () {
+      const nativeFetch = sinon
+        .stub()
+        .resolves(new Response('', { status: 200 }));
+      let suppressedDuringInstrumentedFetch: boolean | undefined;
+      const instrumentedFetch = sinon
+        .stub()
+        .callsFake(
+          (...args: Parameters<typeof fetch>): ReturnType<typeof fetch> => {
+            suppressedDuringInstrumentedFetch = isTracingSuppressed(
+              context.active()
+            );
+            return nativeFetch(...args);
+          }
+        );
+      (
+        instrumentedFetch as unknown as { __original: typeof fetch }
+      ).__original = nativeFetch as unknown as typeof fetch;
+
+      // Simulate a third-party wrapper installed after the instrumentation.
+      // It calls the instrumented fetch but does not expose `__original`.
+      sinon.stub(globalThis, 'fetch').callsFake((...args) => {
+        return instrumentedFetch(...args);
+      });
+
+      const transport = createFetchTransport(testTransportParameters);
+      const response = await transport.send(testPayload, requestTimeout);
+
+      assert.strictEqual(response.status, 'success');
+      assert.strictEqual(
+        suppressedDuringInstrumentedFetch,
+        true,
+        'the hidden instrumentation wrapper must observe suppressed tracing'
+      );
+    });
+
+    it('suppresses tracing for the fetch call even when the caller did not', function (done) {
+      let suppressedDuringFetch: boolean | undefined;
+      sinon.stub(globalThis, 'fetch').callsFake(() => {
+        suppressedDuringFetch = isTracingSuppressed(context.active());
+        return Promise.resolve(new Response('', { status: 200 }));
+      });
+
+      const transport = createFetchTransport(testTransportParameters);
+
+      assert.strictEqual(isTracingSuppressed(context.active()), false);
+      transport.send(testPayload, requestTimeout).then(response => {
+        try {
+          assert.strictEqual(response.status, 'success');
+          assert.strictEqual(
+            suppressedDuringFetch,
+            true,
+            'the transport must suppress tracing for its own request'
+          );
+        } catch (e) {
+          return done(e);
+        }
+        done();
+      }, done /* catch any rejections */);
+    });
+
+    it('suppresses tracing on retries, which run from a timer', function (done) {
+      const suppressedPerAttempt: boolean[] = [];
+      let attempt = 0;
+      sinon.stub(globalThis, 'fetch').callsFake(() => {
+        suppressedPerAttempt.push(isTracingSuppressed(context.active()));
+        return Promise.resolve(
+          attempt++ === 0
+            ? new Response('', { status: 503, headers: { 'Retry-After': '0' } })
+            : new Response('', { status: 200 })
+        );
+      });
+
+      const transport = createRetryingTransport({
+        transport: createFetchTransport(testTransportParameters),
+      });
+
+      transport.send(testPayload, requestTimeout).then(response => {
+        try {
+          assert.strictEqual(response.status, 'success');
+          assert.deepStrictEqual(
+            suppressedPerAttempt,
+            [true, true],
+            'every attempt must run suppressed'
+          );
+        } catch (e) {
+          return done(e);
+        }
+        done();
+      }, done /* catch any rejections */);
     });
   });
 
