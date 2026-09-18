@@ -7,7 +7,7 @@ import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { context } from '@opentelemetry/api';
 import { isTracingSuppressed } from '@opentelemetry/core';
-import { TestStackContextManager } from './TestStackContextManager';
+import { StackContextManager } from '@opentelemetry/sdk-trace';
 import { createFetchTransport } from '../../src/transport/fetch-transport';
 import { createRetryingTransport } from '../../src/retrying-transport';
 import { registerMockDiagLogger, withResolvers } from '../common/test-utils';
@@ -261,7 +261,7 @@ describe('FetchTransport', function () {
 
   describe('suppressTracing context', function () {
     beforeEach(function () {
-      context.setGlobalContextManager(new TestStackContextManager());
+      context.setGlobalContextManager(new StackContextManager().enable());
     });
 
     afterEach(function () {
