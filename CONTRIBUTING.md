@@ -240,9 +240,11 @@ npm run clean
 
 These commands can also be run for specific packages instead of the whole project, which can speed up compilations while developing.
 
-**NOTE**: Please use npm `11.10.0` or newer. Earlier versions silently ignore the `min-release-age`
-setting in `.npmrc`, and versions below `10.9.0` cannot run commands in specific packages (compile,
-lint, etc). Node.js 22 bundles npm `10.9.x`, so on that line upgrade with `npm i -g npm@latest`.
+**NOTE**: Please use npm `11.10.0` or newer, the first version that supports the `min-release-age`
+setting in `.npmrc`. Older npm reports it as an unknown config; upgrade npm rather than deleting the
+line to silence the warning, which would drop the release cooldown for everyone. Node.js 22 bundles
+npm `10.9.x`, and Node.js 24 before `24.14.1` bundles npm `11.6.x`, so on those lines upgrade with
+`npm i -g npm@latest`.
 
 ```sh
 # Build a single module and all of its dependencies
