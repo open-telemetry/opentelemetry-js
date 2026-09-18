@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Attributes, AttributeValue } from '@opentelemetry/api';
+import type { AnyValue, Attributes } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
 import { isSimpleAttributeValue, SDK_INFO } from '@opentelemetry/core';
 import {
@@ -31,7 +31,7 @@ class ResourceImpl implements Resource {
   private _memoizedAttributes?: Attributes;
 
   static FromAttributeList(
-    attributes: [string, MaybePromise<AttributeValue | undefined>][],
+    attributes: [string, MaybePromise<AnyValue | undefined>][],
     options?: ResourceOptions
   ): Resource {
     const res = new ResourceImpl({}, options);
