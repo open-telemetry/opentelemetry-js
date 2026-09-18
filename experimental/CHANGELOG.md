@@ -72,6 +72,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 * fix(instrumentation-http): redact sensitive query parameters on incoming (server) spans; add `redactedQueryParamsServer` config option @dyladan
 * fix(sdk-node): support `headers_list` when creating OTLP exporters from declarative configuration [#6953](https://github.com/open-telemetry/opentelemetry-js/issues/6953) @JacksonWeber
 * fix(otlp-exporter-base): drain the fetch response body so that browsers release the keepalive quota [#7002](https://github.com/open-telemetry/opentelemetry-js/pull/7002) @anneheartrecord
+* fix(otlp-exporter-base): parse the `Retry-After` delay strictly so a malformed value falls back to exponential backoff [#7010](https://github.com/open-telemetry/opentelemetry-js/pull/7010) @rajanpanth
 
 ### :books: Documentation
 
