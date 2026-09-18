@@ -12,6 +12,7 @@ import type { MetricCollector, MetricCollectorHandle } from './MetricCollector';
 import { toAggregation } from '../view/AggregationOption';
 import type { Aggregation } from '../view/Aggregation';
 import type { InstrumentType } from '../export/MetricData';
+import type { MeterConfigurator } from '../MeterConfigurator';
 
 /**
  * An internal record for shared meter provider states.
@@ -22,17 +23,23 @@ export class MeterProviderSharedState {
   metricCollectors: MetricCollector[] = [];
 
   meterSharedStates: Map<string, MeterSharedState> = new Map();
-  public resource: Resource;
 
-  constructor(resource: Resource) {
-    this.resource = resource;
-  }
+  constructor(
+    public resource: Resource,
+    public meterConfigurator?: MeterConfigurator
+  ) {}
 
   getMeterSharedState(instrumentationScope: InstrumentationScope) {
     const id = instrumentationScopeId(instrumentationScope);
     let meterSharedState = this.meterSharedStates.get(id);
     if (meterSharedState == null) {
-      meterSharedState = new MeterSharedState(this, instrumentationScope);
+      const meterConfig =
+        this.meterConfigurator?.(instrumentationScope) ?? undefined;
+      meterSharedState = new MeterSharedState(
+        this,
+        instrumentationScope,
+        meterConfig
+      );
       this.meterSharedStates.set(id, meterSharedState);
     }
     return meterSharedState;
