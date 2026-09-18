@@ -13,6 +13,9 @@ export type {
   IExportLogsPartialSuccess,
 } from './export-response';
 
+/**
+ * @experimental this helper may receive breaking changes in minor versions, pin this package's version when using this constant
+ */
 export const LogsExporterMetricsHelper: IExporterMetricsHelper<
   ReadableLogRecord[]
 > = {

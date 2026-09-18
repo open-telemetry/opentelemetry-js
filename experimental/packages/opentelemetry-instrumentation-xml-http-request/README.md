@@ -16,22 +16,22 @@ npm install --save @opentelemetry/instrumentation-xml-http-request
 ## Usage
 
 ```js
+import { context, trace } from '@opentelemetry/api';
 import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,
-  WebTracerProvider,
-} from '@opentelemetry/sdk-trace-web';
+  TracerProvider,
+} from '@opentelemetry/sdk-trace';
 import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xml-http-request';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
-const providerWithZone = new WebTracerProvider({
+const providerWithZone = new TracerProvider({
   spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
 });
 
-providerWithZone.register({
-  contextManager: new ZoneContextManager(),
-});
+context.setGlobalContextManager(new ZoneContextManager().enable());
+trace.setGlobalTracerProvider(providerWithZone);
 
 registerInstrumentations({
   instrumentations: [
@@ -50,10 +50,8 @@ const webTracerWithZone = providerWithZone.getTracer('default');
 const xmlHttpRequestInstrumentation = new XMLHttpRequestInstrumentation({
   propagateTraceHeaderCorsUrls: ['http://localhost:8090']
 });
-const providerWithZone = new WebTracerProvider();
-providerWithZone.register({
-  contextManager: new ZoneContextManager(),
-});
+const providerWithZone = new TracerProvider();
+context.setGlobalContextManager(new ZoneContextManager().enable());
 xmlHttpRequestInstrumentation.setTracerProvider(providerWithZone);
 /////////////////////////////////////////
 
@@ -95,7 +93,7 @@ The `instrumentation-xml-http-request` versions v0.220.0 and later emit the stab
 ![Screenshot of the running example](images/request.jpg)
 ![Screenshot of the running example](images/cors.jpg)
 
-See [examples/tracer-web](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/tracer-web) for a short example.
+See [examples/opentelemetry-web](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/opentelemetry-web) for a short example.
 
 ## Useful links
 

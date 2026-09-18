@@ -7,7 +7,7 @@ const Benchmark = require('benchmark');
 const {
   MeterProvider,
   createAllowListAttributesProcessor,
-} = require('../../../build/src');
+} = require('../../../dist/index.cjs');
 
 const provider = new MeterProvider();
 const meter = provider.getMeter('bench');

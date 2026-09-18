@@ -6,7 +6,7 @@
 import type { Attributes } from '@opentelemetry/api';
 import { context, propagation, SpanKind, trace } from '@opentelemetry/api';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import type { ContextManager } from '@opentelemetry/api';
 import type { ReadableSpan } from '@opentelemetry/sdk-trace';
 import {
@@ -421,7 +421,7 @@ export const runTests = (
     });
 
     beforeEach(() => {
-      contextManager = new AsyncHooksContextManager().enable();
+      contextManager = new AsyncLocalStorageContextManager().enable();
       context.setGlobalContextManager(contextManager);
     });
 

@@ -17,22 +17,22 @@ npm install --save @opentelemetry/instrumentation-fetch
 ## Usage
 
 ```js
+import { context, trace } from '@opentelemetry/api';
 import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,
-  WebTracerProvider,
-} from '@opentelemetry/sdk-trace-web';
+  TracerProvider,
+} from '@opentelemetry/sdk-trace';
 import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
-const provider = new WebTracerProvider({
+const provider = new TracerProvider({
   spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
 });
 
-provider.register({
-  contextManager: new ZoneContextManager(),
-});
+context.setGlobalContextManager(new ZoneContextManager().enable());
+trace.setGlobalTracerProvider(provider);
 
 registerInstrumentations({
   instrumentations: [new FetchInstrumentation()],
@@ -40,12 +40,11 @@ registerInstrumentations({
 
 // or plugin can be also initialised separately and then set the tracer provider or meter provider
 const fetchInstrumentation = new FetchInstrumentation();
-const provider = new WebTracerProvider({
+const provider = new TracerProvider({
   spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
 });
-provider.register({
-  contextManager: new ZoneContextManager(),
-});
+context.setGlobalContextManager(new ZoneContextManager().enable());
+trace.setGlobalTracerProvider(provider);
 fetchInstrumentation.setTracerProvider(provider);
 
 // and some test
@@ -60,7 +59,7 @@ fetch('http://localhost:8090/fetch.js');
 ![Screenshot of the running example](images/trace2.png)
 ![Screenshot of the running example](images/trace3.png)
 
-See [examples/tracer-web/fetch](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/tracer-web) for a short example.
+See [examples/opentelemetry-web](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/opentelemetry-web) for a short example.
 
 ### Fetch Instrumentation options
 

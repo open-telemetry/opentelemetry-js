@@ -13,7 +13,7 @@ import {
 } from '@opentelemetry/core';
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
-import type { SdkLogRecord } from './SdkLogRecord';
+import type { ReadWriteLogRecord } from './ReadWriteLogRecord';
 import { OTEL_COMPONENT_TYPE_VALUE_SIMPLE_LOG_PROCESSOR } from '../semconv';
 import { LogRecordProcessorMetrics } from './LogRecordProcessorMetrics';
 import type { Context } from '@opentelemetry/api';
@@ -48,7 +48,7 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
     );
   }
 
-  public onEmit(logRecord: SdkLogRecord, _context?: Context): void {
+  public onEmit(logRecord: ReadWriteLogRecord, _context?: Context): void {
     if (this._shutdownOnce.isCalled) {
       return;
     }

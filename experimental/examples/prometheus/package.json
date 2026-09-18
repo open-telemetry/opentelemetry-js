@@ -6,13 +6,13 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "align-api-deps": "node ../../../scripts/align-api-deps.js"
+    "align-api-deps": "node ../../../scripts/align-api-deps.mjs"
   },
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "dependencies": {
     "@opentelemetry/api": "^1.3.0",
-    "@opentelemetry/exporter-prometheus": "0.221.0",
-    "@opentelemetry/sdk-metrics": "2.10.0"
+    "@opentelemetry/exporter-prometheus": "0.222.0",
+    "@opentelemetry/sdk-metrics": "2.11.0"
   }
 }

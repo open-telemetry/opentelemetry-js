@@ -41,7 +41,7 @@ docker run -d --name jaeger \
   -p 16686:16686 \
   -p 14268:14268 \
   -p 9411:9411 \
-  jaegertracing/all-in-one:latest
+  jaegertracing/jaeger:latest
 ```
 
 Or run the `jaeger-all-in-one(.exe)` executable from the [binary distribution archives](https://www.jaegertracing.io/download/):

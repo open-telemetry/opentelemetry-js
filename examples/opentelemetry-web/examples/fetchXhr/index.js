@@ -1,7 +1,6 @@
 const { context, trace } = require('@opentelemetry/api');
-const { ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
-const { WebTracerProvider } = require('@opentelemetry/sdk-trace-web');
+const { ConsoleSpanExporter, SimpleSpanProcessor, TracerProvider } = require('@opentelemetry/sdk-trace');
 const { FetchInstrumentation } = require('@opentelemetry/instrumentation-fetch');
 const { XMLHttpRequestInstrumentation } = require('@opentelemetry/instrumentation-xml-http-request');
 const { ZoneContextManager } = require('@opentelemetry/context-zone');
@@ -9,7 +8,7 @@ const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 const { resourceFromAttributes } = require('@opentelemetry/resources');
 const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 
-const provider = new WebTracerProvider({
+const provider = new TracerProvider({
   resource: resourceFromAttributes({
     [ATTR_SERVICE_NAME]: 'fetch-xhr-web-service'
   }),
@@ -22,9 +21,8 @@ const provider = new WebTracerProvider({
   ]
 });
 
-provider.register({
-  contextManager: new ZoneContextManager(),
-});
+trace.setGlobalTracerProvider(provider);
+context.setGlobalContextManager(new ZoneContextManager().enable());
 
 registerInstrumentations({
   instrumentations: [
