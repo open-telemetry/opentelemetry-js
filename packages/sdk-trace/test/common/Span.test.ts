@@ -32,7 +32,11 @@ import * as sinon from 'sinon';
 import type { Span, SpanProcessor } from '../../src';
 import { TracerProvider } from '../../src';
 import { SpanImpl } from '../../src/Span';
-import { invalidAttributes, validAttributes, validSimpleAttributes } from './util';
+import {
+  invalidAttributes,
+  validAttributes,
+  validSimpleAttributes,
+} from './util';
 import type { Tracer } from '../../src/Tracer';
 
 import { cheatSpanLimitsFromTracer } from './util';
