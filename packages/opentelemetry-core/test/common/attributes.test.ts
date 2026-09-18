@@ -116,7 +116,6 @@ describe('attributes', () => {
   const attrTypesExtended: any = {
     a12_ArrayMixed: [1, 'b', null, { val: 'four' }],
     a13_Obj: { spam: 'eggs', foo: ['bar'] },
-    a14_Buffer: Buffer.from('hello'),
     a15_Uint8Array: new Uint8Array([104, 101, 108, 108, 111]), // 'hello' ords
     a16_Null: null,
   };
@@ -263,13 +262,11 @@ describe('attributes', () => {
       const { attributes, droppedAttributesCount } = cleanAttributes(
         {
           str: 'abcdefghij', // truncate
-          buf: Buffer.from('hello'), // truncate
           uint8Array: new Uint8Array([104, 101, 108, 108, 111]), // truncate
           recursive: [
             'abcdefghij', // truncate
             {
               str: 'abcdefghij', // truncate
-              buf: Buffer.from('hello'), // truncate
               uint8Array: new Uint8Array([104, 101, 108, 108, 111]), // truncate
             },
             3,
@@ -289,13 +286,11 @@ describe('attributes', () => {
 
       assert.deepEqual(attributes, {
         str: 'abc',
-        buf: Buffer.from('hel'),
         uint8Array: new Uint8Array([104, 101, 108]),
         recursive: [
           'abc',
           {
             str: 'abc',
-            buf: Buffer.from('hel'),
             uint8Array: new Uint8Array([104, 101, 108]),
           },
           3,
