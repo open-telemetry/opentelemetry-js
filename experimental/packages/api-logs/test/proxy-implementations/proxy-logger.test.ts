@@ -67,7 +67,7 @@ describe('ProxyLogger', () => {
       ]);
     });
 
-    it('should pass LoggerOptions with attributes (LogAttributes) to delegate', () => {
+    it('should pass LoggerOptions with attributes to delegate', () => {
       const attributes = {
         'service.name': 'api',
         version: 1,

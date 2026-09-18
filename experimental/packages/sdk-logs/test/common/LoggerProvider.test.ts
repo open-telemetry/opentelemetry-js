@@ -2,8 +2,8 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
+import type { Attributes } from '@opentelemetry/api';
 import { logs } from '@opentelemetry/api-logs';
-import type { LogAttributes } from '@opentelemetry/api-logs';
 import { diag } from '@opentelemetry/api';
 import {
   defaultResource,
@@ -274,9 +274,10 @@ describe('LoggerProvider', () => {
       circular.self = circular;
       const invalidScopeAttributes = {
         valid: 'payments',
-        invalid: circular,
+        invalidCircular: circular,
+        invalidByteArray: new Uint8Array([1, 2, 3]),
         '': 'empty-key',
-      } as unknown as LogAttributes;
+      } as unknown as Attributes;
 
       // act
       const logger1 = provider.getLogger(testName, testVersion, {
@@ -299,12 +300,16 @@ describe('LoggerProvider', () => {
       );
       assert.strictEqual(
         (logger1 as Logger)['_instrumentationScope'].droppedAttributesCount,
-        2
+        3
       );
       assert.notStrictEqual(logger1, logger2);
       sinon.assert.calledWith(
         warnStub,
-        'Invalid attribute value set for key: invalid'
+        'Invalid attribute value set for key: invalidCircular'
+      );
+      sinon.assert.calledWith(
+        warnStub,
+        'Invalid attribute value set for key: invalidByteArray'
       );
       sinon.assert.calledWith(warnStub, 'Invalid attribute key: ');
     });
@@ -383,32 +388,6 @@ describe('LoggerProvider', () => {
       const logger2 = provider.getLogger(testName, testVersion, {
         schemaUrl: testSchemaURL,
         attributes: { a: NaN, b: Infinity, c: -Infinity },
-      });
-      assert.strictEqual(logger1, logger2);
-    });
-
-    it('should distinguish Uint8Arrays from in scope attributes', () => {
-      const provider = new LoggerProvider();
-      const logger1 = provider.getLogger(testName, testVersion, {
-        schemaUrl: testSchemaURL,
-        attributes: { v: new Uint8Array([1, 2, 3]) },
-      });
-      const logger2 = provider.getLogger(testName, testVersion, {
-        schemaUrl: testSchemaURL,
-        attributes: { v: new Uint8Array([3, 2, 1]) },
-      });
-      assert.notStrictEqual(logger1, logger2);
-    });
-
-    it('should return the same logger for identical Uint8Array attributes', () => {
-      const provider = new LoggerProvider();
-      const logger1 = provider.getLogger(testName, testVersion, {
-        schemaUrl: testSchemaURL,
-        attributes: { v: new Uint8Array([1, 2, 3]) },
-      });
-      const logger2 = provider.getLogger(testName, testVersion, {
-        schemaUrl: testSchemaURL,
-        attributes: { v: new Uint8Array([1, 2, 3]) },
       });
       assert.strictEqual(logger1, logger2);
     });
