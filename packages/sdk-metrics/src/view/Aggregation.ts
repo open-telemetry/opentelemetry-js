@@ -122,15 +122,18 @@ export class ExplicitBucketHistogramAggregation implements Aggregation {
 export class ExponentialHistogramAggregation implements Aggregation {
   private readonly _maxSize: number;
   private readonly _recordMinMax: boolean;
+  private readonly _maxScale: number;
 
-  constructor(maxSize = 160, recordMinMax = true) {
+  constructor(maxSize = 160, recordMinMax = true, maxScale = 20) {
     this._maxSize = maxSize;
     this._recordMinMax = recordMinMax;
+    this._maxScale = maxScale;
   }
   createAggregator(_instrument: InstrumentDescriptor) {
     return new ExponentialHistogramAggregator(
       this._maxSize,
-      this._recordMinMax
+      this._recordMinMax,
+      this._maxScale
     );
   }
 }
