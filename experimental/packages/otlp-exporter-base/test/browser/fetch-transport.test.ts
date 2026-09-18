@@ -260,13 +260,15 @@ describe('FetchTransport', function () {
   });
 
   describe('suppressTracing context', function () {
+    beforeEach(function () {
+      context.setGlobalContextManager(new TestStackContextManager());
+    });
+
     afterEach(function () {
       context.disable();
     });
 
     it('suppresses tracing for the fetch call when the caller already did so', function (done) {
-      context.setGlobalContextManager(new TestStackContextManager());
-
       let suppressedDuringFetch: boolean | undefined;
       sinon.stub(globalThis, 'fetch').callsFake(() => {
         suppressedDuringFetch = isTracingSuppressed(context.active());
@@ -293,8 +295,6 @@ describe('FetchTransport', function () {
     });
 
     it('keeps tracing suppressed when a third-party wrapper hides an instrumented fetch', async function () {
-      context.setGlobalContextManager(new TestStackContextManager());
-
       const nativeFetch = sinon
         .stub()
         .resolves(new Response('', { status: 200 }));
@@ -334,8 +334,6 @@ describe('FetchTransport', function () {
     });
 
     it('carries the caller context into the fetch call', function (done) {
-      context.setGlobalContextManager(new TestStackContextManager());
-
       let baggageDuringFetch: string | undefined;
       sinon.stub(globalThis, 'fetch').callsFake(() => {
         baggageDuringFetch = propagation
@@ -367,8 +365,6 @@ describe('FetchTransport', function () {
     });
 
     it('suppresses tracing for the fetch call even when the caller did not', function (done) {
-      context.setGlobalContextManager(new TestStackContextManager());
-
       let suppressedDuringFetch: boolean | undefined;
       sinon.stub(globalThis, 'fetch').callsFake(() => {
         suppressedDuringFetch = isTracingSuppressed(context.active());
@@ -394,8 +390,6 @@ describe('FetchTransport', function () {
     });
 
     it('suppresses tracing on retries, which run from a timer', function (done) {
-      context.setGlobalContextManager(new TestStackContextManager());
-
       const suppressedPerAttempt: boolean[] = [];
       let attempt = 0;
       sinon.stub(globalThis, 'fetch').callsFake(() => {
