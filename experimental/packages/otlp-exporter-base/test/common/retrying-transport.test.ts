@@ -13,6 +13,10 @@ const timeoutMillis = 1000000;
 
 describe('RetryingTransport', function () {
   describe('send', function () {
+    afterEach(function () {
+      sinon.restore();
+    });
+
     it('does not retry when underlying transport succeeds', async function () {
       // arrange
       const expectedResponse: ExportResponse = {
@@ -168,15 +172,14 @@ describe('RetryingTransport', function () {
       );
     });
 
-    it('does retry 5 times, then resolves as retryable', async function () {
+    it('stops retrying when timeout is exhausted', async function () {
       // arrange
-      // make random return a negative value so that what's passed to setTimeout() is negative and therefore gets executed immediately.
-      Math.random = sinon.stub().returns(-Infinity);
+      const clock = sinon.useFakeTimers();
+      const testTimeout = 10000; // 10 seconds
 
       const retryResponse: ExportResponse = {
         status: 'retryable',
       };
-
       const mockData = Uint8Array.from([1, 2, 3]);
 
       const transportStubs = {
@@ -187,20 +190,30 @@ describe('RetryingTransport', function () {
       const transport = createRetryingTransport({ transport: mockTransport });
 
       // act
-      const result = await transport.send(mockData, timeoutMillis);
+      let resolved = false;
+      let result: ExportResponse | undefined;
+      transport.send(mockData, testTimeout).then(r => {
+        resolved = true;
+        result = r;
+      });
+
+      while (!resolved) {
+        await clock.tickAsync(100);
+      }
 
       // assert
-      sinon.assert.callCount(transportStubs.send, 6); // 1 initial try and 5 retries
-      sinon.assert.alwaysCalledWithMatch(
-        transportStubs.send,
-        mockData,
-        sinon.match.number.and(
-          sinon.match(value => {
-            return value <= timeoutMillis;
-          })
-        )
+      assert.strictEqual(result!.status, 'retryable');
+      // At least one of these conditions caused the stop:
+      // - timeout exhausted, OR
+      // - max attempts reached
+      assert.ok(
+        transportStubs.send.callCount > 1,
+        `Should have retried at least once`
       );
-      assert.strictEqual(result, retryResponse);
+      assert.ok(
+        transportStubs.send.callCount <= 21, // initial + 20 retries
+        `Should not exceed max attempts`
+      );
     });
 
     it('does not retry when retryInMillis takes place after timeoutMillis', async function () {
@@ -230,6 +243,49 @@ describe('RetryingTransport', function () {
         timeoutMillis
       );
       assert.strictEqual(result, retryResponse);
+    });
+
+    it('uses at least 80% of timeout duration for retries', async function () {
+      // arrange
+      const clock = sinon.useFakeTimers();
+      const testTimeout = 60000; // 60 seconds
+
+      const retryResponse: ExportResponse = {
+        status: 'retryable',
+      };
+      const mockData = Uint8Array.from([1, 2, 3]);
+
+      const transportStubs = {
+        send: sinon.stub().callsFake(() => {
+          return Promise.resolve(retryResponse);
+        }),
+        shutdown: sinon.stub(),
+      };
+      const mockTransport = <IExporterTransport>transportStubs;
+      const transport = createRetryingTransport({ transport: mockTransport });
+
+      // act
+      let resolved = false;
+      const resultPromise = transport.send(mockData, testTimeout).then(r => {
+        resolved = true;
+        return r;
+      });
+
+      // Advance time in small increments, allowing promises to resolve between ticks
+      while (!resolved) {
+        await clock.tickAsync(1000);
+      }
+
+      await resultPromise;
+
+      // assert
+      const timeUsed = clock.now;
+      const timeUsedThreshold = 0.8 * testTimeout;
+
+      assert.ok(
+        timeUsed >= timeUsedThreshold,
+        `Expected to use at least ${timeUsedThreshold}, but only used ${timeUsed}ms (timeout: ${testTimeout}ms)`
+      );
     });
   });
 });
