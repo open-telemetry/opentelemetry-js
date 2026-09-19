@@ -12,9 +12,9 @@ const common = {
     'xml-http-request': 'examples/xml-http-request/index.js',
     fetchXhr: 'examples/fetchXhr/index.js',
     fetchXhrB3: 'examples/fetchXhrB3/index.js',
-    "fetch-proto": "examples/fetch-proto/index.js",
+    'fetch-proto': 'examples/fetch-proto/index.js',
     zipkin: 'examples/zipkin/index.js',
-    session: 'examples/session/index.js'
+    session: 'examples/session/index.js',
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -41,11 +41,11 @@ const common = {
     ],
   },
   resolve: {
-    modules: [
-      path.resolve(directory),
-      'node_modules',
-    ],
+    modules: [path.resolve(directory), 'node_modules'],
     extensions: ['.ts', '.js', '.jsx', '.json'],
+    fallback: {
+      path: false,
+    },
   },
   optimization: {
     minimize: true,
