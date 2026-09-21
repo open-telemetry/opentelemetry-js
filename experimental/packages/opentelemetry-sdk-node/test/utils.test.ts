@@ -55,7 +55,7 @@ describe('getPropagatorFromEnv', function () {
   });
 
   it('should return the selected propagators when multiple are in the list', () => {
-    process.env.OTEL_PROPAGATORS = 'tracecontext,baggage,b3,b3multi,jaeger';
+    process.env.OTEL_PROPAGATORS = 'tracecontext,baggage,b3,b3multi';
     assert.deepStrictEqual(getPropagatorFromEnv()?.fields(), [
       'traceparent',
       'tracestate',
@@ -66,7 +66,6 @@ describe('getPropagatorFromEnv', function () {
       'x-b3-flags',
       'x-b3-sampled',
       'x-b3-parentspanid',
-      'uber-trace-id',
     ]);
   });
 

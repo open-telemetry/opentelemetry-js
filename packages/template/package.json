@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/template",
-  "version": "2.11.0",
+  "version": "3.0.0-development.0",
   "description": "> TODO: description",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -37,15 +37,15 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "engines": {
-    "node": "^18.19.0 || >=20.6.0"
+    "node": ">=22.15.0"
   },
   "scripts": {
     "prepublishOnly": "npm run compile",
     "compile": "tsdown",
     "version": "node ../../scripts/version-update.js",
     "clean": "rimraf dist build",
-    "peer-api-check": "node ../../scripts/peer-api-check.js",
-    "align-api-deps": "node ../../scripts/align-api-deps.js"
+    "peer-api-check": "node ../../scripts/peer-api-check.mjs",
+    "align-api-deps": "node ../../scripts/align-api-deps.mjs"
   },
   "Add these to scripts": {
     "test": "nyc mocha 'test/**/*.test.ts'",

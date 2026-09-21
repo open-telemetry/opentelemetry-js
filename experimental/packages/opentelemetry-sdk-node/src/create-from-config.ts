@@ -125,7 +125,6 @@ import {
   SimpleLogRecordProcessor,
   LoggerProvider,
 } from '@opentelemetry/sdk-logs';
-import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import {
   CompositePropagator,
@@ -403,15 +402,6 @@ export function createPropagatorFromConfig(
     [
       'b3multi',
       () => new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
-    ],
-    [
-      'jaeger',
-      () => {
-        diag.warn(
-          'The Jaeger propagator is deprecated and will be removed in a future release. Use the W3C TraceContext propagator ("tracecontext") instead.'
-        );
-        return new JaegerPropagator();
-      },
     ],
   ]);
 

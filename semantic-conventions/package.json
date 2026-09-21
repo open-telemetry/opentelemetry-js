@@ -34,9 +34,9 @@
     "clean": "rimraf dist build",
     "version": "node ../scripts/version-update.js",
     "watch": "tsdown --watch --no-clean",
-    "peer-api-check": "node ../scripts/peer-api-check.js",
+    "peer-api-check": "node ../scripts/peer-api-check.mjs",
     "size-check": "npm run compile && mocha 'test/**/*.test.ts'",
-    "align-api-deps": "node ../scripts/align-api-deps.js"
+    "align-api-deps": "node ../scripts/align-api-deps.mjs"
   },
   "keywords": [
     "opentelemetry",

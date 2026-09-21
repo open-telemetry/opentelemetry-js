@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sampler-jaeger-remote",
-  "version": "0.222.0",
+  "version": "0.300.0-development.0",
   "description": "Jaeger Remote Sampler",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -27,8 +27,8 @@
     "test": "nyc mocha 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc -w",
-    "peer-api-check": "node ../../../scripts/peer-api-check.js",
-    "align-api-deps": "node ../../../scripts/align-api-deps.js"
+    "peer-api-check": "node ../../../scripts/peer-api-check.mjs",
+    "align-api-deps": "node ../../../scripts/align-api-deps.mjs"
   },
   "keywords": [
     "opentelemetry",
@@ -39,7 +39,7 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "engines": {
-    "node": "^18.19.0 || >=20.6.0"
+    "node": ">=22.15.0"
   },
   "files": [
     "LICENSE",
@@ -50,7 +50,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/sdk-trace": "2.11.0"
+    "@opentelemetry/sdk-trace": "3.0.0-development.0"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.3.0"

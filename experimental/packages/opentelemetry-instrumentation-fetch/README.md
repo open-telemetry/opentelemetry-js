@@ -17,22 +17,22 @@ npm install --save @opentelemetry/instrumentation-fetch
 ## Usage
 
 ```js
+import { context, trace } from '@opentelemetry/api';
 import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,
-  WebTracerProvider,
-} from '@opentelemetry/sdk-trace-web';
+  TracerProvider,
+} from '@opentelemetry/sdk-trace';
 import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
-const provider = new WebTracerProvider({
+const provider = new TracerProvider({
   spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
 });
 
-provider.register({
-  contextManager: new ZoneContextManager(),
-});
+context.setGlobalContextManager(new ZoneContextManager().enable());
+trace.setGlobalTracerProvider(provider);
 
 registerInstrumentations({
   instrumentations: [new FetchInstrumentation()],
@@ -40,12 +40,11 @@ registerInstrumentations({
 
 // or plugin can be also initialised separately and then set the tracer provider or meter provider
 const fetchInstrumentation = new FetchInstrumentation();
-const provider = new WebTracerProvider({
+const provider = new TracerProvider({
   spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
 });
-provider.register({
-  contextManager: new ZoneContextManager(),
-});
+context.setGlobalContextManager(new ZoneContextManager().enable());
+trace.setGlobalTracerProvider(provider);
 fetchInstrumentation.setTracerProvider(provider);
 
 // and some test

@@ -2,7 +2,7 @@
 
 This example shows how to use [@opentelemetry/sdk-trace](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-trace) to instrument a simple Node.js application - e.g. a batch job.
 
-Our example will export spans data simultaneously on `Console` and [Jaeger](https://www.jaegertracing.io), however you can run your code anywhere and can use any exporter that OpenTelemetry supports.
+Our example will export spans data simultaneously on the `Console` and to an OTLP-compatible receiver (like Jaeger or an OpenTelemetry Collector) using [@opentelemetry/exporter-trace-otlp-proto](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-trace-otlp-proto).
 
 ## Installation
 
@@ -11,7 +11,11 @@ Our example will export spans data simultaneously on `Console` and [Jaeger](http
 npm install
 ```
 
-(Optional) Setup [Jaeger Tracing](https://www.jaegertracing.io/docs/latest/getting-started/#all-in-one): needs to be running on `localhost` port `16686`.
+(Optional) Setup the OpenTelemetry Collector and Jaeger using Docker:
+
+```sh
+docker compose -f docker/ot/docker-compose.yaml up -d
+```
 
 ## Run the Application
 
@@ -24,13 +28,9 @@ npm start
 
 Open the Jaeger UI in your browser [http://localhost:16686](http://localhost:16686)
 
-<p align="center"><img alt="Jaeger UI showing list of traces" src="images/jaeger-ui-list.png?raw=true"/></p>
-
-Select `basic-service` under *Service Name* and click on *Find Traces*.
+Select `basic-service` under *Service* and click on *Find Traces*.
 
 Click on the trace to view its details.
-
-<p align="center"><img alt="Jaeger UI showing a trace" src="./images/jaeger-ui-detail.png?raw=true"/></p>
 
 ## Useful links
 

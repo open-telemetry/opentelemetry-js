@@ -557,6 +557,7 @@ const meterProvider = new MeterProvider({
     new PeriodicExportingMetricReader({
       exporter,
       exportIntervalMillis: 1000,
+      maxExportBatchSize: 200, // optional: maximum number of data points per export batch
     }),
   ],
 });
@@ -566,6 +567,3 @@ const meter = meterProvider.getMeter('example-meter');
 const counter = meter.createCounter('metric_name');
 counter.add(10, { 'key': 'value' });
 ```
-
-For a fully functioning code example for using this exporter, please have a look
-at: <https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/otlp-exporter-node>

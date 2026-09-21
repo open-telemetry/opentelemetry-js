@@ -4,25 +4,15 @@
  */
 
 import * as assert from 'assert';
-import {
-  AsyncHooksContextManager,
-  AsyncLocalStorageContextManager,
-} from '../src';
+import { AsyncLocalStorageContextManager } from '../src';
 import { EventEmitter } from 'events';
 import { createContextKey, ROOT_CONTEXT } from '@opentelemetry/api';
 
-for (const contextManagerClass of [
-  AsyncHooksContextManager,
-  AsyncLocalStorageContextManager,
-]) {
+for (const contextManagerClass of [AsyncLocalStorageContextManager]) {
   describe(contextManagerClass.name, () => {
-    let contextManager:
-      | AsyncHooksContextManager
-      | AsyncLocalStorageContextManager;
+    let contextManager: AsyncLocalStorageContextManager;
     const key1 = createContextKey('test key 1');
-    let otherContextManager:
-      | AsyncHooksContextManager
-      | AsyncLocalStorageContextManager;
+    let otherContextManager: AsyncLocalStorageContextManager;
 
     beforeEach(() => {
       contextManager = new contextManagerClass();

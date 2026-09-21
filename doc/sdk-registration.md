@@ -20,7 +20,7 @@ api.trace.getTracer(name, version);
 api.propagation.setGlobalPropagator(httpTraceContextPropagator);
 
 /* Register a global Context Manager */
-api.context.setGlobalContextManager(asyncHooksContextManager);
+api.context.setGlobalContextManager(asyncLocalStorageContextManager);
 ```
 
 [opentelemetry-js]: https://github.com/open-telemetry/opentelemetry-js
