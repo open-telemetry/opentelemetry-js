@@ -13,6 +13,18 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :boom: Breaking Changes
 
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 3.0.0-development.0
+
+### :boom: Breaking Changes
+
 * chore(sdk-trace-node)!: remove the `@opentelemetry/sdk-trace-node` package [#7054](https://github.com/open-telemetry/opentelemetry-js/issues/7054)
   * The sdk-trace-node package has been replaced by the `@opentelemetry/sdk-trace` package.
     See the [3.x migration guide](doc/3.x/migration-guide.md) for full migration instructions.
@@ -44,8 +56,6 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 ### :rocket: Features
 
 * feat(sdk-metrics): stabilize `maxExportBatchSize` option in `PeriodicExportingMetricReader`
-
-### :bug: Bug Fixes
 
 ### :books: Documentation
 
