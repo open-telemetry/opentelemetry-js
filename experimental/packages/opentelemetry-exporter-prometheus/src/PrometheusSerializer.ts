@@ -41,7 +41,7 @@ function escapeString(str: string) {
  *
  * Note: This does *not* currently guard against unserializable attribute
  * values, e.g. BigInt or circular references. This is relying, as is
- * the sdk-metrics package, that users follow the required to only used
+ * the sdk-metrics package, that users follow the requirement to only use
  * simple attributes. (See OTEP 4485.)
  */
 function escapeAttributeValue(val: AnyValue = '') {

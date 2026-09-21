@@ -31,7 +31,7 @@ describe('NoopLoggerProvider', () => {
       assert.ok(logger);
     });
 
-    it('should accept attributes with LogAttribute value types', () => {
+    it('should accept attributes with complex value types', () => {
       const logger = loggerProvider.getLogger('logger-name', undefined, {
         attributes: {
           scalar: 'value',

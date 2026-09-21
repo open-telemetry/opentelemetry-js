@@ -146,7 +146,7 @@ class ResourceImpl implements Resource {
  * Create a `Resource` from the given attributes object.
  *
  * Only *simple* attributes are supported: string, bool, number, and homogeneous
- * arrays of these three primitive types. Complex attribute values will be
+ * arrays of these three scalar types. Complex attribute values will be
  * dropped with a warning. (See OTEP 4485.)
  */
 export function resourceFromAttributes(

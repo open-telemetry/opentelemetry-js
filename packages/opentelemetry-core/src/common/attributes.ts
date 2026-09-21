@@ -32,7 +32,7 @@
  * 1. Support the "simple" set of types. Use `cleanSimpleAttributes()` and
  *    `maybeAddSimpleAttribute()`. (Or use `sanitizeAttributes()`, kept for
  *    backward compatibility.)
- * 2. Support the extended types. Use `cleanAttributes()` and
+ * 2. Support the extended types. Use `cleanAttributes()`, `isAnyValue()`, and
  *    `maybeAddAttribute()`; and test the SDK implementation with newer
  *    attribute value types.
  */
@@ -41,7 +41,7 @@ import type { AnyValue, Attributes } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
 
 /**
- * A simpler set of attribute value with limited supported types.
+ * A simpler attribute value with limited supported types.
  * This is the set of types that `Attributes` supported in versions of
  * `@opentelemetry/api` before v1.10.0.
  */
@@ -82,8 +82,9 @@ type MaybeAddAttributeOpts = {
 
 /**
  * Maybe add the `key`/`val` attribute to the given `attributes`.
- * - "Maybe" because this ensures the `key` is valid (the string is not empty)
- *   and the `val` is an accepted spec AnyValue type (see `isAnyValue` below).
+ * - "Maybe" because this ensures the `key` is valid (the string is not empty),
+ *   the `val` is an accepted spec AnyValue type (see `isAnyValue` below),
+ *   and the attribute does not need to be dropped because of a count limit.
  *   Note that the TypeScript `AnyValue` type is *looser* than the spec
  *   `AnyValue`.
  * - This also applies attribute count and value length limits.
@@ -254,9 +255,6 @@ function cleanAttributesInternal(
  *
  * Notes:
  * - `undefined` is *not* considered an AnyValue.
- *   (TODO: update the spec to exclude `undefined`. *`null`* is the JavaScript
- *   value for "empty".)
- * - TypedArray's other than `Uint8Array` are *not* considered an AnyValue.
  *
  * @param val
  * @returns true if the value is a valid AnyValue, false otherwise
