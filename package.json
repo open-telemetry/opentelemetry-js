@@ -1,6 +1,7 @@
 {
   "name": "opentelemetry",
   "version": "0.1.0",
+  "private": true,
   "description": "OpenTelemetry is a distributed tracing and stats collection framework.",
   "scripts": {
     "precompile": "npm run submodule && nx run-many -t protos:generate",

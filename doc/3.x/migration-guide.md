@@ -42,6 +42,36 @@ propagation.setGlobalPropagator(new W3CTraceContextPropagator());
 
 ---
 
+## `@opentelemetry/exporter-jaeger` (package removed)
+
+The `@opentelemetry/exporter-jaeger` package has been removed. Jaeger has deprecated its custom Thrift collection protocols in favor of standard OpenTelemetry Protocol (OTLP).
+
+### Migrate to OTLP Exporters
+
+Jaeger natively supports receiving OpenTelemetry Protocol (OTLP) data. Replace `JaegerExporter` with `OTLPTraceExporter` using HTTP/JSON (via `@opentelemetry/exporter-trace-otlp-proto` or `@opentelemetry/exporter-trace-otlp-http`) or gRPC (via `@opentelemetry/exporter-trace-otlp-grpc`).
+
+```ts
+// before
+import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
+import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace';
+
+const provider = new TracerProvider();
+provider.addSpanProcessor(new SimpleSpanProcessor(new JaegerExporter({
+  endpoint: 'http://localhost:14268/api/traces',
+})));
+
+// after (using OTLP Proto over HTTP)
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
+import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace';
+
+const provider = new TracerProvider();
+provider.addSpanProcessor(new SimpleSpanProcessor(new OTLPTraceExporter({
+  url: 'http://localhost:4318/v1/traces',
+})));
+```
+
+---
+
 ## `@opentelemetry/instrumentation-http`
 
 ### Removed: `HttpInstrumentationConfig.serverName`

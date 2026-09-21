@@ -13,6 +13,21 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :boom: Breaking Changes
 
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+* chore: declare the Node.js and npm version floors that the tsdown build requires via `devEngines` [#7093](https://github.com/open-telemetry/opentelemetry-js/pull/7093) @overbalance
+  * The migration to tsdown raised the toolchain a contributor needs to build this repo, but nothing declared it. Contributors now build on Node.js `^24.11.1 || >=26.0.0` with npm `>=11.10.0`; both are advisory and warn rather than fail. The published packages are unaffected and still support Node.js `>=22.15.0`, which the test matrix continues to cover.
+
+## 3.0.0-development.0
+
+### :boom: Breaking Changes
+
 * chore(sdk-trace-node)!: remove the `@opentelemetry/sdk-trace-node` package [#7054](https://github.com/open-telemetry/opentelemetry-js/issues/7054)
   * The sdk-trace-node package has been replaced by the `@opentelemetry/sdk-trace` package.
     See the [3.x migration guide](doc/3.x/migration-guide.md) for full migration instructions.
@@ -36,13 +51,14 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 * feat(propagator-jaeger)!: remove `@opentelemetry/propagator-jaeger` package [#7077](https://github.com/open-telemetry/opentelemetry-js/pull/7077)
   * The Jaeger propagator is deprecated by the OpenTelemetry specification in favour of `W3CTraceContextPropagator`. Use `W3CTraceContextPropagator` from `@opentelemetry/core` instead.
   * See the [3.x migration guide](doc/3.x/migration-guide.md) for full instructions.
+* feat(exporter-jaeger)!: remove `@opentelemetry/exporter-jaeger` package
+  * The Jaeger exporter has been removed. Jaeger has deprecated its custom Thrift collection protocols in favor of standard OpenTelemetry Protocol (OTLP). Use standard OTLP exporters instead.
+  * See the [3.x migration guide](doc/3.x/migration-guide.md) for full instructions.
 * chore!: bump minimum node.js version to >=22.15.0
 
 ### :rocket: Features
 
 * feat(sdk-metrics): stabilize `maxExportBatchSize` option in `PeriodicExportingMetricReader`
-
-### :bug: Bug Fixes
 
 ### :books: Documentation
 
@@ -55,8 +71,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 * feat(ci): support releasing from maintenance branches [#6767](https://github.com/open-telemetry/opentelemetry-js/issues/6767) @pichlermarc
   * The API documentation site is only redeployed for releases whose commit is reachable from `main`, so a maintenance release no longer overwrites it.
 * chore: don't close stale issues [#x](https://github.com/open-telemetry/opentelemetry-js/issues/x) @maryliag
-* chore: declare the Node.js and npm version floors that the tsdown build requires via `devEngines` [#7093](https://github.com/open-telemetry/opentelemetry-js/pull/7093) @overbalance
-  * The migration to tsdown raised the toolchain a contributor needs to build this repo, but nothing declared it. Contributors now build on Node.js `^24.11.1 || >=26.0.0` with npm `>=11.10.0`; both are advisory and warn rather than fail. The published packages are unaffected and still support Node.js `>=22.15.0`, which the test matrix continues to cover.
+* chore: mark the workspace root package as private [#7097](https://github.com/open-telemetry/opentelemetry-js/pull/7097) @overbalance
 
 ## 2.11.0
 
