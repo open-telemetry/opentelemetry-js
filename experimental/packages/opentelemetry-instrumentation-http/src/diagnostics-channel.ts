@@ -12,11 +12,20 @@ import type {
 } from '@opentelemetry/api';
 import { context, propagation } from '@opentelemetry/api';
 import { safeExecuteInTheMiddle } from '@opentelemetry/instrumentation';
+import {
+  ATTR_SERVER_ADDRESS,
+  ATTR_SERVER_PORT,
+  ATTR_URL_FULL,
+} from '@opentelemetry/semantic-conventions';
 import * as diagch from 'diagnostics_channel';
 import type * as http from 'http';
-import { parseHttpAuthority, parseHttpRequestTarget } from './http-url';
+import {
+  getAbsoluteUrl,
+  parseHttpAuthority,
+  parseHttpRequestTarget,
+} from './http-url';
 import type { HttpInstrumentationConfig } from './types';
-import { getRequestInfo } from './utils';
+import { extractHostnameAndPort, getRequestInfo } from './utils';
 
 const CLIENT_REQUEST_CREATED_CHANNEL = 'http.client.request.created';
 const SERVER_REQUEST_START_CHANNEL = 'http.server.request.start';
@@ -76,7 +85,8 @@ export interface HttpDiagnosticsChannelHost {
     request: http.ClientRequest,
     span: Span,
     startTime: HrTime,
-    metricAttributes: Attributes
+    metricAttributes: Attributes,
+    finalizeRequestAttributes?: () => void
   ): http.ClientRequest;
   wrapServerEmit(server: http.Server, component: 'http' | 'https'): void;
   unwrapServerEmit(server: http.Server): void;
@@ -93,7 +103,8 @@ interface ListenerRecord {
  * absolute-form target when present, and from the Host header otherwise.
  */
 function recoverRequestOptions(
-  request: http.ClientRequest
+  request: http.ClientRequest,
+  initialOptions?: http.RequestOptions
 ): http.RequestOptions {
   const headers = request.getHeaders();
   const hostAuthority =
@@ -103,6 +114,14 @@ function recoverRequestOptions(
   let authority = hostAuthority?.value;
   let port: number | string | undefined = hostAuthority?.port;
   let protocol = request.protocol;
+
+  if (hostAuthority === undefined && initialOptions !== undefined) {
+    const initialDestination = extractHostnameAndPort(initialOptions);
+    const requestHost = request.host.replace(/^\[|\]$/g, '').toLowerCase();
+    if (initialDestination.hostname.toLowerCase() === requestHost) {
+      port = initialDestination.port;
+    }
+  }
 
   // An `Authorization` header set directly by the caller cannot be told apart
   // from one generated from the `auth` option, so `url.full` may carry
@@ -139,6 +158,28 @@ function recoverRequestOptions(
     auth,
     headers,
   };
+}
+
+function updateOutgoingRequestAuthority(
+  component: 'http' | 'https',
+  optionsParsed: http.RequestOptions,
+  span: Span,
+  metricAttributes: Attributes,
+  redactedQueryParams?: string[]
+): void {
+  const { hostname, port } = extractHostnameAndPort(optionsParsed);
+  span.setAttributes({
+    [ATTR_SERVER_ADDRESS]: hostname,
+    [ATTR_SERVER_PORT]: Number(port),
+    [ATTR_URL_FULL]: getAbsoluteUrl(
+      optionsParsed,
+      (optionsParsed.headers as http.OutgoingHttpHeaders | undefined) ?? {},
+      `${component}:`,
+      redactedQueryParams
+    ),
+  });
+  metricAttributes[ATTR_SERVER_ADDRESS] = hostname;
+  metricAttributes[ATTR_SERVER_PORT] = Number(port);
 }
 
 /**
@@ -219,9 +260,10 @@ export class HttpDiagnosticsChannelSubscription {
     }
 
     const component = request.protocol === 'https:' ? 'https' : 'http';
+    const initialOptions = recoverRequestOptions(request);
     const { method, optionsParsed } = getRequestInfo(
       this._host.diag,
-      recoverRequestOptions(request)
+      initialOptions
     );
 
     const started = this._host.startOutgoingHttpSpan(
@@ -234,6 +276,27 @@ export class HttpDiagnosticsChannelSubscription {
     }
     const { span, startTime, metricAttributes, parentContext, requestContext } =
       started;
+    const redactedQueryParams = this._host
+      .getConfig()
+      .redactedQueryParams?.slice();
+    let requestAttributesFinalized = false;
+    const finalizeRequestAttributes = () => {
+      if (requestAttributesFinalized) {
+        return;
+      }
+      requestAttributesFinalized = true;
+      const { optionsParsed: finalOptions } = getRequestInfo(
+        this._host.diag,
+        recoverRequestOptions(request, optionsParsed)
+      );
+      updateOutgoingRequestAuthority(
+        component,
+        finalOptions,
+        span,
+        metricAttributes,
+        redactedQueryParams
+      );
+    };
 
     // The channel fires before the headers are flushed, except for
     // `Expect: 100-continue` requests, which flush them while the request is
@@ -246,7 +309,13 @@ export class HttpDiagnosticsChannelSubscription {
 
     context.bind(parentContext, request);
     context.with(requestContext, () => {
-      this._host.traceClientRequest(request, span, startTime, metricAttributes);
+      this._host.traceClientRequest(
+        request,
+        span,
+        startTime,
+        metricAttributes,
+        finalizeRequestAttributes
+      );
     });
 
     this._host.diag.debug(`${component} instrumentation outgoingRequest`);
