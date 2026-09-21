@@ -83,6 +83,7 @@
     "@opentelemetry/core": "3.0.0-development.0",
     "@opentelemetry/instrumentation": "0.300.0-development.0",
     "@opentelemetry/semantic-conventions": "^1.29.0",
+    "fast-uri": "4.2.1",
     "forwarded-parse": "2.1.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-http",

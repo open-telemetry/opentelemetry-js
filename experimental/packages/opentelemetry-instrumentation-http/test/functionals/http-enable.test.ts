@@ -31,6 +31,7 @@ import {
   ATTR_SERVER_PORT,
   ATTR_URL_FULL,
   ATTR_URL_PATH,
+  ATTR_URL_QUERY,
   ATTR_URL_SCHEME,
   HTTP_REQUEST_METHOD_VALUE_GET,
 } from '@opentelemetry/semantic-conventions';
@@ -1219,6 +1220,9 @@ describe('HttpInstrumentation', () => {
             JSON.stringify({ address: getRemoteClientAddress(request) })
           );
         });
+        server.on('connect', (_request, socket) => {
+          socket.end('HTTP/1.1 200 Connection Established\r\n\r\n');
+        });
 
         await new Promise<void>(resolve => server.listen(serverPort, resolve));
       });
@@ -1273,6 +1277,106 @@ describe('HttpInstrumentation', () => {
           [ATTR_URL_PATH]: pathname,
           [ATTR_URL_SCHEME]: protocol,
         });
+      });
+
+      it('should handle asterisk-form OPTIONS requests', async () => {
+        const response = await httpRequest.get({
+          hostname,
+          port: serverPort,
+          method: 'OPTIONS',
+          path: '*',
+        });
+        assert.strictEqual(response.statusCode, 200);
+
+        const spans = memoryExporter.getFinishedSpans();
+        const serverSpan = spans.find(span => span.kind === SpanKind.SERVER);
+        const clientSpan = spans.find(span => span.kind === SpanKind.CLIENT);
+        assert.ok(serverSpan);
+        assert.ok(clientSpan);
+        assert.strictEqual(serverSpan.attributes[ATTR_URL_PATH], '');
+        assert.strictEqual(
+          clientSpan.attributes[ATTR_URL_FULL],
+          `${protocol}://${hostname}:${serverPort}`
+        );
+      });
+
+      it('should preserve a double-slash origin-form path', async () => {
+        const response = await httpRequest.get({
+          hostname,
+          port: serverPort,
+          path: '//foo?x=1',
+        });
+        assert.strictEqual(response.statusCode, 200);
+
+        const spans = memoryExporter.getFinishedSpans();
+        const serverSpan = spans.find(span => span.kind === SpanKind.SERVER);
+        const clientSpan = spans.find(span => span.kind === SpanKind.CLIENT);
+        assert.ok(serverSpan);
+        assert.ok(clientSpan);
+        assert.strictEqual(serverSpan.attributes[ATTR_URL_PATH], '//foo');
+        assert.strictEqual(serverSpan.attributes[ATTR_URL_QUERY], 'x=1');
+        assert.strictEqual(
+          clientSpan.attributes[ATTR_URL_FULL],
+          `${protocol}://${hostname}:${serverPort}//foo?x=1`
+        );
+      });
+
+      it('should preserve malformed percent escapes in origin-form', async () => {
+        await new Promise<void>((resolve, reject) => {
+          const request = http.get(
+            {
+              hostname,
+              port: serverPort,
+              path: '/foo%GG?x=%',
+            },
+            response => {
+              assert.strictEqual(response.statusCode, 200);
+              response.resume();
+              response.on('end', resolve);
+            }
+          );
+          request.on('error', reject);
+        });
+
+        const spans = memoryExporter.getFinishedSpans();
+        const serverSpan = spans.find(span => span.kind === SpanKind.SERVER);
+        const clientSpan = spans.find(span => span.kind === SpanKind.CLIENT);
+        assert.ok(serverSpan);
+        assert.ok(clientSpan);
+        assert.strictEqual(serverSpan.attributes[ATTR_URL_PATH], '/foo%GG');
+        assert.strictEqual(serverSpan.attributes[ATTR_URL_QUERY], 'x=%');
+        assert.strictEqual(
+          clientSpan.attributes[ATTR_URL_FULL],
+          `${protocol}://${hostname}:${serverPort}/foo%GG?x=%`
+        );
+      });
+
+      it('should handle authority-form CONNECT requests', async () => {
+        await new Promise<void>((resolve, reject) => {
+          const request = http.request({
+            hostname,
+            port: serverPort,
+            method: 'CONNECT',
+            path: 'example.test:443',
+          });
+          request.on('connect', (_response, socket) => socket.destroy());
+          request.on('close', resolve);
+          request.on('error', reject);
+          request.end();
+        });
+
+        const spans = memoryExporter.getFinishedSpans();
+        const clientSpan = spans.find(span => span.kind === SpanKind.CLIENT);
+        assert.ok(clientSpan);
+        assert.strictEqual(
+          clientSpan.attributes[ATTR_SERVER_ADDRESS],
+          'example.test'
+        );
+        assert.strictEqual(clientSpan.attributes[ATTR_SERVER_PORT], 443);
+        assert.strictEqual(
+          clientSpan.attributes[ATTR_URL_FULL],
+          'http://example.test:443'
+        );
       });
 
       it('should redact auth from the `url.full` attribute (client side and server side)', async () => {

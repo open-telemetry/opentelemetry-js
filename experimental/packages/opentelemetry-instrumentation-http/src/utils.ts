@@ -48,89 +48,21 @@ import type {
   IgnoreMatcher,
   ParsedRequestOptions,
 } from './internal-types';
-import { SYNTHETIC_BOT_NAMES, SYNTHETIC_TEST_NAMES } from './internal-types';
 import {
   DEFAULT_QUERY_STRINGS_TO_REDACT,
-  STR_REDACTED,
+  SYNTHETIC_BOT_NAMES,
+  SYNTHETIC_TEST_NAMES,
 } from './internal-types';
+import {
+  getAbsoluteUrl,
+  parseHttpAuthority,
+  parseHttpRequestTarget,
+  redactQueryString,
+} from './http-url';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import forwardedParse = require('forwarded-parse');
 
 const defaultQueryStringsToRedact = Array.from(DEFAULT_QUERY_STRINGS_TO_REDACT);
-
-/**
- * Redacts sensitive query parameters from a query string (without leading '?').
- * Returns the input unchanged if it cannot be parsed.
- */
-export const redactQueryString = (
-  searchParams: URLSearchParams,
-  paramsToRedact: string[]
-): string => {
-  const params = new URLSearchParams(searchParams);
-  for (const param of paramsToRedact) {
-    if (params.has(param)) {
-      params.set(param, STR_REDACTED);
-    }
-  }
-  return params.toString();
-};
-
-/**
- * Get an absolute url
- */
-export const getAbsoluteUrl = (
-  requestUrl: ParsedRequestOptions | null,
-  headers: IncomingHttpHeaders | OutgoingHttpHeaders,
-  fallbackProtocol = 'http:',
-  redactedQueryParams: string[] = Array.from(DEFAULT_QUERY_STRINGS_TO_REDACT)
-): string => {
-  const reqUrlObject = requestUrl || {};
-  const protocol = reqUrlObject.protocol || fallbackProtocol;
-  const port = (reqUrlObject.port || '').toString();
-  let path = reqUrlObject.path || '/';
-  // `host`, `hostname` and the `host` header may hold values of unexpected
-  // types at runtime. Node.js itself ignores non-string values when it can
-  // derive the target from another option (e.g. it uses `hostname` when
-  // `host` is not a valid string), so skip non-string candidates instead of
-  // crashing on them.
-  let host: string =
-    (typeof reqUrlObject.host === 'string' && reqUrlObject.host) ||
-    (typeof reqUrlObject.hostname === 'string' && reqUrlObject.hostname) ||
-    (typeof headers.host === 'string' && headers.host) ||
-    'localhost';
-  let hostHasPort = false;
-  if (isIPv6(host)) {
-    host = `[${host}]`;
-  } else {
-    // Parse an already-bracketed IPv6 authority with an optional port.
-    const bracketedHost = /^\[([^\]]+)\](?::(\d+))?$/.exec(host);
-    const bracketedIpv6 = bracketedHost !== null && isIPv6(bracketedHost[1]);
-    hostHasPort = bracketedIpv6
-      ? bracketedHost[2] !== undefined
-      : host.includes(':');
-  }
-  const isDefaultPort =
-    (protocol === 'http:' && port === '80') ||
-    (protocol === 'https:' && port === '443');
-  if (!hostHasPort && port && !isDefaultPort) {
-    host += `:${port}`;
-  }
-  // Redact sensitive query parameters
-  if (typeof path === 'string' && path.includes('?')) {
-    try {
-      const parsedUrl = new URL(path, 'http://localhost');
-      const redacted = redactQueryString(
-        parsedUrl.searchParams,
-        redactedQueryParams
-      );
-      path = `${parsedUrl.pathname}?${redacted}`;
-    } catch {
-      // Ignore error, as the path was not a valid URL.
-    }
-  }
-  const authPart = reqUrlObject.auth ? `${STR_REDACTED}:${STR_REDACTED}@` : '';
-  return `${protocol}//${authPart}${host}${path}`;
-};
 
 /**
  * Parse status code from HTTP response. [More details](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-http.md#status)
@@ -372,12 +304,9 @@ export const getRequestInfo = (
 
     pathname = (options as url.URL).pathname;
     if (!pathname && optionsParsed.path) {
-      try {
-        const parsedUrl = new URL(optionsParsed.path, origin);
-        pathname = parsedUrl.pathname || '/';
-      } catch {
-        pathname = '/';
-      }
+      pathname =
+        parseHttpRequestTarget(optionsParsed.path, optionsParsed.method)
+          ?.pathname || '/';
     }
   }
 
@@ -439,13 +368,14 @@ export const extractHostnameAndPort = (
           optionsPort || (requestOptions.protocol === 'https:' ? '443' : '80'),
       };
     }
-    const bracketedHost = /^\[([^\]]+)\](?::(\d{1,5}))?$/.exec(optionsHost);
-    if (bracketedHost && isIPv6(bracketedHost[1])) {
+    const parsedAuthority = parseHttpAuthority(optionsHost);
+    if (parsedAuthority !== undefined) {
+      const authorityPort = parsedAuthority.port?.toString();
       return {
-        hostname: bracketedHost[1],
+        hostname: parsedAuthority.hostname,
         port:
           optionsPort ||
-          bracketedHost[2] ||
+          authorityPort ||
           (requestOptions.protocol === 'https:' ? '443' : '80'),
       };
     }
@@ -481,9 +411,19 @@ export const getOutgoingRequestAttributes = (
   },
   enableSyntheticSourceDetection: boolean
 ): Attributes => {
-  const hostname = options.hostname;
-  const port = options.port;
   const method = requestOptions.method ?? 'GET';
+  const requestTarget =
+    typeof requestOptions.path === 'string'
+      ? parseHttpRequestTarget(requestOptions.path, method)
+      : undefined;
+  const hostname =
+    requestTarget?.form === 'authority-form'
+      ? requestTarget.authority.hostname
+      : options.hostname;
+  const port =
+    requestTarget?.form === 'authority-form'
+      ? requestTarget.authority.port
+      : options.port;
   const normalizedMethod = normalizeMethod(method);
   const headers = (requestOptions.headers || {}) as OutgoingHttpHeaders;
   const userAgent = headers['user-agent'];
@@ -594,55 +534,17 @@ function parseHostHeader(
   hostHeader: string,
   proto?: string
 ): { host: string; port?: string } {
-  const parts = hostHeader.split(':');
-
-  // no semicolon implies ipv4 dotted syntax or host name without port
-  // x.x.x.x
-  // example.com
-  if (parts.length === 1) {
-    if (proto === 'http') {
-      return { host: parts[0], port: '80' };
-    }
-
-    if (proto === 'https') {
-      return { host: parts[0], port: '443' };
-    }
-
-    return { host: parts[0] };
+  const parsed = parseHttpAuthority(hostHeader);
+  if (parsed === undefined) {
+    return { host: hostHeader };
   }
 
-  // single semicolon implies ipv4 dotted syntax or host name with port
-  // x.x.x.x:yyyy
-  // example.com:yyyy
-  if (parts.length === 2) {
-    return {
-      host: parts[0],
-      port: parts[1],
-    };
-  }
-
-  // more than 2 parts implies ipv6 syntax with multiple colons
-  // [x:x:x:x:x:x:x:x]
-  // [x:x:x:x:x:x:x:x]:yyyy
-  if (parts[0].startsWith('[')) {
-    if (parts[parts.length - 1].endsWith(']')) {
-      if (proto === 'http') {
-        return { host: hostHeader, port: '80' };
-      }
-
-      if (proto === 'https') {
-        return { host: hostHeader, port: '443' };
-      }
-    } else if (parts[parts.length - 2].endsWith(']')) {
-      return {
-        host: parts.slice(0, -1).join(':'),
-        port: parts[parts.length - 1],
-      };
-    }
-  }
-
-  // if nothing above matches just return the host header
-  return { host: hostHeader };
+  const defaultPort =
+    proto === 'http' ? '80' : proto === 'https' ? '443' : undefined;
+  return {
+    host: parsed.hostname,
+    port: parsed.port === undefined ? defaultPort : String(parsed.port),
+  };
 }
 
 /**
@@ -765,39 +667,18 @@ function removePortFromAddress(input: string): string {
 }
 
 function getInfoFromIncomingMessage(
-  component: 'http' | 'https',
   request: IncomingMessage,
   logger: DiagLogger
-): { pathname?: string; search?: string; toString: () => string } {
-  try {
-    if (request.headers.host) {
-      return new URL(
-        request.url ?? '/',
-        `${component}://${request.headers.host}`
-      );
-    } else {
-      const unsafeParsedUrl = new URL(
-        request.url ?? '/',
-        // using localhost as a workaround to still use the URL constructor for parsing
-        `${component}://localhost`
-      );
-      // since we use localhost as a workaround, ensure we hide the rest of the properties to avoid
-      // our workaround leaking though.
-      return {
-        pathname: unsafeParsedUrl.pathname,
-        search: unsafeParsedUrl.search,
-        toString: function () {
-          // we cannot use the result of unsafeParsedUrl.toString as it's potentially wrong.
-          return unsafeParsedUrl.pathname + unsafeParsedUrl.search;
-        },
-      };
-    }
-  } catch (e) {
-    // something is wrong, use undefined - this *should* never happen, logging
-    // for troubleshooting in case it does happen.
-    logger.verbose('Unable to get URL from request', e);
+): { pathname?: string; search?: string } {
+  const requestTarget = parseHttpRequestTarget(
+    request.url ?? '/',
+    request.method
+  );
+  if (requestTarget === undefined) {
+    logger.verbose('Unable to parse HTTP request target');
     return {};
   }
+  return requestTarget;
 }
 
 /**
@@ -823,7 +704,7 @@ export const getIncomingRequestAttributes = (
   } = options;
   const { headers, method } = request;
   const { 'user-agent': userAgent } = headers;
-  const parsedUrl = getInfoFromIncomingMessage(component, request, logger);
+  const parsedUrl = getInfoFromIncomingMessage(request, logger);
 
   // Stable attributes are used.
   const normalizedMethod = normalizeMethod(method);
@@ -848,7 +729,7 @@ export const getIncomingRequestAttributes = (
     // Remove leading '?' from URL search (https://developer.mozilla.org/en-US/docs/Web/API/URL/search).
     const paramsToRedact = redactedQueryParams ?? defaultQueryStringsToRedact;
     attributes[ATTR_URL_QUERY] = redactQueryString(
-      new URLSearchParams(parsedUrl.search.slice(1)),
+      parsedUrl.search.slice(1),
       paramsToRedact
     );
   }

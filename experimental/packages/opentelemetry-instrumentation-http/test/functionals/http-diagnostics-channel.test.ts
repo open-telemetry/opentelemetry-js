@@ -297,6 +297,32 @@ runIfSupported('HttpInstrumentation diagnostics channel', () => {
     metricsMemoryExporter.reset();
   });
 
+  it('treats an empty port in an absolute-form target as the default port', async () => {
+    const result = await httpRequest.get({
+      hostname,
+      port: serverPort,
+      path: 'http://origin.example:/proxied-empty-port',
+    });
+    assert.strictEqual(result.statusCode, 200);
+
+    const clientSpan = memoryExporter
+      .getFinishedSpans()
+      .find(span => span.kind === SpanKind.CLIENT);
+    assert.ok(clientSpan);
+    assert.strictEqual(
+      clientSpan.attributes[ATTR_SERVER_ADDRESS],
+      'origin.example'
+    );
+    assert.strictEqual(clientSpan.attributes[ATTR_SERVER_PORT], 80);
+    assert.strictEqual(
+      clientSpan.attributes[ATTR_URL_FULL],
+      'http://origin.example/proxied-empty-port'
+    );
+
+    await metricReader.collectAndExport();
+    metricsMemoryExporter.reset();
+  });
+
   it('records client and server duration metrics', async () => {
     await httpRequest.get(`http://${hostname}:${serverPort}/test`);
     await metricReader.collectAndExport();
