@@ -14,6 +14,7 @@ import { context, propagation } from '@opentelemetry/api';
 import { safeExecuteInTheMiddle } from '@opentelemetry/instrumentation';
 import * as diagch from 'diagnostics_channel';
 import type * as http from 'http';
+import { parseHttpAuthority, parseHttpRequestTarget } from './http-url';
 import type { HttpInstrumentationConfig } from './types';
 import { getRequestInfo } from './utils';
 
@@ -87,34 +88,20 @@ interface ListenerRecord {
 }
 
 /**
- * Extracts the port from a `host:port` / `[ipv6]:port` value, if any.
- */
-function portFromHostHeader(hostHeader: string): number | undefined {
-  const bracketed = /^\[.+\](?::(\d+))?$/.exec(hostHeader);
-  if (bracketed) {
-    return bracketed[1] ? Number(bracketed[1]) : undefined;
-  }
-  // More than one colon without brackets is a bare IPv6 literal.
-  if (hostHeader.indexOf(':') !== hostHeader.lastIndexOf(':')) {
-    return undefined;
-  }
-  const withPort = /:(\d+)$/.exec(hostHeader);
-  return withPort ? Number(withPort[1]) : undefined;
-}
-
-/**
  * Rebuilds the `RequestOptions` that `getRequestInfo` expects from an already
- * created `http.ClientRequest`; the port and credentials only survive in the
- * request headers.
+ * created `http.ClientRequest`. The request authority comes from an
+ * absolute-form target when present, and from the Host header otherwise.
  */
 function recoverRequestOptions(
   request: http.ClientRequest
 ): http.RequestOptions {
   const headers = request.getHeaders();
-  const hostHeader =
-    typeof headers.host === 'string' ? headers.host : undefined;
-  let hostname: string | undefined;
-  let port = hostHeader ? portFromHostHeader(hostHeader) : undefined;
+  const hostAuthority =
+    typeof headers.host === 'string'
+      ? parseHttpAuthority(headers.host)
+      : undefined;
+  let authority = hostAuthority?.value;
+  let port: number | string | undefined = hostAuthority?.port;
   let protocol = request.protocol;
 
   // An `Authorization` header set directly by the caller cannot be told apart
@@ -129,28 +116,25 @@ function recoverRequestOptions(
   // A proxy request may use an absolute-form request target; recover its
   // origin authority and the origin-form path the caller requested.
   let path = request.path;
-  if (/^https?:\/\//i.test(path)) {
-    try {
-      const pathUrl = new URL(path);
-      hostname = pathUrl.hostname.replace(/^\[|\]$/g, '');
-      protocol = pathUrl.protocol;
-      port =
-        pathUrl.port === ''
-          ? protocol === 'https:'
-            ? 443
-            : 80
-          : Number(pathUrl.port);
-      path = `${pathUrl.pathname}${pathUrl.search}`;
-    } catch {
-      // not a URL after all; leave the path alone
-    }
+  const requestTarget = parseHttpRequestTarget(path, request.method);
+  if (requestTarget?.form === 'absolute-form') {
+    authority = requestTarget.authority.value;
+    protocol = requestTarget.protocol;
+    port =
+      requestTarget.authority.port ??
+      (requestTarget.protocol === 'https:' ? 443 : 80);
+    path = `${requestTarget.pathname}${requestTarget.search}`;
+  } else if (requestTarget?.form === 'authority-form') {
+    authority = requestTarget.authority.value;
+    port = requestTarget.authority.port;
+    path = '';
   }
 
   return {
     method: request.method,
     port,
     protocol,
-    ...(hostname === undefined ? { host: request.host } : { hostname }),
+    host: authority ?? request.host,
     path,
     auth,
     headers,

@@ -23,6 +23,8 @@ import {
   ATTR_SERVER_ADDRESS,
   ATTR_SERVER_PORT,
   ATTR_URL_FULL,
+  ATTR_URL_PATH,
+  ATTR_URL_QUERY,
   METRIC_HTTP_CLIENT_REQUEST_DURATION,
   METRIC_HTTP_SERVER_REQUEST_DURATION,
 } from '@opentelemetry/semantic-conventions';
@@ -149,7 +151,7 @@ runIfSupported('HttpInstrumentation diagnostics channel', () => {
     assert.strictEqual(result.statusCode, 200);
   });
 
-  it('preserves host in reconstructed options for origin-form requests', async () => {
+  it('passes the Host authority in reconstructed options for origin-form requests', async () => {
     let hookOptions: http.RequestOptions | undefined;
     instrumentation.setConfig({
       useDiagnosticsChannel: true,
@@ -163,11 +165,150 @@ runIfSupported('HttpInstrumentation diagnostics channel', () => {
       await httpRequest.get(`http://${hostname}:${serverPort}/hook-options`);
 
       assert.ok(hookOptions);
-      assert.strictEqual(hookOptions.host, hostname);
+      assert.strictEqual(hookOptions.host, `${hostname}:${serverPort}`);
       assert.strictEqual(hookOptions.hostname, undefined);
+      assert.strictEqual(hookOptions.port, serverPort);
     } finally {
       instrumentation.setConfig({ useDiagnosticsChannel: true });
     }
+  });
+
+  it('uses an overridden Host header as the request authority', async () => {
+    await metricReader.collectAndExport();
+    metricsMemoryExporter.reset();
+
+    const result = await httpRequest.get({
+      hostname,
+      port: serverPort,
+      path: '/host-override',
+      headers: { Host: 'example.test' },
+    });
+
+    assert.strictEqual(result.statusCode, 200);
+    const clientSpan = memoryExporter
+      .getFinishedSpans()
+      .find(span => span.kind === SpanKind.CLIENT);
+    assert.ok(clientSpan);
+    assert.strictEqual(
+      clientSpan.attributes[ATTR_SERVER_ADDRESS],
+      'example.test'
+    );
+    assert.strictEqual(clientSpan.attributes[ATTR_SERVER_PORT], 80);
+    assert.strictEqual(
+      clientSpan.attributes[ATTR_URL_FULL],
+      'http://example.test/host-override'
+    );
+
+    await metricReader.collectAndExport();
+    const metrics =
+      metricsMemoryExporter.getMetrics()[0].scopeMetrics[0].metrics;
+    const clientDuration = metrics.find(
+      metric => metric.descriptor.name === METRIC_HTTP_CLIENT_REQUEST_DURATION
+    );
+    assert.ok(clientDuration);
+    assert.strictEqual(clientDuration.dataPoints.length, 1);
+    assert.strictEqual(
+      clientDuration.dataPoints[0].attributes[ATTR_SERVER_ADDRESS],
+      'example.test'
+    );
+    assert.strictEqual(
+      clientDuration.dataPoints[0].attributes[ATTR_SERVER_PORT],
+      80
+    );
+  });
+
+  it('normalizes optional whitespace around the Host authority', async () => {
+    await httpRequest.get({
+      hostname,
+      port: serverPort,
+      path: '/host-whitespace',
+      headers: { Host: ' example.test:8080 ' },
+    });
+
+    const clientSpan = memoryExporter
+      .getFinishedSpans()
+      .find(span => span.kind === SpanKind.CLIENT);
+    assert.ok(clientSpan);
+    assert.strictEqual(
+      clientSpan.attributes[ATTR_SERVER_ADDRESS],
+      'example.test'
+    );
+    assert.strictEqual(clientSpan.attributes[ATTR_SERVER_PORT], 8080);
+    assert.strictEqual(
+      clientSpan.attributes[ATTR_URL_FULL],
+      'http://example.test:8080/host-whitespace'
+    );
+  });
+
+  it('uses a bracketed IPv6 Host authority', async () => {
+    await httpRequest.get({
+      hostname,
+      port: serverPort,
+      path: '/ipv6-host',
+      headers: { Host: '[2001:db8::1]:8080' },
+    });
+
+    const clientSpan = memoryExporter
+      .getFinishedSpans()
+      .find(span => span.kind === SpanKind.CLIENT);
+    assert.ok(clientSpan);
+    assert.strictEqual(
+      clientSpan.attributes[ATTR_SERVER_ADDRESS],
+      '2001:db8::1'
+    );
+    assert.strictEqual(clientSpan.attributes[ATTR_SERVER_PORT], 8080);
+    assert.strictEqual(
+      clientSpan.attributes[ATTR_URL_FULL],
+      'http://[2001:db8::1]:8080/ipv6-host'
+    );
+  });
+
+  it('uses an IPvFuture Host authority', async () => {
+    await httpRequest.get({
+      hostname,
+      port: serverPort,
+      path: '/ipvfuture-host?query=value',
+      headers: { Host: '[v1.fe80]:8080' },
+    });
+
+    const clientSpan = memoryExporter
+      .getFinishedSpans()
+      .find(span => span.kind === SpanKind.CLIENT);
+    assert.ok(clientSpan);
+    assert.strictEqual(clientSpan.attributes[ATTR_SERVER_ADDRESS], 'v1.fe80');
+    assert.strictEqual(clientSpan.attributes[ATTR_SERVER_PORT], 8080);
+    assert.strictEqual(
+      clientSpan.attributes[ATTR_URL_FULL],
+      'http://[v1.fe80]:8080/ipvfuture-host?query=value'
+    );
+    const serverSpan = memoryExporter
+      .getFinishedSpans()
+      .find(span => span.kind === SpanKind.SERVER);
+    assert.ok(serverSpan);
+    assert.strictEqual(serverSpan.attributes[ATTR_SERVER_ADDRESS], 'v1.fe80');
+    assert.strictEqual(serverSpan.attributes[ATTR_SERVER_PORT], 8080);
+    assert.strictEqual(serverSpan.attributes[ATTR_URL_PATH], '/ipvfuture-host');
+    assert.strictEqual(serverSpan.attributes[ATTR_URL_QUERY], 'query=value');
+  });
+
+  it('does not interpret userinfo in a malformed Host header', async () => {
+    await httpRequest.get({
+      hostname,
+      port: serverPort,
+      path: '/malformed-host',
+      headers: { Host: 'user:secret@example.test' },
+    });
+
+    const clientSpan = memoryExporter
+      .getFinishedSpans()
+      .find(span => span.kind === SpanKind.CLIENT);
+    assert.ok(clientSpan);
+    assert.strictEqual(clientSpan.attributes[ATTR_SERVER_ADDRESS], hostname);
+    assert.strictEqual(clientSpan.attributes[ATTR_SERVER_PORT], 80);
+    assert.strictEqual(
+      clientSpan.attributes[ATTR_URL_FULL],
+      `http://${hostname}/malformed-host`
+    );
   });
 
   it('propagates context from client to server', async () => {
