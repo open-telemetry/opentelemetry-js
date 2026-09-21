@@ -6,6 +6,7 @@
 import type { TracerProvider, MeterProvider } from '@opentelemetry/api';
 import type { Instrumentation } from './types';
 import type { LoggerProvider } from '@opentelemetry/api-logs';
+import type { ConfigProvider } from '@opentelemetry/api-config';
 
 /**
  * Enable instrumentations
@@ -17,10 +18,17 @@ export function enableInstrumentations(
   instrumentations: Instrumentation[],
   tracerProvider?: TracerProvider,
   meterProvider?: MeterProvider,
-  loggerProvider?: LoggerProvider
+  loggerProvider?: LoggerProvider,
+  configProvider?: ConfigProvider
 ): void {
   for (let i = 0, j = instrumentations.length; i < j; i++) {
     const instrumentation = instrumentations[i];
+    if (configProvider && instrumentation.setConfigProvider) {
+      // Setting ConfigProvider before others, because theoretically config
+      // could impact usage of the other providers, e.g. which metric
+      // instruments are setup in `_updateMetricInstruments()`.
+      instrumentation.setConfigProvider(configProvider);
+    }
     if (tracerProvider) {
       instrumentation.setTracerProvider(tracerProvider);
     }
