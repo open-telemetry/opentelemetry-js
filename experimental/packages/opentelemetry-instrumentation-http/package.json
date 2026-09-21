@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation-http",
-  "version": "0.223.0-development.0",
+  "version": "0.300.0-development.0",
   "description": "OpenTelemetry instrumentation for `node:http` and `node:https` http client and server modules",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -80,7 +80,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "3.0.0-development.0",
-    "@opentelemetry/instrumentation": "0.223.0-development.0",
+    "@opentelemetry/instrumentation": "0.300.0-development.0",
     "@opentelemetry/semantic-conventions": "^1.29.0",
     "forwarded-parse": "2.1.2"
   },

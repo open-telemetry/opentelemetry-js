@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/otlp-exporter-base",
-  "version": "0.223.0-development.0",
+  "version": "0.300.0-development.0",
   "description": "OpenTelemetry OTLP Exporter base (for internal use only)",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -77,7 +77,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "3.0.0-development.0",
-    "@opentelemetry/otlp-transformer": "0.223.0-development.0"
+    "@opentelemetry/otlp-transformer": "0.300.0-development.0"
   },
   "devDependencies": {
     "@babel/core": "7.29.7",

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/opentelemetry-browser-detector",
-  "version": "0.223.0-development.0",
+  "version": "0.300.0-development.0",
   "description": "OpenTelemetry Resource Detector for Browser",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",

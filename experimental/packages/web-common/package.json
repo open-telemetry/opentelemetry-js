@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/web-common",
-  "version": "0.223.0-development.0",
+  "version": "0.300.0-development.0",
   "description": "Common utilities for web instrumentation",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -71,8 +71,8 @@
   "devDependencies": {
     "@babel/core": "7.29.7",
     "@opentelemetry/api": "1.9.1",
-    "@opentelemetry/api-logs": "0.223.0-development.0",
-    "@opentelemetry/sdk-logs": "0.223.0-development.0",
+    "@opentelemetry/api-logs": "0.300.0-development.0",
+    "@opentelemetry/sdk-logs": "0.300.0-development.0",
     "@opentelemetry/sdk-trace": "3.0.0-development.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",

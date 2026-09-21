@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation-xml-http-request",
-  "version": "0.223.0-development.0",
+  "version": "0.300.0-development.0",
   "description": "OpenTelemetry instrumentation for XMLHttpRequest http client in web browsers",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -87,9 +87,9 @@
   },
   "dependencies": {
     "@opentelemetry/core": "3.0.0-development.0",
-    "@opentelemetry/instrumentation": "0.223.0-development.0",
+    "@opentelemetry/instrumentation": "0.300.0-development.0",
     "@opentelemetry/semantic-conventions": "^1.29.0",
-    "@opentelemetry/web-common": "0.223.0-development.0"
+    "@opentelemetry/web-common": "0.300.0-development.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-xml-http-request",
   "sideEffects": false

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/propagator-env-carrier",
-  "version": "0.223.0-development.0",
+  "version": "0.300.0-development.0",
   "description": "OpenTelemetry environment variable carrier helpers for context propagation",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
