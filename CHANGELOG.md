@@ -21,6 +21,9 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :house: Internal
 
+* chore: declare the Node.js and npm version floors that the tsdown build requires via `devEngines` [#7093](https://github.com/open-telemetry/opentelemetry-js/pull/7093) @overbalance
+  * The migration to tsdown raised the toolchain a contributor needs to build this repo, but nothing declared it. Contributors now build on Node.js `^24.11.1 || >=26.0.0` with npm `>=11.10.0`; both are advisory and warn rather than fail. The published packages are unaffected and still support Node.js `>=22.15.0`, which the test matrix continues to cover.
+
 ## 3.0.0-development.0
 
 ### :boom: Breaking Changes

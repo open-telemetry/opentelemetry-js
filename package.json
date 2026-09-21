@@ -100,5 +100,17 @@
     "examples/http",
     "examples/https",
     "examples/esm-http-ts"
-  ]
+  ],
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "^24.11.1 || >=26.0.0",
+      "onFail": "warn"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": ">=11.10.0",
+      "onFail": "warn"
+    }
+  }
 }
