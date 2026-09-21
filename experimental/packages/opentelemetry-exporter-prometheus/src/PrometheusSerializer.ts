@@ -39,22 +39,14 @@ function escapeString(str: string) {
  * String Attribute values are converted directly to Prometheus attribute values.
  * Non-string values are represented as JSON-encoded strings.
  *
- * `undefined` is converted to an empty string.
+ * Note: This does *not* currently guard against unserializable attribute
+ * values, e.g. BigInt or circular references. This is relying, as is
+ * the sdk-metrics package, that users follow the required to only used
+ * simple attributes. (See OTEP 4485.)
  */
 function escapeAttributeValue(val: AnyValue = '') {
   let str: string;
   if (typeof val !== 'string') {
-    // XXX throw on BigInt, circular. How best to doc and protect?
-    //     Are we allowed to drop?
-    //     Spec doesn't cover serialization of attributes at all that I can tell:
-    //     https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/prometheus.md
-    //  XXX see Prom note at https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/4485-extending-attributes-to-support-complex-values.md#exporters
-    //  XXX also note this from there:
-    //    > When serializing AnyValue objects to JSON, it is RECOMMENDED to sort lists of key-value pairs lexicographically by key and apply additional settings that enhance serialization stability.
-    //    It might be nice to use that separate serializing lib?
-    //    Or we could document it as a limitation and perf decision. Because
-    //    JS objects maintain order, we rely on that and the user to provide
-    //    attributes in a stable order.
     str = JSON.stringify(val);
   } else {
     str = val;

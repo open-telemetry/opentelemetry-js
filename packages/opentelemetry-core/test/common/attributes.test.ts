@@ -206,8 +206,6 @@ describe('attributes', () => {
       );
     });
 
-    // XXX handle `?` on attributes and droppedAttributesCount cases, update docstring
-
     it('should copy the input', () => {
       const inp = {
         str: 'unmodified',

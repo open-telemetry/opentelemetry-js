@@ -8,24 +8,27 @@
  * - a string, number, boolean value
  * - a byte array (Uint8Array)
  * - array of any value
- * - map from string to any value
+ * - map from string to any value (a plain Object)
  * - null (an empty value)
  *
  * https://opentelemetry.io/docs/specs/otel/common/#anyvalue
  *
- * XXX TODO: explain intent and implications of using `unknown` here
- *  - Implementors unpacking this of AnyValue, e.g. attributes
- *    for a lot of the OTel API, need to defensively switch on
- *    all types. No type narrowing and then *assuming* remaining
- *    types.
- *  - Users can pass whatever garbage, but SDK implementations
- *    may/will drop attribute values not of the above types.
- *  - Using unknown and these rules allows supporting more
- *    anyvalue types later, say `BigInt`, if wanted.
- *  - Point out that `undefined` value means drop the key.
- *    That was the behaviour for `span.attributes` in sdk-trace, but
- *    wasn't always handled so in other SDK components.
+ * Notable JavaScript types that are excluded:
+ * - `undefined` - Excluding this means the common practice in instrumentations,
+ *   using `undefined` to mean "no value for this optional attribute", can
+ *   remain supported.
+ * - `BigInt`
+ * - TypedArrays other than `Uint8Array`
+ * - subclasses of Object, e.g. Date, Error
  *
- * @since XXX
+ * The TypeScript type `unknown` is used for `AnyValue`. This has some
+ * implications:
+ * - Callers of `@opentelemetry/api` APIs using `AnyValue` can pass in
+ *   whatever type. This was always the case for (untyped) JavaScript usage.
+ * - SDK implementations of `@opentelemetry/api` need to document if/when they
+ *   support a subset of AnyValue types.
+ * - Using `unknown` allows future changes to support more types (e.g. BigInt).
+ *
+ * @since 1.10.0
  */
 export type AnyValue = unknown;

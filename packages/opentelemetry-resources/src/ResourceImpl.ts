@@ -103,7 +103,6 @@ class ResourceImpl implements Resource {
       } else if (k.length === 0) {
         diag.warn('dropping invalid resource attribute key: <empty string>');
       } else if (!isSimpleAttributeValue(v)) {
-        // XXX Still discussing if we want to allow complex resource attr values.
         diag.warn(`dropping invalid resource attribute value for key "${k}"`);
       } else {
         attrs[k] = v;
@@ -146,20 +145,9 @@ class ResourceImpl implements Resource {
 /**
  * Create a `Resource` from the given attributes object.
  *
- * XXX change
- * It is the responsibility of callers to limit attribute values to the
- * set of allowed by AnyValue (https://opentelemetry.io/docs/specs/otel/common/#anyvalue).
- * This can be done with `cleanAttributes` and/or `isAnyValue` from `@opentelemetry/core`.
- *
- * This is made the responsibility of callers because (a) resource detectors
- * typically should only produce simple attribute values, and (b) the
- * complexity of *async* resource attributes adds complexity.
- *
- * **Note**:
- * Simple attributes SHOULD be used whenever possible. Assume that backends do
- * not index individual properties of complex attributes, that querying or
- * aggregating on such properties is inefficient and complicated, and that
- * reporting complex attributes carries higher performance overhead.
+ * Only *simple* attributes are supported: string, bool, number, and homogeneous
+ * arrays of these three primitive types. Complex attribute values will be
+ * dropped with a warning. (See OTEP 4485.)
  */
 export function resourceFromAttributes(
   attributes: DetectedResourceAttributes,

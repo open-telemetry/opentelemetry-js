@@ -119,7 +119,6 @@ export function writeKeyValue(
 const MIN_64_BIT_INT = -(2 ** 63);
 const MAX_64_BIT_INT = 2 ** 63;
 
-// XXX re-review writeAnyValue
 /**
  * Write an AnyValue directly from raw attribute value to protobuf
  */
@@ -200,7 +199,6 @@ export function writeAnyValue(writer: IProtobufWriter, value: AnyValue): void {
 export function writeInstrumentationScope(
   writer: IProtobufWriter,
   scope: InstrumentationScope &
-    // XXX revisit this, can InstrumentationScope get these? Or at least `attributes`?
     /**
      * Additional properties that are currently only part of the logs-specific type.
      * Once InstrumentationScope also includes `attributes` and `droppedAttributesCount`,

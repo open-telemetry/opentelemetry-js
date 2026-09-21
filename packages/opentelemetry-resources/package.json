@@ -106,7 +106,6 @@
     "webpack": "5.108.4",
     "webpack-cli": "7.2.3"
   },
-  "XXX": "cannot use AnyValue? because api dep. Copy? Test for this where?",
   "peerDependencies": {
     "@opentelemetry/api": ">=1.3.0 <1.10.0"
   },

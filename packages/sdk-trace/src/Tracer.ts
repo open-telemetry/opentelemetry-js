@@ -139,7 +139,6 @@ export class Tracer implements api.Tracer {
 
     // Set initial span attributes. The attributes object may have been mutated
     // by the sampler, so we sanitize the merged attributes before setting them.
-    // XXX Do we really need to cope with a sampler mutating the given attributes? https://opentelemetry.io/docs/specs/otel/trace/sdk/#shouldsample doesn't help clarify.
     const attrsData2 = cleanAttributes(
       Object.assign(attributes, samplingResult.attributes),
       this._spanLimits

@@ -40,7 +40,11 @@
 import type { AnyValue, Attributes } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
 
-// XXX Is there any value to other packages in exporting this type?
+/**
+ * A simpler set of attribute value with limited supported types.
+ * This is the set of types that `Attributes` supported in versions of
+ * `@opentelemetry/api` before v1.10.0.
+ */
 type SimpleAttributeValue =
   | string
   | number
@@ -49,7 +53,6 @@ type SimpleAttributeValue =
   | Array<null | undefined | number>
   | Array<null | undefined | boolean>;
 
-// XXX I'd welcome a suggestion other than an enum; prefer erasable syntax.
 export enum AddAttributeDecision {
   DROP_UNDEFINED = 0,
   DROP_INVALID = 1,
@@ -337,9 +340,6 @@ function isAnyValueInternal(
  *
  * For arrays and objects, this also returns a deep copy to avoid mutating data
  * passed in by calling code.
- *
- * XXX diffs from truncateToSize() from sdk-logs:
- * - Uint8Array *is* truncated
  *
  * @param {AnyValue} val - The attribute value. We are assuming this has
  *    already been guarded by `isAnyValue`. This filters out non-plain objects,
