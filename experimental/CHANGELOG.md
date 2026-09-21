@@ -9,6 +9,18 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :boom: Breaking Changes
 
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 0.300.0-development.0
+
+### :boom: Breaking Changes
+
 * chore(shim-opencensus)!: remove the `@opentelemetry/shim-opencensus` package
   * In the [OpenTelemetry Specification v1.58.0](https://github.com/open-telemetry/opentelemetry-specification/releases/tag/v1.58.0) the [OpenCensus compatibility requirements were deprecated](https://github.com/open-telemetry/opentelemetry-specification/pull/5138). The JavaScript OpenCensus shim package will not receive any more releases after the current [0.222.0 release](https://www.npmjs.com/package/@opentelemetry/shim-opencensus/v/0.222.0) ([source code for last release](https://github.com/open-telemetry/opentelemetry-js/tree/experimental/v0.222.0/experimental/packages/shim-opencensus/)).
 * feat(instrumentation-http)!: remove deprecated `serverName` field from `HttpInstrumentationConfig` [#7081](https://github.com/open-telemetry/opentelemetry-js/pull/7081)
@@ -35,14 +47,10 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 * fix(opentelemetry-exporter-prometheus)!: default exporter host to localhost [#6599](https://github.com/open-telemetry/opentelemetry-js/pull/6599) @cjihrig
 * chore!: bump minimum node.js version to >=22.15.0
 
-### :rocket: Features
-
 ### :bug: Bug Fixes
 
 * fix(otlp-exporter-base): suppress tracing around the browser fetch transport's own request so a `fetch` instrumentation cannot create an export → span → export loop [#6948](https://github.com/open-telemetry/opentelemetry-js/pull/6948) @YangJonghun
 * fix(instrumentation-http): set `error.type` on spans whose status code makes them an error [#7061](https://github.com/open-telemetry/opentelemetry-js/pull/7061) @mwear
-
-### :books: Documentation
 
 ### :house: Internal
 
