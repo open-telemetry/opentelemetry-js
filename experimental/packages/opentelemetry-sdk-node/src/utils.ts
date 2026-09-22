@@ -420,7 +420,12 @@ export function getMetricReadersFromEnv(): IMetricReader[] {
         })
       );
     } else if (exporter === 'prometheus') {
-      metricReaders.push(new PrometheusExporter());
+      metricReaders.push(
+        new PrometheusExporter({
+          host: getStringFromEnv('OTEL_EXPORTER_PROMETHEUS_HOST'),
+          port: getNumberFromEnv('OTEL_EXPORTER_PROMETHEUS_PORT'),
+        })
+      );
     } else {
       diag.warn(
         `Unsupported OTEL_METRICS_EXPORTER value: "${exporter}". Supported values are: otlp, console, prometheus, none.`
