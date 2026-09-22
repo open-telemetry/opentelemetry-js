@@ -1397,7 +1397,44 @@ describe('create-from-config', () => {
           name: 'wildcard-only pattern matches every scope',
           config: { tracers: [{ name: '*', config: { enabled: false } }] },
           enabled: [],
-          disabled: ['library', 'another-library', '\n'],
+          disabled: ['', 'library', 'another-library', '\n'],
+        },
+        {
+          name: 'empty pattern only matches the empty name',
+          config: { tracers: [{ name: '', config: { enabled: false } }] },
+          enabled: ['library', '\n'],
+          disabled: [''],
+        },
+        {
+          name: 'consecutive stars still require a character for question mark',
+          config: {
+            tracers: [{ name: 'lib-**?**', config: { enabled: false } }],
+          },
+          enabled: ['', 'lib-', 'Lib-a'],
+          disabled: ['lib-a', 'lib-ab', 'lib-\n', 'lib-\u{1f680}'],
+        },
+        {
+          name: 'matches Unicode literals and counts question marks by code point',
+          config: {
+            tracers: [{ name: '\u{1f680}-??', config: { enabled: false } }],
+          },
+          enabled: [
+            '\u{1f680}-',
+            '\u{1f680}-a',
+            '\u{1f680}-\u{1f680}',
+            '\u{1f680}-abc',
+          ],
+          disabled: ['\u{1f680}-ab', '\u{1f680}-\u{1f680}a', '\u{1f680}-\n\n'],
+        },
+        {
+          name: 'repeated star/literal segments do not backtrack exponentially',
+          config: {
+            tracers: [
+              { name: '*a'.repeat(12) + 'b', config: { enabled: false } },
+            ],
+          },
+          enabled: ['a'.repeat(32)],
+          disabled: ['a'.repeat(32) + 'b'],
         },
       ];
 

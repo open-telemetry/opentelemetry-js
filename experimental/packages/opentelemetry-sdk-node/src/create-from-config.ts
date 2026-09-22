@@ -1426,6 +1426,33 @@ export function createIdGeneratorFromConfig(
   }
 }
 
+function matchesWildcardPattern(
+  name: string,
+  pattern: readonly string[]
+): boolean {
+  // Dynamic programming bounds matching to O(name.length * pattern.length)
+  // time and O(pattern.length) space, without regex backtracking.
+  const matches: boolean[] = new Array(pattern.length + 1).fill(false);
+  matches[0] = true;
+  for (let i = 0; i < pattern.length; i++) {
+    matches[i + 1] = matches[i] && pattern[i] === '*';
+  }
+
+  for (const character of name) {
+    let previous = matches[0];
+    matches[0] = false;
+    for (let i = 0; i < pattern.length; i++) {
+      const previousMatch = matches[i + 1];
+      matches[i + 1] =
+        pattern[i] === '*'
+          ? matches[i] || previousMatch
+          : previous && (pattern[i] === '?' || pattern[i] === character);
+      previous = previousMatch;
+    }
+  }
+  return matches[pattern.length];
+}
+
 function createTracerConfiguratorFromConfig(
   config: TracerProviderConfigModel['tracer_configurator/development']
 ): TracerConfigurator | undefined {
@@ -1447,21 +1474,16 @@ function createTracerConfiguratorFromConfig(
       'config',
     ]);
     checkConfigUse('ExperimentalTracerConfig', matcher.config, ['enabled']);
-    const pattern = matcher.name.replace(/[\\^$.*+?()[\]{}|]/g, char => {
-      if (char === '*') return '.*';
-      if (char === '?') return '.';
-      return `\\${char}`;
-    });
     return {
-      // Unlike $, this end assertion cannot match before a final newline.
-      pattern: new RegExp(`^${pattern}(?!.)`, 'su'),
+      pattern: Array.from(matcher.name),
       config: { enabled: matcher.config.enabled ?? true },
     };
   });
 
   return scope =>
-    matchers.find(matcher => matcher.pattern.test(scope.name))?.config ??
-    defaultConfig;
+    matchers.find(matcher =>
+      matchesWildcardPattern(scope.name, matcher.pattern)
+    )?.config ?? defaultConfig;
 }
 
 export function createTracerProviderFromConfig(
