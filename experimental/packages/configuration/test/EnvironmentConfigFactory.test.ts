@@ -278,6 +278,40 @@ describe('EnvironmentConfigFactory', function () {
     assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
   });
 
+  it('should preserve zero-valued limits', function () {
+    process.env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '0';
+    process.env.OTEL_ATTRIBUTE_COUNT_LIMIT = '0';
+    process.env.OTEL_TRACES_EXPORTER = 'console';
+    process.env.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT = '0';
+    process.env.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT = '0';
+    process.env.OTEL_SPAN_EVENT_COUNT_LIMIT = '0';
+    process.env.OTEL_SPAN_LINK_COUNT_LIMIT = '0';
+    process.env.OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT = '0';
+    process.env.OTEL_LINK_ATTRIBUTE_COUNT_LIMIT = '0';
+    process.env.OTEL_LOGS_EXPORTER = 'console';
+    process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = '0';
+    process.env.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '0';
+
+    const config = createConfigFactory().getConfigModel();
+
+    assert.deepStrictEqual(config.attribute_limits, {
+      attribute_value_length_limit: 0,
+      attribute_count_limit: 0,
+    });
+    assert.deepStrictEqual(config.tracer_provider?.limits, {
+      attribute_value_length_limit: 0,
+      attribute_count_limit: 0,
+      event_count_limit: 0,
+      link_count_limit: 0,
+      event_attribute_count_limit: 0,
+      link_attribute_count_limit: 0,
+    });
+    assert.deepStrictEqual(config.logger_provider?.limits, {
+      attribute_value_length_limit: 0,
+      attribute_count_limit: 0,
+    });
+  });
+
   it('should not set propagators by default', function () {
     const configFactory = createConfigFactory();
     const config = configFactory.getConfigModel();

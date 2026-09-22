@@ -276,7 +276,7 @@ describe('NodeSDK', () => {
       });
 
       const sdk = new NodeSDK({
-        metricReader: metricReader,
+        metricReaders: [metricReader],
         autoDetectResources: false,
       });
 
@@ -332,62 +332,6 @@ describe('NodeSDK', () => {
       // Verify that both metric readers are registered
       const sharedState = (meterProvider as any)['_sharedState'];
       assert.strictEqual(sharedState.metricCollectors.length, 2);
-
-      await sdk.shutdown();
-    });
-
-    it('should show deprecation warning when using metricReader option', async () => {
-      const exporter = new ConsoleMetricExporter();
-      const metricReader = new PeriodicExportingMetricReader({
-        exporter: exporter,
-        exportIntervalMillis: 100,
-        exportTimeoutMillis: 100,
-      });
-
-      const warnSpy = Sinon.spy(diag, 'warn');
-
-      const sdk = new NodeSDK({
-        metricReader: metricReader,
-        autoDetectResources: false,
-      });
-
-      sdk.start();
-
-      // Verify deprecation warning was shown
-      Sinon.assert.calledWith(
-        warnSpy,
-        "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
-      );
-
-      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
-
-      await sdk.shutdown();
-    });
-
-    it('should not show deprecation warning when using metricReaders option', async () => {
-      const exporter = new ConsoleMetricExporter();
-      const metricReader = new PeriodicExportingMetricReader({
-        exporter: exporter,
-        exportIntervalMillis: 100,
-        exportTimeoutMillis: 100,
-      });
-
-      const warnSpy = Sinon.spy(diag, 'warn');
-
-      const sdk = new NodeSDK({
-        metricReaders: [metricReader],
-        autoDetectResources: false,
-      });
-
-      sdk.start();
-
-      // Verify no metricReader deprecation warning was shown
-      Sinon.assert.neverCalledWith(
-        warnSpy,
-        "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
-      );
-
-      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
 
       await sdk.shutdown();
     });
@@ -556,7 +500,7 @@ describe('NodeSDK', () => {
         exporter: logRecordExporter,
       });
       const sdk = new NodeSDK({
-        logRecordProcessor: logRecordProcessor,
+        logRecordProcessors: [logRecordProcessor],
         autoDetectResources: false,
       });
 
@@ -733,7 +677,7 @@ describe('NodeSDK', () => {
     });
 
     const sdk = new NodeSDK({
-      metricReader: metricReader,
+      metricReaders: [metricReader],
       views: [
         {
           name: 'test-view',
@@ -1192,7 +1136,7 @@ describe('NodeSDK', () => {
       });
 
       const sdk = new NodeSDK({
-        metricReader: metricReader,
+        metricReaders: [metricReader],
         autoDetectResources: false,
       });
       sdk.start();
@@ -1255,7 +1199,7 @@ describe('NodeSDK', () => {
       });
       const sdk = new NodeSDK({
         idGenerator,
-        spanProcessor,
+        spanProcessors: [spanProcessor],
       });
       sdk.start();
 
@@ -1843,7 +1787,7 @@ describe('NodeSDK', () => {
       const exporter = new ConsoleSpanExporter();
       const spanProcessor = new SimpleSpanProcessor({ exporter });
       const sdk = new NodeSDK({
-        spanProcessor,
+        spanProcessors: [spanProcessor],
       });
       sdk.start();
       const listOfProcessors = getSdkSpanProcessors(sdk);

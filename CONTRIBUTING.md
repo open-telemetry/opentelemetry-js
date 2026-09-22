@@ -228,7 +228,7 @@ npm ci
 
 ### Compile modules
 
-All modules are built with [tsdown](https://tsdown.dev/), orchestrated by nx: `npm run compile` builds each package's workspace dependencies before the package itself and caches results between runs. Building requires Node.js >= 22.18 (CI builds on Node ^26.3.0); tests still run on every supported Node version.
+All modules are built with [tsdown](https://tsdown.dev/), orchestrated by nx: `npm run compile` builds each package's workspace dependencies before the package itself and caches results between runs. Building requires a Node.js version matching `devEngines.runtime` in the root `package.json` (CI builds on Node ^26.3.0); tests still run on every supported Node version.
 
 ```sh
 # Build all modules
@@ -240,8 +240,10 @@ npm run clean
 
 These commands can also be run for specific packages instead of the whole project, which can speed up compilations while developing.
 
-**NOTE**: To run commands in specific packages (compile, lint, etc), please ensure you are using at least `7.x`
-version of `npm`.
+**NOTE**: Please use npm `11.10.0` or newer, the first version that supports the `min-release-age`
+setting in `.npmrc`. Older npm reports it as an unknown config; upgrade npm rather than deleting the
+line to silence the warning, which would drop the release cooldown for everyone. Node.js 24 before
+`24.14.1` bundles npm `11.6.x`, so on that line upgrade with `npm i -g npm@latest`.
 
 ```sh
 # Build a single module and all of its dependencies

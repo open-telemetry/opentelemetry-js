@@ -41,7 +41,7 @@
     "cycle-check": "dpdm --exit-code circular:1 src/index.ts",
     "version": "node ../scripts/version-update.js",
     "watch": "tsdown --watch --no-clean",
-    "peer-api-check": "node ../scripts/peer-api-check.js"
+    "peer-api-check": "node ../scripts/peer-api-check.mjs"
   },
   "keywords": [
     "opentelemetry",

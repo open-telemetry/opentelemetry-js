@@ -84,7 +84,7 @@ To use mutual authentication, pass to the `createSsl()` constructor:
   ),
 ```
 
-To generate credentials for mutual authentication, you can refer to [the script used to generate certificates for tests here](./test/certs/regenerate.sh).
+To generate credentials for mutual authentication, you can refer to [the script used to generate certificates for tests here](../otlp-grpc-exporter-base/test/certs/regenerate.sh).
 
 The exporter can be configured to send custom metadata with each request as in the example below:
 
@@ -164,11 +164,6 @@ const exporter = new OTLPTraceExporter(collectorOptions);
 | OTEL_EXPORTER_OTLP_TIMEOUT                   | The maximum waiting time, in milliseconds, allowed to send each OTLP trace and metric batch. Default is 10000.                                                                                                                                                                                                         |
 
  > Settings configured programmatically take precedence over environment variables. Per-signal environment variables take precedence over non-per-signal environment variables.
-
-## Running opentelemetry-collector locally to see the traces
-
-1. Go to `examples/otlp-exporter-node`
-2. Follow the instructions there to inspect traces.
 
 ## Useful links
 

@@ -36,20 +36,16 @@
       "experimental/packages/sampler-composite",
       "experimental/packages/sampler-jaeger-remote",
       "experimental/packages/sdk-logs",
-      "experimental/packages/shim-opencensus",
       "experimental/packages/web-common",
       "packages/opentelemetry-context-async-hooks",
       "packages/opentelemetry-context-zone",
       "packages/opentelemetry-context-zone-peer-dep",
       "packages/opentelemetry-core",
-      "packages/opentelemetry-exporter-jaeger",
       "packages/opentelemetry-exporter-zipkin",
       "packages/opentelemetry-propagator-b3",
       "packages/opentelemetry-resources",
       "packages/opentelemetry-sdk-trace-base",
-      "packages/opentelemetry-sdk-trace-node",
       "packages/opentelemetry-sdk-trace-web",
-      "packages/opentelemetry-shim-opentracing",
       "packages/sdk-metrics",
       "packages/sdk-trace",
       "semantic-conventions"
@@ -147,9 +143,6 @@
       "path": "experimental/packages/sdk-logs"
     },
     {
-      "path": "experimental/packages/shim-opencensus"
-    },
-    {
       "path": "experimental/packages/web-common"
     },
     {
@@ -165,9 +158,6 @@
       "path": "packages/opentelemetry-core"
     },
     {
-      "path": "packages/opentelemetry-exporter-jaeger"
-    },
-    {
       "path": "packages/opentelemetry-exporter-zipkin"
     },
     {
@@ -180,13 +170,7 @@
       "path": "packages/opentelemetry-sdk-trace-base"
     },
     {
-      "path": "packages/opentelemetry-sdk-trace-node"
-    },
-    {
       "path": "packages/opentelemetry-sdk-trace-web"
-    },
-    {
-      "path": "packages/opentelemetry-shim-opentracing"
     },
     {
       "path": "packages/sdk-metrics"

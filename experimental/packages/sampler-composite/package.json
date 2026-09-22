@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sampler-composite",
-  "version": "0.222.0",
+  "version": "0.300.0-development.0",
   "description": "Composite samplers for OpenTelemetry tracing",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -32,8 +32,8 @@
     "lint:fix": "eslint . --fix",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsdown --watch --no-clean",
-    "peer-api-check": "node ../../../scripts/peer-api-check.js",
-    "align-api-deps": "node ../../../scripts/align-api-deps.js"
+    "peer-api-check": "node ../../../scripts/peer-api-check.mjs",
+    "align-api-deps": "node ../../../scripts/align-api-deps.mjs"
   },
   "keywords": [
     "opentelemetry",
@@ -44,7 +44,7 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "engines": {
-    "node": "^18.19.0 || >=20.6.0"
+    "node": ">=22.15.0"
   },
   "files": [
     "LICENSE",
@@ -62,8 +62,8 @@
     "nyc": "17.1.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "2.11.0",
-    "@opentelemetry/sdk-trace": "2.11.0"
+    "@opentelemetry/core": "3.0.0-development.0",
+    "@opentelemetry/sdk-trace": "3.0.0-development.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/sampler-composite",
   "sideEffects": false

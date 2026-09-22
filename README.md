@@ -131,11 +131,10 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 | Platform Version    | Supported                                     |
 | ------------------- | --------------------------------------------- |
+| Node.js `v26`       | :heavy_check_mark:                            |
 | Node.js `v24`       | :heavy_check_mark:                            |
 | Node.js `v22`       | :heavy_check_mark:                            |
-| Node.js `v20`       | :heavy_check_mark:                            |
-| Node.js `v18`       | :heavy_check_mark:                            |
-| Older Node Versions | See [Node Support](#node-support)             |
+| Other Node Versions | See [Node Support](#node-support)             |
 | Web Browsers        | See [Browser Support](#browser-support) below |
 
 ### Node Support
@@ -391,12 +390,6 @@ These instrumentations are hosted at <https://github.com/open-telemetry/opentele
 
 These instrumentations are hosted at <https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web>
 
-### Shims
-
-| Package                                                  | Description                                                                             |
-| -------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| [@opentelemetry/shim-opentracing][otel-shim-opentracing] | OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry |
-
 ## Useful links
 
 - [Upgrade to SDK 2.x guide](./doc/upgrade-to-2.x.md)
@@ -425,7 +418,6 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-instrumentation-http]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-http
 [otel-instrumentation-xml-http-request]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-xml-http-request
 
-[otel-shim-opentracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-shim-opentracing
 [otel-tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-trace
 [otel-api]: https://github.com/open-telemetry/opentelemetry-js/tree/main/api
 [otel-core]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-core

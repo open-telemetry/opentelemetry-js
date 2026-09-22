@@ -5,7 +5,8 @@
 
 import type { IExporterTransport } from '../exporter-transport';
 import type { ExportResponse } from '../export-response';
-import { diag } from '@opentelemetry/api';
+import { context, diag } from '@opentelemetry/api';
+import { suppressTracing } from '@opentelemetry/core';
 import {
   isExportHTTPErrorRetryable,
   parseRetryAfterToMills,
@@ -56,11 +57,10 @@ class FetchTransport implements IExporterTransport {
     const abortController = new AbortController();
     const timeout = setTimeout(() => abortController.abort(), timeoutMillis);
     // Fetch API may be wrapped by an instrumentation like `@opentelemetry/instrumentation-fetch`.
-    // In that case the instrumentation would create a new Span for this request
-    // because the context manager cannot keep the context after `await` calls.
-    // This creates an indirect endless loop Export -> Span -> Export
-    // By using the `__original` function the instrumentation can't intercept the call
-    // and no Span will be created breaking the vicious cycle
+    // In that case the instrumentation would create a new Span for this request,
+    // creating an indirect endless loop Export -> Span -> Export.
+    // `__original` lets the call bypass one wrapper; the suppressed context
+    // below covers a `fetch` that was wrapped more than once.
     let fetchApi = globalThis.fetch;
     // @ts-expect-error -- fetch could be wrapped
     if (typeof fetchApi.__original === 'function') {
@@ -87,20 +87,30 @@ class FetchTransport implements IExporterTransport {
       );
     }
 
+    // Captured before the first `await`, which a synchronous context manager
+    // would not survive.
+    const suppressedContext = suppressTracing(context.active());
+
     try {
       const url = new URL(this._parameters.url);
-      const response = await fetchApi(url.href, {
-        method: 'POST',
-        headers: await this._parameters.headers(),
-        body: data,
-        signal: abortController.signal,
-        keepalive: useKeepalive,
-        mode: globalThis.location
-          ? globalThis.location.origin === url.origin
-            ? 'same-origin'
-            : 'cors'
-          : 'no-cors',
-      });
+      // Resolve headers before entering the suppressed fetch context.
+      const headers = await this._parameters.headers();
+      const response = await context.with(suppressedContext, () =>
+        fetchApi(url.href, {
+          method: 'POST',
+          headers,
+          body: data,
+          signal: abortController.signal,
+          keepalive: useKeepalive,
+          mode: globalThis.location
+            ? globalThis.location.origin === url.origin
+              ? 'same-origin'
+              : 'cors'
+            : 'no-cors',
+        })
+      );
+
+      await drainResponseBody(response);
 
       if (response.status >= 200 && response.status <= 299) {
         diag.debug(`export response success (status: ${response.status})`);
@@ -159,4 +169,50 @@ export function createFetchTransport(
 
 function isFetchNetworkErrorRetryable(error: unknown): boolean {
   return error instanceof TypeError && !error.cause;
+}
+
+/**
+ * Reads the response body to its end and discards it.
+ *
+ * Chromium gives the request's share of the keepalive quota back only once the
+ * response body has been read to the end, and it skips the buffering consumer
+ * that would otherwise drain the body on its own when the response carries a
+ * `Cache-Control: no-store` header, which collectors commonly send. Leaving the
+ * body unread then leaks the quota until the document goes away and every
+ * following keepalive export stays pending forever. Cancelling the body is the
+ * client-abort path and releases the quota far more slowly than reading it to
+ * the end, so the body is read rather than cancelled.
+ *
+ * @see https://fetch.spec.whatwg.org/#fetch-processresponseendofbody
+ */
+async function drainResponseBody(response: Response): Promise<void> {
+  try {
+    // Empty and opaque responses have no body to read.
+    const body = response.body;
+    if (body == null) {
+      return;
+    }
+
+    // Throws when the body is already locked to another reader, which happens
+    // when the same response is handed to more than one export.
+    const reader = body.getReader();
+    try {
+      // Chunks are dropped as they arrive: the payload is not used, and
+      // buffering it - with `response.arrayBuffer()` for instance - would keep
+      // a response of arbitrary size in memory.
+      let chunk = await reader.read();
+      while (!chunk.done) {
+        chunk = await reader.read();
+      }
+    } finally {
+      // The reader keeps the body locked until it is released, which would
+      // make a later export handed the same response fail to acquire a reader
+      // and skip the drain.
+      reader.releaseLock();
+    }
+  } catch (error) {
+    // The export outcome is decided by the response status, a body that cannot
+    // be read must not change it.
+    diag.debug(`error reading export response body: ${error}`);
+  }
 }
