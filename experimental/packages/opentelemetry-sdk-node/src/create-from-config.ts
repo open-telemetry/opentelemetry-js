@@ -24,6 +24,7 @@ import type {
   SpanExporter,
   SpanLimits,
   SpanProcessor,
+  TracerConfigurator,
 } from '@opentelemetry/sdk-trace';
 import {
   AlwaysOffSampler,
@@ -1425,6 +1426,44 @@ export function createIdGeneratorFromConfig(
   }
 }
 
+function createTracerConfiguratorFromConfig(
+  config: TracerProviderConfigModel['tracer_configurator/development']
+): TracerConfigurator | undefined {
+  if (!config) {
+    return undefined;
+  }
+
+  checkConfigUse('ExperimentalTracerConfigurator', config, [
+    'default_config',
+    'tracers',
+  ]);
+  checkConfigUse('ExperimentalTracerConfig', config.default_config, [
+    'enabled',
+  ]);
+  const defaultConfig = { enabled: config.default_config?.enabled ?? true };
+  const matchers = (config.tracers ?? []).map(matcher => {
+    checkConfigUse('ExperimentalTracerMatcherAndConfig', matcher, [
+      'name',
+      'config',
+    ]);
+    checkConfigUse('ExperimentalTracerConfig', matcher.config, ['enabled']);
+    const pattern = matcher.name.replace(/[\\^$.*+?()[\]{}|]/g, char => {
+      if (char === '*') return '.*';
+      if (char === '?') return '.';
+      return `\\${char}`;
+    });
+    return {
+      // Unlike $, this end assertion cannot match before a final newline.
+      pattern: new RegExp(`^${pattern}(?!.)`, 'su'),
+      config: { enabled: matcher.config.enabled ?? true },
+    };
+  });
+
+  return scope =>
+    matchers.find(matcher => matcher.pattern.test(scope.name))?.config ??
+    defaultConfig;
+}
+
 export function createTracerProviderFromConfig(
   resource: Resource,
   tracer_provider: TracerProviderConfigModel,
@@ -1439,15 +1478,18 @@ export function createTracerProviderFromConfig(
   );
   const sampler = createSamplerFromConfig(tracer_provider.sampler);
   const idGenerator = createIdGeneratorFromConfig(tracer_provider.id_generator);
+  const tracerConfigurator = createTracerConfiguratorFromConfig(
+    tracer_provider['tracer_configurator/development']
+  );
 
   checkConfigUse('TracerProvider', tracer_provider, [
     'processors',
     'limits',
     'sampler',
     'id_generator',
+    'tracer_configurator/development',
   ]);
 
-  // TODO(6960): 'tracer_configurator/development', TracerProvider doesn't currently support this
   // TODO(6624): meterProvider, if SDK health metrics enabled
   return new TracerProvider({
     resource,
@@ -1455,5 +1497,6 @@ export function createTracerProviderFromConfig(
     spanLimits,
     sampler,
     idGenerator,
+    tracerConfigurator,
   });
 }

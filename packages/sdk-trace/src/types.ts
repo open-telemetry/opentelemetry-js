@@ -4,13 +4,48 @@
  */
 
 import type { MeterProvider } from '@opentelemetry/api';
+import type { InstrumentationScope } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import type { IdGenerator } from './IdGenerator';
 import type { Sampler } from './Sampler';
 import type { SpanProcessor } from './SpanProcessor';
 import type { SpanExporter } from './export/SpanExporter';
 
+/**
+ * Configuration for an individual tracer.
+ *
+ * @experimental This feature is in development as per the OpenTelemetry specification.
+ */
+export interface TracerConfig {
+  /**
+   * Whether the tracer is enabled. Defaults to true.
+   * Disabled tracers behave like no-op tracers.
+   *
+   * @experimental This feature is in development as per the OpenTelemetry specification.
+   */
+  enabled?: boolean;
+}
+
+/**
+ * Computes configuration once when a tracer is created.
+ * Returning null, undefined, or an empty object uses the default configuration.
+ * Reconfiguration of existing tracers is not supported.
+ *
+ * @experimental This feature is in development as per the OpenTelemetry specification.
+ */
+export type TracerConfigurator = (
+  tracerScope: InstrumentationScope
+) => TracerConfig | null | undefined;
+
 export interface TracerProviderOptions {
+  /**
+   * Computes configuration for each tracer's instrumentation scope.
+   * Tracers are enabled by default.
+   *
+   * @experimental This feature is in development as per the OpenTelemetry specification.
+   */
+  tracerConfigurator?: TracerConfigurator;
+
   /**
    * Sampler determines if a span should be recorded or should be a NoopSpan.
    */
@@ -55,6 +90,7 @@ export interface ForceFlushOptions {
  * `TracerProviderOptions`.
  */
 export interface TracerOptions {
+  tracerConfigurator?: TracerConfigurator;
   resource: Resource;
   sampler: Sampler;
   spanLimits: SpanLimits;

@@ -25,6 +25,7 @@ import {
  * This class represents a basic tracer.
  */
 export class Tracer implements api.Tracer {
+  private readonly _enabled: boolean;
   private readonly _sampler: Sampler;
   private readonly _spanLimits: SpanLimits;
   private readonly _idGenerator: IdGenerator;
@@ -42,6 +43,8 @@ export class Tracer implements api.Tracer {
     options: TracerOptions
   ) {
     this.instrumentationScope = instrumentationScope;
+    this._enabled =
+      options.tracerConfigurator?.(instrumentationScope)?.enabled ?? true;
     this._sampler = options.sampler;
     this._spanLimits = options.spanLimits;
     this._resource = options.resource;
@@ -69,6 +72,15 @@ export class Tracer implements api.Tracer {
       context = api.trace.deleteSpan(context);
     }
     const parentSpan = api.trace.getSpan(context);
+
+    if (!this._enabled) {
+      const parentSpanContext = parentSpan?.spanContext();
+      return api.trace.wrapSpanContext(
+        parentSpanContext && api.trace.isSpanContextValid(parentSpanContext)
+          ? parentSpanContext
+          : api.INVALID_SPAN_CONTEXT
+      );
+    }
 
     if (isTracingSuppressed(context)) {
       api.diag.debug('Instrumentation suppressed, returning Noop Span');

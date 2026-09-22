@@ -11,6 +11,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :rocket: Features
 
+* feat(sdk-node): support `tracer_configurator/development` in declarative configuration [#6960](https://github.com/open-telemetry/opentelemetry-js/issues/6960)
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
