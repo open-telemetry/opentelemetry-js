@@ -42,7 +42,6 @@ import {
   TraceIdRatioBasedSampler,
 } from '@opentelemetry/sdk-trace';
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
-import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import type {
   LogRecordProcessor,
   LogRecordLimits,
@@ -104,15 +103,6 @@ function createPropagatorFromEnv(): TextMapPropagator | null {
     [
       'b3multi',
       () => new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
-    ],
-    [
-      'jaeger',
-      () => {
-        diag.warn(
-          'The Jaeger propagator is deprecated and will be removed in a future release. Use the W3C TraceContext propagator ("tracecontext") instead.'
-        );
-        return new JaegerPropagator();
-      },
     ],
   ]);
 

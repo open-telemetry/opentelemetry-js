@@ -141,13 +141,6 @@ describe('create-from-env', () => {
         // Asserts propagator is null.
       },
       {
-        name: 'OTEL_PROPAGATORS=jaeger warns it is deprecated',
-        env: { OTEL_PROPAGATORS: 'jaeger' },
-        propagatorFields: ['uber-trace-id'],
-        diagWarn:
-          'The Jaeger propagator is deprecated and will be removed in a future release. Use the W3C TraceContext propagator ("tracecontext") instead.',
-      },
-      {
         name: 'opts.propagators beats OTEL_PROPAGATORS',
         opts: { propagators: [new W3CTraceContextPropagator()] },
         env: { OTEL_PROPAGATORS: 'baggage' },
