@@ -131,11 +131,10 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 | Platform Version    | Supported                                     |
 | ------------------- | --------------------------------------------- |
+| Node.js `v26`       | :heavy_check_mark:                            |
 | Node.js `v24`       | :heavy_check_mark:                            |
 | Node.js `v22`       | :heavy_check_mark:                            |
-| Node.js `v20`       | :heavy_check_mark:                            |
-| Node.js `v18`       | :heavy_check_mark:                            |
-| Older Node Versions | See [Node Support](#node-support)             |
+| Other Node Versions | See [Node Support](#node-support)             |
 | Web Browsers        | See [Browser Support](#browser-support) below |
 
 ### Node Support
@@ -250,6 +249,7 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [David Luna](https://github.com/david-luna), Elastic
 - [Jamie Danielson](https://github.com/JamieDanielson), Honeycomb
 - [Marc Pichler](https://github.com/pichlermarc), Dynatrace
+- [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
 - [Trent Mick](https://github.com/trentm), Elastic
 
 For more information about the maintainer role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#maintainer).
@@ -259,7 +259,6 @@ For more information about the maintainer role, see the [community repository](h
 - [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
 - [Jackson Weber](https://github.com/JacksonWeber), Microsoft
 - [Martin Kuba](https://github.com/martinkuba), Grafana Labs
-- [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
 - [Raphaël Thériault](https://github.com/raphael-theriault-swi), SolarWinds
 
 In addition, [Browser SIG Maintainers](https://github.com/orgs/open-telemetry/teams/browser-maintainers) are granted the
@@ -391,12 +390,6 @@ These instrumentations are hosted at <https://github.com/open-telemetry/opentele
 
 These instrumentations are hosted at <https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web>
 
-### Shims
-
-| Package                                                  | Description                                                                             |
-| -------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| [@opentelemetry/shim-opentracing][otel-shim-opentracing] | OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry |
-
 ## Useful links
 
 - [Upgrade to SDK 2.x guide](./doc/upgrade-to-2.x.md)
@@ -425,7 +418,6 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-instrumentation-http]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-http
 [otel-instrumentation-xml-http-request]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-xml-http-request
 
-[otel-shim-opentracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-shim-opentracing
 [otel-tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-trace
 [otel-api]: https://github.com/open-telemetry/opentelemetry-js/tree/main/api
 [otel-core]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-core

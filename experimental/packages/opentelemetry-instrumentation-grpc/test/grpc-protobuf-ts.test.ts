@@ -22,7 +22,7 @@ import * as assert from 'assert';
 import type { ContextManager } from '@opentelemetry/api';
 import { context, propagation, SpanKind, trace } from '@opentelemetry/api';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { startServer } from './helper';
 import type { SpanAssertionFunction, TestFunction } from './protobuf-ts-utils';
 import {
@@ -149,7 +149,7 @@ describe('#grpc-protobuf', () => {
 
   beforeEach(() => {
     memoryExporter.reset();
-    contextManager = new AsyncHooksContextManager().enable();
+    contextManager = new AsyncLocalStorageContextManager().enable();
     context.setGlobalContextManager(contextManager);
   });
 

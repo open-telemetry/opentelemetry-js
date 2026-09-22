@@ -134,7 +134,7 @@ body:
   - type: textarea
     attributes:
       label: Runtime and Version
-      placeholder: Node.js v20.12.1, Node.js v18.18.2, Firefox 130, Chrome 132, ...
+      placeholder: Node.js v22.15.0, Firefox 130, Chrome 132, ...
     validations:
       required: false
   - type: dropdown

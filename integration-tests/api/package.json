@@ -17,19 +17,20 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "engines": {
-    "node": "^18.19.0 || >=20.6.0"
+    "node": ">=22.15.0"
   },
   "scripts": {
     "test": "nyc mocha test/**/*.test.js",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "align-api-deps": "node ../../scripts/align-api-deps.mjs"
   },
   "devDependencies": {
     "@opentelemetry/api": "^1.3.0",
-    "@opentelemetry/core": "2.10.0",
+    "@opentelemetry/core": "3.0.0-development.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
-    "mocha": "11.7.6",
+    "mocha": "11.8.0",
     "nyc": "17.1.0"
   }
 }

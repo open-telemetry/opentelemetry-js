@@ -21,17 +21,12 @@ import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/expo
 import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
-import type {
-  DetectedResourceAttributes,
-  Resource,
-  ResourceDetector,
-} from '@opentelemetry/resources';
+import type { ResourceDetector } from '@opentelemetry/resources';
 import {
   envDetector,
   hostDetector,
   osDetector,
   processDetector,
-  resourceFromAttributes,
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 import type { SpanExporter, SpanProcessor } from '@opentelemetry/sdk-trace';
@@ -40,14 +35,8 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace';
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
-import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
-import { createEmptyMetadata } from '@opentelemetry/otlp-grpc-exporter-base';
-import type {
-  ConfigurationModel,
-  NameStringValuePairConfigModel,
-} from '@opentelemetry/configuration';
-import { mergeResourceAttributesConfig } from '@opentelemetry/configuration';
+import type { ConfigurationModel } from '@opentelemetry/configuration';
 import type {
   IMetricReader,
   PushMetricExporter,
@@ -69,33 +58,6 @@ const RESOURCE_DETECTOR_HOST = 'host';
 const RESOURCE_DETECTOR_OS = 'os';
 const RESOURCE_DETECTOR_PROCESS = 'process';
 const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
-
-export function getResourceFromConfiguration(
-  config: ConfigurationModel
-): Resource | undefined {
-  if (!config.resource) {
-    return undefined;
-  }
-
-  const configAttrs = mergeResourceAttributesConfig(
-    config.resource.attributes,
-    config.resource.attributes_list
-  );
-  if (!configAttrs) {
-    return undefined;
-  }
-
-  const attrs: DetectedResourceAttributes = {};
-  for (let i = 0; i < configAttrs.length; i++) {
-    const a = configAttrs[i];
-    if (a.value !== null) {
-      attrs[a.name] = a.value;
-    }
-  }
-  return resourceFromAttributes(attrs, {
-    schemaUrl: config.resource.schema_url ?? undefined,
-  });
-}
 
 export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
   // When updating this list, make sure to also update the section `resourceDetectors` on README.
@@ -127,22 +89,6 @@ export function getResourceDetectorsFromEnv(): Array<ResourceDetector> {
       );
     }
     return resourceDetector || [];
-  });
-}
-
-export function getResourceDetectorsFromConfiguration(
-  config: ConfigurationModel
-): Array<ResourceDetector> {
-  const detectors = config.resource?.['detection/development']?.detectors ?? [];
-
-  return detectors.flatMap(detector => {
-    const result: ResourceDetector[] = [];
-    if (detector.host !== undefined) result.push(hostDetector);
-    if (detector.os !== undefined) result.push(osDetector);
-    if (detector.process !== undefined) result.push(processDetector);
-    if (detector.service !== undefined) result.push(serviceInstanceIdDetector);
-    if (detector.env !== undefined) result.push(envDetector);
-    return result;
   });
 }
 
@@ -260,15 +206,6 @@ export function getPropagatorFromEnv(): TextMapPropagator | null | undefined {
     [
       'b3multi',
       () => new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
-    ],
-    [
-      'jaeger',
-      () => {
-        diag.warn(
-          'The Jaeger propagator is deprecated and will be removed in a future release. Use the W3C TraceContext propagator ("tracecontext") instead.'
-        );
-        return new JaegerPropagator();
-      },
     ],
   ]);
 
@@ -492,36 +429,6 @@ export function getBatchLogRecordProcessorFromEnv(
     selfObsMeterProvider,
     ...getBatchLogRecordProcessorConfigFromEnv(),
   });
-}
-
-export function getHeadersFromConfiguration(
-  headers: NameStringValuePairConfigModel[] | undefined
-): Record<string, string> | undefined {
-  if (!headers) {
-    return undefined;
-  }
-  const result: Record<string, string> = {};
-  headers.forEach(header => {
-    if (header.value !== null) {
-      result[header.name] = header.value;
-    }
-  });
-  return result;
-}
-
-export function getGrpcMetadataFromHeaders(
-  headers: NameStringValuePairConfigModel[] | undefined
-) {
-  if (!headers || headers.length === 0) {
-    return undefined;
-  }
-  const metadata = createEmptyMetadata();
-  for (const header of headers) {
-    if (header.value !== null) {
-      metadata.set(header.name, header.value);
-    }
-  }
-  return metadata;
 }
 
 export function getInstanceID(config: ConfigurationModel): string | undefined {
