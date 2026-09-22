@@ -42,7 +42,6 @@ import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import type { NodeSDKConfiguration } from './types';
 import {
   getBooleanFromEnv,
-  getNumberFromEnv,
   getStringFromEnv,
   getStringListFromEnv,
   diagLogLevelFromString,
