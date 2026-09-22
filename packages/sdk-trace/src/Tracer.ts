@@ -21,6 +21,11 @@ import {
   settledResourceAttributes,
 } from './inspect';
 
+const NO_ATTR_LIMITS = {
+  attributeCountLimit: Infinity,
+  attributeValueLengthLimit: Infinity,
+};
+
 /**
  * This class represents a basic tracer.
  */
@@ -107,7 +112,9 @@ export class Tracer implements api.Tracer {
       };
     });
 
-    const attrsData1 = cleanAttributes(options.attributes, this._spanLimits);
+    // `NO_ATTR_LIMITS` to avoid applying limits until after `shouldSample`.
+    // The second `cleanAttributes` below will apply user limits.
+    const attrsData1 = cleanAttributes(options.attributes, NO_ATTR_LIMITS);
     const attributes = attrsData1.attributes ?? {};
 
     // Make sampling decision.
