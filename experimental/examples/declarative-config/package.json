@@ -6,7 +6,7 @@
   "main": "index.ts",
   "scripts": {
     "start": "OTEL_CONFIG_FILE=./otel-config.yaml ts-node index.ts",
-    "align-api-deps": "node ../../../scripts/align-api-deps.js"
+    "align-api-deps": "node ../../../scripts/align-api-deps.mjs"
   },
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
