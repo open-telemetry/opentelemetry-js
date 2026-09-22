@@ -273,40 +273,6 @@ It has generally been agreed that these better belong elsewhere,
 perhaps in [`@opentelemetry/browser-instrumentation`](https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation/src/utils).
 However, [many utilities have not yet been migrated](https://github.com/open-telemetry/opentelemetry-js/issues/6591).
 
-### Migrating from sdk-trace-node
-
-**`NodeTracerProvider` -> `BasicTracerProvider` -> `TracerProvider`.**
-NodeTracerProvider added a single `.register(...)` method to register a context manager and propagators.
-It is recommended that user code do this manually now.
-BasicTracerProvider (in sdk-trace-base) reads environment variables for some tracer provider defaults.
-It is recommended that user code use the [sdk-node](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-sdk-node/) or [configuration](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/configuration/) packages for environment variable-based or file-based SDK configuration.
-
-```ts
-// -- Before
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
-const tracerProvider = new NodeTracerProvider(/* ... */);
-tracerProvider.register(/* ... */);
-
-// -- After (using low-level primitives)
-import { context, propagation, trace } from '@opentelemetry/api';
-import { TracerProvider } from '@opentelemetry/sdk-trace';
-import { CompositePropagator, W3CBaggagePropagator, W3CTraceContextPropagator } from '@opentelemetry/core';
-
-// Manually handle `OTEL_` envvars as necessary, or see "sdk-node" package docs.
-const tracerProvider = new TracerProvider(/* ... */);
-trace.setGlobalTracerProvider(tracerProvider);
-
-import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
-context.setGlobalContextManager(new AsyncLocalStorageContextManager());
-
-const propagator = new CompositePropagator({
-  propagators: [new W3CTraceContextPropagator(), new W3CBaggagePropagator()],
-});
-propagation.setGlobalPropagator(propagator);
-```
-
-See "Migrating from sdk-trace-base" below for some changes to the `TracerProvider` constructor options.
-
 ### Migrating from sdk-trace-base
 
 Roughly speaking `sdk-trace` is `sdk-trace-base` with any reading of environment variables *removed*.

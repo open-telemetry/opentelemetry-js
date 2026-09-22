@@ -80,25 +80,6 @@ main();
 
 Because the npm installer and node module resolution algorithm could potentially allow two or more copies of any given package to exist within the same `node_modules` structure, the OpenTelemetry API takes advantage of a variable on the `global` object to store the global API. When an API method in the API package is called, it checks if this `global` API exists and proxies calls to it if and only if it is a compatible API version. This means if a package has a dependency on an OpenTelemetry API version which is not compatible with the API used by the end user, the package will receive a no-op implementation of the API.
 
-## Upgrade Guidelines
-
-### 0.21.0 to 1.0.0
-
-No breaking changes
-
-### 0.20.0 to 0.21.0
-
-- [#78](https://github.com/open-telemetry/opentelemetry-js-api/issues/78) `api.context.bind` arguments reversed and `context` is now a required argument.
-- [#46](https://github.com/open-telemetry/opentelemetry-js-api/issues/46) Noop classes and singletons are no longer exported. To create a noop span it is recommended to use `api.trace.wrapSpanContext` with `INVALID_SPAN_CONTEXT` instead of using the `NOOP_TRACER`.
-
-### 1.0.0-rc.3 to 0.20.0
-
-- Removing `TimedEvent` which was not part of spec
-- `HttpBaggage` renamed to `HttpBaggagePropagator`
-- [#45](https://github.com/open-telemetry/opentelemetry-js-api/pull/45) `Span#context` renamed to `Span#spanContext`
-- [#47](https://github.com/open-telemetry/opentelemetry-js-api/pull/47) `getSpan`/`setSpan`/`getSpanContext`/`setSpanContext` moved to `trace` namespace
-- [#55](https://github.com/open-telemetry/opentelemetry-js-api/pull/55) `getBaggage`/`setBaggage`/`createBaggage` moved to `propagation` namespace
-
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

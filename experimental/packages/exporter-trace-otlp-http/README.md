@@ -13,6 +13,11 @@ This module provides a trace-exporter for OTLP (http/json) using protocol versio
 npm install --save @opentelemetry/exporter-trace-otlp-http
 ```
 
+## Shared HTTP exporter options
+
+This exporter uses the shared HTTP options documented in [`@opentelemetry/otlp-exporter-base`][otlp-exporter-base-config].
+That includes `url`, `headers`, `timeoutMillis`, `concurrencyLimit`, and Node.js options such as `compression`, `keepAlive`, `httpAgentOptions`, and `userAgent`.
+
 ## Service Name
 
 The OpenTelemetry Collector Exporter does not have a service name configuration.
@@ -24,10 +29,11 @@ To see documentation and sample code for the metric exporter, see the [exporter-
 The OTLPTraceExporter in Web expects the endpoint to end in `/v1/traces`.
 
 ```js
+import { trace } from '@opentelemetry/api';
 import {
   BatchSpanProcessor,
-  WebTracerProvider,
-} from '@opentelemetry/sdk-trace-web';
+  TracerProvider,
+} from '@opentelemetry/sdk-trace';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 
 const collectorOptions = {
@@ -37,7 +43,7 @@ const collectorOptions = {
 };
 
 const exporter = new OTLPTraceExporter(collectorOptions);
-const provider = new WebTracerProvider({
+const provider = new TracerProvider({
   spanProcessors: [
     new BatchSpanProcessor(exporter, {
       // The maximum queue size. After the size is reached spans are dropped.
@@ -52,7 +58,7 @@ const provider = new WebTracerProvider({
   ]
 });
 
-provider.register();
+trace.setGlobalTracerProvider(provider);
 
 ```
 
@@ -163,11 +169,6 @@ This retry policy first checks if the response has a `'Retry-After'` header. If 
 
   > The exporter will retry exporting within the [exporter timeout configuration](#exporter-timeout-configuration) time.
 
-## Running opentelemetry-collector locally to see the traces
-
-1. Go to `examples/otlp-exporter-node`
-2. Follow the instructions there to inspect traces.
-
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
@@ -184,6 +185,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-trace-otlp-http
 [npm-url-grpc]: https://www.npmjs.com/package/@opentelemetry/exporter-trace-otlp-grpc
 [npm-url-proto]: https://www.npmjs.com/package/@opentelemetry/exporter-trace-otlp-proto
+[otlp-exporter-base-config]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-exporter-base#http-exporter-configuration
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-trace-otlp-http.svg
 [opentelemetry-spec-protocol-exporter]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options
 [semconv-resource-service-name]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service
