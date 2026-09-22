@@ -810,13 +810,14 @@ describe('Span', () => {
       kind: SpanKind.CLIENT,
       spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
+      links: [{ context: linkContext, attributes: { foo: 'bar' } }],
     });
     span.addLink({ context: linkContext });
     span.addLink({ context: linkContext });
     span.end();
 
     assert.strictEqual(span.links.length, 0);
-    assert.strictEqual(span.droppedLinksCount, 2);
+    assert.strictEqual(span.droppedLinksCount, 3);
   });
 
   it('should enforce linkCountLimit via addLinks', () => {
