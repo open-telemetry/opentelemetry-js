@@ -9,17 +9,23 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :boom: Breaking Changes
 
-* fix(exporter-prometheus)!: stop reading Prometheus exporter host and port environment variables in the exporter constructor [#6966](https://github.com/open-telemetry/opentelemetry-js/pull/6966) @LarryHu0217
-
 ### :rocket: Features
 
 ### :bug: Bug Fixes
 
-* fix(configuration): preserve zero-valued limits from environment variables [#7060](https://github.com/open-telemetry/opentelemetry-js/pull/7060) @DenisCDev
-
 ### :books: Documentation
 
 ### :house: Internal
+
+## 0.300.0-development.1
+
+### :boom: Breaking Changes
+
+* fix(exporter-prometheus)!: stop reading Prometheus exporter host and port environment variables in the exporter constructor [#6966](https://github.com/open-telemetry/opentelemetry-js/pull/6966) @LarryHu0217
+
+### :bug: Bug Fixes
+
+* fix(configuration): preserve zero-valued limits from environment variables [#7060](https://github.com/open-telemetry/opentelemetry-js/pull/7060) @DenisCDev
 
 ## 0.300.0-development.0
 
