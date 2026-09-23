@@ -8,15 +8,6 @@
 // appropriate here. Otherwise, it'd be a pain to enumerate and keep things
 // in-sync with all the upstream packages.
 
-/* eslint-disable no-restricted-syntax */
-export * as api from '@opentelemetry/api';
-export * as contextBase from '@opentelemetry/api';
-export * as core from '@opentelemetry/core';
-export * as logs from '@opentelemetry/sdk-logs';
-export * as metrics from '@opentelemetry/sdk-metrics';
-export * as resources from '@opentelemetry/resources';
-/* eslint-enable no-restricted-syntax */
-
 export { NodeSDK } from './sdk';
 export type { LoggerProviderConfig, MeterProviderConfig } from './sdk';
 export type { NodeSDKConfiguration } from './types';

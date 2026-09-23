@@ -339,3 +339,77 @@ const provider = new node.NodeTracerProvider();
 import { TracerProvider } from '@opentelemetry/sdk-trace';
 // See sdk-trace-node section above for migration to sdk-trace.
 ```
+
+### Removed: `api` and `contextBase` namespace re-exports
+
+The namespace re-exports `api` and `contextBase` (both re-exporting `@opentelemetry/api`) have been removed from `@opentelemetry/sdk-node`. Import directly from `@opentelemetry/api`.
+
+```ts
+// before
+import { api } from '@opentelemetry/sdk-node';
+const tracer = api.trace.getTracer('my-lib');
+
+import { contextBase } from '@opentelemetry/sdk-node';
+const ctx = contextBase.context.active();
+
+// after
+import { trace, context } from '@opentelemetry/api';
+const tracer = trace.getTracer('my-lib');
+const ctx = context.active();
+```
+
+### Removed: `core` namespace re-export
+
+The namespace re-export `core` (re-exporting `@opentelemetry/core`) has been removed from `@opentelemetry/sdk-node`. Import directly from `@opentelemetry/core`.
+
+```ts
+// before
+import { core } from '@opentelemetry/sdk-node';
+const propagator = new core.W3CTraceContextPropagator();
+
+// after
+import { W3CTraceContextPropagator } from '@opentelemetry/core';
+const propagator = new W3CTraceContextPropagator();
+```
+
+### Removed: `logs` namespace re-export
+
+The namespace re-export `logs` (re-exporting `@opentelemetry/sdk-logs`) has been removed from `@opentelemetry/sdk-node`. Import directly from `@opentelemetry/sdk-logs`.
+
+```ts
+// before
+import { logs } from '@opentelemetry/sdk-node';
+const processor = new logs.SimpleLogRecordProcessor(exporter);
+
+// after
+import { SimpleLogRecordProcessor } from '@opentelemetry/sdk-logs';
+const processor = new SimpleLogRecordProcessor(exporter);
+```
+
+### Removed: `metrics` namespace re-export
+
+The namespace re-export `metrics` (re-exporting `@opentelemetry/sdk-metrics`) has been removed from `@opentelemetry/sdk-node`. Import directly from `@opentelemetry/sdk-metrics`.
+
+```ts
+// before
+import { metrics } from '@opentelemetry/sdk-node';
+const reader = new metrics.PeriodicExportingMetricReader({ exporter });
+
+// after
+import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
+const reader = new PeriodicExportingMetricReader({ exporter });
+```
+
+### Removed: `resources` namespace re-export
+
+The namespace re-export `resources` (re-exporting `@opentelemetry/resources`) has been removed from `@opentelemetry/sdk-node`. Import directly from `@opentelemetry/resources`.
+
+```ts
+// before
+import { resources } from '@opentelemetry/sdk-node';
+const resource = new resources.Resource({ 'service.name': 'my-service' });
+
+// after
+import { Resource } from '@opentelemetry/resources';
+const resource = new Resource({ 'service.name': 'my-service' });
+```
