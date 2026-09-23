@@ -21,7 +21,9 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :house: Internal
 
-* chore(web-common): deprecate `addSpanNetworkEvents()` and `addSpanNetworkEvent()` [#3174](https://github.com/open-telemetry/opentelemetry-js/issues/3174)
+* chore(web-common)!: clean up and deprecate network span utils [#7144](https://github.com/open-telemetry/opentelemetry-js/issues/7144)
+  * These utilities were long planned for removal. They were moved from the `sdk-trace-web` package and are currently only used by the (deprecated) `instrumentation-fetch` and `instrumentation-xml-http-request` packages.
+  * Drop the `skipOldSemconvContentLengthAttrs` vestigial option from `addSpanNetworkEvents()`.
 
 ## 0.300.0-development.0
 
