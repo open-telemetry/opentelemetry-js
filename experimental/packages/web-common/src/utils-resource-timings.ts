@@ -23,6 +23,7 @@ type PropagateTraceHeaderCorsUrl = string | RegExp;
 
 /**
  * urls which should include trace headers when origin doesn't match
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export type PropagateTraceHeaderCorsUrls =
   | PropagateTraceHeaderCorsUrl
@@ -42,6 +43,7 @@ function getUrlNormalizingAnchor(): HTMLAnchorElement {
  * Helper function to be able to use enum as typed key in type and in interface when using forEach
  * @param obj
  * @param key
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export function hasKey<O extends object>(
   obj: O,
@@ -77,7 +79,6 @@ export function addSpanNetworkEvent(
 
 /**
  * Helper function for adding network events and content length attributes.
- *
  * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export function addSpanNetworkEvents(
@@ -170,6 +171,7 @@ export function addSpanNetworkEvents(
 /**
  * sort resources by startTime
  * @param filteredResources
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export function sortResources(
   filteredResources: PerformanceResourceTiming[]
@@ -200,6 +202,7 @@ function getOrigin(): string | undefined {
  * @param resources
  * @param ignoredResources
  * @param initiatorType
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export function getResource(
   spanUrl: string,
@@ -350,6 +353,7 @@ function filterResourcesForSpan(
 
 /**
  * The URLLike interface represents an URL and HTMLAnchorElement compatible fields.
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export interface URLLike {
   hash: string;
@@ -368,6 +372,7 @@ export interface URLLike {
 /**
  * Parses url using URL constructor or fallback to anchor element.
  * @param url
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export function parseUrl(url: string): URLLike {
   if (typeof URL === 'function') {
@@ -392,6 +397,7 @@ export function parseUrl(url: string): URLLike {
  * Performs the steps described in https://html.spec.whatwg.org/multipage/urls-and-fetching.html#parse-a-url
  *
  * @param url
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export function normalizeUrl(url: string): string {
   const urlLike = parseUrl(url);
@@ -485,6 +491,7 @@ function getNodeValue(target: HTMLElement, optimised?: boolean): string {
  * Checks if trace headers should be propagated
  * @param spanUrl
  * @private
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export function shouldPropagateTraceHeaders(
   spanUrl: string,
