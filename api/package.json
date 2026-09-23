@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/api",
-  "version": "1.9.1",
+  "version": "1.10.0-development.0",
   "description": "Public API for OpenTelemetry",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",

@@ -26,5 +26,10 @@
     "next": "^15",
     "react": "^18",
     "react-dom": "^18"
+  },
+  "overrides": {
+    "next": {
+      "@opentelemetry/api": "1.10.0-development.0"
+    }
   }
 }

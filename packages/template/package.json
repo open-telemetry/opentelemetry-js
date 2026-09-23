@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/template",
-  "version": "3.0.0-development.0",
+  "version": "3.0.0-development.1",
   "description": "> TODO: description",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
