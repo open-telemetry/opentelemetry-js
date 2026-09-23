@@ -56,6 +56,7 @@ export function hasKey<O extends object>(
  * @param performanceName name of performance entry for time start
  * @param entries
  * @param ignoreZeros
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export function addSpanNetworkEvent(
   span: Span,
@@ -76,6 +77,8 @@ export function addSpanNetworkEvent(
 
 /**
  * Helper function for adding network events and content length attributes.
+ *
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export function addSpanNetworkEvents(
   span: Span,

@@ -21,6 +21,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :house: Internal
 
+* chore(web-common): deprecate `addSpanNetworkEvents()` and `addSpanNetworkEvent()` [#3174](https://github.com/open-telemetry/opentelemetry-js/issues/3174)
+
 ## 0.300.0-development.0
 
 ### :boom: Breaking Changes
