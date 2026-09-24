@@ -450,7 +450,7 @@ describe('xhr', () => {
           });
 
           it('should create a span with correct root span', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             assert.strictEqual(
               span.parentSpanContext?.spanId,
               rootSpan.spanContext().spanId,
@@ -459,12 +459,12 @@ describe('xhr', () => {
           });
 
           it('span should have correct name', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             assert.strictEqual(span.name, 'GET', 'span has wrong name');
           });
 
           it('span should have correct kind', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             assert.strictEqual(
               span.kind,
               api.SpanKind.CLIENT,
@@ -473,7 +473,7 @@ describe('xhr', () => {
           });
 
           it('span should have correct attributes', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const attributes = span.attributes;
             let expectedNumAttrs = 0;
             expectedNumAttrs += 5;
@@ -498,7 +498,7 @@ describe('xhr', () => {
           });
 
           it('span should have correct events', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const events = span.events;
             testForCorrectEvents(events, [
               EventNames.METHOD_OPEN,
@@ -516,50 +516,6 @@ describe('xhr', () => {
             assert.strictEqual(events.length, 11, 'number of events is wrong');
           });
 
-          it('should create a span for preflight request', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-            const parentSpan: tracing.ReadableSpan = exportSpy.args[1][0][0];
-            assert.strictEqual(
-              span.parentSpanContext?.spanId,
-              parentSpan.spanContext().spanId,
-              'parent span is not root span'
-            );
-          });
-
-          it('preflight request span should have correct name', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-            assert.strictEqual(
-              span.name,
-              'CORS Preflight',
-              'preflight request span has wrong name'
-            );
-          });
-
-          it('preflight request span should have correct kind', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-            assert.strictEqual(
-              span.kind,
-              api.SpanKind.INTERNAL,
-              'span has wrong kind'
-            );
-          });
-
-          it('preflight request span should have correct events', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-            const events = span.events;
-            assert.strictEqual(events.length, 8, 'number of events is wrong');
-            testForCorrectEvents(events, [
-              PTN.FETCH_START,
-              PTN.DOMAIN_LOOKUP_START,
-              PTN.DOMAIN_LOOKUP_END,
-              PTN.CONNECT_START,
-              PTN.CONNECT_END,
-              PTN.REQUEST_START,
-              PTN.RESPONSE_START,
-              PTN.RESPONSE_END,
-            ]);
-          });
-
           it('should NOT clear the resources', () => {
             assert.ok(
               clearResourceTimingsSpy.notCalled,
@@ -571,7 +527,6 @@ describe('xhr', () => {
         describe('when making https requests', () => {
           beforeEach(done => {
             clearData();
-            // this won't generate a preflight span
             const propagateTraceHeaderCorsUrls = [secureUrl];
             prepareData(secureUrl, {
               propagateTraceHeaderCorsUrls,
@@ -580,7 +535,7 @@ describe('xhr', () => {
           });
 
           it('span should have correct events', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const events = span.events;
 
             testForCorrectEvents(events, [
@@ -599,29 +554,11 @@ describe('xhr', () => {
             ]);
             assert.strictEqual(events.length, 12, 'number of events is wrong');
           });
-
-          it('preflight request span should have correct events', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-            const events = span.events;
-            assert.strictEqual(events.length, 9, 'number of events is wrong');
-            testForCorrectEvents(events, [
-              PTN.FETCH_START,
-              PTN.DOMAIN_LOOKUP_START,
-              PTN.DOMAIN_LOOKUP_END,
-              PTN.CONNECT_START,
-              PTN.SECURE_CONNECTION_START,
-              PTN.CONNECT_END,
-              PTN.REQUEST_START,
-              PTN.RESPONSE_START,
-              PTN.RESPONSE_END,
-            ]);
-          });
         });
 
         describe('AND origin match with window.location', () => {
           beforeEach(done => {
             clearData();
-            // this won't generate a preflight span
             const propagateTraceHeaderCorsUrls = [url];
             prepareData(window.location.origin + '/xml-http-request.js', {
               propagateTraceHeaderCorsUrls,
@@ -664,8 +601,7 @@ describe('xhr', () => {
               successfulGetRequest(ghUrl, done);
             });
             it('should set trace headers', () => {
-              // span at exportSpy.args[0][0][0] is the preflight span
-              const span: api.Span = exportSpy.args[1][0][0];
+              const span: api.Span = exportSpy.args[0][0][0];
               assert.strictEqual(
                 requests[0].requestHeaders[X_B3_TRACE_ID],
                 span.spanContext().traceId,
@@ -795,7 +731,7 @@ describe('xhr', () => {
           });
 
           it('should clear previous span information', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[2][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
             const attributes = span.attributes;
             const keys = Object.keys(attributes);
 
@@ -825,7 +761,7 @@ describe('xhr', () => {
           });
 
           it('span should have custom attribute', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const attributes = span.attributes;
             assert.ok(attributes['xhr-custom-attribute'] === 'bar');
           });
@@ -881,7 +817,7 @@ describe('xhr', () => {
             successfulGetRequest(url, done);
           });
           it('should NOT add network events', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const events = span.events;
             assert.strictEqual(events.length, 3, 'number of events is wrong');
           });
@@ -985,7 +921,7 @@ describe('xhr', () => {
           });
 
           it('span should have correct attributes and status', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const attributes = span.attributes;
             let expectedNumAttrs = 0;
             assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
@@ -1014,7 +950,7 @@ describe('xhr', () => {
           });
 
           it('span should have correct events', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const events = span.events;
 
             testForCorrectEvents(events, [
@@ -1212,7 +1148,7 @@ describe('xhr', () => {
             });
 
             it('span should have custom attribute', () => {
-              const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+              const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
               const attributes = span.attributes;
               assert.ok(attributes['xhr-custom-error-code'] === 400);
             });
@@ -1349,7 +1285,7 @@ describe('xhr', () => {
           });
 
           it('should create a span with correct root span', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             assert.strictEqual(
               span.parentSpanContext?.spanId,
               rootSpan.spanContext().spanId,
@@ -1358,12 +1294,12 @@ describe('xhr', () => {
           });
 
           it('span should have correct name', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             assert.strictEqual(span.name, 'POST', 'span has wrong name');
           });
 
           it('span should have correct kind', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             assert.strictEqual(
               span.kind,
               api.SpanKind.CLIENT,
@@ -1372,7 +1308,7 @@ describe('xhr', () => {
           });
 
           it('span should have correct attributes and status', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
@@ -1402,7 +1338,7 @@ describe('xhr', () => {
           });
 
           it('span should have correct events', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const events = span.events;
             testForCorrectEvents(events, [
               EventNames.METHOD_OPEN,
@@ -1420,50 +1356,6 @@ describe('xhr', () => {
             assert.strictEqual(events.length, 11, 'number of events is wrong');
           });
 
-          it('should create a span for preflight request', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-            const parentSpan: tracing.ReadableSpan = exportSpy.args[1][0][0];
-            assert.strictEqual(
-              span.parentSpanContext?.spanId,
-              parentSpan.spanContext().spanId,
-              'parent span is not root span'
-            );
-          });
-
-          it('preflight request span should have correct name', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-            assert.strictEqual(
-              span.name,
-              'CORS Preflight',
-              'preflight request span has wrong name'
-            );
-          });
-
-          it('preflight request span should have correct kind', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-            assert.strictEqual(
-              span.kind,
-              api.SpanKind.INTERNAL,
-              'span has wrong kind'
-            );
-          });
-
-          it('preflight request span should have correct events', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-            const events = span.events;
-            assert.strictEqual(events.length, 8, 'number of events is wrong');
-            testForCorrectEvents(events, [
-              PTN.FETCH_START,
-              PTN.DOMAIN_LOOKUP_START,
-              PTN.DOMAIN_LOOKUP_END,
-              PTN.CONNECT_START,
-              PTN.CONNECT_END,
-              PTN.REQUEST_START,
-              PTN.RESPONSE_START,
-              PTN.RESPONSE_END,
-            ]);
-          });
-
           it('should NOT clear the resources', () => {
             assert.ok(
               clearResourceTimingsSpy.notCalled,
@@ -1475,7 +1367,6 @@ describe('xhr', () => {
         describe('When making https requests', () => {
           beforeEach(done => {
             clearData();
-            // this won't generate a preflight span
             const propagateTraceHeaderCorsUrls = [secureUrl];
             prepareData(secureUrl, {
               propagateTraceHeaderCorsUrls,
@@ -1484,7 +1375,7 @@ describe('xhr', () => {
           });
 
           it('span should have correct events', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const events = span.events;
             testForCorrectEvents(events, [
               EventNames.METHOD_OPEN,
@@ -1502,29 +1393,11 @@ describe('xhr', () => {
             ]);
             assert.strictEqual(events.length, 12, 'number of events is wrong');
           });
-
-          it('preflight request span should have correct events', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-            const events = span.events;
-            assert.strictEqual(events.length, 9, 'number of events is wrong');
-            testForCorrectEvents(events, [
-              PTN.FETCH_START,
-              PTN.DOMAIN_LOOKUP_START,
-              PTN.DOMAIN_LOOKUP_END,
-              PTN.CONNECT_START,
-              PTN.SECURE_CONNECTION_START,
-              PTN.CONNECT_END,
-              PTN.REQUEST_START,
-              PTN.RESPONSE_START,
-              PTN.RESPONSE_END,
-            ]);
-          });
         });
 
         describe('AND origin match with window.location', () => {
           beforeEach(done => {
             clearData();
-            // this won't generate a preflight span
             const propagateTraceHeaderCorsUrls = [url];
             prepareData(window.location.origin + '/xml-http-request.js', {
               propagateTraceHeaderCorsUrls,
@@ -1569,8 +1442,7 @@ describe('xhr', () => {
               successfulPostRequest(ghUrl, done);
             });
             it('should set trace headers', () => {
-              // span at exportSpy.args[0][0][0] is the preflight span
-              const span: api.Span = exportSpy.args[1][0][0];
+              const span: api.Span = exportSpy.args[0][0][0];
               assert.strictEqual(
                 requests[0].requestHeaders[X_B3_TRACE_ID],
                 span.spanContext().traceId,
@@ -1689,8 +1561,7 @@ describe('xhr', () => {
           });
 
           it('should clear previous span information', () => {
-            // span at exportSpy.args[0][0][0] is the preflight span
-            const span: tracing.ReadableSpan = exportSpy.args[2][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
             const attributes = span.attributes;
             const keys = Object.keys(attributes);
 
@@ -1720,8 +1591,7 @@ describe('xhr', () => {
           });
 
           it('span should have custom attribute', () => {
-            // span at exportSpy.args[0][0][0] is the preflight span
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const attributes = span.attributes;
             assert.ok(attributes['xhr-custom-attribute'] === 'bar');
           });
@@ -1878,7 +1748,7 @@ describe('xhr', () => {
           });
 
           it('span should have correct attributes', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
@@ -1908,7 +1778,7 @@ describe('xhr', () => {
           });
 
           it('span should have correct events', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const events = span.events;
 
             testForCorrectEvents(events, [
@@ -1930,7 +1800,6 @@ describe('xhr', () => {
         });
 
         describe('when request encounters a network error', () => {
-          // this won't generate a preflight span
           beforeEach(done => {
             networkErrorRequest(done);
           });
@@ -1988,7 +1857,6 @@ describe('xhr', () => {
             }
           });
 
-          // this won't generate a preflight span
           beforeEach(done => {
             abortedRequest(done);
           });
@@ -2045,7 +1913,6 @@ describe('xhr', () => {
             }
           });
 
-          // this won't generate a preflight span
           beforeEach(done => {
             timedOutRequest(done);
           });
@@ -2109,7 +1976,7 @@ describe('xhr', () => {
             });
 
             it('span should have custom attribute', () => {
-              const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+              const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
               const attributes = span.attributes;
               assert.ok(attributes['xhr-custom-error-code'] === 400);
             });
