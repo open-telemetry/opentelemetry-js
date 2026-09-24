@@ -13,10 +13,6 @@ import type {
   PerformanceEntries,
   PerformanceResourceTimingInfo,
 } from './types/Performance';
-import {
-  ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
-  ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-} from './semconv';
 import { PerformanceTimingNames } from './enums/PerformanceTimingNames';
 
 type PropagateTraceHeaderCorsUrl = string | RegExp;
