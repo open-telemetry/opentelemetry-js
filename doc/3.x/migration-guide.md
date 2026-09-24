@@ -407,9 +407,9 @@ The namespace re-export `resources` (re-exporting `@opentelemetry/resources`) ha
 ```ts
 // before
 import { resources } from '@opentelemetry/sdk-node';
-const resource = new resources.Resource({ 'service.name': 'my-service' });
+const resource = resources.resourceFromAttributes({ 'service.name': 'my-service' });
 
 // after
-import { Resource } from '@opentelemetry/resources';
-const resource = new Resource({ 'service.name': 'my-service' });
+import { resourceFromAttributes } from '@opentelemetry/resources';
+const resource = resourceFromAttributes({ 'service.name': 'my-service' });
 ```
