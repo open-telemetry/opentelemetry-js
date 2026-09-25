@@ -19,6 +19,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :rocket: Features
 
+* feat(sdk-node): support `tracer_configurator/development` in declarative configuration [#6960](https://github.com/open-telemetry/opentelemetry-js/issues/6960)
+
 ### :bug: Bug Fixes
 
 * fix(configuration): preserve zero-valued limits from environment variables [#7060](https://github.com/open-telemetry/opentelemetry-js/pull/7060) @DenisCDev
