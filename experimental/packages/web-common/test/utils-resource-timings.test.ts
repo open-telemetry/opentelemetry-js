@@ -71,7 +71,7 @@ function createResource(
   ) as PerformanceResourceTiming;
 }
 
-describe('utils', function () {
+describe('utils-resource-timings', function () {
   afterEach(() => {
     sinon.restore();
   });
