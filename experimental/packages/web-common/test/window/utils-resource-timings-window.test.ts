@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// XXX file name
-
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import type { URLLike } from '../../src';
