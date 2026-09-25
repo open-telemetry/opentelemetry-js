@@ -282,9 +282,9 @@ function isAnyValueInternal(
       // Handled below.
       break;
     default:
-      throw new Error(
-        'internal error: unexpected JS object typeof: ${typeof val}'
-      );
+      // JavaScript added a new primitive type!?
+      // Default to *not* supporting this new type as an AnyValue.
+      return false;
   }
 
   if (val === null) {
@@ -366,9 +366,9 @@ function copyAndTruncAnyValue(val: AnyValue, limit: number): AnyValue {
       // Handled below.
       break;
     default:
-      throw new Error(
-        'internal error: unexpected JS object typeof: ${typeof val}'
-      );
+      // JavaScript added a new primitive type!?
+      // Assume we cannot meaningfully copy/trunc this new type.
+      return val;
   }
 
   if (val === null) {
