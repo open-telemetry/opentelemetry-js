@@ -3,7 +3,11 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-**Note: This is an experimental package under active development. New releases may include breaking changes.**
+> [!NOTE]
+> `@opentelemetry/instrumentation-fetch` is deprecated.
+> Vendors and users should plan moving to [instrumentations being developed in the opentelemetry-browser repository](https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation#readme),
+> specifically [`@opentelemetry/browser-instrumentation/experimental/fetch`](https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation#fetch).
+> Note that while the `@opentelemetry/browser-instrumentation` instrumentations cover the same Browser technologies, the emitted telemetry differs significantly.
 
 This module provides auto instrumentation for web using [fetch](https://developer.mozilla.org/en-US/docs/Web/API/fetch).
 (Note: This instrumentation does **not** instrument [Node.js' fetch](https://nodejs.org/api/globals.html#fetch). See [`@opentelemetry/instrumentation-undici`](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/packages/instrumentation-undici) for that.)

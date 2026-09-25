@@ -3,7 +3,11 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-**Note: This is an experimental package. New releases may include breaking changes.**
+> [!NOTE]
+> `@opentelemetry/instrumentation-xml-http-request` is deprecated.
+> Vendors and users should plan moving to [instrumentations being developed in the opentelemetry-browser repository](https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation#readme),
+> specifically [`@opentelemetry/browser-instrumentation/experimental/xhr`](https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation#xhr-xmlhttprequest).
+> Note that while the `@opentelemetry/browser-instrumentation` instrumentations cover the same Browser technologies, the emitted telemetry differs significantly.
 
 This module provides auto instrumentation for web using XMLHttpRequest.
 
