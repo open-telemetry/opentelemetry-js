@@ -10,6 +10,9 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 ### :boom: Breaking Changes
 
 * fix(exporter-prometheus)!: stop reading Prometheus exporter host and port environment variables in the exporter constructor [#6966](https://github.com/open-telemetry/opentelemetry-js/pull/6966) @LarryHu0217
+* chore(web-common)!: clean up and deprecate network span utils [#7114](https://github.com/open-telemetry/opentelemetry-js/issues/7114)
+  * These utilities were long planned for removal. They were moved from the `sdk-trace-web` package and are currently only used by the (deprecated) `instrumentation-fetch` and `instrumentation-xml-http-request` packages.
+  * Drop the `skipOldSemconvContentLengthAttrs` vestigial option from `addSpanNetworkEvents()`.
 
 ### :rocket: Features
 
@@ -21,9 +24,6 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :house: Internal
 
-* chore(web-common)!: clean up and deprecate network span utils [#7114](https://github.com/open-telemetry/opentelemetry-js/issues/7114)
-  * These utilities were long planned for removal. They were moved from the `sdk-trace-web` package and are currently only used by the (deprecated) `instrumentation-fetch` and `instrumentation-xml-http-request` packages.
-  * Drop the `skipOldSemconvContentLengthAttrs` vestigial option from `addSpanNetworkEvents()`.
 
 ## 0.300.0-development.0
 
