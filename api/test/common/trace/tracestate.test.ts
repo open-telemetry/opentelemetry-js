@@ -42,6 +42,51 @@ describe('TraceState', function () {
     });
   });
 
+  describe('.set()', function () {
+    // 32 list-members, well below the 512 character limit
+    const fullState = new Array(32)
+      .fill(0)
+      .map((_: null, num: number) => `a${num}=${num}`)
+      .join(',');
+    // 508 characters, just below the 512 character limit
+    const longState = 'a=' + '1'.repeat(252) + ',b=' + '2'.repeat(251);
+
+    it('must not add a new list member once the list holds the max number of items', function () {
+      const orgState = createTraceState(fullState);
+      const state = orgState.set('b', '1'); // this would make it 33 items
+      assert.strictEqual(state, orgState);
+      assert.deepStrictEqual(orgState.serialize(), fullState);
+    });
+
+    it('must still update an existing list member once the list is full', function () {
+      const orgState = createTraceState(fullState);
+      const state = orgState.set('a31', '99') as TraceStateImpl;
+      assert.deepStrictEqual(state['_keys']().length, 32);
+      assert.deepStrictEqual(state.get('a31'), '99');
+      assert.ok(state.serialize().startsWith('a31=99,'));
+    });
+
+    it('must not add a new list member if it makes exceed the total limit', function () {
+      const orgState = createTraceState(longState);
+      const state = orgState.set('c', 'xy'); // 508 + 5 exceeds 512
+      assert.strictEqual(state, orgState);
+      assert.deepStrictEqual(orgState.serialize(), longState);
+    });
+
+    it('must add a new list member that fits exactly within the total limit', function () {
+      const state = createTraceState(longState).set('c', 'x'); // 508 + 4 is exactly 512
+      assert.deepStrictEqual(state.serialize().length, 512);
+      assert.deepStrictEqual(state.get('c'), 'x');
+    });
+
+    it('must not update a list member if the longer value makes exceed the total limit', function () {
+      const orgState = createTraceState(longState);
+      const state = orgState.set('b', '2'.repeat(256)); // 508 + 5 exceeds 512
+      assert.strictEqual(state, orgState);
+      assert.deepStrictEqual(orgState.serialize(), longState);
+    });
+  });
+
   describe('.parse()', function () {
     it('must successfully parse valid state value', function () {
       const state = createTraceState(
