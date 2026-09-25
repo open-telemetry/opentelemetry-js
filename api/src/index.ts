@@ -76,6 +76,7 @@ export type { PropagationAPI } from './api/propagation';
 
 // Trace APIs
 export type { Link } from './trace/link';
+export { createNoopTracer } from './trace/NoopTracer';
 export { ProxyTracer, type TracerDelegator } from './trace/ProxyTracer';
 export type { SpanContext } from './trace/span_context';
 export { SpanKind } from './trace/span_kind';
