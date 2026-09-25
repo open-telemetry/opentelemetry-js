@@ -89,12 +89,10 @@ describe('TraceState', function () {
     });
 
     it('must truncate states with too many items', function () {
-      const state = createTraceState(
-        new Array(33)
-          .fill(0)
-          .map((_: null, num: number) => `a${num}=${num}`)
-          .join(',')
-      ) as TraceStateImpl;
+      const items = new Array(33)
+        .fill(0)
+        .map((_: null, num: number) => `a${num}=${num}`);
+      const state = createTraceState(items.join(',')) as TraceStateImpl;
       assert.deepStrictEqual(state['_keys']().length, 32);
       assert.deepStrictEqual(state.get('a0'), '0');
       assert.deepStrictEqual(state.get('a31'), '31');
@@ -102,6 +100,11 @@ describe('TraceState', function () {
         state.get('a32'),
         undefined,
         'should truncate from the tail'
+      );
+      assert.deepStrictEqual(
+        state.serialize(),
+        items.slice(0, 32).join(','),
+        'should preserve the original member order after truncation'
       );
     });
 
