@@ -26,8 +26,8 @@ const provider = new TracerProvider({
     [ATTR_SERVICE_NAME]: 'basic-service',
   }),
   spanProcessors: [
-    new SimpleSpanProcessor(exporter),
-    new SimpleSpanProcessor(new ConsoleSpanExporter()),
+    new SimpleSpanProcessor({ exporter }),
+    new SimpleSpanProcessor({ exporter: new ConsoleSpanExporter() }),
   ]
 });
 opentelemetry.trace.setGlobalTracerProvider(provider);
