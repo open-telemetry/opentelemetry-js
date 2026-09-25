@@ -86,6 +86,7 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
 
 /**
  * This class represents a fetch plugin for auto instrumentation
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation#fetch
  */
 export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentationConfig> {
   readonly component: string = 'fetch';

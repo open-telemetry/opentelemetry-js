@@ -83,6 +83,7 @@ export interface XMLHttpRequestInstrumentationConfig
 
 /**
  * This class represents a XMLHttpRequest plugin for auto instrumentation
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation#xhr-xmlhttprequest
  */
 export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRequestInstrumentationConfig> {
   readonly component: string = 'xml-http-request';
