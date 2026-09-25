@@ -325,12 +325,11 @@ trace.setGlobalTracerProvider(tracerProvider);
 context.setGlobalContextManager(new StackContextManager().enable());
 
 const propagator = new CompositePropagator({
-    propagators: [
-      new W3CTraceContextPropagator(),
-      new W3CBaggagePropagator(),
-    ],
-  })
-);
+  propagators: [
+    new W3CTraceContextPropagator(),
+    new W3CBaggagePropagator(),
+  ],
+});
 propagation.setGlobalPropagator(propagator);
 ```
 
