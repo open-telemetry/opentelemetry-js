@@ -4,13 +4,11 @@
  */
 
 import type { Context } from '../context/types';
-import { NoopTracer } from './NoopTracer';
+import { NOOP_TRACER } from './NoopTracer';
 import type { Span } from './span';
 import type { SpanOptions } from './SpanOptions';
 import type { Tracer } from './tracer';
 import type { TracerOptions } from './tracer_options';
-
-const NOOP_TRACER = new NoopTracer();
 
 /**
  * Proxy tracer provided by the proxy tracer provider
