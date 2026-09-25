@@ -13,12 +13,19 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 * chore(web-common)!: clean up and deprecate network span utils [#7114](https://github.com/open-telemetry/opentelemetry-js/issues/7114)
   * These utilities were long planned for removal. They were moved from the `sdk-trace-web` package and are currently only used by the (deprecated) `instrumentation-fetch` and `instrumentation-xml-http-request` packages.
   * Drop the `skipOldSemconvContentLengthAttrs` vestigial option from `addSpanNetworkEvents()`.
+* feat(sdk-node)!: drop SDK package re-exports (`api`, `contextBase`, `core`, `logs`, `metrics`, `resources`) [#7111](https://github.com/open-telemetry/opentelemetry-js/pull/7111) @pichlermarc
+  * `api` / `contextBase` → import from `@opentelemetry/api`
+  * `core` → import from `@opentelemetry/core`
+  * `logs` → import from `@opentelemetry/sdk-logs`
+  * `metrics` → import from `@opentelemetry/sdk-metrics`
+  * `resources` → import from `@opentelemetry/resources`
 
 ### :rocket: Features
 
 ### :bug: Bug Fixes
 
 * fix(configuration): preserve zero-valued limits from environment variables [#7060](https://github.com/open-telemetry/opentelemetry-js/pull/7060) @DenisCDev
+* fix(otlp-exporter-base): release the keepalive budget once the response body drains, instead of holding up the export until it does [#7070](https://github.com/open-telemetry/opentelemetry-js/pull/7070) @overbalance
 
 ### :books: Documentation
 
