@@ -13,16 +13,13 @@ import type {
   PerformanceEntries,
   PerformanceResourceTimingInfo,
 } from './types/Performance';
-import {
-  ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
-  ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-} from './semconv';
 import { PerformanceTimingNames } from './enums/PerformanceTimingNames';
 
 type PropagateTraceHeaderCorsUrl = string | RegExp;
 
 /**
  * urls which should include trace headers when origin doesn't match
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export type PropagateTraceHeaderCorsUrls =
   | PropagateTraceHeaderCorsUrl
@@ -42,6 +39,7 @@ function getUrlNormalizingAnchor(): HTMLAnchorElement {
  * Helper function to be able to use enum as typed key in type and in interface when using forEach
  * @param obj
  * @param key
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export function hasKey<O extends object>(
   obj: O,
@@ -56,6 +54,7 @@ export function hasKey<O extends object>(
  * @param performanceName name of performance entry for time start
  * @param entries
  * @param ignoreZeros
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export function addSpanNetworkEvent(
   span: Span,
@@ -76,13 +75,13 @@ export function addSpanNetworkEvent(
 
 /**
  * Helper function for adding network events and content length attributes.
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export function addSpanNetworkEvents(
   span: Span,
   resource: PerformanceEntries,
   ignoreNetworkEvents = false,
-  ignoreZeros?: boolean,
-  skipOldSemconvContentLengthAttrs?: boolean
+  ignoreZeros?: boolean
 ): void {
   if (ignoreZeros === undefined) {
     ignoreZeros = resource[PerformanceTimingNames.START_TIME] !== 0;
@@ -144,29 +143,12 @@ export function addSpanNetworkEvents(
       ignoreZeros
     );
   }
-
-  if (!skipOldSemconvContentLengthAttrs) {
-    // This block adds content-length-related span attributes using the
-    // *old* HTTP semconv (v1.7.0).
-    const encodedLength = resource[PerformanceTimingNames.ENCODED_BODY_SIZE];
-    if (encodedLength !== undefined) {
-      span.setAttribute(ATTR_HTTP_RESPONSE_CONTENT_LENGTH, encodedLength);
-    }
-
-    const decodedLength = resource[PerformanceTimingNames.DECODED_BODY_SIZE];
-    // Spec: Not set if transport encoding not used (in which case encoded and decoded sizes match)
-    if (decodedLength !== undefined && encodedLength !== decodedLength) {
-      span.setAttribute(
-        ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-        decodedLength
-      );
-    }
-  }
 }
 
 /**
  * sort resources by startTime
  * @param filteredResources
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export function sortResources(
   filteredResources: PerformanceResourceTiming[]
@@ -197,6 +179,7 @@ function getOrigin(): string | undefined {
  * @param resources
  * @param ignoredResources
  * @param initiatorType
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export function getResource(
   spanUrl: string,
@@ -347,6 +330,7 @@ function filterResourcesForSpan(
 
 /**
  * The URLLike interface represents an URL and HTMLAnchorElement compatible fields.
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export interface URLLike {
   hash: string;
@@ -365,6 +349,7 @@ export interface URLLike {
 /**
  * Parses url using URL constructor or fallback to anchor element.
  * @param url
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export function parseUrl(url: string): URLLike {
   if (typeof URL === 'function') {
@@ -389,6 +374,7 @@ export function parseUrl(url: string): URLLike {
  * Performs the steps described in https://html.spec.whatwg.org/multipage/urls-and-fetching.html#parse-a-url
  *
  * @param url
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export function normalizeUrl(url: string): string {
   const urlLike = parseUrl(url);
@@ -482,6 +468,7 @@ function getNodeValue(target: HTMLElement, optimised?: boolean): string {
  * Checks if trace headers should be propagated
  * @param spanUrl
  * @private
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export function shouldPropagateTraceHeaders(
   spanUrl: string,
