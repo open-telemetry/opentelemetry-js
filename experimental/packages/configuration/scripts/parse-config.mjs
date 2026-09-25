@@ -5,28 +5,25 @@
  */
 
 /**
- * Parse a declaractive config file (or create a config from env vars) and
- * print its JS object representation.  This is a convenience script for
- * development of this package.
+ * Parse a declaractive config file and print its JS object representation.
+ * This is a convenience script for development of this package.
  *
  * Usage:
  *    ./scripts/parse-config.mjs [CONFIG_FILE]
  *
- * If `CONFIG_FILE` is given, it is used to set the `OTEL_CONFIG_FILE` envvar.
- * That means that if no `CONFIG_FILE` is given, the config will be
- * generated from envvars.
+ * The config file to parse can be provided as a command-line argument, or
+ * via the `OTEL_CONFIG_FILE` environment variable.
  */
 
-import { createConfigFactory } from '@opentelemetry/configuration';
+import { parseConfigFile } from '@opentelemetry/configuration';
 import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api';
 
 diag.setLogger(new DiagConsoleLogger(), { logLevel: DiagLogLevel.INFO });
 
-const configFile = process.argv[2];
-if (configFile) {
-  process.env.OTEL_CONFIG_FILE = configFile;
+const configFile = process.argv[2] || process.env.OTEL_CONFIG_FILE;
+if (!configFile) {
+  throw new Error('missing CONFIG_FILE argument or `OTEL_CONFIG_FILE` envvar');
 }
 
-const fac = createConfigFactory();
-const config = fac.getConfigModel();
+const config = parseConfigFile(configFile);
 console.dir(config, { depth: 50 });

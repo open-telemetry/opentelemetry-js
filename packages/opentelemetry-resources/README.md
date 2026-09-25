@@ -3,7 +3,7 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-The OpenTelemetry Resource is an immutable representation of the entity producing telemetry. For example, a process producing telemetry that is running in a container on Kubernetes has a Pod name, it is in a namespace and possibly is part of a Deployment which also has a name. All three of these attributes can be included in the `Resource`.
+This package provides support for working with [OpenTelemetry Resource objects](https://opentelemetry.io/docs/specs/otel/resource/), e.g. `resourceFromAttributes(), and includes a number of *resource detectors* which gather resource attributes from the environment. (Other resource detectors, e.g. for cloud providers, are available in ["resource-detector-\*" packages in the opentelemetry-js-contrib.git repository](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/packages).
 
 [This document][resource-semantic_conventions] defines standard attributes for resources which are accessible via [`@opentelemetry/semantic-conventions`](https://github.com/open-telemetry/opentelemetry-js/tree/main/semantic-conventions).
 
@@ -29,6 +29,25 @@ const anotherResource = resourceFromAttributes({
 });
 const mergedResource = resource.merge(anotherResource);
 ```
+
+## Resource detectors
+
+```ts
+import { detectResources, processDetector, hostDetector } from '@opentelemetry/resources';
+
+const resource = detectResources({
+  detectors: [ processDetector, hostDetector ],
+});
+```
+
+Included resource detectors:
+
+- `hostDetector`: Detect `host.*` attributes per <https://opentelemetry.io/docs/specs/semconv/resource/host/>.
+- `osDetector`: Detect `os.*` attributes per <https://opentelemetry.io/docs/specs/semconv/resource/os/>.
+- `processDetector`: Detect `process.*` attributes per <https://opentelemetry.io/docs/specs/semconv/resource/process/>.
+- `resourceAttributesEnvDetector`: Detect attributes from the `OTEL_RESOURCE_ATTRIBUTES` environment variable per <https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#general-sdk-configuration>.
+- `serviceInstanceIdDetector`: Detect `service.instance.id` per <https://opentelemetry.io/docs/specs/semconv/resource/service/#service-instance>.
+- `serviceNameEnvDetector`: Detect `service.name` from the `OTEL_SERVICE_NAME` environment variable per <https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#general-sdk-configuration>.
 
 ## Useful links
 

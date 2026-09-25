@@ -10,7 +10,9 @@ export {
   hostDetector,
   osDetector,
   processDetector,
+  resourceAttributesEnvDetector,
   serviceInstanceIdDetector,
+  serviceNameEnvDetector,
 } from './detectors';
 export type { Resource } from './Resource';
 export {

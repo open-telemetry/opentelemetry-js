@@ -8,27 +8,16 @@ import * as assert from 'assert';
 import * as Sinon from 'sinon';
 import { diag } from '@opentelemetry/api';
 import type { ConfigurationModel } from '../src';
-import { createConfigFactory } from '../src/ConfigFactory';
 import {
   mergeHeadersConfig,
   mergeResourceAttributesConfig,
   mergePropagatorCompositeConfig,
   parseConfigFile,
-} from '../src/FileConfigFactory';
+} from '../src/parse';
 import type {
   AttributeNameValue,
   TextMapPropagator,
 } from '../src/generated/types';
-
-const defaultConfig: ConfigurationModel = {
-  disabled: false,
-  log_level: 'info',
-  resource: {},
-  attribute_limits: {
-    attribute_count_limit: 128,
-  },
-  propagator: {},
-};
 
 const configFromFile = {
   disabled: false,
@@ -716,24 +705,17 @@ describe('FileConfigFactory', function () {
   });
 
   it('should initialize config with default values from valid config file', function () {
-    process.env.OTEL_CONFIG_FILE = 'test/fixtures/sdk-config.yaml';
-    const configFactory = createConfigFactory();
-    assert.deepStrictEqual(configFactory.getConfigModel(), configFromFile);
+    const config = parseConfigFile('test/fixtures/sdk-config.yaml');
+    assert.deepStrictEqual(config, configFromFile);
   });
 
   it('should initialize config with default values from longer valid config file', function () {
-    process.env.OTEL_CONFIG_FILE = 'test/fixtures/kitchen-sink.yaml';
-    const configFactory = createConfigFactory();
-    assert.deepStrictEqual(
-      configFactory.getConfigModel(),
-      configFromKitchenSinkFile
-    );
+    const config = parseConfigFile('test/fixtures/kitchen-sink.yaml');
+    assert.deepStrictEqual(config, configFromKitchenSinkFile);
   });
 
   it('should parse samplers from config file', function () {
-    process.env.OTEL_CONFIG_FILE = 'test/fixtures/samplers.yaml';
-    const configFactory = createConfigFactory();
-    const config = configFactory.getConfigModel();
+    const config = parseConfigFile('test/fixtures/samplers.yaml');
     assert.deepStrictEqual(config.tracer_provider?.sampler, {
       parent_based: {
         root: {
@@ -747,9 +729,9 @@ describe('FileConfigFactory', function () {
   });
 
   it('should parse composite sampler with rule_based rules from config file', function () {
-    process.env.OTEL_CONFIG_FILE = 'test/fixtures/composite-sampler-array.yaml';
-    const configFactory = createConfigFactory();
-    const config = configFactory.getConfigModel();
+    const config = parseConfigFile(
+      'test/fixtures/composite-sampler-array.yaml'
+    );
     assert.deepStrictEqual(config.tracer_provider?.sampler, {
       'composite/development': {
         rule_based: {
@@ -763,10 +745,9 @@ describe('FileConfigFactory', function () {
   });
 
   it('should parse composite sampler with rule_based attribute matching from config file', function () {
-    process.env.OTEL_CONFIG_FILE =
-      'test/fixtures/composite-sampler-rulebased-full.yaml';
-    const configFactory = createConfigFactory();
-    const config = configFactory.getConfigModel();
+    const config = parseConfigFile(
+      'test/fixtures/composite-sampler-rulebased-full.yaml'
+    );
     assert.deepStrictEqual(config.tracer_provider?.sampler, {
       'composite/development': {
         rule_based: {
@@ -785,9 +766,8 @@ describe('FileConfigFactory', function () {
   });
 
   it('should throw on non-existant config file', function () {
-    process.env.OTEL_CONFIG_FILE = 'test/fixtures/no-such-file.txt';
     try {
-      createConfigFactory();
+      parseConfigFile('test/fixtures/no-such-file.txt');
     } catch (err) {
       assert.ok(err);
       assert.equal(err.code, 'ENOENT');
@@ -795,71 +775,56 @@ describe('FileConfigFactory', function () {
   });
 
   it('should throw from invalid config file format', function () {
-    process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid.yaml';
-    assert.throws(() => createConfigFactory(), /Unsupported file_format/);
+    assert.throws(() => {
+      parseConfigFile('test/fixtures/invalid.yaml');
+    }, /Unsupported file_format/);
   });
 
   it('should accept file_format 1.0 for backward compatibility', function () {
-    process.env.OTEL_CONFIG_FILE = 'test/fixtures/file-format-1.0.yaml';
-    assert.doesNotThrow(() => createConfigFactory());
+    assert.doesNotThrow(() => {
+      parseConfigFile('test/fixtures/file-format-1.0.yaml');
+    });
   });
 
   it('should accept file_format 1.1', function () {
-    process.env.OTEL_CONFIG_FILE = 'test/fixtures/short-config.yml';
-    assert.doesNotThrow(() => createConfigFactory());
+    assert.doesNotThrow(() => {
+      parseConfigFile('test/fixtures/short-config.yml');
+    });
   });
 
   it('should accept a newer minor file_format with a warning', function () {
     const warnStub = Sinon.stub(diag, 'warn');
-    process.env.OTEL_CONFIG_FILE =
-      'test/fixtures/file-format-future-minor.yaml';
-    assert.doesNotThrow(() => createConfigFactory());
+    assert.doesNotThrow(() => {
+      parseConfigFile('test/fixtures/file-format-future-minor.yaml');
+    });
     Sinon.assert.calledWith(warnStub, Sinon.match(/newer minor version/));
     warnStub.restore();
   });
 
   it('should throw for an unsupported major file_format version', function () {
-    process.env.OTEL_CONFIG_FILE = 'test/fixtures/file-format-unsupported.yaml';
-    assert.throws(
-      () => createConfigFactory(),
-      /Unsupported file_format.*supports schema version 1\.x/
-    );
+    assert.throws(() => {
+      parseConfigFile('test/fixtures/file-format-unsupported.yaml');
+    }, /Unsupported file_format.*supports schema version 1\.x/);
   });
 
   it('should show multiple validation errors for invalid config', function () {
-    process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid-multiple-errors.yaml';
-    assert.throws(
-      () => createConfigFactory(),
-      /Invalid OpenTelemetry config file: .*?:.*must be string.*must be number/s
-    );
-  });
-
-  it('should initialize config with default values with empty string for config file', function () {
-    process.env.OTEL_CONFIG_FILE = '';
-    const configFactory = createConfigFactory();
-    assert.deepStrictEqual(configFactory.getConfigModel(), defaultConfig);
-  });
-
-  it('should initialize config with default values with all whitespace for config file', function () {
-    process.env.OTEL_CONFIG_FILE = '  ';
-    const configFactory = createConfigFactory();
-    assert.deepStrictEqual(configFactory.getConfigModel(), defaultConfig);
+    assert.throws(() => {
+      parseConfigFile('test/fixtures/invalid-multiple-errors.yaml');
+    }, /Invalid OpenTelemetry config file: .*?:.*must be string.*must be number/s);
   });
 
   it('should initialize config with default values from valid short config file', function () {
-    process.env.OTEL_CONFIG_FILE = 'test/fixtures/short-config.yml';
-    const configFactory = createConfigFactory();
+    const config = parseConfigFile('test/fixtures/short-config.yml');
     const expectedConfig: ConfigurationModel = {
       disabled: false,
       resource: {
         attributes_list: 'service.instance.id=123',
       },
     };
-    assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    assert.deepStrictEqual(config, expectedConfig);
   });
 
   it('should initialize config with config file that contains environment variables', function () {
-    process.env.OTEL_CONFIG_FILE = 'test/fixtures/sdk-migration-config.yaml';
     process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://test.com:4318';
     process.env.OTEL_SDK_DISABLED = 'false';
     process.env.OTEL_LOG_LEVEL = 'debug';
@@ -917,7 +882,8 @@ describe('FileConfigFactory', function () {
     process.env.OTEL_EXPORTER_OTLP_LOGS_HEADERS = 'logs-header';
     process.env.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = '28';
     process.env.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '29';
-    const configFactory = createConfigFactory();
+    const config = parseConfigFile('test/fixtures/sdk-migration-config.yaml');
+
     const expectedConfig: ConfigurationModel = {
       ...defaultConfigFromFileWithEnvVariables,
       resource: {
@@ -1030,30 +996,22 @@ describe('FileConfigFactory', function () {
       },
     };
 
-    assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    assert.deepStrictEqual(config, expectedConfig);
   });
 
   it('should initialize config with fallbacks defined in config file when corresponding environment variables are not defined', function () {
-    process.env.OTEL_CONFIG_FILE = 'test/fixtures/sdk-migration-config.yaml';
-
-    const configFactory = createConfigFactory();
-    assert.deepStrictEqual(
-      configFactory.getConfigModel(),
-      defaultConfigFromFileWithEnvVariables
-    );
+    const config = parseConfigFile('test/fixtures/sdk-migration-config.yaml');
+    assert.deepStrictEqual(config, defaultConfigFromFileWithEnvVariables);
   });
 
   it('should throw for empty processors (minItems)', function () {
-    process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid-providers.yaml';
-    assert.throws(
-      () => createConfigFactory(),
-      /Invalid OpenTelemetry config file: .*?: \/logger_provider\/processors must be array/
-    );
+    assert.throws(() => {
+      parseConfigFile('test/fixtures/invalid-providers.yaml');
+    }, /Invalid OpenTelemetry config file: .*?: \/logger_provider\/processors must be array/);
   });
 
   it('check resources priority', function () {
-    process.env.OTEL_CONFIG_FILE = 'test/fixtures/resources.yaml';
-    const configFactory = createConfigFactory();
+    const config = parseConfigFile('test/fixtures/resources.yaml');
     const expectedConfig: ConfigurationModel = {
       disabled: false,
       resource: {
@@ -1113,7 +1071,7 @@ describe('FileConfigFactory', function () {
         ],
       },
     };
-    assert.deepStrictEqual(configFactory.getConfigModel(), expectedConfig);
+    assert.deepStrictEqual(config, expectedConfig);
   });
 
   it('leaves attribute type undefined when omitted in YAML', function () {
@@ -1122,8 +1080,7 @@ describe('FileConfigFactory', function () {
     // responsible for interpreting undefined type as string. This matches the Java/Python
     // pattern where the model faithfully mirrors the config file and semantic defaults
     // are applied at the point of use.
-    process.env.OTEL_CONFIG_FILE = 'test/fixtures/attribute-type-omitted.yaml';
-    const config = parseConfigFile();
+    const config = parseConfigFile('test/fixtures/attribute-type-omitted.yaml');
     const attrs = (config as Record<string, unknown>).resource as {
       attributes: { name: string; value: string; type?: string }[];
     };
@@ -1136,9 +1093,7 @@ describe('FileConfigFactory', function () {
   });
 
   it('checks to keep good code coverage', function () {
-    process.env.OTEL_CONFIG_FILE = 'test/fixtures/test-for-coverage.yaml';
-
-    const config = parseConfigFile();
+    const config = parseConfigFile('test/fixtures/test-for-coverage.yaml');
     assert.deepStrictEqual(config, {
       resource: {
         attributes_list: null,

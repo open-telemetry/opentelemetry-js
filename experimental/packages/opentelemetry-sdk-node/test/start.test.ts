@@ -4,7 +4,7 @@
  */
 
 import * as assert from 'assert';
-import { startNodeSDK } from '../src/start';
+import { startNodeSdk } from '../src/start';
 import * as Sinon from 'sinon';
 import {
   context,
@@ -16,7 +16,6 @@ import {
   DiagConsoleLogger,
 } from '@opentelemetry/api';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
-import { W3CTraceContextPropagator } from '@opentelemetry/core';
 import { logs } from '@opentelemetry/api-logs';
 import {
   SimpleLogRecordProcessor,
@@ -32,7 +31,6 @@ import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exp
 import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
-import { setupContextManager } from '../src/utils';
 import { NOOP_SDK } from '../src/start';
 import {
   ConsoleMetricExporter,
@@ -47,7 +45,7 @@ import {
   TracerProvider,
 } from '@opentelemetry/sdk-trace';
 
-describe('startNodeSDK', function () {
+describe('startNodeSdk', function () {
   let setGlobalLoggerProviderSpy: Sinon.SinonSpy;
   let setGlobalMeterProviderSpy: Sinon.SinonSpy;
   let setGlobalTracerProviderSpy: Sinon.SinonSpy;
@@ -85,7 +83,7 @@ describe('startNodeSDK', function () {
   describe('Basic Registration', function () {
     it('should return NOOP_SDK when disabled is true', async () => {
       process.env.OTEL_SDK_DISABLED = 'true';
-      const sdk = startNodeSDK();
+      const sdk = startNodeSdk();
 
       assert.strictEqual(sdk, NOOP_SDK);
 
@@ -97,11 +95,14 @@ describe('startNodeSDK', function () {
       process.env.OTEL_TRACES_EXPORTER = 'none';
       process.env.OTEL_LOGS_EXPORTER = 'none';
       process.env.OTEL_METRICS_EXPORTER = 'none';
-      const sdk = startNodeSDK();
+      const sdk = startNodeSdk();
 
-      // These are minimal OTel functionality and always registered.
       assertDefaultContextManagerRegistered();
-      assert.deepStrictEqual(propagation.fields(), []);
+      assert.deepStrictEqual(propagation.fields(), [
+        'traceparent',
+        'tracestate',
+        'baggage',
+      ]);
 
       assert.ok(
         setGlobalLoggerProviderSpy.called === false,
@@ -120,7 +121,7 @@ describe('startNodeSDK', function () {
       process.env.OTEL_LOG_LEVEL = 'ERROR';
 
       const spy = Sinon.spy(diag, 'setLogger');
-      const sdk = startNodeSDK();
+      const sdk = startNodeSdk();
 
       assert.strictEqual(spy.callCount, 1);
       assert.ok(spy.args[0][0] instanceof DiagConsoleLogger);
@@ -135,7 +136,7 @@ describe('startNodeSDK', function () {
       delete process.env.OTEL_LOG_LEVEL;
 
       const spy = Sinon.spy(diag, 'setLogger');
-      const sdk = startNodeSDK();
+      const sdk = startNodeSdk();
 
       assert.strictEqual(spy.callCount, 1);
       assert.ok(spy.args[0][0] instanceof DiagConsoleLogger);
@@ -146,18 +147,9 @@ describe('startNodeSDK', function () {
       await sdk.shutdown();
     });
 
-    it('should register a propagator if only a propagator is provided', async () => {
-      const expectedPropagator = new W3CTraceContextPropagator();
-      const sdk = startNodeSDK({ textMapPropagator: expectedPropagator });
-
-      const actualPropagator = propagation['_getGlobalPropagator']();
-      assert.equal(actualPropagator, expectedPropagator);
-      await sdk.shutdown();
-    });
-
     it('should register propagators as defined in OTEL_PROPAGATORS', async () => {
       process.env.OTEL_PROPAGATORS = 'b3';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSdk({});
 
       assert.deepStrictEqual(propagation.fields(), ['b3']);
 
@@ -166,7 +158,7 @@ describe('startNodeSDK', function () {
 
     it('should not register propagators OTEL_PROPAGATORS contains "none"', async () => {
       process.env.OTEL_PROPAGATORS = 'none';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSdk({});
 
       assert.deepStrictEqual(propagation.fields(), []);
 
@@ -175,16 +167,7 @@ describe('startNodeSDK', function () {
 
     it('should not register propagators OTEL_PROPAGATORS contains "none" alongside valid propagator', async () => {
       process.env.OTEL_PROPAGATORS = 'b3, none';
-      const sdk = startNodeSDK({});
-
-      assert.deepStrictEqual(propagation.fields(), []);
-
-      await sdk.shutdown();
-    });
-
-    it('should not register propagators OTEL_PROPAGATORS contains valid propagator but option is set to null', async () => {
-      process.env.OTEL_PROPAGATORS = 'b3';
-      const sdk = startNodeSDK({ textMapPropagator: null });
+      const sdk = startNodeSdk({});
 
       assert.deepStrictEqual(propagation.fields(), []);
 
@@ -195,7 +178,7 @@ describe('startNodeSDK', function () {
   it('should return NOOP_SDK when OTEL_CONFIG_FILE is invalid', async () => {
     const diagError = Sinon.spy(diag, 'error');
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/invalid.yaml';
-    const sdk = startNodeSDK({});
+    const sdk = startNodeSdk({});
 
     assert.strictEqual(sdk, NOOP_SDK);
     assert.strictEqual(diagError.callCount, 1);
@@ -211,7 +194,7 @@ describe('startNodeSDK', function () {
   it('should return NOOP_SDK when OTEL_CONFIG_FILE does not exist', async () => {
     const diagError = Sinon.spy(diag, 'error');
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/no-such-file.yaml';
-    const sdk = startNodeSDK({});
+    const sdk = startNodeSdk({});
 
     assert.strictEqual(sdk, NOOP_SDK);
     assert.strictEqual(diagError.callCount, 1);
@@ -228,7 +211,7 @@ describe('startNodeSDK', function () {
     const diagError = Sinon.spy(diag, 'error');
     process.env.OTEL_CONFIG_FILE =
       'test/fixtures/unknown-log-record-processor.yaml';
-    const sdk = startNodeSDK({});
+    const sdk = startNodeSdk({});
 
     assert.strictEqual(sdk, NOOP_SDK);
     assert.strictEqual(diagError.callCount, 1);
@@ -243,7 +226,7 @@ describe('startNodeSDK', function () {
   it('should register a logger provider if multiple log record processors are provided', async () => {
     process.env.TEST_DIR = __dirname;
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/logger.yaml';
-    const sdk = startNodeSDK({});
+    const sdk = startNodeSdk({});
 
     const loggerProvider = logs.getLoggerProvider();
     const sharedState = (loggerProvider as any)['_sharedState'];
@@ -276,11 +259,9 @@ describe('startNodeSDK', function () {
   });
 
   it('should register a meter provider if multiple metric readers are provided', async () => {
-    const stubLoggerWarn: Sinon.SinonStub = Sinon.stub(diag, 'warn');
-
     process.env.TEST_DIR = __dirname;
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/meter.yaml';
-    const sdk = startNodeSDK({});
+    const sdk = startNodeSdk({});
 
     const meterProvider = metrics.getMeterProvider() as MeterProvider;
     const sharedState = (meterProvider as any)['_sharedState'];
@@ -322,14 +303,13 @@ describe('startNodeSDK', function () {
         ConsoleMetricExporter
     );
 
-    stubLoggerWarn.reset();
     await sdk.shutdown();
   });
 
   it('should register a tracer provider for fixtures/tracer.yaml', async () => {
     process.env.TEST_DIR = __dirname;
     process.env.OTEL_CONFIG_FILE = 'test/fixtures/tracer.yaml';
-    const sdk = startNodeSDK({});
+    const sdk = startNodeSdk({});
 
     assert.strictEqual(setGlobalTracerProviderSpy.callCount, 1);
     assert.ok(
@@ -365,23 +345,9 @@ describe('startNodeSDK', function () {
   });
 
   describe('configuring logger provider from env', function () {
-    let stubLogger: Sinon.SinonStub;
-
-    beforeEach(() => {
-      stubLogger = Sinon.stub(diag, 'info');
-    });
-
-    afterEach(() => {
-      stubLogger.reset();
-    });
-
     it('should not register the provider if OTEL_LOGS_EXPORTER contains none', async () => {
       process.env.OTEL_LOGS_EXPORTER = 'console,none';
-      const sdk = startNodeSDK({});
-      assert.strictEqual(
-        stubLogger.args[0][0],
-        'OTEL_LOGS_EXPORTER contains "none". Logger provider will not be initialized.'
-      );
+      const sdk = startNodeSdk();
 
       assert.ok(
         setGlobalLoggerProviderSpy.callCount === 0,
@@ -392,7 +358,7 @@ describe('startNodeSDK', function () {
 
     it('should set up all allowed exporters', async () => {
       process.env.OTEL_LOGS_EXPORTER = 'console,otlp';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSdk({});
 
       const loggerProvider = logs.getLoggerProvider();
       const sharedState = (loggerProvider as any)['_sharedState'];
@@ -420,7 +386,7 @@ describe('startNodeSDK', function () {
     it('should use OTEL_EXPORTER_OTLP_LOGS_PROTOCOL for otlp protocol', async () => {
       process.env.OTEL_LOGS_EXPORTER = 'otlp';
       process.env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL = 'grpc';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSdk({});
 
       const loggerProvider = logs.getLoggerProvider();
       const sharedState = (loggerProvider as any)['_sharedState'];
@@ -435,7 +401,7 @@ describe('startNodeSDK', function () {
     it('should use OTLPHttpLogExporter when http/json is set', async () => {
       process.env.OTEL_LOGS_EXPORTER = 'otlp';
       process.env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL = 'http/json';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSdk({});
 
       const loggerProvider = logs.getLoggerProvider();
       const sharedState = (loggerProvider as any)['_sharedState'];
@@ -450,7 +416,7 @@ describe('startNodeSDK', function () {
     it('should fall back to OTEL_EXPORTER_OTLP_PROTOCOL', async () => {
       process.env.OTEL_LOGS_EXPORTER = 'otlp';
       process.env.OTEL_EXPORTER_OTLP_PROTOCOL = 'grpc';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSdk({});
 
       const loggerProvider = logs.getLoggerProvider();
       const sharedState = (loggerProvider as any)['_sharedState'];
@@ -465,7 +431,7 @@ describe('startNodeSDK', function () {
     it('should fall back to http/protobuf if invalid protocol is set', async () => {
       process.env.OTEL_LOGS_EXPORTER = 'otlp';
       process.env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL = 'grpc2';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSdk({});
 
       const loggerProvider = logs.getLoggerProvider();
       const sharedState = (loggerProvider as any)['_sharedState'];
@@ -481,7 +447,7 @@ describe('startNodeSDK', function () {
   describe('configuring meter provider from env', function () {
     it('should register a meter provider if a exporter is provided', async () => {
       process.env.OTEL_METRICS_EXPORTER = 'console';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSdk({});
 
       assertDefaultContextManagerRegistered();
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
@@ -491,7 +457,7 @@ describe('startNodeSDK', function () {
 
     it('should register a meter provider if a list of exporters is provided', async () => {
       process.env.OTEL_METRICS_EXPORTER = 'console,otlp';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSdk({});
 
       assertDefaultContextManagerRegistered();
 
@@ -507,7 +473,7 @@ describe('startNodeSDK', function () {
 
     it('should not register the provider if OTEL_METRICS_EXPORTER contains none', async () => {
       process.env.OTEL_METRICS_EXPORTER = 'console,none';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSdk({});
 
       assert.ok(
         setGlobalMeterProviderSpy.callCount === 0,
@@ -518,9 +484,6 @@ describe('startNodeSDK', function () {
   });
 
   describe('setup trace exporter from env', () => {
-    let stubLoggerWarn: Sinon.SinonStub;
-    let stubLoggerInfo: Sinon.SinonStub;
-
     const getSdkSpanProcessors = () => {
       const tracerProvider = trace.getTracerProvider();
       return (tracerProvider as any)._delegate._activeSpanProcessor
@@ -528,8 +491,6 @@ describe('startNodeSDK', function () {
     };
 
     beforeEach(() => {
-      stubLoggerWarn = Sinon.stub(diag, 'warn');
-      stubLoggerInfo = Sinon.stub(diag, 'info');
       delete process.env.OTEL_LOGS_EXPORTER;
       delete process.env.OTEL_METRICS_EXPORTER;
       delete process.env.OTEL_TRACES_EXPORTER;
@@ -539,13 +500,11 @@ describe('startNodeSDK', function () {
       delete process.env.OTEL_EXPORTER_OTLP_PROTOCOL;
       delete process.env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
       delete process.env.OTEL_TRACES_EXPORTER;
-      stubLoggerWarn.restore();
-      stubLoggerInfo.restore();
     });
 
     it('should only create one span processor when configured using env vars and config', async () => {
       process.env.OTEL_TRACES_EXPORTER = 'console';
-      const sdk = startNodeSDK();
+      const sdk = startNodeSdk();
       const listOfProcessors = getSdkSpanProcessors();
 
       assert.strictEqual(listOfProcessors.length, 1);
@@ -559,7 +518,7 @@ describe('startNodeSDK', function () {
     it('should use otlp exporter and defined exporter protocol env value', async () => {
       process.env.OTEL_TRACES_EXPORTER = 'otlp';
       process.env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSdk({});
       const listOfProcessors = getSdkSpanProcessors();
 
       assert.ok(listOfProcessors.length === 1);
@@ -574,7 +533,7 @@ describe('startNodeSDK', function () {
       process.env.OTEL_TRACES_EXPORTER = 'otlp';
       process.env.OTEL_EXPORTER_OTLP_PROTOCOL = 'http/protobuf';
       process.env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSdk({});
       const listOfProcessors = getSdkSpanProcessors();
 
       assert.ok(listOfProcessors.length === 1);
@@ -587,13 +546,7 @@ describe('startNodeSDK', function () {
 
     it('should use empty span processor when user sets env exporter to none', async () => {
       process.env.OTEL_TRACES_EXPORTER = 'none';
-      const sdk = startNodeSDK({});
-
-      // also it should info
-      assert.strictEqual(
-        stubLoggerInfo.args[0][0],
-        'OTEL_TRACES_EXPORTER contains "none". Tracer provider will not be initialized.'
-      );
+      const sdk = startNodeSdk({});
 
       assert.ok(
         setGlobalTracerProviderSpy.called === false,
@@ -605,13 +558,7 @@ describe('startNodeSDK', function () {
 
     it('should use no exporter when none value is provided with other exporters', async () => {
       process.env.OTEL_TRACES_EXPORTER = 'otlp,zipkin,none';
-      const sdk = startNodeSDK({});
-
-      // also it should info
-      assert.strictEqual(
-        stubLoggerInfo.args[0][0],
-        'OTEL_TRACES_EXPORTER contains "none". Tracer provider will not be initialized.'
-      );
+      const sdk = startNodeSdk({});
 
       assert.ok(
         setGlobalTracerProviderSpy.called === false,
@@ -623,7 +570,7 @@ describe('startNodeSDK', function () {
 
     it('should be able to use console and otlp exporters', async () => {
       process.env.OTEL_TRACES_EXPORTER = 'console, otlp';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSdk({});
 
       const listOfProcessors = getSdkSpanProcessors();
 
@@ -642,7 +589,7 @@ describe('startNodeSDK', function () {
     it('should ignore the protocol from env when use the console exporter', async () => {
       process.env.OTEL_TRACES_EXPORTER = 'console';
       process.env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSdk({});
 
       const listOfProcessors = getSdkSpanProcessors();
 
@@ -656,7 +603,7 @@ describe('startNodeSDK', function () {
 
     it('should not register the same exporter twice', async () => {
       process.env.OTEL_TRACES_EXPORTER = 'console,otlp,console';
-      const sdk = startNodeSDK({});
+      const sdk = startNodeSdk({});
 
       const listOfProcessors = getSdkSpanProcessors();
 
@@ -670,16 +617,6 @@ describe('startNodeSDK', function () {
         listOfProcessors[1]['_exporter'] instanceof OTLPProtoTraceExporter
       );
       await sdk.shutdown();
-    });
-  });
-
-  describe('tests to increase code coverage', function () {
-    it('null context manager', async () => {
-      setupContextManager(null);
-      assert.equal(
-        context['_getContextManager']().constructor.name,
-        'NoopContextManager'
-      );
     });
   });
 });
