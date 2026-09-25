@@ -31,7 +31,6 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :house: Internal
 
-
 ## 0.300.0-development.0
 
 ### :boom: Breaking Changes
