@@ -22,6 +22,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :rocket: Features
 
+* feat(instrumentation-http): add an experimental `useDiagnosticsChannel` option [#6947](https://github.com/open-telemetry/opentelemetry-js/pull/6947) @YangJonghun
+
 ### :bug: Bug Fixes
 
 * fix(configuration): preserve zero-valued limits from environment variables [#7060](https://github.com/open-telemetry/opentelemetry-js/pull/7060) @DenisCDev

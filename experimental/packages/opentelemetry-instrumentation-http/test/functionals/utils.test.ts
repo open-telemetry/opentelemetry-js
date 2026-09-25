@@ -7,6 +7,9 @@ import { SpanStatusCode, SpanKind, context, diag } from '@opentelemetry/api';
 import {
   ATTR_ERROR_TYPE,
   ATTR_HTTP_ROUTE,
+  ATTR_SERVER_ADDRESS,
+  ATTR_SERVER_PORT,
+  ATTR_URL_FULL,
   ATTR_URL_PATH,
   ATTR_URL_QUERY,
   ATTR_USER_AGENT_ORIGINAL,
@@ -28,7 +31,6 @@ import * as utils from '../../src/utils';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { extractHostnameAndPort } from '../../src/utils';
-import type { ParsedUrlQuery } from 'node:querystring';
 
 describe('Utility', () => {
   describe('parseResponseStatus()', () => {
@@ -161,8 +163,28 @@ describe('Utility', () => {
       const result = utils.getRequestInfo(diag, {
         hostname: 'www.google.com',
         method: 1234,
+        path: '/',
       } as unknown as RequestOptions);
       assert.strictEqual(result.method, 'GET');
+    });
+
+    it('should not throw when path is not a string', () => {
+      const result = utils.getRequestInfo(diag, {
+        hostname: 'www.google.com',
+        method: 'GET',
+        path: 1234,
+      } as unknown as RequestOptions);
+      assert.strictEqual(result.optionsParsed.path, 1234);
+    });
+
+    it('parses a request target independently of a WHATWG-incompatible host', () => {
+      const result = utils.getRequestInfo(diag, {
+        protocol: 'http:',
+        host: '[v1.fe80]:8080',
+        path: '/path?query=value',
+      });
+
+      assert.strictEqual(result.pathname, '/path');
     });
 
     it('should treat URL-like objects the same as URL instances, like Node.js does', () => {
@@ -296,223 +318,29 @@ describe('Utility', () => {
     });
   });
 
-  describe('getAbsoluteUrl()', () => {
-    it('should return absolute url with localhost', () => {
-      const path = '/test/1';
-      const result = utils.getAbsoluteUrl(
-        {
-          protocol: null,
-          slashes: null,
-          auth: null,
-          host: null,
-          port: null,
-          hostname: null,
-          hash: null,
-          search: null,
-          query: null as unknown as undefined,
-          pathname: '/test/1',
-          path: '/test/1',
-          href: '/test/1',
-        },
-        {}
-      );
-      assert.strictEqual(result, `http://localhost${path}`);
-    });
-    it('should return absolute url', () => {
-      const absUrl = 'http://www.google/test/1?query=1';
-      const result = utils.getAbsoluteUrl(
+  describe('getOutgoingRequestAttributes()', () => {
+    it('should format IPv6 attributes according to semantic conventions', () => {
+      const attributes = utils.getOutgoingRequestAttributes(
         {
           protocol: 'http:',
-          slashes: true,
-          auth: null,
-          host: 'www.google',
-          port: null,
-          hostname: 'www.google',
-          hash: null,
-          search: '?query=1',
-          query: 'query=1' as unknown as ParsedUrlQuery,
-          pathname: '/test/1',
-          path: '/test/1?query=1',
-          href: 'http://www.google/test/1?query=1',
-        },
-        {}
-      );
-      assert.strictEqual(result, absUrl);
-    });
-    it('should return default url', () => {
-      const result = utils.getAbsoluteUrl(null, {});
-      assert.strictEqual(result, 'http://localhost/');
-    });
-    it("{ path: '/helloworld', port: 8080 } should return http://localhost:8080/helloworld", () => {
-      const result = utils.getAbsoluteUrl(
-        { path: '/helloworld', port: 8080 },
-        {}
-      );
-      assert.strictEqual(result, 'http://localhost:8080/helloworld');
-    });
-    it('should return auth credentials as REDACTED to avoid leaking sensitive information', () => {
-      const result = utils.getAbsoluteUrl(
-        { path: '/helloworld', port: 8080, auth: 'user:password' },
-        {}
-      );
-      assert.strictEqual(
-        result,
-        'http://REDACTED:REDACTED@localhost:8080/helloworld'
-      );
-    });
-    it('should return auth credentials and particular query strings as REDACTED', () => {
-      const result = utils.getAbsoluteUrl(
-        {
-          path: '/registers?X-Goog-Signature=secret123',
+          hostname: '::1',
           port: 8080,
-          auth: 'user:pass',
+          path: '/helloworld',
         },
-        {}
-      );
-      assert.strictEqual(
-        result,
-        'http://REDACTED:REDACTED@localhost:8080/registers?X-Goog-Signature=REDACTED'
-      );
-    });
-    it('should return particular query strings as REDACTED', () => {
-      const result = utils.getAbsoluteUrl(
         {
-          path: '/registers?AWSAccessKeyId=secret123',
+          component: 'http',
+          hostname: '::1',
           port: 8080,
         },
-        {}
+        false
       );
-      assert.strictEqual(
-        result,
-        'http://localhost:8080/registers?AWSAccessKeyId=REDACTED'
-      );
-    });
-    it('does not perform redaction if the provided path cannot be parsed', () => {
-      const result = utils.getAbsoluteUrl(
-        { path: 'http://?AWSAccessKeyId=secret123' },
-        {}
-      );
-      assert.strictEqual(
-        result,
-        'http://localhosthttp://?AWSAccessKeyId=secret123'
-      );
-    });
-    it('should ignore a non-string host and use hostname instead', () => {
-      // Node.js accepts these options: when `hostname` is a valid string it
-      // never looks at `host`. See
-      // https://github.com/open-telemetry/opentelemetry-js/issues/6967
-      const result = utils.getAbsoluteUrl(
-        {
-          host: new URL('http://stale.example.com'),
-          hostname: 'www.google.com',
-          path: '/test/1',
-        } as unknown as ParsedRequestOptions,
-        {}
-      );
-      assert.strictEqual(result, 'http://www.google.com/test/1');
-    });
-    it('should use the host header when neither host nor hostname is a string', () => {
-      // Note: Node.js rejects a non-string `hostname` outright, so these exact
-      // options do not produce a request. This pins the fallback order used
-      // when deriving a best-effort URL, it does not claim Node.js accepts
-      // them.
-      const result = utils.getAbsoluteUrl(
-        {
-          host: 1234,
-          hostname: new URL('http://stale.example.com'),
-          path: '/test/1',
-        } as unknown as ParsedRequestOptions,
-        { host: 'www.google.com:8181' }
-      );
-      assert.strictEqual(result, 'http://www.google.com:8181/test/1');
-    });
-    it('should not throw on options that Node.js itself rejects', () => {
-      // These options never reach the network: Node.js resolves the target as
-      // `validateHost(hostname) || validateHost(host) || 'localhost'`, and
-      // `validateHost` throws ERR_INVALID_ARG_TYPE for any non-string, non-null
-      // value. With no usable `hostname`, the non-string `host` is validated and
-      // rejected - a valid `host` header does not rescue it either.
-      //
-      // So there is no destination to report here, and the URL below is only
-      // ever attached to an error span for a request that never left the
-      // process. What matters is that the instrumentation does not throw first,
-      // so the caller sees Node.js's own error rather than a TypeError from us.
-      // The `localhost` value is this function's long-standing last resort (see
-      // the 'should return default url' case above), not a claim about where
-      // the request went.
-      const result = utils.getAbsoluteUrl(
-        {
-          host: new URL('http://stale.example.com'),
-          hostname: undefined,
-          path: '/test/1',
-        } as unknown as ParsedRequestOptions,
-        { host: 1234 as unknown as string }
-      );
-      assert.strictEqual(result, 'http://localhost/test/1');
-    });
-    it('should not throw when path is not a string', () => {
-      const result = utils.getAbsoluteUrl(
-        {
-          host: 'www.google.com',
-          path: 1234,
-        } as unknown as ParsedRequestOptions,
-        {}
-      );
-      assert.strictEqual(result, 'http://www.google.com1234');
-    });
-  });
 
-  describe('redactQueryString()', () => {
-    it('redacts a matching parameter', () => {
       assert.strictEqual(
-        utils.redactQueryString(new URLSearchParams('sig=secret&foo=bar'), [
-          'sig',
-        ]),
-        'sig=REDACTED&foo=bar'
+        attributes[ATTR_URL_FULL],
+        'http://[::1]:8080/helloworld'
       );
-    });
-
-    it('leaves non-matching parameters unchanged', () => {
-      assert.strictEqual(
-        utils.redactQueryString(new URLSearchParams('foo=bar&baz=qux'), [
-          'sig',
-        ]),
-        'foo=bar&baz=qux'
-      );
-    });
-
-    it('redacts multiple parameters', () => {
-      assert.strictEqual(
-        utils.redactQueryString(
-          new URLSearchParams('sig=a&AWSAccessKeyId=b&keep=c'),
-          ['sig', 'AWSAccessKeyId']
-        ),
-        'sig=REDACTED&AWSAccessKeyId=REDACTED&keep=c'
-      );
-    });
-
-    it('returns the input unchanged when the list is empty', () => {
-      assert.strictEqual(
-        utils.redactQueryString(new URLSearchParams('sig=secret'), []),
-        'sig=secret'
-      );
-    });
-
-    it('redacts a param with an empty value', () => {
-      assert.strictEqual(
-        utils.redactQueryString(new URLSearchParams('sig=&foo=bar'), ['sig']),
-        'sig=REDACTED&foo=bar'
-      );
-    });
-
-    it('redacts all occurrences of a duplicated parameter', () => {
-      assert.strictEqual(
-        utils.redactQueryString(
-          new URLSearchParams('sig=SECRET1&sig=SECRET2&foo=bar'),
-          ['sig']
-        ),
-        'sig=REDACTED&foo=bar'
-      );
+      assert.strictEqual(attributes[ATTR_SERVER_ADDRESS], '::1');
+      assert.strictEqual(attributes[ATTR_SERVER_PORT], 8080);
     });
   });
 
@@ -630,6 +458,29 @@ describe('Utility', () => {
       );
       assert.strictEqual(attributes[ATTR_URL_PATH], '/user/');
       assert.strictEqual(attributes[ATTR_USER_AGENT_SYNTHETIC_TYPE], undefined);
+    });
+
+    it('parses the request target independently of an IPvFuture Host', () => {
+      const request = {
+        url: '/path?query=value',
+        method: 'GET',
+        socket: {},
+        headers: { host: '[v1.fe80]:8080' },
+      } as unknown as IncomingMessage;
+
+      const attributes = utils.getIncomingRequestAttributes(
+        request,
+        {
+          component: 'http',
+          enableSyntheticSourceDetection: false,
+        },
+        diag
+      );
+
+      assert.strictEqual(attributes[ATTR_URL_PATH], '/path');
+      assert.strictEqual(attributes[ATTR_URL_QUERY], 'query=value');
+      assert.strictEqual(attributes[ATTR_SERVER_ADDRESS], 'v1.fe80');
+      assert.strictEqual(attributes[ATTR_SERVER_PORT], 8080);
     });
 
     it('should set synthetic attributes on requests', () => {
@@ -874,6 +725,27 @@ describe('Utility', () => {
       const { hostname, port } = extractHostnameAndPort(parsedOption);
       assert.strictEqual(hostname, 'www.google.com');
       assert.strictEqual(port, '80');
+    });
+
+    it('should extract a bare IPv6 host with a separate port', () => {
+      const { hostname, port } = extractHostnameAndPort({
+        host: '::1',
+        port: 8080,
+        protocol: 'http:',
+      });
+
+      assert.strictEqual(hostname, '::1');
+      assert.strictEqual(port, 8080);
+    });
+
+    it('should extract a bracketed IPv6 host with an embedded port', () => {
+      const { hostname, port } = extractHostnameAndPort({
+        host: '[::1]:8080',
+        protocol: 'http:',
+      });
+
+      assert.strictEqual(hostname, '::1');
+      assert.strictEqual(port, '8080');
     });
 
     it('should ignore a non-string host and use hostname instead', () => {
