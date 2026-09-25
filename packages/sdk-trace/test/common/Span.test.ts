@@ -32,7 +32,11 @@ import * as sinon from 'sinon';
 import type { Span, SpanProcessor } from '../../src';
 import { TracerProvider } from '../../src';
 import { SpanImpl } from '../../src/Span';
-import { invalidAttributes, validAttributes } from './util';
+import {
+  invalidAttributes,
+  validAttributes,
+  validSimpleAttributes,
+} from './util';
 import type { Tracer } from '../../src/Tracer';
 
 import { cheatSpanLimitsFromTracer } from './util';
@@ -526,7 +530,7 @@ describe('Span', () => {
 
       assert.strictEqual(span.events.length, 1);
       assert.deepStrictEqual(span.events[0].name, 'rev');
-      assert.deepStrictEqual(span.events[0].attributes, validAttributes);
+      assert.deepStrictEqual(span.events[0].attributes, validSimpleAttributes);
     });
   });
 
@@ -806,13 +810,14 @@ describe('Span', () => {
       kind: SpanKind.CLIENT,
       spanLimits: cheatSpanLimitsFromTracer(tracer),
       spanProcessor: tracer['_spanProcessor'],
+      links: [{ context: linkContext, attributes: { foo: 'bar' } }],
     });
     span.addLink({ context: linkContext });
     span.addLink({ context: linkContext });
     span.end();
 
     assert.strictEqual(span.links.length, 0);
-    assert.strictEqual(span.droppedLinksCount, 2);
+    assert.strictEqual(span.droppedLinksCount, 3);
   });
 
   it('should enforce linkCountLimit via addLinks', () => {
@@ -1238,6 +1243,7 @@ describe('Span', () => {
       },
       {
         attributes: { attr1: 'value', attr2: 123, attr3: true },
+        droppedAttributesCount: 0,
         context: linkContext,
       },
     ]);
@@ -1258,14 +1264,14 @@ describe('Span', () => {
     assert.strictEqual(span.events.length, 1);
     const [event] = span.events;
     assert.deepStrictEqual(event.name, 'sent');
-    assert.deepStrictEqual(event.attributes, {});
+    assert.deepStrictEqual(event.attributes, undefined);
     assert.ok(event.time[0] > 0);
 
     span.addEvent('rev', { attr1: 'value', attr2: 123, attr3: true });
     assert.strictEqual(span.events.length, 2);
     const [event1, event2] = span.events;
     assert.deepStrictEqual(event1.name, 'sent');
-    assert.deepStrictEqual(event1.attributes, {});
+    assert.deepStrictEqual(event1.attributes, undefined);
     assert.ok(event1.time[0] > 0);
     assert.deepStrictEqual(event2.name, 'rev');
     assert.deepStrictEqual(event2.attributes, {
@@ -1273,6 +1279,7 @@ describe('Span', () => {
       attr2: 123,
       attr3: true,
     });
+    assert.deepStrictEqual(event2.droppedAttributesCount, 0);
     assert.ok(event2.time[0] > 0);
 
     span.end();

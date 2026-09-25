@@ -5,7 +5,7 @@
 
 import * as api from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
-import { sanitizeAttributes, isTracingSuppressed } from '@opentelemetry/core';
+import { isTracingSuppressed, cleanAttributes } from '@opentelemetry/core';
 import { SpanImpl } from './Span';
 import type { SpanLimits, TracerOptions } from './types';
 import type { SpanProcessor } from './SpanProcessor';
@@ -21,12 +21,17 @@ import {
   settledResourceAttributes,
 } from './inspect';
 
+const NO_ATTR_LIMITS = {
+  attributeCountLimit: Infinity,
+  attributeValueLengthLimit: Infinity,
+};
+
 /**
  * This class represents a basic tracer.
  */
 export class Tracer implements api.Tracer {
   private readonly _sampler: Sampler;
-  private readonly _spanLimits: SpanLimits;
+  private readonly _spanLimits: Required<SpanLimits>;
   private readonly _idGenerator: IdGenerator;
   readonly instrumentationScope: InstrumentationScope;
 
@@ -100,11 +105,19 @@ export class Tracer implements api.Tracer {
     const links = (options.links ?? []).map(link => {
       return {
         context: link.context,
-        attributes: sanitizeAttributes(link.attributes),
+        ...cleanAttributes(link.attributes, {
+          attributeCountLimit: this._spanLimits.attributePerLinkCountLimit,
+          attributeValueLengthLimit: this._spanLimits.attributeValueLengthLimit,
+        }),
       };
     });
-    const attributes = sanitizeAttributes(options.attributes);
-    // make sampling decision
+
+    // `NO_ATTR_LIMITS` to avoid applying limits until after `shouldSample`.
+    // The second `cleanAttributes` below will apply user limits.
+    const attrsData1 = cleanAttributes(options.attributes, NO_ATTR_LIMITS);
+    const attributes = attrsData1.attributes ?? {};
+
+    // Make sampling decision.
     const samplingResult = this._sampler.shouldSample(
       context,
       traceId,
@@ -113,14 +126,11 @@ export class Tracer implements api.Tracer {
       attributes,
       links
     );
-
     const recordEndMetrics = this._tracerMetrics.startSpan(
       parentSpanContext,
       samplingResult.decision
     );
-
     traceState = samplingResult.traceState ?? traceState;
-
     const traceFlags =
       samplingResult.decision === api.SamplingDecision.RECORD_AND_SAMPLED
         ? api.TraceFlags.SAMPLED
@@ -136,8 +146,9 @@ export class Tracer implements api.Tracer {
 
     // Set initial span attributes. The attributes object may have been mutated
     // by the sampler, so we sanitize the merged attributes before setting them.
-    const initAttributes = sanitizeAttributes(
-      Object.assign(attributes, samplingResult.attributes)
+    const attrsData2 = cleanAttributes(
+      Object.assign(attributes, samplingResult.attributes),
+      this._spanLimits
     );
 
     const span = new SpanImpl({
@@ -149,7 +160,10 @@ export class Tracer implements api.Tracer {
       kind: spanKind,
       links,
       parentSpanContext: validParentSpanContext,
-      attributes: initAttributes,
+      attributes: attrsData2.attributes,
+      droppedAttributesCount:
+        (attrsData1.droppedAttributesCount ?? 0) +
+        (attrsData2.droppedAttributesCount ?? 0),
       startTime: options.startTime,
       spanProcessor: this._spanProcessor,
       spanLimits: this._spanLimits,

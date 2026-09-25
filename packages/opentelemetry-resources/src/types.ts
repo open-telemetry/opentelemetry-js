@@ -3,13 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { AttributeValue } from '@opentelemetry/api';
+import type { AnyValue } from '@opentelemetry/api';
 import type { ResourceDetectionConfig } from './config';
 
 /**
  * Interface for a Resource Detector.
  * A resource detector returns a set of detected resource attributes.
- * A detected resource attribute may be an {@link AttributeValue} or a Promise of an AttributeValue.
+ * A detected resource attribute may be an {@link AnyValue} or a Promise of an AnyValue.
+ * Attributes values that are not "simple" attributes are dropped with a warning.
+ * See OTEP 4485.
  */
 export interface ResourceDetector {
   /**
@@ -29,13 +31,13 @@ export type DetectedResource = {
 
 /**
  * An object representing detected resource attributes.
- * Value may be {@link AttributeValue}s, a promise to an {@link AttributeValue}, or undefined.
+ * Value may be {@link AnyValue}s, a promise to an {@link AnyValue}, or undefined.
  */
-type DetectedResourceAttributeValue = MaybePromise<AttributeValue | undefined>;
+type DetectedResourceAttributeValue = MaybePromise<AnyValue | undefined>;
 
 /**
  * An object representing detected resource attributes.
- * Values may be {@link AttributeValue}s or a promise to an {@link AttributeValue}.
+ * Values may be {@link AnyValue}s or a promise to an {@link AnyValue}.
  */
 export type DetectedResourceAttributes = Record<
   string,
@@ -44,10 +46,7 @@ export type DetectedResourceAttributes = Record<
 
 export type MaybePromise<T> = T | Promise<T>;
 
-export type RawResourceAttribute = [
-  string,
-  MaybePromise<AttributeValue | undefined>,
-];
+export type RawResourceAttribute = [string, MaybePromise<AnyValue | undefined>];
 
 /**
  * Options for creating a {@link Resource}.

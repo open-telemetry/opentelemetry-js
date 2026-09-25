@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Attributes, AttributeValue } from '@opentelemetry/api';
+import type { AnyValue, Attributes } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
-import { SDK_INFO } from '@opentelemetry/core';
+import { isSimpleAttributeValue, SDK_INFO } from '@opentelemetry/core';
 import {
   ATTR_SERVICE_NAME,
   ATTR_TELEMETRY_SDK_LANGUAGE,
@@ -31,7 +31,7 @@ class ResourceImpl implements Resource {
   private _memoizedAttributes?: Attributes;
 
   static FromAttributeList(
-    attributes: [string, MaybePromise<AttributeValue | undefined>][],
+    attributes: [string, MaybePromise<AnyValue | undefined>][],
     options?: ResourceOptions
   ): Resource {
     const res = new ResourceImpl({}, options);
@@ -98,8 +98,14 @@ class ResourceImpl implements Resource {
         diag.debug(`Unsettled resource attribute ${k} skipped`);
         continue;
       }
-      if (v != null) {
-        attrs[k] ??= v;
+      if (Object.hasOwn(attrs, k)) {
+        // Pass. First res attribute wins.
+      } else if (k.length === 0) {
+        diag.warn('dropping invalid resource attribute key: <empty string>');
+      } else if (!isSimpleAttributeValue(v)) {
+        diag.warn(`dropping invalid resource attribute value for key "${k}"`);
+      } else {
+        attrs[k] = v;
       }
     }
 
@@ -136,6 +142,13 @@ class ResourceImpl implements Resource {
   }
 }
 
+/**
+ * Create a `Resource` from the given attributes object.
+ *
+ * Only *simple* attributes are supported: string, bool, number, and homogeneous
+ * arrays of these three scalar types. Complex attribute values will be
+ * dropped with a warning. (See OTEP 4485.)
+ */
 export function resourceFromAttributes(
   attributes: DetectedResourceAttributes,
   options?: ResourceOptions
@@ -170,14 +183,17 @@ function guardedRawAttributes(
     if (isPromiseLike(v)) {
       return [
         k,
-        v.catch(err => {
-          diag.debug(
-            'promise rejection for resource attribute: %s - %s',
-            k,
-            err
-          );
-          return undefined;
-        }),
+        v.then(
+          val => val,
+          err => {
+            diag.debug(
+              'promise rejection for resource attribute: %s - %s',
+              k,
+              err
+            );
+            return undefined;
+          }
+        ),
       ];
     }
     return [k, v];
