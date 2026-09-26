@@ -45,6 +45,7 @@ import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import type { NodeSDKConfiguration } from './types';
 import {
   getBooleanFromEnv,
+  getNumberFromEnv,
   getStringFromEnv,
   getStringListFromEnv,
   diagLogLevelFromString,
@@ -118,7 +119,12 @@ function getMetricReadersFromEnv(): IMetricReader[] {
         })
       );
     } else if (exporter === 'prometheus') {
-      metricReaders.push(new PrometheusMetricExporter());
+      metricReaders.push(
+        new PrometheusMetricExporter({
+          host: getStringFromEnv('OTEL_EXPORTER_PROMETHEUS_HOST'),
+          port: getNumberFromEnv('OTEL_EXPORTER_PROMETHEUS_PORT'),
+        })
+      );
     } else {
       diag.warn(
         `Unsupported OTEL_METRICS_EXPORTER value: "${exporter}". Supported values are: otlp, console, prometheus, none.`

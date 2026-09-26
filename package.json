@@ -1,6 +1,7 @@
 {
   "name": "opentelemetry",
   "version": "0.1.0",
+  "private": true,
   "description": "OpenTelemetry is a distributed tracing and stats collection framework.",
   "scripts": {
     "precompile": "npm run submodule && nx run-many -t protos:generate",
@@ -54,7 +55,7 @@
     "@types/node": "18.19.130",
     "assert": "2.1.0",
     "benchmark": "2.1.4",
-    "eslint": "10.9.1",
+    "eslint": "10.10.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-n": "18.3.0",
     "eslint-plugin-prettier": "5.5.6",
@@ -73,7 +74,7 @@
     "linkinator": "7.6.1",
     "markdownlint-cli2": "0.23.2",
     "mocha": "11.8.0",
-    "nx": "22.7.9",
+    "nx": "22.7.12",
     "prettier": "3.6.2",
     "process": "0.11.10",
     "publint": "0.3.24",
@@ -95,10 +96,21 @@
     "experimental/packages/*",
     "experimental/examples/*",
     "integration-tests/*",
-    "examples/otlp-exporter-node",
     "examples/opentelemetry-web",
     "examples/http",
     "examples/https",
     "examples/esm-http-ts"
-  ]
+  ],
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "^24.11.1 || >=26.0.0",
+      "onFail": "warn"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": ">=11.10.0",
+      "onFail": "warn"
+    }
+  }
 }

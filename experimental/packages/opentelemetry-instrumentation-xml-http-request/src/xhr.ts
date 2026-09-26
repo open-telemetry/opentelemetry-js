@@ -16,7 +16,7 @@ import {
   PerformanceTimingNames as PTN,
   shouldPropagateTraceHeaders,
   parseUrl,
-} from '@opentelemetry/sdk-trace-web';
+} from '@opentelemetry/web-common';
 import {
   ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
@@ -154,8 +154,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         childSpan,
         corsPreFlightRequest,
         this.getConfig().ignoreNetworkEvents,
-        undefined,
-        true
+        undefined
       );
       childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
     });
@@ -295,8 +294,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         span,
         mainRequest,
         this.getConfig().ignoreNetworkEvents,
-        undefined,
-        true
+        undefined
       );
     }
   }

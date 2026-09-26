@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-logs-otlp-proto",
-  "version": "0.222.0",
+  "version": "0.300.0-development.0",
   "description": "An OTLP exporter to send logs using protobuf over HTTP",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -71,7 +71,7 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "engines": {
-    "node": "^18.19.0 || >=20.6.0"
+    "node": ">=22.15.0"
   },
   "files": [
     "doc",
@@ -108,9 +108,9 @@
     "@opentelemetry/api": "^1.3.0"
   },
   "dependencies": {
-    "@opentelemetry/otlp-exporter-base": "0.222.0",
-    "@opentelemetry/otlp-transformer": "0.222.0",
-    "@opentelemetry/sdk-logs": "0.222.0"
+    "@opentelemetry/otlp-exporter-base": "0.300.0-development.0",
+    "@opentelemetry/otlp-transformer": "0.300.0-development.0",
+    "@opentelemetry/sdk-logs": "0.300.0-development.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-logs-otlp-proto",
   "sideEffects": false

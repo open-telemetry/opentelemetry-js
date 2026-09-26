@@ -22,7 +22,7 @@
     "typescript"
   ],
   "engines": {
-    "node": "^18.19.0 || >=20.6.0"
+    "node": ">=22.15.0"
   },
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
@@ -32,11 +32,11 @@
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/",
   "dependencies": {
     "@opentelemetry/api": "1.9.1",
-    "@opentelemetry/exporter-trace-otlp-proto": "0.222.0",
-    "@opentelemetry/instrumentation": "0.222.0",
-    "@opentelemetry/instrumentation-http": "0.222.0",
-    "@opentelemetry/resources": "2.11.0",
-    "@opentelemetry/sdk-trace": "2.11.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "0.300.0-development.0",
+    "@opentelemetry/instrumentation": "0.300.0-development.0",
+    "@opentelemetry/instrumentation-http": "0.300.0-development.0",
+    "@opentelemetry/resources": "3.0.0-development.0",
+    "@opentelemetry/sdk-trace": "3.0.0-development.0",
     "@opentelemetry/semantic-conventions": "^1.29.0"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/otlp-exporter-base",
-  "version": "0.222.0",
+  "version": "0.300.0-development.0",
   "description": "OpenTelemetry OTLP Exporter base (for internal use only)",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -65,7 +65,7 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "engines": {
-    "node": "^18.19.0 || >=20.6.0"
+    "node": ">=22.15.0"
   },
   "files": [
     "LICENSE",
@@ -76,13 +76,14 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/core": "2.11.0",
-    "@opentelemetry/otlp-transformer": "0.222.0"
+    "@opentelemetry/core": "3.0.0-development.0",
+    "@opentelemetry/otlp-transformer": "0.300.0-development.0"
   },
   "devDependencies": {
     "@babel/core": "7.29.7",
     "@babel/preset-env": "7.29.7",
     "@opentelemetry/api": "1.9.1",
+    "@opentelemetry/sdk-trace": "3.0.0-development.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",

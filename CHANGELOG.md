@@ -13,6 +13,32 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :boom: Breaking Changes
 
+* chore(sdk-trace-base, sdk-trace-web)!: remove the `@opentelemetry/sdk-trace-base` and `@opentelemetry/sdk-trace-web` packages [#7117](https://github.com/open-telemetry/opentelemetry-js/issues/7117)
+  * The sdk-trace-base, sdk-trace-web, and sdk-trace-node packages have been replaced by the `@opentelemetry/sdk-trace` package.
+    See the [3.x migration guide](doc/3.x/migration-guide.md) for full migration instructions.
+
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+* fix(sdk-metrics): guard against a missing or empty name to MeterProvider#getMeter [#7105](https://github.com/open-telemetry/opentelemetry-js/pull/7105) @trentm
+
+### :books: Documentation
+
+### :house: Internal
+
+* chore: declare the Node.js and npm version floors that the tsdown build requires via `devEngines` [#7093](https://github.com/open-telemetry/opentelemetry-js/pull/7093) @overbalance
+  * The migration to tsdown raised the toolchain a contributor needs to build this repo, but nothing declared it. Contributors now build on Node.js `^24.11.1 || >=26.0.0` with npm `>=11.10.0`; both are advisory and warn rather than fail. The published packages are unaffected and still support Node.js `>=22.15.0`, which the test matrix continues to cover.
+
+## 3.0.0-development.0
+
+### :boom: Breaking Changes
+
+* chore(sdk-trace-node)!: remove the `@opentelemetry/sdk-trace-node` package [#7054](https://github.com/open-telemetry/opentelemetry-js/issues/7054)
+  * The sdk-trace-node package has been replaced by the `@opentelemetry/sdk-trace` package.
+    See the [3.x migration guide](doc/3.x/migration-guide.md) for full migration instructions.
+* chore(shim-opentracing)!: remove the `@opentelemetry/shim-opentracing` package
+  * In the [OpenTelemetry Specification v1.58.0](https://github.com/open-telemetry/opentelemetry-specification/releases/tag/v1.56.0) the [OpenTracing compatibility requirements were deprecated](https://github.com/open-telemetry/opentelemetry-specification/pull/4938). The JavaScript OpenTracing shim package will not receive any more releases after the current [2.11.0 release](https://www.npmjs.com/package/@opentelemetry/shim-opentracing/v/2.11.0) ([source code for last release](https://github.com/open-telemetry/opentelemetry-js/tree/v2.11.0/packages/opentelemetry-shim-opentracing/)).
 * chore(context-async-hooks)!: remove the unused class `AsyncHooksContextManager` [#7078](https://github.com/open-telemetry/opentelemetry-js/pull/7078)
 * feat!: migrate package builds from `tsc` to `tsdown`, emitting dual CJS/ESM output from a single `dist/` directory and declaring an `exports` map on every package [#6293](https://github.com/open-telemetry/opentelemetry-js/pull/6293) @overbalance
   * Importing a package by its name is unaffected in both CommonJS and ESM, as is every subpath listed in its `exports` map.
@@ -31,17 +57,27 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 * feat(propagator-jaeger)!: remove `@opentelemetry/propagator-jaeger` package [#7077](https://github.com/open-telemetry/opentelemetry-js/pull/7077)
   * The Jaeger propagator is deprecated by the OpenTelemetry specification in favour of `W3CTraceContextPropagator`. Use `W3CTraceContextPropagator` from `@opentelemetry/core` instead.
   * See the [3.x migration guide](doc/3.x/migration-guide.md) for full instructions.
+* feat(exporter-jaeger)!: remove `@opentelemetry/exporter-jaeger` package
+  * The Jaeger exporter has been removed. Jaeger has deprecated its custom Thrift collection protocols in favor of standard OpenTelemetry Protocol (OTLP). Use standard OTLP exporters instead.
+  * See the [3.x migration guide](doc/3.x/migration-guide.md) for full instructions.
+* chore!: bump minimum node.js version to >=22.15.0
 
 ### :rocket: Features
 
-### :bug: Bug Fixes
+* feat(sdk-metrics): stabilize `maxExportBatchSize` option in `PeriodicExportingMetricReader`
 
 ### :books: Documentation
 
+* chore(examples): drop examples/{otlp-exporter-node,grpc-js} [#7096](https://github.com/open-telemetry/opentelemetry-js/pull/7096)
+
 ### :house: Internal
 
+* chore: remove `@opentelemetry/sdk-trace-web` package from examples and bundler tests [#7095](https://github.com/open-telemetry/opentelemetry-js/pull/7095)
+* chore(sdk-trace): add `StackContextManager` in `@opentelemetry/sdk-trace` package [#7086](https://github.com/open-telemetry/opentelemetry-js/pull/7086)
 * feat(ci): support releasing from maintenance branches [#6767](https://github.com/open-telemetry/opentelemetry-js/issues/6767) @pichlermarc
   * The API documentation site is only redeployed for releases whose commit is reachable from `main`, so a maintenance release no longer overwrites it.
+* chore: don't close stale issues [#x](https://github.com/open-telemetry/opentelemetry-js/issues/x) @maryliag
+* chore: mark the workspace root package as private [#7097](https://github.com/open-telemetry/opentelemetry-js/pull/7097) @overbalance
 
 ## 2.11.0
 

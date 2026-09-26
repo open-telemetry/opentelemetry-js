@@ -1,7 +1,7 @@
 # Overview
 
 This example shows how to
-use [@opentelemetry/sdk-trace-web](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-web)
+use [@opentelemetry/sdk-trace](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-trace)
 with different plugins and setup to instrument your JavaScript code running in the browser.
 
 ## Installation
@@ -48,7 +48,7 @@ Included Components
 - XMLHttpRequestInstrumentation
 - ZoneContextManager
 - OTLPTraceExporter
-- WebTracerProvider
+- TracerProvider
 - B3Propagator
 
 To see the results, open the browser at <http://localhost:8090/xml-http-request/> and make sure you have the browser
@@ -67,7 +67,7 @@ Included Components
 - FetchInstrumentation
 - ZoneContextManager
 - OTLPTraceExporter
-- WebTracerProvider
+- TracerProvider
 - B3Propagator
 
 To see the results, open the browser at <http://localhost:8090/fetch/> and make sure you have the browser console open.
@@ -84,7 +84,7 @@ Included Components
 - FetchInstrumentation
 - ZoneContextManager
 - OTLPTraceExporter
-- WebTracerProvider
+- TracerProvider
 
 ### FetchXhrB3
 
@@ -97,7 +97,7 @@ Included Components
 - FetchInstrumentation
 - ZoneContextManager
 - OTLPTraceExporter
-- WebTracerProvider
+- TracerProvider
 - B3Propagator
 
 ### Metrics
@@ -117,14 +117,8 @@ This example show a simple usage of the ZipKin Exporter with the Web Tracer Prov
 
 Included Components
 
-- WebTracerProvider
+- TracerProvider
 - ZipkinExporter
-
-## Useful links
-
-- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For more information on web tracing,
-  visit: <https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-web>
 
 ## LICENSE
 

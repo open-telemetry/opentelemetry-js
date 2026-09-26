@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/template",
-  "version": "2.11.0",
+  "version": "3.0.0-development.0",
   "description": "> TODO: description",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -37,7 +37,7 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "engines": {
-    "node": "^18.19.0 || >=20.6.0"
+    "node": ">=22.15.0"
   },
   "scripts": {
     "prepublishOnly": "npm run compile",
