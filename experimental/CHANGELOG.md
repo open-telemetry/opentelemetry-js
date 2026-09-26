@@ -63,6 +63,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :bug: Bug Fixes
 
+* fix(otlp-exporter-base): honor standard proxy environment variables in Node.js HTTP exporters while preserving explicit proxy configuration. Native environment proxying requires Node.js 22.21.0+ or 24.5.0+; earlier supported runtimes require an explicit agent implementation. [#6932](https://github.com/open-telemetry/opentelemetry-js/pull/6932) @LarryHu0217
 * fix(otlp-exporter-base): suppress tracing around the browser fetch transport's own request so a `fetch` instrumentation cannot create an export → span → export loop [#6948](https://github.com/open-telemetry/opentelemetry-js/pull/6948) @YangJonghun
 * fix(instrumentation-http): set `error.type` on spans whose status code makes them an error [#7061](https://github.com/open-telemetry/opentelemetry-js/pull/7061) @mwear
 
