@@ -354,6 +354,11 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         }
         const createdSpan = plugin._createSpan(url, options);
         if (!createdSpan) {
+          // A Request plus init is normalized above and may consume its input body.
+          // Forward the normalized Request instead of reusing the original args.
+          if (options instanceof Request) {
+            return original.apply(this, [options]);
+          }
           return original.apply(this, args);
         }
         const spanData = plugin._prepareSpanData(url);
