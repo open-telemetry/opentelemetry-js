@@ -3,7 +3,6 @@
   "version": "3.0.0-development.0",
   "description": "OpenTelemetry Context Zone with peer dependency for zone.js",
   "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
   "exports": {
     ".": {

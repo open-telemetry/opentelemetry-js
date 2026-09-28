@@ -3,7 +3,6 @@
   "version": "1.9.1",
   "description": "Public API for OpenTelemetry",
   "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
   "exports": {
     ".": {

@@ -41,6 +41,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 * chore(instrumentation-fetch, instrumentation-xml-http-request): Soft-deprecate `@opentelemetry/instrumentation-fetch` and `@opentelemetry/instrumentation-xml-http-request` [#7109](https://github.com/open-telemetry/opentelemetry-js/issues/7109) @trentm
   * Browser instrumentations in this repository are being (soft-)deprecated in favor of the new (and significantly different) [`@opentelemetry/browser-instrumentation` instrumentations](https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation#readme). "Soft" deprecation means exports have been marked with `@deprecated` and a notice added to READMEs, but the packages will *not* yet be `npm deprecate`'d to avoid loud notice to users while opentelemetry-browser.git is still in heavy development.
+* chore: remove the redundant `module` field from `package.json`; bundlers resolve the ESM build through the `exports` map [#7130](https://github.com/open-telemetry/opentelemetry-js/pull/7130) @overbalance
 
 ## 0.300.0-development.0
 

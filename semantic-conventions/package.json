@@ -3,7 +3,6 @@
   "version": "1.43.0",
   "description": "OpenTelemetry semantic conventions",
   "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
   "exports": {
     ".": {
