@@ -3,7 +3,6 @@
   "version": "0.300.0-development.0",
   "description": "Transform OpenTelemetry SDK data into OTLP",
   "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
   "exports": {
     ".": {
