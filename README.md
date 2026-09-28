@@ -381,11 +381,6 @@ These instrumentations are hosted at <https://github.com/open-telemetry/opentele
 
 #### Web Instrumentations
 
-##### Core
-
-- [@opentelemetry/instrumentation-xml-http-request][otel-instrumentation-xml-http-request]
-- [@opentelemetry/instrumentation-fetch][otel-instrumentation-fetch]
-
 ##### Contrib
 
 These instrumentations are hosted at <https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web>
@@ -413,10 +408,8 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 
 [otel-metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-metrics
 
-[otel-instrumentation-fetch]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-fetch
 [otel-instrumentation-grpc]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-grpc
 [otel-instrumentation-http]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-http
-[otel-instrumentation-xml-http-request]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-xml-http-request
 
 [otel-tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-trace
 [otel-api]: https://github.com/open-telemetry/opentelemetry-js/tree/main/api
