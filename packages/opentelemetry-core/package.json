@@ -3,7 +3,6 @@
   "version": "3.0.0-development.0",
   "description": "OpenTelemetry Core provides constants and utilities shared by all OpenTelemetry SDK packages.",
   "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
   "exports": {
     ".": {

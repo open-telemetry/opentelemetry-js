@@ -3,7 +3,6 @@
   "version": "0.300.0-development.0",
   "description": "OpenTelemetry Collector Logs Exporter allows user to send collected logs to the OpenTelemetry Collector",
   "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
   "exports": {
     ".": {
