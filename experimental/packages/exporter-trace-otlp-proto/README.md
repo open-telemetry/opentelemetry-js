@@ -13,6 +13,11 @@ This module provides a trace-exporter for OTLP (http/protobuf) using protocol ve
 npm install --save @opentelemetry/exporter-trace-otlp-proto
 ```
 
+## Shared HTTP exporter options
+
+This exporter uses the shared HTTP options documented in [`@opentelemetry/otlp-exporter-base`][otlp-exporter-base-config].
+That includes `url`, `headers`, `timeoutMillis`, `concurrencyLimit`, and Node.js options such as `compression`, `keepAlive`, `httpAgentOptions`, and `userAgent`.
+
 ## Service Name
 
 The OpenTelemetry Collector Exporter does not have a service name configuration.
@@ -22,7 +27,8 @@ To see documentation and sample code for the metric exporter, see the [exporter-
 ## Traces in Node - PROTO over http
 
 ```js
-const { NodeTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-node');
+const { trace } = require('@opentelemetry/api');
+const { TracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace');
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-proto');
 
 const collectorOptions = {
@@ -33,12 +39,10 @@ const collectorOptions = {
 };
 
 const exporter = new OTLPTraceExporter(collectorOptions);
-const provider = new NodeTracerProvider({
-  spanProcessors: [new SimpleSpanProcessor(exporter)]
+const tracerProvider = new TracerProvider({
+  spanProcessors: [new SimpleSpanProcessor({ exporter })]
 });
-
-provider.register();
-
+trace.setGlobalTracerProvider(tracerProvider);
 ```
 
 ## Exporter Timeout Configuration
@@ -49,10 +53,10 @@ To override the default timeout duration, use the following options:
 
 - Set with environment variables:
 
-  | Environment variable | Description |
-  |----------------------|-------------|
-  | OTEL_EXPORTER_OTLP_TRACES_TIMEOUT | The maximum waiting time, in milliseconds, allowed to send each OTLP trace batch. Default is 10000. |
-  | OTEL_EXPORTER_OTLP_TIMEOUT | The maximum waiting time, in milliseconds, allowed to send each OTLP trace and metric batch. Default is 10000. |
+  | Environment variable              | Description                                                                                                    |
+  | --------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+  | OTEL_EXPORTER_OTLP_TRACES_TIMEOUT | The maximum waiting time, in milliseconds, allowed to send each OTLP trace batch. Default is 10000.            |
+  | OTEL_EXPORTER_OTLP_TIMEOUT        | The maximum waiting time, in milliseconds, allowed to send each OTLP trace and metric batch. Default is 10000. |
 
   > `OTEL_EXPORTER_OTLP_TRACES_TIMEOUT` takes precedence and overrides `OTEL_EXPORTER_OTLP_TIMEOUT`.
 
@@ -87,12 +91,6 @@ This retry policy first checks if the response has a `'Retry-After'` header. If 
 
   > The exporter will retry exporting within the [exporter timeout configuration](#exporter-timeout-configuration) time.
 
-## Running opentelemetry-collector locally to see the traces
-
-1. Go to examples/otlp-exporter-node
-2. run `npm run docker:start`
-3. Open page at `http://localhost:9411/zipkin/` to observe the traces
-
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
@@ -107,6 +105,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-trace-otlp-proto
+[otlp-exporter-base-config]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-exporter-base#http-exporter-configuration
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-trace-otlp-proto.svg
 [semconv-resource-service-name]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service
 [metrics-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-proto

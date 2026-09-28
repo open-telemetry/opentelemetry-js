@@ -1,21 +1,11 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 import * as ieee754 from './ieee754';
 import * as util from '../util';
-import { Mapping, MappingError } from './types';
+import type { Mapping } from './types';
+import { MappingError } from './types';
 
 /**
  * ExponentMapping implements exponential mapping functions for
@@ -40,14 +30,9 @@ export class ExponentMapping implements Mapping {
 
     const exp = ieee754.getNormalBase2(value);
 
-    // In case the value is an exact power of two, compute a
-    // correction of -1. Note, we are using a custom _rightShift
-    // to accommodate a 52-bit argument, which the native bitwise
-    // operators do not support
-    const correction = this._rightShift(
-      ieee754.getSignificand(value) - 1,
-      ieee754.SIGNIFICAND_WIDTH
-    );
+    // An exact power of two sits on a bucket boundary; correct by -1 so it
+    // falls into the lower bucket.
+    const correction = ieee754.isPowerOfTwo(value) ? -1 : 0;
 
     return (exp + correction) >> this._shift;
   }
@@ -97,9 +82,5 @@ export class ExponentMapping implements Mapping {
 
   private _maxNormalLowerBoundaryIndex(): number {
     return ieee754.MAX_NORMAL_EXPONENT >> this._shift;
-  }
-
-  private _rightShift(value: number, shift: number): number {
-    return Math.floor(value * Math.pow(2, -shift));
   }
 }

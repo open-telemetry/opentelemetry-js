@@ -1,22 +1,11 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
-import { Span } from '@opentelemetry/api';
+import type { Span } from '@opentelemetry/api';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
-import { ReadableSpan, SpanProcessor } from '@opentelemetry/sdk-trace-base';
-import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
+import type { ReadableSpan, SpanProcessor } from '@opentelemetry/sdk-trace';
+import { TracerProvider } from '@opentelemetry/sdk-trace';
 import { XMLHttpRequestInstrumentation } from '../src';
 import * as assert from 'assert';
 
@@ -38,23 +27,23 @@ class TestSpanProcessor implements SpanProcessor {
 
 describe('unmocked xhr', () => {
   let testSpans: TestSpanProcessor;
-  let provider: WebTracerProvider;
+  let provider: TracerProvider;
   beforeEach(() => {
     testSpans = new TestSpanProcessor();
-    provider = new WebTracerProvider({
+    provider = new TracerProvider({
       spanProcessors: [testSpans],
     });
     registerInstrumentations({
-      instrumentations: [
-        new XMLHttpRequestInstrumentation({
-          semconvStabilityOptIn: 'http',
-        }),
-      ],
+      instrumentations: [new XMLHttpRequestInstrumentation({})],
       tracerProvider: provider,
     });
   });
   afterEach(() => {
-    // nop
+    // NOTE: need to unwrap here to restore the API for the other test file
+    // @ts-expect-error -- property added by instrumentation.wrap(...)
+    XMLHttpRequest.prototype.send.__unwrap();
+    // @ts-expect-error -- property added by instrumentation.wrap(...)
+    XMLHttpRequest.prototype.open.__unwrap();
   });
 
   it('should find resource with a relative url', done => {

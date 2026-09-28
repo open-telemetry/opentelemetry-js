@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
@@ -89,14 +78,15 @@ describe('safeExecuteInTheMiddle', function () {
 });
 
 describe('safeExecuteInTheMiddleAsync', function () {
-  it('should not throw error', function () {
+  it('should not throw error', function (done) {
     safeExecuteInTheMiddleAsync(
       async () => {
-        await setTimeout(() => {}, 1);
+        await new Promise(res => setTimeout(res, 1));
         return 'foo';
       },
       err => {
         assert.deepStrictEqual(err, undefined);
+        done();
       },
       true
     );
@@ -106,7 +96,7 @@ describe('safeExecuteInTheMiddleAsync', function () {
     try {
       await safeExecuteInTheMiddleAsync(
         async () => {
-          await setTimeout(() => {}, 1);
+          await new Promise(res => setTimeout(res, 1));
           throw error;
         },
         err => {
@@ -120,7 +110,7 @@ describe('safeExecuteInTheMiddleAsync', function () {
   it('should return result', async function () {
     const result = await safeExecuteInTheMiddleAsync(
       async () => {
-        await setTimeout(() => {}, 1);
+        await new Promise(res => setTimeout(res, 1));
         return 1;
       },
       (err, result) => {
@@ -129,5 +119,18 @@ describe('safeExecuteInTheMiddleAsync', function () {
       }
     );
     assert.deepStrictEqual(result, 1);
+  });
+  it('should wait for the error', async function () {
+    const result = await Promise.race([
+      safeExecuteInTheMiddleAsync(
+        () => 1,
+        async () => {
+          await new Promise(res => setTimeout(res, 100));
+        }
+      ),
+      new Promise(res => setTimeout(() => res('waited'), 10)),
+    ]);
+
+    assert.deepStrictEqual(result, 'waited');
   });
 });

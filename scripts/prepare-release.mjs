@@ -1,0 +1,595 @@
+#!/usr/bin/env node
+/**
+ * This script:
+ * 1. Validates and resolves release configuration from environment variables
+ * 2. Bumps package versions selectively based on configuration
+ * 3. Updates changelogs for affected packages, collapsing the pre-release sections of a
+ *    cycle into the release that finalizes it - see lib/changelog-utils.mjs
+ * 4. Handles API version bumping when needed
+ *
+ * Environment Variables (Input):
+ * - STABLE_SDK_RELEASE: "inherit" (default), "patch", "minor", or "major"
+ * - EXPERIMENTAL_RELEASE: "inherit" (default), "patch", or "minor"
+ * - API_RELEASE: "inherit" (default), "patch", or "minor"
+ * - SEMCONV_RELEASE: "inherit" (default), "patch", or "minor"
+ * - PRERELEASE: "none" (default), "development", or "rc"
+ * - RELEASE_BASE_BRANCH: branch the release is cut from, "main" or "v<major>.x" (e.g. "v2.x").
+ *   Defaults to the currently checked out branch - see resolveBaseBranch().
+ *
+ * PRERELEASE is a modifier, not a selector: it changes how the selected groups are
+ * bumped (2.10.0 -> 3.0.0-development.0) but never selects a group on its own. It cannot be
+ * combined with a Semantic Conventions release - see resolveReleaseConfig().
+ *
+ * RELEASE_BASE_BRANCH decides which of those combinations are allowed at all: a maintenance
+ * branch such as "v2.x" only cuts normal releases within its own major, while "main" is
+ * unrestricted - again see resolveReleaseConfig().
+ */
+
+import * as fs from 'fs';
+import * as path from 'path';
+import semver from 'semver';
+import { execSync } from 'child_process';
+import { determineVersionFromPath } from './lib/version-utils.mjs';
+import {
+  getReleaseTypeForPackagePath,
+  getWorkspacePackagePaths
+} from './lib/package-utils.mjs';
+import { RELEASE_GROUPS } from './lib/release-groups.mjs';
+import { nextVersion, releaseLineOfVersion } from './lib/bump-utils.mjs';
+import { parseReleaseBranch, resolveDistTags, RELEASE_BRANCH_HINT } from './lib/release-branch.mjs';
+import { rotateChangelog } from './lib/changelog-utils.mjs';
+
+function isLowerOrEqualReleaseType(expectedLower, expectedHigher) {
+  const order = { 'patch': 1, 'minor': 2, 'major': 3 };
+
+  // "inherit" is considered equal to any type since it will resolve to the same type as the other group
+  return expectedHigher === 'inherit' || expectedLower  === 'inherit' || order[expectedLower] <= order[expectedHigher];
+}
+
+// Experimental packages live in the "0.x", so they never take a major bump: a stable `major` maps to
+// an experimental `minor` (0.221.0 -> 0.222.0), not to 1.0.0. Used for both validation
+// and resolution - applying it in one but not the other silently produces 1.0.0.
+// Vanity version bumps (e.g. 0.221.0 -> 0.300.0 when bumping stable to 3.0.0) need to be done manually.
+function experimentalEquivalentOf(releaseType) {
+  return releaseType === 'major' ? 'minor' : releaseType;
+}
+
+// Check if working directory is clean
+function checkNoChanges() {
+  try {
+    const status = execSync('git status -uall --porcelain', { encoding: 'utf8' });
+    if (status.trim()) {
+      console.error('Error: Please ensure all changes are committed');
+      process.exit(1);
+    }
+  } catch (err) {
+    console.error('Error checking git status:', err.message);
+    process.exit(1);
+  }
+}
+
+// Resolve the branch this release is cut from.
+//
+// The release workflow passes RELEASE_BASE_BRANCH explicitly, because by the time this
+// script runs create-or-update-release-pr.mjs has already checked out the release PR's head
+// branch - `git rev-parse` would report that instead. The fallback therefore only ever
+// applies to local runs, and it errors out rather than assuming "main", since assuming
+// would silently skip every maintenance-branch guard in resolveReleaseConfig().
+function resolveBaseBranch() {
+  let name = process.env.RELEASE_BASE_BRANCH;
+
+  if (!name) {
+    try {
+      name = execSync('git rev-parse --abbrev-ref HEAD', { encoding: 'utf8' }).trim();
+    } catch (err) {
+      console.error('Error determining the current branch:', err.message);
+      console.error('Please set RELEASE_BASE_BRANCH explicitly.');
+      process.exit(1);
+    }
+  }
+
+  const branch = parseReleaseBranch(name);
+  if (branch == null) {
+    console.error(`Error: cannot release from branch "${name}".`);
+    console.error(RELEASE_BRANCH_HINT);
+    console.error('Set RELEASE_BASE_BRANCH to the branch you are preparing the release for.');
+    process.exit(1);
+  }
+
+  console.log(`  Release base branch: ${name} (${branch.kind})`);
+  return { name, ...branch };
+}
+
+// Validate and resolve release configuration
+function resolveReleaseConfig(baseBranch) {
+  // Allow-lists are per-variable: `major` is only meaningful for the stable SDK. The
+  // workflow's `choice` inputs are UI only - this is the actual trust boundary, since
+  // the script also runs locally via `npm run prepare_release`. Values are used
+  // verbatim in shell commands further down, so nothing free-form may pass through.
+  const VALID_VALUES = {
+    STABLE_SDK_RELEASE: ['inherit', 'patch', 'minor', 'major'],
+    EXPERIMENTAL_RELEASE: ['inherit', 'patch', 'minor'],
+    API_RELEASE: ['inherit', 'patch', 'minor'],
+    SEMCONV_RELEASE: ['inherit', 'patch', 'minor'],
+    // Listed in semver precedence order: development < rc.
+    PRERELEASE: ['none', 'development', 'rc']
+  };
+
+  const validateInput = (name, value) => {
+    if (!VALID_VALUES[name].includes(value)) {
+      console.error(`Error: ${name} must be one of: ${VALID_VALUES[name].join(', ')}`);
+      console.error(`Received: ${value}`);
+      process.exit(1);
+    }
+    return value;
+  };
+
+  const isSet = (value) => value !== 'inherit';
+
+  // Validate and sanitize all inputs
+  const STABLE_SDK_RELEASE = validateInput('STABLE_SDK_RELEASE', process.env.STABLE_SDK_RELEASE || 'inherit');
+  const EXPERIMENTAL_RELEASE = validateInput('EXPERIMENTAL_RELEASE', process.env.EXPERIMENTAL_RELEASE || 'inherit');
+  const API_RELEASE = validateInput('API_RELEASE', process.env.API_RELEASE || 'inherit');
+  const SEMCONV_RELEASE = validateInput('SEMCONV_RELEASE', process.env.SEMCONV_RELEASE || 'inherit');
+  const PRERELEASE = validateInput('PRERELEASE', process.env.PRERELEASE || 'none');
+  const prereleaseId = PRERELEASE === 'none' ? null : PRERELEASE;
+
+  // A maintenance branch (`v2.x`, while `main` builds the next major) only ever cuts normal
+  // releases within its own major. The publish workflow derives the npm dist-tags from the
+  // branch, so anything that leaves that line would go out under the wrong tag - reject it
+  // here, where the error can explain itself, rather than leaving it to review.
+  if (baseBranch.kind === 'maintenance') {
+    if (prereleaseId) {
+      console.error(`Error: PRERELEASE="${PRERELEASE}" is not supported on maintenance branch "${baseBranch.name}".`);
+      console.error('Maintenance releases are always normal releases; pre-releases are cut from "main",');
+      console.error('where they get their own npm dist-tag.');
+      process.exit(1);
+    }
+
+    for (const [name, value] of [['API_RELEASE', API_RELEASE], ['SEMCONV_RELEASE', SEMCONV_RELEASE]]) {
+      if (isSet(value)) {
+        console.error(`Error: ${name} is not supported on maintenance branch "${baseBranch.name}".`);
+        console.error('The API and Semantic Conventions packages are on their own version line, shared by every');
+        console.error('branch and independent of the SDK major, so "main" still carries the very same line. From');
+        console.error(`here they would be published under the "${resolveDistTags(baseBranch.name).distTag}" dist-tag instead of "latest".`);
+        console.error('Please release them from "main".');
+        process.exit(1);
+      }
+    }
+  }
+
+  // A pre-release version does not satisfy a caret or "<x.y.z" range, e.g.
+  // semver.satisfies('1.44.0-rc.0', '^1.29.0') === false. Both the API and Semantic
+  // Conventions packages are depended on through such ranges (rather than exact pins),
+  // so a pre-release of either makes npm resolve those dependencies to the last published
+  // release from the registry instead of linking the local workspace copy.
+  //
+  // For the API that is handled: align-api-deps appends the exact pre-release version to
+  // every range as an alternative ("^1.3.0 || 1.10.0-rc.0") for the duration of the cycle -
+  // see scripts/lib/api-range-utils.mjs. Semantic Conventions has no equivalent, because
+  // scripts/lint-semconv-deps.mjs requires its dependents to keep a plain caret range, so a
+  // pre-release there stays unsupported.
+  if (prereleaseId && isSet(SEMCONV_RELEASE)) {
+    console.error(`Error: SEMCONV_RELEASE cannot be combined with PRERELEASE="${PRERELEASE}".`);
+    console.error('Dependents of @opentelemetry/semantic-conventions must keep a caret range, which a');
+    console.error('pre-release version does not satisfy.');
+    console.error('Please release this package separately, as a normal release.');
+    process.exit(1);
+  }
+
+  // Check for conflicting configuration
+  if (isSet(API_RELEASE)) {
+    if ((isSet(STABLE_SDK_RELEASE) && !isLowerOrEqualReleaseType(API_RELEASE, STABLE_SDK_RELEASE))
+      || (isSet(EXPERIMENTAL_RELEASE) && !isLowerOrEqualReleaseType(experimentalEquivalentOf(API_RELEASE), EXPERIMENTAL_RELEASE))) {
+      console.error('Error: API_RELEASE cannot be set to a different value STABLE_SDK_RELEASE or EXPERIMENTAL_RELEASE are also set.');
+      console.error('Please align or use API_RELEASE or individually.');
+      console.error('Current settings:');
+      console.error(`  STABLE_SDK_RELEASE: ${STABLE_SDK_RELEASE}`);
+      console.error(`  EXPERIMENTAL_RELEASE: ${EXPERIMENTAL_RELEASE}`);
+      console.error(`  API_RELEASE: ${API_RELEASE}`);
+      process.exit(1);
+    }
+  }
+
+  // Check that EXPERIMENTAL_RELEASE is not lower than STABLE_SDK_RELEASE
+  // Experimental can be higher (e.g., stable=patch, experimental=minor) but not lower
+  // Compared against the capped stable type, so that stable=major + experimental=minor
+  // is legal - that is what a major stable release looks like for experimental.
+  if (isSet(STABLE_SDK_RELEASE) && isSet(EXPERIMENTAL_RELEASE)) {
+    const requiredExperimental = experimentalEquivalentOf(STABLE_SDK_RELEASE);
+    if (!isLowerOrEqualReleaseType(requiredExperimental, EXPERIMENTAL_RELEASE)) {
+      console.error('Error: EXPERIMENTAL_RELEASE cannot be lower than STABLE_SDK_RELEASE.');
+      console.error('Experimental packages depend on stable SDK packages, so they must have at least the same version bump.');
+      console.error('Current settings:');
+      console.error(`  STABLE_SDK_RELEASE: ${STABLE_SDK_RELEASE}`);
+      console.error(`  EXPERIMENTAL_RELEASE: ${EXPERIMENTAL_RELEASE}`);
+      console.error('');
+      console.error('Please either:');
+      console.error('  - Set EXPERIMENTAL_RELEASE to "inherit" to automatically match STABLE_SDK_RELEASE');
+      console.error(`  - Set EXPERIMENTAL_RELEASE to "${requiredExperimental}" to match or exceed STABLE_SDK_RELEASE`);
+      console.error('  - Set only EXPERIMENTAL_RELEASE if you want to release only experimental packages');
+      process.exit(1);
+    }
+  }
+
+  // Resolve effective release types
+  let releaseTypeStable = '';
+  let releaseTypeExperimental = '';
+  let releaseTypeApi = '';
+  let releaseTypeSemconv = '';
+
+  if (isSet(API_RELEASE)) {
+    // API release makes SDK and experimental inherit the bump, rules are enforced above to prevent conflicts.
+    releaseTypeApi = API_RELEASE;
+    if (isSet(STABLE_SDK_RELEASE)) {
+      releaseTypeStable = STABLE_SDK_RELEASE;
+    } else {
+      releaseTypeStable = API_RELEASE;
+      console.log(`Info: STABLE_SDK_RELEASE inheriting "${API_RELEASE}" from API_RELEASE`);
+    }
+
+    if (isSet(EXPERIMENTAL_RELEASE)) {
+      releaseTypeExperimental = EXPERIMENTAL_RELEASE;
+    } else {
+      releaseTypeExperimental = experimentalEquivalentOf(releaseTypeStable);
+      console.log(`Info: EXPERIMENTAL_RELEASE inheriting "${releaseTypeExperimental}" from STABLE_SDK_RELEASE or API_RELEASE`);
+    }
+  } else if (isSet(STABLE_SDK_RELEASE)) {
+    // Stable SDK release
+    releaseTypeStable = STABLE_SDK_RELEASE;
+    // Experimental uses explicit value if set, otherwise inherits from stable SDK
+    if (isSet(EXPERIMENTAL_RELEASE)) {
+      releaseTypeExperimental = EXPERIMENTAL_RELEASE;
+    } else {
+      releaseTypeExperimental = experimentalEquivalentOf(STABLE_SDK_RELEASE);
+      console.log(`Info: EXPERIMENTAL_RELEASE inheriting "${releaseTypeExperimental}" from STABLE_SDK_RELEASE`);
+    }
+  } else if (isSet(EXPERIMENTAL_RELEASE)) {
+    // Only experimental is being released
+    releaseTypeExperimental = EXPERIMENTAL_RELEASE;
+  }
+
+  // Semconv is independent
+  if (isSet(SEMCONV_RELEASE)) {
+    releaseTypeSemconv = SEMCONV_RELEASE;
+  }
+
+  // Ensure at least one package is selected
+  if (!releaseTypeApi && !releaseTypeStable && !releaseTypeExperimental && !releaseTypeSemconv) {
+    console.error('Error: No packages selected for release.');
+    console.error('At least one of STABLE_SDK_RELEASE, EXPERIMENTAL_RELEASE, API_RELEASE, or SEMCONV_RELEASE must be set to "patch", "minor" or "major".');
+    if (prereleaseId) {
+      console.error('');
+      console.error(`Note: PRERELEASE="${PRERELEASE}" only changes how the selected packages are bumped.`);
+      console.error('It does not select any package for release on its own.');
+    }
+    process.exit(1);
+  }
+
+  // Experimental packages pin stable SDK packages to an exact version, so cutting a
+  // normal experimental release while the stable SDK is mid-pre-release would publish a
+  // stable version that depends on e.g. "@opentelemetry/core": "3.0.0-rc.2".
+  if (releaseTypeExperimental && !releaseTypeStable && !prereleaseId) {
+    const stableVersion = determineVersionFromPath(RELEASE_GROUPS['Stable SDK'].packagePath);
+    if (semver.prerelease(stableVersion)) {
+      console.error(`Error: cannot cut a normal Experimental release while the Stable SDK is at ${stableVersion}.`);
+      console.error('Experimental packages pin stable SDK packages exactly, so the release would depend on a pre-release.');
+      console.error('Please finalize the Stable SDK release first, or set PRERELEASE to match.');
+      process.exit(1);
+    }
+  }
+
+  // The API's version and the ranges every package depends on it through are only touched
+  // when API_RELEASE is set - see bumpApiVersion(). Cutting a normal release without it
+  // while the API is mid-pre-release would therefore publish final Stable SDK and
+  // Experimental versions still advertising a peer range widened for a pre-release nobody
+  // can install ("^1.3.0 || 1.10.0-rc.0"), and leave the pending pre-release API behind for
+  // lerna to publish alongside them. Iterating a pre-release without the API is fine, since
+  // everything involved stays on `canary`, so this only applies to normal releases.
+  if (!prereleaseId && !releaseTypeApi && (releaseTypeStable || releaseTypeExperimental)) {
+    const apiVersion = determineVersionFromPath(RELEASE_GROUPS['API'].packagePath);
+    if (semver.prerelease(apiVersion)) {
+      console.error(`Error: cannot cut a normal release while the API is at ${apiVersion}.`);
+      console.error('The API needs to be finalized in the same run, otherwise the released packages keep the');
+      console.error('peer dependency range that was widened for the pre-release.');
+      console.error(`Please set API_RELEASE to "${releaseLineOfVersion(apiVersion)}" to finalize it alongside.`);
+      process.exit(1);
+    }
+  }
+
+  // Second half of the maintenance-branch guard: with the effective bumps known, check
+  // that the Stable SDK stays on the branch's major. This is what rejects `major`
+  // (2.10.0 -> 3.0.0 does not belong on "v2.x"), and the check on the *current* version
+  // doubles as a check that the branch is the one it claims to be.
+  if (baseBranch.kind === 'maintenance') {
+    const currentStable = determineVersionFromPath(RELEASE_GROUPS['Stable SDK'].packagePath);
+
+    if (semver.major(currentStable) !== baseBranch.major) {
+      console.error(`Error: branch "${baseBranch.name}" maintains the ${baseBranch.major}.x line, but the Stable SDK is at ${currentStable}.`);
+      console.error('This looks like the wrong branch - check out the branch you want to release from,');
+      console.error('or correct RELEASE_BASE_BRANCH.');
+      process.exit(1);
+    }
+
+    if (releaseTypeStable) {
+      let nextStable;
+      try {
+        nextStable = nextVersion(currentStable, releaseTypeStable, prereleaseId);
+      } catch (err) {
+        console.error(`Error bumping the Stable SDK: ${err.message}`);
+        process.exit(1);
+      }
+
+      if (semver.major(nextStable) !== baseBranch.major) {
+        console.error(`Error: a "${releaseTypeStable}" bump takes the Stable SDK from ${currentStable} to ${nextStable}, off the ${baseBranch.major}.x line.`);
+        console.error(`Branch "${baseBranch.name}" only releases ${baseBranch.major}.x versions - a new major is released from "main".`);
+        process.exit(1);
+      }
+    }
+  }
+
+  console.log('Resolved release configuration:');
+  console.log(`  RELEASE_TYPE_STABLE: ${releaseTypeStable || '(none)'}`);
+  console.log(`  RELEASE_TYPE_EXPERIMENTAL: ${releaseTypeExperimental || '(none)'}`);
+  console.log(`  RELEASE_TYPE_API: ${releaseTypeApi || '(none)'}`);
+  console.log(`  RELEASE_TYPE_SEMCONV: ${releaseTypeSemconv || '(none)'}`);
+  console.log(`  PRERELEASE_ID: ${prereleaseId || '(none)'}`);
+
+  return {
+    RELEASE_TYPE_STABLE: releaseTypeStable,
+    RELEASE_TYPE_EXPERIMENTAL: releaseTypeExperimental,
+    RELEASE_TYPE_API: releaseTypeApi,
+    RELEASE_TYPE_SEMCONV: releaseTypeSemconv,
+    PRERELEASE_ID: prereleaseId
+  };
+}
+
+// Bump package versions
+function bumpVersions(config) {
+  const rootPackageJsonPath = path.resolve('package.json');
+  const rootPackageJson = JSON.parse(fs.readFileSync(rootPackageJsonPath, 'utf-8'));
+  const workspaceGlobs = rootPackageJson.workspaces || [];
+
+  const updatePinnedDependencies = (pkgJson, updatedVersions) => {
+    ['dependencies', 'devDependencies', 'peerDependencies'].forEach(depType => {
+      const deps = pkgJson[depType];
+      if (!deps) return;
+
+      Object.keys(deps).forEach(dep => {
+        if (updatedVersions[dep]) {
+          const currentVersion = deps[dep];
+          // Only exact pins are rewritten; ranges ("^1.29.0", ">=1.0.0 <1.10.0") and
+          // non-registry specs ("file:../..") are left alone. Comparing against the
+          // input rather than just checking for null matters because semver.valid()
+          // normalizes, so "v1.2.3" would otherwise be rewritten and lose its prefix.
+          if (semver.valid(currentVersion) === currentVersion) {
+            deps[dep] = updatedVersions[dep];
+          }
+        }
+      });
+    });
+  };
+
+  const packagePaths = getWorkspacePackagePaths(workspaceGlobs);
+  console.log('\nBumping package versions...');
+  const updatedVersions = {};
+  const packageJsonCache = new Map();
+
+  // First pass: load all package.json files and bump versions of packages being released
+  packagePaths.forEach(pkgPath => {
+    const pkgJsonPath = path.join(pkgPath, 'package.json');
+    const pkgJson = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'));
+    packageJsonCache.set(pkgJsonPath, pkgJson);
+
+    const releaseType = getReleaseTypeForPackagePath(pkgPath, config);
+    if (!releaseType) return;
+
+    // Skip API package as it was already bumped in Step 3
+    const normalizedPath = path.resolve(pkgPath);
+    const rootDir = path.resolve('.');
+    const relativePath = path.relative(rootDir, normalizedPath);
+    if (relativePath === 'api') {
+      // Store the current version since it was already bumped.
+      updatedVersions[pkgJson.name] = pkgJson.version;
+      return;
+    }
+
+    const oldVersion = pkgJson.version;
+    let newVersion;
+    try {
+      newVersion = nextVersion(oldVersion, releaseType, config.PRERELEASE_ID);
+    } catch (err) {
+      console.error(`Error bumping ${pkgJson.name}: ${err.message}`);
+      process.exit(1);
+    }
+    pkgJson.version = newVersion;
+    updatedVersions[pkgJson.name] = newVersion;
+
+    console.log(`  Bumped ${pkgJson.name} from ${oldVersion} to ${newVersion}`);
+  });
+
+  // Second pass: update pinned dependencies in ALL workspace packages
+  // This includes released packages, examples, integration tests, etc.
+  packageJsonCache.forEach((pkgJson, pkgJsonPath) => {
+    updatePinnedDependencies(pkgJson, updatedVersions);
+
+    fs.writeFileSync(pkgJsonPath, JSON.stringify(pkgJson, null, 2) + '\n');
+  });
+
+  console.log('Version bumping complete.');
+}
+
+// Handle API version bump and alignment.
+//
+// Bumped in-process rather than via `npm version`, which would also create a git commit
+// and tag as a side effect (the release branch makes its own commit further down) and
+// would bypass the checks in nextVersion(). api/src/version.ts is gitignored and
+// regenerated at build time, so nothing else needs updating here.
+function bumpApiVersion(releaseType, prereleaseId) {
+  if (!releaseType) return;
+
+  console.log(`\nBumping API version (${releaseType})...`);
+  try {
+    const apiPackageJsonPath = path.resolve('api/package.json');
+    const apiPackageJson = JSON.parse(fs.readFileSync(apiPackageJsonPath, 'utf-8'));
+
+    const oldVersion = apiPackageJson.version;
+    const newVersion = nextVersion(oldVersion, releaseType, prereleaseId);
+    apiPackageJson.version = newVersion;
+
+    fs.writeFileSync(apiPackageJsonPath, JSON.stringify(apiPackageJson, null, 2) + '\n');
+    console.log(`  Bumped ${apiPackageJson.name} from ${oldVersion} to ${newVersion}`);
+
+    execSync('npx nx run-many -t align-api-deps', { stdio: 'inherit' });
+    console.log('API version bumping complete.');
+  } catch (err) {
+    console.error('Error bumping API version:', err.message);
+    process.exit(1);
+  }
+}
+
+// Update changelogs
+function updateChangelogs(config) {
+  console.log('\nUpdating changelogs...');
+
+  Object.entries(RELEASE_GROUPS).forEach(([groupName, groupConfig]) => {
+    if (!config[groupConfig.configKey]) return;
+
+    const version = determineVersionFromPath(groupConfig.packagePath);
+    console.log(`  Updating ${groupName} changelog (${version})...`);
+
+    let result;
+    try {
+      result = rotateChangelog(
+        fs.readFileSync(groupConfig.changelogPath, 'utf8'),
+        version
+      );
+    } catch (err) {
+      console.error(`Error updating ${groupConfig.changelogPath}: ${err.message}`);
+      process.exit(1);
+    }
+
+    // Finalizing a pre-release cycle folds the pre-release sections into this release. Logged
+    // because it is the one case where the release notes cover more than the "## Unreleased"
+    // section did.
+    if (result.absorbed.length > 0) {
+      console.log(`    Collapsed ${result.absorbed.join(', ')} into ${version}`);
+    }
+
+    fs.writeFileSync(groupConfig.changelogPath, result.changelog);
+  });
+
+  console.log('Changelog updates complete.');
+}
+
+// Extract the new version section from a changelog
+function extractVersionSection(changelogPath, version) {
+  const changelog = fs.readFileSync(changelogPath, 'utf8');
+
+  // Find the section for this version
+  const escapedVersion = version.replace(/[\\.*+?^${}()|[\]]/g, '\\$&'); // keep CodeQL happy by escaping regex special chars in version (should never be there)
+  const versionHeaderRegex = new RegExp(`^## ${escapedVersion}$`, 'm');
+  const versionMatch = changelog.match(versionHeaderRegex);
+
+  if (!versionMatch) {
+    return null;
+  }
+
+  const versionStartIndex = versionMatch.index + versionMatch[0].length;
+
+  // Find the next version header (## followed by a digit or the end of file)
+  const nextVersionRegex = /^## \d/m;
+  const restOfChangelog = changelog.slice(versionStartIndex);
+  const nextVersionMatch = restOfChangelog.match(nextVersionRegex);
+
+  let versionContent;
+  if (nextVersionMatch) {
+    versionContent = restOfChangelog.slice(0, nextVersionMatch.index);
+  } else {
+    versionContent = restOfChangelog;
+  }
+
+  // Clean up the content (trim excessive whitespace at the end)
+  return versionContent.trimEnd();
+}
+
+// Write release summary
+function writeReleaseSummary(config) {
+  console.log('\nWriting release summary...');
+
+  const summaryParts = [];
+
+  // Include actual changelog content for modified changelogs
+  let hasChangelogs = false;
+  Object.entries(RELEASE_GROUPS).forEach(([groupName, groupConfig]) => {
+    if (config[groupConfig.configKey]) {
+      const version = determineVersionFromPath(groupConfig.packagePath);
+      const changelogContent = extractVersionSection(groupConfig.changelogPath, version);
+
+      if (changelogContent) {
+        hasChangelogs = true;
+        summaryParts.push(`### ${groupName} (${groupConfig.changelogPath})\n`);
+        summaryParts.push(`\n## ${version}`);
+        summaryParts.push(changelogContent);
+        summaryParts.push('\n\n');
+      }
+    }
+  });
+
+  if (!hasChangelogs) {
+    summaryParts.push('No changelogs were modified.\n');
+  }
+
+  // Write to file
+  const tmpDir = path.resolve('.tmp');
+  if (!fs.existsSync(tmpDir)) {
+    fs.mkdirSync(tmpDir, { recursive: true });
+  }
+
+  const summaryPath = path.join(tmpDir, 'release-summary.md');
+  fs.writeFileSync(summaryPath, summaryParts.join(''));
+
+  console.log(`  ✓ Release summary written to ${summaryPath}`);
+}
+
+// Main execution
+function main() {
+  // Step 1: Check for uncommitted changes
+  console.log('Step 1: Checking for uncommitted changes...');
+  checkNoChanges();
+  console.log('  ✓ Working directory is clean\n');
+
+  // Step 2: Resolve configuration
+  console.log('Step 2: Resolving release configuration...');
+  const baseBranch = resolveBaseBranch();
+  const config = resolveReleaseConfig(baseBranch);
+  console.log('  ✓ Configuration resolved\n');
+
+  // Step 3: Bump API version if needed (must be done before bumping other packages)
+  if (config.RELEASE_TYPE_API) {
+    console.log('Step 3: Bumping API version...');
+    bumpApiVersion(config.RELEASE_TYPE_API, config.PRERELEASE_ID);
+    console.log('  ✓ API version bumped\n');
+  } else {
+    console.log('Step 3: Skipping API version bump (not selected)\n');
+  }
+
+  // Step 4: Bump package versions
+  console.log('Step 4: Bumping package versions...');
+  bumpVersions(config);
+  console.log('  ✓ Package versions bumped\n');
+
+  // Step 5: Update changelogs
+  console.log('Step 5: Updating changelogs...');
+  updateChangelogs(config);
+  console.log('  ✓ Changelogs updated\n');
+
+  // Step 6: Write release summary
+  console.log('Step 6: Writing release summary...');
+  writeReleaseSummary(config);
+  console.log('  ✓ Release summary written\n');
+
+  console.log('✓ Done!\n');
+}
+
+main();

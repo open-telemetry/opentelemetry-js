@@ -1,36 +1,22 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as api from '@opentelemetry/api';
+import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import {
-  SemconvStability,
-  semconvStabilityFromStr,
-  isWrapped,
   InstrumentationBase,
-  InstrumentationConfig,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
-import { hrTime, isUrlIgnored, otperformance } from '@opentelemetry/core';
+import { hrTime, isUrlIgnored } from '@opentelemetry/core';
 import {
   addSpanNetworkEvents,
   getResource,
   PerformanceTimingNames as PTN,
   shouldPropagateTraceHeaders,
   parseUrl,
-} from '@opentelemetry/sdk-trace-web';
+} from '@opentelemetry/web-common';
 import {
   ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
@@ -40,18 +26,9 @@ import {
   ATTR_SERVER_PORT,
   ATTR_URL_FULL,
 } from '@opentelemetry/semantic-conventions';
-import {
-  ATTR_HTTP_HOST,
-  ATTR_HTTP_METHOD,
-  ATTR_HTTP_SCHEME,
-  ATTR_HTTP_STATUS_CODE,
-  ATTR_HTTP_URL,
-  ATTR_HTTP_USER_AGENT,
-  ATTR_HTTP_REQUEST_BODY_SIZE,
-  ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-} from './semconv';
+import { ATTR_HTTP_REQUEST_BODY_SIZE } from './semconv';
 import { EventNames } from './enums/EventNames';
-import {
+import type {
   OpenFunction,
   PropagateTraceHeaderCorsUrls,
   SendFunction,
@@ -63,7 +40,6 @@ import {
   getXHRBodyLength,
 } from './utils';
 import { VERSION } from './version';
-import { AttributeNames } from './enums/AttributeNames';
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
@@ -103,12 +79,11 @@ export interface XMLHttpRequestInstrumentationConfig
   ignoreNetworkEvents?: boolean;
   /** Measure outgoing request size */
   measureRequestSize?: boolean;
-  /** Select the HTTP semantic conventions version(s) used. */
-  semconvStabilityOptIn?: string;
 }
 
 /**
  * This class represents a XMLHttpRequest plugin for auto instrumentation
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation#xhr-xmlhttprequest
  */
 export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRequestInstrumentationConfig> {
   readonly component: string = 'xml-http-request';
@@ -118,14 +93,18 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   private _tasksCount = 0;
   private _xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
-  private _semconvStability: SemconvStability;
+
+  // Note: Intentionally *not* using `_enabled` as the field name to avoid
+  // any possible confusion with the `_enabled` field used on the *Node.js*
+  // InstrumentationBase class.
+  // Also not initializing the fields to `false` because the base class
+  // constructor already calls `enable` modifying their values and it will
+  // set the instrumentations in a bad state (enabled, patched but with flags set to false)
+  declare private _isEnabled: boolean;
+  declare private _isXhrPatched: boolean;
 
   constructor(config: XMLHttpRequestInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-xml-http-request', VERSION, config);
-    this._semconvStability = semconvStabilityFromStr(
-      'http',
-      config?.semconvStabilityOptIn
-    );
   }
 
   init() {}
@@ -172,15 +151,11 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       const childSpan = this.tracer.startSpan('CORS Preflight', {
         startTime: corsPreFlightRequest[PTN.FETCH_START],
       });
-      const skipOldSemconvContentLengthAttrs = !(
-        this._semconvStability & SemconvStability.OLD
-      );
       addSpanNetworkEvents(
         childSpan,
         corsPreFlightRequest,
         this.getConfig().ignoreNetworkEvents,
-        undefined,
-        skipOldSemconvContentLengthAttrs
+        undefined
       );
       childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
     });
@@ -190,37 +165,14 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * Add attributes when span is going to end
    * @param span
    * @param xhr
-   * @param spanUrl
    * @private
    */
-  _addFinalSpanAttributes(span: api.Span, xhrMem: XhrMem, spanUrl?: string) {
-    if (this._semconvStability & SemconvStability.OLD) {
-      if (xhrMem.status !== undefined) {
-        span.setAttribute(ATTR_HTTP_STATUS_CODE, xhrMem.status);
-      }
-      if (xhrMem.statusText !== undefined) {
-        span.setAttribute(AttributeNames.HTTP_STATUS_TEXT, xhrMem.statusText);
-      }
-      if (typeof spanUrl === 'string') {
-        const parsedUrl = parseUrl(spanUrl);
-        span.setAttribute(ATTR_HTTP_HOST, parsedUrl.host);
-        span.setAttribute(
-          ATTR_HTTP_SCHEME,
-          parsedUrl.protocol.replace(':', '')
-        );
-      }
-
-      // @TODO do we want to collect this or it will be collected earlier once only or
-      //    maybe when parent span is not available ?
-      span.setAttribute(ATTR_HTTP_USER_AGENT, navigator.userAgent);
-    }
-    if (this._semconvStability & SemconvStability.STABLE) {
-      if (xhrMem.status) {
-        // Intentionally exclude status=0, because XHR uses 0 for before a
-        // response is received and semconv says to only add the attribute if
-        // received a response.
-        span.setAttribute(ATTR_HTTP_RESPONSE_STATUS_CODE, xhrMem.status);
-      }
+  _addFinalSpanAttributes(span: api.Span, xhrMem: XhrMem) {
+    if (xhrMem.status) {
+      // Intentionally exclude status=0, because XHR uses 0 for before a
+      // response is received and semconv says to only add the attribute if
+      // received a response.
+      span.setAttribute(ATTR_HTTP_RESPONSE_STATUS_CODE, xhrMem.status);
     }
   }
 
@@ -289,7 +241,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    */
   private _clearResources() {
     if (this._tasksCount === 0 && this.getConfig().clearTimingResources) {
-      (otperformance as unknown as Performance).clearResourceTimings();
+      performance.clearResourceTimings();
       this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
       this._usedResources = new WeakSet<PerformanceResourceTiming>();
     }
@@ -309,7 +261,6 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     if (!spanUrl || !startTime || !endTime || !xhrMem.createdResources) {
       return;
     }
-
     let resources: PerformanceResourceTiming[] =
       xhrMem.createdResources.entries;
 
@@ -318,7 +269,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       // then OBSERVER_WAIT_TIME_MS and observer didn't collect enough
       // information
       // ts thinks this is the perf_hooks module, but it is the browser performance api
-      resources = (otperformance as unknown as Performance).getEntriesByType(
+      resources = performance.getEntriesByType(
         'resource'
       ) as PerformanceResourceTiming[];
     }
@@ -340,15 +291,11 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         this._addChildSpan(span, corsPreFlightRequest);
         this._markResourceAsUsed(corsPreFlightRequest);
       }
-      const skipOldSemconvContentLengthAttrs = !(
-        this._semconvStability & SemconvStability.OLD
-      );
       addSpanNetworkEvents(
         span,
         mainRequest,
         this.getConfig().ignoreNetworkEvents,
-        undefined,
-        skipOldSemconvContentLengthAttrs
+        undefined
       );
     }
   }
@@ -382,37 +329,25 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     url: string,
     method: string
   ): api.Span | undefined {
-    if (isUrlIgnored(url, this.getConfig().ignoreUrls)) {
+    const parsedUrl = parseUrl(url);
+    if (isUrlIgnored(parsedUrl.href, this.getConfig().ignoreUrls)) {
       this._diag.debug('ignoring span as url matches ignored url');
       return;
     }
-
-    let name = '';
-    const parsedUrl = parseUrl(url);
     const attributes = {} as api.Attributes;
-    if (this._semconvStability & SemconvStability.OLD) {
-      name = method.toUpperCase();
-      attributes[ATTR_HTTP_METHOD] = method;
-      attributes[ATTR_HTTP_URL] = parsedUrl.toString();
+    const origMethod = method;
+    const normMethod = normalizeHttpRequestMethod(method);
+    const name = normMethod;
+
+    attributes[ATTR_HTTP_REQUEST_METHOD] = normMethod;
+    if (normMethod !== origMethod) {
+      attributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = origMethod;
     }
-    if (this._semconvStability & SemconvStability.STABLE) {
-      const origMethod = method;
-      const normMethod = normalizeHttpRequestMethod(method);
-      if (!name) {
-        // The "old" span name wins if emitting both old and stable semconv
-        // ('http/dup').
-        name = normMethod;
-      }
-      attributes[ATTR_HTTP_REQUEST_METHOD] = normMethod;
-      if (normMethod !== origMethod) {
-        attributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = origMethod;
-      }
-      attributes[ATTR_URL_FULL] = parsedUrl.toString();
-      attributes[ATTR_SERVER_ADDRESS] = parsedUrl.hostname;
-      const serverPort = serverPortFromUrl(parsedUrl);
-      if (serverPort) {
-        attributes[ATTR_SERVER_PORT] = serverPort;
-      }
+    attributes[ATTR_URL_FULL] = parsedUrl.toString();
+    attributes[ATTR_SERVER_ADDRESS] = parsedUrl.hostname;
+    const serverPort = serverPortFromUrl(parsedUrl);
+    if (serverPort) {
+      attributes[ATTR_SERVER_PORT] = serverPort;
     }
 
     const currentSpan = this.tracer.startSpan(name, {
@@ -451,6 +386,9 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     return (original: OpenFunction): OpenFunction => {
       const plugin = this;
       return function patchOpen(this: XMLHttpRequest, ...args): void {
+        if (!plugin._isEnabled) {
+          return original.apply(this, args);
+        }
         const method: string = args[0];
         const url: string = args[1];
         plugin._createSpan(this, url, method);
@@ -490,7 +428,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
           performanceEndTime
         );
         span.addEvent(eventName, endTime);
-        plugin._addFinalSpanAttributes(span, xhrMem, spanUrl);
+        plugin._addFinalSpanAttributes(span, xhrMem);
         span.end(endTime);
         plugin._tasksCount--;
       }
@@ -515,19 +453,17 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         const span = xhrMem.span;
         plugin._applyAttributesAfterXHR(span, xhr);
 
-        if (plugin._semconvStability & SemconvStability.STABLE) {
-          if (isError) {
-            if (errorType) {
-              span.setStatus({
-                code: api.SpanStatusCode.ERROR,
-                message: errorType,
-              });
-              span.setAttribute(ATTR_ERROR_TYPE, errorType);
-            }
-          } else if (xhrMem.status && xhrMem.status >= 400) {
-            span.setStatus({ code: api.SpanStatusCode.ERROR });
-            span.setAttribute(ATTR_ERROR_TYPE, String(xhrMem.status));
+        if (isError) {
+          if (errorType) {
+            span.setStatus({
+              code: api.SpanStatusCode.ERROR,
+              message: errorType,
+            });
+            span.setAttribute(ATTR_ERROR_TYPE, errorType);
           }
+        } else if (xhrMem.status && xhrMem.status >= 400) {
+          span.setStatus({ code: api.SpanStatusCode.ERROR });
+          span.setAttribute(ATTR_ERROR_TYPE, String(xhrMem.status));
         }
       }
 
@@ -575,6 +511,9 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
 
     return (original: SendFunction): SendFunction => {
       return function patchSend(this: XMLHttpRequest, ...args): void {
+        if (!plugin._isEnabled) {
+          return original.apply(this, args);
+        }
         const xhrMem = plugin._xhrMem.get(this);
         if (!xhrMem) {
           return original.apply(this, args);
@@ -587,18 +526,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
             const body = args[0];
             const bodyLength = getXHRBodyLength(body);
             if (bodyLength !== undefined) {
-              if (plugin._semconvStability & SemconvStability.OLD) {
-                currentSpan.setAttribute(
-                  ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-                  bodyLength
-                );
-              }
-              if (plugin._semconvStability & SemconvStability.STABLE) {
-                currentSpan.setAttribute(
-                  ATTR_HTTP_REQUEST_BODY_SIZE,
-                  bodyLength
-                );
-              }
+              currentSpan.setAttribute(ATTR_HTTP_REQUEST_BODY_SIZE, bodyLength);
             }
           }
 
@@ -634,31 +562,45 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * implements enable function
    */
   override enable() {
-    this._diag.debug('applying patch to', this.moduleName, this.version);
+    if (this._isEnabled) {
+      return;
+    }
+    if (this._isXhrPatched) {
+      this._diag.debug(
+        'reactivating existing patch on',
+        this.moduleName,
+        this.version
+      );
+      this._isEnabled = true;
+      return;
+    }
 
-    if (isWrapped(XMLHttpRequest.prototype.open)) {
+    try {
+      this._diag.debug('applying patch to', this.moduleName, this.version);
+      this._wrap(XMLHttpRequest.prototype, 'open', this._patchOpen());
+      this._wrap(XMLHttpRequest.prototype, 'send', this._patchSend());
+      this._isXhrPatched = true;
+      this._isEnabled = true;
+    } catch (err) {
+      // make sure there is no wrapped functions
       this._unwrap(XMLHttpRequest.prototype, 'open');
-      this._diag.debug('removing previous patch from method open');
-    }
-
-    if (isWrapped(XMLHttpRequest.prototype.send)) {
       this._unwrap(XMLHttpRequest.prototype, 'send');
-      this._diag.debug('removing previous patch from method send');
+      this._diag.warn(
+        'Failed to patch globalThis.XMLHttpRequest; instrumentation will not be enabled. ' +
+          'Another script may have locked globalThis.XMLHttpRequest via Object.defineProperty.',
+        err
+      );
     }
-
-    this._wrap(XMLHttpRequest.prototype, 'open', this._patchOpen());
-    this._wrap(XMLHttpRequest.prototype, 'send', this._patchSend());
   }
 
   /**
    * implements disable function
    */
   override disable() {
-    this._diag.debug('removing patch from', this.moduleName, this.version);
-
-    this._unwrap(XMLHttpRequest.prototype, 'open');
-    this._unwrap(XMLHttpRequest.prototype, 'send');
-
+    if (!this._isEnabled) {
+      return;
+    }
+    this._isEnabled = false;
     this._tasksCount = 0;
     this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
     this._usedResources = new WeakSet<PerformanceResourceTiming>();

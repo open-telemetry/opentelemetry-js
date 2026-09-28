@@ -1,41 +1,22 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { AnyValue } from './AnyValue';
+
 /**
- * Attributes is a map from string to attribute values.
+ * Attributes is a mapping from string to attribute values.
+ * https://opentelemetry.io/docs/specs/otel/common/#attribute-collections
  *
- * Note: only the own enumerable keys are counted as valid attribute keys.
- *
- * @since 1.3.0
+ * @since 1.1.0
  */
 export interface Attributes {
-  [attributeKey: string]: AttributeValue | undefined;
+  [attributeKey: string]: AnyValue;
 }
 
 /**
- * Attribute values may be any non-nullish primitive value except an object.
- *
- * null or undefined attribute values are invalid and will result in undefined behavior.
- *
- * @since 1.3.0
+ * @since 1.1.0
+ * @deprecated use AnyValue
  */
-export type AttributeValue =
-  | string
-  | number
-  | boolean
-  | Array<null | undefined | string>
-  | Array<null | undefined | number>
-  | Array<null | undefined | boolean>;
+export type AttributeValue = AnyValue;

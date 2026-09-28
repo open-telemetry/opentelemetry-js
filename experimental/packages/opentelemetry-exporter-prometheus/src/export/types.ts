@@ -1,20 +1,9 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { MetricProducer } from '@opentelemetry/sdk-metrics';
+import type { MetricProducer } from '@opentelemetry/sdk-metrics';
 
 /**
  * Configuration interface for prometheus exporter
@@ -29,7 +18,7 @@ export interface ExporterConfig {
 
   /**
    * Append timestamp to metrics
-   * @default true
+   * @default false
    */
   appendTimestamp?: boolean;
 
@@ -74,4 +63,16 @@ export interface ExporterConfig {
    * @default undefined (no resource attributes are applied)
    */
   withResourceConstantLabels?: RegExp;
+
+  /**
+   * If true, scope labels are not included in scraped metrics.
+   * @default false (scope labels are included)
+   */
+  withoutScopeInfo?: boolean;
+
+  /**
+   * If true, the target_info metric is not included in scraped metrics.
+   * @default false (target_info metric is included)
+   */
+  withoutTargetInfo?: boolean;
 }

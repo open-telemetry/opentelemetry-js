@@ -1,22 +1,11 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { LoggerProvider } from './types/LoggerProvider';
-import { Logger } from './types/Logger';
-import { LoggerOptions } from './types/LoggerOptions';
+import type { LoggerProvider } from './types/LoggerProvider';
+import type { Logger } from './types/Logger';
+import type { LoggerOptions } from './types/LoggerOptions';
 import { NOOP_LOGGER_PROVIDER } from './NoopLoggerProvider';
 import { ProxyLogger } from './ProxyLogger';
 
@@ -29,23 +18,32 @@ export class ProxyLoggerProvider implements LoggerProvider {
     options?: LoggerOptions | undefined
   ): Logger {
     return (
-      this.getDelegateLogger(name, version, options) ??
+      this._getDelegateLogger(name, version, options) ??
       new ProxyLogger(this, name, version, options)
     );
   }
 
-  getDelegate(): LoggerProvider {
+  /**
+   * Get the delegate logger provider.
+   * Used by tests only.
+   * @internal
+   */
+  _getDelegate(): LoggerProvider {
     return this._delegate ?? NOOP_LOGGER_PROVIDER;
   }
 
   /**
    * Set the delegate logger provider
+   * @internal
    */
-  setDelegate(delegate: LoggerProvider) {
+  _setDelegate(delegate: LoggerProvider) {
     this._delegate = delegate;
   }
 
-  getDelegateLogger(
+  /**
+   * @internal
+   */
+  _getDelegateLogger(
     name: string,
     version?: string | undefined,
     options?: LoggerOptions | undefined

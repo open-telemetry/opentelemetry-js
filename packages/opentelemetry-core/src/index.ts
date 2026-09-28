@@ -1,23 +1,22 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 export { W3CBaggagePropagator } from './baggage/propagation/W3CBaggagePropagator';
 export { AnchoredClock } from './common/anchored-clock';
 export type { Clock } from './common/anchored-clock';
-export { isAttributeValue, sanitizeAttributes } from './common/attributes';
+export {
+  AddAttributeDecision,
+  maybeAddAttribute,
+  maybeAddSimpleAttribute,
+  cleanAttributes,
+  cleanSimpleAttributes,
+  isAnyValue,
+  isSimpleAttributeValue,
+  sanitizeAttributes,
+  isAttributeValue,
+} from './common/attributes';
 export {
   globalErrorHandler,
   setGlobalErrorHandler,
@@ -25,12 +24,12 @@ export {
 export { loggingErrorHandler } from './common/logging-error-handler';
 export {
   addHrTimes,
-  getTimeOrigin,
   hrTime,
   hrTimeDuration,
   hrTimeToMicroseconds,
   hrTimeToMilliseconds,
   hrTimeToNanoseconds,
+  hrTimeToSeconds,
   hrTimeToTimeStamp,
   isTimeInput,
   isTimeInputHrTime,
@@ -43,13 +42,10 @@ export type { ExportResult } from './ExportResult';
 export { parseKeyPairsIntoRecord } from './baggage/utils';
 export {
   SDK_INFO,
-  _globalThis,
   getStringFromEnv,
   getBooleanFromEnv,
   getNumberFromEnv,
   getStringListFromEnv,
-  otperformance,
-  unrefTimer,
 } from './platform';
 export { CompositePropagator } from './propagation/composite';
 export type { CompositePropagatorConfig } from './propagation/composite';

@@ -24,8 +24,7 @@ If the SDK is initialized in a separate file (recommended), ensure it is importe
 
 For CJS, the `NODE_OPTIONS` for the startup command should include `--require ./telemetry.js`.
 
-For ESM, minimum Node.js version of `18.19.0` is required.
-The `NODE_OPTIONS` for the startup command should include `--import ./telemetry.js`.
+For ESM, the `NODE_OPTIONS` for the startup command should include `--import ./telemetry.js`.
 
 ## Instrumentation Hook Required for ESM
 
@@ -71,7 +70,7 @@ node --experimental-loader=@opentelemetry/instrumentation/hook.mjs --import @ope
 ```javascript
 /*telemetry.cjs*/
 const { NodeSDK } = require('@opentelemetry/sdk-node');
-const { ConsoleSpanExporter } = require('@opentelemetry/sdk-trace-node');
+const { ConsoleSpanExporter } = require('@opentelemetry/sdk-trace');
 const {
   getNodeAutoInstrumentations,
 } = require('@opentelemetry/auto-instrumentations-node');
@@ -95,7 +94,7 @@ node --require ./telemetry.cjs app.js
 ```typescript
 /*telemetry.ts | telemetry.mjs*/
 import { NodeSDK } from '@opentelemetry/sdk-node';
-import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-node';
+import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 
 const sdk = new NodeSDK({
@@ -117,15 +116,3 @@ Startup command for compiled ESM:
 ```sh
 node --experimental-loader=@opentelemetry/instrumentation/hook.mjs --import ./telemetry.js app.js
 ```
-
-### ESM Options for Different Versions of Node.js
-
-The entire startup command should include the following `NODE_OPTIONS`:
-
-| Node.js Version   | NODE_OPTIONS                                                                              |
-| ----------------- | ----------------------------------------------------------------------------------------- |
-| 16.x              | `--require ./telemetry.cjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs` |
-| >=18.1.0 <18.19.0 | `--require ./telemetry.cjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs` |
-| ^18.19.0          | `--import ./telemetry.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
-| 20.x              | `--import ./telemetry.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
-| 22.x              | `--import ./telemetry.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |

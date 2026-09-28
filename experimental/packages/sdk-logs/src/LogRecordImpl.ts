@@ -1,53 +1,75 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { AttributeValue, diag } from '@opentelemetry/api';
-import type * as logsAPI from '@opentelemetry/api/experimental';
+import type { LogRecord, SeverityNumber } from '@opentelemetry/api/experimental';
 import * as api from '@opentelemetry/api';
+import type { InstrumentationScope } from '@opentelemetry/core';
 import {
+  AddAttributeDecision,
+  maybeAddAttribute,
   timeInputToHrTime,
-  isAttributeValue,
-  InstrumentationScope,
 } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
-
+import {
+  ATTR_EXCEPTION_MESSAGE,
+  ATTR_EXCEPTION_STACKTRACE,
+  ATTR_EXCEPTION_TYPE,
+} from '@opentelemetry/semantic-conventions';
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
-import {
-  AnyValue,
-  LogAttributes,
-  LogBody,
-} from '@opentelemetry/api/experimental';
-import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
+import type { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 
 export class LogRecordImpl implements ReadableLogRecord {
-  readonly hrTime: api.HrTime;
-  readonly hrTimeObserved: api.HrTime;
-  readonly spanContext?: api.SpanContext;
   readonly resource: Resource;
-  readonly instrumentationScope: InstrumentationScope;
-  readonly attributes: logsAPI.LogAttributes = {};
+  readonly instrumentationScope: InstrumentationScope & {
+    attributes?: api.Attributes;
+    droppedAttributesCount?: number;
+  };
+  readonly attributes: api.Attributes = {};
+  private _hrTime: api.HrTime;
+  private _hrTimeObserved: api.HrTime;
+  private _spanContext?: api.SpanContext;
   private _severityText?: string;
-  private _severityNumber?: logsAPI.SeverityNumber;
-  private _body?: LogBody;
+  private _severityNumber?: SeverityNumber;
+  private _body?: api.AnyValue;
   private _eventName?: string;
-  private totalAttributesCount: number = 0;
+  private _attributesCount: number = 0;
+  private _droppedAttributesCount: number = 0;
 
   private _isReadonly: boolean = false;
   private readonly _logRecordLimits: Required<LogRecordLimits>;
+
+  get hrTime(): api.HrTime {
+    return this._hrTime;
+  }
+  set hrTime(hrTime: api.HrTime) {
+    if (this._isLogRecordReadonly()) {
+      return;
+    }
+    this._hrTime = hrTime;
+  }
+
+  get hrTimeObserved(): api.HrTime {
+    return this._hrTimeObserved;
+  }
+  set hrTimeObserved(hrTimeObserved: api.HrTime) {
+    if (this._isLogRecordReadonly()) {
+      return;
+    }
+    this._hrTimeObserved = hrTimeObserved;
+  }
+
+  get spanContext(): api.SpanContext | undefined {
+    return this._spanContext;
+  }
+  set spanContext(spanContext: api.SpanContext | undefined) {
+    if (this._isLogRecordReadonly()) {
+      return;
+    }
+    this._spanContext = spanContext;
+  }
 
   set severityText(severityText: string | undefined) {
     if (this._isLogRecordReadonly()) {
@@ -59,23 +81,23 @@ export class LogRecordImpl implements ReadableLogRecord {
     return this._severityText;
   }
 
-  set severityNumber(severityNumber: logsAPI.SeverityNumber | undefined) {
+  set severityNumber(severityNumber: SeverityNumber | undefined) {
     if (this._isLogRecordReadonly()) {
       return;
     }
     this._severityNumber = severityNumber;
   }
-  get severityNumber(): logsAPI.SeverityNumber | undefined {
+  get severityNumber(): SeverityNumber | undefined {
     return this._severityNumber;
   }
 
-  set body(body: LogBody | undefined) {
+  set body(body: api.AnyValue | undefined) {
     if (this._isLogRecordReadonly()) {
       return;
     }
     this._body = body;
   }
-  get body(): LogBody | undefined {
+  get body(): api.AnyValue | undefined {
     return this._body;
   }
 
@@ -90,13 +112,13 @@ export class LogRecordImpl implements ReadableLogRecord {
   }
 
   get droppedAttributesCount(): number {
-    return this.totalAttributesCount - Object.keys(this.attributes).length;
+    return this._droppedAttributesCount;
   }
 
   constructor(
     _sharedState: LoggerProviderSharedState,
     instrumentationScope: InstrumentationScope,
-    logRecord: logsAPI.LogRecord
+    logRecord: LogRecord
   ) {
     const {
       timestamp,
@@ -106,17 +128,18 @@ export class LogRecordImpl implements ReadableLogRecord {
       severityText,
       body,
       attributes = {},
+      exception,
       context,
     } = logRecord;
 
     const now = Date.now();
-    this.hrTime = timeInputToHrTime(timestamp ?? now);
-    this.hrTimeObserved = timeInputToHrTime(observedTimestamp ?? now);
+    this._hrTime = timeInputToHrTime(timestamp ?? now);
+    this._hrTimeObserved = timeInputToHrTime(observedTimestamp ?? now);
 
     if (context) {
       const spanContext = api.trace.getSpanContext(context);
       if (spanContext && api.isSpanContextValid(spanContext)) {
-        this.spanContext = spanContext;
+        this._spanContext = spanContext;
       }
     }
     this.severityNumber = severityNumber;
@@ -127,58 +150,45 @@ export class LogRecordImpl implements ReadableLogRecord {
     this._logRecordLimits = _sharedState.logRecordLimits;
     this._eventName = eventName;
     this.setAttributes(attributes);
+    if (exception != null) {
+      this._setException(exception);
+    }
   }
 
-  public setAttribute(key: string, value?: AnyValue) {
+  public setAttribute(key: string, value?: api.AnyValue) {
     if (this._isLogRecordReadonly()) {
       return this;
     }
-    if (value === null) {
-      return this;
-    }
-    if (key.length === 0) {
-      api.diag.warn(`Invalid attribute key: ${key}`);
-      return this;
-    }
-    if (
-      !isAttributeValue(value) &&
-      !(
-        typeof value === 'object' &&
-        !Array.isArray(value) &&
-        Object.keys(value).length > 0
-      )
-    ) {
-      api.diag.warn(`Invalid attribute value set for key: ${key}`);
-      return this;
-    }
-    this.totalAttributesCount += 1;
-    if (
-      Object.keys(this.attributes).length >=
-        this._logRecordLimits.attributeCountLimit &&
-      !Object.prototype.hasOwnProperty.call(this.attributes, key)
-    ) {
-      // This logic is to create drop message at most once per LogRecord to prevent excessive logging.
-      if (this.droppedAttributesCount === 1) {
+
+    const decision = maybeAddAttribute({
+      key,
+      value,
+      attributes: this.attributes,
+      limits: this._logRecordLimits,
+      currentAttributesCount: this._attributesCount,
+    });
+
+    if (decision === AddAttributeDecision.DROP_LIMIT_REACHED) {
+      this._droppedAttributesCount++;
+      if (this._droppedAttributesCount === 1) {
+        // Only warn once per LogRecord to avoid log spam
         api.diag.warn('Dropping extra attributes.');
       }
-      return this;
+    } else if (decision === AddAttributeDecision.ADD_NEW) {
+      this._attributesCount++;
     }
-    if (isAttributeValue(value)) {
-      this.attributes[key] = this._truncateToSize(value);
-    } else {
-      this.attributes[key] = value;
-    }
+
     return this;
   }
 
-  public setAttributes(attributes: LogAttributes) {
+  public setAttributes(attributes: api.Attributes) {
     for (const [k, v] of Object.entries(attributes)) {
       this.setAttribute(k, v);
     }
     return this;
   }
 
-  public setBody(body: LogBody) {
+  public setBody(body: api.AnyValue) {
     this.body = body;
     return this;
   }
@@ -188,7 +198,7 @@ export class LogRecordImpl implements ReadableLogRecord {
     return this;
   }
 
-  public setSeverityNumber(severityNumber: logsAPI.SeverityNumber) {
+  public setSeverityNumber(severityNumber: SeverityNumber) {
     this.severityNumber = severityNumber;
     return this;
   }
@@ -207,41 +217,57 @@ export class LogRecordImpl implements ReadableLogRecord {
     this._isReadonly = true;
   }
 
-  private _truncateToSize(value: AttributeValue): AttributeValue {
-    const limit = this._logRecordLimits.attributeValueLengthLimit;
-    // Check limit
-    if (limit <= 0) {
-      // Negative values are invalid, so do not truncate
-      api.diag.warn(`Attribute value limit must be positive, got ${limit}`);
-      return value;
+  private _setException(exception: unknown): void {
+    let hasMinimumAttributes = false;
+
+    if (typeof exception === 'string' || typeof exception === 'number') {
+      if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_MESSAGE)) {
+        this.setAttribute(ATTR_EXCEPTION_MESSAGE, String(exception));
+      }
+      hasMinimumAttributes = true;
+    } else if (exception && typeof exception === 'object') {
+      const exceptionObj = exception as {
+        code?: string | number;
+        name?: string;
+        message?: string;
+        stack?: string;
+      };
+
+      if (exceptionObj.code) {
+        if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_TYPE)) {
+          this.setAttribute(ATTR_EXCEPTION_TYPE, exceptionObj.code.toString());
+        }
+        hasMinimumAttributes = true;
+      } else if (exceptionObj.name) {
+        if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_TYPE)) {
+          this.setAttribute(ATTR_EXCEPTION_TYPE, exceptionObj.name);
+        }
+        hasMinimumAttributes = true;
+      }
+
+      if (exceptionObj.message) {
+        if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_MESSAGE)) {
+          this.setAttribute(ATTR_EXCEPTION_MESSAGE, exceptionObj.message);
+        }
+        hasMinimumAttributes = true;
+      }
+
+      if (exceptionObj.stack) {
+        if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_STACKTRACE)) {
+          this.setAttribute(ATTR_EXCEPTION_STACKTRACE, exceptionObj.stack);
+        }
+        hasMinimumAttributes = true;
+      }
     }
 
-    // String
-    if (typeof value === 'string') {
-      return this._truncateToLimitUtil(value, limit);
+    if (!hasMinimumAttributes) {
+      api.diag.warn(`Failed to record an exception ${exception}`);
     }
-
-    // Array of strings
-    if (Array.isArray(value)) {
-      return (value as []).map(val =>
-        typeof val === 'string' ? this._truncateToLimitUtil(val, limit) : val
-      );
-    }
-
-    // Other types, no need to apply value length limit
-    return value;
-  }
-
-  private _truncateToLimitUtil(value: string, limit: number): string {
-    if (value.length <= limit) {
-      return value;
-    }
-    return value.substring(0, limit);
   }
 
   private _isLogRecordReadonly(): boolean {
     if (this._isReadonly) {
-      diag.warn('Can not execute the operation on emitted log record');
+      api.diag.warn('Can not execute the operation on emitted log record');
     }
     return this._isReadonly;
   }

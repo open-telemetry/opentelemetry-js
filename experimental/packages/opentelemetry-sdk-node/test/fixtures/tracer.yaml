@@ -1,0 +1,112 @@
+file_format: "1.1"
+disabled: false
+tracer_provider:
+  processors:
+    - batch:
+        schedule_delay: 5000
+        export_timeout: 30000
+        max_queue_size: 2048
+        max_export_batch_size: 512
+        exporter:
+          otlp_http:
+            endpoint: http://localhost:4318/v1/traces
+            tls:
+              ca_file: ${TEST_DIR}/certs/ca.crt
+              key_file: ${TEST_DIR}/certs/client.key
+              cert_file: ${TEST_DIR}/certs/client.crt
+            headers:
+              - name: api-key
+                value: "1234"
+            headers_list: "api-key=1234"
+            compression: gzip
+            timeout: 10000
+            encoding: protobuf
+    - batch:
+        schedule_delay: 5000
+        export_timeout: 30000
+        max_queue_size: 2048
+        max_export_batch_size: 512
+        exporter:
+          otlp_http:
+            endpoint: http://localhost:4318/v1/traces
+            tls:
+              ca_file: ${TEST_DIR}/certs/ca.crt
+              key_file: ${TEST_DIR}/certs/client.key
+              cert_file: ${TEST_DIR}/certs/client.crt
+            headers:
+              - name: api-key
+                value: "1234"
+            headers_list: "api-key=1234"
+            compression: gzip
+            timeout: 10000
+            encoding: json
+    - batch:
+        exporter:
+          otlp_grpc:
+            endpoint: http://localhost:4317
+            tls:
+              ca_file: ${TEST_DIR}/certs/ca.crt
+              key_file: ${TEST_DIR}/certs/client.key
+              cert_file: ${TEST_DIR}/certs/client.crt
+              insecure: false
+            headers:
+              - name: api-key
+                value: "1234"
+            headers_list: "api-key=1234"
+            compression: gzip
+            timeout: 10000
+    - simple:
+        exporter:
+          console:
+  limits:
+    attribute_value_length_limit: 4096
+    attribute_count_limit: 128
+    event_count_limit: 128
+    link_count_limit: 128
+    event_attribute_count_limit: 128
+    link_attribute_count_limit: 128
+
+  sampler:
+    parent_based:
+
+  # TODO(6541): restore this sampler config when probability/development and composite/development are supported
+  # sampler:
+  #   parent_based:
+  #     root:
+  #       always_on:
+  #     remote_parent_sampled:
+  #       always_on:
+  #     remote_parent_not_sampled:
+  #       probability/development:
+  #         ratio: 0.01
+  #     local_parent_sampled:
+  #       composite/development:
+  #         rule_based:
+  #           rules:
+  #             - attribute_values:
+  #                 key: http.route
+  #                 values:
+  #                   - /healthz
+  #                   - /livez
+  #               sampler:
+  #                 always_off:
+  #             - attribute_patterns:
+  #                 key: http.path
+  #                 included:
+  #                   - /internal/*
+  #                 excluded:
+  #                   - /internal/special/*
+  #               sampler:
+  #                 always_on:
+  #             - parent:
+  #                 - none
+  #               span_kinds:
+  #                 - client
+  #               sampler:
+  #                 probability:
+  #                   ratio: 0.05
+  #             - sampler:
+  #                 probability:
+  #                   ratio: 0.001
+  #     local_parent_not_sampled:
+  #       always_off:

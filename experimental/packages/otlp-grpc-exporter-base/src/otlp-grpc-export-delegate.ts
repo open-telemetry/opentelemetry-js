@@ -1,43 +1,91 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { MeterProvider } from '@opentelemetry/api';
+
+import type { ServiceError } from '@grpc/grpc-js';
+import type { IOtlpExportDelegate } from '@opentelemetry/otlp-exporter-base';
 import {
   createOtlpNetworkExportDelegate,
-  IOtlpExportDelegate,
+  ExporterMetrics,
 } from '@opentelemetry/otlp-exporter-base';
-import { ISerializer } from '@opentelemetry/otlp-transformer';
-import { OtlpGrpcConfiguration } from './configuration/otlp-grpc-configuration';
+import type {
+  IExporterMetricsHelper,
+  ISerializer,
+} from '@opentelemetry/otlp-transformer';
+import type { OtlpGrpcConfiguration } from './configuration/otlp-grpc-configuration';
 import { createOtlpGrpcExporterTransport } from './grpc-exporter-transport';
+import { ATTR_RPC_RESPONSE_STATUS_CODE } from './semconv';
+
+export function createOtlpGrpcExporterMetrics<Internal>(
+  metricsComponentType: string,
+  exporterMetricsHelper: IExporterMetricsHelper<Internal>,
+  url: string | undefined,
+  meterProvider: MeterProvider | undefined
+): ExporterMetrics<Internal> {
+  return new ExporterMetrics({
+    componentType: metricsComponentType,
+    metricsHelper: exporterMetricsHelper,
+    url,
+    meterProvider,
+    responseAttributesFromError: (error: Error | string | undefined) => {
+      if (!error) {
+        return {
+          [ATTR_RPC_RESPONSE_STATUS_CODE]: 'OK',
+        };
+      }
+      if (!isServiceError(error)) {
+        return {};
+      }
+      // Lazy-load so that we don't need to require/import '@grpc/grpc-js' before it can be wrapped by instrumentation.
+      const { status } =
+        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/consistent-type-imports
+        require('@grpc/grpc-js') as typeof import('@grpc/grpc-js');
+      const statusName = status[error.code] ?? 'UNKNOWN';
+      return {
+        [ATTR_RPC_RESPONSE_STATUS_CODE]: statusName,
+      };
+    },
+  });
+}
 
 export function createOtlpGrpcExportDelegate<Internal, Response>(
   options: OtlpGrpcConfiguration,
   serializer: ISerializer<Internal, Response>,
+  metricsComponentType: string,
+  exporterMetricsHelper: IExporterMetricsHelper<Internal>,
+  meterProvider: MeterProvider | undefined,
   grpcName: string,
   grpcPath: string
 ): IOtlpExportDelegate<Internal> {
   return createOtlpNetworkExportDelegate(
     options,
     serializer,
+    createOtlpGrpcExporterMetrics(
+      metricsComponentType,
+      exporterMetricsHelper,
+      options.url,
+      meterProvider
+    ),
     createOtlpGrpcExporterTransport({
       address: options.url,
       compression: options.compression,
       credentials: options.credentials,
       metadata: options.metadata,
+      userAgent: options.userAgent,
       grpcName,
       grpcPath,
     })
+  );
+}
+
+function isServiceError(error: unknown): error is ServiceError {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    typeof (error as { code: unknown }).code === 'number'
   );
 }

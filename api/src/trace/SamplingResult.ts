@@ -1,24 +1,13 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { SpanAttributes } from './attributes';
-import { TraceState } from './trace_state';
+import type { SpanAttributes } from './attributes';
+import type { TraceState } from './trace_state';
 
 /**
- * @deprecated use the one declared in @opentelemetry/sdk-trace-base instead.
+ * @deprecated use the one declared in @opentelemetry/sdk-trace instead.
  * A sampling decision that determines how a {@link Span} will be recorded
  * and collected.
  *
@@ -43,7 +32,7 @@ export enum SamplingDecision {
 }
 
 /**
- * @deprecated use the one declared in @opentelemetry/sdk-trace-base instead.
+ * @deprecated use the one declared in @opentelemetry/sdk-trace instead.
  * A sampling result contains a decision for a {@link Span} and additional
  * attributes the sampler would like to added to the Span.
  *
@@ -65,6 +54,8 @@ export interface SamplingResult {
    * the new {@link SpanContext}. Samplers SHOULD return the TraceState from
    * the passed-in {@link Context} if they do not intend to change it. Leaving
    * the value undefined will also leave the TraceState unchanged.
+   *
+   * @since 1.4.1
    */
   traceState?: TraceState;
 }

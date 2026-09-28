@@ -1,58 +1,49 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
+
+import type {
+  HrTime,
+  Span,
+  SpanOptions,
+  SpanStatus,
+  Histogram,
+  Attributes,
+} from '@opentelemetry/api';
 import {
   context,
-  HrTime,
   INVALID_SPAN_CONTEXT,
   propagation,
   ROOT_CONTEXT,
-  Span,
   SpanKind,
-  SpanOptions,
-  SpanStatus,
   SpanStatusCode,
   trace,
-  Histogram,
-  Attributes,
   ValueType,
 } from '@opentelemetry/api';
+import type { RPCMetadata } from '@opentelemetry/core';
 import {
   hrTime,
   hrTimeDuration,
   hrTimeToMilliseconds,
   suppressTracing,
-  RPCMetadata,
   RPCType,
   setRPCMetadata,
 } from '@opentelemetry/core';
 import type * as http from 'http';
 import type * as https from 'https';
-import { Socket } from 'net';
-import * as url from 'url';
-import { HttpInstrumentationConfig } from './types';
+import type { Socket } from 'net';
+import type * as url from 'url';
+import type { HttpInstrumentationConfig } from './types';
 import { VERSION } from './version';
 import {
   InstrumentationBase,
   InstrumentationNodeModuleDefinition,
-  SemconvStability,
-  semconvStabilityFromStr,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import { errorMonitor } from 'events';
 import {
+  ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
   ATTR_NETWORK_PROTOCOL_VERSION,
@@ -67,21 +58,20 @@ import {
   extractHostnameAndPort,
   getIncomingRequestAttributes,
   getIncomingRequestAttributesOnResponse,
-  getIncomingRequestMetricAttributes,
-  getIncomingRequestMetricAttributesOnResponse,
   getIncomingStableRequestMetricAttributesOnResponse,
   getOutgoingRequestAttributes,
   getOutgoingRequestAttributesOnResponse,
-  getOutgoingRequestMetricAttributes,
-  getOutgoingRequestMetricAttributesOnResponse,
   getOutgoingStableRequestMetricAttributesOnResponse,
   getRequestInfo,
+  isURLLike,
   headerCapture,
   isValidOptionsType,
+  parseErrorType,
   parseResponseStatus,
   setSpanWithError,
 } from './utils';
-import { Err, Func, Http, HttpRequestArgs, Https } from './internal-types';
+import type { Err, Func, Http, HttpRequestArgs, Https } from './internal-types';
+import { DEFAULT_QUERY_STRINGS_TO_REDACT } from './internal-types';
 
 /**
  * `node:http` and `node:https` instrumentation for OpenTelemetry
@@ -90,40 +80,18 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span> = new WeakSet<Span>();
   private _headerCapture;
-  declare private _oldHttpServerDurationHistogram: Histogram;
-  declare private _stableHttpServerDurationHistogram: Histogram;
-  declare private _oldHttpClientDurationHistogram: Histogram;
-  declare private _stableHttpClientDurationHistogram: Histogram;
-
-  private _semconvStability: SemconvStability = SemconvStability.OLD;
+  private _httpPatched: boolean = false;
+  private _httpsPatched: boolean = false;
+  declare private _httpServerDurationHistogram: Histogram;
+  declare private _httpClientDurationHistogram: Histogram;
 
   constructor(config: HttpInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-http', VERSION, config);
     this._headerCapture = this._createHeaderCapture();
-    this._semconvStability = semconvStabilityFromStr(
-      'http',
-      process.env.OTEL_SEMCONV_STABILITY_OPT_IN
-    );
   }
 
   protected override _updateMetricInstruments() {
-    this._oldHttpServerDurationHistogram = this.meter.createHistogram(
-      'http.server.duration',
-      {
-        description: 'Measures the duration of inbound HTTP requests.',
-        unit: 'ms',
-        valueType: ValueType.DOUBLE,
-      }
-    );
-    this._oldHttpClientDurationHistogram = this.meter.createHistogram(
-      'http.client.duration',
-      {
-        description: 'Measures the duration of outbound HTTP requests.',
-        unit: 'ms',
-        valueType: ValueType.DOUBLE,
-      }
-    );
-    this._stableHttpServerDurationHistogram = this.meter.createHistogram(
+    this._httpServerDurationHistogram = this.meter.createHistogram(
       METRIC_HTTP_SERVER_REQUEST_DURATION,
       {
         description: 'Duration of HTTP server requests.',
@@ -137,7 +105,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         },
       }
     );
-    this._stableHttpClientDurationHistogram = this.meter.createHistogram(
+    this._httpClientDurationHistogram = this.meter.createHistogram(
       METRIC_HTTP_CLIENT_REQUEST_DURATION,
       {
         description: 'Duration of HTTP client requests.',
@@ -153,42 +121,14 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     );
   }
 
-  private _recordServerDuration(
-    durationMs: number,
-    oldAttributes: Attributes,
-    stableAttributes: Attributes
-  ) {
-    if (this._semconvStability & SemconvStability.OLD) {
-      // old histogram is counted in MS
-      this._oldHttpServerDurationHistogram.record(durationMs, oldAttributes);
-    }
-
-    if (this._semconvStability & SemconvStability.STABLE) {
-      // stable histogram is counted in S
-      this._stableHttpServerDurationHistogram.record(
-        durationMs / 1000,
-        stableAttributes
-      );
-    }
+  private _recordServerDuration(durationMs: number, attributes: Attributes) {
+    // stable histogram is counted in S
+    this._httpServerDurationHistogram.record(durationMs / 1000, attributes);
   }
 
-  private _recordClientDuration(
-    durationMs: number,
-    oldAttributes: Attributes,
-    stableAttributes: Attributes
-  ) {
-    if (this._semconvStability & SemconvStability.OLD) {
-      // old histogram is counted in MS
-      this._oldHttpClientDurationHistogram.record(durationMs, oldAttributes);
-    }
-
-    if (this._semconvStability & SemconvStability.STABLE) {
-      // stable histogram is counted in S
-      this._stableHttpClientDurationHistogram.record(
-        durationMs / 1000,
-        stableAttributes
-      );
-    }
+  private _recordClientDuration(durationMs: number, attributes: Attributes) {
+    // stable histogram is counted in S
+    this._httpClientDurationHistogram.record(durationMs / 1000, attributes);
   }
 
   override setConfig(config: HttpInstrumentationConfig = {}): void {
@@ -208,8 +148,16 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'http',
       ['*'],
       (moduleExports: Http): Http => {
+        // Guard against double-instrumentation, if loaded by both `require`
+        // and `import`.
+        if (this._httpPatched) {
+          return moduleExports;
+        }
+        this._httpPatched = true;
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const isESM = (moduleExports as any)[Symbol.toStringTag] === 'Module';
+
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
           const patchedRequest = this._wrap(
             moduleExports,
@@ -240,6 +188,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         return moduleExports;
       },
       (moduleExports: Http) => {
+        this._httpPatched = false;
         if (moduleExports === undefined) return;
 
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
@@ -258,8 +207,16 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'https',
       ['*'],
       (moduleExports: Https): Https => {
+        // Guard against double-instrumentation, if loaded by both `require`
+        // and `import`.
+        if (this._httpsPatched) {
+          return moduleExports;
+        }
+        this._httpsPatched = true;
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const isESM = (moduleExports as any)[Symbol.toStringTag] === 'Module';
+
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
           const patchedRequest = this._wrap(
             moduleExports,
@@ -290,6 +247,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         return moduleExports;
       },
       (moduleExports: Https) => {
+        this._httpsPatched = false;
         if (moduleExports === undefined) return;
 
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
@@ -356,7 +314,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     return (original: Func<http.ClientRequest>): Func<http.ClientRequest> => {
       const instrumentation = this;
       return function httpsOutgoingRequest(
-        // eslint-disable-next-line node/no-unsupported-features/node-builtins
         options: https.RequestOptions | string | URL,
         ...args: HttpRequestArgs
       ): http.ClientRequest {
@@ -384,7 +341,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   /** Patches HTTPS outgoing get requests */
   private _getPatchHttpsOutgoingGetFunction(
     clientRequest: (
-      // eslint-disable-next-line node/no-unsupported-features/node-builtins
       options: http.RequestOptions | string | URL,
       ...args: HttpRequestArgs
     ) => http.ClientRequest
@@ -392,7 +348,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     return (original: Func<http.ClientRequest>): Func<http.ClientRequest> => {
       const instrumentation = this;
       return function httpsOutgoingRequest(
-        // eslint-disable-next-line node/no-unsupported-features/node-builtins
         options: https.RequestOptions | string | URL,
         ...args: HttpRequestArgs
       ): http.ClientRequest {
@@ -409,15 +364,13 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
    * @param request The original request object.
    * @param span representing the current operation
    * @param startTime representing the start time of the request to calculate duration in Metric
-   * @param oldMetricAttributes metric attributes for old semantic conventions
-   * @param stableMetricAttributes metric attributes for new semantic conventions
+   * @param metricAttributes metric attributes for the request duration metric
    */
   private _traceClientRequest(
     request: http.ClientRequest,
     span: Span,
     startTime: HrTime,
-    oldMetricAttributes: Attributes,
-    stableMetricAttributes: Attributes
+    metricAttributes: Attributes
   ): http.ClientRequest {
     if (this.getConfig().requestHook) {
       this._callRequestHook(span, request);
@@ -440,17 +393,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         if (request.listenerCount('response') <= 1) {
           response.resume();
         }
-        const responseAttributes = getOutgoingRequestAttributesOnResponse(
-          response,
-          this._semconvStability
-        );
+        const responseAttributes =
+          getOutgoingRequestAttributesOnResponse(response);
         span.setAttributes(responseAttributes);
-        oldMetricAttributes = Object.assign(
-          oldMetricAttributes,
-          getOutgoingRequestMetricAttributesOnResponse(responseAttributes)
-        );
-        stableMetricAttributes = Object.assign(
-          stableMetricAttributes,
+        metricAttributes = Object.assign(
+          metricAttributes,
           getOutgoingStableRequestMetricAttributesOnResponse(responseAttributes)
         );
 
@@ -458,12 +405,15 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           this._callResponseHook(span, response);
         }
 
-        this._headerCapture.client.captureRequestHeaders(span, header =>
-          request.getHeader(header)
+        span.setAttributes(
+          this._headerCapture.client.captureRequestHeaders(header =>
+            request.getHeader(header)
+          )
         );
-        this._headerCapture.client.captureResponseHeaders(
-          span,
-          header => response.headers[header]
+        span.setAttributes(
+          this._headerCapture.client.captureResponseHeaders(
+            header => response.headers[header]
+          )
         );
 
         context.bind(context.active(), response);
@@ -483,6 +433,13 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             status = {
               code: parseResponseStatus(SpanKind.CLIENT, response.statusCode),
             };
+            const errorType = parseErrorType(
+              SpanKind.CLIENT,
+              response.statusCode
+            );
+            if (errorType !== undefined) {
+              span.setAttribute(ATTR_ERROR_TYPE, errorType);
+            }
           }
 
           span.setStatus(status);
@@ -504,8 +461,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             span,
             SpanKind.CLIENT,
             startTime,
-            oldMetricAttributes,
-            stableMetricAttributes
+            metricAttributes
           );
         };
 
@@ -516,17 +472,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             return;
           }
           responseFinished = true;
-          setSpanWithError(span, error, this._semconvStability);
-          span.setStatus({
-            code: SpanStatusCode.ERROR,
-            message: error.message,
-          });
-          this._closeHttpSpan(
+          this._onOutgoingRequestError(
             span,
-            SpanKind.CLIENT,
+            metricAttributes,
             startTime,
-            oldMetricAttributes,
-            stableMetricAttributes
+            error
           );
         });
       }
@@ -537,13 +487,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         return;
       }
       responseFinished = true;
-      this._closeHttpSpan(
-        span,
-        SpanKind.CLIENT,
-        startTime,
-        oldMetricAttributes,
-        stableMetricAttributes
-      );
+      this._closeHttpSpan(span, SpanKind.CLIENT, startTime, metricAttributes);
     });
     request.on(errorMonitor, (error: Err) => {
       this._diag.debug('outgoingRequest on request error()', error);
@@ -551,15 +495,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         return;
       }
       responseFinished = true;
-      setSpanWithError(span, error, this._semconvStability);
-
-      this._closeHttpSpan(
-        span,
-        SpanKind.CLIENT,
-        startTime,
-        oldMetricAttributes,
-        stableMetricAttributes
-      );
+      this._onOutgoingRequestError(span, metricAttributes, startTime, error);
     });
 
     this._diag.debug('http.ClientRequest return request');
@@ -617,16 +553,24 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         request,
         {
           component: component,
-          serverName: instrumentation.getConfig().serverName,
           hookAttributes: instrumentation._callStartSpanHook(
             request,
             instrumentation.getConfig().startIncomingSpanHook
           ),
-          semconvStability: instrumentation._semconvStability,
           enableSyntheticSourceDetection:
             instrumentation.getConfig().enableSyntheticSourceDetection || false,
+          redactedQueryParams:
+            instrumentation.getConfig().redactedQueryParamsServer ??
+            Array.from(DEFAULT_QUERY_STRINGS_TO_REDACT),
         },
         instrumentation._diag
+      );
+
+      Object.assign(
+        spanAttributes,
+        instrumentation._headerCapture.server.captureRequestHeaders(
+          header => request.headers[header]
+        )
       );
 
       const spanOptions: SpanOptions = {
@@ -635,18 +579,16 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       };
 
       const startTime = hrTime();
-      const oldMetricAttributes =
-        getIncomingRequestMetricAttributes(spanAttributes);
 
       // request method and url.scheme are both required span attributes
-      const stableMetricAttributes: Attributes = {
+      const metricAttributes: Attributes = {
         [ATTR_HTTP_REQUEST_METHOD]: spanAttributes[ATTR_HTTP_REQUEST_METHOD],
         [ATTR_URL_SCHEME]: spanAttributes[ATTR_URL_SCHEME],
       };
 
       // recommended if and only if one was sent, same as span recommendation
       if (spanAttributes[ATTR_NETWORK_PROTOCOL_VERSION]) {
-        stableMetricAttributes[ATTR_NETWORK_PROTOCOL_VERSION] =
+        metricAttributes[ATTR_NETWORK_PROTOCOL_VERSION] =
           spanAttributes[ATTR_NETWORK_PROTOCOL_VERSION];
       }
 
@@ -670,11 +612,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             instrumentation._callResponseHook(span, response);
           }
 
-          instrumentation._headerCapture.server.captureRequestHeaders(
-            span,
-            header => request.headers[header]
-          );
-
           // After 'error', no further events other than 'close' should be emitted.
           let hasError = false;
           response.on('close', () => {
@@ -685,8 +622,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
               request,
               response,
               span,
-              oldMetricAttributes,
-              stableMetricAttributes,
+              metricAttributes,
               startTime
             );
           });
@@ -694,8 +630,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             hasError = true;
             instrumentation._onServerResponseError(
               span,
-              oldMetricAttributes,
-              stableMetricAttributes,
+              metricAttributes,
               startTime,
               err
             );
@@ -705,17 +640,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             () => original.apply(this, [event, ...args]),
             error => {
               if (error) {
-                setSpanWithError(
+                instrumentation._onServerResponseError(
                   span,
-                  error,
-                  instrumentation._semconvStability
-                );
-                instrumentation._closeHttpSpan(
-                  span,
-                  SpanKind.SERVER,
+                  metricAttributes,
                   startTime,
-                  oldMetricAttributes,
-                  stableMetricAttributes
+                  error
                 );
                 throw error;
               }
@@ -741,7 +670,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       }
       const extraOptions =
         typeof args[0] === 'object' &&
-        (typeof options === 'string' || options instanceof url.URL)
+        (typeof options === 'string' || isURLLike(options))
           ? (args.shift() as http.RequestOptions)
           : undefined;
       const { method, invalidUrl, optionsParsed } = getRequestInfo(
@@ -781,17 +710,15 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             optionsParsed,
             instrumentation.getConfig().startOutgoingSpanHook
           ),
+          redactedQueryParams: instrumentation.getConfig().redactedQueryParams, // Added config for adding custom query strings
         },
-        instrumentation._semconvStability,
         instrumentation.getConfig().enableSyntheticSourceDetection || false
       );
 
       const startTime = hrTime();
-      const oldMetricAttributes: Attributes =
-        getOutgoingRequestMetricAttributes(attributes);
 
       // request method, server address, and server port are both required span attributes
-      const stableMetricAttributes: Attributes = {
+      const metricAttributes: Attributes = {
         [ATTR_HTTP_REQUEST_METHOD]: attributes[ATTR_HTTP_REQUEST_METHOD],
         [ATTR_SERVER_ADDRESS]: attributes[ATTR_SERVER_ADDRESS],
         [ATTR_SERVER_PORT]: attributes[ATTR_SERVER_PORT],
@@ -799,13 +726,13 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
       // required if and only if one was sent, same as span requirement
       if (attributes[ATTR_HTTP_RESPONSE_STATUS_CODE]) {
-        stableMetricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] =
+        metricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] =
           attributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
       }
 
       // recommended if and only if one was sent, same as span recommendation
       if (attributes[ATTR_NETWORK_PROTOCOL_VERSION]) {
-        stableMetricAttributes[ATTR_NETWORK_PROTOCOL_VERSION] =
+        metricAttributes[ATTR_NETWORK_PROTOCOL_VERSION] =
           attributes[ATTR_NETWORK_PROTOCOL_VERSION];
       }
 
@@ -850,14 +777,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           },
           error => {
             if (error) {
-              setSpanWithError(span, error, instrumentation._semconvStability);
-
-              instrumentation._closeHttpSpan(
+              instrumentation._onOutgoingRequestError(
                 span,
-                SpanKind.CLIENT,
+                metricAttributes,
                 startTime,
-                oldMetricAttributes,
-                stableMetricAttributes
+                error
               );
               throw error;
             }
@@ -872,8 +796,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           request,
           span,
           startTime,
-          oldMetricAttributes,
-          stableMetricAttributes
+          metricAttributes
         );
       });
     };
@@ -883,31 +806,29 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     request: http.IncomingMessage,
     response: http.ServerResponse,
     span: Span,
-    oldMetricAttributes: Attributes,
-    stableMetricAttributes: Attributes,
+    metricAttributes: Attributes,
     startTime: HrTime
   ) {
-    const attributes = getIncomingRequestAttributesOnResponse(
-      request,
-      response,
-      this._semconvStability
-    );
-    oldMetricAttributes = Object.assign(
-      oldMetricAttributes,
-      getIncomingRequestMetricAttributesOnResponse(attributes)
-    );
-    stableMetricAttributes = Object.assign(
-      stableMetricAttributes,
+    const attributes = getIncomingRequestAttributesOnResponse(response);
+    metricAttributes = Object.assign(
+      metricAttributes,
       getIncomingStableRequestMetricAttributesOnResponse(attributes)
     );
 
-    this._headerCapture.server.captureResponseHeaders(span, header =>
-      response.getHeader(header)
+    span.setAttributes(
+      this._headerCapture.server.captureResponseHeaders(header =>
+        response.getHeader(header)
+      )
     );
 
     span.setAttributes(attributes).setStatus({
       code: parseResponseStatus(SpanKind.SERVER, response.statusCode),
     });
+
+    const errorType = parseErrorType(SpanKind.SERVER, response.statusCode);
+    if (errorType !== undefined) {
+      span.setAttribute(ATTR_ERROR_TYPE, errorType);
+    }
 
     const route = attributes[ATTR_HTTP_ROUTE];
     if (route) {
@@ -927,31 +848,31 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       );
     }
 
-    this._closeHttpSpan(
-      span,
-      SpanKind.SERVER,
-      startTime,
-      oldMetricAttributes,
-      stableMetricAttributes
-    );
+    this._closeHttpSpan(span, SpanKind.SERVER, startTime, metricAttributes);
+  }
+
+  private _onOutgoingRequestError(
+    span: Span,
+    metricAttributes: Attributes,
+    startTime: HrTime,
+    error: Err
+  ) {
+    setSpanWithError(span, error);
+    metricAttributes[ATTR_ERROR_TYPE] = error.name;
+
+    this._closeHttpSpan(span, SpanKind.CLIENT, startTime, metricAttributes);
   }
 
   private _onServerResponseError(
     span: Span,
-    oldMetricAttributes: Attributes,
-    stableMetricAttributes: Attributes,
+    metricAttributes: Attributes,
     startTime: HrTime,
     error: Err
   ) {
-    setSpanWithError(span, error, this._semconvStability);
-    // TODO get error attributes for metrics
-    this._closeHttpSpan(
-      span,
-      SpanKind.SERVER,
-      startTime,
-      oldMetricAttributes,
-      stableMetricAttributes
-    );
+    setSpanWithError(span, error);
+    metricAttributes[ATTR_ERROR_TYPE] = error.name;
+
+    this._closeHttpSpan(span, SpanKind.SERVER, startTime, metricAttributes);
   }
 
   private _startHttpSpan(
@@ -971,7 +892,10 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     let span: Span;
     const currentSpan = trace.getSpan(ctx);
 
-    if (requireParent === true && currentSpan === undefined) {
+    if (
+      requireParent === true &&
+      (!currentSpan || !trace.isSpanContextValid(currentSpan.spanContext()))
+    ) {
       span = trace.wrapSpanContext(INVALID_SPAN_CONTEXT);
     } else if (requireParent === true && currentSpan?.spanContext().isRemote) {
       span = currentSpan;
@@ -986,8 +910,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     span: Span,
     spanKind: SpanKind,
     startTime: HrTime,
-    oldMetricAttributes: Attributes,
-    stableMetricAttributes: Attributes
+    metricAttributes: Attributes
   ) {
     if (!this._spanNotEnded.has(span)) {
       return;
@@ -999,17 +922,9 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     // Record metrics
     const duration = hrTimeToMilliseconds(hrTimeDuration(startTime, hrTime()));
     if (spanKind === SpanKind.SERVER) {
-      this._recordServerDuration(
-        duration,
-        oldMetricAttributes,
-        stableMetricAttributes
-      );
+      this._recordServerDuration(duration, metricAttributes);
     } else if (spanKind === SpanKind.CLIENT) {
-      this._recordClientDuration(
-        duration,
-        oldMetricAttributes,
-        stableMetricAttributes
-      );
+      this._recordClientDuration(duration, metricAttributes);
     }
   }
 

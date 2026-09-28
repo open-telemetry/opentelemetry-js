@@ -1,31 +1,20 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as api from '@opentelemetry/api';
+import type { Aggregator } from '../aggregator';
 import {
-  Aggregator,
   SumAggregator,
   DropAggregator,
   LastValueAggregator,
   HistogramAggregator,
   ExponentialHistogramAggregator,
 } from '../aggregator';
-import { Accumulation } from '../aggregator/types';
-import { InstrumentDescriptor } from '../InstrumentDescriptor';
-import { Maybe } from '../utils';
+import type { Accumulation } from '../aggregator/types';
+import type { InstrumentDescriptor } from '../InstrumentDescriptor';
+import type { Maybe } from '../utils';
 import { InstrumentType } from '../export/MetricData';
 
 /**
@@ -98,15 +87,13 @@ export class HistogramAggregation implements Aggregation {
  */
 export class ExplicitBucketHistogramAggregation implements Aggregation {
   private _boundaries: number[];
+  private readonly _recordMinMax: boolean;
 
   /**
    * @param boundaries the bucket boundaries of the histogram aggregation
    * @param _recordMinMax If set to true, min and max will be recorded. Otherwise, min and max will not be recorded.
    */
-  constructor(
-    boundaries: number[],
-    private readonly _recordMinMax = true
-  ) {
+  constructor(boundaries: number[], recordMinMax = true) {
     if (boundaries == null) {
       throw new Error(
         'ExplicitBucketHistogramAggregation should be created with explicit boundaries, if a single bucket histogram is required, please pass an empty array'
@@ -124,6 +111,7 @@ export class ExplicitBucketHistogramAggregation implements Aggregation {
       infinityIndex = undefined;
     }
     this._boundaries = boundaries.slice(minusInfinityIndex + 1, infinityIndex);
+    this._recordMinMax = recordMinMax;
   }
 
   createAggregator(_instrument: InstrumentDescriptor) {
@@ -132,10 +120,13 @@ export class ExplicitBucketHistogramAggregation implements Aggregation {
 }
 
 export class ExponentialHistogramAggregation implements Aggregation {
-  constructor(
-    private readonly _maxSize = 160,
-    private readonly _recordMinMax = true
-  ) {}
+  private readonly _maxSize: number;
+  private readonly _recordMinMax: boolean;
+
+  constructor(maxSize = 160, recordMinMax = true) {
+    this._maxSize = maxSize;
+    this._recordMinMax = recordMinMax;
+  }
   createAggregator(_instrument: InstrumentDescriptor) {
     return new ExponentialHistogramAggregator(
       this._maxSize,

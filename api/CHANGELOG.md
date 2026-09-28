@@ -5,23 +5,54 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
-### :boom: Breaking Change
+### :boom: Breaking Changes
 
-* feat(api): Integrate @opentelemetry/api-logs package into @opentelemetry/api as experimental [#4862](https://github.com/open-telemetry/opentelemetry-js/pull/4862) @hectorhdzg
+### :rocket: Features
 
-### :rocket: (Enhancement)
+* feat(api): add imperative `context.attach()` for setting context across callback boundaries that `with()` cannot wrap. [#6845](https://github.com/open-telemetry/opentelemetry-js/pull/6845) @pichlermarc
+  * `attach()` returns a `Token` whose `dispose()` method restores the previous context. Use `token.dispose()` to detach.
+  * `attach` is an optional method on the `ContextManager` interface; when the active context manager does not implement it, `context.attach()` logs a warning and returns a no-op token.
+* feat(api): add `AnyValue` type (of type `unknown`) and extend `Attributes` type values to use `AnyValue` [#6780](https://github.com/open-telemetry/opentelemetry-js/pull/6780) @trentm
+  * This is part of supporting [OTEP 4485](https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/4485-extending-attributes-to-support-complex-values.md#how).
+  * This is a **breaking change for SDK implementations**, in that they may need to support more attribute types for any APIs that accept `Attributes` or `AnyValue`. Implementors should refer to the OTEP 4485 link above for "MUST / SHOULD" requirements for complex attributes handling. See also the [attributes-handling utilities provided by `@opentelemetry/core` to help](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-core/src/common/attributes.ts). For example, `cleanSimpleAttributes()` can be used to limit user-provided attributes to the set of value types supported in earlier `@opentelemetry/api` versions.
+  * This change is **typically not a breaking change for users** of `@opentelemetry/api`. There is one possible breaking case: If a TypeScript user was using the `Attributes` type in their own code and using [TypeScript Narrowing](https://www.typescriptlang.org/docs/handbook/2/narrowing.html) to reduce an attribute value to an expected type ([example here](https://github.com/open-telemetry/opentelemetry-js/pull/6579#issuecomment-4345316200)). It is expected that this usage should be rare and, likely, limited to SDK implementations, if at all. (If this impacted your code, [please let us know](https://github.com/open-telemetry/opentelemetry-js/issues/new).)
+  * **Note for users of attributes:** Simple attributes SHOULD be used whenever possible. Instrumentations SHOULD assume that backends do not index individual properties of complex attributes, that querying or aggregating on such properties is inefficient and complicated, and that reporting complex attributes carries higher performance overhead.
 
-* feat(api): improve isValidSpanId, isValidTraceId performance [#5714](https://github.com/open-telemetry/opentelemetry-js/pull/5714) @seemk
-* feat(diag): change types in `DiagComponentLogger` from `any` to `unknown`[#5478](https://github.com/open-telemetry/opentelemetry-js/pull/5478) @loganrosen
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+* docs(api): complete `@since` annotations for the public API [#7023](https://github.com/open-telemetry/opentelemetry-js/pull/7023) @nabeelamjadsheikh
+  * Adds the three missing exported-type annotations and the member-level annotations for methods and properties introduced after their enclosing type.
+  * Corrects `Attributes`, `AttributeValue` and `TracerOptions` from `1.3.0` to `1.1.0`; all three were already importable in 1.1.0 via wildcard re-export.
+
+### :house: Internal
+
+* build: migrate the package build from `tsc` to `tsdown`, emitting dual CJS/ESM output from a single `dist/` directory [#6293](https://github.com/open-telemetry/opentelemetry-js/pull/6293) @overbalance
+  * The public entry points are unchanged: `@opentelemetry/api` and `@opentelemetry/api/experimental`. This package already declared an `exports` map, so deep imports such as `@opentelemetry/api/build/src/...` were rejected before this change and continue to be.
+  * The emitted files moved out of `build/src` (CJS), `build/esm` and `build/esnext` (ESM) into `dist/`, using `.cjs`/`.mjs` extensions with matching `.d.cts`/`.d.mts` declarations. The non-standard `esnext` condition has been dropped in favour of the standard `import`/`require` conditions.
+* perf(api): add getGlobal fast-path [#6956](https://github.com/open-telemetry/opentelemetry-js/pull/6956) @legendecas
+
+## 1.9.1
 
 ### :bug: (Bug Fix)
 
-### :books: (Refine Doc)
+* fix(api): prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
+* fix(api): update diag `consoleLogger` to use original console methods to prevent infinite loop when a console instrumentation is present [#6395](https://github.com/open-telemetry/opentelemetry-js/pull/6395)
+* fix(api): use `Attributes` instead of deprecated `SpanAttributes` in `SpanOptions` [#6478](https://github.com/open-telemetry/opentelemetry-js/pull/6478) @overbalance
+* fix(diag): change types in `DiagComponentLogger` from `any` to `unknown`[#5478](https://github.com/open-telemetry/opentelemetry-js/pull/5478) @loganrosen
+* fix(api): re-introduce fallback chain for global utils [#6523](https://github.com/open-telemetry/opentelemetry-js/pull/6523/) @pichlermarc
 
 ### :house: (Internal)
 
+* refactor(api): refactor to avoid circular deps by merging observable types into `Metric.ts` [#6441](https://github.com/open-telemetry/opentelemetry-js/pull/6441) @pichlermarc
 * refactor(api): remove "export *" in favor of explicit named exports [#4880](https://github.com/open-telemetry/opentelemetry-js/pull/4880) @robbkidd
 * chore: enable tsconfig isolatedModules [#5697](https://github.com/open-telemetry/opentelemetry-js/pull/5697) @legendecas
+* chore: disallow constructor parameter property syntax [#6187](https://github.com/open-telemetry/opentelemetry-js/pull/6187) @legendecas
+* refactor(api): remove platform-specific globalThis, use globalThis directly [#6208](https://github.com/open-telemetry/opentelemetry-js/pull/6208) @overbalance
+* chore(api): mark ProxyTracerProvider as deprecated [#6328](https://github.com/open-telemetry/opentelemetry-js/pull/6328) @cjihrig
+* chore: enforce `import type` for type-only imports via ESLint [#6467](https://github.com/open-telemetry/opentelemetry-js/pull/6467) @overbalance
+* perf(api): improve isValidSpanId, isValidTraceId performance [#5714](https://github.com/open-telemetry/opentelemetry-js/pull/5714) @seemk
 
 ## 1.9.0
 
@@ -29,7 +60,7 @@ All notable changes to this project will be documented in this file.
 
 * feat(metrics): added synchronous gauge [#4528](https://github.com/open-telemetry/opentelemetry-js/pull/4528) @clintonb
 * feat(api): allow adding span links after span creation [#4536](https://github.com/open-telemetry/opentelemetry-js/pull/4536) @seemk
-  * This change is non-breaking for end-users, but breaking for Trace SDK implmentations in accordance with the [specification](https://github.com/open-telemetry/opentelemetry-specification/blob/a03382ada8afa9415266a84dafac0510ec8c160f/specification/upgrading.md?plain=1#L97-L122) as new features need to be implemented.
+  * This change is non-breaking for end-users, but breaking for Trace SDK implementations in accordance with the [specification](https://github.com/open-telemetry/opentelemetry-specification/blob/a03382ada8afa9415266a84dafac0510ec8c160f/specification/upgrading.md?plain=1#L97-L122) as new features need to be implemented.
 * feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
 
 ## 1.8.0

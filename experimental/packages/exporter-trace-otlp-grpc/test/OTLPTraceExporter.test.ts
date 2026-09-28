@@ -1,26 +1,14 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import { OTLPTraceExporter } from '../src';
-import { ServerTestContext, startServer } from './utils';
+import type { ServerTestContext } from './utils';
+import { startServer, TestMetricReader } from './utils';
 import * as assert from 'assert';
-import {
-  SimpleSpanProcessor,
-  BasicTracerProvider,
-} from '@opentelemetry/sdk-trace-base';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
+import { SimpleSpanProcessor, TracerProvider } from '@opentelemetry/sdk-trace';
 
 const testServiceDefinition = {
   export: {
@@ -78,13 +66,18 @@ describe('OTLPTraceExporter', function () {
 
   it('successfully exports data', async () => {
     // arrange
-    const tracerProvider = new BasicTracerProvider({
+    const metricReader = new TestMetricReader();
+    const meterProvider = new MeterProvider({
+      readers: [metricReader],
+    });
+    const tracerProvider = new TracerProvider({
       spanProcessors: [
-        new SimpleSpanProcessor(
-          new OTLPTraceExporter({
+        new SimpleSpanProcessor({
+          exporter: new OTLPTraceExporter({
             url: 'http://localhost:1501',
-          })
-        ),
+            selfObsMeterProvider: meterProvider,
+          }),
+        }),
       ],
     });
 
@@ -94,5 +87,12 @@ describe('OTLPTraceExporter', function () {
 
     // assert
     assert.strictEqual(serverTestContext.requests.length, 1);
+
+    const metrics = await metricReader.collect();
+    const scopeMetrics = metrics.resourceMetrics.scopeMetrics.find(
+      sm => sm.scope.name === '@opentelemetry/otlp-exporter'
+    );
+    assert.ok(scopeMetrics);
+    await meterProvider.shutdown();
   });
 });

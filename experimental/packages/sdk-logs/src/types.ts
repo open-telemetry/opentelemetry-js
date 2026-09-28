@@ -1,37 +1,98 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import type { Resource } from '@opentelemetry/resources';
-import { LogRecordProcessor } from './LogRecordProcessor';
+import type { SeverityNumber } from '@opentelemetry/api/experimental';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import type { MeterProvider } from '@opentelemetry/api';
+import type { LogRecordProcessor } from './LogRecordProcessor';
+import type { LogRecordExporter } from './export/LogRecordExporter';
 
-export interface LoggerProviderConfig {
-  /** Resource associated with trace telemetry  */
-  resource?: Resource;
+/**
+ * A LoggerConfig defines various configurable aspects of a Logger's behavior.
+ *
+ * @experimental This feature is in development as per the OpenTelemetry specification.
+ */
+export interface LoggerConfig {
+  /**
+   * A boolean indication of whether the logger is enabled.
+   * If a Logger is disabled, it behaves equivalently to a No-op Logger.
+   * Defaults to false (loggers are enabled by default).
+   *
+   * @experimental This feature is in development as per the OpenTelemetry specification.
+   */
+  disabled?: boolean;
 
   /**
-   * How long the forceFlush can run before it is cancelled.
-   * The default value is 30000ms
+   * A SeverityNumber indicating the minimum severity level for log records to be processed.
+   * If not explicitly set, defaults to 0 (UNSPECIFIED).
+   * Log records with a specified severity (i.e. not 0) that is less than this value will be dropped.
+   * Log records with unspecified severity (0) bypass this filter.
+   *
+   * @experimental This feature is in development as per the OpenTelemetry specification.
    */
-  forceFlushTimeoutMillis?: number;
+  minimumSeverity?: SeverityNumber;
+
+  /**
+   * A boolean indication of whether the logger should only process log records
+   * associated with sampled traces.
+   * If not explicitly set, defaults to false.
+   * If true, log records associated with unsampled traces will be dropped.
+   *
+   * @experimental This feature is in development as per the OpenTelemetry specification.
+   */
+  traceBased?: boolean;
+}
+
+/**
+ * A LoggerConfigurator is a function which computes the LoggerConfig for a Logger.
+ * It is called when a Logger is first created, and for each outstanding Logger
+ * when a LoggerProvider's LoggerConfigurator is updated (if updating is supported).
+ *
+ * The function must return the complete LoggerConfig for the given logger scope.
+ * All config properties should have their values computed and set to appropriate defaults.
+ *
+ * @param loggerScope - The InstrumentationScope of the Logger
+ * @returns The computed LoggerConfig with all properties set
+ * @experimental This feature is in development as per the OpenTelemetry specification.
+ */
+export type LoggerConfigurator = (
+  loggerScope: InstrumentationScope
+) => Required<LoggerConfig>;
+
+export interface ForceFlushOptions {
+  /**
+   * How long the force flush can run before it is cancelled.
+   * The default value is 30000ms.
+   */
+  timeoutMillis?: number;
+}
+
+export interface LoggerProviderOptions {
+  /** Resource associated with trace telemetry  */
+  resource?: Resource;
 
   /** Log Record Limits*/
   logRecordLimits?: LogRecordLimits;
 
   /** Log Record Processors */
   processors?: LogRecordProcessor[];
+
+  /**
+   * A function that computes the LoggerConfig for a given logger.
+   * This is called when a Logger is first created.
+   *
+   * @experimental This feature is in development as per the OpenTelemetry specification.
+   */
+  loggerConfigurator?: LoggerConfigurator;
+
+  /**
+   * A meter provider to record logs SDK metrics to.
+   * @experimental This option is experimental and is subject to breaking changes in minor releases.
+   */
+  meterProvider?: MeterProvider;
 }
 
 export interface LogRecordLimits {
@@ -42,14 +103,32 @@ export interface LogRecordLimits {
   attributeCountLimit?: number;
 }
 
-/** Interface configuration for a buffer. */
-export interface BufferConfig {
+/**
+ * Common options for SDK log processors.
+ */
+export interface LogRecordProcessorOptions {
+  /**
+   * A meter provider to which to record self-observability log processor metrics.
+   * @experimental This option is experimental and is subject to breaking changes in minor releases.
+   */
+  selfObsMeterProvider?: MeterProvider;
+}
+
+export interface SimpleLogRecordProcessorOptions
+  extends LogRecordProcessorOptions {
+  exporter: LogRecordExporter;
+}
+
+export interface BatchLogRecordProcessorOptions
+  extends LogRecordProcessorOptions {
+  exporter: LogRecordExporter;
+
   /** The maximum batch size of every export. It must be smaller or equal to
    * maxQueueSize. The default value is 512. */
   maxExportBatchSize?: number;
 
   /** The delay interval in milliseconds between two consecutive exports.
-   *  The default value is 5000ms. */
+   *  The default value is 1000ms. */
   scheduledDelayMillis?: number;
 
   /** How long the export can run before it is cancelled.
@@ -61,7 +140,8 @@ export interface BufferConfig {
   maxQueueSize?: number;
 }
 
-export interface BatchLogRecordProcessorBrowserConfig extends BufferConfig {
+export interface BatchLogRecordProcessorBrowserOptions
+  extends BatchLogRecordProcessorOptions {
   /** Disable flush when a user navigates to a new page, closes the tab or the browser, or,
    * on mobile, switches to a different app. Auto flush is enabled by default. */
   disableAutoFlushOnDocumentHide?: boolean;

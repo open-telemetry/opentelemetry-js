@@ -1,21 +1,13 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import { parseRetryAfterToMills } from '../../src/is-export-retryable';
+import {
+  isExportHTTPErrorRetryable,
+  parseRetryAfterToMills,
+} from '../../src/is-export-retryable';
 
 describe('parseRetryAfterToMills', function () {
   // now: 2023-01-20T00:00:00.000Z
@@ -42,4 +34,22 @@ describe('parseRetryAfterToMills', function () {
       assert.strictEqual(parseRetryAfterToMills(value), expect);
     });
   }
+});
+
+describe('isExportHTTPErrorRetryable', function () {
+  it('should return true for retryable status codes', function () {
+    assert.strictEqual(isExportHTTPErrorRetryable(429), true);
+    assert.strictEqual(isExportHTTPErrorRetryable(502), true);
+    assert.strictEqual(isExportHTTPErrorRetryable(503), true);
+    assert.strictEqual(isExportHTTPErrorRetryable(504), true);
+  });
+
+  it('should return false for non-retryable status codes', function () {
+    assert.strictEqual(isExportHTTPErrorRetryable(200), false);
+    assert.strictEqual(isExportHTTPErrorRetryable(201), false);
+    assert.strictEqual(isExportHTTPErrorRetryable(400), false);
+    assert.strictEqual(isExportHTTPErrorRetryable(401), false);
+    assert.strictEqual(isExportHTTPErrorRetryable(404), false);
+    assert.strictEqual(isExportHTTPErrorRetryable(500), false);
+  });
 });

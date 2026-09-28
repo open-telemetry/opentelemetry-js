@@ -1,47 +1,33 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  Attributes,
-  context,
-  propagation,
-  SpanKind,
-  trace,
-} from '@opentelemetry/api';
+import type { Attributes } from '@opentelemetry/api';
+import { context, propagation, SpanKind, trace } from '@opentelemetry/api';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
-import { ContextManager } from '@opentelemetry/api';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
+import type { ContextManager } from '@opentelemetry/api';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace';
 import {
   InMemorySpanExporter,
-  ReadableSpan,
   SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
+  TracerProvider,
+} from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
 import * as protoLoader from '@grpc/proto-loader';
-import {
-  status as GrpcStatus,
+import type {
   ServerUnaryCall,
   requestCallback,
   ServerReadableStream,
   ServerDuplexStream,
   ServerWritableStream,
   Client,
-  Metadata,
   ServiceError,
+} from '@grpc/grpc-js';
+import {
+  status as GrpcStatus,
+  Metadata,
   Server,
   credentials,
   loadPackageDefinition,
@@ -50,7 +36,6 @@ import {
 import { assertPropagation, assertSpan } from './utils/assertionUtils';
 import { promisify } from 'util';
 import type { GrpcInstrumentation } from '../src';
-import { SemconvStability } from '@opentelemetry/instrumentation';
 import * as path from 'path';
 
 const PROTO_PATH = path.resolve(__dirname, './fixtures/grpc-test.proto');
@@ -256,38 +241,6 @@ export async function startServer(proto: any, port: number) {
   return server;
 }
 
-export const runTestsWithSemconvStabilityLevels = (
-  plugin: GrpcInstrumentation,
-  moduleName: string,
-  grpcPort: number
-) => {
-  describe('GrpcInstrumentation with different semconvStability levels', () => {
-    describe('OLD semantic conventions', () => {
-      before(() => {
-        plugin['_semconvStability'] = SemconvStability.OLD;
-      });
-
-      runTests(plugin, moduleName, grpcPort);
-    });
-
-    describe('STABLE semantic conventions', () => {
-      before(() => {
-        plugin['_semconvStability'] = SemconvStability.STABLE;
-      });
-
-      runTests(plugin, moduleName, grpcPort);
-    });
-
-    describe('DUPLICATE semantic conventions', () => {
-      before(() => {
-        plugin['_semconvStability'] = SemconvStability.DUPLICATE;
-      });
-
-      runTests(plugin, moduleName, grpcPort);
-    });
-  });
-};
-
 export const runTests = (
   plugin: GrpcInstrumentation,
   moduleName: string,
@@ -468,7 +421,7 @@ export const runTests = (
     });
 
     beforeEach(() => {
-      contextManager = new AsyncHooksContextManager().enable();
+      contextManager = new AsyncLocalStorageContextManager().enable();
       context.setGlobalContextManager(contextManager);
     });
 
@@ -550,20 +503,8 @@ export const runTests = (
         port: grpcPort,
       };
 
-      assertSpan(
-        moduleName,
-        serverSpan,
-        SpanKind.SERVER,
-        validations,
-        plugin['_semconvStability']
-      );
-      assertSpan(
-        moduleName,
-        clientSpan,
-        SpanKind.CLIENT,
-        validations,
-        plugin['_semconvStability']
-      );
+      assertSpan(moduleName, serverSpan, SpanKind.SERVER, validations);
+      assertSpan(moduleName, clientSpan, SpanKind.CLIENT, validations);
 
       assertPropagation(serverSpan, clientSpan);
 
@@ -588,7 +529,7 @@ export const runTests = (
 
     const ClientServerValidationTest = (
       method: (typeof methodList)[0],
-      provider: NodeTracerProvider,
+      provider: TracerProvider,
       checkSpans = true,
       attributesValidation?: {
         serverAttributes?: Attributes;
@@ -632,7 +573,7 @@ export const runTests = (
 
     const ErrorValidationTest = (
       method: (typeof methodList)[0],
-      provider: NodeTracerProvider,
+      provider: TracerProvider,
       checkSpans = true,
       attributesValidation?: {
         serverAttributes?: Attributes;
@@ -688,7 +629,7 @@ export const runTests = (
 
     const runTestWithAttributeValidation = (
       method: (typeof methodList)[0],
-      provider: NodeTracerProvider,
+      provider: TracerProvider,
       checkSpans = true,
       attributesValidation: {
         serverAttributes?: Attributes;
@@ -706,7 +647,7 @@ export const runTests = (
 
     const runTest = (
       method: (typeof methodList)[0],
-      provider: NodeTracerProvider,
+      provider: TracerProvider,
       checkSpans = true
     ) => {
       ClientServerValidationTest(method, provider, checkSpans);
@@ -722,7 +663,7 @@ export const runTests = (
       method: (typeof methodList)[0],
       key: string,
       errorCode: number,
-      provider: NodeTracerProvider
+      provider: TracerProvider
     ) => {
       it(`should raise an error for client/server rootSpans: method=${method.methodName}, status=${key}`, async () => {
         const expectEmpty = memoryExporter.getFinishedSpans();
@@ -747,20 +688,8 @@ export const runTests = (
             };
             const serverRoot = spans[0];
             const clientRoot = spans[1];
-            assertSpan(
-              moduleName,
-              serverRoot,
-              SpanKind.SERVER,
-              validations,
-              plugin['_semconvStability']
-            );
-            assertSpan(
-              moduleName,
-              clientRoot,
-              SpanKind.CLIENT,
-              validations,
-              plugin['_semconvStability']
-            );
+            assertSpan(moduleName, serverRoot, SpanKind.SERVER, validations);
+            assertSpan(moduleName, clientRoot, SpanKind.CLIENT, validations);
             assertPropagation(serverRoot, clientRoot);
           });
       });
@@ -796,20 +725,8 @@ export const runTests = (
                 host: 'localhost',
                 port: grpcPort,
               };
-              assertSpan(
-                moduleName,
-                serverSpan,
-                SpanKind.SERVER,
-                validations,
-                plugin['_semconvStability']
-              );
-              assertSpan(
-                moduleName,
-                clientSpan,
-                SpanKind.CLIENT,
-                validations,
-                plugin['_semconvStability']
-              );
+              assertSpan(moduleName, serverSpan, SpanKind.SERVER, validations);
+              assertSpan(moduleName, clientSpan, SpanKind.CLIENT, validations);
               assertPropagation(serverSpan, clientSpan);
               assert.strictEqual(
                 rootSpan.spanContext().traceId,
@@ -833,8 +750,8 @@ export const runTests = (
     };
 
     describe('enable()', () => {
-      const provider = new NodeTracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      const provider = new TracerProvider({
+        spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
       });
       beforeEach(() => {
         memoryExporter.reset();
@@ -878,8 +795,8 @@ export const runTests = (
     });
 
     describe('disable()', () => {
-      const provider = new NodeTracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      const provider = new TracerProvider({
+        spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
       });
       beforeEach(() => {
         memoryExporter.reset();
@@ -910,8 +827,8 @@ export const runTests = (
     });
 
     describe('Test filtering requests using metadata', () => {
-      const provider = new NodeTracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      const provider = new TracerProvider({
+        spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
       });
       beforeEach(() => {
         memoryExporter.reset();
@@ -940,8 +857,8 @@ export const runTests = (
     });
 
     describe('Test filtering requests using options', () => {
-      const provider = new NodeTracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      const provider = new TracerProvider({
+        spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
       });
       const checkSpans: { [key: string]: boolean } = {
         unaryMethod: false,
@@ -1018,8 +935,8 @@ export const runTests = (
     });
 
     describe('Test capturing metadata', () => {
-      const provider = new NodeTracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      const provider = new TracerProvider({
+        spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
       });
 
       const clientMetadata = new Metadata();

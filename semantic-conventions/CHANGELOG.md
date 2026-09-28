@@ -15,6 +15,1386 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :house: Internal
 
+* build: migrate the package build from `tsc` to `tsdown`, emitting dual CJS/ESM output from a single `dist/` directory [#6293](https://github.com/open-telemetry/opentelemetry-js/pull/6293) @overbalance
+  * The public entry points are unchanged: `@opentelemetry/semantic-conventions` and `@opentelemetry/semantic-conventions/incubating`. This package already declared an `exports` map, so deep imports such as `@opentelemetry/semantic-conventions/build/src/...` were rejected before this change and continue to be.
+  * The emitted files moved out of `build/src` (CJS), `build/esm` and `build/esnext` (ESM) into `dist/`, using `.cjs`/`.mjs` extensions with matching `.d.cts`/`.d.mts` declarations. The non-standard `esnext` condition has been dropped in favour of the standard `import`/`require` conditions.
+
+## 1.43.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.43.0 [#6883](https://github.com/open-telemetry/opentelemetry-js/pull/6883)
+  * Semantic Conventions v1.43.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1430) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *1 added export*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *1 added export*
+
+#### Stable changes in v1.43.0
+
+<details open>
+<summary>1 added export</summary>
+
+```js
+TELEMETRY_SDK_LANGUAGE_VALUE_KOTLIN // "kotlin"
+```
+
+</details>
+
+#### Unstable changes in v1.43.0
+
+<details>
+<summary>1 added export</summary>
+
+```js
+ATTR_AZURE_RESOURCE_GROUP_NAME // azure.resource_group.name
+```
+
+</details>
+
+## 1.42.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.42.0 [#6871](https://github.com/open-telemetry/opentelemetry-js/pull/6871) @trentm
+  * Semantic Conventions v1.42.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1420) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *46 added exports*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *74 newly deprecated exports, 16 added exports*
+    * Notably: This deprecates a number of GenAI-related exports. GenAI Semantic Conventions have been [federated to a new semantic-conventions-genai repository](https://github.com/open-telemetry/semantic-conventions-genai). The eventual plan is to [publish a separate `@opentelemetry/semantic-conventions-genai` package](https://github.com/open-telemetry/opentelemetry-js/issues/6783) with these exports.
+
+#### Stable changes in v1.42.0
+
+<details open>
+<summary>46 added exports</summary>
+
+```js
+ATTR_CONTAINER_ID                 // container.id
+ATTR_CONTAINER_IMAGE_NAME         // container.image.name
+ATTR_CONTAINER_IMAGE_REPO_DIGESTS // container.image.repo_digests
+ATTR_CONTAINER_IMAGE_TAGS         // container.image.tags
+
+ATTR_K8S_CLUSTER_NAME             // k8s.cluster.name
+ATTR_K8S_CLUSTER_UID              // k8s.cluster.uid
+ATTR_K8S_CONTAINER_NAME           // k8s.container.name
+ATTR_K8S_CONTAINER_RESTART_COUNT  // k8s.container.restart_count
+ATTR_K8S_CRONJOB_ANNOTATION       // (key) => `k8s.cronjob.annotation.${key}`
+ATTR_K8S_CRONJOB_LABEL            // (key) => `k8s.cronjob.label.${key}`
+ATTR_K8S_CRONJOB_NAME             // k8s.cronjob.name
+ATTR_K8S_CRONJOB_UID              // k8s.cronjob.uid
+ATTR_K8S_DAEMONSET_ANNOTATION     // (key) => `k8s.daemonset.annotation.${key}`
+ATTR_K8S_DAEMONSET_LABEL          // (key) => `k8s.daemonset.label.${key}`
+ATTR_K8S_DAEMONSET_NAME           // k8s.daemonset.name
+ATTR_K8S_DAEMONSET_UID            // k8s.daemonset.uid
+ATTR_K8S_DEPLOYMENT_ANNOTATION    // (key) => `k8s.deployment.annotation.${key}`
+ATTR_K8S_DEPLOYMENT_LABEL         // (key) => `k8s.deployment.label.${key}`
+ATTR_K8S_DEPLOYMENT_NAME          // k8s.deployment.name
+ATTR_K8S_DEPLOYMENT_UID           // k8s.deployment.uid
+ATTR_K8S_JOB_ANNOTATION           // (key) => `k8s.job.annotation.${key}`
+ATTR_K8S_JOB_LABEL                // (key) => `k8s.job.label.${key}`
+ATTR_K8S_JOB_NAME                 // k8s.job.name
+ATTR_K8S_JOB_UID                  // k8s.job.uid
+ATTR_K8S_NAMESPACE_ANNOTATION     // (key) => `k8s.namespace.annotation.${key}`
+ATTR_K8S_NAMESPACE_LABEL          // (key) => `k8s.namespace.label.${key}`
+ATTR_K8S_NAMESPACE_NAME           // k8s.namespace.name
+ATTR_K8S_NODE_ANNOTATION          // (key) => `k8s.node.annotation.${key}`
+ATTR_K8S_NODE_LABEL               // (key) => `k8s.node.label.${key}`
+ATTR_K8S_NODE_NAME                // k8s.node.name
+ATTR_K8S_NODE_UID                 // k8s.node.uid
+ATTR_K8S_POD_ANNOTATION           // (key) => `k8s.pod.annotation.${key}`
+ATTR_K8S_POD_HOSTNAME             // k8s.pod.hostname
+ATTR_K8S_POD_IP                   // k8s.pod.ip
+ATTR_K8S_POD_LABEL                // (key) => `k8s.pod.label.${key}`
+ATTR_K8S_POD_NAME                 // k8s.pod.name
+ATTR_K8S_POD_START_TIME           // k8s.pod.start_time
+ATTR_K8S_POD_UID                  // k8s.pod.uid
+ATTR_K8S_REPLICASET_ANNOTATION    // (key) => `k8s.replicaset.annotation.${key}`
+ATTR_K8S_REPLICASET_LABEL         // (key) => `k8s.replicaset.label.${key}`
+ATTR_K8S_REPLICASET_NAME          // k8s.replicaset.name
+ATTR_K8S_REPLICASET_UID           // k8s.replicaset.uid
+ATTR_K8S_STATEFULSET_ANNOTATION   // (key) => `k8s.statefulset.annotation.${key}`
+ATTR_K8S_STATEFULSET_LABEL        // (key) => `k8s.statefulset.label.${key}`
+ATTR_K8S_STATEFULSET_NAME         // k8s.statefulset.name
+ATTR_K8S_STATEFULSET_UID          // k8s.statefulset.uid
+```
+
+</details>
+
+#### Unstable changes in v1.42.0
+
+<details>
+<summary>74 newly deprecated exports</summary>
+
+```js
+METRIC_GEN_AI_CLIENT_OPERATION_DURATION              // gen_ai.client.operation.duration: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+METRIC_GEN_AI_CLIENT_OPERATION_TIME_PER_OUTPUT_CHUNK // gen_ai.client.operation.time_per_output_chunk: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+METRIC_GEN_AI_CLIENT_OPERATION_TIME_TO_FIRST_CHUNK   // gen_ai.client.operation.time_to_first_chunk: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+METRIC_GEN_AI_CLIENT_TOKEN_USAGE                     // gen_ai.client.token.usage: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+METRIC_GEN_AI_SERVER_REQUEST_DURATION                // gen_ai.server.request.duration: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+METRIC_GEN_AI_SERVER_TIME_PER_OUTPUT_TOKEN           // gen_ai.server.time_per_output_token: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+METRIC_GEN_AI_SERVER_TIME_TO_FIRST_TOKEN             // gen_ai.server.time_to_first_token: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+METRIC_MCP_CLIENT_OPERATION_DURATION                 // mcp.client.operation.duration: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+METRIC_MCP_CLIENT_SESSION_DURATION                   // mcp.client.session.duration: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+METRIC_MCP_SERVER_OPERATION_DURATION                 // mcp.server.operation.duration: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+METRIC_MCP_SERVER_SESSION_DURATION                   // mcp.server.session.duration: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+METRIC_V8JS_MEMORY_HEAP_LIMIT                        // v8js.memory.heap.limit: Replaced by `v8js.memory.heap.space.size`.
+EVENT_GEN_AI_CLIENT_INFERENCE_OPERATION_DETAILS      // gen_ai.client.inference.operation.details: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+EVENT_GEN_AI_CLIENT_OPERATION_EXCEPTION              // gen_ai.client.operation.exception: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+EVENT_GEN_AI_EVALUATION_RESULT                       // gen_ai.evaluation.result: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+CPU_MODE_VALUE_KERNEL                                // kernel: Replaced by `system`.
+ATTR_GEN_AI_AGENT_DESCRIPTION                        // gen_ai.agent.description: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_AGENT_ID                                 // gen_ai.agent.id: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_AGENT_NAME                               // gen_ai.agent.name: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_AGENT_VERSION                            // gen_ai.agent.version: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_CONVERSATION_ID                          // gen_ai.conversation.id: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_DATA_SOURCE_ID                           // gen_ai.data_source.id: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_EMBEDDINGS_DIMENSION_COUNT               // gen_ai.embeddings.dimension.count: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_EVALUATION_EXPLANATION                   // gen_ai.evaluation.explanation: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_EVALUATION_NAME                          // gen_ai.evaluation.name: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_EVALUATION_SCORE_LABEL                   // gen_ai.evaluation.score.label: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_EVALUATION_SCORE_VALUE                   // gen_ai.evaluation.score.value: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_INPUT_MESSAGES                           // gen_ai.input.messages: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_OPERATION_NAME                           // gen_ai.operation.name: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_OUTPUT_MESSAGES                          // gen_ai.output.messages: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_OUTPUT_TYPE                              // gen_ai.output.type: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_PROMPT_NAME                              // gen_ai.prompt.name: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_PROVIDER_NAME                            // gen_ai.provider.name: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_REQUEST_CHOICE_COUNT                     // gen_ai.request.choice.count: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_REQUEST_ENCODING_FORMATS                 // gen_ai.request.encoding_formats: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_REQUEST_FREQUENCY_PENALTY                // gen_ai.request.frequency_penalty: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_REQUEST_MAX_TOKENS                       // gen_ai.request.max_tokens: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_REQUEST_MODEL                            // gen_ai.request.model: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_REQUEST_PRESENCE_PENALTY                 // gen_ai.request.presence_penalty: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_REQUEST_SEED                             // gen_ai.request.seed: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_REQUEST_STOP_SEQUENCES                   // gen_ai.request.stop_sequences: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_REQUEST_STREAM                           // gen_ai.request.stream: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_REQUEST_TEMPERATURE                      // gen_ai.request.temperature: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_REQUEST_TOP_K                            // gen_ai.request.top_k: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_REQUEST_TOP_P                            // gen_ai.request.top_p: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_RESPONSE_FINISH_REASONS                  // gen_ai.response.finish_reasons: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_RESPONSE_ID                              // gen_ai.response.id: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_RESPONSE_MODEL                           // gen_ai.response.model: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_RESPONSE_TIME_TO_FIRST_CHUNK             // gen_ai.response.time_to_first_chunk: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_RETRIEVAL_DOCUMENTS                      // gen_ai.retrieval.documents: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_RETRIEVAL_QUERY_TEXT                     // gen_ai.retrieval.query.text: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_SYSTEM_INSTRUCTIONS                      // gen_ai.system_instructions: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_TOKEN_TYPE                               // gen_ai.token.type: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_TOOL_CALL_ARGUMENTS                      // gen_ai.tool.call.arguments: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_TOOL_CALL_ID                             // gen_ai.tool.call.id: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_TOOL_CALL_RESULT                         // gen_ai.tool.call.result: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_TOOL_DEFINITIONS                         // gen_ai.tool.definitions: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_TOOL_DESCRIPTION                         // gen_ai.tool.description: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_TOOL_NAME                                // gen_ai.tool.name: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_TOOL_TYPE                                // gen_ai.tool.type: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_USAGE_CACHE_CREATION_INPUT_TOKENS        // gen_ai.usage.cache_creation.input_tokens: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_USAGE_CACHE_READ_INPUT_TOKENS            // gen_ai.usage.cache_read.input_tokens: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_USAGE_INPUT_TOKENS                       // gen_ai.usage.input_tokens: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_USAGE_OUTPUT_TOKENS                      // gen_ai.usage.output_tokens: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_USAGE_REASONING_OUTPUT_TOKENS            // gen_ai.usage.reasoning.output_tokens: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_GEN_AI_WORKFLOW_NAME                            // gen_ai.workflow.name: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_MCP_METHOD_NAME                                 // mcp.method.name: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_MCP_PROTOCOL_VERSION                            // mcp.protocol.version: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_MCP_RESOURCE_URI                                // mcp.resource.uri: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_MCP_SESSION_ID                                  // mcp.session.id: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_OPENAI_API_TYPE                                 // openai.api.type: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_OPENAI_REQUEST_SERVICE_TIER                     // openai.request.service_tier: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_OPENAI_RESPONSE_SERVICE_TIER                    // openai.response.service_tier: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+ATTR_OPENAI_RESPONSE_SYSTEM_FINGERPRINT              // openai.response.system_fingerprint: Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
+```
+
+</details>
+
+<details>
+<summary>16 added exports</summary>
+
+```js
+METRIC_K8S_CONTAINER_EPHEMERAL_STORAGE_USAGE         // k8s.container.ephemeral_storage.usage
+
+METRIC_SYSTEM_FILESYSTEM_LOCK_COUNT                  // system.filesystem.lock.count
+
+METRIC_V8JS_MEMORY_HEAP_SPACE_SIZE                   // v8js.memory.heap.space.size
+
+EVENT_APP_CRASH                                      // app.crash
+
+ATTR_APP_CRASH_ID                                    // app.crash.id
+
+ATTR_BROWSER_DOCUMENT_URL_FULL                       // browser.document.url.full
+
+ATTR_FILE_LOCK_MECHANISM                             // file.lock.mechanism
+ATTR_FILE_LOCK_MODE                                  // file.lock.mode
+ATTR_FILE_LOCK_TYPE                                  // file.lock.type
+  FILE_LOCK_TYPE_VALUE_READ                            // "read"
+  FILE_LOCK_TYPE_VALUE_WRITE                           // "write"
+
+ATTR_GCP_GCE_INSTANCE_LABELS                         // (key) => `gcp.gce.instance.labels.${key}`
+
+ATTR_K8S_CONTAINER_EPHEMERAL_STORAGE_FS_TYPE         // k8s.container.ephemeral_storage.fs_type
+  K8S_CONTAINER_EPHEMERAL_STORAGE_FS_TYPE_VALUE_LOGS   // "logs"
+  K8S_CONTAINER_EPHEMERAL_STORAGE_FS_TYPE_VALUE_ROOTFS // "rootfs"
+
+PROFILE_FRAME_TYPE_VALUE_LUAJIT                      // "luajit"
+```
+
+</details>
+
+## 1.41.1
+
+### :rocket: Features
+
+Note: Semantic Conventions v1.41.0 included [an issue](https://github.com/open-telemetry/semantic-conventions/issues/3705) that prevented publishing a "1.41.0" version of this package.
+
+* feat: update semantic conventions to v1.41.1 [#6695](https://github.com/open-telemetry/opentelemetry-js/pull/6695) @trentm
+  * Semantic Conventions v1.41.1: [changelog v1.41.0](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1410) | [changelog v1.41.1](https://github.com/open-telemetry/semantic-conventions/blob/release/v1.41.x/CHANGELOG.md#v1411) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *8 added exports*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *2 exported values changed, 4 newly deprecated exports, 80 added exports*
+
+#### Stable changes in v1.41.1
+
+<details open>
+<summary>8 added exports</summary>
+
+```js
+ATTR_DEPLOYMENT_ENVIRONMENT_NAME              // deployment.environment.name
+  DEPLOYMENT_ENVIRONMENT_NAME_VALUE_DEVELOPMENT // "development"
+  DEPLOYMENT_ENVIRONMENT_NAME_VALUE_PRODUCTION  // "production"
+  DEPLOYMENT_ENVIRONMENT_NAME_VALUE_STAGING     // "staging"
+  DEPLOYMENT_ENVIRONMENT_NAME_VALUE_TEST        // "test"
+
+ATTR_OTEL_EVENT_NAME                          // otel.event.name
+
+ATTR_TELEMETRY_DISTRO_NAME                    // telemetry.distro.name
+ATTR_TELEMETRY_DISTRO_VERSION                 // telemetry.distro.version
+```
+
+</details>
+
+#### Unstable changes in v1.41.1
+
+<details>
+<summary>2 exported values changed</summary>
+
+```js
+METRIC_K8S_CONTAINER_CPU_LIMIT_UTILIZATION   // k8s.container.cpu.limit_utilization -> k8s.container.cpu.limit.utilization
+METRIC_K8S_CONTAINER_CPU_REQUEST_UTILIZATION // k8s.container.cpu.request_utilization -> k8s.container.cpu.request.utilization
+```
+
+</details>
+
+<details>
+<summary>4 newly deprecated exports</summary>
+
+```js
+METRIC_K8S_CONTAINER_CPU_LIMIT      // k8s.container.cpu.limit: Replaced by `k8s.container.cpu.limit.desired`.
+METRIC_K8S_CONTAINER_CPU_REQUEST    // k8s.container.cpu.request: Replaced by `k8s.container.cpu.request.desired`.
+METRIC_K8S_CONTAINER_MEMORY_LIMIT   // k8s.container.memory.limit: Replaced by `k8s.container.memory.limit.desired`.
+METRIC_K8S_CONTAINER_MEMORY_REQUEST // k8s.container.memory.request: Replaced by `k8s.container.memory.request.desired`.
+```
+
+</details>
+
+<details>
+<summary>80 added exports</summary>
+
+```js
+METRIC_GEN_AI_CLIENT_OPERATION_TIME_PER_OUTPUT_CHUNK // gen_ai.client.operation.time_per_output_chunk
+METRIC_GEN_AI_CLIENT_OPERATION_TIME_TO_FIRST_CHUNK   // gen_ai.client.operation.time_to_first_chunk
+
+METRIC_GO_CPU_TIME                                   // go.cpu.time
+METRIC_GO_MEMORY_GC_CYCLES                           // go.memory.gc.cycles
+METRIC_GO_MEMORY_GC_PAUSE_DURATION                   // go.memory.gc.pause.duration
+
+METRIC_K8S_CONTAINER_CPU_LIMIT_CURRENT               // k8s.container.cpu.limit.current
+METRIC_K8S_CONTAINER_CPU_LIMIT_DESIRED               // k8s.container.cpu.limit.desired
+METRIC_K8S_CONTAINER_CPU_REQUEST_CURRENT             // k8s.container.cpu.request.current
+METRIC_K8S_CONTAINER_CPU_REQUEST_DESIRED             // k8s.container.cpu.request.desired
+METRIC_K8S_CONTAINER_MEMORY_LIMIT_CURRENT            // k8s.container.memory.limit.current
+METRIC_K8S_CONTAINER_MEMORY_LIMIT_DESIRED            // k8s.container.memory.limit.desired
+METRIC_K8S_CONTAINER_MEMORY_REQUEST_CURRENT          // k8s.container.memory.request.current
+METRIC_K8S_CONTAINER_MEMORY_REQUEST_DESIRED          // k8s.container.memory.request.desired
+METRIC_K8S_NODE_SYSTEM_CONTAINER_CPU_TIME            // k8s.node.system_container.cpu.time
+METRIC_K8S_NODE_SYSTEM_CONTAINER_CPU_USAGE           // k8s.node.system_container.cpu.usage
+METRIC_K8S_NODE_SYSTEM_CONTAINER_MEMORY_USAGE        // k8s.node.system_container.memory.usage
+METRIC_K8S_NODE_SYSTEM_CONTAINER_MEMORY_WORKING_SET  // k8s.node.system_container.memory.working_set
+METRIC_K8S_PERSISTENTVOLUME_STATUS_PHASE             // k8s.persistentvolume.status.phase
+METRIC_K8S_PERSISTENTVOLUME_STORAGE_CAPACITY         // k8s.persistentvolume.storage.capacity
+METRIC_K8S_PERSISTENTVOLUMECLAIM_STATUS_PHASE        // k8s.persistentvolumeclaim.status.phase
+METRIC_K8S_PERSISTENTVOLUMECLAIM_STORAGE_CAPACITY    // k8s.persistentvolumeclaim.storage.capacity
+METRIC_K8S_PERSISTENTVOLUMECLAIM_STORAGE_REQUEST     // k8s.persistentvolumeclaim.storage.request
+
+METRIC_SYSTEM_MEMORY_LINUX_HUGEPAGES_LIMIT           // system.memory.linux.hugepages.limit
+METRIC_SYSTEM_MEMORY_LINUX_HUGEPAGES_PAGE_SIZE       // system.memory.linux.hugepages.page_size
+METRIC_SYSTEM_MEMORY_LINUX_HUGEPAGES_RESERVED        // system.memory.linux.hugepages.reserved
+METRIC_SYSTEM_MEMORY_LINUX_HUGEPAGES_SURPLUS         // system.memory.linux.hugepages.surplus
+METRIC_SYSTEM_MEMORY_LINUX_HUGEPAGES_USAGE           // system.memory.linux.hugepages.usage
+METRIC_SYSTEM_MEMORY_LINUX_HUGEPAGES_UTILIZATION     // system.memory.linux.hugepages.utilization
+
+METRIC_V8JS_RESOURCE_ACTIVE                          // v8js.resource.active
+
+EVENT_FAAS_INVOCATION_EXCEPTION                      // faas.invocation.exception
+EVENT_GEN_AI_CLIENT_OPERATION_EXCEPTION              // gen_ai.client.operation.exception
+EVENT_MESSAGING_CREATE_EXCEPTION                     // messaging.create.exception
+EVENT_MESSAGING_PROCESS_EXCEPTION                    // messaging.process.exception
+EVENT_MESSAGING_RECEIVE_EXCEPTION                    // messaging.receive.exception
+EVENT_MESSAGING_SEND_EXCEPTION                       // messaging.send.exception
+EVENT_MESSAGING_SETTLE_EXCEPTION                     // messaging.settle.exception
+
+GEN_AI_OPERATION_NAME_VALUE_INVOKE_WORKFLOW          // "invoke_workflow"
+ATTR_GEN_AI_REQUEST_STREAM                           // gen_ai.request.stream
+ATTR_GEN_AI_RESPONSE_TIME_TO_FIRST_CHUNK             // gen_ai.response.time_to_first_chunk
+ATTR_GEN_AI_USAGE_REASONING_OUTPUT_TOKENS            // gen_ai.usage.reasoning.output_tokens
+ATTR_GEN_AI_WORKFLOW_NAME                            // gen_ai.workflow.name
+
+ATTR_GO_CPU_DETAILED_STATE                           // go.cpu.detailed_state
+ATTR_GO_CPU_STATE                                    // go.cpu.state
+  GO_CPU_STATE_VALUE_GC                                // "gc"
+  GO_CPU_STATE_VALUE_IDLE                              // "idle"
+  GO_CPU_STATE_VALUE_SCAVENGE                          // "scavenge"
+  GO_CPU_STATE_VALUE_USER                              // "user"
+ATTR_GO_MEMORY_DETAILED_TYPE                         // go.memory.detailed_type
+
+ATTR_K8S_NODE_SYSTEM_CONTAINER_NAME                  // k8s.node.system_container.name
+ATTR_K8S_PERSISTENTVOLUME_ANNOTATION                 // (key) => `k8s.persistentvolume.annotation.${key}`
+ATTR_K8S_PERSISTENTVOLUME_LABEL                      // (key) => `k8s.persistentvolume.label.${key}`
+ATTR_K8S_PERSISTENTVOLUME_NAME                       // k8s.persistentvolume.name
+ATTR_K8S_PERSISTENTVOLUME_RECLAIM_POLICY             // k8s.persistentvolume.reclaim_policy
+  K8S_PERSISTENTVOLUME_RECLAIM_POLICY_VALUE_DELETE     // "Delete"
+  K8S_PERSISTENTVOLUME_RECLAIM_POLICY_VALUE_RECYCLE    // "Recycle"
+  K8S_PERSISTENTVOLUME_RECLAIM_POLICY_VALUE_RETAIN     // "Retain"
+ATTR_K8S_PERSISTENTVOLUME_STATUS_PHASE               // k8s.persistentvolume.status.phase
+  K8S_PERSISTENTVOLUME_STATUS_PHASE_VALUE_AVAILABLE    // "Available"
+  K8S_PERSISTENTVOLUME_STATUS_PHASE_VALUE_BOUND        // "Bound"
+  K8S_PERSISTENTVOLUME_STATUS_PHASE_VALUE_FAILED       // "Failed"
+  K8S_PERSISTENTVOLUME_STATUS_PHASE_VALUE_PENDING      // "Pending"
+  K8S_PERSISTENTVOLUME_STATUS_PHASE_VALUE_RELEASED     // "Released"
+ATTR_K8S_PERSISTENTVOLUME_UID                        // k8s.persistentvolume.uid
+ATTR_K8S_PERSISTENTVOLUMECLAIM_ANNOTATION            // (key) => `k8s.persistentvolumeclaim.annotation.${key}`
+ATTR_K8S_PERSISTENTVOLUMECLAIM_LABEL                 // (key) => `k8s.persistentvolumeclaim.label.${key}`
+ATTR_K8S_PERSISTENTVOLUMECLAIM_NAME                  // k8s.persistentvolumeclaim.name
+ATTR_K8S_PERSISTENTVOLUMECLAIM_STATUS_PHASE          // k8s.persistentvolumeclaim.status.phase
+  K8S_PERSISTENTVOLUMECLAIM_STATUS_PHASE_VALUE_BOUND   // "Bound"
+  K8S_PERSISTENTVOLUMECLAIM_STATUS_PHASE_VALUE_LOST    // "Lost"
+  K8S_PERSISTENTVOLUMECLAIM_STATUS_PHASE_VALUE_PENDING // "Pending"
+ATTR_K8S_PERSISTENTVOLUMECLAIM_UID                   // k8s.persistentvolumeclaim.uid
+
+ATTR_SYSTEM_MEMORY_LINUX_HUGEPAGES_STATE             // system.memory.linux.hugepages.state
+  SYSTEM_MEMORY_LINUX_HUGEPAGES_STATE_VALUE_FREE       // "free"
+  SYSTEM_MEMORY_LINUX_HUGEPAGES_STATE_VALUE_USED       // "used"
+
+ATTR_V8JS_RESOURCE_TYPE                              // v8js.resource.type
+  V8JS_RESOURCE_TYPE_VALUE_IMMEDIATE                   // "Immediate"
+  V8JS_RESOURCE_TYPE_VALUE_TCPSERVERWRAP               // "TCPServerWrap"
+  V8JS_RESOURCE_TYPE_VALUE_TCPWRAP                     // "TCPWrap"
+  V8JS_RESOURCE_TYPE_VALUE_TIMEOUT                     // "Timeout"
+  V8JS_RESOURCE_TYPE_VALUE_TTYWRAP                     // "TTYWrap"
+```
+
+</details>
+
+## 1.40.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.40.0 [#6438](https://github.com/open-telemetry/opentelemetry-js/pull/6438)
+  * Semantic Conventions v1.40.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1400) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *2 added exports*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *11 newly deprecated exports, 56 added exports*
+
+#### Stable changes in v1.40.0
+
+<details open>
+<summary>2 added exports</summary>
+
+```js
+ATTR_SERVICE_INSTANCE_ID // service.instance.id
+ATTR_SERVICE_NAMESPACE   // service.namespace
+```
+
+</details>
+
+#### Unstable changes in v1.40.0
+
+<details>
+<summary>11 newly deprecated exports</summary>
+
+```js
+METRIC_RPC_CLIENT_REQUEST_SIZE     // rpc.client.request.size: Removed, no replacement at this time.
+METRIC_RPC_CLIENT_RESPONSE_SIZE    // rpc.client.response.size: Removed, no replacement at this time.
+METRIC_RPC_SERVER_REQUEST_SIZE     // rpc.server.request.size: Removed, no replacement at this time.
+METRIC_RPC_SERVER_RESPONSE_SIZE    // rpc.server.response.size: Removed, no replacement at this time.
+METRIC_SYSTEM_MEMORY_SHARED        // system.memory.shared: Replaced by `system.memory.linux.shared`.
+EVENT_RPC_MESSAGE                  // rpc.message: Deprecated, no replacement at this time.
+ATTR_ERROR_MESSAGE                 // error.message: Use domain-specific error message attribute. For example, use `feature_flag.error.message` for feature flag errors.
+ATTR_RPC_MESSAGE_COMPRESSED_SIZE   // rpc.message.compressed_size: Deprecated, no replacement at this time.
+ATTR_RPC_MESSAGE_ID                // rpc.message.id: Deprecated, no replacement at this time.
+ATTR_RPC_MESSAGE_TYPE              // rpc.message.type: Deprecated, no replacement at this time.
+ATTR_RPC_MESSAGE_UNCOMPRESSED_SIZE // rpc.message.uncompressed_size: Deprecated, no replacement at this time.
+```
+
+</details>
+
+<details>
+<summary>56 added exports</summary>
+
+```js
+METRIC_JVM_FILE_DESCRIPTOR_LIMIT                 // jvm.file_descriptor.limit
+
+METRIC_K8S_SERVICE_ENDPOINT_COUNT                // k8s.service.endpoint.count
+METRIC_K8S_SERVICE_LOAD_BALANCER_INGRESS_COUNT   // k8s.service.load_balancer.ingress.count
+
+METRIC_SYSTEM_MEMORY_LINUX_SHARED                // system.memory.linux.shared
+
+EVENT_DB_CLIENT_OPERATION_EXCEPTION              // db.client.operation.exception
+EVENT_HTTP_CLIENT_REQUEST_EXCEPTION              // http.client.request.exception
+EVENT_HTTP_SERVER_REQUEST_EXCEPTION              // http.server.request.exception
+EVENT_RPC_CLIENT_CALL_EXCEPTION                  // rpc.client.call.exception
+EVENT_RPC_SERVER_CALL_EXCEPTION                  // rpc.server.call.exception
+
+ATTR_FEATURE_FLAG_ERROR_MESSAGE                  // feature_flag.error.message
+
+ATTR_GCP_GCE_INSTANCE_GROUP_MANAGER_NAME         // gcp.gce.instance_group_manager.name
+ATTR_GCP_GCE_INSTANCE_GROUP_MANAGER_REGION       // gcp.gce.instance_group_manager.region
+ATTR_GCP_GCE_INSTANCE_GROUP_MANAGER_ZONE         // gcp.gce.instance_group_manager.zone
+
+ATTR_GEN_AI_AGENT_VERSION                        // gen_ai.agent.version
+GEN_AI_OPERATION_NAME_VALUE_RETRIEVAL            // "retrieval"
+ATTR_GEN_AI_RETRIEVAL_DOCUMENTS                  // gen_ai.retrieval.documents
+ATTR_GEN_AI_RETRIEVAL_QUERY_TEXT                 // gen_ai.retrieval.query.text
+ATTR_GEN_AI_USAGE_CACHE_CREATION_INPUT_TOKENS    // gen_ai.usage.cache_creation.input_tokens
+ATTR_GEN_AI_USAGE_CACHE_READ_INPUT_TOKENS        // gen_ai.usage.cache_read.input_tokens
+
+ATTR_K8S_SERVICE_ANNOTATION                      // (key) => `k8s.service.annotation.${key}`
+ATTR_K8S_SERVICE_ENDPOINT_ADDRESS_TYPE           // k8s.service.endpoint.address_type
+  K8S_SERVICE_ENDPOINT_ADDRESS_TYPE_VALUE_FQDN     // "FQDN"
+  K8S_SERVICE_ENDPOINT_ADDRESS_TYPE_VALUE_IPV4     // "IPv4"
+  K8S_SERVICE_ENDPOINT_ADDRESS_TYPE_VALUE_IPV6     // "IPv6"
+ATTR_K8S_SERVICE_ENDPOINT_CONDITION              // k8s.service.endpoint.condition
+  K8S_SERVICE_ENDPOINT_CONDITION_VALUE_READY       // "ready"
+  K8S_SERVICE_ENDPOINT_CONDITION_VALUE_SERVING     // "serving"
+  K8S_SERVICE_ENDPOINT_CONDITION_VALUE_TERMINATING // "terminating"
+ATTR_K8S_SERVICE_ENDPOINT_ZONE                   // k8s.service.endpoint.zone
+ATTR_K8S_SERVICE_LABEL                           // (key) => `k8s.service.label.${key}`
+ATTR_K8S_SERVICE_NAME                            // k8s.service.name
+ATTR_K8S_SERVICE_PUBLISH_NOT_READY_ADDRESSES     // k8s.service.publish_not_ready_addresses
+ATTR_K8S_SERVICE_SELECTOR                        // (key) => `k8s.service.selector.${key}`
+ATTR_K8S_SERVICE_TRAFFIC_DISTRIBUTION            // k8s.service.traffic_distribution
+ATTR_K8S_SERVICE_TYPE                            // k8s.service.type
+  K8S_SERVICE_TYPE_VALUE_CLUSTER_IP                // "ClusterIP"
+  K8S_SERVICE_TYPE_VALUE_EXTERNAL_NAME             // "ExternalName"
+  K8S_SERVICE_TYPE_VALUE_LOAD_BALANCER             // "LoadBalancer"
+  K8S_SERVICE_TYPE_VALUE_NODE_PORT                 // "NodePort"
+ATTR_K8S_SERVICE_UID                             // k8s.service.uid
+
+ATTR_OPENAI_API_TYPE                             // openai.api.type
+  OPENAI_API_TYPE_VALUE_CHAT_COMPLETIONS           // "chat_completions"
+  OPENAI_API_TYPE_VALUE_RESPONSES                  // "responses"
+
+ATTR_ORACLE_DB_DOMAIN                            // oracle.db.domain
+ATTR_ORACLE_DB_INSTANCE_NAME                     // oracle.db.instance.name
+ATTR_ORACLE_DB_NAME                              // oracle.db.name
+ATTR_ORACLE_DB_PDB                               // oracle.db.pdb
+ATTR_ORACLE_DB_SERVICE                           // oracle.db.service
+ATTR_ORACLE_CLOUD_REALM                          // oracle_cloud.realm
+
+ATTR_PPROF_SCOPE_DEFAULT_SAMPLE_TYPE             // pprof.scope.default_sample_type
+ATTR_PPROF_SCOPE_SAMPLE_TYPE_ORDER               // pprof.scope.sample_type_order
+
+ATTR_SERVICE_CRITICALITY                         // service.criticality
+  SERVICE_CRITICALITY_VALUE_CRITICAL               // "critical"
+  SERVICE_CRITICALITY_VALUE_HIGH                   // "high"
+  SERVICE_CRITICALITY_VALUE_LOW                    // "low"
+  SERVICE_CRITICALITY_VALUE_MEDIUM                 // "medium"
+```
+
+</details>
+
+## 1.39.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.39.0 [#6301](https://github.com/open-telemetry/opentelemetry-js/pull/6301) @trentm
+  * Semantic Conventions v1.39.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1390) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *none*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *19 newly deprecated exports, 70 added exports*
+
+#### Unstable changes in v1.39.0
+
+<details>
+<summary>19 newly deprecated exports</summary>
+
+```js
+METRIC_PROCESS_OPEN_FILE_DESCRIPTOR_COUNT // process.open_file_descriptor.count: Replaced by `process.unix.file_descriptor.count`.
+METRIC_RPC_CLIENT_DURATION                // rpc.client.duration: Replaced by `rpc.client.call.duration` with unit `s`.
+METRIC_RPC_SERVER_DURATION                // rpc.server.duration: Replaced by `rpc.server.call.duration` with unit `s`.
+METRIC_SYSTEM_LINUX_MEMORY_AVAILABLE      // system.linux.memory.available: Replaced by `system.memory.linux.available`.
+METRIC_SYSTEM_LINUX_MEMORY_SLAB_USAGE     // system.linux.memory.slab.usage: Replaced by `system.memory.linux.slab.usage`.
+ATTR_LINUX_MEMORY_SLAB_STATE              // linux.memory.slab.state: Replaced by `system.memory.linux.slab.state`.
+ATTR_PEER_SERVICE                         // peer.service: Replaced by `service.peer.name`.
+ATTR_RPC_CONNECT_RPC_ERROR_CODE           // rpc.connect_rpc.error_code: Replaced by `rpc.response.status_code`.
+ATTR_RPC_CONNECT_RPC_REQUEST_METADATA     // (key) => `rpc.connect_rpc.request.metadata.${key}`: Replaced by `rpc.request.metadata`.
+ATTR_RPC_CONNECT_RPC_RESPONSE_METADATA    // (key) => `rpc.connect_rpc.response.metadata.${key}`: Replaced by `rpc.response.metadata`.
+ATTR_RPC_GRPC_REQUEST_METADATA            // (key) => `rpc.grpc.request.metadata.${key}`: Replaced by `rpc.request.metadata`.
+ATTR_RPC_GRPC_RESPONSE_METADATA           // (key) => `rpc.grpc.response.metadata.${key}`: Replaced by `rpc.response.metadata`.
+ATTR_RPC_GRPC_STATUS_CODE                 // rpc.grpc.status_code: Use string representation of the gRPC status code on the `rpc.response.status_code` attribute.
+ATTR_RPC_JSONRPC_ERROR_CODE               // rpc.jsonrpc.error_code: Use string representation of the error code on the `rpc.response.status_code` attribute.
+ATTR_RPC_JSONRPC_ERROR_MESSAGE            // rpc.jsonrpc.error_message: Use the span status description or `error.message` attribute on other signals.
+ATTR_RPC_JSONRPC_REQUEST_ID               // rpc.jsonrpc.request_id: Replaced by `jsonrpc.request.id`.
+ATTR_RPC_JSONRPC_VERSION                  // rpc.jsonrpc.version: Replaced by `jsonrpc.protocol.version`.
+ATTR_RPC_SERVICE                          // rpc.service: Value should be included in `rpc.method` which is expected to be a fully-qualified name.
+ATTR_RPC_SYSTEM                           // rpc.system: Replaced by `rpc.system.name`.
+```
+
+</details>
+
+<details>
+<summary>70 added exports</summary>
+
+```js
+METRIC_MCP_CLIENT_OPERATION_DURATION                       // mcp.client.operation.duration
+METRIC_MCP_CLIENT_SESSION_DURATION                         // mcp.client.session.duration
+METRIC_MCP_SERVER_OPERATION_DURATION                       // mcp.server.operation.duration
+METRIC_MCP_SERVER_SESSION_DURATION                         // mcp.server.session.duration
+
+METRIC_PROCESS_UNIX_FILE_DESCRIPTOR_COUNT                  // process.unix.file_descriptor.count
+METRIC_PROCESS_WINDOWS_HANDLE_COUNT                        // process.windows.handle.count
+
+METRIC_RPC_CLIENT_CALL_DURATION                            // rpc.client.call.duration
+METRIC_RPC_SERVER_CALL_DURATION                            // rpc.server.call.duration
+
+METRIC_SYSTEM_MEMORY_LINUX_AVAILABLE                       // system.memory.linux.available
+METRIC_SYSTEM_MEMORY_LINUX_SLAB_USAGE                      // system.memory.linux.slab.usage
+
+CLOUD_PLATFORM_VALUE_AKAMAI_CLOUD_COMPUTE                  // "akamai_cloud.compute"
+CLOUD_PLATFORM_VALUE_GCP_AGENT_ENGINE                      // "gcp.agent_engine"
+CLOUD_PLATFORM_VALUE_HETZNER_CLOUD_SERVER                  // "hetzner.cloud_server"
+CLOUD_PLATFORM_VALUE_VULTR_CLOUD_COMPUTE                   // "vultr.cloud_compute"
+CLOUD_PROVIDER_VALUE_AKAMAI_CLOUD                          // "akamai_cloud"
+CLOUD_PROVIDER_VALUE_HETZNER                               // "hetzner"
+CLOUD_PROVIDER_VALUE_VULTR                                 // "vultr"
+
+ATTR_GEN_AI_PROMPT_NAME                                    // gen_ai.prompt.name
+
+ATTR_JSONRPC_PROTOCOL_VERSION                              // jsonrpc.protocol.version
+ATTR_JSONRPC_REQUEST_ID                                    // jsonrpc.request.id
+
+ATTR_K8S_POD_HOSTNAME                                      // k8s.pod.hostname
+ATTR_K8S_POD_IP                                            // k8s.pod.ip
+ATTR_K8S_POD_START_TIME                                    // k8s.pod.start_time
+
+ATTR_MCP_METHOD_NAME                                       // mcp.method.name
+  MCP_METHOD_NAME_VALUE_COMPLETION_COMPLETE                  // "completion/complete"
+  MCP_METHOD_NAME_VALUE_ELICITATION_CREATE                   // "elicitation/create"
+  MCP_METHOD_NAME_VALUE_INITIALIZE                           // "initialize"
+  MCP_METHOD_NAME_VALUE_LOGGING_SET_LEVEL                    // "logging/setLevel"
+  MCP_METHOD_NAME_VALUE_NOTIFICATIONS_CANCELLED              // "notifications/cancelled"
+  MCP_METHOD_NAME_VALUE_NOTIFICATIONS_INITIALIZED            // "notifications/initialized"
+  MCP_METHOD_NAME_VALUE_NOTIFICATIONS_MESSAGE                // "notifications/message"
+  MCP_METHOD_NAME_VALUE_NOTIFICATIONS_PROGRESS               // "notifications/progress"
+  MCP_METHOD_NAME_VALUE_NOTIFICATIONS_PROMPTS_LIST_CHANGED   // "notifications/prompts/list_changed"
+  MCP_METHOD_NAME_VALUE_NOTIFICATIONS_RESOURCES_LIST_CHANGED // "notifications/resources/list_changed"
+  MCP_METHOD_NAME_VALUE_NOTIFICATIONS_RESOURCES_UPDATED      // "notifications/resources/updated"
+  MCP_METHOD_NAME_VALUE_NOTIFICATIONS_ROOTS_LIST_CHANGED     // "notifications/roots/list_changed"
+  MCP_METHOD_NAME_VALUE_NOTIFICATIONS_TOOLS_LIST_CHANGED     // "notifications/tools/list_changed"
+  MCP_METHOD_NAME_VALUE_PING                                 // "ping"
+  MCP_METHOD_NAME_VALUE_PROMPTS_GET                          // "prompts/get"
+  MCP_METHOD_NAME_VALUE_PROMPTS_LIST                         // "prompts/list"
+  MCP_METHOD_NAME_VALUE_RESOURCES_LIST                       // "resources/list"
+  MCP_METHOD_NAME_VALUE_RESOURCES_READ                       // "resources/read"
+  MCP_METHOD_NAME_VALUE_RESOURCES_SUBSCRIBE                  // "resources/subscribe"
+  MCP_METHOD_NAME_VALUE_RESOURCES_TEMPLATES_LIST             // "resources/templates/list"
+  MCP_METHOD_NAME_VALUE_RESOURCES_UNSUBSCRIBE                // "resources/unsubscribe"
+  MCP_METHOD_NAME_VALUE_ROOTS_LIST                           // "roots/list"
+  MCP_METHOD_NAME_VALUE_SAMPLING_CREATE_MESSAGE              // "sampling/createMessage"
+  MCP_METHOD_NAME_VALUE_TOOLS_CALL                           // "tools/call"
+  MCP_METHOD_NAME_VALUE_TOOLS_LIST                           // "tools/list"
+ATTR_MCP_PROTOCOL_VERSION                                  // mcp.protocol.version
+ATTR_MCP_RESOURCE_URI                                      // mcp.resource.uri
+ATTR_MCP_SESSION_ID                                        // mcp.session.id
+
+ATTR_OTEL_EVENT_NAME                                       // otel.event.name
+
+ATTR_PPROF_PROFILE_DOC_URL                                 // pprof.profile.doc_url
+ATTR_PPROF_PROFILE_DROP_FRAMES                             // pprof.profile.drop_frames
+ATTR_PPROF_PROFILE_KEEP_FRAMES                             // pprof.profile.keep_frames
+
+ATTR_RPC_METHOD_ORIGINAL                                   // rpc.method_original
+ATTR_RPC_REQUEST_METADATA                                  // (key) => `rpc.request.metadata.${key}`
+ATTR_RPC_RESPONSE_METADATA                                 // (key) => `rpc.response.metadata.${key}`
+ATTR_RPC_RESPONSE_STATUS_CODE                              // rpc.response.status_code
+ATTR_RPC_SYSTEM_NAME                                       // rpc.system.name
+  RPC_SYSTEM_NAME_VALUE_CONNECTRPC                           // "connectrpc"
+  RPC_SYSTEM_NAME_VALUE_DUBBO                                // "dubbo"
+  RPC_SYSTEM_NAME_VALUE_GRPC                                 // "grpc"
+  RPC_SYSTEM_NAME_VALUE_JSONRPC                              // "jsonrpc"
+
+ATTR_SERVICE_PEER_NAME                                     // service.peer.name
+ATTR_SERVICE_PEER_NAMESPACE                                // service.peer.namespace
+
+ATTR_SYSTEM_MEMORY_LINUX_SLAB_STATE                        // system.memory.linux.slab.state
+  SYSTEM_MEMORY_LINUX_SLAB_STATE_VALUE_RECLAIMABLE           // "reclaimable"
+  SYSTEM_MEMORY_LINUX_SLAB_STATE_VALUE_UNRECLAIMABLE         // "unreclaimable"
+```
+
+</details>
+
+## 1.38.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.38.0 [#6090](https://github.com/open-telemetry/opentelemetry-js/pull/6090) @trentm
+  * Semantic Conventions v1.38.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1380) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *none*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *1 exported value changed, 40 newly deprecated exports, 1 newly undeprecated export, 157 added exports*
+
+#### Unstable changes in v1.38.0
+
+<details>
+<summary>1 exported value changed</summary>
+
+```js
+ATTR_PROCESS_CONTEXT_SWITCH_TYPE // process.context_switch_type -> process.context_switch.type
+```
+
+</details>
+
+<details>
+<summary>40 newly deprecated exports</summary>
+
+```js
+METRIC_K8S_CRONJOB_ACTIVE_JOBS                  // k8s.cronjob.active_jobs: Replaced by `k8s.cronjob.job.active`.
+METRIC_K8S_DAEMONSET_CURRENT_SCHEDULED_NODES    // k8s.daemonset.current_scheduled_nodes: Replaced by `k8s.daemonset.node.current_scheduled`.
+METRIC_K8S_DAEMONSET_DESIRED_SCHEDULED_NODES    // k8s.daemonset.desired_scheduled_nodes: Replaced by `k8s.daemonset.node.desired_scheduled`.
+METRIC_K8S_DAEMONSET_MISSCHEDULED_NODES         // k8s.daemonset.misscheduled_nodes: Replaced by `k8s.daemonset.node.misscheduled`.
+METRIC_K8S_DAEMONSET_READY_NODES                // k8s.daemonset.ready_nodes: Replaced by `k8s.daemonset.node.ready`.
+METRIC_K8S_DEPLOYMENT_AVAILABLE_PODS            // k8s.deployment.available_pods: Replaced by `k8s.deployment.pod.available`.
+METRIC_K8S_DEPLOYMENT_DESIRED_PODS              // k8s.deployment.desired_pods: Replaced by `k8s.deployment.pod.desired`.
+METRIC_K8S_HPA_CURRENT_PODS                     // k8s.hpa.current_pods: Replaced by `k8s.hpa.pod.current`.
+METRIC_K8S_HPA_DESIRED_PODS                     // k8s.hpa.desired_pods: Replaced by `k8s.hpa.pod.desired`.
+METRIC_K8S_HPA_MAX_PODS                         // k8s.hpa.max_pods: Replaced by `k8s.hpa.pod.max`.
+METRIC_K8S_HPA_MIN_PODS                         // k8s.hpa.min_pods: Replaced by `k8s.hpa.pod.min`.
+METRIC_K8S_JOB_ACTIVE_PODS                      // k8s.job.active_pods: Replaced by `k8s.job.pod.active`.
+METRIC_K8S_JOB_DESIRED_SUCCESSFUL_PODS          // k8s.job.desired_successful_pods: Replaced by `k8s.job.pod.desired_successful`.
+METRIC_K8S_JOB_FAILED_PODS                      // k8s.job.failed_pods: Replaced by `k8s.job.pod.failed`.
+METRIC_K8S_JOB_MAX_PARALLEL_PODS                // k8s.job.max_parallel_pods: Replaced by `k8s.job.pod.max_parallel`.
+METRIC_K8S_JOB_SUCCESSFUL_PODS                  // k8s.job.successful_pods: Replaced by `k8s.job.pod.successful`.
+METRIC_K8S_NODE_ALLOCATABLE_CPU                 // k8s.node.allocatable.cpu: Replaced by `k8s.node.cpu.allocatable`.
+METRIC_K8S_NODE_ALLOCATABLE_EPHEMERAL_STORAGE   // k8s.node.allocatable.ephemeral_storage: Replaced by `k8s.node.ephemeral_storage.allocatable`.
+METRIC_K8S_NODE_ALLOCATABLE_MEMORY              // k8s.node.allocatable.memory: Replaced by `k8s.node.memory.allocatable`.
+METRIC_K8S_NODE_ALLOCATABLE_PODS                // k8s.node.allocatable.pods: Replaced by `k8s.node.pod.allocatable`.
+METRIC_K8S_REPLICASET_AVAILABLE_PODS            // k8s.replicaset.available_pods: Replaced by `k8s.replicaset.pod.available`.
+METRIC_K8S_REPLICASET_DESIRED_PODS              // k8s.replicaset.desired_pods: Replaced by `k8s.replicaset.pod.desired`.
+METRIC_K8S_REPLICATIONCONTROLLER_AVAILABLE_PODS // k8s.replicationcontroller.available_pods: Replaced by `k8s.replicationcontroller.pod.available`.
+METRIC_K8S_REPLICATIONCONTROLLER_DESIRED_PODS   // k8s.replicationcontroller.desired_pods: Replaced by `k8s.replicationcontroller.pod.desired`.
+METRIC_K8S_STATEFULSET_CURRENT_PODS             // k8s.statefulset.current_pods: Replaced by `k8s.statefulset.pod.current`.
+METRIC_K8S_STATEFULSET_DESIRED_PODS             // k8s.statefulset.desired_pods: Replaced by `k8s.statefulset.pod.desired`.
+METRIC_K8S_STATEFULSET_READY_PODS               // k8s.statefulset.ready_pods: Replaced by `k8s.statefulset.pod.ready`.
+METRIC_K8S_STATEFULSET_UPDATED_PODS             // k8s.statefulset.updated_pods: Replaced by `k8s.statefulset.pod.updated`.
+METRIC_RPC_CLIENT_REQUESTS_PER_RPC              // rpc.client.requests_per_rpc: Removed, no replacement at this time.
+METRIC_RPC_CLIENT_RESPONSES_PER_RPC             // rpc.client.responses_per_rpc: Removed, no replacement at this time.
+METRIC_RPC_SERVER_REQUESTS_PER_RPC              // rpc.server.requests_per_rpc: Removed, no replacement at this time.
+METRIC_RPC_SERVER_RESPONSES_PER_RPC             // rpc.server.responses_per_rpc: Removed, no replacement at this time.
+METRIC_V8JS_HEAP_SPACE_AVAILABLE_SIZE           // v8js.heap.space.available_size: Replaced by `v8js.memory.heap.space.available_size`.
+METRIC_V8JS_HEAP_SPACE_PHYSICAL_SIZE            // v8js.heap.space.physical_size: Replaced by `v8js.memory.heap.space.physical_size`.
+GEN_AI_SYSTEM_VALUE_AZ_AI_INFERENCE             // az.ai.inference: Replaced by `azure.ai.inference`.
+GEN_AI_SYSTEM_VALUE_AZ_AI_OPENAI                // az.ai.openai: Replaced by `azure.ai.openai`.
+ATTR_PROCESS_PAGING_FAULT_TYPE                  // process.paging.fault_type: Replaced by `system.paging.fault.type`.
+ATTR_SYSTEM_CPU_LOGICAL_NUMBER                  // system.cpu.logical_number: Replaced by `cpu.logical_number`.
+ATTR_SYSTEM_PAGING_TYPE                         // system.paging.type: Replaced by `system.paging.fault.type`.
+ATTR_SYSTEM_PROCESS_STATUS                      // system.process.status: Replaced by `process.state`.
+```
+
+</details>
+
+<details>
+<summary>1 newly undeprecated export</summary>
+
+```js
+GEN_AI_SYSTEM_VALUE_XAI // xai
+```
+
+</details>
+
+<details>
+<summary>157 added exports</summary>
+
+```js
+METRIC_CONTAINER_MEMORY_AVAILABLE                                       // container.memory.available
+METRIC_CONTAINER_MEMORY_PAGING_FAULTS                                   // container.memory.paging.faults
+METRIC_CONTAINER_MEMORY_RSS                                             // container.memory.rss
+METRIC_CONTAINER_MEMORY_WORKING_SET                                     // container.memory.working_set
+
+METRIC_K8S_CONTAINER_CPU_LIMIT_UTILIZATION                              // k8s.container.cpu.limit_utilization
+METRIC_K8S_CONTAINER_CPU_REQUEST_UTILIZATION                            // k8s.container.cpu.request_utilization
+METRIC_K8S_CRONJOB_JOB_ACTIVE                                           // k8s.cronjob.job.active
+METRIC_K8S_DAEMONSET_NODE_CURRENT_SCHEDULED                             // k8s.daemonset.node.current_scheduled
+METRIC_K8S_DAEMONSET_NODE_DESIRED_SCHEDULED                             // k8s.daemonset.node.desired_scheduled
+METRIC_K8S_DAEMONSET_NODE_MISSCHEDULED                                  // k8s.daemonset.node.misscheduled
+METRIC_K8S_DAEMONSET_NODE_READY                                         // k8s.daemonset.node.ready
+METRIC_K8S_DEPLOYMENT_POD_AVAILABLE                                     // k8s.deployment.pod.available
+METRIC_K8S_DEPLOYMENT_POD_DESIRED                                       // k8s.deployment.pod.desired
+METRIC_K8S_HPA_POD_CURRENT                                              // k8s.hpa.pod.current
+METRIC_K8S_HPA_POD_DESIRED                                              // k8s.hpa.pod.desired
+METRIC_K8S_HPA_POD_MAX                                                  // k8s.hpa.pod.max
+METRIC_K8S_HPA_POD_MIN                                                  // k8s.hpa.pod.min
+METRIC_K8S_JOB_POD_ACTIVE                                               // k8s.job.pod.active
+METRIC_K8S_JOB_POD_DESIRED_SUCCESSFUL                                   // k8s.job.pod.desired_successful
+METRIC_K8S_JOB_POD_FAILED                                               // k8s.job.pod.failed
+METRIC_K8S_JOB_POD_MAX_PARALLEL                                         // k8s.job.pod.max_parallel
+METRIC_K8S_JOB_POD_SUCCESSFUL                                           // k8s.job.pod.successful
+METRIC_K8S_NODE_CPU_ALLOCATABLE                                         // k8s.node.cpu.allocatable
+METRIC_K8S_NODE_EPHEMERAL_STORAGE_ALLOCATABLE                           // k8s.node.ephemeral_storage.allocatable
+METRIC_K8S_NODE_MEMORY_ALLOCATABLE                                      // k8s.node.memory.allocatable
+METRIC_K8S_NODE_MEMORY_AVAILABLE                                        // k8s.node.memory.available
+METRIC_K8S_NODE_MEMORY_PAGING_FAULTS                                    // k8s.node.memory.paging.faults
+METRIC_K8S_NODE_MEMORY_RSS                                              // k8s.node.memory.rss
+METRIC_K8S_NODE_MEMORY_WORKING_SET                                      // k8s.node.memory.working_set
+METRIC_K8S_NODE_POD_ALLOCATABLE                                         // k8s.node.pod.allocatable
+METRIC_K8S_POD_MEMORY_AVAILABLE                                         // k8s.pod.memory.available
+METRIC_K8S_POD_MEMORY_PAGING_FAULTS                                     // k8s.pod.memory.paging.faults
+METRIC_K8S_POD_MEMORY_RSS                                               // k8s.pod.memory.rss
+METRIC_K8S_POD_MEMORY_WORKING_SET                                       // k8s.pod.memory.working_set
+METRIC_K8S_POD_STATUS_PHASE                                             // k8s.pod.status.phase
+METRIC_K8S_POD_STATUS_REASON                                            // k8s.pod.status.reason
+METRIC_K8S_REPLICASET_POD_AVAILABLE                                     // k8s.replicaset.pod.available
+METRIC_K8S_REPLICASET_POD_DESIRED                                       // k8s.replicaset.pod.desired
+METRIC_K8S_REPLICATIONCONTROLLER_POD_AVAILABLE                          // k8s.replicationcontroller.pod.available
+METRIC_K8S_REPLICATIONCONTROLLER_POD_DESIRED                            // k8s.replicationcontroller.pod.desired
+METRIC_K8S_STATEFULSET_POD_CURRENT                                      // k8s.statefulset.pod.current
+METRIC_K8S_STATEFULSET_POD_DESIRED                                      // k8s.statefulset.pod.desired
+METRIC_K8S_STATEFULSET_POD_READY                                        // k8s.statefulset.pod.ready
+METRIC_K8S_STATEFULSET_POD_UPDATED                                      // k8s.statefulset.pod.updated
+
+METRIC_NFS_CLIENT_NET_COUNT                                             // nfs.client.net.count
+METRIC_NFS_CLIENT_NET_TCP_CONNECTION_ACCEPTED                           // nfs.client.net.tcp.connection.accepted
+METRIC_NFS_CLIENT_OPERATION_COUNT                                       // nfs.client.operation.count
+METRIC_NFS_CLIENT_PROCEDURE_COUNT                                       // nfs.client.procedure.count
+METRIC_NFS_CLIENT_RPC_AUTHREFRESH_COUNT                                 // nfs.client.rpc.authrefresh.count
+METRIC_NFS_CLIENT_RPC_COUNT                                             // nfs.client.rpc.count
+METRIC_NFS_CLIENT_RPC_RETRANSMIT_COUNT                                  // nfs.client.rpc.retransmit.count
+METRIC_NFS_SERVER_FH_STALE_COUNT                                        // nfs.server.fh.stale.count
+METRIC_NFS_SERVER_IO                                                    // nfs.server.io
+METRIC_NFS_SERVER_NET_COUNT                                             // nfs.server.net.count
+METRIC_NFS_SERVER_NET_TCP_CONNECTION_ACCEPTED                           // nfs.server.net.tcp.connection.accepted
+METRIC_NFS_SERVER_OPERATION_COUNT                                       // nfs.server.operation.count
+METRIC_NFS_SERVER_PROCEDURE_COUNT                                       // nfs.server.procedure.count
+METRIC_NFS_SERVER_REPCACHE_REQUESTS                                     // nfs.server.repcache.requests
+METRIC_NFS_SERVER_RPC_COUNT                                             // nfs.server.rpc.count
+METRIC_NFS_SERVER_THREAD_COUNT                                          // nfs.server.thread.count
+
+METRIC_OPENSHIFT_CLUSTERQUOTA_CPU_LIMIT_HARD                            // openshift.clusterquota.cpu.limit.hard
+METRIC_OPENSHIFT_CLUSTERQUOTA_CPU_LIMIT_USED                            // openshift.clusterquota.cpu.limit.used
+METRIC_OPENSHIFT_CLUSTERQUOTA_CPU_REQUEST_HARD                          // openshift.clusterquota.cpu.request.hard
+METRIC_OPENSHIFT_CLUSTERQUOTA_CPU_REQUEST_USED                          // openshift.clusterquota.cpu.request.used
+METRIC_OPENSHIFT_CLUSTERQUOTA_EPHEMERAL_STORAGE_LIMIT_HARD              // openshift.clusterquota.ephemeral_storage.limit.hard
+METRIC_OPENSHIFT_CLUSTERQUOTA_EPHEMERAL_STORAGE_LIMIT_USED              // openshift.clusterquota.ephemeral_storage.limit.used
+METRIC_OPENSHIFT_CLUSTERQUOTA_EPHEMERAL_STORAGE_REQUEST_HARD            // openshift.clusterquota.ephemeral_storage.request.hard
+METRIC_OPENSHIFT_CLUSTERQUOTA_EPHEMERAL_STORAGE_REQUEST_USED            // openshift.clusterquota.ephemeral_storage.request.used
+METRIC_OPENSHIFT_CLUSTERQUOTA_HUGEPAGE_COUNT_REQUEST_HARD               // openshift.clusterquota.hugepage_count.request.hard
+METRIC_OPENSHIFT_CLUSTERQUOTA_HUGEPAGE_COUNT_REQUEST_USED               // openshift.clusterquota.hugepage_count.request.used
+METRIC_OPENSHIFT_CLUSTERQUOTA_MEMORY_LIMIT_HARD                         // openshift.clusterquota.memory.limit.hard
+METRIC_OPENSHIFT_CLUSTERQUOTA_MEMORY_LIMIT_USED                         // openshift.clusterquota.memory.limit.used
+METRIC_OPENSHIFT_CLUSTERQUOTA_MEMORY_REQUEST_HARD                       // openshift.clusterquota.memory.request.hard
+METRIC_OPENSHIFT_CLUSTERQUOTA_MEMORY_REQUEST_USED                       // openshift.clusterquota.memory.request.used
+METRIC_OPENSHIFT_CLUSTERQUOTA_OBJECT_COUNT_HARD                         // openshift.clusterquota.object_count.hard
+METRIC_OPENSHIFT_CLUSTERQUOTA_OBJECT_COUNT_USED                         // openshift.clusterquota.object_count.used
+METRIC_OPENSHIFT_CLUSTERQUOTA_PERSISTENTVOLUMECLAIM_COUNT_HARD          // openshift.clusterquota.persistentvolumeclaim_count.hard
+METRIC_OPENSHIFT_CLUSTERQUOTA_PERSISTENTVOLUMECLAIM_COUNT_USED          // openshift.clusterquota.persistentvolumeclaim_count.used
+METRIC_OPENSHIFT_CLUSTERQUOTA_STORAGE_REQUEST_HARD                      // openshift.clusterquota.storage.request.hard
+METRIC_OPENSHIFT_CLUSTERQUOTA_STORAGE_REQUEST_USED                      // openshift.clusterquota.storage.request.used
+
+METRIC_SYSTEM_NETWORK_DROPPED                                           // system.network.dropped
+METRIC_SYSTEM_NETWORK_PACKETS                                           // system.network.packets
+
+METRIC_V8JS_MEMORY_HEAP_SPACE_AVAILABLE_SIZE                            // v8js.memory.heap.space.available_size
+METRIC_V8JS_MEMORY_HEAP_SPACE_PHYSICAL_SIZE                             // v8js.memory.heap.space.physical_size
+
+EVENT_GEN_AI_EVALUATION_RESULT                                          // gen_ai.evaluation.result
+
+ATTR_APP_SCREEN_ID                                                      // app.screen.id
+ATTR_APP_SCREEN_NAME                                                    // app.screen.name
+
+ATTR_GCP_APPHUB_DESTINATION_APPLICATION_CONTAINER                       // gcp.apphub_destination.application.container
+ATTR_GCP_APPHUB_DESTINATION_APPLICATION_ID                              // gcp.apphub_destination.application.id
+ATTR_GCP_APPHUB_DESTINATION_APPLICATION_LOCATION                        // gcp.apphub_destination.application.location
+ATTR_GCP_APPHUB_DESTINATION_SERVICE_CRITICALITY_TYPE                    // gcp.apphub_destination.service.criticality_type
+  GCP_APPHUB_DESTINATION_SERVICE_CRITICALITY_TYPE_VALUE_HIGH              // "HIGH"
+  GCP_APPHUB_DESTINATION_SERVICE_CRITICALITY_TYPE_VALUE_LOW               // "LOW"
+  GCP_APPHUB_DESTINATION_SERVICE_CRITICALITY_TYPE_VALUE_MEDIUM            // "MEDIUM"
+  GCP_APPHUB_DESTINATION_SERVICE_CRITICALITY_TYPE_VALUE_MISSION_CRITICAL  // "MISSION_CRITICAL"
+ATTR_GCP_APPHUB_DESTINATION_SERVICE_ENVIRONMENT_TYPE                    // gcp.apphub_destination.service.environment_type
+  GCP_APPHUB_DESTINATION_SERVICE_ENVIRONMENT_TYPE_VALUE_DEVELOPMENT       // "DEVELOPMENT"
+  GCP_APPHUB_DESTINATION_SERVICE_ENVIRONMENT_TYPE_VALUE_PRODUCTION        // "PRODUCTION"
+  GCP_APPHUB_DESTINATION_SERVICE_ENVIRONMENT_TYPE_VALUE_STAGING           // "STAGING"
+  GCP_APPHUB_DESTINATION_SERVICE_ENVIRONMENT_TYPE_VALUE_TEST              // "TEST"
+ATTR_GCP_APPHUB_DESTINATION_SERVICE_ID                                  // gcp.apphub_destination.service.id
+ATTR_GCP_APPHUB_DESTINATION_WORKLOAD_CRITICALITY_TYPE                   // gcp.apphub_destination.workload.criticality_type
+  GCP_APPHUB_DESTINATION_WORKLOAD_CRITICALITY_TYPE_VALUE_HIGH             // "HIGH"
+  GCP_APPHUB_DESTINATION_WORKLOAD_CRITICALITY_TYPE_VALUE_LOW              // "LOW"
+  GCP_APPHUB_DESTINATION_WORKLOAD_CRITICALITY_TYPE_VALUE_MEDIUM           // "MEDIUM"
+  GCP_APPHUB_DESTINATION_WORKLOAD_CRITICALITY_TYPE_VALUE_MISSION_CRITICAL // "MISSION_CRITICAL"
+ATTR_GCP_APPHUB_DESTINATION_WORKLOAD_ENVIRONMENT_TYPE                   // gcp.apphub_destination.workload.environment_type
+  GCP_APPHUB_DESTINATION_WORKLOAD_ENVIRONMENT_TYPE_VALUE_DEVELOPMENT      // "DEVELOPMENT"
+  GCP_APPHUB_DESTINATION_WORKLOAD_ENVIRONMENT_TYPE_VALUE_PRODUCTION       // "PRODUCTION"
+  GCP_APPHUB_DESTINATION_WORKLOAD_ENVIRONMENT_TYPE_VALUE_STAGING          // "STAGING"
+  GCP_APPHUB_DESTINATION_WORKLOAD_ENVIRONMENT_TYPE_VALUE_TEST             // "TEST"
+ATTR_GCP_APPHUB_DESTINATION_WORKLOAD_ID                                 // gcp.apphub_destination.workload.id
+
+ATTR_GEN_AI_EMBEDDINGS_DIMENSION_COUNT                                  // gen_ai.embeddings.dimension.count
+ATTR_GEN_AI_EVALUATION_EXPLANATION                                      // gen_ai.evaluation.explanation
+ATTR_GEN_AI_EVALUATION_NAME                                             // gen_ai.evaluation.name
+ATTR_GEN_AI_EVALUATION_SCORE_LABEL                                      // gen_ai.evaluation.score.label
+ATTR_GEN_AI_EVALUATION_SCORE_VALUE                                      // gen_ai.evaluation.score.value
+ATTR_GEN_AI_TOOL_CALL_ARGUMENTS                                         // gen_ai.tool.call.arguments
+ATTR_GEN_AI_TOOL_CALL_RESULT                                            // gen_ai.tool.call.result
+ATTR_GEN_AI_TOOL_DEFINITIONS                                            // gen_ai.tool.definitions
+
+HTTP_REQUEST_METHOD_VALUE_QUERY                                         // "QUERY"
+
+ATTR_K8S_POD_STATUS_PHASE                                               // k8s.pod.status.phase
+  K8S_POD_STATUS_PHASE_VALUE_FAILED                                       // "Failed"
+  K8S_POD_STATUS_PHASE_VALUE_PENDING                                      // "Pending"
+  K8S_POD_STATUS_PHASE_VALUE_RUNNING                                      // "Running"
+  K8S_POD_STATUS_PHASE_VALUE_SUCCEEDED                                    // "Succeeded"
+  K8S_POD_STATUS_PHASE_VALUE_UNKNOWN                                      // "Unknown"
+ATTR_K8S_POD_STATUS_REASON                                              // k8s.pod.status.reason
+  K8S_POD_STATUS_REASON_VALUE_EVICTED                                     // "Evicted"
+  K8S_POD_STATUS_REASON_VALUE_NODE_AFFINITY                               // "NodeAffinity"
+  K8S_POD_STATUS_REASON_VALUE_NODE_LOST                                   // "NodeLost"
+  K8S_POD_STATUS_REASON_VALUE_SHUTDOWN                                    // "Shutdown"
+  K8S_POD_STATUS_REASON_VALUE_UNEXPECTED_ADMISSION_ERROR                  // "UnexpectedAdmissionError"
+
+ATTR_NFS_OPERATION_NAME                                                 // nfs.operation.name
+ATTR_NFS_SERVER_REPCACHE_STATUS                                         // nfs.server.repcache.status
+
+ATTR_ONC_RPC_PROCEDURE_NAME                                             // onc_rpc.procedure.name
+ATTR_ONC_RPC_PROCEDURE_NUMBER                                           // onc_rpc.procedure.number
+ATTR_ONC_RPC_PROGRAM_NAME                                               // onc_rpc.program.name
+ATTR_ONC_RPC_VERSION                                                    // onc_rpc.version
+
+ATTR_OPENSHIFT_CLUSTERQUOTA_NAME                                        // openshift.clusterquota.name
+ATTR_OPENSHIFT_CLUSTERQUOTA_UID                                         // openshift.clusterquota.uid
+
+ATTR_PPROF_LOCATION_IS_FOLDED                                           // pprof.location.is_folded
+ATTR_PPROF_MAPPING_HAS_FILENAMES                                        // pprof.mapping.has_filenames
+ATTR_PPROF_MAPPING_HAS_FUNCTIONS                                        // pprof.mapping.has_functions
+ATTR_PPROF_MAPPING_HAS_INLINE_FRAMES                                    // pprof.mapping.has_inline_frames
+ATTR_PPROF_MAPPING_HAS_LINE_NUMBERS                                     // pprof.mapping.has_line_numbers
+ATTR_PPROF_PROFILE_COMMENT                                              // pprof.profile.comment
+
+ATTR_PROCESS_STATE                                                      // process.state
+  PROCESS_STATE_VALUE_DEFUNCT                                             // "defunct"
+  PROCESS_STATE_VALUE_RUNNING                                             // "running"
+  PROCESS_STATE_VALUE_SLEEPING                                            // "sleeping"
+  PROCESS_STATE_VALUE_STOPPED                                             // "stopped"
+
+RPC_SYSTEM_VALUE_JSONRPC                                                // "jsonrpc"
+RPC_SYSTEM_VALUE_ONC_RPC                                                // "onc_rpc"
+
+ATTR_SYSTEM_PAGING_FAULT_TYPE                                           // system.paging.fault.type
+  SYSTEM_PAGING_FAULT_TYPE_VALUE_MAJOR                                    // "major"
+  SYSTEM_PAGING_FAULT_TYPE_VALUE_MINOR                                    // "minor"
+```
+
+</details>
+
+## 1.37.0
+
+### :rocket: Features
+
+* feat: add `EVENT_*` exports for event names in Semantic Conventions [#5832](https://github.com/open-telemetry/opentelemetry-js/pull/5832) @trentm
+
+* feat: update semantic conventions to v1.37.0 [#5879](https://github.com/open-telemetry/opentelemetry-js/pull/5879) @trentm
+  * Semantic Conventions v1.37.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1370) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *2 added exports*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *1 exported value changed, 6 newly deprecated exports, 1 newly undeprecated export, 246 added exports*
+
+#### Stable changes in v1.37.0
+
+<details open>
+<summary>2 added exports</summary>
+
+```js
+EVENT_EXCEPTION                       // exception
+
+ATTR_ASPNETCORE_USER_IS_AUTHENTICATED // aspnetcore.user.is_authenticated
+```
+
+</details>
+
+#### Unstable changes in v1.37.0
+
+<details>
+<summary>1 exported value changed</summary>
+
+```js
+GEN_AI_SYSTEM_VALUE_AZ_AI_OPENAI // "azure.ai.openai" -> "az.ai.openai"
+```
+
+</details>
+
+<details>
+<summary>6 newly deprecated exports</summary>
+
+```js
+ATTR_CONTAINER_RUNTIME                         // container.runtime: Replaced by `container.runtime.name`.
+ATTR_GEN_AI_OPENAI_REQUEST_SERVICE_TIER        // gen_ai.openai.request.service_tier: Replaced by `openai.request.service_tier`.
+ATTR_GEN_AI_OPENAI_RESPONSE_SERVICE_TIER       // gen_ai.openai.response.service_tier: Replaced by `openai.response.service_tier`.
+ATTR_GEN_AI_OPENAI_RESPONSE_SYSTEM_FINGERPRINT // gen_ai.openai.response.system_fingerprint: Replaced by `openai.response.system_fingerprint`.
+ATTR_GEN_AI_SYSTEM                             // gen_ai.system: Replaced by `gen_ai.provider.name`.
+GEN_AI_SYSTEM_VALUE_XAI                        // xai: Replaced by `x_ai`.
+```
+
+</details>
+
+<details>
+<summary>1 newly undeprecated export</summary>
+
+```js
+GEN_AI_SYSTEM_VALUE_AZ_AI_INFERENCE // az.ai.inference
+```
+
+</details>
+
+<details>
+<summary>246 added exports</summary>
+
+```js
+METRIC_ASPNETCORE_AUTHENTICATION_AUTHENTICATE_DURATION                            // aspnetcore.authentication.authenticate.duration
+METRIC_ASPNETCORE_AUTHENTICATION_CHALLENGES                                       // aspnetcore.authentication.challenges
+METRIC_ASPNETCORE_AUTHENTICATION_FORBIDS                                          // aspnetcore.authentication.forbids
+METRIC_ASPNETCORE_AUTHENTICATION_SIGN_INS                                         // aspnetcore.authentication.sign_ins
+METRIC_ASPNETCORE_AUTHENTICATION_SIGN_OUTS                                        // aspnetcore.authentication.sign_outs
+METRIC_ASPNETCORE_AUTHORIZATION_ATTEMPTS                                          // aspnetcore.authorization.attempts
+METRIC_ASPNETCORE_IDENTITY_SIGN_IN_AUTHENTICATE_DURATION                          // aspnetcore.identity.sign_in.authenticate.duration
+METRIC_ASPNETCORE_IDENTITY_SIGN_IN_CHECK_PASSWORD_ATTEMPTS                        // aspnetcore.identity.sign_in.check_password_attempts
+METRIC_ASPNETCORE_IDENTITY_SIGN_IN_SIGN_INS                                       // aspnetcore.identity.sign_in.sign_ins
+METRIC_ASPNETCORE_IDENTITY_SIGN_IN_SIGN_OUTS                                      // aspnetcore.identity.sign_in.sign_outs
+METRIC_ASPNETCORE_IDENTITY_SIGN_IN_TWO_FACTOR_CLIENTS_FORGOTTEN                   // aspnetcore.identity.sign_in.two_factor_clients_forgotten
+METRIC_ASPNETCORE_IDENTITY_SIGN_IN_TWO_FACTOR_CLIENTS_REMEMBERED                  // aspnetcore.identity.sign_in.two_factor_clients_remembered
+METRIC_ASPNETCORE_IDENTITY_USER_CHECK_PASSWORD_ATTEMPTS                           // aspnetcore.identity.user.check_password_attempts
+METRIC_ASPNETCORE_IDENTITY_USER_CREATE_DURATION                                   // aspnetcore.identity.user.create.duration
+METRIC_ASPNETCORE_IDENTITY_USER_DELETE_DURATION                                   // aspnetcore.identity.user.delete.duration
+METRIC_ASPNETCORE_IDENTITY_USER_GENERATED_TOKENS                                  // aspnetcore.identity.user.generated_tokens
+METRIC_ASPNETCORE_IDENTITY_USER_UPDATE_DURATION                                   // aspnetcore.identity.user.update.duration
+METRIC_ASPNETCORE_IDENTITY_USER_VERIFY_TOKEN_ATTEMPTS                             // aspnetcore.identity.user.verify_token_attempts
+METRIC_ASPNETCORE_MEMORY_POOL_ALLOCATED                                           // aspnetcore.memory_pool.allocated
+METRIC_ASPNETCORE_MEMORY_POOL_EVICTED                                             // aspnetcore.memory_pool.evicted
+METRIC_ASPNETCORE_MEMORY_POOL_POOLED                                              // aspnetcore.memory_pool.pooled
+METRIC_ASPNETCORE_MEMORY_POOL_RENTED                                              // aspnetcore.memory_pool.rented
+
+METRIC_CONTAINER_FILESYSTEM_AVAILABLE                                             // container.filesystem.available
+METRIC_CONTAINER_FILESYSTEM_CAPACITY                                              // container.filesystem.capacity
+METRIC_CONTAINER_FILESYSTEM_USAGE                                                 // container.filesystem.usage
+
+METRIC_HW_BATTERY_CHARGE                                                          // hw.battery.charge
+METRIC_HW_BATTERY_CHARGE_LIMIT                                                    // hw.battery.charge.limit
+METRIC_HW_BATTERY_TIME_LEFT                                                       // hw.battery.time_left
+METRIC_HW_CPU_SPEED                                                               // hw.cpu.speed
+METRIC_HW_CPU_SPEED_LIMIT                                                         // hw.cpu.speed.limit
+METRIC_HW_FAN_SPEED                                                               // hw.fan.speed
+METRIC_HW_FAN_SPEED_LIMIT                                                         // hw.fan.speed.limit
+METRIC_HW_FAN_SPEED_RATIO                                                         // hw.fan.speed_ratio
+METRIC_HW_GPU_IO                                                                  // hw.gpu.io
+METRIC_HW_GPU_MEMORY_LIMIT                                                        // hw.gpu.memory.limit
+METRIC_HW_GPU_MEMORY_USAGE                                                        // hw.gpu.memory.usage
+METRIC_HW_GPU_MEMORY_UTILIZATION                                                  // hw.gpu.memory.utilization
+METRIC_HW_GPU_UTILIZATION                                                         // hw.gpu.utilization
+METRIC_HW_LOGICAL_DISK_LIMIT                                                      // hw.logical_disk.limit
+METRIC_HW_LOGICAL_DISK_USAGE                                                      // hw.logical_disk.usage
+METRIC_HW_LOGICAL_DISK_UTILIZATION                                                // hw.logical_disk.utilization
+METRIC_HW_MEMORY_SIZE                                                             // hw.memory.size
+METRIC_HW_NETWORK_BANDWIDTH_LIMIT                                                 // hw.network.bandwidth.limit
+METRIC_HW_NETWORK_BANDWIDTH_UTILIZATION                                           // hw.network.bandwidth.utilization
+METRIC_HW_NETWORK_IO                                                              // hw.network.io
+METRIC_HW_NETWORK_PACKETS                                                         // hw.network.packets
+METRIC_HW_NETWORK_UP                                                              // hw.network.up
+METRIC_HW_PHYSICAL_DISK_ENDURANCE_UTILIZATION                                     // hw.physical_disk.endurance_utilization
+METRIC_HW_PHYSICAL_DISK_SIZE                                                      // hw.physical_disk.size
+METRIC_HW_PHYSICAL_DISK_SMART                                                     // hw.physical_disk.smart
+METRIC_HW_POWER_SUPPLY_LIMIT                                                      // hw.power_supply.limit
+METRIC_HW_POWER_SUPPLY_USAGE                                                      // hw.power_supply.usage
+METRIC_HW_POWER_SUPPLY_UTILIZATION                                                // hw.power_supply.utilization
+METRIC_HW_TAPE_DRIVE_OPERATIONS                                                   // hw.tape_drive.operations
+METRIC_HW_TEMPERATURE                                                             // hw.temperature
+METRIC_HW_TEMPERATURE_LIMIT                                                       // hw.temperature.limit
+METRIC_HW_VOLTAGE                                                                 // hw.voltage
+METRIC_HW_VOLTAGE_LIMIT                                                           // hw.voltage.limit
+METRIC_HW_VOLTAGE_NOMINAL                                                         // hw.voltage.nominal
+
+METRIC_K8S_NODE_FILESYSTEM_AVAILABLE                                              // k8s.node.filesystem.available
+METRIC_K8S_NODE_FILESYSTEM_CAPACITY                                               // k8s.node.filesystem.capacity
+METRIC_K8S_NODE_FILESYSTEM_USAGE                                                  // k8s.node.filesystem.usage
+METRIC_K8S_POD_FILESYSTEM_AVAILABLE                                               // k8s.pod.filesystem.available
+METRIC_K8S_POD_FILESYSTEM_CAPACITY                                                // k8s.pod.filesystem.capacity
+METRIC_K8S_POD_FILESYSTEM_USAGE                                                   // k8s.pod.filesystem.usage
+METRIC_K8S_POD_VOLUME_AVAILABLE                                                   // k8s.pod.volume.available
+METRIC_K8S_POD_VOLUME_CAPACITY                                                    // k8s.pod.volume.capacity
+METRIC_K8S_POD_VOLUME_INODE_COUNT                                                 // k8s.pod.volume.inode.count
+METRIC_K8S_POD_VOLUME_INODE_FREE                                                  // k8s.pod.volume.inode.free
+METRIC_K8S_POD_VOLUME_INODE_USED                                                  // k8s.pod.volume.inode.used
+METRIC_K8S_POD_VOLUME_USAGE                                                       // k8s.pod.volume.usage
+
+METRIC_SYSTEM_NETWORK_PACKET_COUNT                                                // system.network.packet.count
+METRIC_SYSTEM_NETWORK_PACKET_DROPPED                                              // system.network.packet.dropped
+
+EVENT_APP_JANK                                                                    // app.jank
+EVENT_APP_SCREEN_CLICK                                                            // app.screen.click
+EVENT_APP_WIDGET_CLICK                                                            // app.widget.click
+EVENT_AZ_RESOURCE_LOG                                                             // az.resource.log
+EVENT_AZURE_RESOURCE_LOG                                                          // azure.resource.log
+EVENT_BROWSER_WEB_VITAL                                                           // browser.web_vital
+EVENT_DEVICE_APP_LIFECYCLE                                                        // device.app.lifecycle
+EVENT_FEATURE_FLAG_EVALUATION                                                     // feature_flag.evaluation
+EVENT_GEN_AI_ASSISTANT_MESSAGE                                                    // gen_ai.assistant.message
+EVENT_GEN_AI_CHOICE                                                               // gen_ai.choice
+EVENT_GEN_AI_CLIENT_INFERENCE_OPERATION_DETAILS                                   // gen_ai.client.inference.operation.details
+EVENT_GEN_AI_SYSTEM_MESSAGE                                                       // gen_ai.system.message
+EVENT_GEN_AI_TOOL_MESSAGE                                                         // gen_ai.tool.message
+EVENT_GEN_AI_USER_MESSAGE                                                         // gen_ai.user.message
+EVENT_RPC_MESSAGE                                                                 // rpc.message
+EVENT_SESSION_END                                                                 // session.end
+EVENT_SESSION_START                                                               // session.start
+
+ATTR_APP_BUILD_ID                                                                 // app.build_id
+ATTR_APP_JANK_FRAME_COUNT                                                         // app.jank.frame_count
+ATTR_APP_JANK_PERIOD                                                              // app.jank.period
+ATTR_APP_JANK_THRESHOLD                                                           // app.jank.threshold
+
+ATTR_ASPNETCORE_AUTHENTICATION_RESULT                                             // aspnetcore.authentication.result
+  ASPNETCORE_AUTHENTICATION_RESULT_VALUE_FAILURE                                    // "failure"
+  ASPNETCORE_AUTHENTICATION_RESULT_VALUE_NONE                                       // "none"
+  ASPNETCORE_AUTHENTICATION_RESULT_VALUE_SUCCESS                                    // "success"
+ATTR_ASPNETCORE_AUTHENTICATION_SCHEME                                             // aspnetcore.authentication.scheme
+ATTR_ASPNETCORE_AUTHORIZATION_POLICY                                              // aspnetcore.authorization.policy
+ATTR_ASPNETCORE_AUTHORIZATION_RESULT                                              // aspnetcore.authorization.result
+  ASPNETCORE_AUTHORIZATION_RESULT_VALUE_FAILURE                                     // "failure"
+  ASPNETCORE_AUTHORIZATION_RESULT_VALUE_SUCCESS                                     // "success"
+ATTR_ASPNETCORE_IDENTITY_ERROR_CODE                                               // aspnetcore.identity.error_code
+ATTR_ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT                                    // aspnetcore.identity.password_check_result
+  ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT_VALUE_FAILURE                           // "failure"
+  ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT_VALUE_PASSWORD_MISSING                  // "password_missing"
+  ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT_VALUE_SUCCESS                           // "success"
+  ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT_VALUE_SUCCESS_REHASH_NEEDED             // "success_rehash_needed"
+  ASPNETCORE_IDENTITY_PASSWORD_CHECK_RESULT_VALUE_USER_MISSING                      // "user_missing"
+ATTR_ASPNETCORE_IDENTITY_RESULT                                                   // aspnetcore.identity.result
+  ASPNETCORE_IDENTITY_RESULT_VALUE_FAILURE                                          // "failure"
+  ASPNETCORE_IDENTITY_RESULT_VALUE_SUCCESS                                          // "success"
+ATTR_ASPNETCORE_IDENTITY_SIGN_IN_RESULT                                           // aspnetcore.identity.sign_in.result
+  ASPNETCORE_IDENTITY_SIGN_IN_RESULT_VALUE_FAILURE                                  // "failure"
+  ASPNETCORE_IDENTITY_SIGN_IN_RESULT_VALUE_LOCKED_OUT                               // "locked_out"
+  ASPNETCORE_IDENTITY_SIGN_IN_RESULT_VALUE_NOT_ALLOWED                              // "not_allowed"
+  ASPNETCORE_IDENTITY_SIGN_IN_RESULT_VALUE_REQUIRES_TWO_FACTOR                      // "requires_two_factor"
+  ASPNETCORE_IDENTITY_SIGN_IN_RESULT_VALUE_SUCCESS                                  // "success"
+ATTR_ASPNETCORE_IDENTITY_SIGN_IN_TYPE                                             // aspnetcore.identity.sign_in.type
+  ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_EXTERNAL                                   // "external"
+  ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_PASSKEY                                    // "passkey"
+  ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_PASSWORD                                   // "password"
+  ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_TWO_FACTOR                                 // "two_factor"
+  ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_TWO_FACTOR_AUTHENTICATOR                   // "two_factor_authenticator"
+  ASPNETCORE_IDENTITY_SIGN_IN_TYPE_VALUE_TWO_FACTOR_RECOVERY_CODE                   // "two_factor_recovery_code"
+ATTR_ASPNETCORE_IDENTITY_TOKEN_PURPOSE                                            // aspnetcore.identity.token_purpose
+  ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_OTHER                                     // "_OTHER"
+  ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_CHANGE_EMAIL                              // "change_email"
+  ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_CHANGE_PHONE_NUMBER                       // "change_phone_number"
+  ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_EMAIL_CONFIRMATION                        // "email_confirmation"
+  ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_RESET_PASSWORD                            // "reset_password"
+  ASPNETCORE_IDENTITY_TOKEN_PURPOSE_VALUE_TWO_FACTOR                                // "two_factor"
+ATTR_ASPNETCORE_IDENTITY_TOKEN_VERIFIED                                           // aspnetcore.identity.token_verified
+  ASPNETCORE_IDENTITY_TOKEN_VERIFIED_VALUE_FAILURE                                  // "failure"
+  ASPNETCORE_IDENTITY_TOKEN_VERIFIED_VALUE_SUCCESS                                  // "success"
+ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE                                         // aspnetcore.identity.user.update_type
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_OTHER                                  // "_OTHER"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_ACCESS_FAILED                          // "access_failed"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_ADD_CLAIMS                             // "add_claims"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_ADD_LOGIN                              // "add_login"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_ADD_PASSWORD                           // "add_password"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_ADD_TO_ROLES                           // "add_to_roles"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_CHANGE_EMAIL                           // "change_email"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_CHANGE_PASSWORD                        // "change_password"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_CHANGE_PHONE_NUMBER                    // "change_phone_number"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_CONFIRM_EMAIL                          // "confirm_email"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_GENERATE_NEW_TWO_FACTOR_RECOVERY_CODES // "generate_new_two_factor_recovery_codes"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_PASSWORD_REHASH                        // "password_rehash"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REDEEM_TWO_FACTOR_RECOVERY_CODE        // "redeem_two_factor_recovery_code"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_AUTHENTICATION_TOKEN            // "remove_authentication_token"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_CLAIMS                          // "remove_claims"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_FROM_ROLES                      // "remove_from_roles"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_LOGIN                           // "remove_login"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_PASSKEY                         // "remove_passkey"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REMOVE_PASSWORD                        // "remove_password"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_REPLACE_CLAIM                          // "replace_claim"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_RESET_ACCESS_FAILED_COUNT              // "reset_access_failed_count"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_RESET_AUTHENTICATOR_KEY                // "reset_authenticator_key"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_RESET_PASSWORD                         // "reset_password"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SECURITY_STAMP                         // "security_stamp"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_AUTHENTICATION_TOKEN               // "set_authentication_token"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_EMAIL                              // "set_email"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_LOCKOUT_ENABLED                    // "set_lockout_enabled"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_LOCKOUT_END_DATE                   // "set_lockout_end_date"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_PASSKEY                            // "set_passkey"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_PHONE_NUMBER                       // "set_phone_number"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_SET_TWO_FACTOR_ENABLED                 // "set_two_factor_enabled"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_UPDATE                                 // "update"
+  ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_USER_NAME                              // "user_name"
+ATTR_ASPNETCORE_IDENTITY_USER_TYPE                                                // aspnetcore.identity.user_type
+ATTR_ASPNETCORE_MEMORY_POOL_OWNER                                                 // aspnetcore.memory_pool.owner
+ATTR_ASPNETCORE_SIGN_IN_IS_PERSISTENT                                             // aspnetcore.sign_in.is_persistent
+
+ATTR_CONTAINER_RUNTIME_DESCRIPTION                                                // container.runtime.description
+ATTR_CONTAINER_RUNTIME_NAME                                                       // container.runtime.name
+ATTR_CONTAINER_RUNTIME_VERSION                                                    // container.runtime.version
+
+ATTR_GEN_AI_INPUT_MESSAGES                                                        // gen_ai.input.messages
+ATTR_GEN_AI_OUTPUT_MESSAGES                                                       // gen_ai.output.messages
+ATTR_GEN_AI_PROVIDER_NAME                                                         // gen_ai.provider.name
+  GEN_AI_PROVIDER_NAME_VALUE_ANTHROPIC                                              // "anthropic"
+  GEN_AI_PROVIDER_NAME_VALUE_AWS_BEDROCK                                            // "aws.bedrock"
+  GEN_AI_PROVIDER_NAME_VALUE_AZURE_AI_INFERENCE                                     // "azure.ai.inference"
+  GEN_AI_PROVIDER_NAME_VALUE_AZURE_AI_OPENAI                                        // "azure.ai.openai"
+  GEN_AI_PROVIDER_NAME_VALUE_COHERE                                                 // "cohere"
+  GEN_AI_PROVIDER_NAME_VALUE_DEEPSEEK                                               // "deepseek"
+  GEN_AI_PROVIDER_NAME_VALUE_GCP_GEMINI                                             // "gcp.gemini"
+  GEN_AI_PROVIDER_NAME_VALUE_GCP_GEN_AI                                             // "gcp.gen_ai"
+  GEN_AI_PROVIDER_NAME_VALUE_GCP_VERTEX_AI                                          // "gcp.vertex_ai"
+  GEN_AI_PROVIDER_NAME_VALUE_GROQ                                                   // "groq"
+  GEN_AI_PROVIDER_NAME_VALUE_IBM_WATSONX_AI                                         // "ibm.watsonx.ai"
+  GEN_AI_PROVIDER_NAME_VALUE_MISTRAL_AI                                             // "mistral_ai"
+  GEN_AI_PROVIDER_NAME_VALUE_OPENAI                                                 // "openai"
+  GEN_AI_PROVIDER_NAME_VALUE_PERPLEXITY                                             // "perplexity"
+  GEN_AI_PROVIDER_NAME_VALUE_X_AI                                                   // "x_ai"
+ATTR_GEN_AI_SYSTEM_INSTRUCTIONS                                                   // gen_ai.system_instructions
+
+ATTR_HW_BATTERY_CAPACITY                                                          // hw.battery.capacity
+ATTR_HW_BATTERY_CHEMISTRY                                                         // hw.battery.chemistry
+ATTR_HW_BATTERY_STATE                                                             // hw.battery.state
+  HW_BATTERY_STATE_VALUE_CHARGING                                                   // "charging"
+  HW_BATTERY_STATE_VALUE_DISCHARGING                                                // "discharging"
+ATTR_HW_BIOS_VERSION                                                              // hw.bios_version
+ATTR_HW_DRIVER_VERSION                                                            // hw.driver_version
+ATTR_HW_ENCLOSURE_TYPE                                                            // hw.enclosure.type
+ATTR_HW_FIRMWARE_VERSION                                                          // hw.firmware_version
+ATTR_HW_GPU_TASK                                                                  // hw.gpu.task
+  HW_GPU_TASK_VALUE_DECODER                                                         // "decoder"
+  HW_GPU_TASK_VALUE_ENCODER                                                         // "encoder"
+  HW_GPU_TASK_VALUE_GENERAL                                                         // "general"
+ATTR_HW_LIMIT_TYPE                                                                // hw.limit_type
+  HW_LIMIT_TYPE_VALUE_CRITICAL                                                      // "critical"
+  HW_LIMIT_TYPE_VALUE_DEGRADED                                                      // "degraded"
+  HW_LIMIT_TYPE_VALUE_HIGH_CRITICAL                                                 // "high.critical"
+  HW_LIMIT_TYPE_VALUE_HIGH_DEGRADED                                                 // "high.degraded"
+  HW_LIMIT_TYPE_VALUE_LOW_CRITICAL                                                  // "low.critical"
+  HW_LIMIT_TYPE_VALUE_LOW_DEGRADED                                                  // "low.degraded"
+  HW_LIMIT_TYPE_VALUE_MAX                                                           // "max"
+  HW_LIMIT_TYPE_VALUE_THROTTLED                                                     // "throttled"
+  HW_LIMIT_TYPE_VALUE_TURBO                                                         // "turbo"
+ATTR_HW_LOGICAL_DISK_RAID_LEVEL                                                   // hw.logical_disk.raid_level
+ATTR_HW_LOGICAL_DISK_STATE                                                        // hw.logical_disk.state
+  HW_LOGICAL_DISK_STATE_VALUE_FREE                                                  // "free"
+  HW_LOGICAL_DISK_STATE_VALUE_USED                                                  // "used"
+ATTR_HW_MEMORY_TYPE                                                               // hw.memory.type
+ATTR_HW_MODEL                                                                     // hw.model
+ATTR_HW_NETWORK_LOGICAL_ADDRESSES                                                 // hw.network.logical_addresses
+ATTR_HW_NETWORK_PHYSICAL_ADDRESS                                                  // hw.network.physical_address
+ATTR_HW_PHYSICAL_DISK_SMART_ATTRIBUTE                                             // hw.physical_disk.smart_attribute
+ATTR_HW_PHYSICAL_DISK_STATE                                                       // hw.physical_disk.state
+  HW_PHYSICAL_DISK_STATE_VALUE_REMAINING                                            // "remaining"
+ATTR_HW_PHYSICAL_DISK_TYPE                                                        // hw.physical_disk.type
+ATTR_HW_SENSOR_LOCATION                                                           // hw.sensor_location
+ATTR_HW_SERIAL_NUMBER                                                             // hw.serial_number
+HW_STATE_VALUE_NEEDS_CLEANING                                                     // "needs_cleaning"
+HW_STATE_VALUE_PREDICTED_FAILURE                                                  // "predicted_failure"
+ATTR_HW_TAPE_DRIVE_OPERATION_TYPE                                                 // hw.tape_drive.operation_type
+  HW_TAPE_DRIVE_OPERATION_TYPE_VALUE_CLEAN                                          // "clean"
+  HW_TAPE_DRIVE_OPERATION_TYPE_VALUE_MOUNT                                          // "mount"
+  HW_TAPE_DRIVE_OPERATION_TYPE_VALUE_UNMOUNT                                        // "unmount"
+ATTR_HW_VENDOR                                                                    // hw.vendor
+
+MESSAGING_SYSTEM_VALUE_AWS_SNS                                                    // "aws.sns"
+
+ATTR_OPENAI_REQUEST_SERVICE_TIER                                                  // openai.request.service_tier
+  OPENAI_REQUEST_SERVICE_TIER_VALUE_AUTO                                            // "auto"
+  OPENAI_REQUEST_SERVICE_TIER_VALUE_DEFAULT                                         // "default"
+ATTR_OPENAI_RESPONSE_SERVICE_TIER                                                 // openai.response.service_tier
+ATTR_OPENAI_RESPONSE_SYSTEM_FINGERPRINT                                           // openai.response.system_fingerprint
+
+ATTR_OTEL_SCOPE_SCHEMA_URL                                                        // otel.scope.schema_url
+```
+
+</details>
+
+### :bug: Bug Fixes
+
+* fix: prioritize `esnext` export condition as it is more specific [#5458](https://github.com/open-telemetry/opentelemetry-js/pull/5458)
+
+## 1.36.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.36.0 [#5779](https://github.com/open-telemetry/opentelemetry-js/pull/5779) @trentm
+  * Semantic Conventions v1.36.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1360) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *none*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *8 exported values changed, 7 newly deprecated exports, 3 newly undeprecated exports, 88 added exports*
+
+#### Unstable changes in v1.36.0
+
+<details>
+<summary>8 exported values changed</summary>
+
+```js
+CLOUD_PLATFORM_VALUE_AZURE_AKS                 // "azure_aks" -> "azure.aks"
+CLOUD_PLATFORM_VALUE_AZURE_APP_SERVICE         // "azure_app_service" -> "azure.app_service"
+CLOUD_PLATFORM_VALUE_AZURE_CONTAINER_APPS      // "azure_container_apps" -> "azure.container_apps"
+CLOUD_PLATFORM_VALUE_AZURE_CONTAINER_INSTANCES // "azure_container_instances" -> "azure.container_instances"
+CLOUD_PLATFORM_VALUE_AZURE_FUNCTIONS           // "azure_functions" -> "azure.functions"
+CLOUD_PLATFORM_VALUE_AZURE_OPENSHIFT           // "azure_openshift" -> "azure.openshift"
+CLOUD_PLATFORM_VALUE_AZURE_VM                  // "azure_vm" -> "azure.vm"
+GEN_AI_SYSTEM_VALUE_AZ_AI_OPENAI               // "az.ai.openai" -> "azure.ai.openai"
+```
+
+</details>
+
+<details>
+<summary>7 newly deprecated exports</summary>
+
+```js
+METRIC_CPU_FREQUENCY              // cpu.frequency: Replaced by `system.cpu.frequency`.
+METRIC_CPU_TIME                   // cpu.time: Replaced by `system.cpu.time`.
+METRIC_CPU_UTILIZATION            // cpu.utilization: Replaced by `system.cpu.utilization`.
+METRIC_OTEL_SDK_SPAN_ENDED        // otel.sdk.span.ended: Obsoleted.
+METRIC_SYSTEM_NETWORK_CONNECTIONS // system.network.connections: Replaced by `system.network.connection.count`.
+ATTR_AZ_NAMESPACE                 // az.namespace: Replaced by `azure.resource_provider.namespace`.
+ATTR_AZ_SERVICE_REQUEST_ID        // az.service_request_id: Replaced by `azure.service.request.id`.
+```
+
+</details>
+
+<details>
+<summary>3 newly undeprecated exports</summary>
+
+```js
+METRIC_SYSTEM_CPU_FREQUENCY   // system.cpu.frequency
+METRIC_SYSTEM_CPU_TIME        // system.cpu.time
+METRIC_SYSTEM_CPU_UTILIZATION // system.cpu.utilization
+```
+
+</details>
+
+<details>
+<summary>88 added exports</summary>
+
+```js
+METRIC_K8S_CONTAINER_CPU_LIMIT                                  // k8s.container.cpu.limit
+METRIC_K8S_CONTAINER_CPU_REQUEST                                // k8s.container.cpu.request
+METRIC_K8S_CONTAINER_EPHEMERAL_STORAGE_LIMIT                    // k8s.container.ephemeral_storage.limit
+METRIC_K8S_CONTAINER_EPHEMERAL_STORAGE_REQUEST                  // k8s.container.ephemeral_storage.request
+METRIC_K8S_CONTAINER_MEMORY_LIMIT                               // k8s.container.memory.limit
+METRIC_K8S_CONTAINER_MEMORY_REQUEST                             // k8s.container.memory.request
+METRIC_K8S_CONTAINER_READY                                      // k8s.container.ready
+METRIC_K8S_CONTAINER_RESTART_COUNT                              // k8s.container.restart.count
+METRIC_K8S_CONTAINER_STATUS_REASON                              // k8s.container.status.reason
+METRIC_K8S_CONTAINER_STATUS_STATE                               // k8s.container.status.state
+METRIC_K8S_CONTAINER_STORAGE_LIMIT                              // k8s.container.storage.limit
+METRIC_K8S_CONTAINER_STORAGE_REQUEST                            // k8s.container.storage.request
+METRIC_K8S_HPA_METRIC_TARGET_CPU_AVERAGE_UTILIZATION            // k8s.hpa.metric.target.cpu.average_utilization
+METRIC_K8S_HPA_METRIC_TARGET_CPU_AVERAGE_VALUE                  // k8s.hpa.metric.target.cpu.average_value
+METRIC_K8S_HPA_METRIC_TARGET_CPU_VALUE                          // k8s.hpa.metric.target.cpu.value
+METRIC_K8S_NODE_ALLOCATABLE_CPU                                 // k8s.node.allocatable.cpu
+METRIC_K8S_NODE_ALLOCATABLE_EPHEMERAL_STORAGE                   // k8s.node.allocatable.ephemeral_storage
+METRIC_K8S_NODE_ALLOCATABLE_MEMORY                              // k8s.node.allocatable.memory
+METRIC_K8S_NODE_ALLOCATABLE_PODS                                // k8s.node.allocatable.pods
+METRIC_K8S_NODE_CONDITION_STATUS                                // k8s.node.condition.status
+METRIC_K8S_RESOURCEQUOTA_CPU_LIMIT_HARD                         // k8s.resourcequota.cpu.limit.hard
+METRIC_K8S_RESOURCEQUOTA_CPU_LIMIT_USED                         // k8s.resourcequota.cpu.limit.used
+METRIC_K8S_RESOURCEQUOTA_CPU_REQUEST_HARD                       // k8s.resourcequota.cpu.request.hard
+METRIC_K8S_RESOURCEQUOTA_CPU_REQUEST_USED                       // k8s.resourcequota.cpu.request.used
+METRIC_K8S_RESOURCEQUOTA_EPHEMERAL_STORAGE_LIMIT_HARD           // k8s.resourcequota.ephemeral_storage.limit.hard
+METRIC_K8S_RESOURCEQUOTA_EPHEMERAL_STORAGE_LIMIT_USED           // k8s.resourcequota.ephemeral_storage.limit.used
+METRIC_K8S_RESOURCEQUOTA_EPHEMERAL_STORAGE_REQUEST_HARD         // k8s.resourcequota.ephemeral_storage.request.hard
+METRIC_K8S_RESOURCEQUOTA_EPHEMERAL_STORAGE_REQUEST_USED         // k8s.resourcequota.ephemeral_storage.request.used
+METRIC_K8S_RESOURCEQUOTA_HUGEPAGE_COUNT_REQUEST_HARD            // k8s.resourcequota.hugepage_count.request.hard
+METRIC_K8S_RESOURCEQUOTA_HUGEPAGE_COUNT_REQUEST_USED            // k8s.resourcequota.hugepage_count.request.used
+METRIC_K8S_RESOURCEQUOTA_MEMORY_LIMIT_HARD                      // k8s.resourcequota.memory.limit.hard
+METRIC_K8S_RESOURCEQUOTA_MEMORY_LIMIT_USED                      // k8s.resourcequota.memory.limit.used
+METRIC_K8S_RESOURCEQUOTA_MEMORY_REQUEST_HARD                    // k8s.resourcequota.memory.request.hard
+METRIC_K8S_RESOURCEQUOTA_MEMORY_REQUEST_USED                    // k8s.resourcequota.memory.request.used
+METRIC_K8S_RESOURCEQUOTA_OBJECT_COUNT_HARD                      // k8s.resourcequota.object_count.hard
+METRIC_K8S_RESOURCEQUOTA_OBJECT_COUNT_USED                      // k8s.resourcequota.object_count.used
+METRIC_K8S_RESOURCEQUOTA_PERSISTENTVOLUMECLAIM_COUNT_HARD       // k8s.resourcequota.persistentvolumeclaim_count.hard
+METRIC_K8S_RESOURCEQUOTA_PERSISTENTVOLUMECLAIM_COUNT_USED       // k8s.resourcequota.persistentvolumeclaim_count.used
+METRIC_K8S_RESOURCEQUOTA_STORAGE_REQUEST_HARD                   // k8s.resourcequota.storage.request.hard
+METRIC_K8S_RESOURCEQUOTA_STORAGE_REQUEST_USED                   // k8s.resourcequota.storage.request.used
+
+METRIC_OTEL_SDK_SPAN_STARTED                                    // otel.sdk.span.started
+
+METRIC_SYSTEM_NETWORK_CONNECTION_COUNT                          // system.network.connection.count
+
+ATTR_AZURE_RESOURCE_PROVIDER_NAMESPACE                          // azure.resource_provider.namespace
+ATTR_AZURE_SERVICE_REQUEST_ID                                   // azure.service.request.id
+
+ATTR_DNS_ANSWERS                                                // dns.answers
+
+GEN_AI_SYSTEM_VALUE_AZURE_AI_INFERENCE                          // "azure.ai.inference"
+GEN_AI_SYSTEM_VALUE_AZURE_AI_OPENAI                             // "azure.ai.openai"
+
+ATTR_K8S_CONTAINER_STATUS_REASON                                // k8s.container.status.reason
+  K8S_CONTAINER_STATUS_REASON_VALUE_COMPLETED                     // "Completed"
+  K8S_CONTAINER_STATUS_REASON_VALUE_CONTAINER_CANNOT_RUN          // "ContainerCannotRun"
+  K8S_CONTAINER_STATUS_REASON_VALUE_CONTAINER_CREATING            // "ContainerCreating"
+  K8S_CONTAINER_STATUS_REASON_VALUE_CRASH_LOOP_BACK_OFF           // "CrashLoopBackOff"
+  K8S_CONTAINER_STATUS_REASON_VALUE_CREATE_CONTAINER_CONFIG_ERROR // "CreateContainerConfigError"
+  K8S_CONTAINER_STATUS_REASON_VALUE_ERR_IMAGE_PULL                // "ErrImagePull"
+  K8S_CONTAINER_STATUS_REASON_VALUE_ERROR                         // "Error"
+  K8S_CONTAINER_STATUS_REASON_VALUE_IMAGE_PULL_BACK_OFF           // "ImagePullBackOff"
+  K8S_CONTAINER_STATUS_REASON_VALUE_OOM_KILLED                    // "OOMKilled"
+ATTR_K8S_CONTAINER_STATUS_STATE                                 // k8s.container.status.state
+  K8S_CONTAINER_STATUS_STATE_VALUE_RUNNING                        // "running"
+  K8S_CONTAINER_STATUS_STATE_VALUE_TERMINATED                     // "terminated"
+  K8S_CONTAINER_STATUS_STATE_VALUE_WAITING                        // "waiting"
+ATTR_K8S_HPA_METRIC_TYPE                                        // k8s.hpa.metric.type
+ATTR_K8S_HPA_SCALETARGETREF_API_VERSION                         // k8s.hpa.scaletargetref.api_version
+ATTR_K8S_HPA_SCALETARGETREF_KIND                                // k8s.hpa.scaletargetref.kind
+ATTR_K8S_HPA_SCALETARGETREF_NAME                                // k8s.hpa.scaletargetref.name
+ATTR_K8S_HUGEPAGE_SIZE                                          // k8s.hugepage.size
+ATTR_K8S_NODE_CONDITION_STATUS                                  // k8s.node.condition.status
+  K8S_NODE_CONDITION_STATUS_VALUE_CONDITION_FALSE                 // "false"
+  K8S_NODE_CONDITION_STATUS_VALUE_CONDITION_TRUE                  // "true"
+  K8S_NODE_CONDITION_STATUS_VALUE_CONDITION_UNKNOWN               // "unknown"
+ATTR_K8S_NODE_CONDITION_TYPE                                    // k8s.node.condition.type
+  K8S_NODE_CONDITION_TYPE_VALUE_DISK_PRESSURE                     // "DiskPressure"
+  K8S_NODE_CONDITION_TYPE_VALUE_MEMORY_PRESSURE                   // "MemoryPressure"
+  K8S_NODE_CONDITION_TYPE_VALUE_NETWORK_UNAVAILABLE               // "NetworkUnavailable"
+  K8S_NODE_CONDITION_TYPE_VALUE_PID_PRESSURE                      // "PIDPressure"
+  K8S_NODE_CONDITION_TYPE_VALUE_READY                             // "Ready"
+ATTR_K8S_RESOURCEQUOTA_RESOURCE_NAME                            // k8s.resourcequota.resource_name
+ATTR_K8S_STORAGECLASS_NAME                                      // k8s.storageclass.name
+
+ATTR_MAINFRAME_LPAR_NAME                                        // mainframe.lpar.name
+
+OS_TYPE_VALUE_ZOS                                               // "zos"
+
+OTEL_COMPONENT_TYPE_VALUE_PROMETHEUS_HTTP_TEXT_METRIC_EXPORTER  // "prometheus_http_text_metric_exporter"
+OTEL_COMPONENT_TYPE_VALUE_ZIPKIN_HTTP_SPAN_EXPORTER             // "zipkin_http_span_exporter"
+ATTR_OTEL_SPAN_PARENT_ORIGIN                                    // otel.span.parent.origin
+  OTEL_SPAN_PARENT_ORIGIN_VALUE_LOCAL                             // "local"
+  OTEL_SPAN_PARENT_ORIGIN_VALUE_NONE                              // "none"
+  OTEL_SPAN_PARENT_ORIGIN_VALUE_REMOTE                            // "remote"
+
+ATTR_ZOS_SMF_ID                                                 // zos.smf.id
+ATTR_ZOS_SYSPLEX_NAME                                           // zos.sysplex.name
+```
+
+</details>
+
+## 1.35.0
+
+**Known issue:** Changes from semantic conventions **v1.36.0** where accidentally released in this JS package with version **1.35.0**. Please use `@opentelemetry/semantic-conventions@1.36.0`.
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.36.0 [#5779](https://github.com/open-telemetry/opentelemetry-js/pull/5779) @trentm
+  * Changes from semantic conventions **v1.36.0** were incorrectly included in this release. See note above.
+
+* feat: improve the jsdoc comment on exported constants for enum values [#5784](https://github.com/open-telemetry/opentelemetry-js/pull/5784) @trentm
+  * The jsdoc comment for enum values now includes the 'brief', an
+    `@experimental` tag, and a `@deprecated` tag if the corresponding fields
+    exist on the semconv definition.
+
 ## 1.34.0
 
 ### :rocket: Features

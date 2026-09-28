@@ -1,30 +1,28 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { diag, Attributes, AttributeValue } from '@opentelemetry/api';
-import {
+import type { AnyValue, Attributes } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
+import type {
   ResourceMetrics,
-  DataPointType,
   ScopeMetrics,
   MetricData,
   DataPoint,
   Histogram,
 } from '@opentelemetry/sdk-metrics';
+import { DataPointType } from '@opentelemetry/sdk-metrics';
+import type { InstrumentationScope } from '@opentelemetry/core';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import type { Resource } from '@opentelemetry/resources';
+import {
+  ATTR_OTEL_SCOPE_NAME,
+  ATTR_OTEL_SCOPE_VERSION,
+} from '@opentelemetry/semantic-conventions';
+
+// This is currently listed as experimental.
+const ATTR_OTEL_SCOPE_SCHEMA_URL = 'otel.scope.schema_url';
 
 type PrometheusDataTypeLiteral =
   | 'counter'
@@ -41,11 +39,17 @@ function escapeString(str: string) {
  * String Attribute values are converted directly to Prometheus attribute values.
  * Non-string values are represented as JSON-encoded strings.
  *
- * `undefined` is converted to an empty string.
+ * Note: This does *not* currently guard against unserializable attribute
+ * values, e.g. BigInt or circular references. This is relying, as is
+ * the sdk-metrics package, that users follow the requirement to only use
+ * simple attributes. (See OTEP 4485.)
  */
-function escapeAttributeValue(str: AttributeValue = '') {
-  if (typeof str !== 'string') {
-    str = JSON.stringify(str);
+function escapeAttributeValue(val: AnyValue = '') {
+  let str: string;
+  if (typeof val !== 'string') {
+    str = JSON.stringify(val);
+  } else {
+    str = val;
   }
   return escapeString(str).replace(/"/g, '\\"');
 }
@@ -173,17 +177,23 @@ export class PrometheusSerializer {
   private _appendTimestamp: boolean;
   private _additionalAttributes: Attributes | undefined;
   private _withResourceConstantLabels: RegExp | undefined;
+  private _withoutScopeInfo: boolean | undefined;
+  private _withoutTargetInfo: boolean | undefined;
 
   constructor(
     prefix?: string,
     appendTimestamp = false,
-    withResourceConstantLabels?: RegExp
+    withResourceConstantLabels?: RegExp,
+    withoutTargetInfo?: boolean,
+    withoutScopeInfo?: boolean
   ) {
     if (prefix) {
       this._prefix = prefix + '_';
     }
     this._appendTimestamp = appendTimestamp;
     this._withResourceConstantLabels = withResourceConstantLabels;
+    this._withoutScopeInfo = !!withoutScopeInfo;
+    this._withoutTargetInfo = !!withoutTargetInfo;
   }
 
   serialize(resourceMetrics: ResourceMetrics): string {
@@ -224,18 +234,40 @@ export class PrometheusSerializer {
   private _serializeScopeMetrics(scopeMetrics: ScopeMetrics) {
     let str = '';
     for (const metric of scopeMetrics.metrics) {
-      str += this._serializeMetricData(metric) + '\n';
+      const metricStr = this._serializeMetricData(metric, scopeMetrics.scope);
+
+      if (metricStr) {
+        str += metricStr + '\n';
+      }
     }
     return str;
   }
 
-  private _serializeMetricData(metricData: MetricData) {
+  private _serializeMetricData(
+    metricData: MetricData,
+    scope: InstrumentationScope
+  ) {
     let name = sanitizePrometheusMetricName(
       escapeString(metricData.descriptor.name)
     );
     if (this._prefix) {
       name = `${this._prefix}${name}`;
     }
+
+    if (name === '') {
+      diag.error(
+        `Normalization for metric "${metricData.descriptor.name}" resulted in empty name`
+      );
+      return '';
+    } else if (name === '_') {
+      diag.error(
+        `Normalization for metric "${metricData.descriptor.name}" resulted in an invalid name: "_"`
+      );
+      return '';
+    } else if (name[0] >= '0' && name[0] <= '9') {
+      name = `_${name}`;
+    }
+
     const dataPointType = metricData.dataPointType;
 
     name = enforcePrometheusNamingConvention(name, metricData);
@@ -247,19 +279,53 @@ export class PrometheusSerializer {
       ? `\n# UNIT ${name} ${escapeString(metricData.descriptor.unit)}`
       : '';
     const type = `# TYPE ${name} ${toPrometheusType(metricData)}`;
+    let additionalAttributes: Attributes | undefined;
+
+    if (this._withoutScopeInfo) {
+      additionalAttributes = this._additionalAttributes;
+    } else {
+      const scopeInfo: Attributes = { [ATTR_OTEL_SCOPE_NAME]: scope.name };
+
+      if (scope.schemaUrl) {
+        scopeInfo[ATTR_OTEL_SCOPE_SCHEMA_URL] = scope.schemaUrl;
+      }
+
+      if (scope.version) {
+        scopeInfo[ATTR_OTEL_SCOPE_VERSION] = scope.version;
+      }
+
+      additionalAttributes = Object.assign(
+        scopeInfo,
+        this._additionalAttributes
+      );
+    }
 
     let results = '';
     switch (dataPointType) {
       case DataPointType.SUM:
       case DataPointType.GAUGE: {
         results = metricData.dataPoints
-          .map(it => this._serializeSingularDataPoint(name, metricData, it))
+          .map(it =>
+            this._serializeSingularDataPoint(
+              name,
+              metricData,
+              it,
+              additionalAttributes
+            )
+          )
           .join('');
         break;
       }
       case DataPointType.HISTOGRAM: {
         results = metricData.dataPoints
-          .map(it => this._serializeHistogramDataPoint(name, metricData, it))
+          .map(it =>
+            this._serializeHistogramDataPoint(
+              name,
+              metricData,
+              it,
+              additionalAttributes
+            )
+          )
           .join('');
         break;
       }
@@ -276,11 +342,11 @@ export class PrometheusSerializer {
   private _serializeSingularDataPoint(
     name: string,
     data: MetricData,
-    dataPoint: DataPoint<number>
+    dataPoint: DataPoint<number>,
+    additionalAttributes: Attributes | undefined
   ): string {
     let results = '';
 
-    name = enforcePrometheusNamingConvention(name, data);
     const { value, attributes } = dataPoint;
     const timestamp = hrTimeToMilliseconds(dataPoint.endTime);
     results += stringify(
@@ -288,7 +354,7 @@ export class PrometheusSerializer {
       attributes,
       value,
       this._appendTimestamp ? timestamp : undefined,
-      this._additionalAttributes
+      additionalAttributes
     );
     return results;
   }
@@ -296,11 +362,11 @@ export class PrometheusSerializer {
   private _serializeHistogramDataPoint(
     name: string,
     data: MetricData,
-    dataPoint: DataPoint<Histogram>
+    dataPoint: DataPoint<Histogram>,
+    additionalAttributes: Attributes | undefined
   ): string {
     let results = '';
 
-    name = enforcePrometheusNamingConvention(name, data);
     const attributes = dataPoint.attributes;
     const histogram = dataPoint.value;
     const timestamp = hrTimeToMilliseconds(dataPoint.endTime);
@@ -313,7 +379,7 @@ export class PrometheusSerializer {
           attributes,
           value,
           this._appendTimestamp ? timestamp : undefined,
-          this._additionalAttributes
+          additionalAttributes
         );
     }
 
@@ -340,7 +406,7 @@ export class PrometheusSerializer {
         attributes,
         cumulativeSum,
         this._appendTimestamp ? timestamp : undefined,
-        Object.assign({}, this._additionalAttributes ?? {}, {
+        Object.assign({}, additionalAttributes, {
           le:
             upperBound === undefined || upperBound === Infinity
               ? '+Inf'
@@ -353,6 +419,10 @@ export class PrometheusSerializer {
   }
 
   protected _serializeResource(resource: Resource): string {
+    if (this._withoutTargetInfo === true) {
+      return '';
+    }
+
     const name = 'target_info';
     const help = `# HELP ${name} Target metadata`;
     const type = `# TYPE ${name} gauge`;

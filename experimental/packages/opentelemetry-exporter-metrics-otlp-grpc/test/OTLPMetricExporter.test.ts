@@ -1,21 +1,11 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import { OTLPMetricExporter } from '../src';
-import { ServerTestContext, startServer } from './utils';
+import type { ServerTestContext } from './utils';
+import { startServer, TestMetricReader } from './utils';
 import * as assert from 'assert';
 import {
   MeterProvider,
@@ -78,19 +68,30 @@ describe('OTLPMetricsExporter', function () {
 
   it('successfully exports data', async () => {
     // arrange
+    const testMetricReader = new TestMetricReader();
+    const exporter = new OTLPMetricExporter({ url: 'http://localhost:1502' });
     const meterProvider = new MeterProvider({
       readers: [
         new PeriodicExportingMetricReader({
-          exporter: new OTLPMetricExporter({ url: 'http://localhost:1502' }),
+          exporter,
         }),
+        testMetricReader,
       ],
     });
+    exporter.setSelfObsMeterProvider(meterProvider);
 
     // act
     meterProvider.getMeter('test-meter').createCounter('test-counter').add(1);
-    await meterProvider.shutdown();
+    await meterProvider.forceFlush();
 
     // assert
     assert.strictEqual(serverTestContext.requests.length, 1);
+
+    const metrics = await testMetricReader.collect();
+    const scopeMetrics = metrics.resourceMetrics.scopeMetrics.find(
+      sm => sm.scope.name === '@opentelemetry/otlp-exporter'
+    );
+    assert.ok(scopeMetrics);
+    await meterProvider.shutdown();
   });
 });

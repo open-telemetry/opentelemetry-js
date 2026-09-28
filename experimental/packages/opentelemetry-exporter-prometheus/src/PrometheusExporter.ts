@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import { diag } from '@opentelemetry/api';
@@ -21,23 +10,27 @@ import {
   AggregationType,
   MetricReader,
 } from '@opentelemetry/sdk-metrics';
-import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
-import { ExporterConfig } from './export/types';
+import type { IncomingMessage, Server, ServerResponse } from 'http';
+import { createServer } from 'http';
+import type { ExporterConfig } from './export/types';
 import { PrometheusSerializer } from './PrometheusSerializer';
+import { OTEL_COMPONENT_TYPE_VALUE_PROMETHEUS_HTTP_TEXT_METRIC_EXPORTER } from './semconv';
 /** Node.js v8.x compat */
 import { URL } from 'url';
 
 export class PrometheusExporter extends MetricReader {
   static readonly DEFAULT_OPTIONS = {
-    host: undefined,
+    host: 'localhost',
     port: 9464,
     endpoint: '/metrics',
     prefix: '',
     appendTimestamp: false,
     withResourceConstantLabels: undefined,
+    withoutScopeInfo: false,
+    withoutTargetInfo: false,
   };
 
-  private readonly _host?: string;
+  private readonly _host: string;
   private readonly _port: number;
   private readonly _baseUrl: string;
   private readonly _endpoint: string;
@@ -68,16 +61,12 @@ export class PrometheusExporter extends MetricReader {
       },
       aggregationTemporalitySelector: _instrumentType =>
         AggregationTemporality.CUMULATIVE,
+      otelComponentType:
+        OTEL_COMPONENT_TYPE_VALUE_PROMETHEUS_HTTP_TEXT_METRIC_EXPORTER,
       metricProducers: config.metricProducers,
     });
-    this._host =
-      config.host ||
-      process.env.OTEL_EXPORTER_PROMETHEUS_HOST ||
-      PrometheusExporter.DEFAULT_OPTIONS.host;
-    this._port =
-      config.port ||
-      Number(process.env.OTEL_EXPORTER_PROMETHEUS_PORT) ||
-      PrometheusExporter.DEFAULT_OPTIONS.port;
+    this._host = config.host || PrometheusExporter.DEFAULT_OPTIONS.host;
+    this._port = config.port || PrometheusExporter.DEFAULT_OPTIONS.port;
     this._prefix = config.prefix || PrometheusExporter.DEFAULT_OPTIONS.prefix;
     this._appendTimestamp =
       typeof config.appendTimestamp === 'boolean'
@@ -86,12 +75,20 @@ export class PrometheusExporter extends MetricReader {
     const _withResourceConstantLabels =
       config.withResourceConstantLabels ||
       PrometheusExporter.DEFAULT_OPTIONS.withResourceConstantLabels;
+    const _withoutScopeInfo =
+      config.withoutScopeInfo ||
+      PrometheusExporter.DEFAULT_OPTIONS.withoutScopeInfo;
+    const _withoutTargetInfo =
+      config.withoutTargetInfo ||
+      PrometheusExporter.DEFAULT_OPTIONS.withoutTargetInfo;
     // unref to prevent prometheus exporter from holding the process open on exit
     this._server = createServer(this._requestHandler).unref();
     this._serializer = new PrometheusSerializer(
       this._prefix,
       this._appendTimestamp,
-      _withResourceConstantLabels
+      _withResourceConstantLabels,
+      _withoutTargetInfo,
+      _withoutScopeInfo
     );
 
     this._baseUrl = `http://${this._host}:${this._port}/`;
@@ -195,10 +192,17 @@ export class PrometheusExporter extends MetricReader {
     request: IncomingMessage,
     response: ServerResponse
   ) => {
-    if (
-      request.url != null &&
-      new URL(request.url, this._baseUrl).pathname === this._endpoint
-    ) {
+    let pathname: string | undefined;
+    try {
+      if (request.url != null) {
+        pathname = new URL(request.url, this._baseUrl).pathname;
+      }
+    } catch {
+      response.statusCode = 400;
+      response.end('Bad Request');
+      return;
+    }
+    if (pathname === this._endpoint) {
       this._exportMetrics(response);
     } else {
       this._notFound(response);

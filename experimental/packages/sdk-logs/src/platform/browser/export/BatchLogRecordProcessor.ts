@@ -1,33 +1,18 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { LogRecordExporter } from './../../../export/LogRecordExporter';
-import type { BatchLogRecordProcessorBrowserConfig } from '../../../types';
+import type { BatchLogRecordProcessorBrowserOptions } from '../../../types';
 import { BatchLogRecordProcessorBase } from '../../../export/BatchLogRecordProcessorBase';
 
-export class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BatchLogRecordProcessorBrowserConfig> {
+export class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BatchLogRecordProcessorBrowserOptions> {
   private _visibilityChangeListener?: () => void;
   private _pageHideListener?: () => void;
 
-  constructor(
-    exporter: LogRecordExporter,
-    config?: BatchLogRecordProcessorBrowserConfig
-  ) {
-    super(exporter, config);
-    this._onInit(config);
+  constructor(options: BatchLogRecordProcessorBrowserOptions) {
+    super(options);
+    this._onInit(options);
   }
 
   protected onShutdown(): void {
@@ -45,9 +30,9 @@ export class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BatchLo
     }
   }
 
-  private _onInit(config?: BatchLogRecordProcessorBrowserConfig): void {
+  private _onInit(options: BatchLogRecordProcessorBrowserOptions): void {
     if (
-      config?.disableAutoFlushOnDocumentHide === true ||
+      options.disableAutoFlushOnDocumentHide === true ||
       typeof document === 'undefined'
     ) {
       return;

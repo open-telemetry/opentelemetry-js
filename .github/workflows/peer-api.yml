@@ -7,21 +7,27 @@ on:
   pull_request:
   merge_group:
 
+permissions:
+  contents: read
+
 jobs:
   peer-api-check:
     runs-on: ubuntu-latest
-    container:
-      image: node:22
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - name: Install lerna
-        run: npm install -g lerna@6.6.2
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+          node-version: '24'
 
-      - name: Install semver
-        run: npm install -g semver
+      - name: Install script dependencies
+        run: npm ci --ignore-scripts
 
       - name: Check API dependency semantics
-        working-directory: packages
-        run: lerna run peer-api-check
+        run: npx nx run-many -t peer-api-check

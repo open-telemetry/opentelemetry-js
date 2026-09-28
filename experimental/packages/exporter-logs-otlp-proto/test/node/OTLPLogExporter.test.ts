@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
@@ -23,7 +12,9 @@ import {
   LoggerProvider,
   SimpleLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { Stream } from 'stream';
+import { TestMetricReader } from '../utils';
 
 /*
  * NOTE: Tests here are not intended to test the underlying components directly. They are intended as a quick
@@ -39,6 +30,11 @@ describe('OTLPLogExporter', () => {
     });
 
     it('successfully exports data', done => {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+
       const fakeRequest = new Stream.PassThrough();
       Object.defineProperty(fakeRequest, 'setTimeout', {
         value: function (_timeout: number) {},
@@ -46,12 +42,19 @@ describe('OTLPLogExporter', () => {
 
       sinon.stub(http, 'request').returns(fakeRequest as any);
       let buff = Buffer.from('');
-      fakeRequest.on('finish', () => {
+      fakeRequest.on('finish', async () => {
         try {
           const requestBody = buff.toString();
           assert.throws(() => {
             JSON.parse(requestBody);
           }, 'expected requestBody to be in protobuf format, but parsing as JSON succeeded');
+
+          const metrics = await metricReader.collect();
+          const scopeMetrics = metrics.resourceMetrics.scopeMetrics.find(
+            sm => sm.scope.name === '@opentelemetry/otlp-exporter'
+          );
+          assert.ok(scopeMetrics);
+
           done();
         } catch (e) {
           done(e);
@@ -63,7 +66,13 @@ describe('OTLPLogExporter', () => {
       });
 
       const loggerProvider = new LoggerProvider({
-        processors: [new SimpleLogRecordProcessor(new OTLPLogExporter())],
+        processors: [
+          new SimpleLogRecordProcessor({
+            exporter: new OTLPLogExporter({
+              selfObsMeterProvider: meterProvider,
+            }),
+          }),
+        ],
       });
 
       loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });

@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
@@ -28,8 +17,17 @@ describe('version', function () {
     assert.strictEqual(pjson.version, VERSION);
   });
 
-  it('prerelease tag versions are banned', function () {
-    // see https://github.com/open-telemetry/opentelemetry-js-api/issues/74
-    assert.ok(VERSION.match(/^\d+\.\d+\.\d+$/));
+  it('is a release or a development/rc pre-release', function () {
+    // Arbitrary prerelease tags used to be banned outright
+    // (https://github.com/open-telemetry/opentelemetry-js-api/issues/74). The release
+    // workflow can now cut `development` and `rc` pre-releases of the API, which go out on
+    // the `canary` dist-tag - see doc/contributing/releasing.md. Any other pre-release tag
+    // is still a mistake: _makeCompatibilityCheck() in src/internal/semver.ts degrades to
+    // exact string equality as soon as a version carries one, so it must only ever happen
+    // deliberately, for a version nobody gets from a plain `npm install`.
+    assert.ok(
+      VERSION.match(/^\d+\.\d+\.\d+(-(development|rc)\.\d+)?$/),
+      `unexpected version: ${VERSION}`
+    );
   });
 });

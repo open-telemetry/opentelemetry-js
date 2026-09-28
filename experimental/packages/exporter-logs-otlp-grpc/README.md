@@ -40,7 +40,7 @@ const collectorOptions = {
 
 const loggerExporter = new OTLPLogExporter(collectorOptions);
 const loggerProvider = new LoggerProvider({
-  processors: [new BatchRecordProcessor(loggerExporter)]
+  processors: [new BatchLogRecordProcessor({ exporter: loggerExporter })]
 });
 
 ['SIGINT', 'SIGTERM'].forEach(signal => {
@@ -52,18 +52,58 @@ const logger = loggerProvider.getLogger('example-logger');
 logger.emit({ body: 'example-log' });
 ```
 
+By default, the exporter creates a secure (TLS) connection. When connecting to a local development collector without TLS, you can use an insecure connection by specifying the `http://` scheme in the URL:
+
+```js
+import {
+  LoggerProvider,
+  BatchLogRecordProcessor,
+} from '@opentelemetry/sdk-logs';
+import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
+
+const collectorOptions = {
+  url: 'http://localhost:4317',  // http:// creates an insecure connection
+};
+
+const loggerExporter = new OTLPLogExporter(collectorOptions);
+const loggerProvider = new LoggerProvider({
+  processors: [new BatchLogRecordProcessor({ exporter: loggerExporter })]
+});
+```
+
+Alternatively, you can explicitly configure insecure credentials:
+
+```js
+import grpc from '@grpc/grpc-js';
+import {
+  LoggerProvider,
+  BatchLogRecordProcessor,
+} from '@opentelemetry/sdk-logs';
+import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
+
+const collectorOptions = {
+  url: 'localhost:4317',
+  credentials: grpc.credentials.createInsecure(),
+};
+
+const loggerExporter = new OTLPLogExporter(collectorOptions);
+const loggerProvider = new LoggerProvider({
+  processors: [new BatchLogRecordProcessor({ exporter: loggerExporter })]
+});
+```
+
 ## Environment Variable Configuration
 
-| Environment variable | Description |
-|----------------------|-------------|
-| OTEL_EXPORTER_OTLP_LOGS_ENDPOINT | The endpoint to send logs to. By default `localhost:4317` will be used. |
-| OTEL_EXPORTER_OTLP_ENDPOINT | The endpoint to send trace, metric, and logs to. By default `localhost:4317` will be used. |
-| OTEL_EXPORTER_OTLP_COMPRESSION | The compression type to use on OTLP trace, metric, and log requests. Options include gzip. By default no compression will be used. |
-| OTEL_EXPORTER_OTLP_INSECURE | Whether to enable client transport security for the exporter's gRPC connection for trace, metric and log requests. This option only applies to OTLP/gRPC when an endpoint is provided without the http or https scheme. Options include true or false. By default insecure is false which creates a secure connection. |
-| OTEL_EXPORTER_OTLP_CERTIFICATE | The path to the file containing trusted root certificate to use when verifying an OTLP trace, metric, or log server's TLS credentials. By default the host platform's trusted root certificate is used. |
-| OTEL_EXPORTER_OTLP_CLIENT_KEY | The path to the file containing private client key to use when verifying an OTLP trace, metric or log client's TLS credentials. Must provide a client certificate/chain when providing a private client key. By default no client key file is used. |
-| OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE | The path to the file containing trusted client certificate/chain for clients private key to use when verifying an OTLP trace, metric and log server's TLS credentials. Must provide a private client key when providing a certificate/chain. By default no chain file is used. |
-| OTEL_EXPORTER_OTLP_TIMEOUT | The maximum waiting time, in milliseconds, allowed to send each OTLP trace and metric batch. Default is 10000. |
+| Environment variable                  | Description                                                                                                                                                                                                                                                                                                            |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| OTEL_EXPORTER_OTLP_LOGS_ENDPOINT      | The endpoint to send logs to. By default `localhost:4317` will be used.                                                                                                                                                                                                                                                |
+| OTEL_EXPORTER_OTLP_ENDPOINT           | The endpoint to send trace, metric, and logs to. By default `localhost:4317` will be used.                                                                                                                                                                                                                             |
+| OTEL_EXPORTER_OTLP_COMPRESSION        | The compression type to use on OTLP trace, metric, and log requests. Options include gzip. By default no compression will be used.                                                                                                                                                                                     |
+| OTEL_EXPORTER_OTLP_INSECURE           | Whether to enable client transport security for the exporter's gRPC connection for trace, metric and log requests. This option only applies to OTLP/gRPC when an endpoint is provided without the http or https scheme. Options include true or false. By default insecure is false which creates a secure connection. |
+| OTEL_EXPORTER_OTLP_CERTIFICATE        | The path to the file containing trusted root certificate to use when verifying an OTLP trace, metric, or log server's TLS credentials. By default the host platform's trusted root certificate is used.                                                                                                                |
+| OTEL_EXPORTER_OTLP_CLIENT_KEY         | The path to the file containing private client key to use when verifying an OTLP trace, metric or log client's TLS credentials. Must provide a client certificate/chain when providing a private client key. By default no client key file is used.                                                                    |
+| OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE | The path to the file containing trusted client certificate/chain for clients private key to use when verifying an OTLP trace, metric and log server's TLS credentials. Must provide a private client key when providing a certificate/chain. By default no chain file is used.                                         |
+| OTEL_EXPORTER_OTLP_TIMEOUT            | The maximum waiting time, in milliseconds, allowed to send each OTLP trace and metric batch. Default is 10000.                                                                                                                                                                                                         |
 
 > Settings configured programmatically take precedence over environment variables. Per-signal environment variables take precedence over non-per-signal environment variables.
 
@@ -83,5 +123,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-logs-otlp-grpc
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-logs-otlp-grpc.svg
 [semconv-resource-service-name]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service
-[trace-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/exporter-trace-otlp-grpc
+[trace-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-trace-otlp-grpc
 [metrics-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-grpc

@@ -1,47 +1,40 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import type { ExportResult } from '@opentelemetry/core';
 import {
   ExportResultCode,
   loggingErrorHandler,
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
+import type { Resource } from '@opentelemetry/resources';
 import {
   defaultResource,
-  Resource,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
 
+import type { LogRecordExporter } from './../../../src';
 import {
   InMemoryLogRecordExporter,
-  LogRecordExporter,
   SimpleLogRecordProcessor,
 } from './../../../src';
 import { LoggerProviderSharedState } from '../../../src/internal/LoggerProviderSharedState';
-import { reconfigureLimits } from '../../../src/config';
 import { TestExporterWithDelay } from './TestExporterWithDelay';
 import { LogRecordImpl } from '../../../src/LogRecordImpl';
+import { TestMetricReader } from '../utils';
 
 const setup = (exporter: LogRecordExporter, resource?: Resource) => {
   const sharedState = new LoggerProviderSharedState(
     resource || defaultResource(),
-    Infinity,
-    reconfigureLimits({}),
+    {
+      attributeCountLimit: 128,
+      attributeValueLengthLimit: Infinity,
+    },
     []
   );
   const logRecord = new LogRecordImpl(
@@ -55,7 +48,7 @@ const setup = (exporter: LogRecordExporter, resource?: Resource) => {
       body: 'body',
     }
   );
-  const processor = new SimpleLogRecordProcessor(exporter);
+  const processor = new SimpleLogRecordProcessor({ exporter });
   return { exporter, processor, logRecord };
 };
 
@@ -92,6 +85,7 @@ describe('SimpleLogRecordProcessor', () => {
             0
           ),
         shutdown: () => Promise.resolve(),
+        forceFlush: () => Promise.resolve(),
       };
       const { processor, logRecord } = setup(exporter);
 
@@ -113,6 +107,7 @@ describe('SimpleLogRecordProcessor', () => {
       const exporter: LogRecordExporter = {
         export: (_, callback) => callback({ code: ExportResultCode.SUCCESS }),
         shutdown: shutdownSpy,
+        forceFlush: () => Promise.resolve(),
       };
       const { processor } = setup(exporter);
       await processor.shutdown();
@@ -149,7 +144,9 @@ describe('SimpleLogRecordProcessor', () => {
           setTimeout(() => resolve('fromasync'), 1)
         ),
       });
-      const processor = new SimpleLogRecordProcessor(testExporterWithDelay);
+      const processor = new SimpleLogRecordProcessor({
+        exporter: testExporterWithDelay,
+      });
       const { logRecord } = setup(testExporterWithDelay, asyncResource);
 
       processor.onEmit(logRecord);
@@ -158,6 +155,81 @@ describe('SimpleLogRecordProcessor', () => {
       assert.strictEqual(processor['_unresolvedExports'].size, 0);
       const exportedLogRecords = testExporterWithDelay.getFinishedLogRecords();
       assert.strictEqual(exportedLogRecords.length, 1);
+    });
+  });
+
+  describe('Metrics', () => {
+    it('should record metrics', async () => {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+      const exporter = new InMemoryLogRecordExporter();
+      const { logRecord } = setup(exporter);
+      const processor = new SimpleLogRecordProcessor({
+        exporter,
+        selfObsMeterProvider: meterProvider,
+      });
+
+      const exportStub = sinon.stub(exporter, 'export');
+      exportStub
+        .onFirstCall()
+        .callsFake((_logs, resultCallback: (result: ExportResult) => void) => {
+          resultCallback({ code: ExportResultCode.SUCCESS });
+        })
+        .onSecondCall()
+        .callsFake((_logs, resultCallback: (result: ExportResult) => void) => {
+          const error = new Error('Export failed');
+          error.name = 'SystemError';
+          resultCallback({ code: ExportResultCode.FAILED, error });
+        });
+
+      processor.onEmit(logRecord);
+      processor.onEmit(logRecord);
+
+      await processor.forceFlush();
+
+      const { resourceMetrics } = await metricReader.collect();
+      const scopeMetrics = resourceMetrics.scopeMetrics.find(
+        sm => sm.scope.name === '@opentelemetry/sdk-logs'
+      );
+      assert.ok(scopeMetrics);
+      const processedLogsMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.log.processed'
+      );
+      assert.ok(processedLogsMetric);
+      const processedLogsDataPoints = processedLogsMetric.dataPoints as Array<{
+        value: number;
+        attributes: Record<string, unknown>;
+      }>;
+      const successPoint = processedLogsDataPoints.find(
+        dataPoint => dataPoint.attributes['error.type'] === undefined
+      );
+      assert.ok(successPoint);
+      assert.strictEqual(successPoint.value, 1);
+      assert.strictEqual(
+        successPoint.attributes['otel.component.type'],
+        'simple_log_processor'
+      );
+      assert.ok(
+        successPoint.attributes['otel.component.name']
+          ?.toString()
+          .startsWith('simple_log_processor/')
+      );
+      const failedPoint = processedLogsDataPoints.find(
+        dataPoint => dataPoint.attributes['error.type'] === 'SystemError'
+      );
+      assert.ok(failedPoint);
+      assert.strictEqual(failedPoint.value, 1);
+      assert.strictEqual(
+        failedPoint.attributes['otel.component.type'],
+        'simple_log_processor'
+      );
+      assert.ok(
+        failedPoint.attributes['otel.component.name']
+          ?.toString()
+          .startsWith('simple_log_processor/')
+      );
     });
   });
 });

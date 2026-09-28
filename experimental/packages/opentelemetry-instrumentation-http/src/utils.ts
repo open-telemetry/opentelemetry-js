@@ -1,27 +1,14 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
-import {
+import type {
   Attributes,
-  SpanStatusCode,
   Span,
-  context,
-  SpanKind,
   DiagLogger,
   AttributeValue,
 } from '@opentelemetry/api';
+import { SpanStatusCode, context, SpanKind } from '@opentelemetry/api';
 import {
   ATTR_CLIENT_ADDRESS,
   ATTR_ERROR_TYPE,
@@ -41,34 +28,11 @@ import {
   ATTR_USER_AGENT_ORIGINAL,
 } from '@opentelemetry/semantic-conventions';
 import {
-  ATTR_HTTP_CLIENT_IP,
-  ATTR_HTTP_FLAVOR,
-  ATTR_HTTP_HOST,
-  ATTR_HTTP_METHOD,
-  ATTR_HTTP_REQUEST_CONTENT_LENGTH,
-  ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-  ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
-  ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-  ATTR_HTTP_SCHEME,
-  ATTR_HTTP_SERVER_NAME,
-  ATTR_HTTP_STATUS_CODE,
-  ATTR_HTTP_TARGET,
-  ATTR_HTTP_URL,
-  ATTR_HTTP_USER_AGENT,
-  ATTR_NET_HOST_IP,
-  ATTR_NET_HOST_NAME,
-  ATTR_NET_HOST_PORT,
-  ATTR_NET_PEER_IP,
-  ATTR_NET_PEER_NAME,
-  ATTR_NET_PEER_PORT,
-  ATTR_NET_TRANSPORT,
-  NET_TRANSPORT_VALUE_IP_TCP,
-  NET_TRANSPORT_VALUE_IP_UDP,
   ATTR_USER_AGENT_SYNTHETIC_TYPE,
   USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT,
   USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST,
 } from './semconv';
-import {
+import type {
   IncomingHttpHeaders,
   IncomingMessage,
   OutgoingHttpHeader,
@@ -77,13 +41,38 @@ import {
   ServerResponse,
 } from 'http';
 import { getRPCMetadata, RPCType } from '@opentelemetry/core';
-import { SemconvStability } from '@opentelemetry/instrumentation';
-import * as url from 'url';
-import { AttributeNames } from './enums/AttributeNames';
-import { Err, IgnoreMatcher, ParsedRequestOptions } from './internal-types';
+import type * as url from 'url';
+import type {
+  Err,
+  IgnoreMatcher,
+  ParsedRequestOptions,
+} from './internal-types';
 import { SYNTHETIC_BOT_NAMES, SYNTHETIC_TEST_NAMES } from './internal-types';
+import {
+  DEFAULT_QUERY_STRINGS_TO_REDACT,
+  STR_REDACTED,
+} from './internal-types';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import forwardedParse = require('forwarded-parse');
+
+const defaultQueryStringsToRedact = Array.from(DEFAULT_QUERY_STRINGS_TO_REDACT);
+
+/**
+ * Redacts sensitive query parameters from a query string (without leading '?').
+ * Returns the input unchanged if it cannot be parsed.
+ */
+export const redactQueryString = (
+  searchParams: URLSearchParams,
+  paramsToRedact: string[]
+): string => {
+  const params = new URLSearchParams(searchParams);
+  for (const param of paramsToRedact) {
+    if (params.has(param)) {
+      params.set(param, STR_REDACTED);
+    }
+  }
+  return params.toString();
+};
 
 /**
  * Get an absolute url
@@ -91,27 +80,43 @@ import forwardedParse = require('forwarded-parse');
 export const getAbsoluteUrl = (
   requestUrl: ParsedRequestOptions | null,
   headers: IncomingHttpHeaders | OutgoingHttpHeaders,
-  fallbackProtocol = 'http:'
+  fallbackProtocol = 'http:',
+  redactedQueryParams: string[] = Array.from(DEFAULT_QUERY_STRINGS_TO_REDACT)
 ): string => {
   const reqUrlObject = requestUrl || {};
   const protocol = reqUrlObject.protocol || fallbackProtocol;
   const port = (reqUrlObject.port || '').toString();
-  const path = reqUrlObject.path || '/';
-  let host =
-    reqUrlObject.host || reqUrlObject.hostname || headers.host || 'localhost';
-
+  let path = reqUrlObject.path || '/';
+  // `host`, `hostname` and the `host` header may hold values of unexpected
+  // types at runtime. Node.js itself ignores non-string values when it can
+  // derive the target from another option (e.g. it uses `hostname` when
+  // `host` is not a valid string), so skip non-string candidates instead of
+  // crashing on them.
+  let host: string =
+    (typeof reqUrlObject.host === 'string' && reqUrlObject.host) ||
+    (typeof reqUrlObject.hostname === 'string' && reqUrlObject.hostname) ||
+    (typeof headers.host === 'string' && headers.host) ||
+    'localhost';
   // if there is no port in host and there is a port
   // it should be displayed if it's not 80 and 443 (default ports)
-  if (
-    (host as string).indexOf(':') === -1 &&
-    port &&
-    port !== '80' &&
-    port !== '443'
-  ) {
+  if (host.indexOf(':') === -1 && port && port !== '80' && port !== '443') {
     host += `:${port}`;
   }
-
-  return `${protocol}//${host}${path}`;
+  // Redact sensitive query parameters
+  if (typeof path === 'string' && path.includes('?')) {
+    try {
+      const parsedUrl = new URL(path, 'http://localhost');
+      const redacted = redactQueryString(
+        parsedUrl.searchParams,
+        redactedQueryParams
+      );
+      path = `${parsedUrl.pathname}?${redacted}`;
+    } catch {
+      // Ignore error, as the path was not a valid URL.
+    }
+  }
+  const authPart = reqUrlObject.auth ? `${STR_REDACTED}:${STR_REDACTED}@` : '';
+  return `${protocol}//${authPart}${host}${path}`;
 };
 
 /**
@@ -130,6 +135,27 @@ export const parseResponseStatus = (
 
   // All other codes are error
   return SpanStatusCode.ERROR;
+};
+
+/**
+ * Returns the `error.type` value for a response status code, or undefined when
+ * the code is not an error for this span kind. Semconv asks for the status code
+ * as a string once a response was received.
+ */
+export const parseErrorType = (
+  kind: SpanKind,
+  statusCode?: unknown
+): string | undefined => {
+  const lowerBound = kind === SpanKind.CLIENT ? 400 : 500;
+  if (
+    typeof statusCode === 'number' &&
+    statusCode >= lowerBound &&
+    statusCode < 600
+  ) {
+    return String(statusCode);
+  }
+
+  return undefined;
 };
 
 /**
@@ -156,78 +182,13 @@ export const satisfiesPattern = (
  * Sets the span with the error passed in params
  * @param {Span} span the span that need to be set
  * @param {Error} error error that will be set to span
- * @param {SemconvStability} semconvStability determines which semconv version to use
  */
-export const setSpanWithError = (
-  span: Span,
-  error: Err,
-  semconvStability: SemconvStability
-): void => {
+export const setSpanWithError = (span: Span, error: Err): void => {
   const message = error.message;
-
-  if (semconvStability & SemconvStability.OLD) {
-    span.setAttribute(AttributeNames.HTTP_ERROR_NAME, error.name);
-    span.setAttribute(AttributeNames.HTTP_ERROR_MESSAGE, message);
-  }
-
-  if (semconvStability & SemconvStability.STABLE) {
-    span.setAttribute(ATTR_ERROR_TYPE, error.name);
-  }
-
+  span.setAttribute(ATTR_ERROR_TYPE, error.name);
   span.setStatus({ code: SpanStatusCode.ERROR, message });
   span.recordException(error);
 };
-/**
- * Adds attributes for request content-length and content-encoding HTTP headers
- * @param { IncomingMessage } Request object whose headers will be analyzed
- * @param { Attributes } Attributes object to be modified
- */
-export const setRequestContentLengthAttribute = (
-  request: IncomingMessage,
-  attributes: Attributes
-): void => {
-  const length = getContentLength(request.headers);
-  if (length === null) return;
-
-  if (isCompressed(request.headers)) {
-    attributes[ATTR_HTTP_REQUEST_CONTENT_LENGTH] = length;
-  } else {
-    attributes[ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED] = length;
-  }
-};
-
-/**
- * Adds attributes for response content-length and content-encoding HTTP headers
- * @param { IncomingMessage } Response object whose headers will be analyzed
- * @param { Attributes } Attributes object to be modified
- *
- * @deprecated this is for an older version of semconv. It is retained for compatibility using OTEL_SEMCONV_STABILITY_OPT_IN
- */
-export const setResponseContentLengthAttribute = (
-  response: IncomingMessage,
-  attributes: Attributes
-): void => {
-  const length = getContentLength(response.headers);
-  if (length === null) return;
-
-  if (isCompressed(response.headers)) {
-    attributes[ATTR_HTTP_RESPONSE_CONTENT_LENGTH] = length;
-  } else {
-    attributes[ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED] = length;
-  }
-};
-
-function getContentLength(
-  headers: OutgoingHttpHeaders | IncomingHttpHeaders
-): number | null {
-  const contentLengthHeader = headers['content-length'];
-  if (contentLengthHeader === undefined) return null;
-
-  const contentLength = parseInt(contentLengthHeader as string, 10);
-  if (isNaN(contentLength)) return null;
-
-  return contentLength;
-}
 
 export const isCompressed = (
   headers: OutgoingHttpHeaders | IncomingHttpHeaders
@@ -296,6 +257,30 @@ function stringUrlToHttpOptions(
 }
 
 /**
+ * Mirrors how Node.js detects WHATWG `URL` objects passed to `http.request`
+ * and `https.request`: by shape rather than by `instanceof`, so that URL
+ * objects from other realms (e.g. `vm` contexts) or WHATWG URL polyfills are
+ * handled the same way Node.js handles them.
+ *
+ * This mirrors Node's `isURL()` predicate exactly. The `auth`/`path` guards
+ * matter: they keep options objects and legacy `url.parse()` results (both
+ * carry `path`) off the URL code path.
+ *
+ * See https://github.com/nodejs/node/blob/2505e217bba05fc581b572c685c5cf280a16c5a3/lib/internal/url.js#L756-L773
+ */
+export const isURLLike = (value: unknown): value is url.URL => {
+  const candidate = value as
+    | (url.URL & { auth?: unknown; path?: unknown })
+    | undefined;
+  return Boolean(
+    candidate?.href &&
+      candidate.protocol &&
+      candidate.auth === undefined &&
+      candidate.path === undefined
+  );
+};
+
+/**
  * Makes sure options is an url object
  * return an object with default value and parsed options
  * @param logger component logger
@@ -339,7 +324,7 @@ export const getRequestInfo = (
     if (extraOptions !== undefined) {
       Object.assign(optionsParsed, extraOptions);
     }
-  } else if (options instanceof url.URL) {
+  } else if (isURLLike(options)) {
     optionsParsed = {
       protocol: options.protocol,
       hostname:
@@ -385,9 +370,12 @@ export const getRequestInfo = (
 
   // some packages return method in lowercase..
   // ensure upperCase for consistency
-  const method = optionsParsed.method
-    ? optionsParsed.method.toUpperCase()
-    : 'GET';
+  // Note: a non-string `method` is rejected by Node.js itself; skip it here
+  // so the resulting error comes from Node.js and not the instrumentation.
+  const method =
+    optionsParsed.method && typeof optionsParsed.method === 'string'
+      ? optionsParsed.method.toUpperCase()
+      : 'GET';
 
   return { origin, pathname, method, optionsParsed, invalidUrl };
 };
@@ -411,13 +399,29 @@ export const extractHostnameAndPort = (
     'hostname' | 'host' | 'port' | 'protocol'
   >
 ): { hostname: string; port: number | string } => {
-  if (requestOptions.hostname && requestOptions.port) {
-    return { hostname: requestOptions.hostname, port: requestOptions.port };
+  // `hostname`, `host` and `port` may hold values of unexpected types at
+  // runtime. Node.js itself ignores non-string values when it can derive the
+  // target from another option (e.g. it uses `hostname` when `host` is not a
+  // valid string), so skip non-string candidates instead of crashing on them.
+  const optionsHostname =
+    typeof requestOptions.hostname === 'string'
+      ? requestOptions.hostname
+      : undefined;
+  const optionsHost =
+    typeof requestOptions.host === 'string' ? requestOptions.host : undefined;
+  const optionsPort =
+    typeof requestOptions.port === 'string' ||
+    typeof requestOptions.port === 'number'
+      ? requestOptions.port
+      : undefined;
+
+  if (optionsHostname && optionsPort) {
+    return { hostname: optionsHostname, port: optionsPort };
   }
-  const matches = requestOptions.host?.match(/^([^:/ ]+)(:\d{1,5})?/) || null;
+  const matches = optionsHost?.match(/^([^:/ ]+)(:\d{1,5})?/) || null;
   const hostname =
-    requestOptions.hostname || (matches === null ? 'localhost' : matches[1]);
-  let port = requestOptions.port;
+    optionsHostname || (matches === null ? 'localhost' : matches[1]);
+  let port = optionsPort;
   if (!port) {
     if (matches && matches[2]) {
       // remove the leading ":". The extracted port would be something like ":8080"
@@ -433,7 +437,6 @@ export const extractHostnameAndPort = (
  * Returns outgoing request attributes scoped to the options passed to the request
  * @param {ParsedRequestOptions} requestOptions the same options used to make the request
  * @param {{ component: string, hostname: string, hookAttributes?: Attributes }} options used to pass data needed to create attributes
- * @param {SemconvStability} semconvStability determines which semconv version to use
  */
 export const getOutgoingRequestAttributes = (
   requestOptions: ParsedRequestOptions,
@@ -442,31 +445,24 @@ export const getOutgoingRequestAttributes = (
     hostname: string;
     port: string | number;
     hookAttributes?: Attributes;
+    redactedQueryParams?: string[];
   },
-  semconvStability: SemconvStability,
   enableSyntheticSourceDetection: boolean
 ): Attributes => {
   const hostname = options.hostname;
   const port = options.port;
   const method = requestOptions.method ?? 'GET';
   const normalizedMethod = normalizeMethod(method);
-  const headers = requestOptions.headers || {};
+  const headers = (requestOptions.headers || {}) as OutgoingHttpHeaders;
   const userAgent = headers['user-agent'];
   const urlFull = getAbsoluteUrl(
     requestOptions,
     headers,
-    `${options.component}:`
+    `${options.component}:`,
+    options.redactedQueryParams
   );
 
-  const oldAttributes: Attributes = {
-    [ATTR_HTTP_URL]: urlFull,
-    [ATTR_HTTP_METHOD]: method,
-    [ATTR_HTTP_TARGET]: requestOptions.path || '/',
-    [ATTR_NET_PEER_NAME]: hostname,
-    [ATTR_HTTP_HOST]: headers.host ?? `${hostname}:${port}`,
-  };
-
-  const newAttributes: Attributes = {
+  const attributes: Attributes = {
     // Required attributes
     [ATTR_HTTP_REQUEST_METHOD]: normalizedMethod,
     [ATTR_SERVER_ADDRESS]: hostname,
@@ -482,56 +478,13 @@ export const getOutgoingRequestAttributes = (
 
   // conditionally required if request method required case normalization
   if (method !== normalizedMethod) {
-    newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
+    attributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
   }
 
   if (enableSyntheticSourceDetection && userAgent) {
-    newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] = getSyntheticType(userAgent);
+    attributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] = getSyntheticType(userAgent);
   }
-  if (userAgent !== undefined) {
-    oldAttributes[ATTR_HTTP_USER_AGENT] = userAgent;
-  }
-
-  switch (semconvStability) {
-    case SemconvStability.STABLE:
-      return Object.assign(newAttributes, options.hookAttributes);
-    case SemconvStability.OLD:
-      return Object.assign(oldAttributes, options.hookAttributes);
-  }
-
-  return Object.assign(oldAttributes, newAttributes, options.hookAttributes);
-};
-
-/**
- * Returns outgoing request Metric attributes scoped to the request data
- * @param {Attributes} spanAttributes the span attributes
- */
-export const getOutgoingRequestMetricAttributes = (
-  spanAttributes: Attributes
-): Attributes => {
-  const metricAttributes: Attributes = {};
-  metricAttributes[ATTR_HTTP_METHOD] = spanAttributes[ATTR_HTTP_METHOD];
-  metricAttributes[ATTR_NET_PEER_NAME] = spanAttributes[ATTR_NET_PEER_NAME];
-  //TODO: http.url attribute, it should substitute any parameters to avoid high cardinality.
-  return metricAttributes;
-};
-
-/**
- * Returns attributes related to the kind of HTTP protocol used
- * @param {string} [kind] Kind of HTTP protocol used: "1.0", "1.1", "2", "SPDY" or "QUIC".
- */
-export const setAttributesFromHttpKind = (
-  kind: string | undefined,
-  attributes: Attributes
-): void => {
-  if (kind) {
-    attributes[ATTR_HTTP_FLAVOR] = kind;
-    if (kind.toUpperCase() !== 'QUIC') {
-      attributes[ATTR_NET_TRANSPORT] = NET_TRANSPORT_VALUE_IP_TCP;
-    } else {
-      attributes[ATTR_NET_TRANSPORT] = NET_TRANSPORT_VALUE_IP_UDP;
-    }
-  }
+  return Object.assign(attributes, options.hookAttributes);
 };
 
 /**
@@ -558,67 +511,32 @@ const getSyntheticType = (
 /**
  * Returns outgoing request attributes scoped to the response data
  * @param {IncomingMessage} response the response object
- * @param {SemconvStability} semconvStability determines which semconv version to use
  */
 export const getOutgoingRequestAttributesOnResponse = (
-  response: IncomingMessage,
-  semconvStability: SemconvStability
+  response: IncomingMessage
 ): Attributes => {
-  const { statusCode, statusMessage, httpVersion, socket } = response;
-  const oldAttributes: Attributes = {};
-  const stableAttributes: Attributes = {};
+  const { statusCode, socket } = response;
+  const attributes: Attributes = {};
 
   if (statusCode != null) {
-    stableAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] = statusCode;
+    attributes[ATTR_HTTP_RESPONSE_STATUS_CODE] = statusCode;
   }
 
   if (socket) {
     const { remoteAddress, remotePort } = socket;
-    oldAttributes[ATTR_NET_PEER_IP] = remoteAddress;
-    oldAttributes[ATTR_NET_PEER_PORT] = remotePort;
 
     // Recommended
-    stableAttributes[ATTR_NETWORK_PEER_ADDRESS] = remoteAddress;
-    stableAttributes[ATTR_NETWORK_PEER_PORT] = remotePort;
-    stableAttributes[ATTR_NETWORK_PROTOCOL_VERSION] = response.httpVersion;
+    attributes[ATTR_NETWORK_PEER_ADDRESS] = remoteAddress;
+    attributes[ATTR_NETWORK_PEER_PORT] = remotePort;
+    attributes[ATTR_NETWORK_PROTOCOL_VERSION] = response.httpVersion;
   }
-  setResponseContentLengthAttribute(response, oldAttributes);
-
-  if (statusCode) {
-    oldAttributes[ATTR_HTTP_STATUS_CODE] = statusCode;
-    oldAttributes[AttributeNames.HTTP_STATUS_TEXT] = (
-      statusMessage || ''
-    ).toUpperCase();
-  }
-
-  setAttributesFromHttpKind(httpVersion, oldAttributes);
-
-  switch (semconvStability) {
-    case SemconvStability.STABLE:
-      return stableAttributes;
-    case SemconvStability.OLD:
-      return oldAttributes;
-  }
-
-  return Object.assign(oldAttributes, stableAttributes);
+  return attributes;
 };
 
 /**
  * Returns outgoing request Metric attributes scoped to the response data
  * @param {Attributes} spanAttributes the span attributes
  */
-export const getOutgoingRequestMetricAttributesOnResponse = (
-  spanAttributes: Attributes
-): Attributes => {
-  const metricAttributes: Attributes = {};
-  metricAttributes[ATTR_NET_PEER_PORT] = spanAttributes[ATTR_NET_PEER_PORT];
-  metricAttributes[ATTR_HTTP_STATUS_CODE] =
-    spanAttributes[ATTR_HTTP_STATUS_CODE];
-  metricAttributes[ATTR_HTTP_FLAVOR] = spanAttributes[ATTR_HTTP_FLAVOR];
-
-  return metricAttributes;
-};
-
 export const getOutgoingStableRequestMetricAttributesOnResponse = (
   spanAttributes: Attributes
 ): Attributes => {
@@ -629,9 +547,13 @@ export const getOutgoingStableRequestMetricAttributesOnResponse = (
       spanAttributes[ATTR_NETWORK_PROTOCOL_VERSION];
   }
 
-  if (spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE]) {
-    metricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] =
-      spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
+  const statusCode = spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
+  if (statusCode) {
+    metricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] = statusCode;
+    const errorType = parseErrorType(SpanKind.CLIENT, statusCode);
+    if (errorType !== undefined) {
+      metricAttributes[ATTR_ERROR_TYPE] ??= errorType;
+    }
   }
   return metricAttributes;
 };
@@ -766,16 +688,24 @@ export function getRemoteClientAddress(
   if (forwardedHeader) {
     for (const entry of parseForwardedHeader(forwardedHeader)) {
       if (entry.for) {
-        return entry.for;
+        return removePortFromAddress(entry.for);
       }
     }
   }
 
   const xForwardedFor = request.headers['x-forwarded-for'];
-  if (typeof xForwardedFor === 'string') {
-    return xForwardedFor;
-  } else if (Array.isArray(xForwardedFor)) {
-    return xForwardedFor[0];
+  if (xForwardedFor) {
+    let xForwardedForVal;
+    if (typeof xForwardedFor === 'string') {
+      xForwardedForVal = xForwardedFor;
+    } else if (Array.isArray(xForwardedFor)) {
+      xForwardedForVal = xForwardedFor[0];
+    }
+
+    if (typeof xForwardedForVal === 'string') {
+      xForwardedForVal = xForwardedForVal.split(',')[0].trim();
+      return removePortFromAddress(xForwardedForVal);
+    }
   }
 
   const remote = request.socket.remoteAddress;
@@ -784,6 +714,22 @@ export function getRemoteClientAddress(
   }
 
   return null;
+}
+
+function removePortFromAddress(input: string): string {
+  // This function can be replaced with SocketAddress.parse() once the minimum
+  // supported Node.js version allows it.
+  try {
+    const { hostname: address } = new URL(`http://${input}`);
+
+    if (address.startsWith('[') && address.endsWith(']')) {
+      return address.slice(1, -1);
+    }
+
+    return address;
+  } catch {
+    return input;
+  }
 }
 
 function getInfoFromIncomingMessage(
@@ -825,37 +771,36 @@ function getInfoFromIncomingMessage(
 /**
  * Returns incoming request attributes scoped to the request data
  * @param {IncomingMessage} request the request object
- * @param {{ component: string, serverName?: string, hookAttributes?: Attributes }} options used to pass data needed to create attributes
- * @param {SemconvStability} semconvStability determines which semconv version to use
+ * @param {{ component: string, hookAttributes?: Attributes, enableSyntheticSourceDetection: boolean }} options used to pass data needed to create attributes
  */
 export const getIncomingRequestAttributes = (
   request: IncomingMessage,
   options: {
     component: 'http' | 'https';
-    serverName?: string;
     hookAttributes?: Attributes;
-    semconvStability: SemconvStability;
     enableSyntheticSourceDetection: boolean;
+    redactedQueryParams?: string[];
   },
   logger: DiagLogger
 ): Attributes => {
-  const headers = request.headers;
-  const userAgent = headers['user-agent'];
-  const ips = headers['x-forwarded-for'];
-  const httpVersion = request.httpVersion;
-  const host = headers.host;
-  const hostname = host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') || 'localhost';
+  const {
+    component,
+    enableSyntheticSourceDetection,
+    hookAttributes,
+    redactedQueryParams,
+  } = options;
+  const { headers, method } = request;
+  const { 'user-agent': userAgent } = headers;
+  const parsedUrl = getInfoFromIncomingMessage(component, request, logger);
 
-  const method = request.method;
+  // Stable attributes are used.
   const normalizedMethod = normalizeMethod(method);
-
-  const serverAddress = getServerAddress(request, options.component);
-  const serverName = options.serverName;
+  const serverAddress = getServerAddress(request, component);
   const remoteClientAddress = getRemoteClientAddress(request);
 
-  const newAttributes: Attributes = {
+  const attributes: Attributes = {
     [ATTR_HTTP_REQUEST_METHOD]: normalizedMethod,
-    [ATTR_URL_SCHEME]: options.component,
+    [ATTR_URL_SCHEME]: component,
     [ATTR_SERVER_ADDRESS]: serverAddress?.host,
     [ATTR_NETWORK_PEER_ADDRESS]: request.socket.remoteAddress,
     [ATTR_NETWORK_PEER_PORT]: request.socket.remotePort,
@@ -863,89 +808,37 @@ export const getIncomingRequestAttributes = (
     [ATTR_USER_AGENT_ORIGINAL]: userAgent,
   };
 
-  const parsedUrl = getInfoFromIncomingMessage(
-    options.component,
-    request,
-    logger
-  );
-
-  if (parsedUrl?.pathname != null) {
-    newAttributes[ATTR_URL_PATH] = parsedUrl.pathname;
+  if (parsedUrl.pathname != null) {
+    attributes[ATTR_URL_PATH] = parsedUrl.pathname;
   }
 
   if (parsedUrl.search) {
     // Remove leading '?' from URL search (https://developer.mozilla.org/en-US/docs/Web/API/URL/search).
-    newAttributes[ATTR_URL_QUERY] = parsedUrl.search.slice(1);
+    const paramsToRedact = redactedQueryParams ?? defaultQueryStringsToRedact;
+    attributes[ATTR_URL_QUERY] = redactQueryString(
+      new URLSearchParams(parsedUrl.search.slice(1)),
+      paramsToRedact
+    );
   }
 
   if (remoteClientAddress != null) {
-    newAttributes[ATTR_CLIENT_ADDRESS] = remoteClientAddress.split(',')[0];
+    attributes[ATTR_CLIENT_ADDRESS] = remoteClientAddress;
   }
 
   if (serverAddress?.port != null) {
-    newAttributes[ATTR_SERVER_PORT] = Number(serverAddress.port);
+    attributes[ATTR_SERVER_PORT] = Number(serverAddress.port);
   }
 
-  // conditionally required if request method required case normalization
+  // Conditionally required if request method required case normalization.
   if (method !== normalizedMethod) {
-    newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
+    attributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
   }
 
-  if (options.enableSyntheticSourceDetection && userAgent) {
-    newAttributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] = getSyntheticType(userAgent);
-  }
-  const oldAttributes: Attributes = {
-    [ATTR_HTTP_URL]: parsedUrl.toString(),
-    [ATTR_HTTP_HOST]: host,
-    [ATTR_NET_HOST_NAME]: hostname,
-    [ATTR_HTTP_METHOD]: method,
-    [ATTR_HTTP_SCHEME]: options.component,
-  };
-
-  if (typeof ips === 'string') {
-    oldAttributes[ATTR_HTTP_CLIENT_IP] = ips.split(',')[0];
+  if (enableSyntheticSourceDetection && userAgent) {
+    attributes[ATTR_USER_AGENT_SYNTHETIC_TYPE] = getSyntheticType(userAgent);
   }
 
-  if (typeof serverName === 'string') {
-    oldAttributes[ATTR_HTTP_SERVER_NAME] = serverName;
-  }
-
-  if (parsedUrl?.pathname) {
-    oldAttributes[ATTR_HTTP_TARGET] =
-      parsedUrl?.pathname + parsedUrl?.search || '/';
-  }
-
-  if (userAgent !== undefined) {
-    oldAttributes[ATTR_HTTP_USER_AGENT] = userAgent;
-  }
-  setRequestContentLengthAttribute(request, oldAttributes);
-  setAttributesFromHttpKind(httpVersion, oldAttributes);
-
-  switch (options.semconvStability) {
-    case SemconvStability.STABLE:
-      return Object.assign(newAttributes, options.hookAttributes);
-    case SemconvStability.OLD:
-      return Object.assign(oldAttributes, options.hookAttributes);
-  }
-
-  return Object.assign(oldAttributes, newAttributes, options.hookAttributes);
-};
-
-/**
- * Returns incoming request Metric attributes scoped to the request data
- * @param {Attributes} spanAttributes the span attributes
- * @param {{ component: string }} options used to pass data needed to create attributes
- */
-export const getIncomingRequestMetricAttributes = (
-  spanAttributes: Attributes
-): Attributes => {
-  const metricAttributes: Attributes = {};
-  metricAttributes[ATTR_HTTP_SCHEME] = spanAttributes[ATTR_HTTP_SCHEME];
-  metricAttributes[ATTR_HTTP_METHOD] = spanAttributes[ATTR_HTTP_METHOD];
-  metricAttributes[ATTR_NET_HOST_NAME] = spanAttributes[ATTR_NET_HOST_NAME];
-  metricAttributes[ATTR_HTTP_FLAVOR] = spanAttributes[ATTR_HTTP_FLAVOR];
-  //TODO: http.target attribute, it should substitute any parameters to avoid high cardinality.
-  return metricAttributes;
+  return Object.assign(attributes, hookAttributes);
 };
 
 /**
@@ -953,63 +846,20 @@ export const getIncomingRequestMetricAttributes = (
  * @param {(ServerResponse & { socket: Socket; })} response the response object
  */
 export const getIncomingRequestAttributesOnResponse = (
-  request: IncomingMessage,
-  response: ServerResponse,
-  semconvStability: SemconvStability
+  response: ServerResponse
 ): Attributes => {
-  // take socket from the request,
-  // since it may be detached from the response object in keep-alive mode
-  const { socket } = request;
-  const { statusCode, statusMessage } = response;
+  const { statusCode } = response;
 
-  const newAttributes: Attributes = {
+  const attributes: Attributes = {
     [ATTR_HTTP_RESPONSE_STATUS_CODE]: statusCode,
   };
 
   const rpcMetadata = getRPCMetadata(context.active());
-  const oldAttributes: Attributes = {};
-  if (socket) {
-    const { localAddress, localPort, remoteAddress, remotePort } = socket;
-    oldAttributes[ATTR_NET_HOST_IP] = localAddress;
-    oldAttributes[ATTR_NET_HOST_PORT] = localPort;
-    oldAttributes[ATTR_NET_PEER_IP] = remoteAddress;
-    oldAttributes[ATTR_NET_PEER_PORT] = remotePort;
-  }
-  oldAttributes[ATTR_HTTP_STATUS_CODE] = statusCode;
-  oldAttributes[AttributeNames.HTTP_STATUS_TEXT] = (
-    statusMessage || ''
-  ).toUpperCase();
-
   if (rpcMetadata?.type === RPCType.HTTP && rpcMetadata.route !== undefined) {
-    oldAttributes[ATTR_HTTP_ROUTE] = rpcMetadata.route;
-    newAttributes[ATTR_HTTP_ROUTE] = rpcMetadata.route;
+    attributes[ATTR_HTTP_ROUTE] = rpcMetadata.route;
   }
 
-  switch (semconvStability) {
-    case SemconvStability.STABLE:
-      return newAttributes;
-    case SemconvStability.OLD:
-      return oldAttributes;
-  }
-
-  return Object.assign(oldAttributes, newAttributes);
-};
-
-/**
- * Returns incoming request Metric attributes scoped to the request data
- * @param {Attributes} spanAttributes the span attributes
- */
-export const getIncomingRequestMetricAttributesOnResponse = (
-  spanAttributes: Attributes
-): Attributes => {
-  const metricAttributes: Attributes = {};
-  metricAttributes[ATTR_HTTP_STATUS_CODE] =
-    spanAttributes[ATTR_HTTP_STATUS_CODE];
-  metricAttributes[ATTR_NET_HOST_PORT] = spanAttributes[ATTR_NET_HOST_PORT];
-  if (spanAttributes[ATTR_HTTP_ROUTE] !== undefined) {
-    metricAttributes[ATTR_HTTP_ROUTE] = spanAttributes[ATTR_HTTP_ROUTE];
-  }
-  return metricAttributes;
+  return attributes;
 };
 
 /**
@@ -1025,10 +875,15 @@ export const getIncomingStableRequestMetricAttributesOnResponse = (
   }
 
   // required if and only if one was sent, same as span requirement
-  if (spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE]) {
-    metricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] =
-      spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
+  const statusCode = spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
+  if (statusCode) {
+    metricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] = statusCode;
+    const errorType = parseErrorType(SpanKind.SERVER, statusCode);
+    if (errorType !== undefined) {
+      metricAttributes[ATTR_ERROR_TYPE] ??= errorType;
+    }
   }
+
   return metricAttributes;
 };
 
@@ -1036,13 +891,13 @@ export function headerCapture(type: 'request' | 'response', headers: string[]) {
   const normalizedHeaders = new Map<string, string>();
   for (let i = 0, len = headers.length; i < len; i++) {
     const capturedHeader = headers[i].toLowerCase();
-    normalizedHeaders.set(capturedHeader, capturedHeader.replace(/-/g, '_'));
+    normalizedHeaders.set(capturedHeader, capturedHeader);
   }
 
   return (
-    span: Span,
     getHeader: (key: string) => undefined | string | string[] | number
-  ) => {
+  ): Attributes => {
+    const attributes: Attributes = {};
     for (const capturedHeader of normalizedHeaders.keys()) {
       const value = getHeader(capturedHeader);
 
@@ -1054,13 +909,14 @@ export function headerCapture(type: 'request' | 'response', headers: string[]) {
       const key = `http.${type}.header.${normalizedHeader}`;
 
       if (typeof value === 'string') {
-        span.setAttribute(key, [value]);
+        attributes[key] = [value];
       } else if (Array.isArray(value)) {
-        span.setAttribute(key, value);
+        attributes[key] = value;
       } else {
-        span.setAttribute(key, [value]);
+        attributes[key] = [value];
       }
     }
+    return attributes;
   };
 }
 
@@ -1077,6 +933,9 @@ const KNOWN_METHODS = new Set([
 
   // PATCH from https://www.rfc-editor.org/rfc/rfc5789.html
   'PATCH',
+
+  // QUERY from https://datatracker.ietf.org/doc/draft-ietf-httpbis-safe-method-w-body/
+  'QUERY',
 ]);
 
 function normalizeMethod(method?: string | null) {

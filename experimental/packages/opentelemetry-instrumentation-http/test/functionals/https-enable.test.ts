@@ -1,43 +1,29 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { Span as ISpan } from '@opentelemetry/api';
 import {
   SpanStatusCode,
   context,
   propagation,
-  Span as ISpan,
   SpanKind,
   trace,
 } from '@opentelemetry/api';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
-import { ContextManager } from '@opentelemetry/api';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
+import type { ContextManager } from '@opentelemetry/api';
 import {
-  BasicTracerProvider,
+  TracerProvider,
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
+} from '@opentelemetry/sdk-trace';
 import {
-  ATTR_HTTP_CLIENT_IP,
-  ATTR_HTTP_FLAVOR,
-  ATTR_HTTP_STATUS_CODE,
-  ATTR_NET_HOST_PORT,
-  ATTR_NET_PEER_PORT,
-  ATTR_NET_TRANSPORT,
-  NET_TRANSPORT_VALUE_IP_TCP,
-} from '../../src/semconv';
+  ATTR_CLIENT_ADDRESS,
+  ATTR_HTTP_RESPONSE_STATUS_CODE,
+  ATTR_NETWORK_PROTOCOL_VERSION,
+  ATTR_SERVER_PORT,
+} from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as nock from 'nock';
@@ -52,6 +38,7 @@ instrumentation.enable();
 instrumentation.disable();
 
 import * as http from 'http';
+import type { OutgoingHttpHeaders } from 'http';
 import * as https from 'https';
 import { httpsRequest } from '../utils/httpsRequest';
 
@@ -62,11 +49,10 @@ let server: https.Server;
 const serverPort = 32345;
 const protocol = 'https';
 const hostname = 'localhost';
-const serverName = 'my.server.name';
 const pathname = '/test';
 const memoryExporter = new InMemorySpanExporter();
-const provider = new BasicTracerProvider({
-  spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+const provider = new TracerProvider({
+  spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
 });
 instrumentation.setTracerProvider(provider);
 const tracer = provider.getTracer('test-https');
@@ -93,7 +79,7 @@ describe('HttpsInstrumentation', () => {
   let contextManager: ContextManager;
 
   beforeEach(() => {
-    contextManager = new AsyncHooksContextManager().enable();
+    contextManager = new AsyncLocalStorageContextManager().enable();
     propagation.setGlobalPropagator(new DummyPropagation());
     context.setGlobalContextManager(contextManager);
   });
@@ -166,11 +152,11 @@ describe('HttpsInstrumentation', () => {
         assertSpan(incomingSpan, SpanKind.SERVER, validations);
         assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
         assert.strictEqual(
-          incomingSpan.attributes[ATTR_NET_HOST_PORT],
+          incomingSpan.attributes[ATTR_SERVER_PORT],
           serverPort
         );
         assert.strictEqual(
-          outgoingSpan.attributes[ATTR_NET_PEER_PORT],
+          outgoingSpan.attributes[ATTR_SERVER_PORT],
           serverPort
         );
       });
@@ -189,16 +175,13 @@ describe('HttpsInstrumentation', () => {
             );
           },
           ignoreOutgoingRequestHook: request => {
-            if (request.headers?.['user-agent'] != null) {
-              return (
-                `${request.headers['user-agent']}`.match('ignored-string') !=
-                null
-              );
+            const headers = request.headers as OutgoingHttpHeaders | undefined;
+            if (headers?.['user-agent'] != null) {
+              return `${headers['user-agent']}`.match('ignored-string') != null;
             }
             return false;
           },
           applyCustomAttributesOnSpan: customAttributeFunction,
-          serverName,
         });
         instrumentation.enable();
         server = https.createServer(
@@ -246,20 +229,19 @@ describe('HttpsInstrumentation', () => {
           resHeaders: result.resHeaders,
           reqHeaders: result.reqHeaders,
           component: 'https',
-          serverName,
         };
 
         assert.strictEqual(spans.length, 2);
         assert.strictEqual(
-          incomingSpan.attributes[ATTR_HTTP_CLIENT_IP],
+          incomingSpan.attributes[ATTR_CLIENT_ADDRESS],
           '<client>'
         );
         assert.strictEqual(
-          incomingSpan.attributes[ATTR_NET_HOST_PORT],
+          incomingSpan.attributes[ATTR_SERVER_PORT],
           serverPort
         );
         assert.strictEqual(
-          outgoingSpan.attributes[ATTR_NET_PEER_PORT],
+          outgoingSpan.attributes[ATTR_SERVER_PORT],
           serverPort
         );
 
@@ -267,10 +249,9 @@ describe('HttpsInstrumentation', () => {
           { span: incomingSpan, kind: SpanKind.SERVER },
           { span: outgoingSpan, kind: SpanKind.CLIENT },
         ].forEach(({ span, kind }) => {
-          assert.strictEqual(span.attributes[ATTR_HTTP_FLAVOR], '1.1');
           assert.strictEqual(
-            span.attributes[ATTR_NET_TRANSPORT],
-            NET_TRANSPORT_VALUE_IP_TCP
+            span.attributes[ATTR_NETWORK_PROTOCOL_VERSION],
+            '1.1'
           );
           assertSpan(span, kind, validations);
         });
@@ -598,7 +579,7 @@ describe('HttpsInstrumentation', () => {
             }
           );
           req.setTimeout(10, () => {
-            req.abort();
+            req.destroy();
           });
           // Instrumentation should not swallow error event.
           assert.strictEqual(req.listeners('error').length, 0);
@@ -613,7 +594,7 @@ describe('HttpsInstrumentation', () => {
         const [span] = spans;
         assert.strictEqual(spans.length, 1);
         assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
-        assert.ok(Object.keys(span.attributes).length >= 6);
+        assert.ok(Object.keys(span.attributes).length >= 5);
       });
 
       it('should have 1 ended span when request is aborted after receiving response', async () => {
@@ -666,7 +647,10 @@ describe('HttpsInstrumentation', () => {
             const [span] = spans;
             assert.strictEqual(spans.length, 1);
             assert.ok(Object.keys(span.attributes).length > 6);
-            assert.strictEqual(span.attributes[ATTR_HTTP_STATUS_CODE], 404);
+            assert.strictEqual(
+              span.attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
+              404
+            );
             assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
             done();
           });

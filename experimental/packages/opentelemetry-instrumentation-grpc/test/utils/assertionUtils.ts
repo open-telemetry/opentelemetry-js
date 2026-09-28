@@ -1,23 +1,12 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import { SpanKind, SpanStatusCode } from '@opentelemetry/api';
 import * as assert from 'assert';
 import type { status as GrpcStatus } from '@grpc/grpc-js';
-import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { ReadableSpan } from '@opentelemetry/sdk-trace';
 import {
   hrTimeToMilliseconds,
   hrTimeToMicroseconds,
@@ -28,13 +17,7 @@ import {
   ATTR_SERVER_PORT,
 } from '@opentelemetry/semantic-conventions';
 
-import {
-  ATTR_NET_PEER_NAME,
-  ATTR_NET_PEER_PORT,
-  ATTR_RPC_GRPC_STATUS_CODE,
-} from '../../src/semconv';
-
-import { SemconvStability } from '@opentelemetry/instrumentation';
+import { ATTR_RPC_GRPC_STATUS_CODE } from '../../src/semconv';
 
 export const grpcStatusCodeToOpenTelemetryStatusCode = (
   status: GrpcStatus
@@ -54,8 +37,7 @@ export const assertSpan = (
     status: GrpcStatus;
     host?: string;
     port?: number;
-  },
-  semconvStability: SemconvStability = SemconvStability.OLD
+  }
 ) => {
   assert.strictEqual(span.spanContext().traceId.length, 32);
   assert.strictEqual(span.spanContext().spanId.length, 16);
@@ -78,41 +60,8 @@ export const assertSpan = (
     validations.host !== undefined &&
     validations.port !== undefined
   ) {
-    switch (semconvStability) {
-      case SemconvStability.STABLE:
-        assert.strictEqual(
-          span.attributes[ATTR_SERVER_ADDRESS],
-          validations.host
-        );
-        assert.strictEqual(span.attributes[ATTR_SERVER_PORT], validations.port);
-        break;
-      case SemconvStability.DUPLICATE:
-        assert.strictEqual(
-          span.attributes[ATTR_SERVER_ADDRESS],
-          validations.host
-        );
-        assert.strictEqual(span.attributes[ATTR_SERVER_PORT], validations.port);
-        assert.strictEqual(
-          span.attributes[ATTR_NET_PEER_NAME],
-          validations.host
-        );
-        assert.strictEqual(
-          span.attributes[ATTR_NET_PEER_PORT],
-          validations.port
-        );
-        break;
-      case SemconvStability.OLD:
-      default:
-        assert.strictEqual(
-          span.attributes[ATTR_NET_PEER_NAME],
-          validations.host
-        );
-        assert.strictEqual(
-          span.attributes[ATTR_NET_PEER_PORT],
-          validations.port
-        );
-        break;
-    }
+    assert.strictEqual(span.attributes[ATTR_SERVER_ADDRESS], validations.host);
+    assert.strictEqual(span.attributes[ATTR_SERVER_PORT], validations.port);
   }
 
   // validations

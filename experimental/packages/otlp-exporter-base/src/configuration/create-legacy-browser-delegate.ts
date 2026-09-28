@@ -1,26 +1,59 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
-import { ISerializer } from '@opentelemetry/otlp-transformer';
-import {
-  createOtlpSendBeaconExportDelegate,
-  createOtlpXhrExportDelegate,
-} from '../otlp-browser-http-export-delegate';
+
+import type { MeterProvider } from '@opentelemetry/api';
+import type {
+  IExporterMetricsHelper,
+  ISerializer,
+} from '@opentelemetry/otlp-transformer';
+import { createOtlpFetchExportDelegate } from '../otlp-browser-http-export-delegate';
 import { convertLegacyBrowserHttpOptions } from './convert-legacy-browser-http-options';
-import { IOtlpExportDelegate } from '../otlp-export-delegate';
-import { OTLPExporterConfigBase } from './legacy-base-configuration';
+import type { IOtlpExportDelegate } from '../otlp-export-delegate';
+import type { OTLPExporterConfigBase } from './legacy-base-configuration';
+import { ATTR_HTTP_RESPONSE_STATUS_CODE } from '../semconv';
+import { ExporterMetrics } from '../ExporterMetrics';
+
+/**
+ * @deprecated
+ */
+export function createLegacyOtlpBrowserExporterMetrics<Internal>(
+  metricsComponentType: string,
+  exporterMetricsHelper: IExporterMetricsHelper<Internal>,
+  url: string | undefined,
+  meterProvider: MeterProvider | undefined
+): ExporterMetrics<Internal> {
+  return new ExporterMetrics({
+    componentType: metricsComponentType,
+    metricsHelper: exporterMetricsHelper,
+    url,
+    meterProvider,
+    responseAttributesFromError: (error: Error | string | undefined) => {
+      if (!error) {
+        return {
+          [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
+        };
+      }
+      if (!(error instanceof Error)) {
+        return {};
+      }
+      if (
+        error.message.startsWith(
+          'Fetch request failed with non-retryable status '
+        )
+      ) {
+        const statusStr = error.message.substring(
+          'Fetch request failed with non-retryable status '.length
+        );
+        return {
+          [ATTR_HTTP_RESPONSE_STATUS_CODE]: Number(statusStr),
+        };
+      }
+      return {};
+    },
+  });
+}
 
 /**
  * @deprecated
@@ -32,20 +65,26 @@ import { OTLPExporterConfigBase } from './legacy-base-configuration';
 export function createLegacyOtlpBrowserExportDelegate<Internal, Response>(
   config: OTLPExporterConfigBase,
   serializer: ISerializer<Internal, Response>,
+  metricsComponentType: string,
+  exporterMetricsHelper: IExporterMetricsHelper<Internal>,
+  meterProvider: MeterProvider | undefined,
   signalResourcePath: string,
   requiredHeaders: Record<string, string>
 ): IOtlpExportDelegate<Internal> {
-  const useXhr = !!config.headers || typeof navigator.sendBeacon !== 'function';
-
   const options = convertLegacyBrowserHttpOptions(
     config,
     signalResourcePath,
     requiredHeaders
   );
 
-  if (useXhr) {
-    return createOtlpXhrExportDelegate(options, serializer);
-  } else {
-    return createOtlpSendBeaconExportDelegate(options, serializer);
-  }
+  return createOtlpFetchExportDelegate(
+    options,
+    serializer,
+    createLegacyOtlpBrowserExporterMetrics(
+      metricsComponentType,
+      exporterMetricsHelper,
+      options.url,
+      config.selfObsMeterProvider
+    )
+  );
 }

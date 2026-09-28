@@ -1,30 +1,14 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { InstrumentationScope } from '@opentelemetry/core';
-import {
-  DataPoint,
-  DataPointType,
-  Histogram,
-  InstrumentType,
-  MeterProvider,
-} from '../src';
-import { InstrumentDescriptor } from '../src/InstrumentDescriptor';
+import type { InstrumentationScope } from '@opentelemetry/core';
+import type { DataPoint, Histogram } from '../src';
+import { DataPointType, InstrumentType, MeterProvider } from '../src';
+import type { InstrumentDescriptor } from '../src/InstrumentDescriptor';
 import {
   TestDeltaMetricReader,
   TestMetricReader,
@@ -37,9 +21,10 @@ import {
   defaultInstrumentationScope,
   testResource,
 } from './util';
-import { ObservableResult, ValueType } from '@opentelemetry/api';
-import { IMetricReader } from '../src/export/MetricReader';
-import { Resource } from '@opentelemetry/resources';
+import type { ObservableResult } from '@opentelemetry/api';
+import { ValueType } from '@opentelemetry/api';
+import type { IMetricReader } from '../src/export/MetricReader';
+import type { Resource } from '@opentelemetry/resources';
 
 describe('Instruments', () => {
   describe('Counter', () => {

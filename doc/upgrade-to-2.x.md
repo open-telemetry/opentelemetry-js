@@ -52,6 +52,7 @@ The OpenTelemetry JS SIG is responsible for numerous packages, all published to 
 | @opentelemetry/sdk-trace-web | 2.0.0 |
 | @opentelemetry/shim-opentracing | 2.0.0 |
 | @opentelemetry/api-events | 0.200.0 |
+| @opentelemetry/api/experimental | 0.200.0 |
 | @opentelemetry/exporter-logs-otlp-grpc | 0.200.0 |
 | @opentelemetry/exporter-logs-otlp-http | 0.200.0 |
 | @opentelemetry/exporter-logs-otlp-proto | 0.200.0 |
@@ -106,7 +107,7 @@ Important: Both of these changes (typescript@5.0.4, dropping old TypeScript vers
 
 ## 💥 ES2022 compilation target
 
-The **compilation target for transpiled TypeScript has been raised to ES2022** (from ES2017) for all packages (except `@opentelemetry/api`, `@opentelemetry/api-events`, and `@opentelemetry/semantic-conventions`).
+The **compilation target for transpiled TypeScript has been raised to ES2022** (from ES2017) for all packages (except `@opentelemetry/api`, `@opentelemetry/api/experimental`, `@opentelemetry/api-events`, and `@opentelemetry/semantic-conventions`).
 
 For Browser usage, this drops support for any browser versions that do not support ES2022 features.
 For Node.js usage, this already follows from the new minimum supported Node.js versions mentioned above.
@@ -207,7 +208,7 @@ If you maintain an *implementation* of a resource detector, i.e. if you have a c
 
 The environment variable utilities have changed to no longer have one large load and parse of all possible `OTEL_*` environment variables. Instead there are `get{Type}FromEnv()` utilities to handle the various [specified OpenTelemetry SDK environment variable types](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#configuration-types).
 
-The caller should now handle default values. The authority for default values is the [OpenTelemetry Environment Variable Spec](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#general-sdk-configuration). The previously used defaults in the 1.x code can be seen [here](https://github.com/open-telemetry/opentelemetry-js/blob/e9d3c71918635d490b6a9ac9f8259265b38394d0/packages/opentelemetry-core/src/utils/environment.ts#L154-L239).
+The caller should now handle default values. The authority for default values is the [OpenTelemetry Environment Variable Spec](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#general-sdk-configuration). See [the previously used defaults in the 1.x code here](https://github.com/open-telemetry/opentelemetry-js/blob/e9d3c71918635d490b6a9ac9f8259265b38394d0/packages/opentelemetry-core/src/utils/environment.ts#L154-L239).
 
 - `getEnv().OTEL_FOO` -> `get{Type}FromEnv('OTEL_FOO') ?? defaultValue`
   - `getStringFromEnv()`

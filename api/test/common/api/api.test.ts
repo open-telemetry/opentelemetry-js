@@ -1,34 +1,26 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
-import api, {
-  context,
+import type {
   Context,
-  defaultTextMapGetter,
-  defaultTextMapSetter,
-  diag,
-  metrics,
-  propagation,
-  ROOT_CONTEXT,
   Span,
   SpanOptions,
   TextMapGetter,
   TextMapPropagator,
   TextMapSetter,
+} from '../../../src';
+import api, {
+  context,
+  defaultTextMapGetter,
+  defaultTextMapSetter,
+  diag,
+  DiagLogLevel,
+  metrics,
+  propagation,
+  ROOT_CONTEXT,
   trace,
   TraceFlags,
 } from '../../../src';
@@ -86,6 +78,58 @@ describe('API', function () {
         context.with(ROOT_CONTEXT, () => 3.14),
         3.14
       );
+    });
+
+    describe('attach when the ContextManager does not implement it', function () {
+      afterEach(() => {
+        context.disable();
+        diag.disable();
+      });
+
+      it('should warn and no-op rather than throw', function () {
+        const warnings: string[] = [];
+        diag.setLogger(
+          {
+            verbose() {},
+            debug() {},
+            info() {},
+            warn(message: string) {
+              warnings.push(message);
+            },
+            error() {},
+          },
+          DiagLogLevel.ALL
+        );
+
+        // a minimal ContextManager that omits the optional attach()
+        context.setGlobalContextManager({
+          active: () => ROOT_CONTEXT,
+          with: (_ctx: Context, fn: () => unknown) => fn(),
+          bind: (_ctx: Context, target: unknown) => target,
+          enable() {
+            return this;
+          },
+          disable() {
+            return this;
+          },
+        } as any);
+
+        // Call attach multiple times to verify we warn at most once.
+        const token = context.attach(ROOT_CONTEXT);
+        context.attach(ROOT_CONTEXT);
+        assert.ok(token, 'attach() still returns a no-op token');
+        assert.doesNotThrow(() => {
+          token.dispose();
+          token.dispose();
+        });
+
+        assert.strictEqual(
+          warnings.length,
+          1,
+          'should warn once for unsupported attach()'
+        );
+        assert.ok(/attach\(\)/.test(warnings[0]));
+      });
     });
   });
 
@@ -221,38 +265,29 @@ describe('API', function () {
   describe('Global diag', function () {
     it('initialization', function () {
       const inst = DiagAPI.instance();
-
       assert.deepStrictEqual(diag, inst);
     });
 
     diagLoggerFunctions.forEach(fName => {
       it(`no argument logger ${fName} message doesn't throw`, function () {
-        //@ts-expect-error an undefined logger is not allowed
+        // @ts-expect-error an undefined logger is not allowed
         diag.setLogger();
-        assert.doesNotThrow(() => {
-          diag[fName](`${fName} message`);
-        });
+        diag[fName](`${fName} message`);
       });
 
       it(`null logger ${fName} message doesn't throw`, function () {
         diag.setLogger(null as any);
-        assert.doesNotThrow(() => {
-          diag[fName](`${fName} message`);
-        });
+        diag[fName](`${fName} message`);
       });
 
       it(`undefined logger ${fName} message doesn't throw`, function () {
         diag.setLogger(undefined as any);
-        assert.doesNotThrow(() => {
-          diag[fName](`${fName} message`);
-        });
+        diag[fName](`${fName} message`);
       });
 
       it(`empty logger ${fName} message doesn't throw`, function () {
         diag.setLogger({} as any);
-        assert.doesNotThrow(() => {
-          diag[fName](`${fName} message`);
-        });
+        diag[fName](`${fName} message`);
       });
     });
   });

@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
@@ -23,24 +12,20 @@ describe('NoopContextManager', function () {
 
   describe('.enable()', function () {
     it('should work', function () {
-      assert.doesNotThrow(() => {
-        contextManager = new NoopContextManager();
-        assert.ok(
-          contextManager.enable() === contextManager,
-          'should return this'
-        );
-      });
+      contextManager = new NoopContextManager();
+      assert.ok(
+        contextManager.enable() === contextManager,
+        'should return this'
+      );
     });
   });
 
   describe('.disable()', function () {
     it('should work', function () {
-      assert.doesNotThrow(() => {
-        assert.ok(
-          contextManager.disable() === contextManager,
-          'should return this'
-        );
-      });
+      assert.ok(
+        contextManager.disable() === contextManager,
+        'should return this'
+      );
       contextManager.enable();
     });
   });
@@ -133,6 +118,21 @@ describe('NoopContextManager', function () {
         test
       );
       contextManager.enable();
+    });
+  });
+
+  describe('.attach()', function () {
+    it('should be a no-op that keeps ROOT_CONTEXT active', function () {
+      const key = createContextKey('test key 1');
+      const test = ROOT_CONTEXT.setValue(key, 1);
+      const token = contextManager.attach(test);
+      assert.strictEqual(
+        contextManager.active(),
+        ROOT_CONTEXT,
+        'attach should not change the active context'
+      );
+      assert.doesNotThrow(() => token.dispose());
+      assert.strictEqual(contextManager.active(), ROOT_CONTEXT);
     });
   });
 });

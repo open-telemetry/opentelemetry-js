@@ -1,25 +1,16 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import {
   LoggerProvider,
   SimpleLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { OTLPLogExporter } from '../src';
-import { ServerTestContext, startServer } from './utils';
+import type { ServerTestContext } from './utils';
+import { startServer, TestMetricReader } from './utils';
 import * as assert from 'assert';
 
 const testServiceDefinition = {
@@ -78,13 +69,18 @@ describe('OTLPLogExporter', function () {
 
   it('successfully exports data', async () => {
     // arrange
+    const metricReader = new TestMetricReader();
+    const meterProvider = new MeterProvider({
+      readers: [metricReader],
+    });
     const loggerProvider = new LoggerProvider({
       processors: [
-        new SimpleLogRecordProcessor(
-          new OTLPLogExporter({
+        new SimpleLogRecordProcessor({
+          exporter: new OTLPLogExporter({
             url: 'http://localhost:1503',
-          })
-        ),
+            selfObsMeterProvider: meterProvider,
+          }),
+        }),
       ],
     });
 
@@ -96,5 +92,12 @@ describe('OTLPLogExporter', function () {
 
     // assert
     assert.strictEqual(serverTestContext.requests.length, 1);
+
+    const metrics = await metricReader.collect();
+    const scopeMetrics = metrics.resourceMetrics.scopeMetrics.find(
+      sm => sm.scope.name === '@opentelemetry/otlp-exporter'
+    );
+    assert.ok(scopeMetrics);
+    await meterProvider.shutdown();
   });
 });

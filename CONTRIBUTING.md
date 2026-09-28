@@ -2,9 +2,11 @@
 
 We'd love your help!
 
+- [OpenTelemetry JS SIG](#opentelemetry-js-sig)
 - [Development Quick Start](#development-quick-start)
 - [Pull Request Merge Guidelines](#pull-request-merge-guidelines)
   - [General Merge Requirements](#general-merge-requirements)
+- [Backports](#backports)
 - [Report a bug or requesting feature](#report-a-bug-or-requesting-feature)
 - [How to contribute](#how-to-contribute)
   - [Before you start](#before-you-start)
@@ -20,6 +22,24 @@ We'd love your help!
   - [Generating docs](#generating-docs)
   - [Adding a package](#adding-a-package)
   - [Platform conditional exports](#platform-conditional-exports)
+
+## OpenTelemetry JS SIG
+
+The JavaScript special interest group (SIG) meets regularly. See the
+OpenTelemetry [community](https://github.com/open-telemetry/community#implementation-sigs)
+repo for information on this and other language SIGs.
+
+See the [public meeting notes](https://docs.google.com/document/d/1tCyoQK49WVcE-x8oryZOTTToFm7sIeUhxFPm9g-qL1k)
+for a summary description of past meetings. To request edit access, join the
+meeting or get in touch on the
+[#otel-js](https://cloud-native.slack.com/archives/C01NL1GRPQR)
+channel on CNCF Slack. If you are new to the CNCF Slack community,
+you can [create an account](https://slack.cncf.io/).
+
+The meeting is open for all to join. We invite everyone to join our meeting,
+regardless of your experience level. Whether you're a seasoned OpenTelemetry
+developer, just starting your journey, or simply curious about the work we do,
+you're more than welcome to participate!
 
 ## Development Quick Start
 
@@ -65,6 +85,52 @@ If a PR has not been interacted with by a reviewer within one week, please ping 
 
 If all of the above requirements are met and there are no unresolved discussions, a pull request may be merged by either a maintainer or an approver.
 
+## Backports
+
+Bug and security fixes may be backported to the previous major version, which is maintained on a
+[maintenance branch](doc/contributing/releasing.md#maintenance-branches) named after it, for example
+`v2.x`. The previous major receives backports for **one year after the next major version is
+released**. After that the branch is no longer maintained and no further releases are cut from it.
+
+The concrete dates for the current transition are in the [SDK 3.0 announcement](doc/3.x/announcement.md).
+
+### What is eligible
+
+- Fixes for `priority:p1` bugs, as defined in [Bug Triage](doc/contributing/bug_triage.md#prioritize).
+- Security fixes.
+
+Fixes for bugs with any other priority label MAY be accepted or rejected at the discretion of the
+maintainers, based on the impact on end users. Features, refactors, dependency updates, and
+documentation-only changes are not backported.
+
+### Fixes MUST land on `main` first
+
+A fix MUST be merged into `main` before it can be backported.
+A backport pull request whose fix is not on `main` will be closed, unless the affected package or code
+no longer exists on `main` - in that case, say so in the pull request description.
+
+### Opening a backport pull request
+
+Anyone may open a backport pull request; maintainers decide whether it is eligible.
+Once the fix is merged into `main`, cherry-pick it onto a branch based on the maintenance branch,
+keeping the reference to the original commit:
+
+```sh
+git fetch upstream
+git checkout -b backport-v2.x-1234 upstream/v2.x
+git cherry-pick -x <sha of the commit on main>
+```
+
+Then:
+
+- Open the pull request against the maintenance branch, **not** `main`.
+- Apply the `backport` label and link the `main` pull request in the description.
+- Add a [changelog](#changelog) entry on the maintenance branch, referencing the backport pull
+  request's own number. Cherry-picking the entry from `main` usually conflicts, and the changelog CI
+  check does not run on maintenance branches, so this is not enforced automatically.
+
+The [General Merge Requirements](#general-merge-requirements) apply to backport pull requests as well.
+
 ## Report a bug or requesting feature
 
 Reporting bugs is an important contribution. Please make sure to include:
@@ -84,7 +150,7 @@ for general practices for OpenTelemetry project.
 
 #### Conventional commit
 
-The Conventional Commits specification is a lightweight convention on top of commit messages. It provides an easy set of rules for creating an explicit commit history; which makes it easier to write automated tools on top of. This convention dovetails with SemVer, by describing the features, fixes, and breaking changes made in commit messages. You can see examples [here](https://www.conventionalcommits.org/en/v1.0.0-beta.4/#examples).
+The Conventional Commits specification is a lightweight convention on top of commit messages. It provides an easy set of rules for creating an explicit commit history; which makes it easier to write automated tools on top of. This convention dovetails with SemVer, by describing the features, fixes, and breaking changes made in commit messages. See [example commit messages here](https://www.conventionalcommits.org/en/v1.0.0-beta.4/#examples).
 
 It is recommended to have your commit messages follow the Conventional Commits specification, with possible types listed in [.commitlint.rc.yml](.commitlintrc.yml). Here an example that uses the recommended format: `git commit -s -am "chore(opentelemetry-core): update deps"`
 
@@ -162,9 +228,7 @@ npm ci
 
 ### Compile modules
 
-All modules are managed as a composite typescript project using [Project References](https://www.typescriptlang.org/docs/handbook/project-references.html). This means that a breaking change in one module will be reflected in compilations of its dependent modules automatically.
-
-DO NOT use lerna to compile all modules unless you know what you are doing because this will cause a new typescript process to be spawned for every module in the project.
+All modules are built with [tsdown](https://tsdown.dev/), orchestrated by nx: `npm run compile` builds each package's workspace dependencies before the package itself and caches results between runs. Building requires a Node.js version matching `devEngines.runtime` in the root `package.json` (CI builds on Node ^26.3.0); tests still run on every supported Node version.
 
 ```sh
 # Build all modules
@@ -176,8 +240,10 @@ npm run clean
 
 These commands can also be run for specific packages instead of the whole project, which can speed up compilations while developing.
 
-**NOTE**: To run commands in specific packages (compile, lint, etc), please ensure you are using at least `7.x`
-version of `npm`.
+**NOTE**: Please use npm `11.10.0` or newer, the first version that supports the `min-release-age`
+setting in `.npmrc`. Older npm reports it as an unknown config; upgrade npm rather than deleting the
+line to silence the warning, which would drop the release cooldown for everyone. Node.js 24 before
+`24.14.1` bundles npm `11.6.x`, so on that line upgrade with `npm i -g npm@latest`.
 
 ```sh
 # Build a single module and all of its dependencies
@@ -198,7 +264,7 @@ npm run watch
 
 #### TypeScript version & update policy
 
-TypeScript version used to compile the pacakges is `v5.0.4`. If you plan to use any of the packages from this
+TypeScript version used to compile the packages is `v5.0.4`. If you plan to use any of the packages from this
 repository to make your own application or package instrumentation make sure to use same version or higher.
 
 <!-- Ref: https://github.com/open-telemetry/opentelemetry-js/pull/5145#issuecomment-2518263890 -->
@@ -289,36 +355,12 @@ The document will be available under `docs` path.
 
 ### Adding a package
 
-To add a new package, copy `packages/template` to your new package directory and modify the `package.json` file to reflect your desired package settings. If the package will not support browser, the `karma.conf` and `tsconifg.esm.json` files may be deleted. If the package will support es5 targets, the reference to `tsconfig.base.json` in `tsconfig.json` should be changed to `tsconfig.es5.json`.
+To add a new package, copy `packages/template` to your new package directory and modify the `package.json` file to reflect your desired package settings. If the package will not support browser, the `karma.conf.js` file may be deleted. Per-package compiler options live in `tsdown.config.ts`, which imports the shared options from the workspace root `tsdown.config.ts` and adds an `entry` list; override fields like `target` only when you have a concrete reason to (see `api/tsdown.config.ts` for an example).
 
-After adding the package, run `npm install` from the root of the project. This will update the `tsconfig.json` project references automatically and install all dependencies in your new package. For packages supporting browser, file `tsconfig.esm.json` needs to be manually updated to include reference to ES modules build.
+After adding the package, run `npm install` from the root of the project to install all dependencies in your new package. For packages with platform-conditional code (browser vs node), add a `browser` field to the `package.json` that path-swaps the relevant `./dist/*.mjs` and `./dist/*.cjs` files; see `@opentelemetry/core`'s `package.json` for a working example.
 
 ### Platform conditional exports
 
 Universal packages are packages that can be used in both web browsers and
 Node.js environment. These packages may be implemented on top of different
-platform APIs to achieve the same goal. Like accessing the _global_ reference,
-we have different preferred ways to do it:
-
-- In Node.js, we access the _global_ reference with `globalThis` or `global`:
-
-```js
-/// packages/opentelemetry-core/src/platform/node/globalThis.ts
-export const _globalThis = typeof globalThis === 'object' ? globalThis : global;
-```
-
-- In web browser, we access the _global_ reference with the following definition:
-
-```js
-/// packages/opentelemetry-core/src/platform/browser/globalThis.ts
-export const _globalThis: typeof globalThis =
-  typeof globalThis === 'object' ? globalThis :
-    typeof self === 'object' ? self :
-      typeof window === 'object' ? window :
-        typeof global === 'object' ? global :
-          {} as typeof globalThis;
-```
-
-Even though the implementation may differ, the exported names must be aligned.
-It can be confusing if exported names present in one environment but not in the
-others.
+platform APIs to achieve the same goal.

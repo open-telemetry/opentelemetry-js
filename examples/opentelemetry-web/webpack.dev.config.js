@@ -14,6 +14,7 @@ const common = {
     fetchXhrB3: 'examples/fetchXhrB3/index.js',
     'fetch-proto': 'examples/fetch-proto/index.js',
     zipkin: 'examples/zipkin/index.js',
+    session: 'examples/session/index.js'
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -44,6 +45,7 @@ const common = {
       path.resolve(directory),
       'node_modules'
     ],
+    fallback: { 'path': require.resolve('path-browserify') },
     extensions: ['.ts', '.js', '.jsx', '.json'],
   },
   optimization: {

@@ -1,25 +1,11 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 import * as api from '@opentelemetry/api';
-import { otperformance as performance } from '@opentelemetry/core';
 import {
   registerInstrumentations,
   isWrapped,
-  semconvStabilityFromStr,
-  SemconvStability,
 } from '@opentelemetry/instrumentation';
 import {
   B3Propagator,
@@ -29,31 +15,18 @@ import {
   X_B3_TRACE_ID,
 } from '@opentelemetry/propagator-b3';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
-import * as tracing from '@opentelemetry/sdk-trace-base';
+import * as tracing from '@opentelemetry/sdk-trace';
 import {
   PerformanceTimingNames as PTN,
-  WebTracerProvider,
   parseUrl,
-} from '@opentelemetry/sdk-trace-web';
+} from '@opentelemetry/web-common';
+import { TracerProvider } from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
-  ATTR_HTTP_HOST,
-  ATTR_HTTP_METHOD,
-  ATTR_HTTP_RESPONSE_CONTENT_LENGTH,
-  ATTR_HTTP_SCHEME,
-  ATTR_HTTP_STATUS_CODE,
-  ATTR_HTTP_URL,
-  ATTR_HTTP_USER_AGENT,
-  ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-  ATTR_HTTP_REQUEST_BODY_SIZE,
-} from '../src/semconv';
+import { ATTR_HTTP_REQUEST_BODY_SIZE } from '../src/semconv';
 import { EventNames } from '../src/enums/EventNames';
-import {
-  XMLHttpRequestInstrumentation,
-  XMLHttpRequestInstrumentationConfig,
-} from '../src/xhr';
-import { AttributeNames } from '../src/enums/AttributeNames';
+import type { XMLHttpRequestInstrumentationConfig } from '../src/xhr';
+import { XMLHttpRequestInstrumentation } from '../src/xhr';
 import {
   ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
@@ -198,7 +171,10 @@ function createMainResource(resource = {}): PerformanceResourceTiming {
 
 function createFakePerformanceObs(url: string) {
   class FakePerfObs implements PerformanceObserver {
-    constructor(private readonly cb: PerformanceObserverCallback) {}
+    private readonly cb: PerformanceObserverCallback;
+    constructor(cb: PerformanceObserverCallback) {
+      this.cb = cb;
+    }
 
     observe() {
       const absoluteUrl = url.startsWith('http') ? url : location.origin + url;
@@ -243,14 +219,7 @@ function testForCorrectEvents(
 }
 
 describe('xhr', () => {
-  const asyncTests = [
-    { async: true, semconvStabilityOptIn: undefined },
-    { async: true, semconvStabilityOptIn: 'http' },
-    { async: true, semconvStabilityOptIn: 'http/dup' },
-    { async: false, semconvStabilityOptIn: undefined },
-    { async: false, semconvStabilityOptIn: 'http' },
-    { async: false, semconvStabilityOptIn: 'http/dup' },
-  ];
+  const asyncTests = [{ async: true }, { async: false }];
 
   let timer: sinon.SinonFakeTimers;
 
@@ -262,12 +231,146 @@ describe('xhr', () => {
     sinon.restore();
   });
 
+  describe('enable', () => {
+    let xhrInstrumentation: XMLHttpRequestInstrumentation;
+
+    describe('when XMLHttpRequest prototype methods can not be wrapped', () => {
+      // Simulate the production failure mode (third-party scripts locking
+      // `XMLHttpRequest.prototype.open` and `XMLHttpRequest.prototype.send`
+      // via `Object.defineProperty` with `writable: false,
+      // configurable: false`).
+      const wrapError = new TypeError(
+        "Cannot assign to read only property 'open' of object '[object XMLHttpRequest]'"
+      );
+
+      beforeEach(() => {
+        // Construct with `enabled: false` so the stub is in place before
+        // `enable()` runs — `_wrap` is an instance-level field inherited
+        // from `InstrumentationBase`, not a prototype method.
+        xhrInstrumentation = new XMLHttpRequestInstrumentation({
+          enabled: false,
+        });
+        // @ts-expect-error access internal property for testing
+        sinon.stub(xhrInstrumentation, '_wrap').throws(wrapError);
+      });
+
+      it('should not throw when _wrap fails', () => {
+        assert.doesNotThrow(() => xhrInstrumentation!.enable());
+      });
+
+      it('should leave open/send unwrapped when _wrap fails', () => {
+        xhrInstrumentation!.enable();
+        assert.ok(!isWrapped(globalThis.XMLHttpRequest.prototype.open));
+        assert.ok(!isWrapped(globalThis.XMLHttpRequest.prototype.send));
+      });
+
+      it('should allow enable() to be retried after _wrap fails', () => {
+        xhrInstrumentation!.enable();
+        assert.doesNotThrow(() => xhrInstrumentation!.enable());
+      });
+    });
+
+    describe('when XMLHttpRequest prototype methods can be wrapped', () => {
+      it('should patch to wrap XML HTTP Requests when enabled', () => {
+        const xhttp = new XMLHttpRequest();
+        assert.ok(!isWrapped(xhttp.send), 'should not be wrapped');
+        // NOTE: constructor already calls `enable()`
+        xhrInstrumentation = new XMLHttpRequestInstrumentation();
+        const xhttp2 = new XMLHttpRequest();
+        assert.ok(isWrapped(xhttp2.open), 'open method should be wrapped');
+        assert.ok(isWrapped(xhttp2.send), 'send method should be wrapped');
+        // @ts-expect-error -- property added by instrumentation.wrap(...)
+        XMLHttpRequest.prototype.send.__unwrap();
+        // @ts-expect-error -- property added by instrumentation.wrap(...)
+        XMLHttpRequest.prototype.open.__unwrap();
+      });
+    });
+  });
+
   asyncTests.forEach(test => {
     const testAsync = test.async;
-    describe(`when async='${testAsync}', semconvStabilityOptIn=${test.semconvStabilityOptIn}`, () => {
+    describe(`when async='${testAsync}'`, () => {
       let requests: any[] = [];
-      let clearData: any;
       let contextManager: ZoneContextManager;
+      let webTracerWithZone: api.Tracer;
+      let webTracerProviderWithZone: TracerProvider;
+      let dummySpanExporter: DummySpanExporter;
+      let spyEntries: any;
+      let fakeNow = 0;
+      let xmlHttpRequestInstrumentation: XMLHttpRequestInstrumentation;
+      let exportSpy: any;
+      let clearResourceTimingsSpy: any;
+      let rootSpan: api.Span;
+
+      const clearData = () => {
+        sinon.restore();
+        timer = sinon.useFakeTimers();
+        requests = [];
+      };
+
+      const prepareData = (
+        fileUrl: string,
+        config?: XMLHttpRequestInstrumentationConfig
+      ) => {
+        const fakeXhr = sinon.useFakeXMLHttpRequest();
+        fakeXhr.onCreate = function (xhr: any) {
+          requests.push(xhr);
+        };
+        if (isWrapped(XMLHttpRequest.prototype.send)) {
+          // @ts-expect-error -- property added by instrumentation.wrap(...)
+          XMLHttpRequest.prototype.send.__unwrap();
+        }
+        if (isWrapped(XMLHttpRequest.prototype.open)) {
+          // @ts-expect-error -- property added by instrumentation.wrap(...)
+          XMLHttpRequest.prototype.open.__unwrap();
+        }
+
+        sinon.stub(performance, 'timeOrigin').value(0);
+        sinon.stub(performance, 'now').callsFake(() => fakeNow);
+
+        const resources: PerformanceResourceTiming[] = [];
+        resources.push(
+          createResource({
+            name: fileUrl,
+          }),
+          createMainResource({
+            name: fileUrl,
+          })
+        );
+
+        spyEntries = sinon.stub(
+          performance as unknown as Performance,
+          'getEntriesByType'
+        );
+        spyEntries.withArgs('resource').returns(resources);
+
+        sinon
+          .stub(window, 'PerformanceObserver')
+          .value(createFakePerformanceObs(fileUrl));
+
+        xmlHttpRequestInstrumentation = new XMLHttpRequestInstrumentation({
+          ...config,
+        });
+        dummySpanExporter = new DummySpanExporter();
+        webTracerProviderWithZone = new TracerProvider({
+          spanProcessors: [
+            new tracing.SimpleSpanProcessor({ exporter: dummySpanExporter }),
+          ],
+        });
+        registerInstrumentations({
+          instrumentations: [xmlHttpRequestInstrumentation],
+          tracerProvider: webTracerProviderWithZone,
+        });
+        webTracerWithZone = webTracerProviderWithZone.getTracer('xhr-test');
+
+        exportSpy = sinon.stub(dummySpanExporter, 'export');
+        clearResourceTimingsSpy = sinon.stub(
+          performance as unknown as Performance,
+          'clearResourceTimings'
+        );
+
+        rootSpan = webTracerWithZone.startSpan('root');
+      };
 
       beforeEach(() => {
         contextManager = new ZoneContextManager().enable();
@@ -289,86 +392,20 @@ describe('xhr', () => {
       });
 
       describe('when GET request is successful', () => {
-        let webTracerWithZone: api.Tracer;
-        let webTracerProviderWithZone: WebTracerProvider;
-        let dummySpanExporter: DummySpanExporter;
-        let exportSpy: any;
-        let clearResourceTimingsSpy: any;
-        let rootSpan: api.Span;
-        let spyEntries: any;
         const url = 'http://localhost:8090/xml-http-request.js';
         const secureUrl = 'https://localhost:8090/xml-http-request.js';
-        let fakeNow = 0;
-        let xmlHttpRequestInstrumentation: XMLHttpRequestInstrumentation;
 
-        clearData = () => {
-          sinon.restore();
-          timer = sinon.useFakeTimers();
-          requests = [];
-        };
-
-        const prepareData = (
+        function successfulGetRequest(
+          url: string,
           done: any,
-          fileUrl: string,
-          config?: XMLHttpRequestInstrumentationConfig
-        ) => {
-          const fakeXhr = sinon.useFakeXMLHttpRequest();
-          fakeXhr.onCreate = function (xhr: any) {
-            requests.push(xhr);
-          };
-
-          sinon.stub(performance, 'timeOrigin').value(0);
-          sinon.stub(performance, 'now').callsFake(() => fakeNow);
-
-          const resources: PerformanceResourceTiming[] = [];
-          resources.push(
-            createResource({
-              name: fileUrl,
-            }),
-            createMainResource({
-              name: fileUrl,
-            })
-          );
-
-          spyEntries = sinon.stub(
-            performance as unknown as Performance,
-            'getEntriesByType'
-          );
-          spyEntries.withArgs('resource').returns(resources);
-
-          sinon
-            .stub(window, 'PerformanceObserver')
-            .value(createFakePerformanceObs(fileUrl));
-
-          xmlHttpRequestInstrumentation = new XMLHttpRequestInstrumentation({
-            semconvStabilityOptIn: test.semconvStabilityOptIn,
-            ...config,
-          });
-          dummySpanExporter = new DummySpanExporter();
-          webTracerProviderWithZone = new WebTracerProvider({
-            spanProcessors: [
-              new tracing.SimpleSpanProcessor(dummySpanExporter),
-            ],
-          });
-          registerInstrumentations({
-            instrumentations: [xmlHttpRequestInstrumentation],
-            tracerProvider: webTracerProviderWithZone,
-          });
-          webTracerWithZone = webTracerProviderWithZone.getTracer('xhr-test');
-
-          exportSpy = sinon.stub(dummySpanExporter, 'export');
-          clearResourceTimingsSpy = sinon.stub(
-            performance as unknown as Performance,
-            'clearResourceTimings'
-          );
-
-          rootSpan = webTracerWithZone.startSpan('root');
+          xhr = new XMLHttpRequest()
+        ) {
           api.context.with(
             api.trace.setSpan(api.context.active(), rootSpan),
             () => {
               void getData(
-                new XMLHttpRequest(),
-                fileUrl,
+                xhr,
+                url,
                 () => {
                   fakeNow = 100;
                 },
@@ -379,7 +416,6 @@ describe('xhr', () => {
                 done();
               });
               assert.strictEqual(requests.length, 1, 'request not called');
-
               requests[0].respond(
                 200,
                 { 'Content-Type': 'application/json' },
@@ -387,124 +423,59 @@ describe('xhr', () => {
               );
             }
           );
-        };
+        }
 
-        beforeEach(function (done) {
-          const propagateTraceHeaderCorsUrls = [window.location.origin];
-          prepareData(done, url, {
-            propagateTraceHeaderCorsUrls,
-            measureRequestSize: true,
+        describe('AND instrumentation is disabled', () => {
+          beforeEach(function (done) {
+            clearData();
+            prepareData(url);
+            xmlHttpRequestInstrumentation!.disable();
+            successfulGetRequest(url, done);
+          });
+
+          it('should not export spans', () => {
+            assert.equal(exportSpy.args.length, 0, 'no spans are exported');
           });
         });
 
-        afterEach(() => {
-          clearData();
-        });
+        describe('when making http requests', () => {
+          beforeEach(function (done) {
+            const propagateTraceHeaderCorsUrls = [window.location.origin];
+            clearData();
+            prepareData(url, {
+              propagateTraceHeaderCorsUrls,
+              measureRequestSize: true,
+            });
+            successfulGetRequest(url, done);
+          });
 
-        it('should patch to wrap XML HTTP Requests when enabled', () => {
-          const xhttp = new XMLHttpRequest();
-          assert.ok(isWrapped(xhttp.send));
-          xmlHttpRequestInstrumentation.enable();
-          assert.ok(isWrapped(xhttp.send));
-        });
-
-        it('should unpatch to unwrap XML HTTP Requests when disabled', () => {
-          const xhttp = new XMLHttpRequest();
-          assert.ok(isWrapped(xhttp.send));
-          xmlHttpRequestInstrumentation.disable();
-          assert.ok(!isWrapped(xhttp.send));
-        });
-
-        it('should create a span with correct root span', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-          assert.strictEqual(
-            span.parentSpanContext?.spanId,
-            rootSpan.spanContext().spanId,
-            'parent span is not root span'
-          );
-        });
-
-        it('span should have correct name', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-          assert.strictEqual(span.name, 'GET', 'span has wrong name');
-        });
-
-        it('span should have correct kind', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-          assert.strictEqual(
-            span.kind,
-            api.SpanKind.CLIENT,
-            'span has wrong kind'
-          );
-        });
-
-        it('span should have correct attributes', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-          const attributes = span.attributes;
-          let expectedNumAttrs = 0;
-          const semconvStability = semconvStabilityFromStr(
-            'http',
-            test.semconvStabilityOptIn
-          );
-
-          if (semconvStability & SemconvStability.OLD) {
-            expectedNumAttrs += 8;
-
+          it('should create a span with correct root span', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
             assert.strictEqual(
-              attributes[ATTR_HTTP_METHOD],
-              'GET',
-              `attributes ${ATTR_HTTP_METHOD} is wrong`
+              span.parentSpanContext?.spanId,
+              rootSpan.spanContext().spanId,
+              'parent span is not root span'
             );
-            assert.strictEqual(
-              attributes[ATTR_HTTP_URL],
-              url,
-              `attributes ${ATTR_HTTP_URL} is wrong`
-            );
-            const requestContentLength = attributes[
-              ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-            ] as number;
-            assert.strictEqual(
-              requestContentLength,
-              undefined,
-              `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
-            );
-            const responseContentLength = attributes[
-              ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-            ] as number;
-            assert.strictEqual(
-              responseContentLength,
-              60,
-              `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
-            );
-            assert.strictEqual(
-              attributes[ATTR_HTTP_STATUS_CODE],
-              200,
-              `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-            );
-            assert.strictEqual(
-              attributes[AttributeNames.HTTP_STATUS_TEXT],
-              'OK',
-              `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-            );
-            assert.strictEqual(
-              attributes[ATTR_HTTP_HOST],
-              parseUrl(url).host,
-              `attributes ${ATTR_HTTP_HOST} is wrong`
-            );
+          });
 
-            const httpScheme = attributes[ATTR_HTTP_SCHEME];
-            assert.ok(
-              httpScheme === 'http' || httpScheme === 'https',
-              `attributes ${ATTR_HTTP_SCHEME} is wrong`
-            );
-            assert.notStrictEqual(
-              attributes[ATTR_HTTP_USER_AGENT],
-              '',
-              `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-            );
-          }
+          it('span should have correct name', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            assert.strictEqual(span.name, 'GET', 'span has wrong name');
+          });
 
-          if (semconvStability & SemconvStability.STABLE) {
+          it('span should have correct kind', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            assert.strictEqual(
+              span.kind,
+              api.SpanKind.CLIENT,
+              'span has wrong kind'
+            );
+          });
+
+          it('span should have correct attributes', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const attributes = span.attributes;
+            let expectedNumAttrs = 0;
             expectedNumAttrs += 5;
 
             assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
@@ -518,97 +489,100 @@ describe('xhr', () => {
               attributes[ATTR_SERVER_PORT],
               Number(parseUrl(url).port)
             );
-          }
 
-          assert.strictEqual(
-            Object.keys(attributes).length,
-            expectedNumAttrs,
-            'number of attributes is wrong'
-          );
-        });
-
-        it('span should have correct events', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-          const events = span.events;
-          testForCorrectEvents(events, [
-            EventNames.METHOD_OPEN,
-            EventNames.METHOD_SEND,
-            PTN.FETCH_START,
-            PTN.DOMAIN_LOOKUP_START,
-            PTN.DOMAIN_LOOKUP_END,
-            PTN.CONNECT_START,
-            PTN.CONNECT_END,
-            PTN.REQUEST_START,
-            PTN.RESPONSE_START,
-            PTN.RESPONSE_END,
-            EventNames.EVENT_LOAD,
-          ]);
-          assert.strictEqual(events.length, 11, 'number of events is wrong');
-        });
-
-        it('should create a span for preflight request', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-          const parentSpan: tracing.ReadableSpan = exportSpy.args[1][0][0];
-          assert.strictEqual(
-            span.parentSpanContext?.spanId,
-            parentSpan.spanContext().spanId,
-            'parent span is not root span'
-          );
-        });
-
-        it('preflight request span should have correct name', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-          assert.strictEqual(
-            span.name,
-            'CORS Preflight',
-            'preflight request span has wrong name'
-          );
-        });
-
-        it('preflight request span should have correct kind', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-          assert.strictEqual(
-            span.kind,
-            api.SpanKind.INTERNAL,
-            'span has wrong kind'
-          );
-        });
-
-        it('preflight request span should have correct events', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-          const events = span.events;
-          assert.strictEqual(events.length, 8, 'number of events is wrong');
-          testForCorrectEvents(events, [
-            PTN.FETCH_START,
-            PTN.DOMAIN_LOOKUP_START,
-            PTN.DOMAIN_LOOKUP_END,
-            PTN.CONNECT_START,
-            PTN.CONNECT_END,
-            PTN.REQUEST_START,
-            PTN.RESPONSE_START,
-            PTN.RESPONSE_END,
-          ]);
-        });
-
-        it('should NOT clear the resources', () => {
-          assert.ok(
-            clearResourceTimingsSpy.notCalled,
-            'resources have been cleared'
-          );
-        });
-        describe('When making https requests', () => {
-          beforeEach(done => {
-            clearData();
-            // this won't generate a preflight span
-            const propagateTraceHeaderCorsUrls = [secureUrl];
-            prepareData(done, secureUrl, {
-              propagateTraceHeaderCorsUrls,
-            });
+            assert.strictEqual(
+              Object.keys(attributes).length,
+              expectedNumAttrs,
+              'number of attributes is wrong'
+            );
           });
 
           it('span should have correct events', () => {
             const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
             const events = span.events;
+            testForCorrectEvents(events, [
+              EventNames.METHOD_OPEN,
+              EventNames.METHOD_SEND,
+              PTN.FETCH_START,
+              PTN.DOMAIN_LOOKUP_START,
+              PTN.DOMAIN_LOOKUP_END,
+              PTN.CONNECT_START,
+              PTN.CONNECT_END,
+              PTN.REQUEST_START,
+              PTN.RESPONSE_START,
+              PTN.RESPONSE_END,
+              EventNames.EVENT_LOAD,
+            ]);
+            assert.strictEqual(events.length, 11, 'number of events is wrong');
+          });
+
+          it('should create a span for preflight request', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            const parentSpan: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            assert.strictEqual(
+              span.parentSpanContext?.spanId,
+              parentSpan.spanContext().spanId,
+              'parent span is not root span'
+            );
+          });
+
+          it('preflight request span should have correct name', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            assert.strictEqual(
+              span.name,
+              'CORS Preflight',
+              'preflight request span has wrong name'
+            );
+          });
+
+          it('preflight request span should have correct kind', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            assert.strictEqual(
+              span.kind,
+              api.SpanKind.INTERNAL,
+              'span has wrong kind'
+            );
+          });
+
+          it('preflight request span should have correct events', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            const events = span.events;
+            assert.strictEqual(events.length, 8, 'number of events is wrong');
+            testForCorrectEvents(events, [
+              PTN.FETCH_START,
+              PTN.DOMAIN_LOOKUP_START,
+              PTN.DOMAIN_LOOKUP_END,
+              PTN.CONNECT_START,
+              PTN.CONNECT_END,
+              PTN.REQUEST_START,
+              PTN.RESPONSE_START,
+              PTN.RESPONSE_END,
+            ]);
+          });
+
+          it('should NOT clear the resources', () => {
+            assert.ok(
+              clearResourceTimingsSpy.notCalled,
+              'resources have been cleared'
+            );
+          });
+        });
+
+        describe('when making https requests', () => {
+          beforeEach(done => {
+            clearData();
+            // this won't generate a preflight span
+            const propagateTraceHeaderCorsUrls = [secureUrl];
+            prepareData(secureUrl, {
+              propagateTraceHeaderCorsUrls,
+            });
+            successfulGetRequest(secureUrl, done);
+          });
+
+          it('span should have correct events', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const events = span.events;
+
             testForCorrectEvents(events, [
               EventNames.METHOD_OPEN,
               EventNames.METHOD_SEND,
@@ -649,13 +623,15 @@ describe('xhr', () => {
             clearData();
             // this won't generate a preflight span
             const propagateTraceHeaderCorsUrls = [url];
-            prepareData(done, window.location.origin + '/xml-http-request.js', {
+            prepareData(window.location.origin + '/xml-http-request.js', {
               propagateTraceHeaderCorsUrls,
             });
+            successfulGetRequest(window.location.origin, done);
           });
 
           it('should set trace headers', () => {
             const span: api.Span = exportSpy.args[0][0][0];
+
             assert.strictEqual(
               requests[0].requestHeaders[X_B3_TRACE_ID],
               span.spanContext().traceId,
@@ -679,12 +655,13 @@ describe('xhr', () => {
             ' propagateTraceHeaderCorsUrls',
           () => {
             beforeEach(done => {
+              const ghUrl =
+                'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json';
               clearData();
-              prepareData(
-                done,
-                'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json',
-                { propagateTraceHeaderCorsUrls: /raw\.githubusercontent\.com/ }
-              );
+              prepareData(ghUrl, {
+                propagateTraceHeaderCorsUrls: /raw\.githubusercontent\.com/,
+              });
+              successfulGetRequest(ghUrl, done);
             });
             it('should set trace headers', () => {
               // span at exportSpy.args[0][0][0] is the preflight span
@@ -707,6 +684,7 @@ describe('xhr', () => {
             });
           }
         );
+
         describe(
           'AND origin does NOT match window.location And does NOT match' +
             ' with propagateTraceHeaderCorsUrls',
@@ -714,15 +692,16 @@ describe('xhr', () => {
             let spyDebug: sinon.SinonSpy;
             beforeEach(done => {
               clearData();
+              const ghUrl =
+                'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json';
               const diagLogger = new api.DiagConsoleLogger();
               spyDebug = sinon.spy();
               diagLogger.debug = spyDebug;
               api.diag.setLogger(diagLogger, api.DiagLogLevel.ALL);
-              prepareData(
-                done,
-                'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json'
-              );
+              prepareData(ghUrl);
+              successfulGetRequest(ghUrl, done);
             });
+
             it('should NOT set trace headers', () => {
               assert.strictEqual(
                 requests[0].requestHeaders[X_B3_TRACE_ID],
@@ -754,10 +733,11 @@ describe('xhr', () => {
           beforeEach(done => {
             clearData();
             const propagateTraceHeaderCorsUrls = url;
-            prepareData(done, url, {
+            prepareData(url, {
               propagateTraceHeaderCorsUrls,
               ignoreUrls: [propagateTraceHeaderCorsUrls],
             });
+            successfulGetRequest(url, done);
           });
 
           it('should NOT create any span', () => {
@@ -765,14 +745,29 @@ describe('xhr', () => {
           });
         });
 
+        describe('when relative url is ignored via domain regex', () => {
+          beforeEach(done => {
+            clearData();
+            prepareData('/xml-http-request.js', {
+              propagateTraceHeaderCorsUrls: [/.*/],
+              ignoreUrls: [/.*localhost.*/],
+            });
+            successfulGetRequest('/xml-http-request.js', done);
+          });
+
+          it('should NOT create any span', () => {
+            assert.ok(exportSpy.notCalled, "span shouldn't be exported");
+          });
+        });
         describe('when clearTimingResources is set', () => {
           beforeEach(done => {
             clearData();
             const propagateTraceHeaderCorsUrls = url;
-            prepareData(done, url, {
+            prepareData(url, {
               propagateTraceHeaderCorsUrls,
               clearTimingResources: true,
             });
+            successfulGetRequest(url, done);
           });
 
           it('should clear the resources', () => {
@@ -788,53 +783,14 @@ describe('xhr', () => {
           const secondUrl = 'http://localhost:8099/get';
 
           beforeEach(done => {
-            requests = [];
-            const reusableReq = new XMLHttpRequest();
-            api.context.with(
-              api.trace.setSpan(api.context.active(), rootSpan),
-              () => {
-                void getData(
-                  reusableReq,
-                  firstUrl,
-                  () => {
-                    fakeNow = 100;
-                  },
-                  testAsync
-                ).then(() => {
-                  fakeNow = 0;
-                  timer.tick(1000);
-                });
-              }
-            );
-
-            api.context.with(
-              api.trace.setSpan(api.context.active(), rootSpan),
-              () => {
-                void getData(
-                  reusableReq,
-                  secondUrl,
-                  () => {
-                    fakeNow = 100;
-                  },
-                  testAsync
-                ).then(() => {
-                  fakeNow = 0;
-                  timer.tick(1000);
-                  done();
-                });
-
-                assert.strictEqual(
-                  requests.length,
-                  1,
-                  'first request not called'
-                );
-
-                requests[0].respond(
-                  200,
-                  { 'Content-Type': 'application/json' },
-                  '{"foo":"bar"}'
-                );
-              }
+            clearData();
+            prepareData(firstUrl);
+            // Must create xhr after prepareData call because it creates the instrumentation
+            const xhr = new XMLHttpRequest();
+            successfulGetRequest(
+              firstUrl,
+              () => successfulGetRequest(secondUrl, done, xhr),
+              xhr
             );
           });
 
@@ -846,16 +802,16 @@ describe('xhr', () => {
             assert.strictEqual(
               attributes[keys[1]],
               secondUrl,
-              `attribute ${ATTR_HTTP_URL} is wrong`
+              'attribute url.full is wrong'
             );
           });
         });
 
-        describe('and applyCustomAttributesOnSpan hook is configured', () => {
+        describe('AND applyCustomAttributesOnSpan hook is configured', () => {
           beforeEach(done => {
             clearData();
             const propagateTraceHeaderCorsUrls = [url];
-            prepareData(done, url, {
+            prepareData(url, {
               propagateTraceHeaderCorsUrls,
               applyCustomAttributesOnSpan: function (
                 span: api.Span,
@@ -865,6 +821,7 @@ describe('xhr', () => {
                 span.setAttribute('xhr-custom-attribute', res.foo);
               },
             });
+            successfulGetRequest(url, done);
           });
 
           it('span should have custom attribute', () => {
@@ -878,7 +835,8 @@ describe('xhr', () => {
           beforeEach(done => {
             clearData();
             const propagateTraceHeaderCorsUrls = [window.location.origin];
-            prepareData(done, '/get', { propagateTraceHeaderCorsUrls });
+            prepareData('/get', { propagateTraceHeaderCorsUrls });
+            successfulGetRequest('/get', done);
           });
 
           it('should create correct span with events', () => {
@@ -908,128 +866,35 @@ describe('xhr', () => {
           it('should have an absolute url attribute', () => {
             const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const attributes = span.attributes;
-
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            assert.strictEqual(
+              attributes[ATTR_URL_FULL],
+              location.origin + '/get',
+              `attributes ${ATTR_URL_FULL} is wrong`
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                location.origin + '/get',
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-            }
-            if (semconvStability & SemconvStability.STABLE) {
-              assert.strictEqual(
-                attributes[ATTR_URL_FULL],
-                location.origin + '/get',
-                `attributes ${ATTR_URL_FULL} is wrong`
-              );
-            }
           });
         });
 
         describe('when network events are ignored', () => {
           beforeEach(done => {
             clearData();
-            prepareData(done, url, {
-              ignoreNetworkEvents: true,
-            });
+            prepareData(url, { ignoreNetworkEvents: true });
+            successfulGetRequest(url, done);
           });
           it('should NOT add network events', () => {
             const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
             const events = span.events;
             assert.strictEqual(events.length, 3, 'number of events is wrong');
           });
-
-          it('should still add the CONTENT_LENGTH attribute', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-            const attributes = span.attributes;
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
-            );
-
-            if (semconvStability & SemconvStability.OLD) {
-              const responseContentLength = attributes[
-                ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-              ] as number;
-              assert.strictEqual(
-                responseContentLength,
-                60,
-                `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
-              );
-            }
-          });
         });
       });
 
       describe('when GET request is NOT successful', () => {
-        let webTracerWithZoneProvider: WebTracerProvider;
-        let webTracerWithZone: api.Tracer;
-        let dummySpanExporter: DummySpanExporter;
-        let exportSpy: any;
-        let rootSpan: api.Span;
-        let spyEntries: any;
         const url =
           'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json';
-        let fakeNow = 0;
-
-        const prepareData = function (
-          config: XMLHttpRequestInstrumentationConfig = {}
-        ) {
-          const fakeXhr = sinon.useFakeXMLHttpRequest();
-          fakeXhr.onCreate = function (xhr: any) {
-            requests.push(xhr);
-          };
-
-          sinon.stub(performance, 'timeOrigin').value(0);
-          sinon.stub(performance, 'now').callsFake(() => fakeNow);
-
-          const resources: PerformanceResourceTiming[] = [];
-          resources.push(
-            createResource({
-              name: url,
-            })
-          );
-
-          spyEntries = sinon.stub(
-            performance as unknown as Performance,
-            'getEntriesByType'
-          );
-          spyEntries.withArgs('resource').returns(resources);
-
-          dummySpanExporter = new DummySpanExporter();
-          webTracerWithZoneProvider = new WebTracerProvider({
-            spanProcessors: [
-              new tracing.SimpleSpanProcessor(dummySpanExporter),
-            ],
-          });
-
-          registerInstrumentations({
-            instrumentations: [
-              new XMLHttpRequestInstrumentation({
-                semconvStabilityOptIn: test.semconvStabilityOptIn,
-                ...config,
-              }),
-            ],
-            tracerProvider: webTracerWithZoneProvider,
-          });
-
-          exportSpy = sinon.stub(dummySpanExporter, 'export');
-          webTracerWithZone = webTracerWithZoneProvider.getTracer('xhr-test');
-
-          rootSpan = webTracerWithZone.startSpan('root');
-        };
 
         beforeEach(() => {
-          prepareData();
-        });
-
-        afterEach(() => {
           clearData();
+          prepareData(url);
         });
 
         function timedOutRequest(done: any) {
@@ -1120,93 +985,26 @@ describe('xhr', () => {
           });
 
           it('span should have correct attributes and status', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
             const attributes = span.attributes;
             let expectedNumAttrs = 0;
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
+
+            expectedNumAttrs += 6;
+            assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
+            assert.strictEqual(attributes[ATTR_URL_FULL], url);
+            assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 400);
+            assert.strictEqual(
+              attributes[ATTR_SERVER_ADDRESS],
+              'raw.githubusercontent.com',
+              'server.address'
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              expectedNumAttrs += 8;
-
-              assert.strictEqual(
-                attributes[ATTR_HTTP_METHOD],
-                'GET',
-                `attributes ${ATTR_HTTP_METHOD} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                url,
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-              const requestContentLength = attributes[
-                ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-              ] as number;
-              assert.strictEqual(
-                requestContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
-              );
-              const responseContentLength = attributes[
-                ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-              ] as number;
-              assert.strictEqual(
-                responseContentLength,
-                30,
-                `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_STATUS_CODE],
-                400,
-                `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-              );
-              assert.strictEqual(
-                attributes[AttributeNames.HTTP_STATUS_TEXT],
-                'Bad Request',
-                `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_HOST],
-                'raw.githubusercontent.com',
-                `attributes ${ATTR_HTTP_HOST} is wrong`
-              );
-
-              const httpScheme = attributes[ATTR_HTTP_SCHEME];
-              assert.ok(
-                httpScheme === 'http' || httpScheme === 'https',
-                `attributes ${ATTR_HTTP_SCHEME} is wrong`
-              );
-              assert.notStrictEqual(
-                attributes[ATTR_HTTP_USER_AGENT],
-                '',
-                `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-              );
-            }
-
-            if (semconvStability & SemconvStability.STABLE) {
-              assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
-
-              expectedNumAttrs += 6;
-              assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
-              assert.strictEqual(attributes[ATTR_URL_FULL], url);
-              assert.strictEqual(
-                attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-                400
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_ADDRESS],
-                'raw.githubusercontent.com',
-                'server.address'
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_PORT],
-                443,
-                'server.port'
-              );
-              assert.strictEqual(attributes[ATTR_ERROR_TYPE], '400');
-            }
+            assert.strictEqual(
+              attributes[ATTR_SERVER_PORT],
+              443,
+              'server.port'
+            );
+            assert.strictEqual(attributes[ATTR_ERROR_TYPE], '400');
 
             assert.strictEqual(
               Object.keys(attributes).length,
@@ -1216,7 +1014,7 @@ describe('xhr', () => {
           });
 
           it('span should have correct events', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
             const events = span.events;
 
             testForCorrectEvents(events, [
@@ -1247,90 +1045,26 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
+
+            expectedNumAttrs += 5;
+            assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
+            assert.strictEqual(attributes[ATTR_URL_FULL], url);
+            assert.strictEqual(
+              attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
+              undefined
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              expectedNumAttrs += 7;
-
-              assert.strictEqual(
-                attributes[ATTR_HTTP_METHOD],
-                'GET',
-                `attributes ${ATTR_HTTP_METHOD} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                url,
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_STATUS_CODE],
-                0,
-                `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-              );
-              assert.strictEqual(
-                attributes[AttributeNames.HTTP_STATUS_TEXT],
-                '',
-                `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_HOST],
-                'raw.githubusercontent.com',
-                `attributes ${ATTR_HTTP_HOST} is wrong`
-              );
-
-              const httpScheme = attributes[ATTR_HTTP_SCHEME];
-              assert.ok(
-                httpScheme === 'http' || httpScheme === 'https',
-                `attributes ${ATTR_HTTP_SCHEME} is wrong`
-              );
-              assert.notStrictEqual(
-                attributes[ATTR_HTTP_USER_AGENT],
-                '',
-                `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-              );
-              const requestContentLength = attributes[
-                ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-              ] as number;
-              assert.strictEqual(
-                requestContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
-              );
-              const responseContentLength = attributes[
-                ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-              ] as number;
-              assert.strictEqual(
-                responseContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
-              );
-            }
-
-            if (semconvStability & SemconvStability.STABLE) {
-              assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
-
-              expectedNumAttrs += 5;
-              assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
-              assert.strictEqual(attributes[ATTR_URL_FULL], url);
-              assert.strictEqual(
-                attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-                undefined
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_ADDRESS],
-                'raw.githubusercontent.com',
-                'server.address'
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_PORT],
-                443,
-                'server.port'
-              );
-              assert.strictEqual(attributes[ATTR_ERROR_TYPE], 'error');
-            }
+            assert.strictEqual(
+              attributes[ATTR_SERVER_ADDRESS],
+              'raw.githubusercontent.com',
+              'server.address'
+            );
+            assert.strictEqual(
+              attributes[ATTR_SERVER_PORT],
+              443,
+              'server.port'
+            );
+            assert.strictEqual(attributes[ATTR_ERROR_TYPE], 'error');
 
             assert.strictEqual(
               Object.keys(attributes).length,
@@ -1368,88 +1102,25 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            assert.strictEqual(span.status.code, api.SpanStatusCode.UNSET);
+
+            expectedNumAttrs += 4;
+            assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
+            assert.strictEqual(attributes[ATTR_URL_FULL], url);
+            assert.strictEqual(
+              attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
+              undefined
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              expectedNumAttrs += 7;
-              assert.strictEqual(
-                attributes[ATTR_HTTP_METHOD],
-                'GET',
-                `attributes ${ATTR_HTTP_METHOD} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                url,
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_STATUS_CODE],
-                0,
-                `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-              );
-              assert.strictEqual(
-                attributes[AttributeNames.HTTP_STATUS_TEXT],
-                '',
-                `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_HOST],
-                'raw.githubusercontent.com',
-                `attributes ${ATTR_HTTP_HOST} is wrong`
-              );
-
-              const httpScheme = attributes[ATTR_HTTP_SCHEME];
-              assert.ok(
-                httpScheme === 'http' || httpScheme === 'https',
-                `attributes ${ATTR_HTTP_SCHEME} is wrong`
-              );
-              assert.notStrictEqual(
-                attributes[ATTR_HTTP_USER_AGENT],
-                '',
-                `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-              );
-              const requestContentLength = attributes[
-                ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-              ] as number;
-              assert.strictEqual(
-                requestContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
-              );
-              const responseContentLength = attributes[
-                ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-              ] as number;
-              assert.strictEqual(
-                responseContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
-              );
-            }
-
-            if (semconvStability & SemconvStability.STABLE) {
-              assert.strictEqual(span.status.code, api.SpanStatusCode.UNSET);
-
-              expectedNumAttrs += 4;
-              assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
-              assert.strictEqual(attributes[ATTR_URL_FULL], url);
-              assert.strictEqual(
-                attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-                undefined
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_ADDRESS],
-                'raw.githubusercontent.com',
-                'server.address'
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_PORT],
-                443,
-                'server.port'
-              );
-            }
+            assert.strictEqual(
+              attributes[ATTR_SERVER_ADDRESS],
+              'raw.githubusercontent.com',
+              'server.address'
+            );
+            assert.strictEqual(
+              attributes[ATTR_SERVER_PORT],
+              443,
+              'server.port'
+            );
 
             assert.strictEqual(
               Object.keys(attributes).length,
@@ -1487,89 +1158,26 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
+
+            expectedNumAttrs += 5;
+            assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
+            assert.strictEqual(attributes[ATTR_URL_FULL], url);
+            assert.strictEqual(
+              attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
+              undefined
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              expectedNumAttrs += 7;
-              assert.strictEqual(
-                attributes[ATTR_HTTP_METHOD],
-                'GET',
-                `attributes ${ATTR_HTTP_METHOD} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                url,
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_STATUS_CODE],
-                0,
-                `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-              );
-              assert.strictEqual(
-                attributes[AttributeNames.HTTP_STATUS_TEXT],
-                '',
-                `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_HOST],
-                'raw.githubusercontent.com',
-                `attributes ${ATTR_HTTP_HOST} is wrong`
-              );
-
-              const httpScheme = attributes[ATTR_HTTP_SCHEME];
-              assert.ok(
-                httpScheme === 'http' || httpScheme === 'https',
-                `attributes ${ATTR_HTTP_SCHEME} is wrong`
-              );
-              assert.notStrictEqual(
-                attributes[ATTR_HTTP_USER_AGENT],
-                '',
-                `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-              );
-              const requestContentLength = attributes[
-                ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-              ] as number;
-              assert.strictEqual(
-                requestContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
-              );
-              const responseContentLength = attributes[
-                ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-              ] as number;
-              assert.strictEqual(
-                responseContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
-              );
-            }
-
-            if (semconvStability & SemconvStability.STABLE) {
-              assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
-
-              expectedNumAttrs += 5;
-              assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'GET');
-              assert.strictEqual(attributes[ATTR_URL_FULL], url);
-              assert.strictEqual(
-                attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-                undefined
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_ADDRESS],
-                'raw.githubusercontent.com',
-                'server.address'
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_PORT],
-                443,
-                'server.port'
-              );
-              assert.strictEqual(attributes[ATTR_ERROR_TYPE], 'timeout');
-            }
+            assert.strictEqual(
+              attributes[ATTR_SERVER_ADDRESS],
+              'raw.githubusercontent.com',
+              'server.address'
+            );
+            assert.strictEqual(
+              attributes[ATTR_SERVER_PORT],
+              443,
+              'server.port'
+            );
+            assert.strictEqual(attributes[ATTR_ERROR_TYPE], 'timeout');
 
             assert.strictEqual(
               Object.keys(attributes).length,
@@ -1595,7 +1203,7 @@ describe('xhr', () => {
           describe('AND request loads and receives an error code', () => {
             beforeEach(done => {
               clearData();
-              prepareData({
+              prepareData(url, {
                 applyCustomAttributesOnSpan: function (span, xhr) {
                   span.setAttribute('xhr-custom-error-code', xhr.status);
                 },
@@ -1604,7 +1212,7 @@ describe('xhr', () => {
             });
 
             it('span should have custom attribute', () => {
-              const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+              const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
               const attributes = span.attributes;
               assert.ok(attributes['xhr-custom-error-code'] === 400);
             });
@@ -1613,7 +1221,7 @@ describe('xhr', () => {
           describe('AND request encounters a network error', () => {
             beforeEach(done => {
               clearData();
-              prepareData({
+              prepareData(url, {
                 applyCustomAttributesOnSpan: function (span, xhr) {
                   span.setAttribute('xhr-custom-error-code', xhr.status);
                 },
@@ -1638,7 +1246,7 @@ describe('xhr', () => {
 
             beforeEach(done => {
               clearData();
-              prepareData({
+              prepareData(url, {
                 applyCustomAttributesOnSpan: function (span, xhr) {
                   span.setAttribute('xhr-custom-error-code', xhr.status);
                 },
@@ -1663,7 +1271,7 @@ describe('xhr', () => {
 
             beforeEach(done => {
               clearData();
-              prepareData({
+              prepareData(url, {
                 applyCustomAttributesOnSpan: function (span, xhr) {
                   span.setAttribute('xhr-custom-error-code', xhr.status);
                 },
@@ -1681,85 +1289,20 @@ describe('xhr', () => {
       });
 
       describe('when POST request is successful', () => {
-        let webTracerWithZone: api.Tracer;
-        let webTracerProviderWithZone: WebTracerProvider;
-        let dummySpanExporter: DummySpanExporter;
-        let exportSpy: any;
-        let clearResourceTimingsSpy: any;
-        let rootSpan: api.Span;
-        let spyEntries: any;
         const url = 'http://localhost:8090/xml-http-request.js';
         const secureUrl = 'https://localhost:8090/xml-http-request.js';
-        let fakeNow = 0;
-        let xmlHttpRequestInstrumentation: XMLHttpRequestInstrumentation;
 
-        clearData = () => {
-          sinon.restore();
-          timer = sinon.useFakeTimers();
-          requests = [];
-        };
-
-        const prepareData = (
+        function successfulPostRequest(
+          url: string,
           done: any,
-          fileUrl: string,
-          config?: XMLHttpRequestInstrumentationConfig
-        ) => {
-          const fakeXhr = sinon.useFakeXMLHttpRequest();
-          fakeXhr.onCreate = function (xhr: any) {
-            requests.push(xhr);
-          };
-
-          sinon.stub(performance, 'timeOrigin').value(0);
-          sinon.stub(performance, 'now').callsFake(() => fakeNow);
-
-          const resources: PerformanceResourceTiming[] = [];
-          resources.push(
-            createResource({
-              name: fileUrl,
-            }),
-            createMainResource({
-              name: fileUrl,
-            })
-          );
-
-          spyEntries = sinon.stub(
-            performance as unknown as Performance,
-            'getEntriesByType'
-          );
-          spyEntries.withArgs('resource').returns(resources);
-
-          sinon
-            .stub(window, 'PerformanceObserver')
-            .value(createFakePerformanceObs(fileUrl));
-
-          xmlHttpRequestInstrumentation = new XMLHttpRequestInstrumentation({
-            semconvStabilityOptIn: test.semconvStabilityOptIn,
-            ...config,
-          });
-          dummySpanExporter = new DummySpanExporter();
-          exportSpy = sinon.stub(dummySpanExporter, 'export');
-          webTracerProviderWithZone = new WebTracerProvider({
-            spanProcessors: [
-              new tracing.SimpleSpanProcessor(dummySpanExporter),
-            ],
-          });
-          registerInstrumentations({
-            instrumentations: [xmlHttpRequestInstrumentation],
-            tracerProvider: webTracerProviderWithZone,
-          });
-          webTracerWithZone = webTracerProviderWithZone.getTracer('xhr-test');
-          clearResourceTimingsSpy = sinon.stub(
-            performance as unknown as Performance,
-            'clearResourceTimings'
-          );
-
-          rootSpan = webTracerWithZone.startSpan('root');
+          xhr = new XMLHttpRequest()
+        ) {
           api.context.with(
             api.trace.setSpan(api.context.active(), rootSpan),
             () => {
               void postData(
-                new XMLHttpRequest(),
-                fileUrl,
+                xhr,
+                url,
                 '{"embedded":"data"}',
                 () => {
                   fakeNow = 100;
@@ -1770,133 +1313,69 @@ describe('xhr', () => {
                 timer.tick(1000);
                 done();
               });
-              assert.strictEqual(requests.length, 1, 'request not called');
+              assert.ok(requests.length >= 1, 'request not called');
 
-              requests[0].respond(
+              requests[requests.length - 1].respond(
                 200,
                 { 'Content-Type': 'application/json' },
                 '{"foo":"bar"}'
               );
             }
           );
-        };
+        }
 
-        beforeEach(done => {
-          clearData();
-          const propagateTraceHeaderCorsUrls = [window.location.origin];
-          prepareData(done, url, {
-            propagateTraceHeaderCorsUrls,
-            measureRequestSize: true,
+        describe('AND instrumentation is disabled', () => {
+          beforeEach(function (done) {
+            clearData();
+            prepareData(url);
+            xmlHttpRequestInstrumentation!.disable();
+            successfulPostRequest(url, done);
+          });
+
+          it('should not export spans', () => {
+            assert.equal(exportSpy.args.length, 0, 'no spans are exported');
           });
         });
 
-        afterEach(() => {
-          clearData();
-        });
+        describe('when making http requests', () => {
+          beforeEach(done => {
+            clearData();
+            const propagateTraceHeaderCorsUrls = [window.location.origin];
+            prepareData(url, {
+              propagateTraceHeaderCorsUrls,
+              measureRequestSize: true,
+            });
+            successfulPostRequest(url, done);
+          });
 
-        it('should patch to wrap XML HTTP Requests when enabled', () => {
-          const xhttp = new XMLHttpRequest();
-          assert.ok(isWrapped(xhttp.send));
-          xmlHttpRequestInstrumentation.enable();
-          assert.ok(isWrapped(xhttp.send));
-        });
-
-        it('should unpatch to unwrap XML HTTP Requests when disabled', () => {
-          const xhttp = new XMLHttpRequest();
-          assert.ok(isWrapped(xhttp.send));
-          xmlHttpRequestInstrumentation.disable();
-          assert.ok(!isWrapped(xhttp.send));
-        });
-
-        it('should create a span with correct root span', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-          assert.strictEqual(
-            span.parentSpanContext?.spanId,
-            rootSpan.spanContext().spanId,
-            'parent span is not root span'
-          );
-        });
-
-        it('span should have correct name', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-          assert.strictEqual(span.name, 'POST', 'span has wrong name');
-        });
-
-        it('span should have correct kind', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-          assert.strictEqual(
-            span.kind,
-            api.SpanKind.CLIENT,
-            'span has wrong kind'
-          );
-        });
-
-        it('span should have correct attributes and status', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-          const attributes = span.attributes;
-
-          let expectedNumAttrs = 0;
-          const semconvStability = semconvStabilityFromStr(
-            'http',
-            test.semconvStabilityOptIn
-          );
-
-          if (semconvStability & SemconvStability.OLD) {
-            expectedNumAttrs += 9;
+          it('should create a span with correct root span', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
             assert.strictEqual(
-              attributes[ATTR_HTTP_METHOD],
-              'POST',
-              `attributes ${ATTR_HTTP_METHOD} is wrong`
+              span.parentSpanContext?.spanId,
+              rootSpan.spanContext().spanId,
+              'parent span is not root span'
             );
-            assert.strictEqual(
-              attributes[ATTR_HTTP_URL],
-              url,
-              `attributes ${ATTR_HTTP_URL} is wrong`
-            );
-            const requestContentLength = attributes[
-              ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-            ] as number;
-            assert.strictEqual(
-              requestContentLength,
-              19,
-              `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} !== 19`
-            );
-            const responseContentLength = attributes[
-              ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-            ] as number;
-            assert.strictEqual(
-              responseContentLength,
-              60,
-              `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
-            );
-            assert.strictEqual(
-              attributes[ATTR_HTTP_STATUS_CODE],
-              200,
-              `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-            );
-            assert.strictEqual(
-              attributes[AttributeNames.HTTP_STATUS_TEXT],
-              'OK',
-              `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-            );
-            assert.strictEqual(
-              attributes[ATTR_HTTP_HOST],
-              parseUrl(url).host,
-              `attributes ${ATTR_HTTP_HOST} is wrong`
-            );
-            const httpScheme = attributes[ATTR_HTTP_SCHEME];
-            assert.ok(
-              httpScheme === 'http' || httpScheme === 'https',
-              `attributes ${ATTR_HTTP_SCHEME} is wrong`
-            );
-            assert.notStrictEqual(
-              attributes[ATTR_HTTP_USER_AGENT],
-              '',
-              `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-            );
-          }
+          });
 
-          if (semconvStability & SemconvStability.STABLE) {
+          it('span should have correct name', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            assert.strictEqual(span.name, 'POST', 'span has wrong name');
+          });
+
+          it('span should have correct kind', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            assert.strictEqual(
+              span.kind,
+              api.SpanKind.CLIENT,
+              'span has wrong kind'
+            );
+          });
+
+          it('span should have correct attributes and status', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const attributes = span.attributes;
+
+            let expectedNumAttrs = 0;
             assert.strictEqual(span.status.code, api.SpanStatusCode.UNSET);
 
             expectedNumAttrs += 6;
@@ -1914,92 +1393,94 @@ describe('xhr', () => {
               'server.port'
             );
             assert.strictEqual(attributes[ATTR_HTTP_REQUEST_BODY_SIZE], 19);
-          }
 
-          assert.strictEqual(
-            Object.keys(attributes).length,
-            expectedNumAttrs,
-            'number of attributes is wrong'
-          );
+            assert.strictEqual(
+              Object.keys(attributes).length,
+              expectedNumAttrs,
+              'number of attributes is wrong'
+            );
+          });
+
+          it('span should have correct events', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const events = span.events;
+            testForCorrectEvents(events, [
+              EventNames.METHOD_OPEN,
+              EventNames.METHOD_SEND,
+              PTN.FETCH_START,
+              PTN.DOMAIN_LOOKUP_START,
+              PTN.DOMAIN_LOOKUP_END,
+              PTN.CONNECT_START,
+              PTN.CONNECT_END,
+              PTN.REQUEST_START,
+              PTN.RESPONSE_START,
+              PTN.RESPONSE_END,
+              EventNames.EVENT_LOAD,
+            ]);
+            assert.strictEqual(events.length, 11, 'number of events is wrong');
+          });
+
+          it('should create a span for preflight request', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            const parentSpan: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            assert.strictEqual(
+              span.parentSpanContext?.spanId,
+              parentSpan.spanContext().spanId,
+              'parent span is not root span'
+            );
+          });
+
+          it('preflight request span should have correct name', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            assert.strictEqual(
+              span.name,
+              'CORS Preflight',
+              'preflight request span has wrong name'
+            );
+          });
+
+          it('preflight request span should have correct kind', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            assert.strictEqual(
+              span.kind,
+              api.SpanKind.INTERNAL,
+              'span has wrong kind'
+            );
+          });
+
+          it('preflight request span should have correct events', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            const events = span.events;
+            assert.strictEqual(events.length, 8, 'number of events is wrong');
+            testForCorrectEvents(events, [
+              PTN.FETCH_START,
+              PTN.DOMAIN_LOOKUP_START,
+              PTN.DOMAIN_LOOKUP_END,
+              PTN.CONNECT_START,
+              PTN.CONNECT_END,
+              PTN.REQUEST_START,
+              PTN.RESPONSE_START,
+              PTN.RESPONSE_END,
+            ]);
+          });
+
+          it('should NOT clear the resources', () => {
+            assert.ok(
+              clearResourceTimingsSpy.notCalled,
+              'resources have been cleared'
+            );
+          });
         });
 
-        it('span should have correct events', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-          const events = span.events;
-          testForCorrectEvents(events, [
-            EventNames.METHOD_OPEN,
-            EventNames.METHOD_SEND,
-            PTN.FETCH_START,
-            PTN.DOMAIN_LOOKUP_START,
-            PTN.DOMAIN_LOOKUP_END,
-            PTN.CONNECT_START,
-            PTN.CONNECT_END,
-            PTN.REQUEST_START,
-            PTN.RESPONSE_START,
-            PTN.RESPONSE_END,
-            EventNames.EVENT_LOAD,
-          ]);
-          assert.strictEqual(events.length, 11, 'number of events is wrong');
-        });
-
-        it('should create a span for preflight request', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-          const parentSpan: tracing.ReadableSpan = exportSpy.args[1][0][0];
-          assert.strictEqual(
-            span.parentSpanContext?.spanId,
-            parentSpan.spanContext().spanId,
-            'parent span is not root span'
-          );
-        });
-
-        it('preflight request span should have correct name', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-          assert.strictEqual(
-            span.name,
-            'CORS Preflight',
-            'preflight request span has wrong name'
-          );
-        });
-
-        it('preflight request span should have correct kind', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-          assert.strictEqual(
-            span.kind,
-            api.SpanKind.INTERNAL,
-            'span has wrong kind'
-          );
-        });
-
-        it('preflight request span should have correct events', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-          const events = span.events;
-          assert.strictEqual(events.length, 8, 'number of events is wrong');
-          testForCorrectEvents(events, [
-            PTN.FETCH_START,
-            PTN.DOMAIN_LOOKUP_START,
-            PTN.DOMAIN_LOOKUP_END,
-            PTN.CONNECT_START,
-            PTN.CONNECT_END,
-            PTN.REQUEST_START,
-            PTN.RESPONSE_START,
-            PTN.RESPONSE_END,
-          ]);
-        });
-
-        it('should NOT clear the resources', () => {
-          assert.ok(
-            clearResourceTimingsSpy.notCalled,
-            'resources have been cleared'
-          );
-        });
         describe('When making https requests', () => {
           beforeEach(done => {
             clearData();
             // this won't generate a preflight span
             const propagateTraceHeaderCorsUrls = [secureUrl];
-            prepareData(done, secureUrl, {
+            prepareData(secureUrl, {
               propagateTraceHeaderCorsUrls,
             });
+            successfulPostRequest(secureUrl, done);
           });
 
           it('span should have correct events', () => {
@@ -2045,9 +1526,13 @@ describe('xhr', () => {
             clearData();
             // this won't generate a preflight span
             const propagateTraceHeaderCorsUrls = [url];
-            prepareData(done, window.location.origin + '/xml-http-request.js', {
+            prepareData(window.location.origin + '/xml-http-request.js', {
               propagateTraceHeaderCorsUrls,
             });
+            successfulPostRequest(
+              window.location.origin + '/xml-http-request.js',
+              done
+            );
           });
 
           it('should set trace headers', () => {
@@ -2075,12 +1560,13 @@ describe('xhr', () => {
             ' propagateTraceHeaderCorsUrls',
           () => {
             beforeEach(done => {
+              const ghUrl =
+                'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json';
               clearData();
-              prepareData(
-                done,
-                'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json',
-                { propagateTraceHeaderCorsUrls: /raw\.githubusercontent\.com/ }
-              );
+              prepareData(ghUrl, {
+                propagateTraceHeaderCorsUrls: /raw\.githubusercontent\.com/,
+              });
+              successfulPostRequest(ghUrl, done);
             });
             it('should set trace headers', () => {
               // span at exportSpy.args[0][0][0] is the preflight span
@@ -2103,6 +1589,7 @@ describe('xhr', () => {
             });
           }
         );
+
         describe(
           'AND origin does NOT match window.location And does NOT match' +
             ' with propagateTraceHeaderCorsUrls',
@@ -2110,15 +1597,16 @@ describe('xhr', () => {
             let spyDebug: sinon.SinonSpy;
             beforeEach(done => {
               clearData();
+              const ghUrl =
+                'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json';
               const diagLogger = new api.DiagConsoleLogger();
               spyDebug = sinon.spy();
               diagLogger.debug = spyDebug;
               api.diag.setLogger(diagLogger, api.DiagLogLevel.ALL);
-              prepareData(
-                done,
-                'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json'
-              );
+              prepareData(ghUrl);
+              successfulPostRequest(ghUrl, done);
             });
+
             it('should NOT set trace headers', () => {
               assert.strictEqual(
                 requests[0].requestHeaders[X_B3_TRACE_ID],
@@ -2150,10 +1638,11 @@ describe('xhr', () => {
           beforeEach(done => {
             clearData();
             const propagateTraceHeaderCorsUrls = url;
-            prepareData(done, url, {
+            prepareData(url, {
               propagateTraceHeaderCorsUrls,
               ignoreUrls: [propagateTraceHeaderCorsUrls],
             });
+            successfulPostRequest(url, done);
           });
 
           it('should NOT create any span', () => {
@@ -2165,10 +1654,11 @@ describe('xhr', () => {
           beforeEach(done => {
             clearData();
             const propagateTraceHeaderCorsUrls = url;
-            prepareData(done, url, {
+            prepareData(url, {
               propagateTraceHeaderCorsUrls,
               clearTimingResources: true,
             });
+            successfulPostRequest(url, done);
           });
 
           it('should clear the resources', () => {
@@ -2184,59 +1674,22 @@ describe('xhr', () => {
           const secondUrl = 'http://localhost:8099/get';
 
           beforeEach(done => {
-            requests = [];
-            const reusableReq = new XMLHttpRequest();
-            api.context.with(
-              api.trace.setSpan(api.context.active(), rootSpan),
-              () => {
-                void postData(
-                  reusableReq,
-                  firstUrl,
-                  '{"embedded":"data"}',
-                  () => {
-                    fakeNow = 100;
-                  },
-                  testAsync
-                ).then(() => {
-                  fakeNow = 0;
-                  timer.tick(1000);
-                });
-              }
-            );
-
-            api.context.with(
-              api.trace.setSpan(api.context.active(), rootSpan),
-              () => {
-                void postData(
-                  reusableReq,
-                  secondUrl,
-                  '{"embedded":"data"}',
-                  () => {
-                    fakeNow = 100;
-                  },
-                  testAsync
-                ).then(() => {
-                  fakeNow = 0;
-                  timer.tick(1000);
-                  done();
-                });
-
-                assert.strictEqual(
-                  requests.length,
-                  1,
-                  'first request not called'
-                );
-
-                requests[0].respond(
-                  200,
-                  { 'Content-Type': 'application/json' },
-                  '{"foo":"bar"}'
-                );
-              }
+            clearData();
+            const propagateTraceHeaderCorsUrls = [firstUrl, secondUrl];
+            prepareData(firstUrl, {
+              propagateTraceHeaderCorsUrls,
+            });
+            // Must create xhr after prepareData call because it creates the instrumentation
+            const xhr = new XMLHttpRequest();
+            successfulPostRequest(
+              firstUrl,
+              () => successfulPostRequest(secondUrl, done),
+              xhr
             );
           });
 
           it('should clear previous span information', () => {
+            // span at exportSpy.args[0][0][0] is the preflight span
             const span: tracing.ReadableSpan = exportSpy.args[2][0][0];
             const attributes = span.attributes;
             const keys = Object.keys(attributes);
@@ -2244,7 +1697,7 @@ describe('xhr', () => {
             assert.strictEqual(
               attributes[keys[1]],
               secondUrl,
-              `attribute ${ATTR_HTTP_URL} is wrong`
+              'attribute url.full is wrong'
             );
           });
         });
@@ -2253,7 +1706,7 @@ describe('xhr', () => {
           beforeEach(done => {
             clearData();
             const propagateTraceHeaderCorsUrls = [url];
-            prepareData(done, url, {
+            prepareData(url, {
               propagateTraceHeaderCorsUrls,
               applyCustomAttributesOnSpan: function (
                 span: api.Span,
@@ -2263,9 +1716,11 @@ describe('xhr', () => {
                 span.setAttribute('xhr-custom-attribute', res.foo);
               },
             });
+            successfulPostRequest(url, done);
           });
 
           it('span should have custom attribute', () => {
+            // span at exportSpy.args[0][0][0] is the preflight span
             const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
             const attributes = span.attributes;
             assert.ok(attributes['xhr-custom-attribute'] === 'bar');
@@ -2276,7 +1731,8 @@ describe('xhr', () => {
           beforeEach(done => {
             clearData();
             const propagateTraceHeaderCorsUrls = [window.location.origin];
-            prepareData(done, '/get', { propagateTraceHeaderCorsUrls });
+            prepareData('/get', { propagateTraceHeaderCorsUrls });
+            successfulPostRequest('/get', done);
           });
 
           it('should create correct span with events', () => {
@@ -2306,95 +1762,22 @@ describe('xhr', () => {
           it('should have an absolute url attribute', () => {
             const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const attributes = span.attributes;
-
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            assert.strictEqual(
+              attributes[ATTR_URL_FULL],
+              location.origin + '/get',
+              `attributes ${ATTR_URL_FULL} is wrong`
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                location.origin + '/get',
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-            }
-            if (semconvStability & SemconvStability.STABLE) {
-              assert.strictEqual(
-                attributes[ATTR_URL_FULL],
-                location.origin + '/get',
-                `attributes ${ATTR_URL_FULL} is wrong`
-              );
-            }
           });
         });
       });
 
       describe('when POST request is NOT successful', () => {
-        let webTracerWithZoneProvider: WebTracerProvider;
-        let webTracerWithZone: api.Tracer;
-        let dummySpanExporter: DummySpanExporter;
-        let exportSpy: any;
-        let rootSpan: api.Span;
-        let spyEntries: any;
         const url =
           'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json';
-        let fakeNow = 0;
-
-        const prepareData = function (
-          config: XMLHttpRequestInstrumentationConfig = {}
-        ) {
-          const fakeXhr = sinon.useFakeXMLHttpRequest();
-          fakeXhr.onCreate = function (xhr: any) {
-            requests.push(xhr);
-          };
-
-          sinon.stub(performance, 'timeOrigin').value(0);
-          sinon.stub(performance, 'now').callsFake(() => fakeNow);
-
-          const resources: PerformanceResourceTiming[] = [];
-          resources.push(
-            createResource({
-              name: url,
-            })
-          );
-
-          spyEntries = sinon.stub(
-            performance as unknown as Performance,
-            'getEntriesByType'
-          );
-          spyEntries.withArgs('resource').returns(resources);
-
-          dummySpanExporter = new DummySpanExporter();
-          webTracerWithZoneProvider = new WebTracerProvider({
-            spanProcessors: [
-              new tracing.SimpleSpanProcessor(dummySpanExporter),
-            ],
-          });
-
-          registerInstrumentations({
-            instrumentations: [
-              new XMLHttpRequestInstrumentation({
-                semconvStabilityOptIn: test.semconvStabilityOptIn,
-                ...config,
-              }),
-            ],
-            tracerProvider: webTracerWithZoneProvider,
-          });
-
-          exportSpy = sinon.stub(dummySpanExporter, 'export');
-
-          webTracerWithZone = webTracerWithZoneProvider.getTracer('xhr-test');
-
-          rootSpan = webTracerWithZone.startSpan('root');
-        };
 
         beforeEach(() => {
-          prepareData();
-        });
-
-        afterEach(() => {
           clearData();
+          prepareData(url);
         });
 
         function timedOutRequest(done: any) {
@@ -2493,94 +1876,29 @@ describe('xhr', () => {
           beforeEach(done => {
             erroredRequest(done);
           });
+
           it('span should have correct attributes', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
+
+            expectedNumAttrs += 6;
+            assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'POST');
+            assert.strictEqual(attributes[ATTR_URL_FULL], url);
+            assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 400);
+            assert.strictEqual(
+              attributes[ATTR_SERVER_ADDRESS],
+              'raw.githubusercontent.com',
+              'server.address'
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              expectedNumAttrs += 8;
-
-              assert.strictEqual(
-                attributes[ATTR_HTTP_METHOD],
-                'POST',
-                `attributes ${ATTR_HTTP_METHOD} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                url,
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-              const requestContentLength = attributes[
-                ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-              ] as number;
-              assert.strictEqual(
-                requestContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
-              );
-              const responseContentLength = attributes[
-                ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-              ] as number;
-              assert.strictEqual(
-                responseContentLength,
-                30,
-                `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_STATUS_CODE],
-                400,
-                `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-              );
-              assert.strictEqual(
-                attributes[AttributeNames.HTTP_STATUS_TEXT],
-                'Bad Request',
-                `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_HOST],
-                'raw.githubusercontent.com',
-                `attributes ${ATTR_HTTP_HOST} is wrong`
-              );
-              const httpScheme = attributes[ATTR_HTTP_SCHEME];
-              assert.ok(
-                httpScheme === 'http' || httpScheme === 'https',
-                `attributes ${ATTR_HTTP_SCHEME} is wrong`
-              );
-              assert.notStrictEqual(
-                attributes[ATTR_HTTP_USER_AGENT],
-                '',
-                `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-              );
-            }
-
-            if (semconvStability & SemconvStability.STABLE) {
-              assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
-
-              expectedNumAttrs += 6;
-              assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'POST');
-              assert.strictEqual(attributes[ATTR_URL_FULL], url);
-              assert.strictEqual(
-                attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-                400
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_ADDRESS],
-                'raw.githubusercontent.com',
-                'server.address'
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_PORT],
-                443,
-                'server.port'
-              );
-              assert.strictEqual(attributes[ATTR_ERROR_TYPE], '400');
-            }
+            assert.strictEqual(
+              attributes[ATTR_SERVER_PORT],
+              443,
+              'server.port'
+            );
+            assert.strictEqual(attributes[ATTR_ERROR_TYPE], '400');
 
             assert.strictEqual(
               Object.keys(attributes).length,
@@ -2590,7 +1908,7 @@ describe('xhr', () => {
           });
 
           it('span should have correct events', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
             const events = span.events;
 
             testForCorrectEvents(events, [
@@ -2612,6 +1930,7 @@ describe('xhr', () => {
         });
 
         describe('when request encounters a network error', () => {
+          // this won't generate a preflight span
           beforeEach(done => {
             networkErrorRequest(done);
           });
@@ -2621,88 +1940,26 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
+
+            expectedNumAttrs += 5;
+            assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'POST');
+            assert.strictEqual(attributes[ATTR_URL_FULL], url);
+            assert.strictEqual(
+              attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
+              undefined
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              expectedNumAttrs += 7;
-              assert.strictEqual(
-                attributes[ATTR_HTTP_METHOD],
-                'POST',
-                `attributes ${ATTR_HTTP_METHOD} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                url,
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_STATUS_CODE],
-                0,
-                `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-              );
-              assert.strictEqual(
-                attributes[AttributeNames.HTTP_STATUS_TEXT],
-                '',
-                `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_HOST],
-                'raw.githubusercontent.com',
-                `attributes ${ATTR_HTTP_HOST} is wrong`
-              );
-              const httpScheme = attributes[ATTR_HTTP_SCHEME];
-              assert.ok(
-                httpScheme === 'http' || httpScheme === 'https',
-                `attributes ${ATTR_HTTP_SCHEME} is wrong`
-              );
-              assert.notStrictEqual(
-                attributes[ATTR_HTTP_USER_AGENT],
-                '',
-                `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-              );
-              const requestContentLength = attributes[
-                ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-              ] as number;
-              assert.strictEqual(
-                requestContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
-              );
-              const responseContentLength = attributes[
-                ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-              ] as number;
-              assert.strictEqual(
-                responseContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
-              );
-            }
-
-            if (semconvStability & SemconvStability.STABLE) {
-              assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
-
-              expectedNumAttrs += 5;
-              assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'POST');
-              assert.strictEqual(attributes[ATTR_URL_FULL], url);
-              assert.strictEqual(
-                attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-                undefined
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_ADDRESS],
-                'raw.githubusercontent.com',
-                'server.address'
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_PORT],
-                443,
-                'server.port'
-              );
-              assert.strictEqual(attributes[ATTR_ERROR_TYPE], 'error');
-            }
+            assert.strictEqual(
+              attributes[ATTR_SERVER_ADDRESS],
+              'raw.githubusercontent.com',
+              'server.address'
+            );
+            assert.strictEqual(
+              attributes[ATTR_SERVER_PORT],
+              443,
+              'server.port'
+            );
+            assert.strictEqual(attributes[ATTR_ERROR_TYPE], 'error');
 
             assert.strictEqual(
               Object.keys(attributes).length,
@@ -2731,6 +1988,7 @@ describe('xhr', () => {
             }
           });
 
+          // this won't generate a preflight span
           beforeEach(done => {
             abortedRequest(done);
           });
@@ -2740,88 +1998,25 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            assert.strictEqual(span.status.code, api.SpanStatusCode.UNSET);
+
+            expectedNumAttrs += 4;
+            assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'POST');
+            assert.strictEqual(attributes[ATTR_URL_FULL], url);
+            assert.strictEqual(
+              attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
+              undefined
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              expectedNumAttrs += 7;
-
-              assert.strictEqual(
-                attributes[ATTR_HTTP_METHOD],
-                'POST',
-                `attributes ${ATTR_HTTP_METHOD} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                url,
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_STATUS_CODE],
-                0,
-                `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-              );
-              assert.strictEqual(
-                attributes[AttributeNames.HTTP_STATUS_TEXT],
-                '',
-                `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_HOST],
-                'raw.githubusercontent.com',
-                `attributes ${ATTR_HTTP_HOST} is wrong`
-              );
-              const httpScheme = attributes[ATTR_HTTP_SCHEME];
-              assert.ok(
-                httpScheme === 'http' || httpScheme === 'https',
-                `attributes ${ATTR_HTTP_SCHEME} is wrong`
-              );
-              assert.notStrictEqual(
-                attributes[ATTR_HTTP_USER_AGENT],
-                '',
-                `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-              );
-              const requestContentLength = attributes[
-                ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-              ] as number;
-              assert.strictEqual(
-                requestContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
-              );
-              const responseContentLength = attributes[
-                ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-              ] as number;
-              assert.strictEqual(
-                responseContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
-              );
-            }
-
-            if (semconvStability & SemconvStability.STABLE) {
-              assert.strictEqual(span.status.code, api.SpanStatusCode.UNSET);
-
-              expectedNumAttrs += 4;
-              assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'POST');
-              assert.strictEqual(attributes[ATTR_URL_FULL], url);
-              assert.strictEqual(
-                attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-                undefined
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_ADDRESS],
-                'raw.githubusercontent.com',
-                'server.address'
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_PORT],
-                443,
-                'server.port'
-              );
-            }
+            assert.strictEqual(
+              attributes[ATTR_SERVER_ADDRESS],
+              'raw.githubusercontent.com',
+              'server.address'
+            );
+            assert.strictEqual(
+              attributes[ATTR_SERVER_PORT],
+              443,
+              'server.port'
+            );
 
             assert.strictEqual(
               Object.keys(attributes).length,
@@ -2850,6 +2045,7 @@ describe('xhr', () => {
             }
           });
 
+          // this won't generate a preflight span
           beforeEach(done => {
             timedOutRequest(done);
           });
@@ -2859,88 +2055,26 @@ describe('xhr', () => {
             const attributes = span.attributes;
 
             let expectedNumAttrs = 0;
-            const semconvStability = semconvStabilityFromStr(
-              'http',
-              test.semconvStabilityOptIn
+            assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
+
+            expectedNumAttrs += 5;
+            assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'POST');
+            assert.strictEqual(attributes[ATTR_URL_FULL], url);
+            assert.strictEqual(
+              attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
+              undefined
             );
-
-            if (semconvStability & SemconvStability.OLD) {
-              expectedNumAttrs += 7;
-              assert.strictEqual(
-                attributes[ATTR_HTTP_METHOD],
-                'POST',
-                `attributes ${ATTR_HTTP_METHOD} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_URL],
-                url,
-                `attributes ${ATTR_HTTP_URL} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_STATUS_CODE],
-                0,
-                `attributes ${ATTR_HTTP_STATUS_CODE} is wrong`
-              );
-              assert.strictEqual(
-                attributes[AttributeNames.HTTP_STATUS_TEXT],
-                '',
-                `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
-              );
-              assert.strictEqual(
-                attributes[ATTR_HTTP_HOST],
-                'raw.githubusercontent.com',
-                `attributes ${ATTR_HTTP_HOST} is wrong`
-              );
-              const httpScheme = attributes[ATTR_HTTP_SCHEME];
-              assert.ok(
-                httpScheme === 'http' || httpScheme === 'https',
-                `attributes ${ATTR_HTTP_SCHEME} is wrong`
-              );
-              assert.notStrictEqual(
-                attributes[ATTR_HTTP_USER_AGENT],
-                '',
-                `attributes ${ATTR_HTTP_USER_AGENT} is not defined`
-              );
-              const requestContentLength = attributes[
-                ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-              ] as number;
-              assert.strictEqual(
-                requestContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
-              );
-              const responseContentLength = attributes[
-                ATTR_HTTP_RESPONSE_CONTENT_LENGTH
-              ] as number;
-              assert.strictEqual(
-                responseContentLength,
-                undefined,
-                `attributes ${ATTR_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
-              );
-            }
-
-            if (semconvStability & SemconvStability.STABLE) {
-              assert.strictEqual(span.status.code, api.SpanStatusCode.ERROR);
-
-              expectedNumAttrs += 5;
-              assert.strictEqual(attributes[ATTR_HTTP_REQUEST_METHOD], 'POST');
-              assert.strictEqual(attributes[ATTR_URL_FULL], url);
-              assert.strictEqual(
-                attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
-                undefined
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_ADDRESS],
-                'raw.githubusercontent.com',
-                'server.address'
-              );
-              assert.strictEqual(
-                attributes[ATTR_SERVER_PORT],
-                443,
-                'server.port'
-              );
-              assert.strictEqual(attributes[ATTR_ERROR_TYPE], 'timeout');
-            }
+            assert.strictEqual(
+              attributes[ATTR_SERVER_ADDRESS],
+              'raw.githubusercontent.com',
+              'server.address'
+            );
+            assert.strictEqual(
+              attributes[ATTR_SERVER_PORT],
+              443,
+              'server.port'
+            );
+            assert.strictEqual(attributes[ATTR_ERROR_TYPE], 'timeout');
 
             assert.strictEqual(
               Object.keys(attributes).length,
@@ -2966,7 +2100,7 @@ describe('xhr', () => {
           describe('AND request loads and receives an error code', () => {
             beforeEach(done => {
               clearData();
-              prepareData({
+              prepareData(url, {
                 applyCustomAttributesOnSpan: function (span, xhr) {
                   span.setAttribute('xhr-custom-error-code', xhr.status);
                 },
@@ -2975,7 +2109,7 @@ describe('xhr', () => {
             });
 
             it('span should have custom attribute', () => {
-              const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+              const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
               const attributes = span.attributes;
               assert.ok(attributes['xhr-custom-error-code'] === 400);
             });
@@ -2984,7 +2118,7 @@ describe('xhr', () => {
           describe('AND request encounters a network error', () => {
             beforeEach(done => {
               clearData();
-              prepareData({
+              prepareData(url, {
                 applyCustomAttributesOnSpan: function (span, xhr) {
                   span.setAttribute('xhr-custom-error-code', xhr.status);
                 },
@@ -3009,7 +2143,7 @@ describe('xhr', () => {
 
             beforeEach(done => {
               clearData();
-              prepareData({
+              prepareData(url, {
                 applyCustomAttributesOnSpan: function (span, xhr) {
                   span.setAttribute('xhr-custom-error-code', xhr.status);
                 },
@@ -3034,7 +2168,7 @@ describe('xhr', () => {
 
             beforeEach(done => {
               clearData();
-              prepareData({
+              prepareData(url, {
                 applyCustomAttributesOnSpan: function (span, xhr) {
                   span.setAttribute('xhr-custom-error-code', xhr.status);
                 },

@@ -5,23 +5,327 @@ All notable changes to this project will be documented in this file.
 
 For API changes, see the [API CHANGELOG](api/CHANGELOG.md).
 For experimental package changes, see the [experimental CHANGELOG](experimental/CHANGELOG.md).
-For semantic convention package changes, see the [semconv CHANGELOG](packages/semantic-conventions/CHANGELOG.md).
+For semantic convention package changes, see the [semconv CHANGELOG](semantic-conventions/CHANGELOG.md).
 For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2.x.md).
+For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-guide.md).
 
 ## Unreleased
 
 ### :boom: Breaking Changes
 
+* chore(sdk-trace-base, sdk-trace-web)!: remove the `@opentelemetry/sdk-trace-base` and `@opentelemetry/sdk-trace-web` packages [#7117](https://github.com/open-telemetry/opentelemetry-js/issues/7117)
+  * The sdk-trace-base, sdk-trace-web, and sdk-trace-node packages have been replaced by the `@opentelemetry/sdk-trace` package.
+    See the [3.x migration guide](doc/3.x/migration-guide.md) for full migration instructions.
+
 ### :rocket: Features
 
 ### :bug: Bug Fixes
 
-* fix(sdk-metrics): Remove invalid default value for `startTime` param to ExponentialHistogramAccumulation. This only impacted the closurescript compiler. [#5763](https://github.com/open-telemetry/opentelemetry-js/pull/5763) @trentm
+* fix(sdk-metrics): guard against a missing or empty name to MeterProvider#getMeter [#7105](https://github.com/open-telemetry/opentelemetry-js/pull/7105) @trentm
 
 ### :books: Documentation
 
 ### :house: Internal
 
+* chore: declare the Node.js and npm version floors that the tsdown build requires via `devEngines` [#7093](https://github.com/open-telemetry/opentelemetry-js/pull/7093) @overbalance
+  * The migration to tsdown raised the toolchain a contributor needs to build this repo, but nothing declared it. Contributors now build on Node.js `^24.11.1 || >=26.0.0` with npm `>=11.10.0`; both are advisory and warn rather than fail. The published packages are unaffected and still support Node.js `>=22.15.0`, which the test matrix continues to cover.
+* test(bundler-tests): typecheck packages under legacy module resolution [#7127](https://github.com/open-telemetry/opentelemetry-js/pull/7127) @overbalance
+
+## 3.0.0-development.0
+
+### :boom: Breaking Changes
+
+* chore(sdk-trace-node)!: remove the `@opentelemetry/sdk-trace-node` package [#7054](https://github.com/open-telemetry/opentelemetry-js/issues/7054)
+  * The sdk-trace-node package has been replaced by the `@opentelemetry/sdk-trace` package.
+    See the [3.x migration guide](doc/3.x/migration-guide.md) for full migration instructions.
+* chore(shim-opentracing)!: remove the `@opentelemetry/shim-opentracing` package
+  * In the [OpenTelemetry Specification v1.58.0](https://github.com/open-telemetry/opentelemetry-specification/releases/tag/v1.56.0) the [OpenTracing compatibility requirements were deprecated](https://github.com/open-telemetry/opentelemetry-specification/pull/4938). The JavaScript OpenTracing shim package will not receive any more releases after the current [2.11.0 release](https://www.npmjs.com/package/@opentelemetry/shim-opentracing/v/2.11.0) ([source code for last release](https://github.com/open-telemetry/opentelemetry-js/tree/v2.11.0/packages/opentelemetry-shim-opentracing/)).
+* chore(context-async-hooks)!: remove the unused class `AsyncHooksContextManager` [#7078](https://github.com/open-telemetry/opentelemetry-js/pull/7078)
+* feat!: migrate package builds from `tsc` to `tsdown`, emitting dual CJS/ESM output from a single `dist/` directory and declaring an `exports` map on every package [#6293](https://github.com/open-telemetry/opentelemetry-js/pull/6293) @overbalance
+  * Importing a package by its name is unaffected in both CommonJS and ESM, as is every subpath listed in its `exports` map.
+  * **Deep imports into the build output no longer resolve.** An `exports` map is an allowlist that Node.js and bundlers enforce, so specifiers such as `@opentelemetry/core/build/src/...` or `@opentelemetry/core/build/esm/...` now fail with `ERR_PACKAGE_PATH_NOT_EXPORTED`. Rewriting them to the new file layout does not help — unlisted subpaths are rejected whether or not the file exists.
+  * The emitted files moved out of `build/src` (CJS), `build/esm` and `build/esnext` (ESM) into `dist/`, using `.cjs`/`.mjs` extensions with matching `.d.cts`/`.d.mts` declarations.
+  * `<package>/package.json` is no longer importable for the same reason. Read a package's version from your own dependency metadata, or use `SDK_INFO` from `@opentelemetry/core` for the SDK version.
+  * The non-standard `esnext` entry point has been removed; tools that preferred it fall back to `module` (ESM) or `main` (CJS).
+  * Packages that ship separate Node.js and browser implementations export them under explicit subpaths, for example `@opentelemetry/core/platform`. If you depend on something that is only reachable through a deep import, please open an issue so it can be considered for the public API.
+* feat(core)!: remove deprecated `getTimeOrigin`, `otperformance`, `_globalThis`, and `unrefTimer` from `@opentelemetry/core` [#7053](https://github.com/open-telemetry/opentelemetry-js/pull/7053)
+  * `getTimeOrigin()` — use `performance.timeOrigin` directly.
+  * `otperformance` — use the global `performance` object directly.
+  * `_globalThis` — use `globalThis` directly.
+  * `unrefTimer(timer)` — call `timer.unref()` directly in your own code.
+* feat(sdk-trace)!: remove deprecated `TracerProviderOptions.forceFlushTimeoutMillis` [#7057](https://github.com/open-telemetry/opentelemetry-js/pull/7057)
+  * Pass `timeoutMillis` to `provider.forceFlush({ timeoutMillis })` instead. The default timeout is 30000ms.
+* feat(propagator-jaeger)!: remove `@opentelemetry/propagator-jaeger` package [#7077](https://github.com/open-telemetry/opentelemetry-js/pull/7077)
+  * The Jaeger propagator is deprecated by the OpenTelemetry specification in favour of `W3CTraceContextPropagator`. Use `W3CTraceContextPropagator` from `@opentelemetry/core` instead.
+  * See the [3.x migration guide](doc/3.x/migration-guide.md) for full instructions.
+* feat(exporter-jaeger)!: remove `@opentelemetry/exporter-jaeger` package
+  * The Jaeger exporter has been removed. Jaeger has deprecated its custom Thrift collection protocols in favor of standard OpenTelemetry Protocol (OTLP). Use standard OTLP exporters instead.
+  * See the [3.x migration guide](doc/3.x/migration-guide.md) for full instructions.
+* chore!: bump minimum node.js version to >=22.15.0
+
+### :rocket: Features
+
+* feat(sdk-metrics): stabilize `maxExportBatchSize` option in `PeriodicExportingMetricReader`
+
+### :books: Documentation
+
+* chore(examples): drop examples/{otlp-exporter-node,grpc-js} [#7096](https://github.com/open-telemetry/opentelemetry-js/pull/7096)
+
+### :house: Internal
+
+* chore: remove `@opentelemetry/sdk-trace-web` package from examples and bundler tests [#7095](https://github.com/open-telemetry/opentelemetry-js/pull/7095)
+* chore(sdk-trace): add `StackContextManager` in `@opentelemetry/sdk-trace` package [#7086](https://github.com/open-telemetry/opentelemetry-js/pull/7086)
+* feat(ci): support releasing from maintenance branches [#6767](https://github.com/open-telemetry/opentelemetry-js/issues/6767) @pichlermarc
+  * The API documentation site is only redeployed for releases whose commit is reachable from `main`, so a maintenance release no longer overwrites it.
+* chore: don't close stale issues [#x](https://github.com/open-telemetry/opentelemetry-js/issues/x) @maryliag
+* chore: mark the workspace root package as private [#7097](https://github.com/open-telemetry/opentelemetry-js/pull/7097) @overbalance
+
+## 2.11.0
+
+### :rocket: Features
+
+* feat(context-async-hooks): implement `attach()` on `AsyncLocalStorageContextManager` [#6845](https://github.com/open-telemetry/opentelemetry-js/pull/6845) @pichlermarc
+  * On Node.js 25.9+, delegates to `AsyncLocalStorage.withScope()` returning a native `RunScope`. On older Node.js, falls back to `enterWith()` with a manual disposable wrapper.
+* feat(sdk-trace): allow configuring the force flush timeout per call #6929 @LarryHu0217
+
+### :bug: Bug Fixes
+
+* fix(sdk-trace-base): avoid a Webpack self-reference error in CommonJS output [#6981](https://github.com/open-telemetry/opentelemetry-js/issues/6981) @sansynx
+* fix(sdk-metrics): ignore `Infinity` in exponential histograms [#7015](https://github.com/open-telemetry/opentelemetry-js/pull/7015) @mwear
+
+### :house: Internal
+
+* perf(sdk-metrics): reuse a single DataView for exponential histogram bit reads [#6998](https://github.com/open-telemetry/opentelemetry-js/pull/6998) @mwear
+* chore(ci): run documentation tests on a weekly schedule [#6920](https://github.com/open-telemetry/opentelemetry-js/pull/6920) @LarryHu0217
+* feat(ci): support pre-releases and major version bumps in the release workflow [#6768](https://github.com/open-telemetry/opentelemetry-js/issues/6768) @pichlermarc
+* chore(resources): Ensure that multiple uses of serviceInstanceIdDetector.detect() return the *same* value for `service.instance.id`
+
+## 2.10.0
+
+### :rocket: Features
+
+* feat(sdk-logs): implement log processor metrics [#6554](https://github.com/open-telemetry/opentelemetry-js/pull/6554) @anuraaga
+* feat(otlp-exporter): implement exporter metrics [#6480](https://github.com/open-telemetry/opentelemetry-js/pull/6480) @anuraaga
+* feat(propagator-jaeger):  *Notice*: The `@opentelemetry/propagator-jaeger` package will be removed in SDK 3.x, planned for approximately September 2026. @pichlermarc
+  * The Jaeger propagator has been deprecated by the OpenTelemetry specification in favor of `W3CTraceContextPropagator`. This package will be removed in a future release.
+
+### :bug: Bug Fixes
+
+* fix(sdk-trace): reject `SimpleSpanProcessor.forceFlush()` when a pending export fails [#6771](https://github.com/open-telemetry/opentelemetry-js/issues/6771) @LarryHu0217
+* fix(sdk-trace): include trace IDs at the ratio 1 upper bound in `TraceIdRatioBasedSampler` [#6890](https://github.com/open-telemetry/opentelemetry-js/pull/6890) @LarryHu0217
+
+### :house: Internal
+
+* chore: build on Node 26 in CI [#6887](https://github.com/open-telemetry/opentelemetry-js/pull/6887) @overbalance
+* chore: bump to typescript@5.2.2 @pichlermarc
+
+## 2.9.0
+
+### :boom: Breaking Changes
+
+* docs(shim-opentracing): *Notice*: The `@opentelemetry/shim-opentracing` package will be removed in SDK 3.x, planned for approximately September 2026.
+  * The [OpenCensus](https://opentelemetry.io/blog/2026/deprecating-opencensus-compatibility/) and [OpenTracing](https://opentelemetry.io/blog/2026/deprecating-opentracing-compatibility/) compatibility requirements in the OpenTelemetry specification have been deprecated.
+
+### :rocket: Features
+
+* feat(sdk-metrics): add maxExportBatchSize option to PeriodicExportingMetricReader [#6655](https://github.com/open-telemetry/opentelemetry-js/pull/6655) @psx95
+  * Optimized `PeriodicExportingMetricReader.forceFlush` to prevent redundant concurrent export cycles. Concurrent calls to forceFlush will now await any ongoing export and reuse a fresh export cycle if one is started concurrently by another caller. This ensures the latest metrics are always exported efficiently without triggering duplicate collection and export cycles.
+* feat(sdk-trace): implement span processor metrics [#6504](https://github.com/open-telemetry/opentelemetry-js/pull/6504) @anuraaga
+* feat(sdk-trace): add a new "sdk-trace" package to hold the Trace SDK, without environment variable configuration handling that belongs elsewhere [#6775](https://github.com/open-telemetry/opentelemetry-js/pull/6775) @trentm
+  * "sdk-trace" will eventually replace all of "sdk-trace-base", "sdk-trace-node", and "sdk-trace-web".
+  * The `BatchSpanProcessor` constructor call signature has changed in "sdk-trace".  For example, before `new BatchSpanProcessor(exporter, { maxQueueSize: 1000 })`, after `new BatchSpanProcessor({ exporter, maxQueueSize: 1000 })`. [#6817](https://github.com/open-telemetry/opentelemetry-js/pull/6817)
+  * The `SimpleSpanProcessor` constructor call signature has changed in "sdk-trace".  For example, before `new SimpleSpanProcessor(exporter)`, after `new SimpleSpanProcessor({ exporter, selfObsMeterProvider: ... })`. [#6504](https://github.com/open-telemetry/opentelemetry-js/pull/6504)
+* feat(sdk-trace): add AlwaysRecordSampler [#6188](https://github.com/open-telemetry/opentelemetry-js/pull/6188) @majanjua-amzn
+
+### :bug: Bug Fixes
+
+* fix(propagator-jaeger): do not throw on malformed percent-encoded `uber-trace-id` / `uberctx-*` headers during extract @pichlermarc
+
+### :house: Internal
+
+* perf(sdk-metrics): defer allocation of HrTime to accumulation creation [#6839](https://github.com/open-telemetry/opentelemetry-js/pull/6839) @legendecas
+* chore(\*): migrate use of sdk-trace-base and sdk-trace-node to sdk-trace [#6851](https://github.com/open-telemetry/opentelemetry-js/pull/6851) @trentm
+* perf(sdk-metrics): optionally capture active context for sync instruments [#6848](https://github.com/open-telemetry/opentelemetry-js/pull/6848) @legendecas
+
+## 2.8.0
+
+### :rocket: Features
+
+* feat(sdk-trace-base): pretty-print `SpanImpl`, `Tracer`, and `BasicTracerProvider` via `util.inspect` so they render through `diag` and `console.log` [#6690](https://github.com/open-telemetry/opentelemetry-js/pull/6690) @mcollina
+* feat(sdk-metrics): implement metric reader self-observability metrics [#6449](https://github.com/open-telemetry/opentelemetry-js/pull/6449) @anuraaga
+* feat(core): add `hrTimeToSeconds` [#6449](https://github.com/open-telemetry/opentelemetry-js/pull/6449) @anuraaga
+
+### :bug: Bug Fixes
+
+* fix(core): limit processing of incoming "baggage" header to 8192 bytes @pichlermarc
+
+## 2.7.1
+
+### :bug: Bug Fixes
+
+* fix(core, api): defer trace state validation. Deprecate trace state implementation in api [#6459](https://github.com/open-telemetry/opentelemetry-js/pull/6459) @david-luna
+  * **important:** this bug fix may be breaking for certain uses of `TraceState`
+    * `set` now returns the same `TraceState` instance if key/value are invalid or makes the while trace state invalid.
+    * `unset` now returns the same `TraceState` instance if key is not present.
+    * best-effort parsing of invalid `TraceState`s has changed: when multiple keys with the same name are present, the most recent one will win.
+
+### :house: Internal
+
+* perf(sdk-trace-base): optimize TraceIdRatioBasedSampler performance [#6284](https://github.com/open-telemetry/opentelemetry-js/pull/6284) @AbhiPrasad
+* test: test Node.js 26 in CI [#6671](https://github.com/open-telemetry/opentelemetry-js/pull/6671) @cjihrig
+
+## 2.7.0
+
+### :rocket: Features
+
+* feat(sdk-logs): implement log creation metrics [#6433](https://github.com/open-telemetry/opentelemetry-js/pull/6433) @anuraaga
+* feat(sdk-metrics): add the cardinalitySelector argument to PeriodicExportingMetricReaders
+  [#6460](https://github.com/open-telemetry/opentelemetry-js/pull/6460) @starzlocker
+* feat(opentelemetry-core): add extra checks on internal merge function for safety [#6587](https://github.com/open-telemetry/opentelemetry-js/pull/6587) @maryliag
+
+### :bug: Bug Fixes
+
+* fix(opentelemetry-resources): do not discard OTEL_RESOURCE_ATTRIBUTES when it contains empty kv pairs
+
+### :house: Internal
+
+* test(exporter-zipkin): fix broken browser test assertions and add missing coverage [#6566](https://github.com/open-telemetry/opentelemetry-js/pull/6566) @overbalance
+* fix(sdk-metrics): repair ExponentialHistogram tests [#6565](https://github.com/open-telemetry/opentelemetry-js/pull/6565) @overbalance
+* perf(sdk-metrics): reduce loop overhead in sdk hot paths [#6593](https://github.com/open-telemetry/opentelemetry-js/pull/6593) @mcollina
+
+## 2.6.1
+
+### :bug: Bug Fixes
+
+* fix(opentelemetry-instrumentation): improve `_warnOnPreloadedModules` function not to show warning logs when the module is not marked as loaded [#6095](https://github.com/open-telemetry/opentelemetry-js/pull/6095) @rlj1202
+* fix(sdk-trace-base): derive internal `SpanOptions` from API type to prevent drift [#6478](https://github.com/open-telemetry/opentelemetry-js/pull/6478) @overbalance
+* fix(span): enforce `attributePerEventCountLimit`, `attributePerLinkCountLimit`, `linkCountLimit`, and `attributeValueLengthLimit` for event/link attributes [#6479](https://github.com/open-telemetry/opentelemetry-js/pull/6479) @overbalance
+* fix(context-zone): guard `onCancelTask` against terminal-state tasks to prevent infinite loop with rc-align (Ant Design) in React 16 dev mode [#6512](https://github.com/open-telemetry/opentelemetry-js/pull/6512) @Renegade2345
+
+### :house: Internal
+
+* chore: enforce `import type` for type-only imports via ESLint [#6467](https://github.com/open-telemetry/opentelemetry-js/pull/6467) @overbalance
+* perf(sdk-trace-base): avoid Object.entries in Span.setAttributes [#6514](https://github.com/open-telemetry/opentelemetry-js/pull/6514) @daniellockyer
+* perf(sdk-trace-base): optimize `Span.{addEvent,addLink}` performance [#6516](https://github.com/open-telemetry/opentelemetry-js/pull/6516) @daniellockyer
+* test(bundlers): broaden bundler test coverage and assert known protobuf dynamic-require failures [#6482](https://github.com/open-telemetry/opentelemetry-js/pull/6482) @overbalance
+
+## 2.6.0
+
+### :boom: Breaking Changes
+
+* fix(resources): update `OTEL_RESOURCE_ATTRIBUTES` parsing to match spec changes (open-telemetry/opentelemetry-specification#4856) [#6261](https://github.com/open-telemetry/opentelemetry-js/pull/6261) @jacksonweber
+  * **Important:** This fix is included in the "breaking changes" section because it can be breaking for some edge case usage of `OTEL_RESOURCE_ATTRIBUTES`:
+    * `export OTEL_RESOURCE_ATTRIBUTES=foo=bar,spam` will now be fully ignored, because the `spam` entry is invalid (missing `=`). Per spec, any parsing error results in ignoring the entire environment variable.
+    * `export OTEL_RESOURCE_ATTRIBUTES='wat=" spaces  "'` will now result in `{"wat": "\" spaces  \""}` *with* the double-quotes included in the value. Before this change the implementation included brittle double-quoting to allow leading and trailing whitespace in the value. To support leading or trailing whitespace now, you must percent-encode the whitespace. Internal whitespace still works without encoding, e.g. `export OTEL_RESOURCE_ATTRIBUTES='green=eggs and ham'`.
+
+### :rocket: Features
+
+* feat(sdk-trace): implement span start/end metrics  [#6213](https://github.com/open-telemetry/opentelemetry-js/pull/6213) @anuraaga
+
+### :bug: Bug Fixes
+
+* fix(sdk-trace-base): enforce StatusCode precedence rules in `setStatus` per specification [#6461](https://github.com/open-telemetry/opentelemetry-js/pull/6461) @newbee1939
+* fix(sdk-trace-web): propagate `optimised` flag in `getElementXPath` recursion [#6335](https://github.com/open-telemetry/opentelemetry-js/pull/6335) @akkupratap323
+
+## 2.5.1
+
+### :bug: Bug Fixes
+
+* fix(opentelemetry-sdk-node): the custom value from env variable for service.instance.id should take priority over random uuid as backup [#6345](https://github.com/open-telemetry/opentelemetry-js/pull/6345) @maryliag
+
+### :house: Internal
+
+* perf(sdk-trace-base): use Uint8Array for browser RandomIdGenerator [#6209](https://github.com/open-telemetry/opentelemetry-js/pull/6209) @overbalance
+* test(sdk-trace-base): remove obsolete TypeScript and platform workarounds [#6327](https://github.com/open-telemetry/opentelemetry-js/pull/6327) @overbalance
+* fix(example-web): update Docker config and deps for collector [#6342](https://github.com/open-telemetry/opentelemetry-js/pull/6342) @overbalance
+* perf(sdk-trace-base): optimize setAttribute performance [#6283](https://github.com/open-telemetry/opentelemetry-js/pull/6283) @AbhiPrasad
+* refactor(core): remove unnecessary closure in \_export() [#6360](https://github.com/open-telemetry/opentelemetry-js/pull/6360) @cjihrig
+
+## 2.5.0
+
+### :bug: Bug Fixes
+
+* refactor(resources): use runtime check for default service name [#6257](https://github.com/open-telemetry/opentelemetry-js/pull/6257) @overbalance
+
+### :house: Internal
+
+* chore(context-async-hooks): Deprecate `AsyncHooksContextManager` [#6298](https://github.com/open-telemetry/opentelemetry-js/pull/6298) @trentm
+* chore: fix CODEOWNERS rule ordering [#6297](https://github.com/open-telemetry/opentelemetry-js/pull/6297) @overbalance
+* fix(github): fix CODEOWNERS browser package paths [#6303](https://github.com/open-telemetry/opentelemetry-js/pull/6303) @overbalance
+* fix(build): update @types/node to 18.19.130, remove DOM types from base tsconfig [#6280](https://github.com/open-telemetry/opentelemetry-js/pull/6280) @overbalance
+
+## 2.4.0
+
+### :bug: Bug Fixes
+
+* fix(sdk-metrics): improve PeriodicExportingMetricReader() constructor input validation [#6286](https://github.com/open-telemetry/opentelemetry-js/pull/6286) @cjihrig
+* fix(core): Avoid using DOM types for otperformance export [#6278](https://github.com/open-telemetry/opentelemetry-js/pull/6278) @samchungy
+
+### :house: Internal
+
+* chore(browser): fix CODEOWNERS paths for browser-related packages
+* refactor(sdk-metrics): remove Promise.allSettled() ponyfill [#6277](https://github.com/open-telemetry/opentelemetry-js/pull/6277) @cjihrig
+
+## 2.3.0
+
+### :rocket: Features
+
+* feat(sdk-trace-base): implement on ending in span processor [#6024](https://github.com/open-telemetry/opentelemetry-js/pull/6024) @majanjua-amzn
+  * note: this feature is experimental and subject to change
+
+### :bug: Bug Fixes
+
+* fix(sdk-metrics): remove setImmediate usage in ConsoleMetricExporter [#6199](https://github.com/open-telemetry/opentelemetry-js/pull/6199) @overbalance
+
+### :house: Internal
+
+* refactor(bundler-tests): split webpack tests into webpack-4 and webpack-5 [#6098](https://github.com/open-telemetry/opentelemetry-js/pull/6098) @overbalance
+* refactor(sdk-metrics): remove isNotNullish() utility function [#6151](https://github.com/open-telemetry/opentelemetry-js/pull/6151) @cjihrig
+* refactor(sdk-metrics): remove FlatMap() utility function [#6154](https://github.com/open-telemetry/opentelemetry-js/pull/6154) @cjihrig
+* refactor(sdk-metrics): simplify AllowList and DenyList processors [#6159](https://github.com/open-telemetry/opentelemetry-js/pull/6159) @cjihrig
+* chore: disallow constructor parameter property syntax [#6187](https://github.com/open-telemetry/opentelemetry-js/pull/6187) @legendecas
+* refactor(sdk-metrics): use test() instead of match() in isValidName() [#6205](https://github.com/open-telemetry/opentelemetry-js/pull/6205) @cjihrig
+* refactor(core): remove TimeOriginLegacy Safari <15 fallback [#6235](https://github.com/open-telemetry/opentelemetry-js/pull/6235) @overbalance
+* chore: remove backcompat workspace [#6238](https://github.com/open-telemetry/opentelemetry-js/pull/6238) @overbalance
+* refactor(core,resources): consolidate platform-specific code [#6208](https://github.com/open-telemetry/opentelemetry-js/pull/6208) @overbalance
+* test(api): remove unnecessary conditional [#6241](https://github.com/open-telemetry/opentelemetry-js/pull/6241) @cjihrig
+* refactor(api): remove several reverse() calls [#6252](https://github.com/open-telemetry/opentelemetry-js/pull/6252) @cjihrig
+* refactor(api): remove unnecessary map() call [#6251](https://github.com/open-telemetry/opentelemetry-js/pull/6251) @cjihrig
+* chore: add zed to gitignore [#6258](https://github.com/open-telemetry/opentelemetry-js/pull/6258) @overbalance
+* chore(deps): update nx to 22.3.0 [#6233](https://github.com/open-telemetry/opentelemetry-js/pull/6233) @overbalance
+
+## 2.2.0
+
+### :bug: Bug Fixes
+
+* fix(core): avoid leaking Node.js types via `unrefTimer()` util [#5986](https://github.com/open-telemetry/opentelemetry-js/pull/5986) @pichlermarc
+* fix(core): avoid leaking Node.js types via otperformance [#5987](https://github.com/open-telemetry/opentelemetry-js/pull/5987) @pichlermarc
+  * **important:** this bug fix may be breaking for certain uses of `otperformance`
+    * `otperformance.now()` and `otperformance.timeOrigin` are not affected.
+    * the previously used type was incorrect and overly broad, leading to unexpected run-time behavior runtimes that are not Node.js.
+    * these problems are now caught on compile-time: if you have been using this API and this change is breaking to you, please consider using your target platform's `performance` implementation instead.
+
+### :house: Internal
+
+* test(shim-opentracing): add comparison thresholds in flaky assertions [#5974](https://github.com/open-telemetry/opentelemetry-js/pull/5974) @cjihrig
+* test(exporter-jaeger): clean up OTEL_EXPORTER_JAEGER_AGENT_PORT between tests [#6003](https://github.com/open-telemetry/opentelemetry-js/pull/6003) @cjihrig
+* test(sdk-trace-base): ensure environment variables are cleaned up between tests [#6011](https://github.com/open-telemetry/opentelemetry-js/pull/6011) @cjihrig
+* perf(opentelemetry-core): optimize attribute serialization [#5866](https://github.com/open-telemetry/opentelemetry-js/pull/5866) @43081j
+* test: test Node.js 25 in CI [#6019](https://github.com/open-telemetry/opentelemetry-js/pull/6019) @cjihrig
+
+## 2.1.0
+
+### :rocket: Features
+
+* feat(opentelemetry-resources): add schema url [#5070](https://github.com/open-telemetry/opentelemetry-js/pull/5753) @c-ehrlich
+
+### :bug: Bug Fixes
+
+* fix(sdk-metrics): Remove invalid default value for `startTime` param to ExponentialHistogramAccumulation. This only impacted the closurescript compiler. [#5763](https://github.com/open-telemetry/opentelemetry-js/pull/5763) @trentm
+
+### :house: Internal
+
+* refactor(context-zone-peer-dep): remove unnecessary helper methods and use meaningful zone names[#6452](https://github.com/open-telemetry/opentelemetry-js/pull/6452) @dyladan
 * chore: enable tsconfig isolatedModules [#5697](https://github.com/open-telemetry/opentelemetry-js/pull/5697) @legendecas
 
 ## 2.0.1
@@ -32,6 +336,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * fix(resource): do not trigger `Accessing resource attributes before async attributes settled` warning when detecting resources [#5546](https://github.com/open-telemetry/opentelemetry-js/pull/5546) @dyladan
   * verbose logging of detected resource removed
 * fix(resource): use dynamic import over require to improve ESM compliance [#5298](https://github.com/open-telemetry/opentelemetry-js/pull/5298) @xiaoxiangmoe
+* fix(core): `getNumberFromEnv` should return number | undefined [#5874](https://github.com/open-telemetry/opentelemetry-js/pull/5874) @shubham-vunet
 
 ### :books: Documentation
 
@@ -46,6 +351,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * refactor: replace assertRejects() with assert.rejects() [#5614](https://github.com/open-telemetry/opentelemetry-js/pull/5614) @cjihrig
 * refactor(core): migrate from deprecated semconv constants [#5575](https://github.com/open-telemetry/opentelemetry-js/pull/5575) @alumni55748
 * refactor(opentelemetry-core): simplify `parseKeyPairsIntoRecord()` [#5610](https://github.com/open-telemetry/opentelemetry-js/pull/5610) @cjihrig
+* refactor(opentelemetry-core): simplify `parsePairKeyValue()` [#5885](https://github.com/open-telemetry/opentelemetry-js/pull/5885) @sivakumarsc
 
 ## 2.0.0
 
@@ -116,7 +422,7 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
   * (user-facing): only a non-env-var based default is now used on `NodeTracerProvider#register()`.
     * propagators can now not be configured via `OTEL_PROPAGATORS` anymore, please pass the propagator to `NodeTracerProvider#register()` instead.
     * if not configured via code, `NodeTracerProvider#register()` will now fall back to the defaults (`tracecontext` and `baggage`)
-    * if autoconfiguration based on enviornment variables is needed, please use `NodeSDK` from `@opentelemetry/sdk-node`.
+    * if autoconfiguration based on environment variables is needed, please use `NodeSDK` from `@opentelemetry/sdk-node`.
 * feat(sdk-trace-web)!: drop ability to instantiate propagators beyond defaults [#5355](https://github.com/open-telemetry/opentelemetry-js/pull/5355) @pichlermarc
   * (user-facing): only a non-env-var based default is now used on `WebTracerProvider#register()`.
     * propagators can now not be configured via `window.OTEL_PROPAGATORS` anymore, please pass the propagator to `WebTracerProvider#register()` instead.
@@ -166,10 +472,10 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 * feat(core)!: drop `getEnv()`, `getEnvWithoutDefaults()` [#5481](https://github.com/open-telemetry/opentelemetry-js/pull/5481) @pichlermarc
   * (user-facing): `getEnv()` has been replaced by `getStringFromEnv()`, `getNumberFromEnv()`, `getBooleanFromEnv()`, `getStringListFromEnv()`
     * these new functions do not include defaults, please inline any defaults if necessary (example: `getStringFromEnv("OTEL_FOO") ?? "my-default"`)
-    * to find the previously used defaults, please see [here](https://github.com/open-telemetry/opentelemetry-js/blob/e9d3c71918635d490b6a9ac9f8259265b38394d0/packages/opentelemetry-core/src/utils/environment.ts#L154-L239)
+    * see [the previously used defaults here](https://github.com/open-telemetry/opentelemetry-js/blob/e9d3c71918635d490b6a9ac9f8259265b38394d0/packages/opentelemetry-core/src/utils/environment.ts#L154-L239)
   * (user-facing): `getEnvWithoutDefaults()` has been replaced by `getStringFromEnv()`, `getNumberFromEnv()`, `getBooleanFromEnv()`, `getStringListFromEnv()`
   * (user-facing): `DEFAULT_ENVIRONMENT` has been removed, please inline any defaults from now on
-    * to find the previously used defaults, please see [here](https://github.com/open-telemetry/opentelemetry-js/blob/e9d3c71918635d490b6a9ac9f8259265b38394d0/packages/opentelemetry-core/src/utils/environment.ts#L154-L239)
+    * see [the previously used defaults here](https://github.com/open-telemetry/opentelemetry-js/blob/e9d3c71918635d490b6a9ac9f8259265b38394d0/packages/opentelemetry-core/src/utils/environment.ts#L154-L239)
   * (user-facing): `ENVIRONMENT` has been removed without replacement
   * (user-facing): `RAW_ENVIRONMENT` has been removed without replacement
   * (user-facing): `parseEnvironment` has been removed without replacement
@@ -1960,7 +2266,7 @@ No changes
 * `opentelemetry-api`, `opentelemetry-node`, `opentelemetry-plugin-fetch`, `opentelemetry-tracing`
   * [#1612](https://github.com/open-telemetry/opentelemetry-js/pull/1612) chore: remove explicit parent option ([@dyladan](https://github.com/dyladan))
 * `opentelemetry-exporter-zipkin`, `opentelemetry-plugin-http`, `opentelemetry-tracing`
-  * [#1632](https://github.com/open-telemetry/opentelemetry-js/pull/1632) feat: span processor onstart recieves context ([@dyladan](https://github.com/dyladan))
+  * [#1632](https://github.com/open-telemetry/opentelemetry-js/pull/1632) feat: span processor onstart receives context ([@dyladan](https://github.com/dyladan))
 * `opentelemetry-api`, `opentelemetry-core`, `opentelemetry-tracing`
   * [#1631](https://github.com/open-telemetry/opentelemetry-js/pull/1631) chore: sampler gets a full context ([@dyladan](https://github.com/dyladan))
 * `opentelemetry-api`, `opentelemetry-core`, `opentelemetry-plugin-http`, `opentelemetry-plugin-https`, `opentelemetry-propagator-b3`

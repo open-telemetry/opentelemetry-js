@@ -1,0 +1,55 @@
+{
+  "analytics": false,
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runners/default",
+      "options": {
+        "cacheableOperations": [
+          "compile",
+          "lint",
+          "version"
+        ]
+      }
+    }
+  },
+  "targetDefaults": {
+    "compile": {
+      "dependsOn": [
+        "version",
+        "^compile"
+      ],
+      "inputs": [
+        "{projectRoot}/src/**/*.ts",
+        "{projectRoot}/test/**/*.ts",
+        "{projectRoot}/**/*.proto",
+        "{projectRoot}/package.json",
+        "{projectRoot}/tsdown.config.ts",
+        "{projectRoot}/tsdown.*.config.ts",
+        "{workspaceRoot}/tsdown.config.ts",
+        "{workspaceRoot}/package-lock.json"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ]
+    },
+    "watch": {
+      "dependsOn": [
+        "compile"
+      ]
+    },
+    "lint": {
+      "inputs": [
+        "{projectRoot}/src/**/*.ts",
+        "{projectRoot}/test/**/*.ts"
+      ]
+    },
+    "version:update": {
+      "inputs": [
+        "{projectRoot}/package.json"
+      ],
+      "outputs": [
+        "{projectRoot}/src/version.ts"
+      ]
+    }
+  }
+}

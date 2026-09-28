@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as child_process from 'child_process';
@@ -26,15 +15,11 @@ const rValues =
 const entryPoints = [
   {
     name: 'cjs',
-    entry: './build/src/index.js',
+    entry: './dist/index.cjs',
   },
   {
     name: 'esm',
-    entry: './build/esm/index.js',
-  },
-  {
-    name: 'esnext',
-    entry: './build/esnext/index.js',
+    entry: './dist/index.mjs',
   },
 ];
 
@@ -55,7 +40,7 @@ describe('size-limits', function () {
       brotli?: ISizeResult | null;
     };
   } = {};
-  const debugPath = path.resolve('./build/size-limit');
+  const debugPath = path.resolve('./.tmp/size-limit');
 
   this.timeout(60000);
 
@@ -103,7 +88,7 @@ describe('size-limits', function () {
 
       assert.ok(true, 'running');
       const value = child_process.execSync(
-        'size-limit --save-bundle build/size-limit/' + name + ' --clean-dir'
+        'size-limit --save-bundle .tmp/size-limit/' + name + ' --clean-dir'
       );
 
       let output = value.toString();

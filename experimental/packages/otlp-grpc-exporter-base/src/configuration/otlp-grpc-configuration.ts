@@ -1,30 +1,18 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { OtlpSharedConfiguration } from '@opentelemetry/otlp-exporter-base';
 import {
   getSharedConfigurationDefaults,
   mergeOtlpSharedConfigurationWithDefaults,
-  OtlpSharedConfiguration,
 } from '@opentelemetry/otlp-exporter-base';
 import {
   createEmptyMetadata,
   createInsecureCredentials,
   createSslCredentials,
 } from '../grpc-exporter-transport';
-import { VERSION } from '../version';
 import { URL } from 'url';
 import { diag } from '@opentelemetry/api';
 
@@ -35,6 +23,7 @@ export interface OtlpGrpcConfiguration extends OtlpSharedConfiguration {
   url: string;
   metadata: () => Metadata;
   credentials: () => ChannelCredentials;
+  userAgent?: string;
 }
 
 /**
@@ -118,17 +107,14 @@ export function mergeOtlpGrpcConfigurationWithDefaults(
       userProvidedConfiguration.credentials ??
       fallbackConfiguration.credentials?.(rawUrl) ??
       defaultConfiguration.credentials(rawUrl),
+    userAgent: userProvidedConfiguration.userAgent,
   };
 }
 
 export function getOtlpGrpcDefaultConfiguration(): UnresolvedOtlpGrpcConfiguration {
   return {
     ...getSharedConfigurationDefaults(),
-    metadata: () => {
-      const metadata = createEmptyMetadata();
-      metadata.set('User-Agent', `OTel-OTLP-Exporter-JavaScript/${VERSION}`);
-      return metadata;
-    },
+    metadata: () => createEmptyMetadata(),
     url: 'http://localhost:4317',
     credentials: (url: string) => {
       if (url.startsWith('http://')) {

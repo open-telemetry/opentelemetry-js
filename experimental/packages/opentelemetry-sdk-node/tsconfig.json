@@ -19,31 +19,25 @@
       "path": "../../../packages/opentelemetry-core"
     },
     {
-      "path": "../../../packages/opentelemetry-exporter-jaeger"
-    },
-    {
       "path": "../../../packages/opentelemetry-exporter-zipkin"
     },
     {
       "path": "../../../packages/opentelemetry-propagator-b3"
     },
     {
-      "path": "../../../packages/opentelemetry-propagator-jaeger"
-    },
-    {
       "path": "../../../packages/opentelemetry-resources"
-    },
-    {
-      "path": "../../../packages/opentelemetry-sdk-trace-base"
-    },
-    {
-      "path": "../../../packages/opentelemetry-sdk-trace-node"
     },
     {
       "path": "../../../packages/sdk-metrics"
     },
     {
+      "path": "../../../packages/sdk-trace"
+    },
+    {
       "path": "../../../semantic-conventions"
+    },
+    {
+      "path": "../configuration"
     },
     {
       "path": "../exporter-logs-otlp-grpc"
@@ -77,6 +71,12 @@
     },
     {
       "path": "../opentelemetry-instrumentation"
+    },
+    {
+      "path": "../otlp-exporter-base"
+    },
+    {
+      "path": "../otlp-grpc-exporter-base"
     },
     {
       "path": "../sdk-logs"

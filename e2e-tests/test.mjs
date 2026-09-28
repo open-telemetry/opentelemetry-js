@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
@@ -19,7 +8,7 @@ import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
 import { SimpleLogRecordProcessor } from '@opentelemetry/sdk-logs';
-import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
+import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace';
 import {
   diag,
   DiagConsoleLogger,
@@ -38,7 +27,7 @@ const collectorUrl = 'http://localhost:4318/v1';
 const traceExporter = new OTLPTraceExporter({
   url: `${collectorUrl}/traces`,
 });
-const spanProcessors = [new SimpleSpanProcessor(traceExporter)];
+const spanProcessors = [new SimpleSpanProcessor({ exporter: traceExporter })];
 
 // Set up metric exporter
 const metricExporter = new OTLPMetricExporter({
@@ -54,7 +43,9 @@ const metricReader = new PeriodicExportingMetricReader({
 const logExporter = new OTLPLogExporter({
   url: `${collectorUrl}/logs`,
 });
-const logRecordProcessors = [new SimpleLogRecordProcessor(logExporter)];
+const logRecordProcessors = [
+  new SimpleLogRecordProcessor({ exporter: logExporter }),
+];
 
 // Set up OpenTelemetry SDK
 const sdk = new NodeSDK({

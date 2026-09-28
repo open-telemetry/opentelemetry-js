@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 // NOTE: do not change these type imports to actual imports. Doing so WILL break `@opentelemetry/instrumentation-http`,
@@ -21,15 +10,32 @@ import type {
   ServiceError,
   ChannelCredentials,
   Client,
+  ServiceClientConstructor,
 } from '@grpc/grpc-js';
-import {
+import type {
   ExportResponse,
   IExporterTransport,
 } from '@opentelemetry/otlp-exporter-base';
+import { VERSION } from './version';
+
+const DEFAULT_USER_AGENT = `OTel-OTLP-Exporter-JavaScript/${VERSION}`;
+
+function createUserAgent(userAgent: string | undefined) {
+  if (userAgent) {
+    return `${userAgent} ${DEFAULT_USER_AGENT}`;
+  }
+  return DEFAULT_USER_AGENT;
+}
 
 // values taken from '@grpc/grpc-js` so that we don't need to require/import it.
 const GRPC_COMPRESSION_NONE = 0;
 const GRPC_COMPRESSION_GZIP = 2;
+const GRPC_DEADLINE_EXCEEDED = 4;
+
+/**
+ * The maximum number of deadline exceeded errors that will be tolerated before the client is closed.
+ */
+const MAX_DEADLINE_EXCEEDED_COUNT = 5;
 
 function toGrpcCompression(compression: 'gzip' | 'none'): number {
   return compression === 'gzip' ? GRPC_COMPRESSION_GZIP : GRPC_COMPRESSION_NONE;
@@ -88,13 +94,19 @@ export interface GrpcExporterTransportParameters {
    */
   metadata: () => Metadata;
   compression: 'gzip' | 'none';
+  userAgent?: string;
 }
 
 export class GrpcExporterTransport implements IExporterTransport {
   private _client?: Client;
   private _metadata?: Metadata;
+  private _parameters: GrpcExporterTransportParameters;
+  private _deadlineExceededCount: number;
 
-  constructor(private _parameters: GrpcExporterTransportParameters) {}
+  constructor(parameters: GrpcExporterTransportParameters) {
+    this._parameters = parameters;
+    this._deadlineExceededCount = 0;
+  }
 
   shutdown() {
     this._client?.close();
@@ -120,10 +132,11 @@ export class GrpcExporterTransport implements IExporterTransport {
         });
       }
 
-      const clientConstructor = createServiceClientConstructor(
-        this._parameters.grpcPath,
-        this._parameters.grpcName
-      );
+      const clientConstructor: ServiceClientConstructor =
+        createServiceClientConstructor(
+          this._parameters.grpcPath,
+          this._parameters.grpcName
+        );
 
       try {
         this._client = new clientConstructor(
@@ -133,8 +146,12 @@ export class GrpcExporterTransport implements IExporterTransport {
             'grpc.default_compression_algorithm': toGrpcCompression(
               this._parameters.compression
             ),
+            'grpc.primary_user_agent': createUserAgent(
+              this._parameters.userAgent
+            ),
           }
         );
+        this._deadlineExceededCount = 0;
       } catch (error) {
         return Promise.resolve({
           status: 'failure',
@@ -166,11 +183,21 @@ export class GrpcExporterTransport implements IExporterTransport {
               status: 'failure',
               error: err,
             });
+
+            if (err.code === GRPC_DEADLINE_EXCEEDED) {
+              this._deadlineExceededCount++;
+              if (this._deadlineExceededCount > MAX_DEADLINE_EXCEEDED_COUNT) {
+                this._client?.close();
+                this._client = undefined;
+              }
+            }
           } else {
             resolve({
               data: response,
               status: 'success',
             });
+            // Reset the deadline exceeded count when we get a successful response.
+            this._deadlineExceededCount = 0;
           }
         }
       );

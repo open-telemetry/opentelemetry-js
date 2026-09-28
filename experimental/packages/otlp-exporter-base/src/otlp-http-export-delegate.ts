@@ -1,31 +1,57 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
-import {
-  createOtlpExportDelegate,
-  IOtlpExportDelegate,
-} from './otlp-export-delegate';
-import { OtlpHttpConfiguration } from './configuration/otlp-http-configuration';
-import { ISerializer } from '@opentelemetry/otlp-transformer';
+
+import type { MeterProvider } from '@opentelemetry/api';
+
+import type { IOtlpExportDelegate } from './otlp-export-delegate';
+import { createOtlpExportDelegate } from './otlp-export-delegate';
+import type {
+  IExporterMetricsHelper,
+  ISerializer,
+} from '@opentelemetry/otlp-transformer';
 import { createHttpExporterTransport } from './transport/http-exporter-transport';
 import { createBoundedQueueExportPromiseHandler } from './bounded-queue-export-promise-handler';
 import { createRetryingTransport } from './retrying-transport';
+import type { OtlpNodeHttpConfiguration } from './configuration/otlp-node-http-configuration';
+import { OTLPExporterError } from './types';
+import { ATTR_HTTP_RESPONSE_STATUS_CODE } from './semconv';
+import { ExporterMetrics } from './ExporterMetrics';
+
+export function createOtlpHttpExporterMetrics<Internal>(
+  metricsComponentType: string,
+  exporterMetricsHelper: IExporterMetricsHelper<Internal>,
+  url: string | undefined,
+  meterProvider: MeterProvider | undefined
+): ExporterMetrics<Internal> {
+  return new ExporterMetrics({
+    componentType: metricsComponentType,
+    metricsHelper: exporterMetricsHelper,
+    url,
+    meterProvider,
+    responseAttributesFromError: (error: Error | string | undefined) => {
+      if (!error) {
+        return {
+          [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
+        };
+      }
+      if (!(error instanceof OTLPExporterError)) {
+        return {};
+      }
+      return {
+        [ATTR_HTTP_RESPONSE_STATUS_CODE]: error.code,
+      };
+    },
+  });
+}
 
 export function createOtlpHttpExportDelegate<Internal, Response>(
-  options: OtlpHttpConfiguration,
-  serializer: ISerializer<Internal, Response>
+  options: OtlpNodeHttpConfiguration,
+  serializer: ISerializer<Internal, Response>,
+  metricsComponentType: string,
+  exporterMetricsHelper: IExporterMetricsHelper<Internal>,
+  meterProvider: MeterProvider | undefined
 ): IOtlpExportDelegate<Internal> {
   return createOtlpExportDelegate(
     {
@@ -34,6 +60,12 @@ export function createOtlpHttpExportDelegate<Internal, Response>(
       }),
       serializer: serializer,
       promiseHandler: createBoundedQueueExportPromiseHandler(options),
+      metrics: createOtlpHttpExporterMetrics(
+        metricsComponentType,
+        exporterMetricsHelper,
+        options.url,
+        meterProvider
+      ),
     },
     { timeout: options.timeoutMillis }
   );

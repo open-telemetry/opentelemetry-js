@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 import { GrpcInstrumentation } from '../src';
 
@@ -24,27 +13,21 @@ import * as grpc from '@grpc/grpc-js';
 import { GrpcTesterClient } from './proto/ts/fixtures/grpc-test.client';
 import {
   InMemorySpanExporter,
-  NodeTracerProvider,
+  TracerProvider,
   SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace-node';
+} from '@opentelemetry/sdk-trace';
 import * as protoLoader from '@grpc/proto-loader';
 import * as path from 'path';
 import * as assert from 'assert';
-import {
-  context,
-  ContextManager,
-  propagation,
-  SpanKind,
-  trace,
-} from '@opentelemetry/api';
+import type { ContextManager } from '@opentelemetry/api';
+import { context, propagation, SpanKind, trace } from '@opentelemetry/api';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { startServer } from './helper';
+import type { SpanAssertionFunction, TestFunction } from './protobuf-ts-utils';
 import {
   assertExportedSpans,
   assertNoSpansExported,
-  SpanAssertionFunction,
-  TestFunction,
 } from './protobuf-ts-utils';
 
 const memoryExporter = new InMemorySpanExporter();
@@ -155,8 +138,8 @@ describe('#grpc-protobuf', () => {
   let client: GrpcTesterClient;
   let server: grpc.Server;
   let contextManager: ContextManager;
-  const provider = new NodeTracerProvider({
-    spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+  const provider = new TracerProvider({
+    spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
   });
 
   before(() => {
@@ -166,7 +149,7 @@ describe('#grpc-protobuf', () => {
 
   beforeEach(() => {
     memoryExporter.reset();
-    contextManager = new AsyncHooksContextManager().enable();
+    contextManager = new AsyncLocalStorageContextManager().enable();
     context.setGlobalContextManager(contextManager);
   });
 

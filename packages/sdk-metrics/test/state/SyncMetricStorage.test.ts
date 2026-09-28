@@ -1,26 +1,16 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as api from '@opentelemetry/api';
+import type { Attributes, Context } from '@opentelemetry/api';
 import * as assert from 'assert';
 
 import { SumAggregator } from '../../src/aggregator';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { DataPointType } from '../../src/export/MetricData';
-import { MetricCollectorHandle } from '../../src/state/MetricCollector';
+import type { MetricCollectorHandle } from '../../src/state/MetricCollector';
 import { SyncMetricStorage } from '../../src/state/SyncMetricStorage';
 import { createNoopAttributesProcessor } from '../../src/view/AttributesProcessor';
 import {
@@ -53,7 +43,7 @@ describe('SyncMetricStorage', () => {
 
       for (const value of commonValues) {
         for (const attributes of commonAttributes) {
-          metricStorage.record(value, attributes, api.context.active(), [0, 0]);
+          metricStorage.record(value, attributes, api.context.active(), 0);
         }
       }
     });
@@ -69,9 +59,9 @@ describe('SyncMetricStorage', () => {
           [deltaCollector]
         );
 
-        metricStorage.record(1, {}, api.context.active(), [0, 0]);
-        metricStorage.record(2, {}, api.context.active(), [1, 1]);
-        metricStorage.record(3, {}, api.context.active(), [2, 2]);
+        metricStorage.record(1, {}, api.context.active(), 0);
+        metricStorage.record(2, {}, api.context.active(), 1000);
+        metricStorage.record(3, {}, api.context.active(), 2000);
         {
           const metric = metricStorage.collect(deltaCollector, [3, 3]);
 
@@ -87,13 +77,13 @@ describe('SyncMetricStorage', () => {
           assert.strictEqual(metric, undefined);
         }
 
-        metricStorage.record(1, {}, api.context.active(), [5, 5]);
+        metricStorage.record(1, {}, api.context.active(), 5000);
         {
           const metric = metricStorage.collect(deltaCollector, [6, 6]);
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 1, [5, 5], [6, 6]);
+          assertDataPoint(metric.dataPoints[0], {}, 1, [5, 0], [6, 6]);
         }
       });
     });
@@ -106,9 +96,9 @@ describe('SyncMetricStorage', () => {
           createNoopAttributesProcessor(),
           [cumulativeCollector]
         );
-        metricStorage.record(1, {}, api.context.active(), [0, 0]);
-        metricStorage.record(2, {}, api.context.active(), [1, 1]);
-        metricStorage.record(3, {}, api.context.active(), [2, 2]);
+        metricStorage.record(1, {}, api.context.active(), 0);
+        metricStorage.record(2, {}, api.context.active(), 1000);
+        metricStorage.record(3, {}, api.context.active(), 2000);
         {
           const metric = metricStorage.collect(cumulativeCollector, [3, 3]);
 
@@ -126,7 +116,7 @@ describe('SyncMetricStorage', () => {
           assertDataPoint(metric.dataPoints[0], {}, 6, [0, 0], [4, 4]);
         }
 
-        metricStorage.record(1, {}, api.context.active(), [5, 5]);
+        metricStorage.record(1, {}, api.context.active(), 5000);
         {
           const metric = metricStorage.collect(cumulativeCollector, [6, 6]);
 
@@ -135,6 +125,46 @@ describe('SyncMetricStorage', () => {
           assertDataPoint(metric.dataPoints[0], {}, 7, [0, 0], [6, 6]);
         }
       });
+    });
+  });
+
+  describe('attribute processor receives context', () => {
+    it('should pass provided context to attribute processor', () => {
+      const expectedContext = api.ROOT_CONTEXT.setValue(
+        api.createContextKey('test'),
+        'value'
+      );
+      const attributeProcessor = {
+        process(incoming: Attributes, context?: Context) {
+          assert.strictEqual(context, expectedContext);
+          return incoming;
+        },
+      };
+      const metricStorage = new SyncMetricStorage(
+        defaultInstrumentDescriptor,
+        new SumAggregator(true),
+        attributeProcessor,
+        [deltaCollector]
+      );
+
+      metricStorage.record(1, {}, expectedContext, 0);
+    });
+
+    it('should resolve active context when context is undefined', () => {
+      const attributeProcessor = {
+        process(incoming: Attributes, context?: Context) {
+          assert.strictEqual(context, api.context.active());
+          return incoming;
+        },
+      };
+      const metricStorage = new SyncMetricStorage(
+        defaultInstrumentDescriptor,
+        new SumAggregator(true),
+        attributeProcessor,
+        [deltaCollector]
+      );
+
+      metricStorage.record(1, {}, undefined, 0);
     });
   });
 });

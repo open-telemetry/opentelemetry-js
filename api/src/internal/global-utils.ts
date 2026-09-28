@@ -1,35 +1,49 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { MeterProvider } from '../metrics/MeterProvider';
-import { ContextManager } from '../context/types';
-import { DiagLogger } from '../diag/types';
-import { _globalThis } from '../platform';
-import { TextMapPropagator } from '../propagation/TextMapPropagator';
+import type { MeterProvider } from '../metrics/MeterProvider';
+import type { LoggerProvider } from '../experimental/logs/types/LoggerProvider';
+import type { ContextManager } from '../context/types';
+import type { DiagLogger } from '../diag/types';
+import type { TextMapPropagator } from '../propagation/TextMapPropagator';
 import type { TracerProvider } from '../trace/tracer_provider';
 import { VERSION } from '../version';
 import { isCompatible } from './semver';
-import { LoggerProvider } from '../experimental';
 
 const major = VERSION.split('.')[0];
 const GLOBAL_OPENTELEMETRY_API_KEY = Symbol.for(
   `opentelemetry.js.api.${major}`
 );
 
-const _global = _globalThis as OTelGlobal;
+declare const self: unknown;
+declare const window: unknown;
+declare const global: unknown;
+
+const _global = (
+  typeof globalThis === 'object'
+    ? globalThis
+    : typeof self === 'object'
+      ? self
+      : typeof window === 'object'
+        ? window
+        : typeof global === 'object'
+          ? global
+          : {}
+) as OTelGlobal;
+
+function _makeGlobalApi(): OTelGlobalAPI {
+  // The version property is sealed (non-writable, non-configurable) so it stays
+  // constant for the api object's lifetime. getGlobal caches its compatibility
+  // check per api-object identity and relies on that invariant.
+  return Object.defineProperty({} as OTelGlobalAPI, 'version', {
+    value: VERSION,
+    enumerable: true,
+    writable: false,
+    configurable: false,
+  });
+}
 
 export function registerGlobal<Type extends keyof OTelGlobalAPI>(
   type: Type,
@@ -37,11 +51,8 @@ export function registerGlobal<Type extends keyof OTelGlobalAPI>(
   diag: DiagLogger,
   allowOverride = false
 ): boolean {
-  const api = (_global[GLOBAL_OPENTELEMETRY_API_KEY] = _global[
-    GLOBAL_OPENTELEMETRY_API_KEY
-  ] ?? {
-    version: VERSION,
-  });
+  const api = (_global[GLOBAL_OPENTELEMETRY_API_KEY] =
+    _global[GLOBAL_OPENTELEMETRY_API_KEY] ?? _makeGlobalApi());
 
   if (!allowOverride && api[type]) {
     // already registered an API of this type
@@ -69,14 +80,27 @@ export function registerGlobal<Type extends keyof OTelGlobalAPI>(
   return true;
 }
 
+// The api object whose compatibility has already been verified. Its version is
+// sealed at registerGlobal, so a full compatibility check is only needed when
+// the object identity changes, letting the steady-state hot path skip it.
+let _compatibleGlobalApi: OTelGlobalAPI | undefined;
+
 export function getGlobal<Type extends keyof OTelGlobalAPI>(
   type: Type
 ): OTelGlobalAPI[Type] | undefined {
-  const globalVersion = _global[GLOBAL_OPENTELEMETRY_API_KEY]?.version;
-  if (!globalVersion || !isCompatible(globalVersion)) {
+  const api = _global[GLOBAL_OPENTELEMETRY_API_KEY];
+  if (api == null) {
     return;
   }
-  return _global[GLOBAL_OPENTELEMETRY_API_KEY]?.[type];
+  if (api !== _compatibleGlobalApi) {
+    // A new api object has been registered since the last time we checked, so
+    // verify its compatibility again.
+    if (!api.version || !isCompatible(api.version)) {
+      return;
+    }
+    _compatibleGlobalApi = api;
+  }
+  return api[type];
 }
 
 export function unregisterGlobal(type: keyof OTelGlobalAPI, diag: DiagLogger) {
@@ -101,6 +125,6 @@ type OTelGlobalAPI = {
   trace?: TracerProvider;
   context?: ContextManager;
   metrics?: MeterProvider;
-  propagation?: TextMapPropagator;
   logs?: LoggerProvider;
+  propagation?: TextMapPropagator;
 };

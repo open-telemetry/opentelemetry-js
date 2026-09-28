@@ -1,25 +1,14 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
-
+import * as fs from 'fs';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
 import { diag } from '@opentelemetry/api';
 
-import { getHttpConfigurationFromEnvironment } from '../../../src/configuration/otlp-http-env-configuration';
+import { getNodeHttpConfigurationFromEnvironment } from '../../../src/configuration/otlp-node-http-env-configuration';
 import { testSharedConfigurationFromEnvironment } from './shared-env-configuration.test';
 
 describe('getHttpConfigurationFromEnvironment', function () {
@@ -34,49 +23,49 @@ describe('getHttpConfigurationFromEnvironment', function () {
       delete process.env.OTEL_EXPORTER_OTLP_HEADERS;
       delete process.env.OTEL_EXPORTER_OTLP_METRICS_HEADERS;
 
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
       assert.strictEqual(config.headers, undefined);
     });
 
-    it('merges headers instead of overriding', function () {
+    it('merges headers instead of overriding', async function () {
       process.env.OTEL_EXPORTER_OTLP_HEADERS = 'key1=value1,key2=value2';
       process.env.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'key1=metrics';
 
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
-      assert.deepEqual(config.headers?.(), {
+      assert.deepEqual(await config.headers?.(), {
         key1: 'metrics',
         key2: 'value2',
       });
     });
 
-    it('allows non-specific only headers', function () {
+    it('allows non-specific only headers', async function () {
       process.env.OTEL_EXPORTER_OTLP_HEADERS = 'key1=value1,key2=value2';
 
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
-      assert.deepEqual(config.headers?.(), {
+      assert.deepEqual(await config.headers?.(), {
         key1: 'value1',
         key2: 'value2',
       });
     });
 
-    it('allows specific only headers', function () {
+    it('allows specific only headers', async function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_HEADERS =
         'key1=value1,key2=value2';
 
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
-      assert.deepEqual(config.headers?.(), {
+      assert.deepEqual(await config.headers?.(), {
         key1: 'value1',
         key2: 'value2',
       });
@@ -85,7 +74,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
     it('remains unset if specific headers are lists of empty strings', function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_HEADERS = ' , , ,';
 
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -102,7 +91,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
 
     it('should use url defined in env that ends with root path and append version and signal path', function () {
       process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -114,7 +103,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
 
     it('should use url defined in env without checking if path is already present', function () {
       process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/metrics';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -126,7 +115,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
 
     it('should use url defined in env and append version and signal', function () {
       process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -139,7 +128,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
     it('should override global exporter url with signal url defined in env', function () {
       process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
       process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.metrics/';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -151,7 +140,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
 
     it('should add root path when signal url defined in env contains no path and no root path', function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.bar';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -163,7 +152,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
 
     it('should not add root path when signal url defined in env contains root path but no path', function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.bar/';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -176,7 +165,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
     it('should not add root path when signal url defined in env contains path', function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT =
         'http://foo.bar/v1/metrics';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -189,7 +178,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
     it('should not add root path when signal url defined in env contains path and ends in /', function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT =
         'http://foo.bar/v1/metrics/';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -202,7 +191,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
     it('should warn on invalid specific url', function () {
       const spyLoggerWarn = sinon.stub(diag, 'warn');
       process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'not a url';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -216,7 +205,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
     it('should warn on invalid non-specific url', function () {
       const spyLoggerWarn = sinon.stub(diag, 'warn');
       process.env.OTEL_EXPORTER_OTLP_ENDPOINT = 'not a url';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -230,7 +219,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
     it('should treat empty urls as not set', function () {
       process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
       process.env.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-      const config = getHttpConfigurationFromEnvironment(
+      const config = getNodeHttpConfigurationFromEnvironment(
         'METRICS',
         'v1/metrics'
       );
@@ -238,7 +227,104 @@ describe('getHttpConfigurationFromEnvironment', function () {
     });
   });
 
+  describe('certs', function () {
+    const certsDir = `${process.cwd()}/test/certs`;
+    const caCert = Buffer.from(fs.readFileSync(`${certsDir}/ca.crt`));
+    const clientCert = Buffer.from(fs.readFileSync(`${certsDir}/client.crt`));
+    const clientKey = Buffer.from(fs.readFileSync(`${certsDir}/client.key`));
+
+    afterEach(function () {
+      delete process.env.OTEL_EXPORTER_OTLP_CERTIFICATE;
+      delete process.env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE;
+      delete process.env.OTEL_EXPORTER_OTLP_CLIENT_KEY;
+      delete process.env.OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE;
+      delete process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE;
+      delete process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY;
+    });
+
+    it('should not set the certs if not defined in env', async function () {
+      const { agentFactory } = getNodeHttpConfigurationFromEnvironment(
+        'METRICS',
+        'v1/metrics'
+      );
+      assert.strictEqual(typeof agentFactory, 'function');
+
+      const agent = (await agentFactory!('https:')) as any;
+      assert.strictEqual(agent.options.ca, undefined);
+      assert.strictEqual(agent.options.cert, undefined);
+      assert.strictEqual(agent.options.key, undefined);
+    });
+
+    it('should not set the certs if env vars have wrong values', async function () {
+      process.env.OTEL_EXPORTER_OTLP_CERTIFICATE = `${certsDir}/bogus-ca.crt`;
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE = `${certsDir}/bogus-client.crt`;
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_KEY = `${certsDir}/bogus-client.key`;
+      const { agentFactory } = getNodeHttpConfigurationFromEnvironment(
+        'METRICS',
+        'v1/metrics'
+      );
+      assert.strictEqual(typeof agentFactory, 'function');
+
+      const agent = (await agentFactory!('https:')) as any;
+      assert.strictEqual(agent.options.ca, undefined);
+      assert.strictEqual(agent.options.cert, undefined);
+      assert.strictEqual(agent.options.key, undefined);
+    });
+
+    it('should not set the certs in agent if protocol is http', async function () {
+      process.env.OTEL_EXPORTER_OTLP_CERTIFICATE = `${certsDir}/ca.crt`;
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE = `${certsDir}/client.crt`;
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_KEY = `${certsDir}/client.key`;
+      const { agentFactory } = getNodeHttpConfigurationFromEnvironment(
+        'METRICS',
+        'v1/metrics'
+      );
+      assert.strictEqual(typeof agentFactory, 'function');
+
+      const agent = (await agentFactory!('http:')) as any;
+      assert.strictEqual(agent.options.ca, undefined);
+      assert.strictEqual(agent.options.cert, undefined);
+      assert.strictEqual(agent.options.key, undefined);
+    });
+
+    it('should use the non signal specific certs in agent if defined in env vars', async function () {
+      process.env.OTEL_EXPORTER_OTLP_CERTIFICATE = `${certsDir}/ca.crt`;
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE = `${certsDir}/client.crt`;
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_KEY = `${certsDir}/client.key`;
+      const { agentFactory } = getNodeHttpConfigurationFromEnvironment(
+        'METRICS',
+        'v1/metrics'
+      );
+      assert.strictEqual(typeof agentFactory, 'function');
+
+      const agent = (await agentFactory!('https:')) as any;
+      assert.strictEqual(caCert.compare(agent.options.ca), 0);
+      assert.strictEqual(clientCert.compare(agent.options.cert), 0);
+      assert.strictEqual(clientKey.compare(agent.options.key), 0);
+    });
+
+    it('should use the signal specific certs in agent if defined in env vars', async function () {
+      process.env.OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE = `${certsDir}/ca.crt`;
+      process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE = `${certsDir}/client.crt`;
+      process.env.OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY = `${certsDir}/client.key`;
+      // NOTE: if files do not exist the options become undefined
+      process.env.OTEL_EXPORTER_OTLP_CERTIFICATE = `${certsDir}/bogus-ca.crt`;
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE = `${certsDir}/bogus-client.crt`;
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_KEY = `${certsDir}/bogus-client.key`;
+      const { agentFactory } = getNodeHttpConfigurationFromEnvironment(
+        'METRICS',
+        'v1/metrics'
+      );
+      assert.strictEqual(typeof agentFactory, 'function');
+
+      const agent = (await agentFactory!('https:')) as any;
+      assert.strictEqual(caCert.compare(agent.options.ca), 0);
+      assert.strictEqual(clientCert.compare(agent.options.cert), 0);
+      assert.strictEqual(clientKey.compare(agent.options.key), 0);
+    });
+  });
+
   testSharedConfigurationFromEnvironment(signalIdentifier =>
-    getHttpConfigurationFromEnvironment(signalIdentifier, 'v1/metrics')
+    getNodeHttpConfigurationFromEnvironment(signalIdentifier, 'v1/metrics')
   );
 });

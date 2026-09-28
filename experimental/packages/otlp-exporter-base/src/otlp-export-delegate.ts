@@ -1,27 +1,19 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ExportResult, ExportResultCode } from '@opentelemetry/core';
-import { IExporterTransport } from './exporter-transport';
-import { IExportPromiseHandler } from './bounded-queue-export-promise-handler';
-import { ISerializer } from '@opentelemetry/otlp-transformer';
+import type { ExportResult } from '@opentelemetry/core';
+import { ExportResultCode } from '@opentelemetry/core';
+import type { IExporterTransport } from './exporter-transport';
+import type { IExportPromiseHandler } from './bounded-queue-export-promise-handler';
+import type { ISerializer } from '@opentelemetry/otlp-transformer';
 import { OTLPExporterError } from './types';
-import { IOtlpResponseHandler } from './response-handler';
+import type { IOtlpResponseHandler } from './response-handler';
 import { createLoggingPartialSuccessResponseHandler } from './logging-response-handler';
-import { diag, DiagLogger } from '@opentelemetry/api';
+import type { DiagLogger } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
+import { type ExporterMetrics } from './ExporterMetrics';
 
 /**
  * Internally shared export logic for OTLP.
@@ -33,22 +25,37 @@ export interface IOtlpExportDelegate<Internal> {
   ): void;
   forceFlush(): Promise<void>;
   shutdown(): Promise<void>;
+  setMetrics(metrics: ExporterMetrics<Internal>): void;
 }
 
 class OTLPExportDelegate<Internal, Response>
   implements IOtlpExportDelegate<Internal>
 {
+  private _metrics: ExporterMetrics<Internal>;
   private _diagLogger: DiagLogger;
+  private _transport: IExporterTransport;
+  private _serializer: ISerializer<Internal, Response>;
+  private _responseHandler: IOtlpResponseHandler<Response>;
+  private _promiseQueue: IExportPromiseHandler;
+  private _timeout: number;
+
   constructor(
-    private _transport: IExporterTransport,
-    private _serializer: ISerializer<Internal, Response>,
-    private _responseHandler: IOtlpResponseHandler<Response>,
-    private _promiseQueue: IExportPromiseHandler,
-    private _timeout: number
+    transport: IExporterTransport,
+    serializer: ISerializer<Internal, Response>,
+    responseHandler: IOtlpResponseHandler<Response>,
+    promiseQueue: IExportPromiseHandler,
+    metrics: ExporterMetrics<Internal>,
+    timeout: number
   ) {
+    this._transport = transport;
+    this._serializer = serializer;
+    this._responseHandler = responseHandler;
+    this._promiseQueue = promiseQueue;
+    this._timeout = timeout;
     this._diagLogger = diag.createComponentLogger({
       namespace: 'OTLPExportDelegate',
     });
+    this._metrics = metrics;
   }
 
   export(
@@ -78,10 +85,12 @@ class OTLPExportDelegate<Internal, Response>
       return;
     }
 
+    const finishExport = this._metrics.startExport(internalRepresentation);
     this._promiseQueue.pushPromise(
       this._transport.send(serializedRequest, this._timeout).then(
         response => {
           if (response.status === 'success') {
+            finishExport(undefined);
             if (response.data != null) {
               try {
                 this._responseHandler.handleResponse(
@@ -101,36 +110,45 @@ class OTLPExportDelegate<Internal, Response>
             });
             return;
           } else if (response.status === 'failure' && response.error) {
+            finishExport(response.error);
             resultCallback({
               code: ExportResultCode.FAILED,
               error: response.error,
             });
             return;
           } else if (response.status === 'retryable') {
+            finishExport('export_max_retries');
             resultCallback({
               code: ExportResultCode.FAILED,
-              error: new OTLPExporterError(
-                'Export failed with retryable status'
-              ),
+              error:
+                response.error ??
+                new OTLPExporterError('Export failed with retryable status'),
             });
           } else {
+            finishExport('export_failed');
             resultCallback({
               code: ExportResultCode.FAILED,
               error: new OTLPExporterError('Export failed with unknown error'),
             });
           }
         },
-        reason =>
+        reason => {
+          finishExport(reason);
           resultCallback({
             code: ExportResultCode.FAILED,
             error: reason,
-          })
+          });
+        }
       )
     );
   }
 
   forceFlush(): Promise<void> {
     return this._promiseQueue.awaitAll();
+  }
+
+  setMetrics(metrics: ExporterMetrics<Internal>) {
+    this._metrics = metrics;
   }
 
   async shutdown(): Promise<void> {
@@ -149,6 +167,7 @@ export function createOtlpExportDelegate<Internal, Response>(
     transport: IExporterTransport;
     serializer: ISerializer<Internal, Response>;
     promiseHandler: IExportPromiseHandler;
+    metrics: ExporterMetrics<Internal>;
   },
   settings: { timeout: number }
 ): IOtlpExportDelegate<Internal> {
@@ -157,6 +176,7 @@ export function createOtlpExportDelegate<Internal, Response>(
     components.serializer,
     createLoggingPartialSuccessResponseHandler(),
     components.promiseHandler,
+    components.metrics,
     settings.timeout
   );
 }

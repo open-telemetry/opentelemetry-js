@@ -1,62 +1,102 @@
 name: Create or Update Release PR
 
+# Run this from the branch you are releasing: either `main`, or a maintenance branch named
+# `v<major>.x` (e.g. `v2.x`). Each branch gets its own release PR, and the branch also
+# decides which of the bumps below are allowed - see doc/contributing/releasing.md.
+#
+# NOTE: workflow_dispatch runs the copy of this file on the selected branch, so this file
+# and the scripts it calls have to exist there too.
+
 on:
   workflow_dispatch:
     inputs:
-      release_type:
+      stable_sdk_release:
         type: choice
-        description: Release type
+        description: 'Stable SDK packages (./packages/*)'
+        default: 'inherit'
         options:
+          - inherit # no release unless required by other settings
           - patch
           - minor
-      release_scope:
+          - major # `main` only; experimental packages inherit this as a minor bump
+      experimental_release:
         type: choice
-        description: Release Scope
+        description: 'Experimental packages (./experimental/packages/*)'
+        default: 'inherit'
         options:
-          - experimental # all packages in experimental/packages
-          - sdk # all SDK packages, experimental and stable, excluding semantic conventions
-          - all # all release packages, including API, excluding semconv
-          - semconv # only semantic convention package
+          - inherit # matches stable SDK if released, otherwise no release
+          - patch
+          - minor
+      api_release:
+        type: choice
+        description: 'API package (./api) - makes stable SDK and experimental inherit the bump'
+        default: 'inherit'
+        options:
+          - inherit # no release
+          - patch
+          - minor # `main` only, as is `patch` - the API is released from `main` on every branch
+      semconv_release:
+        type: choice
+        description: 'Semantic Conventions package (./semantic-conventions)'
+        default: 'inherit'
+        options:
+          - inherit # no release
+          - patch
+          - minor
+      prerelease:
+        type: choice
+        description: 'Pre-release identifier - modifies the bumps above, selects nothing on its own'
+        default: 'none'
+        # Listed in semver precedence order: development < rc. An identifier can only
+        # be changed to a later one, so a `development` stream is promoted to `rc`,
+        # never the other way around. Applies to the API package too, but not to
+        # Semantic Conventions - see doc/contributing/releasing.md.
+        options:
+          - none # normal release
+          - development # `main` only; regular cadence of builds off main
+          - rc # `main` only
+
+permissions:
+  contents: read
 
 jobs:
   create-or-update-release-pr:
     runs-on: ubuntu-latest
     steps:
-      - name: Fork
-        run: gh repo fork open-telemetry/opentelemetry-js
-        env:
-          GITHUB_TOKEN: ${{ secrets.OPENTELEMETRYBOT_GITHUB_TOKEN }}
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: otelbot-token
+        with:
+          client-id: ${{ vars.OTELBOT_JS_CLIENT_ID }}
+          private-key: ${{ secrets.OTELBOT_JS_PRIVATE_KEY }}
+          # Scope to just the permissions required by the "Create/Update Release PR" step below.
+          permission-contents: write
+          permission-pull-requests: write
+
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: opentelemetrybot/opentelemetry-js
-          ref: main
-          token: ${{ secrets.OPENTELEMETRYBOT_GITHUB_TOKEN }}
-      - name: Sync with upstream
-        run: |
-          git remote show origin
-          git remote add upstream https://github.com/open-telemetry/opentelemetry-js.git
-          git fetch upstream
-          git reset --hard upstream/main
-          git push origin main --force
+          token: ${{ steps.otelbot-token.outputs.token }}
+          # Credentials are used in 'Create/Update Release PR' git commands below.
+          persist-credentials: true
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
-          node-version: 22
-      - run: npm install -g npm@latest
-
-      - run: npm ci
+          node-version: ^26.3.0
+          # Disable caching in release workflows (https://docs.zizmor.sh/audits/#cache-poisoning).
+          package-manager-cache: false
+      - run: npm ci --ignore-scripts
 
       - name: Create/Update Release PR
         run: |
-          git config user.name opentelemetrybot
-          git config user.email 107717825+opentelemetrybot@users.noreply.github.com
+          git config user.name otelbot
+          git config user.email 197425009+otelbot@users.noreply.github.com
           npm run github:create_or_update_release_pr
         env:
-          GITHUB_TOKEN: ${{ secrets.OPENTELEMETRYBOT_GITHUB_TOKEN }}
-          RELEASE_SCOPE: ${{ github.event.inputs.release_scope }}
-          RELEASE_KIND: ${{ github.event.inputs.release_scope }}:${{ github.event.inputs.release_type }}
+          GITHUB_TOKEN: ${{ steps.otelbot-token.outputs.token }}
+          STABLE_SDK_RELEASE: ${{ github.event.inputs.stable_sdk_release }}
+          EXPERIMENTAL_RELEASE: ${{ github.event.inputs.experimental_release }}
+          API_RELEASE: ${{ github.event.inputs.api_release }}
+          SEMCONV_RELEASE: ${{ github.event.inputs.semconv_release }}
+          PRERELEASE: ${{ github.event.inputs.prerelease }}
           RELEASE_PR_REMOTE: origin
-          RELEASE_PR_OWNER: opentelemetrybot
+          RELEASE_BASE_BRANCH: ${{ github.ref_name }}

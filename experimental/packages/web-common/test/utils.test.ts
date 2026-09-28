@@ -1,26 +1,19 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
 import {
   createSessionLogRecordProcessor,
   createSessionSpanProcessor,
+  createDefaultSessionIdGenerator,
+  createLocalStorageSessionStore,
 } from '../src/utils';
-import { SessionSpanProcessor } from '../src/SessionSpanProcessor';
-import { SessionLogRecordProcessor } from '../src/SessionLogRecordProcessor';
+import type { SessionSpanProcessor } from '../src/SessionSpanProcessor';
+import type { SessionLogRecordProcessor } from '../src/SessionLogRecordProcessor';
+import type { SessionIdGenerator } from '../src/types/SessionIdGenerator';
+import type { SessionStore } from '../src/types/SessionStore';
 
 describe('createSessionSpanProcessor', function () {
   it('returns an instance of a SessionSpanProcessor', function () {
@@ -41,5 +34,27 @@ describe('createSessionLogRecordProcessor', function () {
       },
     });
     assert.ok(processor as SessionLogRecordProcessor);
+  });
+});
+
+describe('createDefaultSessionIdGenerator', function () {
+  it('returns an instance of a SessionIdGenerator', function () {
+    const generator = createDefaultSessionIdGenerator();
+    assert.ok(generator as SessionIdGenerator);
+
+    const sessionId = generator.generateSessionId();
+    assert.ok(sessionId);
+    assert.ok(typeof sessionId === 'string');
+    assert.ok(sessionId.length > 0);
+  });
+});
+
+describe('createLocalStorageSessionStore', function () {
+  it('returns an instance of a SessionStore', function () {
+    const store = createLocalStorageSessionStore();
+    assert.ok(store as SessionStore);
+
+    assert.ok(typeof store.save === 'function');
+    assert.ok(typeof store.get === 'function');
   });
 });

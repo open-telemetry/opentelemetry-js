@@ -1,46 +1,47 @@
 {
   "name": "@opentelemetry/api",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "Public API for OpenTelemetry",
-  "main": "build/src/index.js",
-  "module": "build/esm/index.js",
-  "esnext": "build/esnext/index.js",
-  "types": "build/src/index.d.ts",
-  "browser": {
-    "./src/platform/index.ts": "./src/platform/browser/index.ts",
-    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
-    "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
-    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
-  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
   "exports": {
     ".": {
-      "types": "./build/src/index.d.ts",
-      "module": "./build/esm/index.js",
-      "esnext": "./build/esnext/index.js",
-      "default": "./build/src/index.js"
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./experimental": {
-      "types": "./build/src/experimental/index.d.ts",
-      "module": "./build/esm/experimental/index.js",
-      "esnext": "./build/esnext/experimental/index.js",
-      "default": "./build/src/experimental/index.js"
+      "import": {
+        "types": "./dist/experimental/index.d.mts",
+        "default": "./dist/experimental/index.mjs"
+      },
+      "require": {
+        "types": "./dist/experimental/index.d.cts",
+        "default": "./dist/experimental/index.cjs"
+      }
     }
   },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
-    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "lint:fix": "eslint . --ext .ts --fix",
-    "lint": "eslint . --ext .ts",
+    "clean": "rimraf dist build",
+    "compile": "tsdown",
+    "lint:fix": "eslint . --fix",
+    "lint": "eslint . && npm run cycle-check",
     "test:browser": "karma start --single-run",
-    "test": "nyc mocha test/**/*.test.ts",
+    "test": "nyc mocha 'test/**/*.test.ts'",
+    "test:bench": "node test/performance/benchmark/internal-benchmarks.js && node test/performance/benchmark/public-benchmarks.js | tee .benchmark-results.txt",
+    "test:node8-compat": "node test/backcompat/node8-compat.js",
     "test:webworker": "karma start karma.worker.js --single-run",
     "cycle-check": "dpdm --exit-code circular:1 src/index.ts",
     "version": "node ../scripts/version-update.js",
-    "prewatch": "npm run precompile",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "peer-api-check": "node ../scripts/peer-api-check.js"
+    "watch": "tsdown --watch --no-clean",
+    "peer-api-check": "node ../scripts/peer-api-check.mjs"
   },
   "keywords": [
     "opentelemetry",
@@ -57,17 +58,9 @@
     "node": ">=8.0.0"
   },
   "files": [
-    "build/esm/**/*.js",
-    "build/esm/**/*.js.map",
-    "build/esm/**/*.d.ts",
-    "build/esnext/**/*.js",
-    "build/esnext/**/*.js.map",
-    "build/esnext/**/*.d.ts",
-    "build/src/**/*.js",
-    "build/src/**/*.js.map",
-    "build/src/**/*.d.ts",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "dist"
   ],
   "publishConfig": {
     "access": "public"
@@ -77,26 +70,24 @@
     "@types/node": "^8.10.66",
     "@types/sinon": "17.0.4",
     "@types/webpack": "5.28.5",
-    "@types/webpack-env": "1.16.3",
-    "babel-plugin-istanbul": "7.0.0",
-    "cross-var": "1.1.0",
-    "dpdm": "3.13.1",
+    "@types/webpack-env": "1.18.8",
+    "babel-plugin-istanbul": "8.0.0",
+    "dpdm": "4.3.0",
     "karma": "6.4.4",
-    "karma-chrome-launcher": "3.1.0",
+    "karma-chrome-launcher": "3.2.0",
     "karma-coverage": "2.2.1",
     "karma-mocha": "2.0.1",
     "karma-mocha-webworker": "1.3.0",
-    "karma-spec-reporter": "0.0.36",
+    "karma-spec-reporter": "0.0.37",
     "karma-webpack": "5.0.1",
-    "lerna": "6.6.2",
     "memfs": "3.5.3",
-    "mocha": "11.1.0",
+    "mocha": "11.8.0",
     "nyc": "17.1.0",
     "sinon": "18.0.1",
-    "ts-loader": "9.5.2",
-    "typescript": "5.0.4",
+    "ts-loader": "9.5.7",
+    "typescript": "5.2.2",
     "unionfs": "4.5.4",
-    "webpack": "5.99.9"
+    "webpack": "5.108.4"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/api",
   "sideEffects": false

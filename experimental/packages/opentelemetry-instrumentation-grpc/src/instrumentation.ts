@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import type { EventEmitter } from 'events';
@@ -41,21 +30,18 @@ import type {
 } from './internal-types';
 import { type GrpcInstrumentationConfig } from './types';
 
+import type { SpanOptions, Span } from '@opentelemetry/api';
 import {
   context,
   propagation,
   ROOT_CONTEXT,
-  SpanOptions,
   SpanKind,
   trace,
-  Span,
   type Attributes,
 } from '@opentelemetry/api';
 import {
   InstrumentationNodeModuleDefinition,
   InstrumentationBase,
-  SemconvStability,
-  semconvStabilityFromStr,
 } from '@opentelemetry/instrumentation';
 
 import {
@@ -63,13 +49,7 @@ import {
   ATTR_SERVER_PORT,
 } from '@opentelemetry/semantic-conventions';
 
-import {
-  ATTR_NET_PEER_NAME,
-  ATTR_NET_PEER_PORT,
-  ATTR_RPC_METHOD,
-  ATTR_RPC_SERVICE,
-  ATTR_RPC_SYSTEM,
-} from '../src/semconv';
+import { ATTR_RPC_METHOD, ATTR_RPC_SERVICE, ATTR_RPC_SYSTEM } from './semconv';
 
 import {
   shouldNotTraceServerCall,
@@ -97,16 +77,10 @@ import { VERSION } from './version';
 
 export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentationConfig> {
   private _metadataCapture: metadataCaptureType;
-  private _semconvStability: SemconvStability;
 
   constructor(config: GrpcInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-grpc', VERSION, config);
     this._metadataCapture = this._createMetadataCapture();
-
-    this._semconvStability = semconvStabilityFromStr(
-      'http',
-      process.env.OTEL_SEMCONV_STABILITY_OPT_IN
-    );
   }
 
   init() {
@@ -140,22 +114,38 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
           this._wrap(
             moduleExports.Client.prototype,
             'makeUnaryRequest',
-            this._patchClientRequestMethod(moduleExports, false)
+            this._patchClientRequestMethod(
+              moduleExports,
+              false,
+              'makeUnaryRequest'
+            )
           );
           this._wrap(
             moduleExports.Client.prototype,
             'makeClientStreamRequest',
-            this._patchClientRequestMethod(moduleExports, false)
+            this._patchClientRequestMethod(
+              moduleExports,
+              false,
+              'makeClientStreamRequest'
+            )
           );
           this._wrap(
             moduleExports.Client.prototype,
             'makeServerStreamRequest',
-            this._patchClientRequestMethod(moduleExports, true)
+            this._patchClientRequestMethod(
+              moduleExports,
+              true,
+              'makeServerStreamRequest'
+            )
           );
           this._wrap(
             moduleExports.Client.prototype,
             'makeBidiStreamRequest',
-            this._patchClientRequestMethod(moduleExports, true)
+            this._patchClientRequestMethod(
+              moduleExports,
+              true,
+              'makeBidiStreamRequest'
+            )
           );
           return moduleExports;
         },
@@ -304,15 +294,14 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
    */
   private _patchClientRequestMethod<ReturnType extends EventEmitter>(
     grpcLib: typeof grpcJs,
-    hasResponseStream: boolean
+    hasResponseStream: boolean,
+    name: string
   ): (
     original: ClientRequestFunction<ReturnType>
   ) => ClientRequestFunction<ReturnType> {
     const instrumentation = this;
     return (original: ClientRequestFunction<ReturnType>) => {
-      instrumentation._diag.debug(
-        'patched makeClientStreamRequest on grpc client'
-      );
+      instrumentation._diag.debug(`patched ${name} on grpc client`);
 
       return function makeClientStreamRequest(this: grpcJs.Client) {
         // method must always be at first position
@@ -340,11 +329,7 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
           service,
           metadata
         );
-        instrumentation.extractNetMetadata(
-          this,
-          span,
-          instrumentation._semconvStability
-        );
+        instrumentation.extractNetMetadata(this, span);
 
         // Callback is only present when there is no responseStream
         if (!hasResponseStream) {
@@ -457,11 +442,7 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
             [ATTR_RPC_METHOD]: method,
             [ATTR_RPC_SERVICE]: service,
           });
-        instrumentation.extractNetMetadata(
-          this,
-          span,
-          instrumentation._semconvStability
-        );
+        instrumentation.extractNetMetadata(this, span);
 
         instrumentation._metadataCapture.client.captureRequestMetadata(
           span,
@@ -513,38 +494,17 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
     return span;
   }
 
-  private extractNetMetadata(
-    client: grpcJs.Client,
-    span: Span,
-    semconvStability: SemconvStability
-  ) {
+  private extractNetMetadata(client: grpcJs.Client, span: Span) {
     // set net.peer.* from target (e.g., "dns:otel-productcatalogservice:8080") as a hint to APMs
     const parsedUri = URI_REGEX.exec(client.getChannel().getTarget());
     const hostname = parsedUri?.groups?.name;
     const port = parseInt(parsedUri?.groups?.port ?? '');
 
-    const oldAttributes: Attributes = {
-      [ATTR_NET_PEER_NAME]: hostname,
-      [ATTR_NET_PEER_PORT]: port,
-    };
-    const newAttributes: Attributes = {
+    const attributes: Attributes = {
       [ATTR_SERVER_ADDRESS]: hostname,
       [ATTR_SERVER_PORT]: port,
     };
-
-    switch (semconvStability) {
-      case SemconvStability.STABLE:
-        span.setAttributes(newAttributes);
-        break;
-      case SemconvStability.OLD:
-        span.setAttributes(oldAttributes);
-        break;
-      case SemconvStability.DUPLICATE:
-        span.setAttributes({ ...oldAttributes, ...newAttributes });
-        break;
-      default:
-        span.setAttributes(oldAttributes);
-    }
+    span.setAttributes(attributes);
   }
 
   /**

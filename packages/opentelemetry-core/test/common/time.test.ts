@@ -1,30 +1,19 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
-import { otperformance as performance } from '../../src/platform';
 import * as sinon from 'sinon';
-import * as api from '@opentelemetry/api';
+import type * as api from '@opentelemetry/api';
 import {
   hrTime,
   timeInputToHrTime,
   hrTimeDuration,
   hrTimeToNanoseconds,
-  hrTimeToMilliseconds,
   hrTimeToMicroseconds,
+  hrTimeToMilliseconds,
+  hrTimeToSeconds,
   hrTimeToTimeStamp,
   isTimeInput,
   addHrTimes,
@@ -83,23 +72,6 @@ describe('time', () => {
       const output = hrTime(null as any);
       assert.deepStrictEqual(output, [0, 22800000]);
     });
-
-    describe('when timeOrigin is not available', () => {
-      it('should use the performance.timing.fetchStart as a fallback', () => {
-        Object.defineProperty(performance, 'timing', {
-          writable: true,
-          value: {
-            fetchStart: 11.5,
-          },
-        });
-
-        sinon.stub(performance, 'timeOrigin').value(undefined);
-        sinon.stub(performance, 'now').callsFake(() => 11.3);
-
-        const output = hrTime();
-        assert.deepStrictEqual(output, [0, 22800000]);
-      });
-    });
   });
 
   describe('#timeInputToHrTime', () => {
@@ -138,6 +110,21 @@ describe('time', () => {
       const output = timeInputToHrTime(timeInput);
 
       assert.deepStrictEqual(output, [0, 123400000]);
+    });
+
+    it('should treat an epoch-ms timestamp as epoch even when it falls just below performance.timeOrigin due to clock skew', () => {
+      // Simulate the scenario reported in issue #6772: performance.timeOrigin
+      // uses a monotonic clock and can be slightly ahead of Date.now() at page
+      // load, causing a real epoch-ms value to be misclassified as a relative
+      // performance.now() reading and doubled.
+      const epochMs = 1779958953234; // a real Date.now()-style timestamp
+      // Set timeOrigin to a value slightly larger than epochMs to reproduce
+      // the clock-skew window.
+      sinon.stub(performance, 'timeOrigin').value(epochMs + 100);
+
+      const output = timeInputToHrTime(epochMs);
+      // Should decode as epoch seconds + remainder nanoseconds, NOT doubled.
+      assert.deepStrictEqual(output, [1779958953, 234000000]);
     });
 
     it('should not convert hrtime hrTime', () => {
@@ -184,6 +171,13 @@ describe('time', () => {
     });
   });
 
+  describe('#hrTimeToMicroseconds', () => {
+    it('should return microseconds', () => {
+      const output = hrTimeToMicroseconds([1, 200000000]);
+      assert.deepStrictEqual(output, 1200000);
+    });
+  });
+
   describe('#hrTimeToMilliseconds', () => {
     it('should return milliseconds', () => {
       const output = hrTimeToMilliseconds([1, 200000000]);
@@ -191,12 +185,13 @@ describe('time', () => {
     });
   });
 
-  describe('#hrTimeToMicroseconds', () => {
-    it('should return microseconds', () => {
-      const output = hrTimeToMicroseconds([1, 200000000]);
-      assert.deepStrictEqual(output, 1200000);
+  describe('#hrTimeToSeconds', () => {
+    it('should return seconds', () => {
+      const output = hrTimeToSeconds([1, 200000000]);
+      assert.deepStrictEqual(output, 1.2);
     });
   });
+
   describe('#isTimeInput', () => {
     it('should return true for a number', () => {
       assert.strictEqual(isTimeInput(12), true);

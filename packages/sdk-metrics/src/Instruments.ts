@@ -1,25 +1,11 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  context as contextApi,
-  diag,
+import type {
   Context,
   Attributes,
-  ValueType,
   UpDownCounter,
   Counter,
   Gauge,
@@ -30,24 +16,30 @@ import {
   ObservableGauge,
   ObservableUpDownCounter,
 } from '@opentelemetry/api';
-import { millisToHrTime } from '@opentelemetry/core';
-import { InstrumentDescriptor } from './InstrumentDescriptor';
-import { ObservableRegistry } from './state/ObservableRegistry';
-import {
+import { diag, ValueType } from '@opentelemetry/api';
+import type { InstrumentDescriptor } from './InstrumentDescriptor';
+import type { ObservableRegistry } from './state/ObservableRegistry';
+import type {
   AsyncWritableMetricStorage,
   WritableMetricStorage,
 } from './state/WritableMetricStorage';
 
 export class SyncInstrument {
+  private _writableMetricStorage: WritableMetricStorage;
+  protected _descriptor: InstrumentDescriptor;
+
   constructor(
-    private _writableMetricStorage: WritableMetricStorage,
-    protected _descriptor: InstrumentDescriptor
-  ) {}
+    writableMetricStorage: WritableMetricStorage,
+    descriptor: InstrumentDescriptor
+  ) {
+    this._writableMetricStorage = writableMetricStorage;
+    this._descriptor = descriptor;
+  }
 
   protected _record(
     value: number,
     attributes: Attributes = {},
-    context: Context = contextApi.active()
+    context?: Context
   ) {
     if (typeof value !== 'number') {
       diag.warn(
@@ -68,12 +60,11 @@ export class SyncInstrument {
         return;
       }
     }
-    this._writableMetricStorage.record(
-      value,
-      attributes,
-      context,
-      millisToHrTime(Date.now())
-    );
+
+    // Intentionally *not* guarding the given attributes with `cleanAttributes`
+    // or similar, because of the performance impact. Users are strongly
+    // encouraged to use only simple attribute types with metrics.
+    this._writableMetricStorage.record(value, attributes, context, Date.now());
   }
 }
 
@@ -146,14 +137,16 @@ export class ObservableInstrument implements Observable {
   _metricStorages: AsyncWritableMetricStorage[];
   /** @internal */
   _descriptor: InstrumentDescriptor;
+  private _observableRegistry: ObservableRegistry;
 
   constructor(
     descriptor: InstrumentDescriptor,
     metricStorages: AsyncWritableMetricStorage[],
-    private _observableRegistry: ObservableRegistry
+    observableRegistry: ObservableRegistry
   ) {
     this._descriptor = descriptor;
     this._metricStorages = metricStorages;
+    this._observableRegistry = observableRegistry;
   }
 
   /**

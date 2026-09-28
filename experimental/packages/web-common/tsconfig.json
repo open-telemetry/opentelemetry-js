@@ -1,6 +1,11 @@
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
+    "lib": [
+      "es2022",
+      "dom",
+      "dom.iterable"
+    ],
     "outDir": "build",
     "rootDir": "."
   },
@@ -13,7 +18,10 @@
       "path": "../../../api"
     },
     {
-      "path": "../../../packages/opentelemetry-sdk-trace-base"
+      "path": "../../../packages/opentelemetry-core"
+    },
+    {
+      "path": "../../../packages/sdk-trace"
     },
     {
       "path": "../../../semantic-conventions"

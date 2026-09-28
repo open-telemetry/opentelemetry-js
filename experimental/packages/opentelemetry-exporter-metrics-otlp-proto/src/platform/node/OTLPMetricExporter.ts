@@ -1,40 +1,54 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
+import { type MeterProvider } from '@opentelemetry/api';
+import type { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPMetricExporterBase } from '@opentelemetry/exporter-metrics-otlp-http';
-import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
-import { ProtobufMetricsSerializer } from '@opentelemetry/otlp-transformer';
-import { VERSION } from '../../version';
+import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import {
+  MetricsExporterMetricsHelper,
+  ProtobufMetricsSerializer,
+} from '@opentelemetry/otlp-transformer';
 import {
   convertLegacyHttpOptions,
   createOtlpHttpExportDelegate,
+  createOtlpHttpExporterMetrics,
 } from '@opentelemetry/otlp-exporter-base/node-http';
 
+import { OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER } from '../../semconv';
+
 export class OTLPMetricExporter extends OTLPMetricExporterBase {
+  private readonly _url: string | undefined;
   constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {
     super(
       createOtlpHttpExportDelegate(
         convertLegacyHttpOptions(config ?? {}, 'METRICS', 'v1/metrics', {
-          'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
           'Content-Type': 'application/x-protobuf',
         }),
-        ProtobufMetricsSerializer
+        ProtobufMetricsSerializer,
+        OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER,
+        MetricsExporterMetricsHelper,
+        config?.selfObsMeterProvider
       ),
       config
+    );
+    this._url = config?.url;
+  }
+
+  /**
+   * Sets the meter provider to use to collect metrics for the exporter itself.
+   * @experimental This method is experimental and is subject to breaking changes in minor releases.
+   */
+  setSelfObsMeterProvider(meterProvider: MeterProvider) {
+    this.setMetrics(
+      createOtlpHttpExporterMetrics(
+        OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER,
+        MetricsExporterMetricsHelper,
+        this._url,
+        meterProvider
+      )
     );
   }
 }

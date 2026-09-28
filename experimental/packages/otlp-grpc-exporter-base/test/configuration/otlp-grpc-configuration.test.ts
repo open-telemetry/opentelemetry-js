@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
@@ -26,7 +15,6 @@ import {
   createSslCredentials,
 } from '../../src/grpc-exporter-transport';
 import * as fs from 'fs';
-import { VERSION } from '../../src/version';
 
 describe('mergeOtlpGrpcConfigurationWithDefaults', function () {
   describe('metadata', function () {
@@ -57,46 +45,21 @@ describe('mergeOtlpGrpcConfigurationWithDefaults', function () {
         foo: 'foo-user', // does not use fallback if the user has set something
         bar: 'bar-fallback', // uses fallback if there is no value set
         baz: 'baz-user', // does not drop user-set metadata if there is no fallback for it
-        'user-agent': 'OTel-OTLP-Exporter-JavaScript/' + VERSION,
       });
+      assert.equal(config.userAgent, undefined);
     });
 
-    it('does not override default (required) metadata', function () {
+    it('sets userAgent options if user provided it', function () {
       // act
       const config = mergeOtlpGrpcConfigurationWithDefaults(
         {
-          metadata: () => {
-            const metadata = createEmptyMetadata();
-            metadata.set('user-agent', 'user-provided-user-agent');
-            return metadata;
-          },
+          userAgent: 'user-provided-user-agent/1.2.3',
         },
-        {
-          metadata: () => {
-            const metadata = createEmptyMetadata();
-            metadata.set('user-agent', 'fallback-user-agent');
-            return metadata;
-          },
-        },
-        getOtlpGrpcDefaultConfiguration()
-      );
-
-      assert.deepStrictEqual(config.metadata().getMap(), {
-        'user-agent': 'OTel-OTLP-Exporter-JavaScript/' + VERSION,
-      });
-    });
-
-    it('does use default metadata if nothing is provided', function () {
-      // act
-      const config = mergeOtlpGrpcConfigurationWithDefaults(
-        {},
         {},
         getOtlpGrpcDefaultConfiguration()
       );
 
-      assert.deepStrictEqual(config.metadata().getMap(), {
-        'user-agent': 'OTel-OTLP-Exporter-JavaScript/' + VERSION,
-      });
+      assert.equal(config.userAgent, 'user-provided-user-agent/1.2.3');
     });
   });
 

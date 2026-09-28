@@ -6,7 +6,7 @@ For a high-level overview of OpenTelemetry metrics in general and definitions of
 
 _Metrics API Specification: <https://github.com/open-telemetry/opentelemetry-specification/blob/v1.14.0/specification/metrics/api.md>_
 
-_Metrics API Reference: <https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_api._opentelemetry_api.MetricsAPI.html>_
+_Metrics API Reference: <https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api._opentelemetry_api.MetricsAPI.html>_
 
 - [Getting Started](#getting-started)
 - [Acquiring a Meter](#acquiring-a-meter)
@@ -328,12 +328,20 @@ all successful POST requests.
 
 While name and measurement are the minimum required to record a metric measurement,
 most of the time they will not be enough information on their own to effectively observe
-an application. To solve this, OpenTelemetry uses _Metric Attributes_. Metric attributes are object with
-string keys and string values which add more context to the measurement.
+an application. To solve this, OpenTelemetry uses _Metric Attributes_. Metric attributes are an object with
+(non-empty) string keys and values which add more context to the measurement.
 
 For example, when you are measuring the number of inflight requests, you might want to be able to count
-the number of POST, or GET requests. You can add the a metric attribute for `http.method` to allow more
+the number of POST, or GET requests. You can add the a metric attribute for `http.request.method` to allow more
 flexibility when leveraging your metric measurement like in Grafana dashboards.
+
+> [!WARNING]
+> Simple attributes values (string, number, boolean) SHOULD be used whenever possible.
+> Using complex attribute values (arrays, nested objects, etc.) can have significant
+> negative performance overhead on the Metrics SDK, and possibly on observability backends.
+> As well, for performance reasons, the OTel JS Metrics SDK does _not_ guard against
+> unserializable values (e.g. a BigInt, a circular reference).
+> Incorrect usage can _crash_ the application.
 
 ### Semantic Conventions
 
@@ -549,6 +557,7 @@ const meterProvider = new MeterProvider({
     new PeriodicExportingMetricReader({
       exporter,
       exportIntervalMillis: 1000,
+      maxExportBatchSize: 200, // optional: maximum number of data points per export batch
     }),
   ],
 });
@@ -558,6 +567,3 @@ const meter = meterProvider.getMeter('example-meter');
 const counter = meter.createCounter('metric_name');
 counter.add(10, { 'key': 'value' });
 ```
-
-For a fully functioning code example for using this exporter, please have a look
-at: <https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/otlp-exporter-node>

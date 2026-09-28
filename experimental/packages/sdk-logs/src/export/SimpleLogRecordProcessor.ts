@@ -1,19 +1,9 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
+import { createNoopMeter } from '@opentelemetry/api';
 import type { ExportResult } from '@opentelemetry/core';
 import {
   BindOnceFuture,
@@ -23,18 +13,42 @@ import {
 } from '@opentelemetry/core';
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
-import type { SdkLogRecord } from './SdkLogRecord';
+import type { ReadWriteLogRecord } from './ReadWriteLogRecord';
+import { OTEL_COMPONENT_TYPE_VALUE_SIMPLE_LOG_PROCESSOR } from '../semconv';
+import { LogRecordProcessorMetrics } from './LogRecordProcessorMetrics';
+import type { Context } from '@opentelemetry/api';
+import type { SimpleLogRecordProcessorOptions } from '../types';
 
+/**
+ * An implementation of the {@link LogRecordProcessor} interface that exports
+ * each {@link LogRecord} as it is emitted.
+ *
+ * NOTE: This {@link LogRecordProcessor} exports every {@link LogRecord}
+ * individually instead of batching them together, which can cause significant
+ * performance overhead with most exporters. For production use, please consider
+ * using the {@link BatchLogRecordProcessor} instead.
+ */
 export class SimpleLogRecordProcessor implements LogRecordProcessor {
+  private readonly _exporter: LogRecordExporter;
+  private readonly _metrics: LogRecordProcessorMetrics;
   private _shutdownOnce: BindOnceFuture<void>;
   private _unresolvedExports: Set<Promise<void>>;
 
-  constructor(private readonly _exporter: LogRecordExporter) {
+  constructor(options: SimpleLogRecordProcessorOptions) {
+    this._exporter = options.exporter;
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
     this._unresolvedExports = new Set<Promise<void>>();
+
+    const meter = options?.selfObsMeterProvider
+      ? options.selfObsMeterProvider.getMeter('@opentelemetry/sdk-logs')
+      : createNoopMeter();
+    this._metrics = new LogRecordProcessorMetrics(
+      OTEL_COMPONENT_TYPE_VALUE_SIMPLE_LOG_PROCESSOR,
+      meter
+    );
   }
 
-  public onEmit(logRecord: SdkLogRecord): void {
+  public onEmit(logRecord: ReadWriteLogRecord, _context?: Context): void {
     if (this._shutdownOnce.isCalled) {
       return;
     }
@@ -43,6 +57,7 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
       internal
         ._export(this._exporter, [logRecord])
         .then((result: ExportResult) => {
+          this._metrics.finishLogs(1, result.error);
           if (result.code !== ExportResultCode.SUCCESS) {
             globalErrorHandler(
               result.error ??
@@ -61,7 +76,6 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
         .then(() => {
           // Using TS Non-null assertion operator because exportPromise could not be null in here
           // if waitForAsyncAttributes is not present this code will never be reached
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           this._unresolvedExports.delete(exportPromise!);
           return doExport();
         }, globalErrorHandler);
@@ -85,6 +99,7 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
   }
 
   private _shutdown(): Promise<void> {
+    this._metrics.shutdown();
     return this._exporter.shutdown();
   }
 }

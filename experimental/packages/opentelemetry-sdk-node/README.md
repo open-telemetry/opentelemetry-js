@@ -22,7 +22,7 @@ $ npm install @opentelemetry/sdk-node
 
 $ # Install exporters and plugins
 $ npm install \
-    @opentelemetry/exporter-jaeger \ # add tracing exporters as needed
+    @opentelemetry/exporter-trace-otlp-proto \ # add tracing exporters as needed
     @opentelemetry/exporter-prometheus \ # add metrics exporters as needed
     @opentelemetry/instrumentation-http # add instrumentations as needed
 
@@ -38,23 +38,24 @@ $ npm install @opentelemetry/auto-instrumentations-node
 Before any other module in your application is loaded, you must initialize the SDK.
 If you fail to initialize the SDK or initialize it too late, no-op implementations will be provided to any library which acquires a tracer or meter from the API.
 
-This example uses Jaeger and Prometheus, but exporters exist for [other tracing backends][other-tracing-backends].
+This example uses Jaeger (via OTLP) and Prometheus, but exporters exist for [other tracing backends][other-tracing-backends].
+OTLP in particular is widely supported by a wide-variety of backends.
 As shown in the installation instructions, exporters passed to the SDK must be installed alongside `@opentelemetry/sdk-node`.
 
 ```javascript
 const opentelemetry = require("@opentelemetry/sdk-node");
-const { JaegerExporter } = require("@opentelemetry/exporter-jaeger");
+const { OTLPTraceExporter } = require("@opentelemetry/exporter-trace-otlp-proto");
 const { PrometheusExporter } = require("@opentelemetry/exporter-prometheus");
 const {
   getNodeAutoInstrumentations,
 } = require("@opentelemetry/auto-instrumentations-node");
 
-const jaegerExporter = new JaegerExporter();
+const otlpExporter = new OTLPTraceExporter();
 const prometheusExporter = new PrometheusExporter();
 
 const sdk = new opentelemetry.NodeSDK({
   // Optional - if omitted, the tracing SDK will be initialized from environment variables
-  traceExporter: jaegerExporter,
+  traceExporter: otlpExporter,
   // Optional - If omitted, the metrics SDK will not be initialized
   metricReader: prometheusExporter,
   // Optional - you can use the metapackage or load each instrumentation individually
@@ -102,32 +103,54 @@ Deprecated, please use [logRecordProcessors](#logrecordprocessors) instead.
 
 An array of log record processors to register to the logger provider.
 
-### mergeResourceWithDefaults
-
-Merge user-provided resources with the default resource. Default `true`.
-The default will change to `false` in a future iteration of this package.
-
 ### metricReader
 
-Add a [MetricReader](../opentelemetry-sdk-metrics/src/export/MetricReader.ts)
+Add a [MetricReader](../../../packages/sdk-metrics/src/export/MetricReader.ts)
 that will be passed to the `MeterProvider`. If `metricReader` is not configured,
 the metrics SDK will not be initialized and registered.
 
 ### views
 
 A list of views to be passed to the `MeterProvider`.
-Accepts an array of [View](../opentelemetry-sdk-metrics/src/view/View.ts)-instances.
+Accepts an array of [View](../../../packages/sdk-metrics/src/view/View.ts)-instances.
 This parameter can be used to configure explicit bucket sizes of histogram metrics.
 
 ### instrumentations
 
 Configure instrumentations. By default none of the instrumentation is enabled,
-if you want to enable them you can use either [metapackage](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/metapackages/auto-instrumentations-node)
+if you want to enable them you can use either [metapackage](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/packages/auto-instrumentations-node)
 or configure each instrumentation individually.
 
 ### resource
 
-Configure a resource. Resources may also be detected by using the `autoDetectResources` method of the SDK.
+A [Resource](https://opentelemetry.io/docs/specs/otel/resource/sdk/) to associate with generated telemetry.
+This resource will be use as the basis for additional resource attributes determined by [resource detectors](#resourcedetectors).
+See also the [`autoDetectResources` setting](#autodetectresources).
+
+If not specified, the [default resource](https://opentelemetry.io/docs/specs/semconv/resource/#semantic-attributes-with-sdk-provided-default-value) will be used.
+
+> [!WARNING]
+> If specifying the `resource` option, it is recommended that the default resource be included.
+> Otherwise the important `service.name` and `telemetry.sdk.*` resource attributes might not be included on telemetry,
+> which can adversely impact downstream processing or visualization.
+> The default resource can be include as follows:
+>
+> ```js
+> import { NodeSDK } from '@opentelemetry/sdk-node';
+> import { resourceFromAttributes, defaultResource } from '@opentelemetry/resources';
+> const sdk = new NodeSDK({
+>   resource: defaultResource().merge(
+>     resourceFromAttributes({
+>       'my.custom.attr': 'some value',
+>     })
+>   ),
+>   // ...
+> });
+> ```
+>
+> Alternatively, consider setting custom resource attributes via the
+> [`OTEL_RESOURCE_ATTRIBUTES`](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#general-sdk-configuration)
+> environment variable.
 
 ### resourceDetectors
 
@@ -145,11 +168,19 @@ If `resourceDetectors` was not set, you can also use the environment variable `O
   - **NOTE:** future versions of `@opentelemetry/sdk-node` may include additional detectors that will be covered by this scope.
 - `none` - disable resource detection
 
+**NOTE:** `env` and `os` are Node.js-specific detectors with no equivalent in the [OpenTelemetry declarative configuration spec](https://github.com/open-telemetry/opentelemetry-configuration). They are supported when using the `detection/development` block in a declarative config file.
+
 For example, to enable only the `env`, `host` detectors:
 
 ```shell
-export OTEL_NODE_RESOURCE_DETECTORS="env,host"
+export OTEL_NODE_RESOURCE_DETECTORS="host,env"
 ```
+
+NOTE: The order set on `OTEL_NODE_RESOURCE_DETECTORS` will be respected and the detectors will be executed in order.
+For example, if you have `OTEL_RESOURCE_ATTRIBUTES="service.instance.id=custom-name"`, but also `serviceinstance` and `env` on `OTEL_NODE_RESOURCE_DETECTORS`, it can have 2 scenarios:
+
+- `OTEL_NODE_RESOURCE_DETECTORS="serviceinstance,env"` will have the `service.instance.id` as `custom-name`
+- `OTEL_NODE_RESOURCE_DETECTORS="env,serviceinstance"` will have the `service.instance.id` as a random UUID
 
 ### sampler
 
@@ -165,15 +196,15 @@ An array of span processors to register to the tracer provider.
 
 ### traceExporter
 
-Configure a trace exporter. If an exporter is configured, it will be used with a [BatchSpanProcessor](../../../packages/opentelemetry-sdk-trace-base/src/platform/node/export/BatchSpanProcessor.ts). If an exporter OR span processor is not configured programmatically, this package will auto setup the default `otlp` exporter  with `http/protobuf` protocol with a `BatchSpanProcessor`.
+Configure a trace exporter. If an exporter is configured, it will be used with a [BatchSpanProcessor](../../../packages/sdk-trace/src/platform/node/export/BatchSpanProcessor.ts). If an exporter OR span processor is not configured programmatically, this package will auto setup the default `otlp` exporter  with `http/protobuf` protocol with a `BatchSpanProcessor`.
 
 ### spanLimits
 
-Configure tracing parameters. These are the same trace parameters used to [configure a tracer](../../../packages/opentelemetry-sdk-trace-base/src/types.ts#L71).
+Configure tracing parameters. These are the same trace parameters used to [configure a tracer](../../../packages/sdk-trace/src/types.ts#L20).
 
 ### serviceName
 
-Configure the [service name](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service).
+Configure the [service name](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/registry/attributes/service.md#service-name).
 
 ## Disable the SDK from the environment
 
@@ -199,10 +230,10 @@ This is an alternative to programmatically configuring an exporter or span proce
 
 ### Exporters
 
-| Environment variable | Description                                                                                                                                                                        |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| OTEL_TRACES_EXPORTER | List of exporters to be used for tracing, separated by commas. Options include `otlp`, `jaeger`, `zipkin`, and `none`. Default is `otlp`. `none` means no autoconfigured exporter. |
-| OTEL_LOGS_EXPORTER   | List of exporters to be used for logging, separated by commas. Options include `otlp`, `console` and `none`. Default is `otlp`. `none` means no autoconfigured exporter.           |
+| Environment variable | Description                                                                                                                                                              |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| OTEL_TRACES_EXPORTER | List of exporters to be used for tracing, separated by commas. Options include `otlp`, `zipkin`, and `none`. Default is `otlp`. `none` means no autoconfigured exporter. |
+| OTEL_LOGS_EXPORTER   | List of exporters to be used for logging, separated by commas. Options include `otlp`, `console` and `none`. Default is `otlp`. `none` means no autoconfigured exporter. |
 
 ### OTLP Exporter
 
@@ -212,15 +243,31 @@ This is an alternative to programmatically configuring an exporter or span proce
 | OTEL_EXPORTER_OTLP_TRACES_PROTOCOL  | The transport protocol to use on OTLP trace requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`.                  |
 | OTEL_EXPORTER_OTLP_METRICS_PROTOCOL | The transport protocol to use on OTLP metric requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`.                 |
 | OTEL_EXPORTER_OTLP_LOGS_PROTOCOL    | The transport protocol to use on OTLP log requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`.                    |
-| OTEL_METRICS_EXPORTER    | Metrics exporter to be used. options are `otlp`, `prometheus`, `console` or `none`.                    |
-| OTEL_METRIC_EXPORT_INTERVAL    | The export interval when using a push Metric Reader. Default is `60000`.                     |
-| OTEL_METRIC_EXPORT_TIMEOUT    | The export timeout when using a push Metric Reader. Default is `30000`.                     |
+| OTEL_METRICS_EXPORTER               | Metrics exporter to be used. options are `otlp`, `prometheus`, `console` or `none`. Default is `otlp`.                                                       |
+| OTEL_METRIC_EXPORT_INTERVAL         | The export interval when using a push Metric Reader. Default is `60000`.                                                                                     |
+| OTEL_METRIC_EXPORT_TIMEOUT          | The export timeout when using a push Metric Reader. Default is `30000`.                                                                                      |
 
 Additionally, you can specify other applicable environment variables that apply to each exporter such as the following:
 
 - [OTLP exporter environment configuration](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options)
 - [Zipkin exporter environment configuration](https://github.com/open-telemetry/opentelemetry-specification/blob/6ce62202e5407518e19c56c445c13682ef51a51d/specification/sdk-environment-variables.md#zipkin-exporter)
-- [Jaeger exporter environment configuration](https://github.com/open-telemetry/opentelemetry-specification/blob/6ce62202e5407518e19c56c445c13682ef51a51d/specification/sdk-environment-variables.md#jaeger-exporter)
+
+## Enable OpenTelemetry SDK internal metrics from environment
+
+OpenTelemetry defines [metrics for monitoring SDK components](https://opentelemetry.io/docs/specs/semconv/otel/sdk-metrics/).
+Until this spec is stabilized, the following environment variable must be used
+to enable these metrics:
+
+```bash
+OTEL_NODE_EXPERIMENTAL_SDK_METRICS=true
+```
+
+Currently a subset of the specified metrics are implemented. See the following
+linkes for details:
+
+- Metric reader metrics: [MetricReaderMetrics](../../../packages//sdk-metrics/src/export/MetricReaderMetrics.ts)
+- Logger metrics: [LoggerMetrics.ts](../sdk-logs/src/LoggerMetrics.ts)
+- Span metrics: [TracerMetrics.ts](../../../packages/sdk-trace/src/TracerMetrics.ts)
 
 ## Useful links
 

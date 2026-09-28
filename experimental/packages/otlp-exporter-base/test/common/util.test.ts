@@ -1,17 +1,6 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
@@ -33,7 +22,7 @@ describe('parseHeaders', function () {
     };
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore simulating plain JS usage
-    const result = validateAndNormalizeHeaders(() => headers)();
+    const result = validateAndNormalizeHeaders(headers);
     assert.deepStrictEqual(result, {
       foo2: 'bar',
       foo3: '1',
@@ -46,7 +35,7 @@ describe('parseHeaders', function () {
   });
 
   it('should parse undefined', function () {
-    const result = validateAndNormalizeHeaders(undefined)();
+    const result = validateAndNormalizeHeaders(undefined);
     assert.deepStrictEqual(result, {});
   });
 });

@@ -1,47 +1,30 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import {
-  Attributes,
-  AttributeValue,
-  diag,
-  ROOT_CONTEXT,
-  trace,
-  TraceFlags,
-} from '@opentelemetry/api';
+import { diag, ROOT_CONTEXT, trace, TraceFlags } from '@opentelemetry/api';
 import * as logsAPI from '@opentelemetry/api/experimental';
-import type { HrTime } from '@opentelemetry/api';
+import type { HrTime, AnyValue, Attributes } from '@opentelemetry/api';
 import { hrTimeToMilliseconds, timeInputToHrTime } from '@opentelemetry/core';
 import { defaultResource } from '@opentelemetry/resources';
-
 import {
-  LogRecordLimits,
-  LogRecordProcessor,
-  LoggerProvider,
-} from './../../src';
+  ATTR_EXCEPTION_MESSAGE,
+  ATTR_EXCEPTION_STACKTRACE,
+  ATTR_EXCEPTION_TYPE,
+} from '@opentelemetry/semantic-conventions';
+
+import type { LogRecordLimits, LogRecordProcessor } from './../../src';
+import { LoggerProvider } from './../../src';
 import { invalidAttributes, validAttributes } from './utils';
 import { LoggerProviderSharedState } from '../../src/internal/LoggerProviderSharedState';
-import { reconfigureLimits } from '../../src/config';
 import { LogRecordImpl } from '../../src/LogRecordImpl';
 
 const performanceTimeOrigin: HrTime = [1, 1];
 
-const setup = (logRecordLimits?: LogRecordLimits, data?: logsAPI.LogRecord) => {
+const setup = (limits?: LogRecordLimits, data?: logsAPI.LogRecord) => {
   const instrumentationScope = {
     name: 'test name',
     version: 'test version',
@@ -50,8 +33,10 @@ const setup = (logRecordLimits?: LogRecordLimits, data?: logsAPI.LogRecord) => {
   const resource = defaultResource();
   const sharedState = new LoggerProviderSharedState(
     resource,
-    Infinity,
-    reconfigureLimits(logRecordLimits ?? {}),
+    {
+      attributeCountLimit: limits?.attributeCountLimit ?? 128,
+      attributeValueLengthLimit: limits?.attributeValueLengthLimit ?? Infinity,
+    },
     []
   );
   const logRecord = new LogRecordImpl(
@@ -153,6 +138,86 @@ describe('LogRecord', () => {
         attr2: 123,
       });
     });
+
+    it('should set exception attributes from exception', () => {
+      const error = new Error('boom');
+      const logRecordData: logsAPI.LogRecord = {
+        exception: error,
+      };
+      const { logRecord } = setup(undefined, logRecordData);
+
+      assert.strictEqual(
+        logRecord.attributes[ATTR_EXCEPTION_MESSAGE],
+        error.message
+      );
+      assert.strictEqual(logRecord.attributes[ATTR_EXCEPTION_TYPE], error.name);
+      if (error.stack) {
+        assert.strictEqual(
+          logRecord.attributes[ATTR_EXCEPTION_STACKTRACE],
+          error.stack
+        );
+      }
+    });
+
+    it('should not overwrite user-provided exception attributes', () => {
+      const error = new Error('boom');
+      const logRecordData: logsAPI.LogRecord = {
+        exception: error,
+        attributes: {
+          [ATTR_EXCEPTION_MESSAGE]: 'user message',
+          [ATTR_EXCEPTION_TYPE]: 'CustomError',
+        },
+      };
+      const { logRecord } = setup(undefined, logRecordData);
+
+      assert.strictEqual(
+        logRecord.attributes[ATTR_EXCEPTION_MESSAGE],
+        'user message'
+      );
+      assert.strictEqual(
+        logRecord.attributes[ATTR_EXCEPTION_TYPE],
+        'CustomError'
+      );
+    });
+
+    it('should set exception.message for string exceptions', () => {
+      const logRecordData: logsAPI.LogRecord = {
+        exception: 'boom',
+      };
+      const { logRecord } = setup(undefined, logRecordData);
+
+      assert.strictEqual(logRecord.attributes[ATTR_EXCEPTION_MESSAGE], 'boom');
+    });
+
+    it('should set exception.message for numeric exceptions', () => {
+      const logRecordData: logsAPI.LogRecord = {
+        exception: 42,
+      };
+      const { logRecord } = setup(undefined, logRecordData);
+
+      assert.strictEqual(logRecord.attributes[ATTR_EXCEPTION_MESSAGE], '42');
+    });
+
+    it('should warn when exception has no useful fields', () => {
+      const warnSpy = sinon.stub(diag, 'warn');
+      const logRecordData: logsAPI.LogRecord = {
+        exception: {} as unknown,
+      };
+
+      setup(undefined, logRecordData);
+
+      assert.ok(warnSpy.calledOnce);
+      warnSpy.restore();
+    });
+
+    it('should set exception.type from code', () => {
+      const logRecordData: logsAPI.LogRecord = {
+        exception: { code: 12 },
+      };
+      const { logRecord } = setup(undefined, logRecordData);
+
+      assert.strictEqual(logRecord.attributes[ATTR_EXCEPTION_TYPE], '12');
+    });
   });
 
   describe('setAttribute', () => {
@@ -163,7 +228,7 @@ describe('LogRecord', () => {
           logRecord.setAttribute(k, v);
         }
         for (const [k, v] of Object.entries(invalidAttributes)) {
-          logRecord.setAttribute(k, v as unknown as AttributeValue);
+          logRecord.setAttribute(k, v as unknown as AnyValue);
         }
         assert.deepStrictEqual(logRecord.attributes, validAttributes);
       });
@@ -233,6 +298,27 @@ describe('LogRecord', () => {
           }
           sinon.assert.callCount(warnStub, 1);
           warnStub.restore();
+        });
+
+        it('should not increment droppedAttributesCount on key updates', () => {
+          const { logRecord } = setup({ attributeCountLimit: 2 });
+          logRecord.setAttribute('key1', 'value1');
+          logRecord.setAttribute('key2', 'value2');
+          logRecord.setAttribute('key1', 'updated');
+          assert.strictEqual(logRecord.droppedAttributesCount, 0);
+          assert.strictEqual(logRecord.attributes['key1'], 'updated');
+        });
+
+        it('should correctly track droppedAttributesCount with key updates and dropped keys', () => {
+          const { logRecord } = setup({ attributeCountLimit: 2 });
+          logRecord.setAttribute('key1', 'value1');
+          logRecord.setAttribute('key2', 'value2');
+          logRecord.setAttribute('key3', 'value3');
+          logRecord.setAttribute('key1', 'updated');
+          assert.strictEqual(logRecord.droppedAttributesCount, 1);
+          assert.strictEqual(logRecord.attributes['key1'], 'updated');
+          assert.strictEqual(logRecord.attributes['key2'], 'value2');
+          assert.strictEqual(logRecord.attributes['key3'], undefined);
         });
       });
 
@@ -307,7 +393,7 @@ describe('LogRecord', () => {
     });
   });
 
-  describe('should rewrite body/severityNumber/severityText', () => {
+  describe('should rewrite body/severityNumber/severityText/eventName/hrTime/hrTimeObserved/spanContext', () => {
     const currentTime = new Date().getTime();
     const logRecordData: logsAPI.LogRecord = {
       timestamp: currentTime,
@@ -323,6 +409,13 @@ describe('LogRecord', () => {
     const newSeverityNumber = logsAPI.SeverityNumber.INFO;
     const newSeverityText = 'INFO';
     const newName = 'new name';
+    const newHrTime: HrTime = [123, 456];
+    const newHrTimeObserved: HrTime = [789, 101112];
+    const newSpanContext = {
+      traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+      spanId: '6e0c63257de34c92',
+      traceFlags: TraceFlags.SAMPLED,
+    };
 
     it('should rewrite directly through the property method', () => {
       const { logRecord } = setup(undefined, logRecordData);
@@ -331,11 +424,17 @@ describe('LogRecord', () => {
       logRecord.severityNumber = newSeverityNumber;
       logRecord.severityText = newSeverityText;
       logRecord.eventName = newName;
+      logRecord.hrTime = newHrTime;
+      logRecord.hrTimeObserved = newHrTimeObserved;
+      logRecord.spanContext = newSpanContext;
 
       assert.deepStrictEqual(logRecord.body, newBody);
       assert.deepStrictEqual(logRecord.severityNumber, newSeverityNumber);
       assert.deepStrictEqual(logRecord.severityText, newSeverityText);
       assert.deepStrictEqual(logRecord.eventName, newName);
+      assert.deepStrictEqual(logRecord.hrTime, newHrTime);
+      assert.deepStrictEqual(logRecord.hrTimeObserved, newHrTimeObserved);
+      assert.deepStrictEqual(logRecord.spanContext, newSpanContext);
     });
 
     it('should rewrite using the set method', () => {
@@ -353,7 +452,7 @@ describe('LogRecord', () => {
     });
   });
 
-  describe('should be read-only(body/severityNumber/severityText/eventName) if makeReadonly has been called', () => {
+  describe('should be read-only(body/severityNumber/severityText/eventName/hrTime/hrTimeObserved/spanContext) if makeReadonly has been called', () => {
     const currentTime = new Date().getTime();
     const logRecordData: logsAPI.LogRecord = {
       timestamp: currentTime,
@@ -369,16 +468,30 @@ describe('LogRecord', () => {
     const newSeverityNumber = logsAPI.SeverityNumber.INFO;
     const newSeverityText = 'INFO';
     const newName = 'new name';
+    const newHrTime: HrTime = [123, 456];
+    const newHrTimeObserved: HrTime = [789, 101112];
+    const newSpanContext = {
+      traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+      spanId: '6e0c63257de34c92',
+      traceFlags: TraceFlags.SAMPLED,
+    };
 
     it('should not rewrite directly through the property method', () => {
       const warnStub = sinon.spy(diag, 'warn');
       const { logRecord } = setup(undefined, logRecordData);
+      const initialHrTime = logRecord.hrTime;
+      const initialHrTimeObserved = logRecord.hrTimeObserved;
+      const initialSpanContext = logRecord.spanContext;
+
       logRecord._makeReadonly();
 
       logRecord.body = newBody;
       logRecord.severityNumber = newSeverityNumber;
       logRecord.severityText = newSeverityText;
       logRecord.eventName = newName;
+      logRecord.hrTime = newHrTime;
+      logRecord.hrTimeObserved = newHrTimeObserved;
+      logRecord.spanContext = newSpanContext;
 
       assert.deepStrictEqual(logRecord.body, logRecordData.body);
       assert.deepStrictEqual(logRecord.eventName, logRecordData.eventName);
@@ -390,7 +503,11 @@ describe('LogRecord', () => {
         logRecord.severityText,
         logRecordData.severityText
       );
-      sinon.assert.callCount(warnStub, 4);
+      assert.deepStrictEqual(logRecord.hrTime, initialHrTime);
+      assert.deepStrictEqual(logRecord.hrTimeObserved, initialHrTimeObserved);
+      assert.deepStrictEqual(logRecord.spanContext, initialSpanContext);
+
+      sinon.assert.callCount(warnStub, 7);
       sinon.assert.alwaysCalledWith(
         warnStub,
         'Can not execute the operation on emitted log record'
@@ -423,6 +540,280 @@ describe('LogRecord', () => {
         warnStub,
         'Can not execute the operation on emitted log record'
       );
+      warnStub.restore();
+    });
+  });
+
+  describe('OpenTelemetry Log Attributes spec compliance', () => {
+    describe('should support all AnyValue types per OpenTelemetry spec', () => {
+      it('should support scalar values (string, number, boolean)', () => {
+        const { logRecord } = setup();
+        logRecord.setAttribute('string', 'test');
+        logRecord.setAttribute('number', 42);
+        logRecord.setAttribute('boolean', true);
+        logRecord.setAttribute('negativeNumber', -123.45);
+
+        assert.strictEqual(logRecord.attributes.string, 'test');
+        assert.strictEqual(logRecord.attributes.number, 42);
+        assert.strictEqual(logRecord.attributes.boolean, true);
+        assert.strictEqual(logRecord.attributes.negativeNumber, -123.45);
+      });
+
+      it('should support byte arrays (Uint8Array)', () => {
+        const { logRecord } = setup();
+        const byteArray = new Uint8Array([1, 2, 3, 4, 5]);
+        logRecord.setAttribute('bytes', byteArray);
+
+        assert.deepStrictEqual(logRecord.attributes.bytes, byteArray);
+        assert.ok(logRecord.attributes.bytes instanceof Uint8Array);
+      });
+
+      it('should support heterogeneous arrays (arrays with mixed types)', () => {
+        const { logRecord } = setup();
+        const mixedArray = ['string', 42, true, null, new Uint8Array([1, 2])];
+        logRecord.setAttribute('mixedArray', mixedArray);
+
+        assert.deepStrictEqual(logRecord.attributes.mixedArray, mixedArray);
+      });
+
+      it('should support nested arrays', () => {
+        const { logRecord } = setup();
+        const nestedArray = [
+          ['a', 'b'],
+          [1, 2],
+          [true, false],
+        ];
+        logRecord.setAttribute('nestedArray', nestedArray);
+
+        assert.deepStrictEqual(logRecord.attributes.nestedArray, nestedArray);
+      });
+
+      it('should support nested objects/maps', () => {
+        const { logRecord } = setup();
+        const nestedObject = {
+          level1: {
+            level2: {
+              string: 'deep value',
+              number: 123,
+              array: ['nested', 'array'],
+            },
+          },
+          topLevel: 'value',
+        };
+        logRecord.setAttribute('nested', nestedObject);
+
+        assert.deepStrictEqual(logRecord.attributes.nested, nestedObject);
+      });
+
+      it('should support empty objects', () => {
+        const { logRecord } = setup();
+        const emptyObj = {};
+        logRecord.setAttribute('empty', emptyObj);
+
+        assert.deepStrictEqual(logRecord.attributes.empty, emptyObj);
+      });
+
+      it('should support null and undefined values', () => {
+        const { logRecord } = setup();
+        logRecord.setAttribute('nullValue', null);
+        logRecord.setAttribute('undefinedValue', undefined);
+
+        assert.strictEqual(logRecord.attributes.nullValue, null);
+        assert.strictEqual(logRecord.attributes.undefinedValue, undefined);
+      });
+
+      it('should support complex combinations of AnyValue types', () => {
+        const { logRecord } = setup();
+        const complexValue = {
+          scalars: {
+            str: 'test',
+            num: 42,
+            bool: true,
+          },
+          arrays: {
+            homogeneous: ['a', 'b', 'c'],
+            heterogeneous: [1, 'two', true, null],
+            nested: [
+              [1, 2],
+              ['a', 'b'],
+            ],
+          },
+          bytes: new Uint8Array([255, 254, 253]),
+          nullValue: null,
+          emptyObj: {},
+        };
+        logRecord.setAttribute('complex', complexValue);
+
+        assert.deepStrictEqual(logRecord.attributes.complex, complexValue);
+      });
+    });
+
+    describe('should properly truncate string values in complex structures', () => {
+      it('should truncate strings in nested objects', () => {
+        const { logRecord } = setup({ attributeValueLengthLimit: 5 });
+        const nestedObject = {
+          level1: {
+            shortString: 'ok',
+            longString: 'this is too long',
+          },
+          topLevelLong: 'also too long',
+        };
+        logRecord.setAttribute('nested', nestedObject);
+
+        const expected = {
+          level1: {
+            shortString: 'ok',
+            longString: 'this ',
+          },
+          topLevelLong: 'also ',
+        };
+        assert.deepStrictEqual(logRecord.attributes.nested, expected);
+      });
+
+      it('should truncate strings in heterogeneous arrays', () => {
+        const { logRecord } = setup({ attributeValueLengthLimit: 5 });
+        const mixedArray = [
+          'short',
+          'this is too long',
+          42,
+          true,
+          'another long string',
+        ];
+        logRecord.setAttribute('mixed', mixedArray);
+
+        const expected = ['short', 'this ', 42, true, 'anoth'];
+        assert.deepStrictEqual(logRecord.attributes.mixed, expected);
+      });
+
+      it('should truncate byte arrays', () => {
+        const { logRecord } = setup({ attributeValueLengthLimit: 5 });
+        const byteArray = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]);
+        logRecord.setAttribute('bytes', byteArray);
+
+        // Byte arrays should not be truncated
+        assert.deepStrictEqual(
+          logRecord.attributes.bytes,
+          new Uint8Array([1, 2, 3, 4, 5])
+        );
+      });
+    });
+
+    describe('should reject invalid values', () => {
+      it('should reject functions', () => {
+        const warnStub = sinon.spy(diag, 'warn');
+        const { logRecord } = setup();
+        logRecord.setAttribute('func', (() => 'test') as unknown as AnyValue);
+
+        assert.strictEqual(logRecord.attributes.func, undefined);
+        sinon.assert.calledWith(
+          warnStub,
+          'Invalid attribute value set for key: func'
+        );
+        warnStub.restore();
+      });
+
+      it('should reject symbols', () => {
+        const warnStub = sinon.spy(diag, 'warn');
+        const { logRecord } = setup();
+        logRecord.setAttribute('symbol', Symbol('test') as any);
+
+        assert.strictEqual(logRecord.attributes.symbol, undefined);
+        sinon.assert.calledWith(
+          warnStub,
+          'Invalid attribute value set for key: symbol'
+        );
+        warnStub.restore();
+      });
+
+      it('should reject objects with invalid nested values', () => {
+        const warnStub = sinon.spy(diag, 'warn');
+        const { logRecord } = setup();
+        const invalidNested = {
+          valid: 'string',
+          invalid: Symbol('test'),
+        };
+        logRecord.setAttribute('nested', invalidNested as any);
+
+        assert.strictEqual(logRecord.attributes.nested, undefined);
+        sinon.assert.calledWith(
+          warnStub,
+          'Invalid attribute value set for key: nested'
+        );
+        warnStub.restore();
+      });
+
+      it('should reject arrays with invalid nested values', () => {
+        const warnStub = sinon.spy(diag, 'warn');
+        const { logRecord } = setup();
+        const invalidArray = ['valid', Symbol('invalid')];
+        logRecord.setAttribute('array', invalidArray as any);
+
+        assert.strictEqual(logRecord.attributes.array, undefined);
+        sinon.assert.calledWith(
+          warnStub,
+          'Invalid attribute value set for key: array'
+        );
+        warnStub.restore();
+      });
+    });
+  });
+
+  describe('should reject empty attribute keys', () => {
+    it('should not set attributes with empty string keys', () => {
+      const warnStub = sinon.spy(diag, 'warn');
+      const { logRecord } = setup();
+
+      // Try to set an attribute with an empty key
+      logRecord.setAttribute('', 'value');
+
+      // The attribute should not be set
+      assert.strictEqual(logRecord.attributes[''], undefined);
+      assert.deepStrictEqual(logRecord.attributes, {});
+
+      // A warning should be logged
+      sinon.assert.calledWith(warnStub, 'Invalid attribute key: ');
+      warnStub.restore();
+    });
+
+    it('should reject empty keys but accept other valid attributes', () => {
+      const warnStub = sinon.spy(diag, 'warn');
+      const { logRecord } = setup();
+
+      // Set some valid attributes
+      logRecord.setAttribute('valid1', 'value1');
+      logRecord.setAttribute('', 'should not be set');
+      logRecord.setAttribute('valid2', 'value2');
+
+      // Only valid attributes should be set
+      assert.deepStrictEqual(logRecord.attributes, {
+        valid1: 'value1',
+        valid2: 'value2',
+      });
+
+      // Warning should be logged for empty key
+      sinon.assert.calledWith(warnStub, 'Invalid attribute key: ');
+      warnStub.restore();
+    });
+
+    it('should reject empty keys in setAttributes', () => {
+      const warnStub = sinon.spy(diag, 'warn');
+      const { logRecord } = setup();
+
+      // Try to set multiple attributes including empty keys
+      logRecord.setAttributes({
+        valid: 'value',
+        '': 'empty key',
+        anotherValid: 'another value',
+      });
+
+      // Only valid attributes should be set
+      assert.deepStrictEqual(logRecord.attributes, {
+        valid: 'value',
+        anotherValid: 'another value',
+      });
+
+      // Warning should be logged for empty key
+      sinon.assert.calledWith(warnStub, 'Invalid attribute key: ');
       warnStub.restore();
     });
   });

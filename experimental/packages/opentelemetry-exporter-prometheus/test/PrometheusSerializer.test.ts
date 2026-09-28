@@ -1,26 +1,15 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as assert from 'assert';
-import { Attributes, UpDownCounter } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
+import type { Attributes, UpDownCounter } from '@opentelemetry/api';
+import type { DataPoint, Histogram } from '@opentelemetry/sdk-metrics';
 import {
   AggregationTemporality,
-  DataPoint,
   DataPointType,
-  Histogram,
   MeterProvider,
   MetricReader,
 } from '@opentelemetry/sdk-metrics';
@@ -114,7 +103,8 @@ describe('PrometheusSerializer', () => {
         const result = serializer['_serializeSingularDataPoint'](
           metric.descriptor.name,
           metric,
-          pointData[0]
+          pointData[0],
+          serializer['_additionalAttributes']
         );
         return result;
       }
@@ -173,7 +163,8 @@ describe('PrometheusSerializer', () => {
         const result = serializer['_serializeHistogramDataPoint'](
           metric.descriptor.name,
           metric,
-          pointData[0]
+          pointData[0],
+          serializer['_additionalAttributes']
         );
         return result;
       }
@@ -264,8 +255,8 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test_total foobar\n' +
             '# TYPE test_total counter\n' +
-            'test_total{val="1"} 1\n' +
-            'test_total{val="2"} 1\n'
+            'test_total{val="1",otel_scope_name="test"} 1\n' +
+            'test_total{val="2",otel_scope_name="test"} 1\n'
         );
       });
 
@@ -276,8 +267,8 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test_total foobar\n' +
             '# TYPE test_total counter\n' +
-            `test_total{val="1"} 1 ${mockedHrTimeMs}\n` +
-            `test_total{val="2"} 1 ${mockedHrTimeMs}\n`
+            `test_total{val="1",otel_scope_name="test"} 1 ${mockedHrTimeMs}\n` +
+            `test_total{val="2",otel_scope_name="test"} 1 ${mockedHrTimeMs}\n`
         );
       });
 
@@ -288,8 +279,8 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test_total foobar\n' +
             '# TYPE test_total counter\n' +
-            `test_total{val="1",${resourceAttributes}} 1 ${mockedHrTimeMs}\n` +
-            `test_total{val="2",${resourceAttributes}} 1 ${mockedHrTimeMs}\n`
+            `test_total{val="1",otel_scope_name="test",${resourceAttributes}} 1 ${mockedHrTimeMs}\n` +
+            `test_total{val="2",otel_scope_name="test",${resourceAttributes}} 1 ${mockedHrTimeMs}\n`
         );
       });
     });
@@ -334,8 +325,8 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test_total foobar\n' +
             '# TYPE test_total gauge\n' +
-            'test_total{val="1"} 1\n' +
-            'test_total{val="2"} 1\n'
+            'test_total{val="1",otel_scope_name="test"} 1\n' +
+            'test_total{val="2",otel_scope_name="test"} 1\n'
         );
       });
 
@@ -346,8 +337,8 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test_total foobar\n' +
             '# TYPE test_total gauge\n' +
-            `test_total{val="1"} 1 ${mockedHrTimeMs}\n` +
-            `test_total{val="2"} 1 ${mockedHrTimeMs}\n`
+            `test_total{val="1",otel_scope_name="test"} 1 ${mockedHrTimeMs}\n` +
+            `test_total{val="2",otel_scope_name="test"} 1 ${mockedHrTimeMs}\n`
         );
       });
 
@@ -359,8 +350,8 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test_total foobar\n' +
             '# TYPE test_total gauge\n' +
-            `test_total{val="1",${resourceAttributes}} 1 ${mockedHrTimeMs}\n` +
-            `test_total{val="2",${resourceAttributes}} 1 ${mockedHrTimeMs}\n`
+            `test_total{val="1",otel_scope_name="test",${resourceAttributes}} 1 ${mockedHrTimeMs}\n` +
+            `test_total{val="2",otel_scope_name="test",${resourceAttributes}} 1 ${mockedHrTimeMs}\n`
         );
       });
     });
@@ -407,8 +398,8 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test_total foobar\n' +
             '# TYPE test_total gauge\n' +
-            'test_total{val="1"} 1\n' +
-            'test_total{val="2"} 1\n'
+            'test_total{val="1",otel_scope_name="test"} 1\n' +
+            'test_total{val="2",otel_scope_name="test"} 1\n'
         );
       });
 
@@ -419,8 +410,8 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test_total foobar\n' +
             '# TYPE test_total gauge\n' +
-            `test_total{val="1"} 1 ${mockedHrTimeMs}\n` +
-            `test_total{val="2"} 1 ${mockedHrTimeMs}\n`
+            `test_total{val="1",otel_scope_name="test"} 1 ${mockedHrTimeMs}\n` +
+            `test_total{val="2",otel_scope_name="test"} 1 ${mockedHrTimeMs}\n`
         );
       });
 
@@ -431,8 +422,8 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test_total foobar\n' +
             '# TYPE test_total gauge\n' +
-            `test_total{val="1",${resourceAttributes}} 1 ${mockedHrTimeMs}\n` +
-            `test_total{val="2",${resourceAttributes}} 1 ${mockedHrTimeMs}\n`
+            `test_total{val="1",otel_scope_name="test",${resourceAttributes}} 1 ${mockedHrTimeMs}\n` +
+            `test_total{val="2",otel_scope_name="test",${resourceAttributes}} 1 ${mockedHrTimeMs}\n`
         );
       });
     });
@@ -484,18 +475,18 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test foobar\n' +
             '# TYPE test histogram\n' +
-            'test_count{val="1"} 3\n' +
-            'test_sum{val="1"} 175\n' +
-            'test_bucket{val="1",le="1"} 0\n' +
-            'test_bucket{val="1",le="10"} 1\n' +
-            'test_bucket{val="1",le="100"} 2\n' +
-            'test_bucket{val="1",le="+Inf"} 3\n' +
-            'test_count{val="2"} 1\n' +
-            'test_sum{val="2"} 5\n' +
-            'test_bucket{val="2",le="1"} 0\n' +
-            'test_bucket{val="2",le="10"} 1\n' +
-            'test_bucket{val="2",le="100"} 1\n' +
-            'test_bucket{val="2",le="+Inf"} 1\n'
+            'test_count{val="1",otel_scope_name="test"} 3\n' +
+            'test_sum{val="1",otel_scope_name="test"} 175\n' +
+            'test_bucket{val="1",otel_scope_name="test",le="1"} 0\n' +
+            'test_bucket{val="1",otel_scope_name="test",le="10"} 1\n' +
+            'test_bucket{val="1",otel_scope_name="test",le="100"} 2\n' +
+            'test_bucket{val="1",otel_scope_name="test",le="+Inf"} 3\n' +
+            'test_count{val="2",otel_scope_name="test"} 1\n' +
+            'test_sum{val="2",otel_scope_name="test"} 5\n' +
+            'test_bucket{val="2",otel_scope_name="test",le="1"} 0\n' +
+            'test_bucket{val="2",otel_scope_name="test",le="10"} 1\n' +
+            'test_bucket{val="2",otel_scope_name="test",le="100"} 1\n' +
+            'test_bucket{val="2",otel_scope_name="test",le="+Inf"} 1\n'
         );
       });
 
@@ -506,18 +497,18 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test foobar\n' +
             '# TYPE test histogram\n' +
-            `test_count{val="1",${resourceAttributes}} 3\n` +
-            `test_sum{val="1",${resourceAttributes}} 175\n` +
-            `test_bucket{val="1",${resourceAttributes},le="1"} 0\n` +
-            `test_bucket{val="1",${resourceAttributes},le="10"} 1\n` +
-            `test_bucket{val="1",${resourceAttributes},le="100"} 2\n` +
-            `test_bucket{val="1",${resourceAttributes},le="+Inf"} 3\n` +
-            `test_count{val="2",${resourceAttributes}} 1\n` +
-            `test_sum{val="2",${resourceAttributes}} 5\n` +
-            `test_bucket{val="2",${resourceAttributes},le="1"} 0\n` +
-            `test_bucket{val="2",${resourceAttributes},le="10"} 1\n` +
-            `test_bucket{val="2",${resourceAttributes},le="100"} 1\n` +
-            `test_bucket{val="2",${resourceAttributes},le="+Inf"} 1\n`
+            `test_count{val="1",otel_scope_name="test",${resourceAttributes}} 3\n` +
+            `test_sum{val="1",otel_scope_name="test",${resourceAttributes}} 175\n` +
+            `test_bucket{val="1",otel_scope_name="test",${resourceAttributes},le="1"} 0\n` +
+            `test_bucket{val="1",otel_scope_name="test",${resourceAttributes},le="10"} 1\n` +
+            `test_bucket{val="1",otel_scope_name="test",${resourceAttributes},le="100"} 2\n` +
+            `test_bucket{val="1",otel_scope_name="test",${resourceAttributes},le="+Inf"} 3\n` +
+            `test_count{val="2",otel_scope_name="test",${resourceAttributes}} 1\n` +
+            `test_sum{val="2",otel_scope_name="test",${resourceAttributes}} 5\n` +
+            `test_bucket{val="2",otel_scope_name="test",${resourceAttributes},le="1"} 0\n` +
+            `test_bucket{val="2",otel_scope_name="test",${resourceAttributes},le="10"} 1\n` +
+            `test_bucket{val="2",otel_scope_name="test",${resourceAttributes},le="100"} 1\n` +
+            `test_bucket{val="2",otel_scope_name="test",${resourceAttributes},le="+Inf"} 1\n`
         );
       });
 
@@ -562,16 +553,16 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test foobar\n' +
             '# TYPE test histogram\n' +
-            'test_count{val="1"} 3\n' +
-            'test_bucket{val="1",le="1"} 0\n' +
-            'test_bucket{val="1",le="10"} 1\n' +
-            'test_bucket{val="1",le="100"} 2\n' +
-            'test_bucket{val="1",le="+Inf"} 3\n' +
-            'test_count{val="2"} 1\n' +
-            'test_bucket{val="2",le="1"} 0\n' +
-            'test_bucket{val="2",le="10"} 1\n' +
-            'test_bucket{val="2",le="100"} 1\n' +
-            'test_bucket{val="2",le="+Inf"} 1\n'
+            'test_count{val="1",otel_scope_name="test"} 3\n' +
+            'test_bucket{val="1",otel_scope_name="test",le="1"} 0\n' +
+            'test_bucket{val="1",otel_scope_name="test",le="10"} 1\n' +
+            'test_bucket{val="1",otel_scope_name="test",le="100"} 2\n' +
+            'test_bucket{val="1",otel_scope_name="test",le="+Inf"} 3\n' +
+            'test_count{val="2",otel_scope_name="test"} 1\n' +
+            'test_bucket{val="2",otel_scope_name="test",le="1"} 0\n' +
+            'test_bucket{val="2",otel_scope_name="test",le="10"} 1\n' +
+            'test_bucket{val="2",otel_scope_name="test",le="100"} 1\n' +
+            'test_bucket{val="2",otel_scope_name="test",le="+Inf"} 1\n'
         );
       });
     });
@@ -619,7 +610,8 @@ describe('PrometheusSerializer', () => {
         const result = serializer['_serializeSingularDataPoint'](
           metric.descriptor.name,
           metric,
-          pointData[0]
+          pointData[0],
+          serializer['_additionalAttributes']
         );
         return result;
       }
@@ -639,7 +631,7 @@ describe('PrometheusSerializer', () => {
           '# HELP test_total description missing\n' +
           `# UNIT test_total ${unitOfMetric}\n` +
           '# TYPE test_total counter\n' +
-          'test_total 1\n'
+          'test_total{otel_scope_name="test"} 1\n'
       );
     });
 
@@ -654,15 +646,23 @@ describe('PrometheusSerializer', () => {
         serializedDefaultResource +
           '# HELP test_total description missing\n' +
           '# TYPE test_total counter\n' +
-          'test_total 1\n'
+          'test_total{otel_scope_name="test"} 1\n'
       );
     });
 
     it('should rename metric of type counter when name misses _total suffix', async () => {
       const serializer = new PrometheusSerializer();
 
-      const result = await getCounterResult('test', serializer);
-      assert.strictEqual(result, 'test_total 1\n');
+      const result = await getCounterResult('test', serializer, {
+        exportAll: true,
+      });
+      assert.strictEqual(
+        result,
+        serializedDefaultResource +
+          '# HELP test_total description missing\n' +
+          '# TYPE test_total counter\n' +
+          'test_total{otel_scope_name="test"} 1\n'
+      );
     });
 
     it('should not rename metric of type counter when name contains _total suffix', async () => {
@@ -670,6 +670,97 @@ describe('PrometheusSerializer', () => {
       const result = await getCounterResult('test_total', serializer);
 
       assert.strictEqual(result, 'test_total 1\n');
+    });
+
+    it('replaces special characters with underscores when escaping is enabled', async () => {
+      const serializer = new PrometheusSerializer();
+      const result = await getCounterResult(
+        'metric@with#special$chars',
+        serializer,
+        {
+          exportAll: true,
+        }
+      );
+
+      assert.strictEqual(
+        result,
+        serializedDefaultResource +
+          '# HELP metric_with_special_chars_total description missing\n' +
+          '# TYPE metric_with_special_chars_total counter\n' +
+          'metric_with_special_chars_total{otel_scope_name="test"} 1\n'
+      );
+    });
+
+    it('metric names do not start with a digit when escaping is enabled', async () => {
+      const serializer = new PrometheusSerializer();
+      const result = await getCounterResult('123metric', serializer, {
+        exportAll: true,
+      });
+
+      assert.strictEqual(
+        result,
+        serializedDefaultResource +
+          '# HELP _123metric_total description missing\n' +
+          '# TYPE _123metric_total counter\n' +
+          '_123metric_total{otel_scope_name="test"} 1\n'
+      );
+    });
+
+    it('multiple special characters are collapsed to a single underscore when escaping is enabled', async () => {
+      const serializer = new PrometheusSerializer();
+      const result = await getCounterResult('metric@@##$$name', serializer, {
+        exportAll: true,
+      });
+
+      assert.strictEqual(
+        result,
+        serializedDefaultResource +
+          '# HELP metric_name_total description missing\n' +
+          '# TYPE metric_name_total counter\n' +
+          'metric_name_total{otel_scope_name="test"} 1\n'
+      );
+    });
+
+    it('metric names of only special characters are not serialized when escaping is enabled', async () => {
+      const serializer = new PrometheusSerializer();
+      const diagErr = diag.error;
+      const spy = sinon.spy();
+      diag.error = spy;
+      const result = await getCounterResult('@#$%', serializer, {
+        exportAll: true,
+      });
+      diag.error = diagErr;
+
+      assert.strictEqual(
+        result,
+        serializedDefaultResource + '# no registered metrics'
+      );
+      assert.strictEqual(spy.calledOnce, true);
+      sinon.assert.calledWith(
+        spy,
+        'Normalization for metric "@#$%" resulted in an invalid name: "_"'
+      );
+    });
+
+    it('metrics with empty names are not serialized', async () => {
+      const serializer = new PrometheusSerializer();
+      const diagErr = diag.error;
+      const spy = sinon.spy();
+      diag.error = spy;
+      const result = await getCounterResult('', serializer, {
+        exportAll: true,
+      });
+      diag.error = diagErr;
+
+      assert.strictEqual(
+        result,
+        serializedDefaultResource + '# no registered metrics'
+      );
+      assert.strictEqual(spy.calledOnce, true);
+      sinon.assert.calledWith(
+        spy,
+        'Normalization for metric "" resulted in empty name'
+      );
     });
   });
 
@@ -710,7 +801,8 @@ describe('PrometheusSerializer', () => {
       const result = serializer['_serializeSingularDataPoint'](
         metric.descriptor.name,
         metric,
-        pointData[0]
+        pointData[0],
+        serializer['_additionalAttributes']
       );
       return result;
     }
@@ -829,6 +921,49 @@ describe('PrometheusSerializer', () => {
           '# TYPE target_info gauge\n' +
           'target_info{env="prod",hostname="myhost",datacenter="sdc",region="europe",owner="frontend"} 1\n'
       );
+    });
+
+    it('omits target_info if withoutTargetInfo is true', () => {
+      const serializer = new PrometheusSerializer(
+        undefined,
+        true,
+        undefined,
+        true
+      );
+      const result = serializer['_serializeResource'](
+        resourceFromAttributes({
+          env: 'prod',
+          hostname: 'myhost',
+          datacenter: 'sdc',
+          region: 'europe',
+          owner: 'frontend',
+        })
+      );
+
+      assert.strictEqual(result.includes('target_info'), false);
+    });
+
+    it('omits scope labels if withoutScopeInfo is true', async () => {
+      const serializer = new PrometheusSerializer(
+        undefined,
+        true,
+        undefined,
+        false,
+        true
+      );
+      const result = serializer['_serializeResource'](
+        resourceFromAttributes({
+          env: 'prod',
+          hostname: 'myhost',
+          datacenter: 'sdc',
+          region: 'europe',
+          owner: 'frontend',
+        })
+      );
+
+      assert.strictEqual(result.includes('otel_scope_name'), false);
+      assert.strictEqual(result.includes('otel_scope_schema_url'), false);
+      assert.strictEqual(result.includes('otel_scope_version'), false);
     });
   });
 });

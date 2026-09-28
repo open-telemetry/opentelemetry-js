@@ -1,76 +1,51 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  ContextManager,
-  TextMapPropagator,
-  metrics,
-  diag,
-  DiagConsoleLogger,
-} from '@opentelemetry/api';
+import { metrics, trace, diag, DiagConsoleLogger } from '@opentelemetry/api';
 import { logs } from '@opentelemetry/api/experimental';
-import {
-  Instrumentation,
-  registerInstrumentations,
-} from '@opentelemetry/instrumentation';
+import type { Instrumentation } from '@opentelemetry/instrumentation';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
+import type {
+  Resource,
+  ResourceDetectionConfig,
+  ResourceDetector,
+} from '@opentelemetry/resources';
 import {
   defaultResource,
   detectResources,
   envDetector,
   hostDetector,
-  Resource,
   processDetector,
-  ResourceDetectionConfig,
-  ResourceDetector,
   resourceFromAttributes,
 } from '@opentelemetry/resources';
-import {
+import type {
   LogRecordProcessor,
-  LoggerProvider,
-  BatchLogRecordProcessor,
-  ConsoleLogRecordExporter,
   LogRecordExporter,
+} from '@opentelemetry/sdk-logs';
+import {
+  LoggerProvider,
+  ConsoleLogRecordExporter,
   SimpleLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
-import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
-import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
-import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { PrometheusExporter as PrometheusMetricExporter } from '@opentelemetry/exporter-prometheus';
+import type { IMetricReader, ViewOptions } from '@opentelemetry/sdk-metrics';
 import {
   MeterProvider,
-  IMetricReader,
-  ViewOptions,
   ConsoleMetricExporter,
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
-import {
-  BatchSpanProcessor,
-  SpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
-import {
-  NodeTracerConfig,
-  NodeTracerProvider,
-} from '@opentelemetry/sdk-trace-node';
+import type { SpanProcessor } from '@opentelemetry/sdk-trace';
+import { TracerProvider } from '@opentelemetry/sdk-trace';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
-import { NodeSDKConfiguration } from './types';
+import type { NodeSDKConfiguration } from './types';
 import {
   getBooleanFromEnv,
+  getNumberFromEnv,
   getStringFromEnv,
   getStringListFromEnv,
   diagLogLevelFromString,
@@ -79,15 +54,24 @@ import {
   getResourceDetectorsFromEnv,
   getSpanProcessorsFromEnv,
   getPropagatorFromEnv,
+  setupPropagator,
+  setupContextManager,
+  getPeriodicExportingMetricReaderFromEnv,
+  getOtlpMetricExporterFromEnv,
+  getBatchLogRecordProcessorFromEnv,
+  getLoggerProviderConfigFromEnv,
 } from './utils';
-
-/** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
+import {
+  createBatchSpanProcessorFromEnv,
+  createSamplerFromEnv,
+  createSpanLimitsFromEnv,
+} from './create-from-env';
 
 export type MeterProviderConfig = {
   /**
-   * Reference to the MetricReader instance by the NodeSDK
+   * Reference to the MetricReader instances by the NodeSDK
    */
-  reader?: IMetricReader;
+  readers?: IMetricReader[];
   /**
    * List of {@link ViewOptions}s that should be passed to the MeterProvider
    */
@@ -102,88 +86,32 @@ export type LoggerProviderConfig = {
 };
 
 /**
- * @Returns param value, if set else returns the default value
- */
-function getValueInMillis(envName: string, defaultValue: number): number {
-  return parseInt(process.env[envName] || '') || defaultValue;
-}
-
-/**
  *
  * @returns MetricReader[] if appropriate environment variables are configured
  */
-function configureMetricProviderFromEnv(): IMetricReader[] {
+function getMetricReadersFromEnv(): IMetricReader[] {
   const metricReaders: IMetricReader[] = [];
-  const enabledExporters = getStringListFromEnv('OTEL_METRICS_EXPORTER');
-  if (!enabledExporters) {
-    return metricReaders;
-  }
+  const enabledExporters = Array.from(
+    new Set(getStringListFromEnv('OTEL_METRICS_EXPORTER') ?? [])
+  );
 
   if (enabledExporters.length === 0) {
     diag.debug('OTEL_METRICS_EXPORTER is empty. Using default otlp exporter.');
+    enabledExporters.push('otlp');
   }
 
   if (enabledExporters.includes('none')) {
     diag.info(
-      `OTEL_METRICS_EXPORTER contains "none". Metric provider will not be initialized.`
+      'OTEL_METRICS_EXPORTER contains "none". Metric provider will not be initialized.'
     );
     return metricReaders;
   }
+
   enabledExporters.forEach(exporter => {
     if (exporter === 'otlp') {
-      const protocol =
-        process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL?.trim() ||
-        process.env.OTEL_EXPORTER_OTLP_PROTOCOL?.trim();
-
-      const exportIntervalMillis = getValueInMillis(
-        'OTEL_METRIC_EXPORT_INTERVAL',
-        60000
+      metricReaders.push(
+        getPeriodicExportingMetricReaderFromEnv(getOtlpMetricExporterFromEnv())
       );
-      const exportTimeoutMillis = getValueInMillis(
-        'OTEL_METRIC_EXPORT_TIMEOUT',
-        30000
-      );
-
-      switch (protocol) {
-        case 'grpc':
-          metricReaders.push(
-            new PeriodicExportingMetricReader({
-              exporter: new OTLPGrpcMetricExporter(),
-              exportIntervalMillis: exportIntervalMillis,
-              exportTimeoutMillis: exportTimeoutMillis,
-            })
-          );
-          break;
-        case 'http/json':
-          metricReaders.push(
-            new PeriodicExportingMetricReader({
-              exporter: new OTLPHttpMetricExporter(),
-              exportIntervalMillis: exportIntervalMillis,
-              exportTimeoutMillis: exportTimeoutMillis,
-            })
-          );
-          break;
-        case 'http/protobuf':
-          metricReaders.push(
-            new PeriodicExportingMetricReader({
-              exporter: new OTLPProtoMetricExporter(),
-              exportIntervalMillis: exportIntervalMillis,
-              exportTimeoutMillis: exportTimeoutMillis,
-            })
-          );
-          break;
-        default:
-          diag.warn(
-            `Unsupported OTLP metrics protocol: "${protocol}". Using http/protobuf.`
-          );
-          metricReaders.push(
-            new PeriodicExportingMetricReader({
-              exporter: new OTLPProtoMetricExporter(),
-              exportIntervalMillis: exportIntervalMillis,
-              exportTimeoutMillis: exportTimeoutMillis,
-            })
-          );
-      }
     } else if (exporter === 'console') {
       metricReaders.push(
         new PeriodicExportingMetricReader({
@@ -191,7 +119,12 @@ function configureMetricProviderFromEnv(): IMetricReader[] {
         })
       );
     } else if (exporter === 'prometheus') {
-      metricReaders.push(new PrometheusMetricExporter());
+      metricReaders.push(
+        new PrometheusMetricExporter({
+          host: getStringFromEnv('OTEL_EXPORTER_PROMETHEUS_HOST'),
+          port: getNumberFromEnv('OTEL_EXPORTER_PROMETHEUS_PORT'),
+        })
+      );
     } else {
       diag.warn(
         `Unsupported OTEL_METRICS_EXPORTER value: "${exporter}". Supported values are: otlp, console, prometheus, none.`
@@ -201,13 +134,26 @@ function configureMetricProviderFromEnv(): IMetricReader[] {
 
   return metricReaders;
 }
+
+/**
+ * A setup helper for the OpenTelemetry SDKs (logs, metrics, traces).
+ * <p> After successful setup using {@link NodeSDK#start()}, use `@opentelemetry/api` to obtain the registered components.
+ * <p> Use the shutdown handler {@link NodeSDK#shutdown()} to ensure your telemetry is exported before the process exits.
+ *
+ * @example <caption> Register SDK by using environment variables </caption>
+ *    const nodeSdk = new NodeSDK(); // providing no options uses OTEL_* environment variables for SDK setup.
+ *    nodeSdk.start(); // registers all configured SDK components
+ * @example <caption> Override environment variable config with your own components </caption>
+ *    const nodeSdk = new NodeSDK({
+ *      // override the list of metric reader with your own options and ignore environment variable config
+ *      // explore the docs of other options to learn more!
+ *      metricReaders: [ new PeriodicExportingMetricReader({
+ *        exporter: new OTLPMetricsExporter()
+ *        })]
+ *    });
+ *    nodeSdk.start(); // registers all configured SDK components
+ */
 export class NodeSDK {
-  private _tracerProviderConfig?: {
-    tracerConfig: NodeTracerConfig;
-    spanProcessors: SpanProcessor[];
-    contextManager?: ContextManager;
-    textMapPropagator?: TextMapPropagator;
-  };
   private _loggerProviderConfig?: LoggerProviderConfig;
   private _meterProviderConfig?: MeterProviderConfig;
   private _instrumentations: Instrumentation[];
@@ -217,7 +163,7 @@ export class NodeSDK {
 
   private _autoDetectResources: boolean;
 
-  private _tracerProvider?: NodeTracerProvider;
+  private _tracerProvider?: TracerProvider;
   private _loggerProvider?: LoggerProvider;
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
@@ -258,71 +204,22 @@ export class NodeSDK {
 
     this._serviceName = configuration.serviceName;
 
-    // If a tracer provider can be created from manual configuration, create it
-    if (
-      configuration.traceExporter ||
-      configuration.spanProcessor ||
-      configuration.spanProcessors
-    ) {
-      const tracerProviderConfig: NodeTracerConfig = {};
-
-      if (configuration.sampler) {
-        tracerProviderConfig.sampler = configuration.sampler;
-      }
-      if (configuration.spanLimits) {
-        tracerProviderConfig.spanLimits = configuration.spanLimits;
-      }
-      if (configuration.idGenerator) {
-        tracerProviderConfig.idGenerator = configuration.idGenerator;
-      }
-
-      if (configuration.spanProcessor) {
-        diag.warn(
-          "The 'spanProcessor' option is deprecated. Please use 'spanProcessors' instead."
-        );
-      }
-
-      const spanProcessor =
-        configuration.spanProcessor ??
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        new BatchSpanProcessor(configuration.traceExporter!);
-
-      const spanProcessors = configuration.spanProcessors ?? [spanProcessor];
-
-      this._tracerProviderConfig = {
-        tracerConfig: tracerProviderConfig,
-        spanProcessors,
-        contextManager: configuration.contextManager,
-        textMapPropagator: configuration.textMapPropagator,
-      };
-    }
-
     if (configuration.logRecordProcessors) {
       this._loggerProviderConfig = {
         logRecordProcessors: configuration.logRecordProcessors,
       };
-    } else if (configuration.logRecordProcessor) {
-      this._loggerProviderConfig = {
-        logRecordProcessors: [configuration.logRecordProcessor],
-      };
-      diag.warn(
-        "The 'logRecordProcessor' option is deprecated. Please use 'logRecordProcessors' instead."
-      );
-    } else {
-      this.configureLoggerProviderFromEnv();
     }
 
-    if (configuration.metricReader || configuration.views) {
-      const meterProviderConfig: MeterProviderConfig = {};
-      if (configuration.metricReader) {
-        meterProviderConfig.reader = configuration.metricReader;
-      }
-
-      if (configuration.views) {
-        meterProviderConfig.views = configuration.views;
-      }
-
-      this._meterProviderConfig = meterProviderConfig;
+    if (configuration.metricReaders) {
+      this._meterProviderConfig = {
+        readers: configuration.metricReaders,
+        views: configuration.views,
+      };
+    } else {
+      this._meterProviderConfig = {
+        readers: getMetricReadersFromEnv(),
+        views: configuration.views,
+      };
     }
 
     this._instrumentations = configuration.instrumentations?.flat() ?? [];
@@ -339,6 +236,13 @@ export class NodeSDK {
     registerInstrumentations({
       instrumentations: this._instrumentations,
     });
+
+    setupContextManager(this._configuration?.contextManager);
+    setupPropagator(
+      this._configuration?.textMapPropagator === null
+        ? null // null means don't set, so we cannot fall back to env config.
+        : (this._configuration?.textMapPropagator ?? getPropagatorFromEnv())
+    );
 
     if (this._autoDetectResources) {
       const internalConfig: ResourceDetectionConfig = {
@@ -357,56 +261,22 @@ export class NodeSDK {
             })
           );
 
-    const spanProcessors = this._tracerProviderConfig
-      ? this._tracerProviderConfig.spanProcessors
-      : getSpanProcessorsFromEnv();
+    // While SDK metrics are unstable, we require an opt-in.
+    // https://opentelemetry.io/docs/specs/semconv/otel/sdk-metrics/
+    const sdkMetricsEnabled = getBooleanFromEnv(
+      'OTEL_NODE_EXPERIMENTAL_SDK_METRICS'
+    );
 
-    this._tracerProvider = new NodeTracerProvider({
-      ...this._configuration,
-      resource: this._resource,
-      spanProcessors,
-    });
-
-    // Only register if there is a span processor
-    if (spanProcessors.length > 0) {
-      this._tracerProvider.register({
-        contextManager:
-          this._tracerProviderConfig?.contextManager ??
-          // _tracerProviderConfig may be undefined if trace-specific settings are not provided - fall back to raw config
-          this._configuration?.contextManager,
-        propagator:
-          this._tracerProviderConfig?.textMapPropagator ??
-          getPropagatorFromEnv(),
-      });
-    }
-
-    if (this._loggerProviderConfig) {
-      const loggerProvider = new LoggerProvider({
-        resource: this._resource,
-        processors: this._loggerProviderConfig.logRecordProcessors,
-      });
-
-      this._loggerProvider = loggerProvider;
-
-      logs.setGlobalLoggerProvider(loggerProvider);
-    }
-
-    const metricReadersFromEnv: IMetricReader[] =
-      configureMetricProviderFromEnv();
-    if (this._meterProviderConfig || metricReadersFromEnv.length > 0) {
-      const readers: IMetricReader[] = [];
-      if (this._meterProviderConfig?.reader) {
-        readers.push(this._meterProviderConfig.reader);
-      }
-
-      if (readers.length === 0) {
-        metricReadersFromEnv.forEach((r: IMetricReader) => readers.push(r));
-      }
-
+    if (
+      this._meterProviderConfig?.readers &&
+      // only register if there is a reader, otherwise we waste compute/memory.
+      this._meterProviderConfig.readers.length > 0
+    ) {
       const meterProvider = new MeterProvider({
         resource: this._resource,
         views: this._meterProviderConfig?.views ?? [],
-        readers: readers,
+        readers: this._meterProviderConfig.readers,
+        sdkMetricsEnabled,
       });
 
       this._meterProvider = meterProvider;
@@ -418,6 +288,58 @@ export class NodeSDK {
       for (const instrumentation of this._instrumentations) {
         instrumentation.setMeterProvider(metrics.getMeterProvider());
       }
+    }
+
+    // Determine `spanProcessors` from configuration options.
+    let spanProcessors: SpanProcessor[];
+    if (this._configuration?.spanProcessors) {
+      spanProcessors = this._configuration.spanProcessors;
+    } else if (this._configuration?.traceExporter) {
+      spanProcessors = [
+        createBatchSpanProcessorFromEnv(
+          this._configuration.traceExporter!,
+          sdkMetricsEnabled ? this._meterProvider : undefined
+        ),
+      ];
+    } else {
+      spanProcessors = getSpanProcessorsFromEnv(
+        sdkMetricsEnabled ? this._meterProvider : undefined
+      );
+    }
+
+    // Only register if there is a span processor
+    if (spanProcessors.length > 0) {
+      this._tracerProvider = new TracerProvider({
+        sampler: this._configuration?.sampler ?? createSamplerFromEnv(),
+        spanLimits: {
+          ...createSpanLimitsFromEnv(),
+          ...this._configuration?.spanLimits,
+        },
+        resource: this._resource,
+        meterProvider: sdkMetricsEnabled ? this._meterProvider : undefined,
+        idGenerator: this._configuration?.idGenerator,
+        spanProcessors,
+      });
+      trace.setGlobalTracerProvider(this._tracerProvider);
+    }
+
+    if (!this._loggerProviderConfig) {
+      this.configureLoggerProviderFromEnv(
+        sdkMetricsEnabled ? this._meterProvider : undefined
+      );
+    }
+
+    if (this._loggerProviderConfig) {
+      const loggerProvider = new LoggerProvider({
+        ...getLoggerProviderConfigFromEnv(),
+        resource: this._resource,
+        processors: this._loggerProviderConfig.logRecordProcessors,
+        meterProvider: sdkMetricsEnabled ? this._meterProvider : undefined,
+      });
+
+      this._loggerProvider = loggerProvider;
+
+      logs.setGlobalLoggerProvider(loggerProvider);
     }
   }
 
@@ -440,8 +362,12 @@ export class NodeSDK {
     );
   }
 
-  private configureLoggerProviderFromEnv(): void {
-    const enabledExporters = getStringListFromEnv('OTEL_LOGS_EXPORTER') ?? [];
+  private configureLoggerProviderFromEnv(
+    meterProvider: MeterProvider | undefined
+  ): void {
+    const enabledExporters = Array.from(
+      new Set(getStringListFromEnv('OTEL_LOGS_EXPORTER') ?? [])
+    );
 
     if (enabledExporters.length === 0) {
       diag.debug('OTEL_LOGS_EXPORTER is empty. Using default otlp exporter.');
@@ -450,7 +376,7 @@ export class NodeSDK {
 
     if (enabledExporters.includes('none')) {
       diag.info(
-        `OTEL_LOGS_EXPORTER contains "none". Logger provider will not be initialized.`
+        'OTEL_LOGS_EXPORTER contains "none". Logger provider will not be initialized.'
       );
       return;
     }
@@ -459,10 +385,11 @@ export class NodeSDK {
 
     enabledExporters.forEach(exporter => {
       if (exporter === 'otlp') {
-        const protocol = (
-          getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_PROTOCOL') ??
-          getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL')
-        )?.trim();
+        const protocol =
+          (
+            getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_PROTOCOL') ??
+            getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL')
+          )?.trim() || 'http/protobuf'; // Using || to also fall back on empty string
 
         switch (protocol) {
           case 'grpc':
@@ -472,10 +399,6 @@ export class NodeSDK {
             exporters.push(new OTLPHttpLogExporter());
             break;
           case 'http/protobuf':
-            exporters.push(new OTLPProtoLogExporter());
-            break;
-          case undefined:
-          case '':
             exporters.push(new OTLPProtoLogExporter());
             break;
           default:
@@ -497,9 +420,12 @@ export class NodeSDK {
       this._loggerProviderConfig = {
         logRecordProcessors: exporters.map(exporter => {
           if (exporter instanceof ConsoleLogRecordExporter) {
-            return new SimpleLogRecordProcessor(exporter);
+            return new SimpleLogRecordProcessor({
+              exporter,
+              selfObsMeterProvider: meterProvider,
+            });
           } else {
-            return new BatchLogRecordProcessor(exporter);
+            return getBatchLogRecordProcessorFromEnv(exporter, meterProvider);
           }
         }),
       };

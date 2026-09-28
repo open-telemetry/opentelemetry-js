@@ -1,20 +1,9 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Counter, Meter, ObservableResult } from '@opentelemetry/api';
+import type { Counter, Meter, ObservableResult } from '@opentelemetry/api';
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -28,7 +17,7 @@ import {
   serviceName,
   mockedHrTimeMs,
 } from './util';
-import { SinonStubbedInstance } from 'sinon';
+import type { SinonStubbedInstance } from 'sinon';
 
 const infoLine = `target_info{service_name="${serviceName}",telemetry_sdk_language="${sdkLanguage}",telemetry_sdk_name="${sdkName}",telemetry_sdk_version="${sdkVersion}"} 1`;
 
@@ -55,6 +44,7 @@ describe('PrometheusExporter', () => {
   describe('constructor', () => {
     it('should construct an exporter', async () => {
       const exporter = new PrometheusExporter();
+      await exporter.startServer();
       assert.ok(typeof exporter.startServer === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
       await exporter.shutdown();
@@ -106,6 +96,7 @@ describe('PrometheusExporter', () => {
       const port = PrometheusExporter.DEFAULT_OPTIONS.port;
       const endpoint = PrometheusExporter.DEFAULT_OPTIONS.endpoint;
       const exporter = new PrometheusExporter();
+      await exporter.startServer();
       const url = `http://localhost:${port}${endpoint}`;
       await request(url);
       await exporter.shutdown();
@@ -119,6 +110,7 @@ describe('PrometheusExporter', () => {
         port,
         endpoint,
       });
+      await exporter.startServer();
       const url = `http://localhost:${port}${endpoint}`;
       await request(url);
       await exporter.shutdown();
@@ -134,14 +126,20 @@ describe('PrometheusExporter', () => {
       sinon.assert.calledOnce(mockServer.unref);
     });
 
-    it('should listen on environmentally set host and port', () => {
+    it('should not read host and port from the environment', () => {
       process.env.OTEL_EXPORTER_PROMETHEUS_HOST = '127.0.0.1';
       process.env.OTEL_EXPORTER_PROMETHEUS_PORT = '1234';
-      const exporter = new PrometheusExporter({}, async () => {
-        await exporter.shutdown();
+      const exporter = new PrometheusExporter({
+        preventServerStart: true,
       });
-      assert.strictEqual(exporter['_host'], '127.0.0.1');
-      assert.strictEqual(exporter['_port'], 1234);
+      assert.strictEqual(
+        exporter['_host'],
+        PrometheusExporter.DEFAULT_OPTIONS.host
+      );
+      assert.strictEqual(
+        exporter['_port'],
+        PrometheusExporter.DEFAULT_OPTIONS.port
+      );
     });
 
     it('should not require endpoints to start with a slash', async () => {
@@ -165,6 +163,7 @@ describe('PrometheusExporter', () => {
         port,
         endpoint,
       });
+      await exporter.startServer();
       const url = `http://localhost:${port}/invalid`;
 
       await assert.rejects(request(url), { statusCode: 404 });
@@ -205,6 +204,7 @@ describe('PrometheusExporter', () => {
 
     beforeEach(async () => {
       exporter = new PrometheusExporter();
+      await exporter.startServer();
       meterProvider = new MeterProvider({
         readers: [exporter],
       });
@@ -234,7 +234,7 @@ describe('PrometheusExporter', () => {
         ...serializedDefaultResourceLines,
         '# HELP counter_total a test description',
         '# TYPE counter_total counter',
-        'counter_total{key1="attributeValue1"} 10',
+        'counter_total{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1"} 10',
         '',
       ]);
     });
@@ -264,7 +264,7 @@ describe('PrometheusExporter', () => {
         ...serializedDefaultResourceLines,
         '# HELP metric_observable_gauge a test description',
         '# TYPE metric_observable_gauge gauge',
-        'metric_observable_gauge{pid="123",core="1"} 0.999',
+        'metric_observable_gauge{pid="123",core="1",otel_scope_name="test-prometheus",otel_scope_version="1"} 0.999',
         '',
       ]);
     });
@@ -284,8 +284,8 @@ describe('PrometheusExporter', () => {
         ...serializedDefaultResourceLines,
         '# HELP counter_total a test description',
         '# TYPE counter_total counter',
-        'counter_total{counterKey1="attributeValue1"} 10',
-        'counter_total{counterKey1="attributeValue2"} 20',
+        'counter_total{counterKey1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1"} 10',
+        'counter_total{counterKey1="attributeValue2",otel_scope_name="test-prometheus",otel_scope_version="1"} 20',
         '',
       ]);
     });
@@ -327,7 +327,7 @@ describe('PrometheusExporter', () => {
         ...serializedDefaultResourceLines,
         '# HELP counter_total description missing',
         '# TYPE counter_total counter',
-        'counter_total{key1="attributeValue1"} 10',
+        'counter_total{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1"} 10',
         '',
       ]);
     });
@@ -344,7 +344,7 @@ describe('PrometheusExporter', () => {
         ...serializedDefaultResourceLines,
         '# HELP counter_bad_name_total description missing',
         '# TYPE counter_bad_name_total counter',
-        'counter_bad_name_total{key1="attributeValue1"} 10',
+        'counter_bad_name_total{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1"} 10',
         '',
       ]);
     });
@@ -362,7 +362,7 @@ describe('PrometheusExporter', () => {
         ...serializedDefaultResourceLines,
         '# HELP counter a test description',
         '# TYPE counter gauge',
-        'counter{key1="attributeValue1"} 20',
+        'counter{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1"} 20',
         '',
       ]);
     });
@@ -391,7 +391,7 @@ describe('PrometheusExporter', () => {
         ...serializedDefaultResourceLines,
         '# HELP metric_observable_counter_total a test description',
         '# TYPE metric_observable_counter_total counter',
-        'metric_observable_counter_total{key1="attributeValue1"} 20',
+        'metric_observable_counter_total{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1"} 20',
         '',
       ]);
     });
@@ -422,7 +422,7 @@ describe('PrometheusExporter', () => {
         ...serializedDefaultResourceLines,
         '# HELP metric_observable_up_down_counter a test description',
         '# TYPE metric_observable_up_down_counter gauge',
-        'metric_observable_up_down_counter{key1="attributeValue1"} 20',
+        'metric_observable_up_down_counter{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1"} 20',
         '',
       ]);
     });
@@ -441,24 +441,24 @@ describe('PrometheusExporter', () => {
         ...serializedDefaultResourceLines,
         '# HELP test_histogram a test description',
         '# TYPE test_histogram histogram',
-        'test_histogram_count{key1="attributeValue1"} 1',
-        'test_histogram_sum{key1="attributeValue1"} 20',
-        'test_histogram_bucket{key1="attributeValue1",le="0"} 0',
-        'test_histogram_bucket{key1="attributeValue1",le="5"} 0',
-        'test_histogram_bucket{key1="attributeValue1",le="10"} 0',
-        'test_histogram_bucket{key1="attributeValue1",le="25"} 1',
-        'test_histogram_bucket{key1="attributeValue1",le="50"} 1',
-        'test_histogram_bucket{key1="attributeValue1",le="75"} 1',
-        'test_histogram_bucket{key1="attributeValue1",le="100"} 1',
-        'test_histogram_bucket{key1="attributeValue1",le="250"} 1',
-        'test_histogram_bucket{key1="attributeValue1",le="500"} 1',
-        'test_histogram_bucket{key1="attributeValue1",le="750"} 1',
-        'test_histogram_bucket{key1="attributeValue1",le="1000"} 1',
-        'test_histogram_bucket{key1="attributeValue1",le="2500"} 1',
-        'test_histogram_bucket{key1="attributeValue1",le="5000"} 1',
-        'test_histogram_bucket{key1="attributeValue1",le="7500"} 1',
-        'test_histogram_bucket{key1="attributeValue1",le="10000"} 1',
-        'test_histogram_bucket{key1="attributeValue1",le="+Inf"} 1',
+        'test_histogram_count{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1"} 1',
+        'test_histogram_sum{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1"} 20',
+        'test_histogram_bucket{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1",le="0"} 0',
+        'test_histogram_bucket{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1",le="5"} 0',
+        'test_histogram_bucket{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1",le="10"} 0',
+        'test_histogram_bucket{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1",le="25"} 1',
+        'test_histogram_bucket{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1",le="50"} 1',
+        'test_histogram_bucket{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1",le="75"} 1',
+        'test_histogram_bucket{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1",le="100"} 1',
+        'test_histogram_bucket{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1",le="250"} 1',
+        'test_histogram_bucket{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1",le="500"} 1',
+        'test_histogram_bucket{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1",le="750"} 1',
+        'test_histogram_bucket{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1",le="1000"} 1',
+        'test_histogram_bucket{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1",le="2500"} 1',
+        'test_histogram_bucket{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1",le="5000"} 1',
+        'test_histogram_bucket{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1",le="7500"} 1',
+        'test_histogram_bucket{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1",le="10000"} 1',
+        'test_histogram_bucket{key1="attributeValue1",otel_scope_name="test-prometheus",otel_scope_version="1",le="+Inf"} 1',
         '',
       ]);
     });
@@ -470,7 +470,8 @@ describe('PrometheusExporter', () => {
     let counter: Counter;
     let exporter: PrometheusExporter;
 
-    function setup(reader: PrometheusExporter) {
+    async function setup(reader: PrometheusExporter) {
+      await reader.startServer();
       meterProvider = new MeterProvider({
         readers: [exporter],
       });
@@ -488,7 +489,7 @@ describe('PrometheusExporter', () => {
       exporter = new PrometheusExporter({
         prefix: 'test_prefix',
       });
-      setup(exporter);
+      await setup(exporter);
       const body = await request('http://localhost:9464/metrics');
       const lines = body.split('\n');
 
@@ -496,7 +497,7 @@ describe('PrometheusExporter', () => {
         ...serializedDefaultResourceLines,
         '# HELP test_prefix_counter_total description missing',
         '# TYPE test_prefix_counter_total counter',
-        'test_prefix_counter_total{key1="attributeValue1"} 10',
+        'test_prefix_counter_total{key1="attributeValue1",otel_scope_name="test-prometheus"} 10',
         '',
       ]);
     });
@@ -506,7 +507,7 @@ describe('PrometheusExporter', () => {
         port: 8080,
       });
 
-      setup(exporter);
+      await setup(exporter);
       const body = await request('http://localhost:8080/metrics');
       const lines = body.split('\n');
 
@@ -514,7 +515,7 @@ describe('PrometheusExporter', () => {
         ...serializedDefaultResourceLines,
         '# HELP counter_total description missing',
         '# TYPE counter_total counter',
-        'counter_total{key1="attributeValue1"} 10',
+        'counter_total{key1="attributeValue1",otel_scope_name="test-prometheus"} 10',
         '',
       ]);
     });
@@ -524,8 +525,82 @@ describe('PrometheusExporter', () => {
         endpoint: '/test',
       });
 
-      setup(exporter);
+      await setup(exporter);
       const body = await request('http://localhost:9464/test');
+      const lines = body.split('\n');
+
+      assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
+        '# HELP counter_total description missing',
+        '# TYPE counter_total counter',
+        'counter_total{key1="attributeValue1",otel_scope_name="test-prometheus"} 10',
+        '',
+      ]);
+    });
+
+    it('should export a metric with timestamp', async () => {
+      exporter = new PrometheusExporter({
+        appendTimestamp: true,
+      });
+      await setup(exporter);
+      const body = await request('http://localhost:9464/metrics');
+      const lines = body.split('\n');
+
+      assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
+        '# HELP counter_total description missing',
+        '# TYPE counter_total counter',
+        `counter_total{key1="attributeValue1",otel_scope_name="test-prometheus"} 10 ${mockedHrTimeMs}`,
+        '',
+      ]);
+    });
+
+    it('should export a metric with all resource attributes', async () => {
+      exporter = new PrometheusExporter({
+        withResourceConstantLabels: /.*/,
+      });
+      await setup(exporter);
+      const body = await request('http://localhost:9464/metrics');
+      const lines = body.split('\n');
+
+      assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
+        '# HELP counter_total description missing',
+        '# TYPE counter_total counter',
+        `counter_total{key1="attributeValue1",otel_scope_name="test-prometheus",service_name="${serviceName}",telemetry_sdk_language="${sdkLanguage}",telemetry_sdk_name="${sdkName}",telemetry_sdk_version="${sdkVersion}"} 10`,
+        '',
+      ]);
+    });
+
+    it('should export a metric with two resource attributes', async () => {
+      exporter = new PrometheusExporter({
+        withResourceConstantLabels: /telemetry.sdk.language|telemetry.sdk.name/,
+      });
+      await setup(exporter);
+      const body = await request('http://localhost:9464/metrics');
+      const lines = body.split('\n');
+
+      assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
+        '# HELP counter_total description missing',
+        '# TYPE counter_total counter',
+        `counter_total{key1="attributeValue1",otel_scope_name="test-prometheus",telemetry_sdk_language="${sdkLanguage}",telemetry_sdk_name="${sdkName}"} 10`,
+        '',
+      ]);
+    });
+
+    it('should omit target_info if withoutTargetInfo is true', async () => {
+      exporter = new PrometheusExporter({ withoutTargetInfo: true });
+      await setup(exporter);
+      const body = await request('http://localhost:9464/metrics');
+
+      assert.deepStrictEqual(body.includes('target_info'), false);
+    });
+
+    it('should omit scope labels if withoutScopeInfo is true', async () => {
+      exporter = new PrometheusExporter({ withoutScopeInfo: true });
+      await setup(exporter);
+      const body = await request('http://localhost:9464/metrics');
       const lines = body.split('\n');
 
       assert.deepStrictEqual(lines, [
@@ -536,63 +611,14 @@ describe('PrometheusExporter', () => {
         '',
       ]);
     });
-
-    it('should export a metric with timestamp', async () => {
-      exporter = new PrometheusExporter({
-        appendTimestamp: true,
-      });
-      setup(exporter);
-      const body = await request('http://localhost:9464/metrics');
-      const lines = body.split('\n');
-
-      assert.deepStrictEqual(lines, [
-        ...serializedDefaultResourceLines,
-        '# HELP counter_total description missing',
-        '# TYPE counter_total counter',
-        `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
-        '',
-      ]);
-    });
-
-    it('should export a metric with all resource attributes', async () => {
-      exporter = new PrometheusExporter({
-        withResourceConstantLabels: /.*/,
-      });
-      setup(exporter);
-      const body = await request('http://localhost:9464/metrics');
-      const lines = body.split('\n');
-
-      assert.deepStrictEqual(lines, [
-        ...serializedDefaultResourceLines,
-        '# HELP counter_total description missing',
-        '# TYPE counter_total counter',
-        `counter_total{key1="attributeValue1",service_name="${serviceName}",telemetry_sdk_language="${sdkLanguage}",telemetry_sdk_name="${sdkName}",telemetry_sdk_version="${sdkVersion}"} 10`,
-        '',
-      ]);
-    });
-
-    it('should export a metric with two resource attributes', async () => {
-      exporter = new PrometheusExporter({
-        withResourceConstantLabels: /telemetry.sdk.language|telemetry.sdk.name/,
-      });
-      setup(exporter);
-      const body = await request('http://localhost:9464/metrics');
-      const lines = body.split('\n');
-
-      assert.deepStrictEqual(lines, [
-        ...serializedDefaultResourceLines,
-        '# HELP counter_total description missing',
-        '# TYPE counter_total counter',
-        `counter_total{key1="attributeValue1",telemetry_sdk_language="${sdkLanguage}",telemetry_sdk_name="${sdkName}"} 10`,
-        '',
-      ]);
-    });
   });
 });
 
 class RequestStatusError extends Error {
-  constructor(public statusCode: number | undefined) {
+  public statusCode: number | undefined;
+  constructor(statusCode: number | undefined) {
     super('request failed with non-200 code');
+    this.statusCode = statusCode;
   }
 }
 

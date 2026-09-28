@@ -1,3 +1,5 @@
 src/generated/*
+test/generated/*
 !src/generated/.gitkeep
+!test/generated/.gitkeep
 !src/logs

@@ -1,29 +1,18 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Link, SpanKind, Attributes, diag, Context } from '@opentelemetry/api';
+import type { Link, SpanKind, Attributes, Context } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
+import type { Sampler, SamplingResult } from '@opentelemetry/sdk-trace';
 import {
-  Sampler,
-  SamplingResult,
   ParentBasedSampler,
   TraceIdRatioBasedSampler,
-} from '@opentelemetry/sdk-trace-base';
-import * as axios from 'axios';
+} from '@opentelemetry/sdk-trace';
 import { PerOperationSampler } from './PerOperationSampler';
-import { SamplingStrategyResponse, StrategyType } from './types';
+import type { SamplingStrategyResponse } from './types';
+import { StrategyType } from './types';
 
 interface JaegerRemoteSamplerOptions {
   /** Address of a service that implements the Remote Sampling API, such as Jaeger Collector or OpenTelemetry Collector */
@@ -131,9 +120,18 @@ export class JaegerRemoteSampler implements Sampler {
   private async getSamplerConfig(
     serviceName?: string
   ): Promise<SamplingStrategyResponse> {
-    const response = await axios.get<SamplingStrategyResponse>(
-      `${this._endpoint}/sampling?service=${serviceName ?? ''}`
-    );
-    return response.data;
+    // As described in https://www.jaegertracing.io/docs/2.20/architecture/apis/#remote-sampling-apis
+    // the response is a protobuf mapped to JSON so `response.json()` will get the data parsed.
+    const samplingUrl = `${this._endpoint}/sampling?service=${serviceName ?? ''}`;
+    return fetch(samplingUrl)
+      .then(resp => {
+        if (resp.ok) {
+          return resp;
+        }
+        throw new Error(
+          `Fetch sampling error(${resp.status}): ${resp.statusText}`
+        );
+      })
+      .then(resp => resp.json()) as Promise<SamplingStrategyResponse>;
   }
 }

@@ -1,24 +1,13 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Tracer } from './tracer';
-import { TracerProvider } from './tracer_provider';
+import type { Tracer } from './tracer';
+import type { TracerProvider } from './tracer_provider';
 import { ProxyTracer } from './ProxyTracer';
 import { NoopTracerProvider } from './NoopTracerProvider';
-import { TracerOptions } from './tracer_options';
+import type { TracerOptions } from './tracer_options';
 
 const NOOP_TRACER_PROVIDER = new NoopTracerProvider();
 
@@ -30,6 +19,7 @@ const NOOP_TRACER_PROVIDER = new NoopTracerProvider();
  *   When a delegate is set after tracers have already been provided,
  *   all tracers already provided will use the provided delegate implementation.
  *
+ * @deprecated This will be removed in the next major version.
  * @since 1.0.0
  */
 export class ProxyTracerProvider implements TracerProvider {

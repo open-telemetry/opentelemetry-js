@@ -1,29 +1,18 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { DiagAPI } from '../../../api/diag';
 import {
-  registerGlobal,
   getGlobal,
+  registerGlobal,
   unregisterGlobal,
 } from '../../../internal/global-utils';
+import type { LoggerProvider } from '../types/LoggerProvider';
+import type { Logger } from '../types/Logger';
+import type { LoggerOptions } from '../types/LoggerOptions';
 import { ProxyLoggerProvider } from '../ProxyLoggerProvider';
-import { Logger } from '../types/Logger';
-import { LoggerOptions } from '../types/LoggerOptions';
-import { LoggerProvider } from '../types/LoggerProvider';
+import { DiagAPI } from '../../../api/diag';
 
 const API_NAME = 'logs';
 
@@ -49,7 +38,7 @@ export class LogsAPI {
       DiagAPI.instance()
     );
     if (success) {
-      this._proxyLoggerProvider.setDelegate(provider);
+      this._proxyLoggerProvider._setDelegate(provider);
     }
     return success;
   }
@@ -60,13 +49,21 @@ export class LogsAPI {
    * @returns LoggerProvider
    */
   public getLoggerProvider(): LoggerProvider {
-    return getGlobal(API_NAME) || this._proxyLoggerProvider;
+    return getGlobal(API_NAME) ?? this._proxyLoggerProvider;
   }
 
   /**
-   * Returns a logger from the global logger provider.
+   * Returns a Logger, creating one if one with the given name, version,
+   * schemaUrl, and attributes is not already created.
    *
-   * @returns Logger
+   * Getting a Logger may be expensive, especially when `attributes` are
+   * provided. Reuse Logger instances where possible instead of calling
+   * `getLogger()` on hot paths.
+   *
+   * @param name The name of the logger or instrumentation library.
+   * @param version The version of the logger or instrumentation library.
+   * @param options The options of the logger or instrumentation library.
+   * @returns {@link Logger}
    */
   public getLogger(
     name: string,

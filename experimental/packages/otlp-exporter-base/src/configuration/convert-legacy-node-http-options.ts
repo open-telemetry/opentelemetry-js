@@ -1,50 +1,38 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
-import { OTLPExporterNodeConfigBase } from './legacy-node-configuration';
-import {
-  getHttpConfigurationDefaults,
-  mergeOtlpHttpConfigurationWithDefaults,
-  OtlpHttpConfiguration,
-} from './otlp-http-configuration';
-import { getHttpConfigurationFromEnvironment } from './otlp-http-env-configuration';
-import type * as http from 'http';
-import type * as https from 'https';
+import type { OTLPExporterNodeConfigBase } from './legacy-node-configuration';
 import { diag } from '@opentelemetry/api';
-import { wrapStaticHeadersInFunction } from './shared-configuration';
+import type {
+  HttpAgentFactory,
+  OtlpNodeHttpConfiguration,
+} from './otlp-node-http-configuration';
+import {
+  getNodeHttpConfigurationDefaults,
+  mergeOtlpNodeHttpConfigurationWithDefaults,
+} from './otlp-node-http-configuration';
+import { httpAgentFactoryFromOptions } from '../index-node-http';
+import { getNodeHttpConfigurationFromEnvironment } from './otlp-node-http-env-configuration';
+import { convertLegacyHeaders } from './convert-legacy-http-options';
 
 function convertLegacyAgentOptions(
   config: OTLPExporterNodeConfigBase
-): http.AgentOptions | https.AgentOptions | undefined {
-  // populate keepAlive for use with new settings
-  if (config?.keepAlive != null) {
-    if (config.httpAgentOptions != null) {
-      if (config.httpAgentOptions.keepAlive == null) {
-        // specific setting is not set, populate with non-specific setting.
-        config.httpAgentOptions.keepAlive = config.keepAlive;
-      }
-      // do nothing, use specific setting otherwise
-    } else {
-      // populate specific option if AgentOptions does not exist.
-      config.httpAgentOptions = {
-        keepAlive: config.keepAlive,
-      };
-    }
+): HttpAgentFactory | undefined {
+  if (typeof config.httpAgentOptions === 'function') {
+    return config.httpAgentOptions;
   }
 
-  return config.httpAgentOptions;
+  let legacy = config.httpAgentOptions;
+  if (config.keepAlive != null) {
+    legacy = { keepAlive: config.keepAlive, ...legacy };
+  }
+
+  if (legacy != null) {
+    return httpAgentFactoryFromOptions(legacy);
+  } else {
+    return undefined;
+  }
 }
 
 /**
@@ -59,22 +47,26 @@ export function convertLegacyHttpOptions(
   signalIdentifier: string,
   signalResourcePath: string,
   requiredHeaders: Record<string, string>
-): OtlpHttpConfiguration {
+): OtlpNodeHttpConfiguration {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if ((config as any).metadata) {
     diag.warn('Metadata cannot be set when using http');
   }
 
-  return mergeOtlpHttpConfigurationWithDefaults(
+  return mergeOtlpNodeHttpConfigurationWithDefaults(
     {
       url: config.url,
-      headers: wrapStaticHeadersInFunction(config.headers),
+      headers: convertLegacyHeaders(config),
       concurrencyLimit: config.concurrencyLimit,
       timeoutMillis: config.timeoutMillis,
       compression: config.compression,
-      agentOptions: convertLegacyAgentOptions(config),
+      agentFactory: convertLegacyAgentOptions(config),
+      userAgent: config.userAgent,
     },
-    getHttpConfigurationFromEnvironment(signalIdentifier, signalResourcePath),
-    getHttpConfigurationDefaults(requiredHeaders, signalResourcePath)
+    getNodeHttpConfigurationFromEnvironment(
+      signalIdentifier,
+      signalResourcePath
+    ),
+    getNodeHttpConfigurationDefaults(requiredHeaders, signalResourcePath)
   );
 }

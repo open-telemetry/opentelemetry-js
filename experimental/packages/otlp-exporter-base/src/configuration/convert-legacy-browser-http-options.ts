@@ -1,25 +1,14 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
+import type { OtlpHttpConfiguration } from './otlp-http-configuration';
 import {
   getHttpConfigurationDefaults,
   mergeOtlpHttpConfigurationWithDefaults,
-  OtlpHttpConfiguration,
 } from './otlp-http-configuration';
-import { OTLPExporterNodeConfigBase } from './legacy-node-configuration';
-import { wrapStaticHeadersInFunction } from './shared-configuration';
+import type { OTLPExporterNodeConfigBase } from './legacy-node-configuration';
+import { convertLegacyHeaders } from './convert-legacy-http-options';
 
 /**
  * @deprecated this will be removed in 2.0
@@ -37,7 +26,7 @@ export function convertLegacyBrowserHttpOptions(
     {
       url: config.url,
       timeoutMillis: config.timeoutMillis,
-      headers: wrapStaticHeadersInFunction(config.headers),
+      headers: convertLegacyHeaders(config),
       concurrencyLimit: config.concurrencyLimit,
     },
     {}, // no fallback for browser case

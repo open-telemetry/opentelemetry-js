@@ -1,38 +1,26 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import { SpanKind, Span, context, propagation } from '@opentelemetry/api';
+import type { Span } from '@opentelemetry/api';
+import { SpanKind, context, propagation } from '@opentelemetry/api';
 import {
-  ATTR_HTTP_FLAVOR,
-  ATTR_HTTP_HOST,
-  ATTR_NET_TRANSPORT,
-  HTTP_FLAVOR_VALUE_HTTP_1_1,
-  NET_TRANSPORT_VALUE_IP_TCP,
-} from '../../src/semconv';
+  ATTR_NETWORK_PROTOCOL_VERSION,
+  ATTR_SERVER_ADDRESS,
+  ATTR_SERVER_PORT,
+} from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
-import * as url from 'url';
+import { urlToHttpOptions } from 'url';
 import { HttpInstrumentation } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
 import * as utils from '../utils/utils';
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+  TracerProvider,
+} from '@opentelemetry/sdk-trace';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 
 const instrumentation = new HttpInstrumentation();
 instrumentation.enable();
@@ -41,7 +29,7 @@ instrumentation.disable();
 import * as http from 'http';
 import { httpRequest } from '../utils/httpRequest';
 import { DummyPropagation } from '../utils/DummyPropagation';
-import { Socket } from 'net';
+import type { Socket } from 'net';
 import { sendRequestTwice } from '../utils/rawRequest';
 
 const protocol = 'http';
@@ -105,7 +93,9 @@ describe('HttpInstrumentation Integration tests', () => {
 
   before(() => {
     propagation.setGlobalPropagator(new DummyPropagation());
-    context.setGlobalContextManager(new AsyncHooksContextManager().enable());
+    context.setGlobalContextManager(
+      new AsyncLocalStorageContextManager().enable()
+    );
   });
 
   after(() => {
@@ -129,8 +119,8 @@ describe('HttpInstrumentation Integration tests', () => {
       });
     });
 
-    const provider = new NodeTracerProvider({
-      spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+    const provider = new TracerProvider({
+      spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
     });
     instrumentation.setTracerProvider(provider);
     beforeEach(() => {
@@ -180,7 +170,7 @@ describe('HttpInstrumentation Integration tests', () => {
       assert.strictEqual(spans.length, 0);
 
       const result = await httpRequest.get(
-        new url.URL(`${protocol}://localhost:${mockServerPort}/?query=test`)
+        new URL(`${protocol}://localhost:${mockServerPort}/?query=test`)
       );
 
       spans = memoryExporter.getFinishedSpans();
@@ -207,7 +197,7 @@ describe('HttpInstrumentation Integration tests', () => {
       assert.strictEqual(spans.length, 0);
 
       const result = await httpRequest.get(
-        new url.URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
+        new URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
         {
           headers: { 'x-foo': 'foo' },
         }
@@ -230,14 +220,7 @@ describe('HttpInstrumentation Integration tests', () => {
       assert.strictEqual(spans.length, 2);
       assert.strictEqual(span.name, 'GET');
       assert.strictEqual(result.reqHeaders['x-foo'], 'foo');
-      assert.strictEqual(
-        span.attributes[ATTR_HTTP_FLAVOR],
-        HTTP_FLAVOR_VALUE_HTTP_1_1
-      );
-      assert.strictEqual(
-        span.attributes[ATTR_NET_TRANSPORT],
-        NET_TRANSPORT_VALUE_IP_TCP
-      );
+      assert.strictEqual(span.attributes[ATTR_NETWORK_PROTOCOL_VERSION], '1.1');
       assertSpan(span, SpanKind.CLIENT, validations);
     });
 
@@ -270,7 +253,7 @@ describe('HttpInstrumentation Integration tests', () => {
 
       const headers = { 'x-foo': 'foo' };
       const result = await httpRequest.get(
-        new url.URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
+        new URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
         { headers }
       );
       assert.deepStrictEqual(headers, { 'x-foo': 'foo' });
@@ -284,7 +267,7 @@ describe('HttpInstrumentation Integration tests', () => {
 
       const headers = { 'x-foo': 'foo', forwarded: 'malformed' };
       const result = await httpRequest.get(
-        new url.URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
+        new URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
         { headers }
       );
 
@@ -297,7 +280,7 @@ describe('HttpInstrumentation Integration tests', () => {
       assert.strictEqual(spans.length, 0);
       const options = Object.assign(
         { headers: { Expect: '100-continue' } },
-        url.parse(`${protocol}://localhost:${mockServerPort}/`)
+        urlToHttpOptions(new URL(`${protocol}://localhost:${mockServerPort}/`))
       );
 
       const result = await httpRequest.get(options);
@@ -405,10 +388,8 @@ describe('HttpInstrumentation Integration tests', () => {
       const span = spans.find(s => s.kind === SpanKind.CLIENT);
       assert.ok(span);
       assert.strictEqual(span.name, 'GET');
-      assert.strictEqual(
-        span.attributes[ATTR_HTTP_HOST],
-        `localhost:${mockServerPort}`
-      );
+      assert.strictEqual(span.attributes[ATTR_SERVER_ADDRESS], 'localhost');
+      assert.strictEqual(span.attributes[ATTR_SERVER_PORT], mockServerPort);
     });
   });
 });

@@ -1,43 +1,56 @@
 /*
  * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  OTLPMetricExporterBase,
-  OTLPMetricExporterOptions,
-} from '@opentelemetry/exporter-metrics-otlp-http';
+import type { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
+import { OTLPMetricExporterBase } from '@opentelemetry/exporter-metrics-otlp-http';
+import type { OTLPGRPCExporterConfigNode } from '@opentelemetry/otlp-grpc-exporter-base';
 import {
   convertLegacyOtlpGrpcOptions,
   createOtlpGrpcExportDelegate,
-  OTLPGRPCExporterConfigNode,
+  createOtlpGrpcExporterMetrics,
 } from '@opentelemetry/otlp-grpc-exporter-base';
-import { ProtobufMetricsSerializer } from '@opentelemetry/otlp-transformer';
+import {
+  MetricsExporterMetricsHelper,
+  ProtobufMetricsSerializer,
+} from '@opentelemetry/otlp-transformer';
+import { OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_METRIC_EXPORTER } from './semconv';
+import type { MeterProvider } from '@opentelemetry/api';
 
 /**
  * OTLP-gRPC metric exporter
  */
 export class OTLPMetricExporter extends OTLPMetricExporterBase {
+  private readonly _url: string | undefined;
   constructor(config?: OTLPGRPCExporterConfigNode & OTLPMetricExporterOptions) {
     super(
       createOtlpGrpcExportDelegate(
         convertLegacyOtlpGrpcOptions(config ?? {}, 'METRICS'),
         ProtobufMetricsSerializer,
+        OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_METRIC_EXPORTER,
+        MetricsExporterMetricsHelper,
+        config?.selfObsMeterProvider,
         'MetricsExportService',
         '/opentelemetry.proto.collector.metrics.v1.MetricsService/Export'
       ),
       config
+    );
+    this._url = config?.url;
+  }
+
+  /**
+   * Sets the meter provider to use to collect metrics for the exporter itself.
+   * @experimental This method is experimental and is subject to breaking changes in minor releases.
+   */
+  setSelfObsMeterProvider(meterProvider: MeterProvider) {
+    this.setMetrics(
+      createOtlpGrpcExporterMetrics(
+        OTEL_COMPONENT_TYPE_VALUE_OTLP_GRPC_METRIC_EXPORTER,
+        MetricsExporterMetricsHelper,
+        this._url,
+        meterProvider
+      )
     );
   }
 }
