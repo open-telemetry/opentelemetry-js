@@ -1,5 +1,5 @@
 import { DiagConsoleLogger, diag } from '@opentelemetry/api';
-import { logs } from '@opentelemetry/api/experimental';
+import { logs } from '@opentelemetry/api';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
 import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';

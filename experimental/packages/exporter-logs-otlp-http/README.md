@@ -28,7 +28,7 @@ To see documentation and sample code for the metric exporter, see the [exporter-
 The OTLPLogExporter in Web expects the endpoint to end in `/v1/logs`.
 
 ```js
-import { SeverityNumber } from '@opentelemetry/api/experimental';
+import { SeverityNumber } from '@opentelemetry/api';
 import {
   LoggerProvider,
   BatchLogRecordProcessor,

@@ -4,11 +4,11 @@
  */
 
 import * as assert from 'assert';
-import type { Logger } from '../../../../../src/experimental/logs';
-import { logs } from '../../../../../src/experimental/logs';
-import { ProxyLoggerProvider } from '../../../../../src/experimental/logs/ProxyLoggerProvider';
-import { NoopLogger } from '../../../../../src/experimental/logs/NoopLogger';
-import { NoopLoggerProvider } from '../../../../../src/experimental/logs/NoopLoggerProvider';
+import type { Logger } from '../../../../src/logs';
+import { logs } from '../../../../src/logs';
+import { ProxyLoggerProvider } from '../../../../src/logs/ProxyLoggerProvider';
+import { NoopLogger } from '../../../../src/logs/NoopLogger';
+import { NoopLoggerProvider } from '../../../../src/logs/NoopLoggerProvider';
 
 describe('API', () => {
   const dummyLogger = new NoopLogger();

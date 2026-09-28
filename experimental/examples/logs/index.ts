@@ -4,7 +4,7 @@
  */
 
 import { DiagConsoleLogger, DiagLogLevel, diag } from '@opentelemetry/api';
-import { logs, SeverityNumber } from '@opentelemetry/api/experimental';
+import { logs, SeverityNumber } from '@opentelemetry/api';
 import {
   LoggerProvider,
   ConsoleLogRecordExporter,

@@ -6,7 +6,7 @@
 import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { diag, ROOT_CONTEXT, trace, TraceFlags } from '@opentelemetry/api';
-import * as logsAPI from '@opentelemetry/api/experimental';
+import * as logsAPI from '@opentelemetry/api';
 import type { HrTime, AnyValue, Attributes } from '@opentelemetry/api';
 import { hrTimeToMilliseconds, timeInputToHrTime } from '@opentelemetry/core';
 import { defaultResource } from '@opentelemetry/resources';

@@ -9,7 +9,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :boom: Breaking Changes
 
-* feat(api-logs)!: move the Logs API to `@opentelemetry/api/experimental` and remove the standalone `@opentelemetry/api-logs` package [#4862](https://github.com/open-telemetry/opentelemetry-js/pull/4862) @hectorhdzg
+* feat(api-logs)!: move the Logs API to `@opentelemetry/api` and remove the standalone `@opentelemetry/api-logs` package [#4862](https://github.com/open-telemetry/opentelemetry-js/pull/4862) @hectorhdzg
 * fix(exporter-prometheus)!: stop reading Prometheus exporter host and port environment variables in the exporter constructor [#6966](https://github.com/open-telemetry/opentelemetry-js/pull/6966) @LarryHu0217
 * chore(web-common)!: clean up and deprecate network span utils [#7114](https://github.com/open-telemetry/opentelemetry-js/issues/7114)
   * These utilities were long planned for removal. They were moved from the `sdk-trace-web` package and are currently only used by the (deprecated) `instrumentation-fetch` and `instrumentation-xml-http-request` packages.

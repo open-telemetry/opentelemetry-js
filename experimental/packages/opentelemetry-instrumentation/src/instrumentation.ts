@@ -12,8 +12,8 @@ import type {
   Span,
 } from '@opentelemetry/api';
 import { diag, metrics, trace } from '@opentelemetry/api';
-import type { Logger, LoggerProvider } from '@opentelemetry/api/experimental';
-import { logs } from '@opentelemetry/api/experimental';
+import type { Logger, LoggerProvider } from '@opentelemetry/api';
+import { logs } from '@opentelemetry/api';
 import * as shimmer from './shimmer';
 import type {
   InstrumentationModuleDefinition,

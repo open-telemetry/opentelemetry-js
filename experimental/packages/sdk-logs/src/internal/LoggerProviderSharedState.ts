@@ -4,8 +4,8 @@
  */
 
 import { type MeterProvider, createNoopMeter } from '@opentelemetry/api';
-import type { Logger } from '@opentelemetry/api/experimental';
-import { SeverityNumber } from '@opentelemetry/api/experimental';
+import type { Logger } from '@opentelemetry/api';
+import { SeverityNumber } from '@opentelemetry/api';
 import type { Resource } from '@opentelemetry/resources';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import type { LogRecordProcessor } from '../LogRecordProcessor';

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import type { Attributes } from '@opentelemetry/api';
-import { logs } from '@opentelemetry/api/experimental';
+import { logs } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
 import {
   defaultResource,

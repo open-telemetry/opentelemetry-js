@@ -4,8 +4,10 @@ version.ts
 
 # Logs
 logs
-!api/src/experimental/logs/
-!api/src/experimental/logs/**
+!api/src/logs/
+!api/src/logs/**
+!api/test/common/logs/
+!api/test/common/logs/**
 *.log
 npm-debug.log*
 yarn-debug.log*

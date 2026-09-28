@@ -10,5 +10,3 @@
 
 export { wrapTracer, SugaredTracer } from './trace/SugaredTracer';
 export type { SugaredSpanOptions } from './trace/SugaredOptions';
-export { createNoopLogger, logs, SeverityNumber } from './logs';
-export type { Logger, LoggerOptions, LoggerProvider, LogRecord } from './logs';

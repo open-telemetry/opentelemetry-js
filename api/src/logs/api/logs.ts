@@ -7,12 +7,12 @@ import {
   getGlobal,
   registerGlobal,
   unregisterGlobal,
-} from '../../../internal/global-utils';
+} from '../../internal/global-utils';
 import type { LoggerProvider } from '../types/LoggerProvider';
 import type { Logger } from '../types/Logger';
 import type { LoggerOptions } from '../types/LoggerOptions';
 import { ProxyLoggerProvider } from '../ProxyLoggerProvider';
-import { DiagAPI } from '../../../api/diag';
+import { DiagAPI } from '../../api/diag';
 
 const API_NAME = 'logs';
 

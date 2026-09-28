@@ -5,13 +5,10 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import type {
-  Logger,
-  LoggerProvider,
-} from '../../../../../src/experimental/logs';
-import { NoopLogger } from '../../../../../src/experimental/logs/NoopLogger';
-import { ProxyLogger } from '../../../../../src/experimental/logs/ProxyLogger';
-import { ProxyLoggerProvider } from '../../../../../src/experimental/logs/ProxyLoggerProvider';
+import type { Logger, LoggerProvider } from '../../../../src/logs';
+import { NoopLogger } from '../../../../src/logs/NoopLogger';
+import { ProxyLogger } from '../../../../src/logs/ProxyLogger';
+import { ProxyLoggerProvider } from '../../../../src/logs/ProxyLoggerProvider';
 
 describe('ProxyLogger', () => {
   let provider: ProxyLoggerProvider;

@@ -17,7 +17,7 @@ import {
 } from '@opentelemetry/api';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
-import { logs } from '@opentelemetry/api/experimental';
+import { logs } from '@opentelemetry/api';
 import {
   SimpleLogRecordProcessor,
   ConsoleLogRecordExporter,

@@ -4,7 +4,7 @@
  */
 
 import type { InstrumentationScope } from '@opentelemetry/core';
-import { SeverityNumber } from '@opentelemetry/api/experimental';
+import { SeverityNumber } from '@opentelemetry/api';
 import type { LoggerConfig, LoggerConfigurator } from '../types';
 
 /**

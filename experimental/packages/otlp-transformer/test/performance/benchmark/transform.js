@@ -15,7 +15,7 @@ const {
 } = require('../../../dist/index.cjs');
 const { resourceFromAttributes } = require('@opentelemetry/resources');
 const { TraceFlags } = require('@opentelemetry/api');
-const { SeverityNumber } = require('@opentelemetry/api/experimental');
+const { SeverityNumber } = require('@opentelemetry/api');
 
 // shared concepts
 const resource = resourceFromAttributes({

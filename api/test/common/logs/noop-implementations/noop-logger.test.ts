@@ -4,8 +4,8 @@
  */
 
 import * as assert from 'assert';
-import { SeverityNumber } from '../../../../../src/experimental/logs';
-import { NoopLoggerProvider } from '../../../../../src/experimental/logs/NoopLoggerProvider';
+import { SeverityNumber } from '../../../../src/logs';
+import { NoopLoggerProvider } from '../../../../src/logs/NoopLoggerProvider';
 
 describe('NoopLogger', () => {
   it('calling emit should not crash', () => {

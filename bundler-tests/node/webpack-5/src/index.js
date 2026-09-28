@@ -1,5 +1,5 @@
 const { diag, DiagConsoleLogger } = require('@opentelemetry/api');
-const { logs } = require('@opentelemetry/api/experimental');
+const { logs } = require('@opentelemetry/api');
 const { InstrumentationBase } = require('@opentelemetry/instrumentation');
 const { OTLPLogExporter } = require('@opentelemetry/exporter-logs-otlp-http');
 const {

@@ -6,7 +6,7 @@
 import type { Context } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import type { ReadWriteLogRecord } from './export/ReadWriteLogRecord';
-import type { SeverityNumber } from '@opentelemetry/api/experimental';
+import type { SeverityNumber } from '@opentelemetry/api';
 import type { ForceFlushOptions } from './types';
 
 export interface LogRecordProcessor {

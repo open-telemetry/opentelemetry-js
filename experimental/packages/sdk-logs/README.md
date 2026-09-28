@@ -14,7 +14,7 @@ It does **not** provide automated instrumentation of known libraries or host env
 ## Installation
 
 ```bash
-npm install --save @opentelemetry/api/experimental
+npm install --save @opentelemetry/api
 npm install --save @opentelemetry/sdk-logs
 ```
 
@@ -23,7 +23,7 @@ npm install --save @opentelemetry/sdk-logs
 The basic setup of the SDK can be seen as followings:
 
 ```js
-const logsAPI = require('@opentelemetry/api/experimental');
+const logsAPI = require('@opentelemetry/api');
 const {
   LoggerProvider,
   SimpleLogRecordProcessor,
@@ -91,7 +91,7 @@ Filter logs based on their severity level. Logs with severity below the configur
 
 ```js
 const { LoggerProvider, createLoggerConfigurator } = require('@opentelemetry/sdk-logs');
-const { SeverityNumber } = require('@opentelemetry/api/experimental');
+const { SeverityNumber } = require('@opentelemetry/api');
 
 const loggerProvider = new LoggerProvider({
   loggerConfigurator: createLoggerConfigurator([

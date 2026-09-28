@@ -9,7 +9,7 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: Features
 
-* feat(api): integrate the Logs API under `@opentelemetry/api/experimental` [#4862](https://github.com/open-telemetry/opentelemetry-js/pull/4862) @hectorhdzg
+* feat(api): integrate the Logs API into `@opentelemetry/api` [#4862](https://github.com/open-telemetry/opentelemetry-js/pull/4862) @hectorhdzg
 * feat(api): add imperative `context.attach()` for setting context across callback boundaries that `with()` cannot wrap. [#6845](https://github.com/open-telemetry/opentelemetry-js/pull/6845) @pichlermarc
   * `attach()` returns a `Token` whose `dispose()` method restores the previous context. Use `token.dispose()` to detach.
   * `attach` is an optional method on the `ContextManager` interface; when the active context manager does not implement it, `context.attach()` logs a warning and returns a no-op token.
@@ -30,7 +30,7 @@ All notable changes to this project will be documented in this file.
 ### :house: Internal
 
 * build: migrate the package build from `tsc` to `tsdown`, emitting dual CJS/ESM output from a single `dist/` directory [#6293](https://github.com/open-telemetry/opentelemetry-js/pull/6293) @overbalance
-  * The public entry points are unchanged: `@opentelemetry/api` and `@opentelemetry/api/experimental`. This package already declared an `exports` map, so deep imports such as `@opentelemetry/api/build/src/...` were rejected before this change and continue to be.
+  * The public entry points are unchanged: `@opentelemetry/api` and `@opentelemetry/api`. This package already declared an `exports` map, so deep imports such as `@opentelemetry/api/build/src/...` were rejected before this change and continue to be.
   * The emitted files moved out of `build/src` (CJS), `build/esm` and `build/esnext` (ESM) into `dist/`, using `.cjs`/`.mjs` extensions with matching `.d.cts`/`.d.mts` declarations. The non-standard `esnext` condition has been dropped in favour of the standard `import`/`require` conditions.
 * perf(api): add getGlobal fast-path [#6956](https://github.com/open-telemetry/opentelemetry-js/pull/6956) @legendecas
 
@@ -72,7 +72,7 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: (Bug Fix)
 
-* fix(api): fix unreachable @opentelemetry/api/experimental entry [#4446](https://github.com/open-telemetry/opentelemetry-js/pull/4446) @legendecas
+* fix(api): fix unreachable @opentelemetry/api entry [#4446](https://github.com/open-telemetry/opentelemetry-js/pull/4446) @legendecas
 
 ## 1.7.0
 

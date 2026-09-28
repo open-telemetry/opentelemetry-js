@@ -5,7 +5,7 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { SeverityNumber } from '@opentelemetry/api/experimental';
+import { SeverityNumber } from '@opentelemetry/api';
 
 import {
   LoggerProvider,

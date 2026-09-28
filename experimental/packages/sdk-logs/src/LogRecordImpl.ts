@@ -3,10 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type {
-  LogRecord,
-  SeverityNumber,
-} from '@opentelemetry/api/experimental';
+import type { LogRecord, SeverityNumber } from '@opentelemetry/api';
 import * as api from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import {

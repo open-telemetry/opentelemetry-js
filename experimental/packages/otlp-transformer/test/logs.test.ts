@@ -10,7 +10,7 @@ import { resourceFromAttributes } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import type { ReadableLogRecord } from '@opentelemetry/sdk-logs';
-import { SeverityNumber } from '@opentelemetry/api/experimental';
+import { SeverityNumber } from '@opentelemetry/api';
 import type { Encoder } from '../src/common/utils';
 import { JSON_ENCODER, PROTOBUF_ENCODER } from '../src/common/utils';
 import { toBase64 } from './utils';

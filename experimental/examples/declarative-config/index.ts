@@ -4,7 +4,7 @@
  */
 
 import { trace, metrics } from '@opentelemetry/api';
-import { logs, SeverityNumber } from '@opentelemetry/api/experimental';
+import { logs, SeverityNumber } from '@opentelemetry/api';
 import { startNodeSDK } from '@opentelemetry/sdk-node';
 
 // `startNodeSDK()` reads OTEL_CONFIG_FILE (set in package.json's start script)

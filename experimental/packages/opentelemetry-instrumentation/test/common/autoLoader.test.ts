@@ -13,11 +13,7 @@ import type {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { InstrumentationBase, registerInstrumentations } from '../../src';
-import type {
-  Logger,
-  LoggerOptions,
-  LoggerProvider,
-} from '@opentelemetry/api/experimental';
+import type { Logger, LoggerOptions, LoggerProvider } from '@opentelemetry/api';
 
 class DummyTracerProvider implements TracerProvider {
   getTracer(name: string, version?: string): Tracer {

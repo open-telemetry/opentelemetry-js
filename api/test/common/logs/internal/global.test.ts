@@ -4,15 +4,15 @@
  */
 
 import * as assert from 'assert';
-import { NoopLoggerProvider } from '../../../../../src/experimental/logs/NoopLoggerProvider';
+import { NoopLoggerProvider } from '../../../../src/logs/NoopLoggerProvider';
 
-const api1 = require('../../../../../src/experimental');
+const api1 = require('../../../../src');
 
 // clear cache and load a second instance of the api
 for (const key of Object.keys(require.cache)) {
   delete require.cache[key];
 }
-const api2 = require('../../../../../src/experimental');
+const api2 = require('../../../../src');
 
 const GLOBAL_API_SYMBOL_KEY = 'opentelemetry.js.api.1';
 

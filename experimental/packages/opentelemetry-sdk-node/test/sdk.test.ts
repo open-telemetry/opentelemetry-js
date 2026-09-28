@@ -51,7 +51,7 @@ import {
   defaultResource,
 } from '@opentelemetry/resources';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { logs } from '@opentelemetry/api/experimental';
+import { logs } from '@opentelemetry/api';
 import {
   SimpleLogRecordProcessor,
   InMemoryLogRecordExporter,
