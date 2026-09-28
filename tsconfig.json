@@ -44,8 +44,6 @@
       "packages/opentelemetry-exporter-zipkin",
       "packages/opentelemetry-propagator-b3",
       "packages/opentelemetry-resources",
-      "packages/opentelemetry-sdk-trace-base",
-      "packages/opentelemetry-sdk-trace-web",
       "packages/sdk-metrics",
       "packages/sdk-trace",
       "semantic-conventions"
@@ -165,12 +163,6 @@
     },
     {
       "path": "packages/opentelemetry-resources"
-    },
-    {
-      "path": "packages/opentelemetry-sdk-trace-base"
-    },
-    {
-      "path": "packages/opentelemetry-sdk-trace-web"
     },
     {
       "path": "packages/sdk-metrics"

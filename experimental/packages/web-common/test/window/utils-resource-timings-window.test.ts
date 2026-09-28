@@ -5,8 +5,8 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import type { URLLike } from '../../src/utils';
-import { getElementXPath, normalizeUrl, parseUrl } from '../../src/utils';
+import type { URLLike } from '../../src';
+import { getElementXPath, normalizeUrl, parseUrl } from '../../src';
 
 const fixture = `
 <div>
@@ -49,7 +49,7 @@ const fixture = `
 </div>
 `;
 
-describe('utils', function () {
+describe('utils-resource-timings', function () {
   afterEach(() => {
     sinon.restore();
   });

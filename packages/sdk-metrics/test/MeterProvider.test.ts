@@ -4,6 +4,7 @@
  */
 
 import * as assert from 'assert';
+import { diag } from '@opentelemetry/api';
 import type { HistogramMetricData, DataPoint } from '../src';
 import { MeterProvider, InstrumentType, DataPointType } from '../src';
 import {
@@ -103,6 +104,35 @@ describe('MeterProvider', () => {
       const meter1 = meterProvider.getMeter('meter1', '1.0.0');
       const meter2 = meterProvider.getMeter('meter1', '1.0.0');
       assert.strictEqual(meter1, meter2);
+    });
+
+    it('should warn and fallback for invalid instrumentation scope name', () => {
+      const warnStub = sinon.spy(diag, 'warn');
+
+      const meterProvider = new MeterProvider();
+      const meter = meterProvider.getMeter('');
+
+      assert.ok(
+        warnStub.calledWithMatch(
+          'Invalid MeterProvider instrumentation scope name, using empty string'
+        )
+      );
+      assert.ok(meter instanceof Meter);
+    });
+
+    it('should warn and fallback for no instrumentation scope name', () => {
+      const warnStub = sinon.spy(diag, 'warn');
+
+      const meterProvider = new MeterProvider();
+      // @ts-expect-error Intentionally calling with a required argument.
+      const meter = meterProvider.getMeter();
+
+      assert.ok(
+        warnStub.calledWithMatch(
+          'Invalid MeterProvider instrumentation scope name, using empty string'
+        )
+      );
+      assert.ok(meter instanceof Meter);
     });
 
     it('get a noop meter on shutdown', async () => {

@@ -22,7 +22,6 @@
     "@opentelemetry/sdk-logs": "file:../../../experimental/packages/sdk-logs",
     "@opentelemetry/sdk-metrics": "file:../../../packages/sdk-metrics",
     "@opentelemetry/sdk-trace": "file:../../../packages/sdk-trace",
-    "@opentelemetry/sdk-trace-web": "file:../../../packages/opentelemetry-sdk-trace-web",
     "next": "^16",
     "react": "^19",
     "react-dom": "^19"

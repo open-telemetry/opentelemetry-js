@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Attributes, AttributeValue } from '@opentelemetry/api';
+import type { AnyValue, Attributes } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
 import type {
   ResourceMetrics,
@@ -39,11 +39,17 @@ function escapeString(str: string) {
  * String Attribute values are converted directly to Prometheus attribute values.
  * Non-string values are represented as JSON-encoded strings.
  *
- * `undefined` is converted to an empty string.
+ * Note: This does *not* currently guard against unserializable attribute
+ * values, e.g. BigInt or circular references. This is relying, as is
+ * the sdk-metrics package, that users follow the requirement to only use
+ * simple attributes. (See OTEP 4485.)
  */
-function escapeAttributeValue(str: AttributeValue = '') {
-  if (typeof str !== 'string') {
-    str = JSON.stringify(str);
+function escapeAttributeValue(val: AnyValue = '') {
+  let str: string;
+  if (typeof val !== 'string') {
+    str = JSON.stringify(val);
+  } else {
+    str = val;
   }
   return escapeString(str).replace(/"/g, '\\"');
 }

@@ -2,7 +2,7 @@
   "name": "opentelemetry-web-example",
   "private": true,
   "version": "0.211.0",
-  "description": "Example of using @opentelemetry/sdk-trace-web and @opentelemetry/sdk-metrics in browser",
+  "description": "Example of using @opentelemetry/sdk-trace and @opentelemetry/sdk-metrics in browser",
   "scripts": {
     "start": "webpack serve --progress --color --port 8090 --config webpack.dev.config.js --hot --host 0.0.0.0 --compress --open",
     "start-nc": "webpack serve --progress --color --port 8090 --config webpack.dev.config.js --hot --host 0.0.0.0 --no-compress",

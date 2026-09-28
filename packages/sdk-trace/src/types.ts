@@ -93,7 +93,7 @@ export interface TracerOptions {
   tracerConfigurator?: TracerConfigurator;
   resource: Resource;
   sampler: Sampler;
-  spanLimits: SpanLimits;
+  spanLimits: Required<SpanLimits>;
   idGenerator: IdGenerator;
   spanProcessor: SpanProcessor;
   meterProvider: MeterProvider;
