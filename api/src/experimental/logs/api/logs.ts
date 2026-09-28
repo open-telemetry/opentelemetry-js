@@ -32,11 +32,7 @@ export class LogsAPI {
   }
 
   public setGlobalLoggerProvider(provider: LoggerProvider): boolean {
-    const success = registerGlobal(
-      API_NAME,
-      this._proxyLoggerProvider,
-      DiagAPI.instance()
-    );
+    const success = registerGlobal(API_NAME, provider, DiagAPI.instance());
     if (success) {
       this._proxyLoggerProvider._setDelegate(provider);
     }

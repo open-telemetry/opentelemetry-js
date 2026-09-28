@@ -38,10 +38,7 @@ describe('API', () => {
       const provider2 = new TestLoggerProvider();
       assert.strictEqual(logs.setGlobalLoggerProvider(provider1), true);
       assert.strictEqual(logs.setGlobalLoggerProvider(provider2), false);
-      assert.strictEqual(
-        (logs.getLoggerProvider() as ProxyLoggerProvider)._getDelegate(),
-        provider1
-      );
+      assert.strictEqual(logs.getLoggerProvider(), provider1);
     });
   });
 

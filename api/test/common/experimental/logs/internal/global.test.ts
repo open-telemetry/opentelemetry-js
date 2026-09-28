@@ -35,10 +35,7 @@ describe('Global Utils', () => {
   it('should change the global logger provider', () => {
     const newLoggerProvider = new NoopLoggerProvider();
     api1.logs.setGlobalLoggerProvider(newLoggerProvider);
-    assert.strictEqual(
-      api1.logs.getLoggerProvider()._getDelegate(),
-      newLoggerProvider
-    );
+    assert.strictEqual(api1.logs.getLoggerProvider(), newLoggerProvider);
   });
 
   it('should load an instance from one which was set in the other', () => {
@@ -51,10 +48,11 @@ describe('Global Utils', () => {
 
   it('should disable both if one is disabled', () => {
     const original = api1.logs.getLoggerProvider();
+    const provider = new NoopLoggerProvider();
 
-    api1.logs.setGlobalLoggerProvider(new NoopLoggerProvider());
+    api1.logs.setGlobalLoggerProvider(provider);
 
-    assert.strictEqual(api2.logs.getLoggerProvider(), original);
+    assert.strictEqual(api2.logs.getLoggerProvider(), provider);
     api2.logs.disable();
     assert.strictEqual(original, api1.logs.getLoggerProvider());
   });
