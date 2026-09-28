@@ -1,0 +1,12 @@
+import '@opentelemetry/core';
+import '@opentelemetry/exporter-logs-otlp-http';
+import '@opentelemetry/exporter-logs-otlp-proto';
+import '@opentelemetry/exporter-metrics-otlp-http';
+import '@opentelemetry/exporter-metrics-otlp-proto';
+import '@opentelemetry/exporter-trace-otlp-http';
+import '@opentelemetry/exporter-trace-otlp-proto';
+import '@opentelemetry/exporter-zipkin';
+import '@opentelemetry/instrumentation';
+import '@opentelemetry/resources';
+import '@opentelemetry/sdk-logs';
+import '@opentelemetry/sdk-trace';

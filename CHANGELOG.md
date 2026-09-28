@@ -31,6 +31,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
   * The migration to tsdown raised the toolchain a contributor needs to build this repo, but nothing declared it. Contributors now build on Node.js `^24.11.1 || >=26.0.0` with npm `>=11.10.0`; both are advisory and warn rather than fail. The published packages are unaffected and still support Node.js `>=22.15.0`, which the test matrix continues to cover.
 * test(bundler-tests): typecheck packages under legacy module resolution [#7127](https://github.com/open-telemetry/opentelemetry-js/pull/7127) @overbalance
 * chore: remove the redundant `module` field from `package.json`; bundlers resolve the ESM build through the `exports` map [#7130](https://github.com/open-telemetry/opentelemetry-js/pull/7130) @overbalance
+* test(bundler-tests): bundle the platform packages for iOS and Android with Metro and Expo, and load them under Jest's jsdom environment [#7131](https://github.com/open-telemetry/opentelemetry-js/pull/7131) @overbalance
 
 ## 3.0.0-development.0
 
