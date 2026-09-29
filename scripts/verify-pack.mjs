@@ -78,16 +78,14 @@ for (const { dir, pkg } of targets) {
         }
       }
     }
-    if (pkg.exports && typeof pkg.exports === 'object') {
-      for (const [subpath, cond] of Object.entries(pkg.exports)) {
-        // Resolvers with a custom condition list may activate neither `import` nor `require`.
-        const fallback = resolveConditions(cond, new Set());
-        const esm = resolveConditions(cond, new Set(['import']));
-        if (fallback === undefined) {
-          failures.push(`${label} :: exports "${subpath}" has no fallback without import/require`);
-        } else if (fallback !== esm) {
-          failures.push(`${label} :: exports "${subpath}" falls back to ${fallback}, not the import target ${esm}`);
-        }
+    for (const [subpath, cond] of Object.entries(subpathMap(pkg.exports))) {
+      // Resolvers with a custom condition list may activate neither `import` nor `require`.
+      const fallback = resolveConditions(cond, new Set());
+      const esm = resolveConditions(cond, new Set(['import']));
+      if (fallback === undefined) {
+        failures.push(`${label} :: exports "${subpath}" has no fallback without import/require`);
+      } else if (fallback !== esm) {
+        failures.push(`${label} :: exports "${subpath}" falls back to ${fallback}, not the import target ${esm}`);
       }
     }
     console.log(failures.length === failuresBefore ? `  ok   ${label}` : `  FAIL ${label}`);
@@ -156,12 +154,8 @@ function collectEntries(pkg) {
       out.push({ kind, subpath, file });
     }
   };
-  if (typeof pkg.exports === 'string') {
-    visit(push, '.', pkg.exports, null);
-  } else if (pkg.exports && typeof pkg.exports === 'object') {
-    for (const [subpath, cond] of Object.entries(pkg.exports)) {
-      visit(push, subpath, cond, null);
-    }
+  for (const [subpath, cond] of Object.entries(subpathMap(pkg.exports))) {
+    visit(push, subpath, cond, null);
   }
   if (out.length === 0) {
     if (pkg.main) visit(push, '.', pkg.main, 'require');
@@ -178,6 +172,13 @@ function collectEntries(pkg) {
     }
   }
   return out;
+}
+
+// A string or condition-keyed `exports` is Node's shorthand for `{ ".": exports }`.
+function subpathMap(exports) {
+  if (typeof exports === 'string') return { '.': exports };
+  if (!exports || typeof exports !== 'object') return {};
+  return Object.keys(exports).some(k => k.startsWith('.')) ? exports : { '.': exports };
 }
 
 // Package name of a bare specifier, keeping the scope for `@scope/pkg`.
