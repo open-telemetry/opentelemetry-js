@@ -42,6 +42,27 @@ describe('detectResources', () => {
     });
   });
 
+  it('skips and warns about a detector that is undefined', () => {
+    const warnStub = sinon.spy(diag, 'warn');
+    const detector: ResourceDetector = {
+      detect() {
+        return { attributes: { kept: 'yes' } };
+      },
+    };
+
+    // For example, a misspelled import in JavaScript code.
+    const resource = detectResources({
+      detectors: [undefined as unknown as ResourceDetector, detector],
+    });
+
+    assert.deepStrictEqual(resource.attributes, { kept: 'yes' });
+    sinon.assert.calledOnce(warnStub);
+    assert.match(
+      String(warnStub.firstCall.args[0]),
+      /detectors\[0\] \(undefined\)/
+    );
+  });
+
   describeNode('logging', () => {
     it("logs when a detector's async attributes promise rejects", async () => {
       const debugStub = sinon.spy(diag, 'debug');
