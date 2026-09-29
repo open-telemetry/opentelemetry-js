@@ -4,7 +4,7 @@
  */
 
 import type { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace';
-import type { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
+import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import {
   ProtobufTraceSerializer,
@@ -22,7 +22,7 @@ export class OTLPTraceExporter
   extends OTLPExporterBase<ReadableSpan[]>
   implements SpanExporter
 {
-  constructor(config: OTLPExporterConfigBase = {}) {
+  constructor(config: OTLPExporterNodeConfigBase = {}) {
     super(
       createLegacyOtlpBrowserExportDelegate(
         config,

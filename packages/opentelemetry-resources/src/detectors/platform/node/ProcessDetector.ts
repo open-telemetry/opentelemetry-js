@@ -55,4 +55,4 @@ class ProcessDetector implements ResourceDetector {
   }
 }
 
-export const processDetector = new ProcessDetector();
+export const processDetector: ResourceDetector = new ProcessDetector();

@@ -13,4 +13,4 @@ export class NoopDetector implements ResourceDetector {
   }
 }
 
-export const noopDetector = new NoopDetector();
+export const noopDetector: ResourceDetector = new NoopDetector();
