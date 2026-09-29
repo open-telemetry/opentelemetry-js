@@ -595,7 +595,8 @@ describe('PrometheusSerializer', () => {
       createInstruments: (
         firstMeter: Meter,
         secondMeter: Meter,
-        thirdMeter: Meter
+        thirdMeter: Meter,
+        fourthMeter: Meter
       ) => void,
       serializer = new PrometheusSerializer()
     ) {
@@ -604,9 +605,10 @@ describe('PrometheusSerializer', () => {
       const firstMeter = meterProvider.getMeter('first-scope');
       const secondMeter = meterProvider.getMeter('second-scope');
       const thirdMeter = meterProvider.getMeter('third-scope');
+      const fourthMeter = meterProvider.getMeter('fourth-scope');
 
       try {
-        createInstruments(firstMeter, secondMeter, thirdMeter);
+        createInstruments(firstMeter, secondMeter, thirdMeter, fourthMeter);
 
         const { resourceMetrics, errors } = await reader.collect();
         assert.strictEqual(errors.length, 0);
@@ -1021,18 +1023,25 @@ describe('PrometheusSerializer', () => {
       );
     });
 
-    it('only warns about TYPE when a later conflict drops the family', async () => {
+    it('drops later metrics and only warns about TYPE when a conflict drops the family', async () => {
       const warn = sinon.stub(diag, 'warn');
-      await serializeScopedMetrics((firstMeter, secondMeter, thirdMeter) => {
-        firstMeter
-          .createUpDownCounter('jobs', { description: 'First description' })
-          .add(1);
-        secondMeter
-          .createUpDownCounter('jobs', { description: 'Second description' })
-          .add(2);
-        thirdMeter.createHistogram('jobs').record(3);
-      });
+      const result = await serializeScopedMetrics(
+        (firstMeter, secondMeter, thirdMeter, fourthMeter) => {
+          firstMeter
+            .createUpDownCounter('jobs', { description: 'First description' })
+            .add(1);
+          secondMeter
+            .createUpDownCounter('jobs', { description: 'Second description' })
+            .add(2);
+          thirdMeter.createHistogram('jobs').record(3);
+          fourthMeter.createUpDownCounter('jobs').add(4);
+        }
+      );
 
+      assert.strictEqual(
+        result,
+        serializedDefaultResource + '# no registered metrics'
+      );
       sinon.assert.calledOnceWithExactly(
         warn,
         'Conflicting TYPE comments for metric "jobs": "gauge", "histogram"; dropping the metric.'
