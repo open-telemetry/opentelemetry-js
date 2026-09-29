@@ -33,6 +33,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 * fix(otlp-exporter-base): release the keepalive budget once the response body drains, instead of holding up the export until it does [#7070](https://github.com/open-telemetry/opentelemetry-js/pull/7070) @overbalance
 * fix(web-common): export getElementXPath utility
   * This was accidentally missed when moving utilities from sdk-trace-web to web-common.
+* fix(opentelemetry-browser-detector): mark the package side-effect free so bundlers can tree-shake it [#7135](https://github.com/open-telemetry/opentelemetry-js/pull/7135) @overbalance
 
 ### :books: Documentation
 
