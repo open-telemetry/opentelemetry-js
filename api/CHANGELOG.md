@@ -20,6 +20,8 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: Bug Fixes
 
+* fix: resolve the ESM build through the `default` export condition instead of `import`, so a resolver that activates neither `import` nor `require` still finds an entry point [#7132](https://github.com/open-telemetry/opentelemetry-js/pull/7132) @overbalance
+
 ### :books: Documentation
 
 * docs(api): complete `@since` annotations for the public API [#7023](https://github.com/open-telemetry/opentelemetry-js/pull/7023) @nabeelamjadsheikh

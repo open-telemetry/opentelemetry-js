@@ -11,6 +11,8 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :bug: Bug Fixes
 
+* fix: resolve the ESM build through the `default` export condition instead of `import`, so a resolver that activates neither `import` nor `require` still finds an entry point [#7132](https://github.com/open-telemetry/opentelemetry-js/pull/7132) @overbalance
+
 ### :books: Documentation
 
 ### :house: Internal
