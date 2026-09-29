@@ -78,6 +78,16 @@ for (const { dir, pkg } of targets) {
         }
       }
     }
+    for (const [subpath, cond] of Object.entries(subpathMap(pkg.exports))) {
+      // Resolvers with a custom condition list may activate neither `import` nor `require`.
+      const fallback = resolveConditions(cond, new Set());
+      const esm = resolveConditions(cond, new Set(['import']));
+      if (fallback === undefined) {
+        failures.push(`${label} :: exports "${subpath}" has no fallback without import/require`);
+      } else if (fallback !== esm) {
+        failures.push(`${label} :: exports "${subpath}" falls back to ${fallback}, not the import target ${esm}`);
+      }
+    }
     console.log(failures.length === failuresBefore ? `  ok   ${label}` : `  FAIL ${label}`);
   } catch (err) {
     failures.push(`${label} :: pack/extract failed: ${err.message}`);
@@ -144,12 +154,8 @@ function collectEntries(pkg) {
       out.push({ kind, subpath, file });
     }
   };
-  if (typeof pkg.exports === 'string') {
-    visit(push, '.', pkg.exports, null);
-  } else if (pkg.exports && typeof pkg.exports === 'object') {
-    for (const [subpath, cond] of Object.entries(pkg.exports)) {
-      visit(push, subpath, cond, null);
-    }
+  for (const [subpath, cond] of Object.entries(subpathMap(pkg.exports))) {
+    visit(push, subpath, cond, null);
   }
   if (out.length === 0) {
     if (pkg.main) visit(push, '.', pkg.main, 'require');
@@ -166,6 +172,13 @@ function collectEntries(pkg) {
     }
   }
   return out;
+}
+
+// A string or condition-keyed `exports` is Node's shorthand for `{ ".": exports }`.
+function subpathMap(exports) {
+  if (typeof exports === 'string') return { '.': exports };
+  if (!exports || typeof exports !== 'object') return {};
+  return Object.keys(exports).some(k => k.startsWith('.')) ? exports : { '.': exports };
 }
 
 // Package name of a bare specifier, keeping the scope for `@scope/pkg`.
@@ -202,6 +215,19 @@ function handleLoadError(err, pkg, context) {
     }
   }
   failures.push(`${context} threw: ${msg}`);
+}
+
+// Node's conditional-exports matching: the first key that is active or `default` wins, and a
+// nested object that matches nothing falls through to the next key.
+function resolveConditions(node, conditions) {
+  if (typeof node === 'string') return node;
+  if (!node || typeof node !== 'object') return undefined;
+  for (const [key, child] of Object.entries(node)) {
+    if (key !== 'default' && !conditions.has(key)) continue;
+    const hit = resolveConditions(child, conditions);
+    if (hit !== undefined) return hit;
+  }
+  return undefined;
 }
 
 function visit(push, subpath, node, cond) {

@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 ### :bug: Bug Fixes
 
 * fix(api): cap tracestate list-members and total length in the deprecated `TraceState.set()` so it stays in step with `TraceState` from `@opentelemetry/core` [#6964](https://github.com/open-telemetry/opentelemetry-js/pull/6964) @Zuhef
+* fix: resolve the ESM build through the `default` export condition instead of `import`, so a resolver that activates neither `import` nor `require` still finds an entry point [#7132](https://github.com/open-telemetry/opentelemetry-js/pull/7132) @overbalance
 
 ### :books: Documentation
 
