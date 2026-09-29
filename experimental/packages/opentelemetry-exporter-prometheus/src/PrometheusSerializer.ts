@@ -39,7 +39,6 @@ interface PrometheusMetadata {
 interface PrometheusMetricFamily {
   metadata: PrometheusMetadata | undefined;
   metrics: { metric: MetricData; scope: InstrumentationScope }[];
-  resource?: Resource;
 }
 
 function createPrometheusMetadata(
@@ -56,6 +55,10 @@ function createPrometheusMetadata(
 
 function escapeString(str: string) {
   return str.replace(/\\/g, '\\\\').replace(/\n/g, '\\n');
+}
+
+function quoteDiagnosticValue(value: string): string {
+  return JSON.stringify(value);
 }
 
 /**
@@ -232,9 +235,9 @@ export class PrometheusSerializer {
       }
 
       let writeMetadata = true;
-      if (family.resource) {
+      if (name === 'target_info' && !this._withoutTargetInfo) {
         resource = this._serializeResource(
-          family.resource,
+          resourceMetrics.resource,
           family.metadata,
           writeMetadata
         );
@@ -279,49 +282,50 @@ export class PrometheusSerializer {
     return;
   }
 
+  private _warnMetadataConflict(
+    activeConflicts: Set<string>,
+    kind: 'HELP' | 'UNIT' | 'TYPE',
+    name: string,
+    firstValue: string,
+    secondValue: string,
+    selected = ''
+  ) {
+    const key = `${kind}:${name}:${selected}`;
+    if (activeConflicts.has(key)) {
+      return;
+    }
+    activeConflicts.add(key);
+    if (this._activeMetadataConflicts.has(key)) {
+      return;
+    }
+
+    const formattedValues = [firstValue, secondValue]
+      .sort()
+      .map(quoteDiagnosticValue)
+      .join(', ');
+    if (kind === 'TYPE') {
+      diag.warn(
+        `Conflicting ${kind} comments for metric "${name}": ${formattedValues}; dropping the metric.`
+      );
+    } else {
+      diag.warn(
+        `Conflicting ${kind} comments for metric "${name}": ${formattedValues}; exporting ${quoteDiagnosticValue(
+          selected
+        )}.`
+      );
+    }
+  }
+
   private _collectMetricFamilies(resourceMetrics: ResourceMetrics) {
     // A TYPE conflict requires dropping the entire family, so all metadata must
     // be resolved before any samples are serialized.
     const metricFamilies = new Map<string, PrometheusMetricFamily>();
     const activeConflicts = new Set<string>();
-    const warn = (
-      kind: 'HELP' | 'UNIT' | 'TYPE',
-      name: string,
-      firstValue: string,
-      secondValue: string,
-      selected?: string
-    ) => {
-      const key = JSON.stringify([kind, name, selected]);
-      if (activeConflicts.has(key)) {
-        return;
-      }
-      activeConflicts.add(key);
-      if (this._activeMetadataConflicts.has(key)) {
-        return;
-      }
-
-      const formattedValues = [firstValue, secondValue]
-        .sort()
-        .map(value => JSON.stringify(value))
-        .join(', ');
-      if (kind === 'TYPE') {
-        diag.warn(
-          `Conflicting ${kind} comments for metric "${name}": ${formattedValues}; dropping the metric.`
-        );
-      } else {
-        diag.warn(
-          `Conflicting ${kind} comments for metric "${name}": ${formattedValues}; exporting ${JSON.stringify(
-            selected
-          )}.`
-        );
-      }
-    };
 
     if (!this._withoutTargetInfo) {
       metricFamilies.set('target_info', {
         metadata: createPrometheusMetadata('Target metadata', '', 'gauge'),
         metrics: [],
-        resource: resourceMetrics.resource,
       });
     }
 
@@ -353,7 +357,13 @@ export class PrometheusSerializer {
         }
 
         if (metadata.type !== type) {
-          warn('TYPE', name, metadata.type, type);
+          this._warnMetadataConflict(
+            activeConflicts,
+            'TYPE',
+            name,
+            metadata.type,
+            type
+          );
           family.metadata = undefined;
           family.metrics = [];
           continue;
@@ -375,14 +385,28 @@ export class PrometheusSerializer {
           if (!metadata.help) {
             metadata.help = help;
           } else if (metadata.help !== help) {
-            warn('HELP', name, metadata.help, help, metadata.help);
+            this._warnMetadataConflict(
+              activeConflicts,
+              'HELP',
+              name,
+              metadata.help,
+              help,
+              metadata.help
+            );
           }
         }
         if (unit) {
           if (!metadata.unit) {
             metadata.unit = unit;
           } else if (metadata.unit !== unit) {
-            warn('UNIT', name, metadata.unit, unit, metadata.unit);
+            this._warnMetadataConflict(
+              activeConflicts,
+              'UNIT',
+              name,
+              metadata.unit,
+              unit,
+              metadata.unit
+            );
           }
         }
       }

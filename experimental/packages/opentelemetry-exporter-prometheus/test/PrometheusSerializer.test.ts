@@ -731,6 +731,26 @@ describe('PrometheusSerializer', () => {
       );
     });
 
+    it('keeps application target_info metadata when resource metadata is disabled', async () => {
+      const result = await serializeScopedMetrics(
+        firstMeter => {
+          firstMeter
+            .createUpDownCounter('target_info', {
+              description: 'Application target metadata',
+            })
+            .add(1);
+        },
+        new PrometheusSerializer(undefined, false, undefined, true)
+      );
+
+      assert.strictEqual(
+        result,
+        '# HELP target_info Application target metadata\n' +
+          '# TYPE target_info gauge\n' +
+          'target_info{otel_scope_name="first-scope"} 1\n'
+      );
+    });
+
     it('emits metadata once for the same family in different scopes', async () => {
       const warn = sinon.stub(diag, 'warn');
       const result = await serializeScopedMetrics((firstMeter, secondMeter) => {
@@ -782,6 +802,25 @@ describe('PrometheusSerializer', () => {
       sinon.assert.calledOnceWithExactly(
         warn,
         'Conflicting HELP comments for metric "jobs": "First description", "Second description"; exporting "First description".'
+      );
+    });
+
+    it('quotes and escapes metadata values in conflict warnings', async () => {
+      const warn = sinon.stub(diag, 'warn');
+      await serializeScopedMetrics((firstMeter, secondMeter) => {
+        firstMeter
+          .createUpDownCounter('jobs', {
+            description: 'First "description"\ncontinued',
+          })
+          .add(1);
+        secondMeter
+          .createUpDownCounter('jobs', { description: 'Second description' })
+          .add(2);
+      });
+
+      sinon.assert.calledOnceWithExactly(
+        warn,
+        'Conflicting HELP comments for metric "jobs": "First \\"description\\"\\ncontinued", "Second description"; exporting "First \\"description\\"\\ncontinued".'
       );
     });
 
