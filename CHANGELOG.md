@@ -16,6 +16,13 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 * chore(sdk-trace-base, sdk-trace-web)!: remove the `@opentelemetry/sdk-trace-base` and `@opentelemetry/sdk-trace-web` packages [#7117](https://github.com/open-telemetry/opentelemetry-js/issues/7117)
   * The sdk-trace-base, sdk-trace-web, and sdk-trace-node packages have been replaced by the `@opentelemetry/sdk-trace` package.
     See the [3.x migration guide](doc/3.x/migration-guide.md) for full migration instructions.
+* feat!: replace the top-level `browser` field in `package.json` with `#platform` subpath imports
+  * Resolvers that apply the `node` condition, such as Node.js, load the Node.js implementation. All others, including browsers, web workers, edge runtimes and React Native, load the browser implementation with no configuration. Bundlers without `imports` support fail to resolve `#platform`; see the migration guide for tested setups.
+  * The package roots' type declarations describe the Node.js implementation.
+* feat(resources)!: remove the `./detectors/platform` and `./detectors/platform/browser` subpath exports
+  * Import the detectors from the package root instead.
+* feat(core, sdk-trace, exporter-zipkin)!: remove the `./platform` and `./platform/browser` subpath exports
+  * Import from the package root instead.
 
 ### :rocket: Features
 
