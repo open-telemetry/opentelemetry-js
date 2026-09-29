@@ -33,6 +33,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 * chore: remove the redundant `module` field from `package.json`; bundlers resolve the ESM build through the `exports` map [#7130](https://github.com/open-telemetry/opentelemetry-js/pull/7130) @overbalance
 * test(bundler-tests): bundle the platform packages for iOS and Android with Metro and Expo, and load them under Jest's jsdom environment [#7131](https://github.com/open-telemetry/opentelemetry-js/pull/7131) @overbalance
 * fix(verify-pack): read the npm 12 `pack --json` output, which is keyed by package name instead of an array [#7133](https://github.com/open-telemetry/opentelemetry-js/pull/7133) @overbalance
+* fix(nx): key the `version` target defaults by the target name, so a cache hit restores the generated `src/version.ts` [#7134](https://github.com/open-telemetry/opentelemetry-js/pull/7134) @overbalance
 
 ## 3.0.0-development.0
 
