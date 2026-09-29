@@ -15,14 +15,14 @@ export class ProxyLogger implements Logger {
   private _delegate?: Logger;
   private _provider: LoggerDelegator;
   public readonly name: string;
-  public readonly version?: string | undefined;
-  public readonly options?: LoggerOptions | undefined;
+  public readonly version?: string;
+  public readonly options?: LoggerOptions;
 
   constructor(
     provider: LoggerDelegator,
     name: string,
-    version?: string | undefined,
-    options?: LoggerOptions | undefined
+    version?: string,
+    options?: LoggerOptions
   ) {
     this._provider = provider;
     this.name = name;

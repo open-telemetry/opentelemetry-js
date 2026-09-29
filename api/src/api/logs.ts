@@ -52,7 +52,7 @@ export class LogsAPI {
    * @returns LoggerProvider
    */
   public getLoggerProvider(): LoggerProvider {
-    return getGlobal(API_NAME) ?? this._proxyLoggerProvider;
+    return getGlobal(API_NAME) || this._proxyLoggerProvider;
   }
 
   /**

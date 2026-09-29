@@ -9,7 +9,23 @@ If you have questions, reach the OTel JS community on [#otel-js](https://cloud-n
 
 ## Raised minimum Node.js version
 
-The minimum supported Node.js version has been raised from `^18.19.0 || >=20.6.0` to `>=22.15.0` for all packages except `@opentelemetry/api`, `@opentelemetry/api/experimental`, and `@opentelemetry/semantic-conventions`, which keep their existing, wider minimum versions. Node.js v18 and v20 reached end-of-life; upgrade your runtime to Node.js `>=22.15.0` before adopting SDK 3.0.
+The minimum supported Node.js version has been raised from `^18.19.0 || >=20.6.0` to `>=22.15.0` for all packages except `@opentelemetry/api` and `@opentelemetry/semantic-conventions`, which keep their existing, wider minimum versions. Node.js v18 and v20 reached end-of-life; upgrade your runtime to Node.js `>=22.15.0` before adopting SDK 3.0.
+
+---
+
+## `@opentelemetry/api-logs` (package removed)
+
+The Logs API is now part of `@opentelemetry/api`. Remove the standalone package and update imports:
+
+```js
+// before
+const { logs, SeverityNumber } = require('@opentelemetry/api-logs');
+
+// after
+const { logs, SeverityNumber } = require('@opentelemetry/api');
+```
+
+`logs.setGlobalLoggerProvider(provider)` now returns a boolean indicating whether registration succeeded. The standalone `@opentelemetry/api-logs` implementation returned the registered `LoggerProvider`. Use `logs.getLoggerProvider()` when the provider instance is needed.
 
 ---
 

@@ -7,7 +7,6 @@
   },
   "dependencies": {
     "@opentelemetry/api": "file:../../../api",
-    "@opentelemetry/api-logs": "file:../../../experimental/packages/api-logs",
     "@opentelemetry/core": "file:../../../packages/opentelemetry-core",
     "@opentelemetry/exporter-logs-otlp-http": "file:../../../experimental/packages/exporter-logs-otlp-http",
     "@opentelemetry/exporter-logs-otlp-proto": "file:../../../experimental/packages/exporter-logs-otlp-proto",

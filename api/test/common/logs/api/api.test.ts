@@ -10,7 +10,7 @@ import { ProxyLoggerProvider } from '../../../../src/logs/ProxyLoggerProvider';
 import { NoopLogger } from '../../../../src/logs/NoopLogger';
 import { NoopLoggerProvider } from '../../../../src/logs/NoopLoggerProvider';
 
-describe('API', () => {
+describe('LogsAPI', () => {
   const dummyLogger = new NoopLogger();
 
   it('should expose a logger provider via getLoggerProvider', () => {

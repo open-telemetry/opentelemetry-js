@@ -23,7 +23,7 @@ npm install --save @opentelemetry/sdk-logs
 The basic setup of the SDK can be seen as followings:
 
 ```js
-const logsAPI = require('@opentelemetry/api');
+const { logs, SeverityNumber } = require('@opentelemetry/api');
 const {
   LoggerProvider,
   SimpleLogRecordProcessor,
@@ -47,12 +47,12 @@ const logger = loggerProvider.getLogger('default');
 // scopeAttributes are provided, so avoid calling it on hot paths.
 
 // You can also use global singleton
-logsAPI.logs.setGlobalLoggerProvider(loggerProvider);
-const logger = logsAPI.logs.getLogger('default');
+logs.setGlobalLoggerProvider(loggerProvider);
+const logger = logs.getLogger('default');
 
 // emit a log record
 logger.emit({
-  severityNumber: logsAPI.SeverityNumber.INFO,
+  severityNumber: SeverityNumber.INFO,
   severityText: 'INFO',
   body: 'this is a log record body',
   attributes: { 'log.type': 'LogRecord' },

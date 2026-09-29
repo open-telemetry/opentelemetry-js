@@ -8,6 +8,8 @@ import type { LoggerOptions } from './LoggerOptions';
 
 /**
  * A registry for creating named {@link Logger}s.
+ *
+ * @since 1.10.0
  */
 export interface LoggerProvider {
   /**

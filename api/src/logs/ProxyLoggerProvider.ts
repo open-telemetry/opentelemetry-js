@@ -12,11 +12,7 @@ import { ProxyLogger } from './ProxyLogger';
 export class ProxyLoggerProvider implements LoggerProvider {
   private _delegate?: LoggerProvider;
 
-  getLogger(
-    name: string,
-    version?: string | undefined,
-    options?: LoggerOptions | undefined
-  ): Logger {
+  getLogger(name: string, version?: string, options?: LoggerOptions): Logger {
     return (
       this._getDelegateLogger(name, version, options) ??
       new ProxyLogger(this, name, version, options)
