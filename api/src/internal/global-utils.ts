@@ -4,7 +4,7 @@
  */
 
 import type { MeterProvider } from '../metrics/MeterProvider';
-import type { LoggerProvider } from '../logs/types/LoggerProvider';
+import type { LoggerProvider } from '../logs/LoggerProvider';
 import type { ContextManager } from '../context/types';
 import type { DiagLogger } from '../diag/types';
 import type { TextMapPropagator } from '../propagation/TextMapPropagator';

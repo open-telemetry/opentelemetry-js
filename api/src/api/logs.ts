@@ -7,22 +7,29 @@ import {
   getGlobal,
   registerGlobal,
   unregisterGlobal,
-} from '../../internal/global-utils';
-import type { LoggerProvider } from '../types/LoggerProvider';
-import type { Logger } from '../types/Logger';
-import type { LoggerOptions } from '../types/LoggerOptions';
-import { ProxyLoggerProvider } from '../ProxyLoggerProvider';
-import { DiagAPI } from '../../api/diag';
+} from '../internal/global-utils';
+import type { LoggerProvider } from '../logs/LoggerProvider';
+import type { Logger } from '../logs/Logger';
+import type { LoggerOptions } from '../logs/LoggerOptions';
+import { ProxyLoggerProvider } from '../logs/ProxyLoggerProvider';
+import { DiagAPI } from './diag';
 
 const API_NAME = 'logs';
 
+/**
+ * Singleton object which represents the entry point to the OpenTelemetry Logs API
+ *
+ * @since 1.10.0
+ */
 export class LogsAPI {
   private static _instance?: LogsAPI;
 
   private _proxyLoggerProvider = new ProxyLoggerProvider();
 
+  /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
 
+  /** Get the singleton instance of the Logs API */
   public static getInstance(): LogsAPI {
     if (!this._instance) {
       this._instance = new LogsAPI();

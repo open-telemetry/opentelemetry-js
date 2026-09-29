@@ -23,6 +23,10 @@ describe('tree-shaking', function () {
   const allowedAPIs = ['ContextAPI', 'DiagAPI'];
   const testAPIs = [
     {
+      name: 'LogsAPI',
+      export: 'logs',
+    },
+    {
       name: 'MetricsAPI',
       export: 'metrics',
     },

@@ -4,8 +4,8 @@
  */
 
 import * as assert from 'assert';
-import type { Logger } from '../../../../src/logs';
-import { logs } from '../../../../src/logs';
+import { logs } from '../../../../src/logs-api';
+import type { Logger } from '../../../../src/logs/Logger';
 import { ProxyLoggerProvider } from '../../../../src/logs/ProxyLoggerProvider';
 import { NoopLogger } from '../../../../src/logs/NoopLogger';
 import { NoopLoggerProvider } from '../../../../src/logs/NoopLoggerProvider';

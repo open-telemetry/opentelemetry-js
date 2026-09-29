@@ -4,7 +4,7 @@
  */
 
 import * as assert from 'assert';
-import { SeverityNumber } from '../../../../src/logs';
+import { SeverityNumber } from '../../../../src/logs/LogRecord';
 import { NoopLoggerProvider } from '../../../../src/logs/NoopLoggerProvider';
 
 describe('NoopLogger', () => {

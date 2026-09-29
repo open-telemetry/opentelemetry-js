@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { LoggerProvider } from './types/LoggerProvider';
-import type { Logger } from './types/Logger';
-import type { LoggerOptions } from './types/LoggerOptions';
+import type { LoggerProvider } from './LoggerProvider';
+import type { Logger } from './Logger';
+import type { LoggerOptions } from './LoggerOptions';
 import { NOOP_LOGGER_PROVIDER } from './NoopLoggerProvider';
 import { ProxyLogger } from './ProxyLogger';
 
