@@ -36,6 +36,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 * fix(verify-pack): read the npm 12 `pack --json` output, which is keyed by package name instead of an array [#7133](https://github.com/open-telemetry/opentelemetry-js/pull/7133) @overbalance
 * fix(karma): resolve plugins and the `process` shim from the repo root, so browser tests run with isolated installs [#7137](https://github.com/open-telemetry/opentelemetry-js/pull/7137) @overbalance
 * fix(nx): key the `version` target defaults by the target name, so a cache hit restores the generated `src/version.ts` [#7134](https://github.com/open-telemetry/opentelemetry-js/pull/7134) @overbalance
+* fix(verify-pack): extract tarballs under the root `node_modules`, so workspace dependencies resolve and entry points load fully instead of being skipped [#7138](https://github.com/open-telemetry/opentelemetry-js/pull/7138) @overbalance
 
 ## 3.0.0-development.0
 
