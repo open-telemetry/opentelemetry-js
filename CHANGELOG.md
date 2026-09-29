@@ -13,6 +13,14 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :boom: Breaking Changes
 
+* feat!: replace the top-level `browser` field in `package.json` with `#platform` subpath imports [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
+  * Resolvers that apply the `node` condition, such as Node.js, load the Node.js implementation. All others, including browsers, web workers, edge runtimes and React Native, load the browser implementation with no configuration. Bundlers without `imports` support fail to resolve `#platform`; see the migration guide.
+  * The package roots' type declarations describe the Node.js implementation.
+* feat(resources)!: remove the `./detectors/platform` and `./detectors/platform/browser` subpath exports [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
+  * Import the detectors from the package root instead.
+* feat(core, sdk-trace, sdk-logs, exporter-zipkin)!: remove the `./platform` and `./platform/browser` subpath exports [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
+  * Import from the package root instead.
+
 ### :rocket: Features
 
 * chore(sdk-logs): mark `@opentelemetry/sdk-logs` as stable [#7143](https://github.com/open-telemetry/opentelemetry-js/issues/7143) @trentm
