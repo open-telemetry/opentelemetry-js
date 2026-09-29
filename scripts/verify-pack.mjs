@@ -42,7 +42,9 @@ for (const { dir, pkg } of targets) {
       ['pack', '--ignore-scripts', '--pack-destination', scratch, '--json'],
       { cwd: dir, encoding: 'utf8' }
     );
-    const tarball = JSON.parse(tgz)[0].filename;
+    // npm 12 keys the JSON output by package name; npm 11 returns an array.
+    const packed = JSON.parse(tgz);
+    const tarball = (Array.isArray(packed) ? packed[0] : Object.values(packed)[0]).filename;
     execFileSync('tar', ['xzf', path.join(scratch, tarball), '-C', scratch]);
     const extracted = path.join(scratch, 'package');
 
