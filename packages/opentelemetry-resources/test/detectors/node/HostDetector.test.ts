@@ -21,7 +21,7 @@ describeNode('hostDetector() on Node.js', () => {
 
   it('should return resource information about the host', async () => {
     const os = require('os');
-    const mid = require('../../../src/detectors/platform/node/machine-id/getMachineId');
+    const mid = require('../../../src/platform/node/machine-id/getMachineId');
 
     const expectedHostId = 'f2c668b579780554f70f72a063dc0864';
 
@@ -55,7 +55,7 @@ describeNode('hostDetector() on Node.js', () => {
 
   it('should handle missing machine id', async () => {
     const os = require('os');
-    const mid = require('../../../src/detectors/platform/node/machine-id/getMachineId');
+    const mid = require('../../../src/platform/node/machine-id/getMachineId');
 
     sinon.stub(os, 'arch').returns('x64');
     sinon.stub(os, 'hostname').returns('opentelemetry-test');

@@ -357,7 +357,7 @@ The document will be available under `docs` path.
 
 To add a new package, copy `packages/template` to your new package directory and modify the `package.json` file to reflect your desired package settings. If the package will not support browser, the `karma.conf.js` file may be deleted. Per-package compiler options live in `tsdown.config.ts`, which imports the shared options from the workspace root `tsdown.config.ts` and adds an `entry` list; override fields like `target` only when you have a concrete reason to (see `api/tsdown.config.ts` for an example).
 
-After adding the package, run `npm install` from the root of the project to install all dependencies in your new package. For packages with platform-conditional code (browser vs node), add a `browser` field to the `package.json` that path-swaps the relevant `./dist/*.mjs` and `./dist/*.cjs` files; see `@opentelemetry/core`'s `package.json` for a working example.
+After adding the package, run `npm install` from the root of the project to install all dependencies in your new package. For packages with platform-conditional code (browser vs node), import it through `#platform` and declare that subpath under `imports` in `package.json` with `otel` and `node` conditions, and point `default` at the browser implementation; see `@opentelemetry/core`'s `package.json` for a working example. The `otel` condition points at `src`, so tests and type-checks never depend on a build of the package itself. Add the package's `src` to `tsconfig.browser.json` so `npm run typecheck:browser` checks it against the browser barrel.
 
 ### Platform conditional exports
 

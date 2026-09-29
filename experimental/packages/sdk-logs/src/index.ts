@@ -21,7 +21,7 @@ export { ConsoleLogRecordExporter } from './export/ConsoleLogRecordExporter';
 export type { LogRecordExporter } from './export/LogRecordExporter';
 export { SimpleLogRecordProcessor } from './export/SimpleLogRecordProcessor';
 export { InMemoryLogRecordExporter } from './export/InMemoryLogRecordExporter';
-export { BatchLogRecordProcessor } from './platform';
+export { BatchLogRecordProcessor } from '#platform';
 export {
   createLoggerConfigurator,
   type LoggerPattern,

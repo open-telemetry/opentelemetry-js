@@ -14,39 +14,21 @@
         "types": "./dist/index.d.mts",
         "default": "./dist/index.mjs"
       }
-    },
-    "./detectors/platform": {
-      "require": {
-        "types": "./dist/detectors/platform/index.d.cts",
-        "default": "./dist/detectors/platform/index.cjs"
-      },
-      "default": {
-        "types": "./dist/detectors/platform/index.d.mts",
-        "default": "./dist/detectors/platform/index.mjs"
-      }
-    },
-    "./detectors/platform/browser": {
-      "require": {
-        "types": "./dist/detectors/platform/browser/index.d.cts",
-        "default": "./dist/detectors/platform/browser/index.cjs"
-      },
-      "default": {
-        "types": "./dist/detectors/platform/browser/index.d.mts",
-        "default": "./dist/detectors/platform/browser/index.mjs"
-      }
     }
   },
-  "browser": {
-    "./dist/detectors/platform/node/HostDetector.mjs": "./dist/detectors/platform/browser/HostDetector.mjs",
-    "./dist/detectors/platform/node/HostDetector.cjs": "./dist/detectors/platform/browser/HostDetector.cjs",
-    "./dist/detectors/platform/node/OSDetector.mjs": "./dist/detectors/platform/browser/OSDetector.mjs",
-    "./dist/detectors/platform/node/OSDetector.cjs": "./dist/detectors/platform/browser/OSDetector.cjs",
-    "./dist/detectors/platform/node/ProcessDetector.mjs": "./dist/detectors/platform/browser/ProcessDetector.mjs",
-    "./dist/detectors/platform/node/ProcessDetector.cjs": "./dist/detectors/platform/browser/ProcessDetector.cjs",
-    "./dist/detectors/platform/node/ServiceInstanceIdDetector.mjs": "./dist/detectors/platform/browser/ServiceInstanceIdDetector.mjs",
-    "./dist/detectors/platform/node/ServiceInstanceIdDetector.cjs": "./dist/detectors/platform/browser/ServiceInstanceIdDetector.cjs",
-    "./dist/detectors/platform/index.mjs": "./dist/detectors/platform/browser/index.mjs",
-    "./dist/detectors/platform/index.cjs": "./dist/detectors/platform/browser/index.cjs"
+  "imports": {
+    "#platform": {
+      "otel": {
+        "node": "./src/platform/node/index.ts",
+        "default": "./src/platform/browser/index.ts"
+      },
+      "node": {
+        "require": "./dist/platform/node/index.cjs",
+        "default": "./dist/platform/node/index.mjs"
+      },
+      "require": "./dist/platform/browser/index.cjs",
+      "default": "./dist/platform/browser/index.mjs"
+    }
   },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {

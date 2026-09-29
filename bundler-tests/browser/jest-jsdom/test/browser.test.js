@@ -8,12 +8,12 @@
 
 const { PACKAGES, detectPlatform } = require('./platform');
 
-// jsdom applies the browser condition to require(), so each package must offer CJS under it.
 test.each(PACKAGES)('%s loads under jsdom', name => {
   expect(require(name)).toBeDefined();
 });
 
-// Jest ignores the top-level browser field, so jsdom still loads the node implementations.
+// Jest 30's CJS runtime always adds the node condition, even under jsdom, so require() takes the node branch.
+// https://github.com/jestjs/jest/issues/16476
 test.failing('resolves the browser implementations', () => {
   expect(detectPlatform()).toEqual({ readsEnv: false, detectsHost: false });
 });

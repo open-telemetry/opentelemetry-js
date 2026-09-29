@@ -1,0 +1,48 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    // node16 always activates the node condition; bundler does not, so #platform
+    // resolves to each package's default (browser) barrel.
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "incremental": false,
+    "lib": ["es2022", "dom", "dom.iterable"],
+    "types": ["node"],
+    // The "." exports have no platform condition and point at the Node.js dist
+    // declarations, so cross-package imports are routed to src instead.
+    "paths": {
+      "@opentelemetry/api": ["./api/src/index.ts"],
+      "@opentelemetry/api-logs": ["./experimental/packages/api-logs/src/index.ts"],
+      "@opentelemetry/core": ["./packages/opentelemetry-core/src/index.ts"],
+      "@opentelemetry/exporter-metrics-otlp-http": ["./experimental/packages/opentelemetry-exporter-metrics-otlp-http/src/index.ts"],
+      "@opentelemetry/instrumentation": ["./experimental/packages/opentelemetry-instrumentation/src/index.ts"],
+      "@opentelemetry/otlp-exporter-base": ["./experimental/packages/otlp-exporter-base/src/index.ts"],
+      "@opentelemetry/otlp-exporter-base/browser-http": ["./experimental/packages/otlp-exporter-base/src/index-browser-http.ts"],
+      "@opentelemetry/otlp-transformer": ["./experimental/packages/otlp-transformer/src/index.ts"],
+      "@opentelemetry/resources": ["./packages/opentelemetry-resources/src/index.ts"],
+      "@opentelemetry/sdk-logs": ["./experimental/packages/sdk-logs/src/index.ts"],
+      "@opentelemetry/sdk-metrics": ["./packages/sdk-metrics/src/index.ts"],
+      "@opentelemetry/sdk-trace": ["./packages/sdk-trace/src/index.ts"],
+      "@opentelemetry/semantic-conventions": ["./semantic-conventions/src/index.ts"]
+    }
+  },
+  "include": [
+    "packages/opentelemetry-core/src/**/*.ts",
+    "packages/sdk-trace/src/**/*.ts",
+    "packages/opentelemetry-exporter-zipkin/src/**/*.ts",
+    "packages/opentelemetry-resources/src/**/*.ts",
+    "experimental/packages/sdk-logs/src/**/*.ts",
+    "experimental/packages/opentelemetry-instrumentation/src/**/*.ts",
+    "experimental/packages/exporter-trace-otlp-http/src/**/*.ts",
+    "experimental/packages/exporter-trace-otlp-proto/src/**/*.ts",
+    "experimental/packages/exporter-logs-otlp-http/src/**/*.ts",
+    "experimental/packages/exporter-logs-otlp-proto/src/**/*.ts",
+    "experimental/packages/opentelemetry-exporter-metrics-otlp-http/src/**/*.ts",
+    "experimental/packages/opentelemetry-exporter-metrics-otlp-proto/src/**/*.ts"
+  ],
+  "exclude": ["node_modules", "**/platform/node/**"]
+}
