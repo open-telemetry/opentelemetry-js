@@ -8,6 +8,16 @@ module.exports = {
   hostname: 'localhost',
   browsers: ['ChromeHeadless'],
   frameworks: ['mocha'],
+  // Karma's default 'karma-*' scan only sees plugins hoisted beside karma
+  // itself; requiring them here resolves from the repo root in any layout.
+  plugins: [
+    require('karma-chrome-launcher'),
+    require('karma-coverage'),
+    require('karma-mocha'),
+    require('karma-mocha-webworker'),
+    require('karma-spec-reporter'),
+    require('karma-webpack'),
+  ],
   coverageReporter: {
     type : 'json',
     subdir: '.',

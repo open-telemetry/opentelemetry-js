@@ -43,7 +43,7 @@
         "{projectRoot}/test/**/*.ts"
       ]
     },
-    "version:update": {
+    "version": {
       "inputs": [
         "{projectRoot}/package.json"
       ],
