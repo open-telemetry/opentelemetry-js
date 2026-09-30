@@ -1,13 +1,15 @@
 # Dice Example
 
 This is the Node.js implementation of the OpenTelemetry [Getting Started][]
-reference application, extended with patterns from the [Instrumentation][] guide.
+reference application based on the [Reference Application Specification][],
+extended with patterns from the [Instrumentation][] guide.
 It shows how to instrument a Node.js application with OpenTelemetry, adding
 distributed tracing, metrics, and log collection to a dice-rolling service.
 It demonstrates instrumentation with existing frameworks (Express, HTTP,
 Winston) and manual instrumentation of application logic.
 
 [Getting Started]: https://opentelemetry.io/docs/languages/js/getting-started/nodejs/
+[Reference Application Specification]: https://opentelemetry.io/docs/getting-started/reference-application-specification/
 [Instrumentation]: https://opentelemetry.io/docs/languages/js/instrumentation/
 
 There are two versions:
@@ -113,11 +115,15 @@ Roll one or more six-sided dice.
 
 ### Responses
 
+Responses follow the [Reference Application Specification][service-requirements]. In particular, invalid requests with non-positive `rolls` return HTTP 500 without JSON output to demonstrate how OpenTelemetry captures exceptions and error status on spans.
+
 | Condition                                 | Status | Body                                                                        |
 |-------------------------------------------|--------|-----------------------------------------------------------------------------|
 | `rolls` not set or valid positive integer | `200`  | Single integer or JSON array of integers from `1` to `6`                    |
 | `rolls` is not a number                   | `400`  | `{"status":"error","message":"Parameter rolls must be a positive integer"}` |
 | `rolls` is `0` or negative                | `500`  | Empty body                                                                  |
+
+[service-requirements]: https://opentelemetry.io/docs/getting-started/reference-application-specification/#service-requirements
 
 ## OpenTelemetry Signals
 
