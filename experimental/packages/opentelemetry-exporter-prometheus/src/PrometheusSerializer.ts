@@ -199,7 +199,7 @@ export class PrometheusSerializer {
   private _withResourceConstantLabels: RegExp | undefined;
   private _withoutScopeInfo: boolean | undefined;
   private _withoutTargetInfo: boolean | undefined;
-  private _activeMetadataConflicts = new Set<string>();
+  private _previousMetadataConflicts = new Set<string>();
 
   constructor(
     prefix?: string,
@@ -283,27 +283,26 @@ export class PrometheusSerializer {
   }
 
   private _warnMetadataConflict(
-    activeConflicts: Set<string>,
+    currentMetadataConflicts: Set<string>,
     kind: 'HELP' | 'UNIT' | 'TYPE',
     name: string,
     firstValue: string,
     secondValue: string,
-    selected = ''
+    selected: string | undefined
   ) {
-    const key = `${kind}:${name}:${selected}`;
-    if (activeConflicts.has(key)) {
+    const key = `${kind}:${name}:${selected ?? ''}`;
+    if (currentMetadataConflicts.has(key)) {
       return;
     }
-    activeConflicts.add(key);
-    if (this._activeMetadataConflicts.has(key)) {
+    currentMetadataConflicts.add(key);
+    if (this._previousMetadataConflicts.has(key)) {
       return;
     }
 
-    const formattedValues = [firstValue, secondValue]
-      .sort()
-      .map(quoteDiagnosticValue)
-      .join(', ');
-    if (kind === 'TYPE') {
+    const formattedValues = `${quoteDiagnosticValue(
+      firstValue
+    )}, ${quoteDiagnosticValue(secondValue)}`;
+    if (selected === undefined) {
       diag.warn(
         `Conflicting ${kind} comments for metric "${name}": ${formattedValues}; dropping the metric.`
       );
@@ -320,7 +319,7 @@ export class PrometheusSerializer {
     // A TYPE conflict requires dropping the entire family, so all metadata must
     // be resolved before any samples are serialized.
     const metricFamilies = new Map<string, PrometheusMetricFamily>();
-    const activeConflicts = new Set<string>();
+    const currentMetadataConflicts = new Set<string>();
 
     if (!this._withoutTargetInfo) {
       metricFamilies.set('target_info', {
@@ -358,11 +357,12 @@ export class PrometheusSerializer {
 
         if (metadata.type !== type) {
           this._warnMetadataConflict(
-            activeConflicts,
+            currentMetadataConflicts,
             'TYPE',
             name,
             metadata.type,
-            type
+            type,
+            undefined
           );
           family.metadata = undefined;
           family.metrics = [];
@@ -386,7 +386,7 @@ export class PrometheusSerializer {
             metadata.help = help;
           } else if (metadata.help !== help) {
             this._warnMetadataConflict(
-              activeConflicts,
+              currentMetadataConflicts,
               'HELP',
               name,
               metadata.help,
@@ -400,7 +400,7 @@ export class PrometheusSerializer {
             metadata.unit = unit;
           } else if (metadata.unit !== unit) {
             this._warnMetadataConflict(
-              activeConflicts,
+              currentMetadataConflicts,
               'UNIT',
               name,
               metadata.unit,
@@ -412,7 +412,9 @@ export class PrometheusSerializer {
       }
     }
 
-    this._activeMetadataConflicts = activeConflicts;
+    // Remember only this scrape's conflicts: persistent conflicts stay quiet,
+    // while resolved conflicts can warn again if they recur later.
+    this._previousMetadataConflicts = currentMetadataConflicts;
     return metricFamilies;
   }
 

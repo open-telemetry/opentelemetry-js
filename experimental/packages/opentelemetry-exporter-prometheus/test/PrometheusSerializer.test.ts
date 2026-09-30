@@ -949,7 +949,7 @@ describe('PrometheusSerializer', () => {
       );
       sinon.assert.calledOnceWithExactly(
         warn,
-        'Conflicting HELP comments for metric "target_info": "Application target metadata", "Target metadata"; exporting "Target metadata".'
+        'Conflicting HELP comments for metric "target_info": "Target metadata", "Application target metadata"; exporting "Target metadata".'
       );
     });
 
