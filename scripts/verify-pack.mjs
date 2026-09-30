@@ -19,7 +19,6 @@ import {
   rmSync,
   existsSync,
 } from 'node:fs';
-import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -32,7 +31,8 @@ console.log(`verify-pack: ${targets.length} publishable packages`);
 
 for (const { dir, pkg } of targets) {
   const label = `${pkg.name}@${pkg.version}`;
-  const scratch = mkdtempSync(path.join(tmpdir(), 'verify-pack-'));
+  // Inside the root node_modules so dependencies resolve to the built workspace packages.
+  const scratch = mkdtempSync(path.join(REPO_ROOT, 'node_modules', '.verify-pack-'));
   try {
     // `npm pack --ignore-scripts` to avoid re-running prepublishOnly (which
     // would rebuild). The caller is responsible for running `npm run compile`
