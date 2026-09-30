@@ -11,10 +11,10 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "dependencies": {
-    "@opentelemetry/api": "^1.7.0",
-    "@opentelemetry/api-logs": "0.300.0-development.0",
-    "@opentelemetry/configuration": "0.300.0-development.0",
-    "@opentelemetry/sdk-node": "0.300.0-development.0"
+    "@opentelemetry/api": "^1.7.0 || 1.10.0-development.0",
+    "@opentelemetry/api-logs": "0.300.0-development.1",
+    "@opentelemetry/configuration": "0.300.0-development.1",
+    "@opentelemetry/sdk-node": "0.300.0-development.1"
   },
   "devDependencies": {
     "@types/node": "18.19.130",
