@@ -60,7 +60,7 @@
     "@opentelemetry/api": ">=1.0.0 <1.10.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
-    "mocha": "11.8.0",
+    "mocha": "12.0.2",
     "nyc": "17.1.0",
     "ts-loader": "9.5.7",
     "typescript": "5.2.2"
