@@ -214,11 +214,6 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     url: string,
     options: Partial<Request | RequestInit> = {}
   ): Span | undefined {
-    if (core.isUrlIgnored(url, this.getConfig().ignoreUrls)) {
-      this._diag.debug('ignoring span as url matches ignored url');
-      return;
-    }
-
     const attributes = {} as Attributes;
     const origMethod = options.method;
     const normMethod = normalizeHttpRequestMethod(options.method || 'GET');
@@ -364,12 +359,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           options = args[1] || {};
         }
 
-        const createdSpan = plugin._createSpan(
-          url,
-          args[0] instanceof Request
-            ? { method: args[1]?.method ?? args[0].method }
-            : args[1] || {}
-        );
+        const createdSpan = plugin._createSpan(url, options);
         if (!createdSpan) {
           return original.apply(
             this,
