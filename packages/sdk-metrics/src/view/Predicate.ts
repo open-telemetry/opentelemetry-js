@@ -4,16 +4,21 @@
  */
 
 // https://tc39.es/proposal-regex-escaping
-// escape ^ $ \ .  + ? ( ) [ ] { } |
-// do not need to escape * as we interpret it as wildcard
-const ESCAPE = /[\^$\\.+?()[\]{}|]/g;
+// escape ^ $ \ .  + ( ) [ ] { } |
+// do not need to escape * or ? as we interpret them as wildcards
+const ESCAPE = /[\^$\\.+()[\]{}|]/g;
 
 export interface Predicate {
   match(str: string): boolean;
 }
 
 /**
- * Wildcard pattern predicate, supports patterns like `*`, `foo*`, `*bar`.
+ * Wildcard pattern predicate, supports patterns like `*`, `foo*`, `*bar`,
+ * as well as `?` to match exactly one character, e.g. `foo?`, `?bar`.
+ *
+ * This follows the wildcard semantics of the OpenTelemetry `IncludeExclude`
+ * configuration type:
+ * https://opentelemetry.io/docs/specs/otel-config/types/#type-includeexclude
  */
 export class PatternPredicate implements Predicate {
   private _matchAll: boolean;
@@ -38,11 +43,14 @@ export class PatternPredicate implements Predicate {
   }
 
   static escapePattern(pattern: string): string {
-    return `^${pattern.replace(ESCAPE, '\\$&').replace('*', '.*')}$`;
+    return `^${pattern
+      .replace(ESCAPE, '\\$&')
+      .replace(/\*/g, '.*')
+      .replace(/\?/g, '.')}$`;
   }
 
   static hasWildcard(pattern: string): boolean {
-    return pattern.includes('*');
+    return pattern.includes('*') || pattern.includes('?');
   }
 }
 
