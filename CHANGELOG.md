@@ -16,8 +16,13 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 * chore(sdk-trace-base, sdk-trace-web)!: remove the `@opentelemetry/sdk-trace-base` and `@opentelemetry/sdk-trace-web` packages [#7117](https://github.com/open-telemetry/opentelemetry-js/issues/7117)
   * The sdk-trace-base, sdk-trace-web, and sdk-trace-node packages have been replaced by the `@opentelemetry/sdk-trace` package.
     See the [3.x migration guide](doc/3.x/migration-guide.md) for full migration instructions.
+* fix(core)!: `getBooleanFromEnv` returns `false` in browsers instead of `undefined`, matching Node.js [#7140](https://github.com/open-telemetry/opentelemetry-js/pull/7140) @overbalance
+* fix(core)!: widen the type of `SDK_INFO['telemetry.sdk.language']` from a literal to `string`, since it is `'nodejs'` or `'webjs'` depending on the platform [#7140](https://github.com/open-telemetry/opentelemetry-js/pull/7140) @overbalance
 
 ### :rocket: Features
+
+* feat(sdk-trace): add `disableAutoFlushOnDocumentHide` to `BatchSpanProcessorOptions` and deprecate `BatchSpanProcessorBrowserOptions` [#7140](https://github.com/open-telemetry/opentelemetry-js/pull/7140) @overbalance
+  * The option applies only in browsers and is ignored in Node.js.
 
 ### :bug: Bug Fixes
 

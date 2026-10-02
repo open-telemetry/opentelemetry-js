@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
+import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import {
   LogsExporterMetricsHelper,
@@ -25,7 +25,7 @@ export class OTLPLogExporter
   extends OTLPExporterBase<ReadableLogRecord[]>
   implements LogRecordExporter
 {
-  constructor(config: OTLPExporterConfigBase = {}) {
+  constructor(config: OTLPExporterNodeConfigBase = {}) {
     super(
       createLegacyOtlpBrowserExportDelegate(
         config,

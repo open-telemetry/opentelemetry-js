@@ -11,7 +11,8 @@ import type { OTLPExporterConfigBase } from './legacy-base-configuration';
 import type { HttpAgentFactory } from './otlp-node-http-configuration';
 
 /**
- * Node.js HTTP exporter configuration.
+ * OTLP/HTTP exporter configuration. Browsers ignore the Node.js-only options
+ * `keepAlive`, `compression`, `httpAgentOptions` and `userAgent`.
  */
 export interface OTLPExporterNodeConfigBase extends OTLPExporterConfigBase {
   /**
@@ -25,7 +26,7 @@ export interface OTLPExporterNodeConfigBase extends OTLPExporterConfigBase {
    */
   keepAlive?: boolean;
   /**
-   * Compression algorithm for outgoing OTLP HTTP requests.
+   * Compression algorithm for outgoing OTLP HTTP requests. Node.js only; browsers send uncompressed.
    *
    * @defaultValue CompressionAlgorithm.NONE
    */
@@ -54,7 +55,7 @@ export interface OTLPExporterNodeConfigBase extends OTLPExporterConfigBase {
    */
   httpAgentOptions?: http.AgentOptions | https.AgentOptions | HttpAgentFactory;
   /**
-   * User agent header string to be prepended to the exporter's default value.
+   * User agent header string to be prepended to the exporter's default value. Node.js only.
    * Available since v1.49.0 of the spec.
    * Ref: https://opentelemetry.io/docs/specs/otel/protocol/exporter/#user-agent
    */

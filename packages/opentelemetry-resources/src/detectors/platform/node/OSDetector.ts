@@ -24,4 +24,4 @@ class OSDetector implements ResourceDetector {
   }
 }
 
-export const osDetector = new OSDetector();
+export const osDetector: ResourceDetector = new OSDetector();

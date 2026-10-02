@@ -30,4 +30,5 @@ class ServiceInstanceIdDetector implements ResourceDetector {
 /**
  * @experimental
  */
-export const serviceInstanceIdDetector = new ServiceInstanceIdDetector();
+export const serviceInstanceIdDetector: ResourceDetector =
+  new ServiceInstanceIdDetector();

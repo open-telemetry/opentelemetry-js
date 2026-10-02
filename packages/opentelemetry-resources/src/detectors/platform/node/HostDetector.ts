@@ -30,4 +30,4 @@ class HostDetector implements ResourceDetector {
   }
 }
 
-export const hostDetector = new HostDetector();
+export const hostDetector: ResourceDetector = new HostDetector();

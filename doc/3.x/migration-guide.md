@@ -111,6 +111,14 @@ instrumentation.setConfig({
 
 ## `@opentelemetry/core`
 
+### Changed: `getBooleanFromEnv()` returns `false` in browsers
+
+The browser implementation returned `undefined` while its type said `boolean`. It now returns `false`, matching Node.js, where an unset variable also reads as `false`.
+
+### Changed: `SDK_INFO['telemetry.sdk.language']` is typed `string`
+
+The value is still `'nodejs'` in Node.js and `'webjs'` in browsers, but the type is `string` rather than the `'nodejs'` literal, since one declaration file describes both platforms.
+
 ### Removed: `getTimeOrigin()`
 
 `getTimeOrigin()` was a thin wrapper around `performance.timeOrigin`. Use `performance.timeOrigin` directly.

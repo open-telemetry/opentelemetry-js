@@ -27,6 +27,12 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
   * The `AnyValue`, `LogBody`, and `LogAttributes` types are no longer exported by the `api-logs` package.
     Instead, use the `AnyValue` and `Attributes` types from the latest `@opentelemetry/api` package.
   * This is part of supporting [OTEP 4485](https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/4485-extending-attributes-to-support-complex-values.md#how).
+* feat(instrumentation): add `isEnabled()` to the browser `InstrumentationBase`, matching Node.js [#7140](https://github.com/open-telemetry/opentelemetry-js/pull/7140) @overbalance
+  * `FetchInstrumentation` and `XMLHttpRequestInstrumentation` override it to report whether they are active, which stays false when patching fails.
+* feat(sdk-logs): add `disableAutoFlushOnDocumentHide` to `BatchLogRecordProcessorOptions` and deprecate `BatchLogRecordProcessorBrowserOptions` [#7140](https://github.com/open-telemetry/opentelemetry-js/pull/7140) @overbalance
+  * The option applies only in browsers and is ignored in Node.js.
+* feat(exporter-trace-otlp-http, exporter-trace-otlp-proto, exporter-logs-otlp-http, exporter-logs-otlp-proto, exporter-metrics-otlp-http): browser exporters accept `OTLPExporterNodeConfigBase`, matching Node.js [#7140](https://github.com/open-telemetry/opentelemetry-js/pull/7140) @overbalance
+  * Browsers ignore the Node.js-only options `keepAlive`, `compression`, `httpAgentOptions` and `userAgent`. A `compression` other than `none` logs a `diag` warning, since the payload is sent uncompressed.
 
 ### :bug: Bug Fixes
 
