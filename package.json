@@ -72,7 +72,7 @@
     "karma-webpack": "5.0.1",
     "lerna": "10.0.1",
     "linkinator": "7.6.1",
-    "markdownlint-cli2": "0.23.2",
+    "markdownlint-cli2": "0.23.3",
     "mocha": "11.8.0",
     "nx": "22.7.12",
     "prettier": "3.6.2",
