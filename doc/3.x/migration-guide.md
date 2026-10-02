@@ -29,6 +29,39 @@ const { logs, SeverityNumber } = require('@opentelemetry/api');
 
 ---
 
+## Platform-specific code resolves through `package.json` conditions
+
+Packages with separate Node.js and browser implementations (`@opentelemetry/core`, `@opentelemetry/resources`, `@opentelemetry/sdk-trace`, `@opentelemetry/sdk-logs`, `@opentelemetry/instrumentation`, `@opentelemetry/exporter-zipkin` and the OTLP HTTP and protobuf exporters) no longer ship a top-level `browser` field in `package.json`. They select the Node.js implementation with the `node` condition on the `#platform` subpath under `imports`, and every other environment gets the browser implementation through the `default` condition. Their `./platform` and `./platform/browser` subpath exports are removed; import from the package root.
+
+Your bundler must support the `imports` and `exports` fields. A bundler without `imports` support, such as browserify, fails with `Can't resolve '#platform'`. Node.js always applies the `node` condition. These bundler setups also resolve the Node.js implementation; all other setups, including browsers, web workers, edge runtimes and React Native, resolve the browser implementation:
+
+| Tool | Node.js implementation when |
+| --- | --- |
+| webpack 5 | `target` is `'node'` |
+| esbuild | `platform: 'node'`, or `conditions` includes `'node'` |
+| Vite | SSR builds, unless `ssr.target` is `'webworker'` |
+| Rollup with `@rollup/plugin-node-resolve` | `exportConditions` includes `'node'` |
+| Parcel 2 | the target environment is Node.js and the app enables package exports (see below) |
+| Jest | the test environment is `node`, or on Jest 30, tests load packages with `require()` (see below) |
+
+A bundle that runs on Node.js but is built without the `node` condition, for example with esbuild `platform: 'neutral'` or Rollup's default `exportConditions`, contains the browser implementation. Add `node` to that bundler's conditions.
+
+Parcel 2 reads `imports` only when package exports are enabled. Add this to the app's `package.json`:
+
+```json
+{
+  "@parcel/resolver-default": {
+    "packageExports": true
+  }
+}
+```
+
+Jest 30's CommonJS runtime always applies the `node` condition, including in the `jsdom` environment, so `require()` in those tests loads the Node.js implementations. Under `jsdom`, tests on Jest 29 and tests that run as native ESM do not get the `node` condition, so they load the browser implementations. There, `getStringFromEnv()` returns `undefined` and `InstrumentationBase` does not patch Node.js modules.
+
+The package roots' type declarations describe the Node.js implementation, because they are generated from the Node.js entry point and the package root has no platform-specific types branch.
+
+---
+
 ## `@opentelemetry/propagator-jaeger` (package removed)
 
 The `@opentelemetry/propagator-jaeger` package has been removed. The Jaeger propagator is deprecated in favour of the W3C TraceContext propagator.
@@ -167,6 +200,22 @@ const timer = setTimeout(() => {}, 1000);
 if (typeof timer !== 'number') {
   timer.unref();
 }
+```
+
+---
+
+## `@opentelemetry/resources`
+
+### Removed: `./detectors/platform` subpath exports
+
+`@opentelemetry/resources/detectors/platform` and `@opentelemetry/resources/detectors/platform/browser` are gone on every platform. Import the detectors from the package root. In browsers they remain no-ops.
+
+```ts
+// before
+import { hostDetector } from '@opentelemetry/resources/detectors/platform';
+
+// after
+import { hostDetector } from '@opentelemetry/resources';
 ```
 
 ---

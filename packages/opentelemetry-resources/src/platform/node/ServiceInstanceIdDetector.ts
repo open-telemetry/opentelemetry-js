@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ATTR_SERVICE_INSTANCE_ID } from '../../../semconv';
+import { ATTR_SERVICE_INSTANCE_ID } from '../../semconv';
 import { randomUUID } from 'crypto';
-import type { ResourceDetectionConfig } from '../../../config';
-import type { DetectedResource, ResourceDetector } from '../../../types';
+import type { ResourceDetectionConfig } from '../../config';
+import type { DetectedResource, ResourceDetector } from '../../types';
 
 /**
  * ServiceInstanceIdDetector detects the resources related to the service instance ID.

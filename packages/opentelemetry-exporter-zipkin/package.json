@@ -14,33 +14,21 @@
         "types": "./dist/index.d.mts",
         "default": "./dist/index.mjs"
       }
-    },
-    "./platform": {
-      "require": {
-        "types": "./dist/platform/index.d.cts",
-        "default": "./dist/platform/index.cjs"
-      },
-      "default": {
-        "types": "./dist/platform/index.d.mts",
-        "default": "./dist/platform/index.mjs"
-      }
-    },
-    "./platform/browser": {
-      "require": {
-        "types": "./dist/platform/browser/index.d.cts",
-        "default": "./dist/platform/browser/index.cjs"
-      },
-      "default": {
-        "types": "./dist/platform/browser/index.d.mts",
-        "default": "./dist/platform/browser/index.mjs"
-      }
     }
   },
-  "browser": {
-    "./dist/platform/node/util.mjs": "./dist/platform/browser/util.mjs",
-    "./dist/platform/node/util.cjs": "./dist/platform/browser/util.cjs",
-    "./dist/platform/index.mjs": "./dist/platform/browser/index.mjs",
-    "./dist/platform/index.cjs": "./dist/platform/browser/index.cjs"
+  "imports": {
+    "#platform": {
+      "otel": {
+        "node": "./src/platform/node/index.ts",
+        "default": "./src/platform/browser/index.ts"
+      },
+      "node": {
+        "require": "./dist/platform/node/index.cjs",
+        "default": "./dist/platform/node/index.mjs"
+      },
+      "require": "./dist/platform/browser/index.cjs",
+      "default": "./dist/platform/browser/index.mjs"
+    }
   },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {

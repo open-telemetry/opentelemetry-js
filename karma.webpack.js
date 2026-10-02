@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+const path = require('path');
 const webpack = require('webpack')
 
 // This is the webpack configuration for browser Karma tests with coverage.
@@ -23,28 +24,6 @@ module.exports = {
   },
   devtool: 'eval-source-map',
   plugins: [
-    // Karma+webpack bundles each package's src/ directly, so package.json#browser
-    // doesn't apply; rewrite platform(/index) requests to /browser/ equivalents.
-    new webpack.NormalModuleReplacementPlugin(
-      /(^|[\\/])(?:detectors[\\/])?platform([\\/]index(\.ts)?)?$/,
-      function (resource) {
-        if (/[\\/]browser([\\/]|$)/.test(resource.request)) return;
-        const issuer = resource.contextInfo && resource.contextInfo.issuer;
-        if (!issuer || /[\\/]node_modules[\\/]/.test(issuer)) return;
-        const original = resource.request;
-        const rewritten = original.replace(
-          /platform([\\/]index(?:\.ts)?)?$/,
-          'platform/browser$1'
-        );
-        if (rewritten === original) {
-          throw new Error(
-            `karma platform-swap: outer regex matched ${JSON.stringify(original)} ` +
-            `but inner replace did not rewrite it. The two regexes have drifted out of sync.`
-          );
-        }
-        resource.request = rewritten;
-      }
-    ),
     new webpack.ProvidePlugin({
       // Not a global: only modules with a free `process` (such as util) get
       // it. Absolute, since isolated installs hide `process` from those modules.
@@ -59,6 +38,12 @@ module.exports = {
   ],
   module: {
     rules: [
+      {
+        // #platform resolves to src for the package under test only; dependencies
+        // keep their dist, as a global condition would resolve them to their src too.
+        include: path.resolve('src'),
+        resolve: { conditionNames: ['otel', '...'] },
+      },
       {
         test: /\.ts$/,
         // transpileOnly: tsconfig.base.json sets `composite` but we never run
