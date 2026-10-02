@@ -29,6 +29,8 @@ export type {
   SimpleSpanProcessorOptions,
   SpanLimits,
   SpanProcessorOptions,
+  TracerConfig,
+  TracerConfigurator,
   TracerProviderOptions,
 } from './types';
 export type { IdGenerator } from './IdGenerator';

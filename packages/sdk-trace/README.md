@@ -95,6 +95,36 @@ process.once('beforeExit', async () => {
 });
 ```
 
+## Tracer configuration
+
+> [!WARNING]
+> Tracer configuration is experimental and opt-in. Its API may change or be
+> removed in minor releases.
+
+Use `TracerProviderOptions.tracerConfigurator` to enable or disable individual
+tracers based on their instrumentation scope:
+
+```js
+const { TracerProvider } = require('@opentelemetry/sdk-trace');
+
+const provider = new TracerProvider({
+  tracerConfigurator: scope => ({
+    enabled: scope.name !== 'noisy-instrumentation',
+  }),
+  // Configure spanProcessors as usual.
+});
+```
+
+The function receives the scope's name, version, and schema URL. It is called
+once for each newly created tracer, not for every span. Returning `undefined`,
+`null`, or `{}` enables the tracer. Configuration updates for existing tracers
+are not supported.
+
+Disabled tracers create no recording spans and do not invoke the sampler or span
+processors. They preserve a valid parent span context, so enabled child tracers
+remain connected to the original parent. Without a parent, or with `root: true`,
+they return a non-recording span with an invalid span context.
+
 ## Built-in Samplers
 
 Sampler is used to make decisions on `Span` sampling.
