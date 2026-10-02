@@ -5,13 +5,18 @@
 import { ValueType } from '@opentelemetry/api';
 import type { Resource } from '@opentelemetry/resources';
 import { resourceFromAttributes } from '@opentelemetry/resources';
-import type { MetricData, ResourceMetrics } from '@opentelemetry/sdk-metrics';
+import type {
+  Exemplar,
+  MetricData,
+  ResourceMetrics,
+} from '@opentelemetry/sdk-metrics';
 import {
   AggregationTemporality,
   DataPointType,
 } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import { createExportMetricsServiceRequest } from '../src/metrics/internal';
+import { hexToBinary } from '../src/common/hex-to-binary';
 import { EAggregationTemporality } from '../src/metrics/internal-types';
 import {
   PROTOBUF_ENCODER,
@@ -351,6 +356,7 @@ describe('Metrics', () => {
                           startTimeUnixNano: encodeAsLongBits(START_TIME),
                           timeUnixNano: encodeAsLongBits(END_TIME),
                           asInt: 10,
+                          exemplars: undefined,
                         },
                       ],
                       aggregationTemporality:
@@ -397,6 +403,7 @@ describe('Metrics', () => {
                           startTimeUnixNano: encodeAsLongBits(START_TIME),
                           timeUnixNano: encodeAsLongBits(END_TIME),
                           asInt: 10,
+                          exemplars: undefined,
                         },
                       ],
                       aggregationTemporality:
@@ -444,6 +451,7 @@ describe('Metrics', () => {
                           startTimeUnixNano: encodeAsLongBits(START_TIME),
                           timeUnixNano: encodeAsLongBits(END_TIME),
                           asInt: 10,
+                          exemplars: undefined,
                         },
                       ],
                       aggregationTemporality:
@@ -491,6 +499,7 @@ describe('Metrics', () => {
                           startTimeUnixNano: encodeAsLongBits(START_TIME),
                           timeUnixNano: encodeAsLongBits(END_TIME),
                           asInt: 10,
+                          exemplars: undefined,
                         },
                       ],
                       aggregationTemporality:
@@ -534,6 +543,7 @@ describe('Metrics', () => {
                           startTimeUnixNano: encodeAsLongBits(START_TIME),
                           timeUnixNano: encodeAsLongBits(END_TIME),
                           asDouble: 10.5,
+                          exemplars: undefined,
                         },
                       ],
                     },
@@ -594,6 +604,7 @@ describe('Metrics', () => {
                             max: 8,
                             startTimeUnixNano: encodeAsLongBits(START_TIME),
                             timeUnixNano: encodeAsLongBits(END_TIME),
+                            exemplars: undefined,
                           },
                         ],
                       },
@@ -651,6 +662,7 @@ describe('Metrics', () => {
                             max: undefined,
                             startTimeUnixNano: encodeAsLongBits(START_TIME),
                             timeUnixNano: encodeAsLongBits(END_TIME),
+                            exemplars: undefined,
                           },
                         ],
                       },
@@ -720,6 +732,7 @@ describe('Metrics', () => {
                             negative: { offset: 0, bucketCounts: [0] },
                             startTimeUnixNano: encodeAsLongBits(START_TIME),
                             timeUnixNano: encodeAsLongBits(END_TIME),
+                            exemplars: undefined,
                           },
                         ],
                       },
@@ -785,6 +798,7 @@ describe('Metrics', () => {
                             negative: { offset: 0, bucketCounts: [0] },
                             startTimeUnixNano: encodeAsLongBits(START_TIME),
                             timeUnixNano: encodeAsLongBits(END_TIME),
+                            exemplars: undefined,
                           },
                         ],
                       },
@@ -819,6 +833,291 @@ describe('Metrics', () => {
       assert.strictEqual(
         exportRequest.resourceMetrics?.[0].schemaUrl,
         'https://opentelemetry.test/schemas/1.2.3'
+      );
+    });
+  });
+
+  describe('exemplar serialization', () => {
+    const EXEMPLAR_TIME: [number, number] = [1234567890, 123456789];
+
+    const exemplarWithTrace: Exemplar = {
+      value: 42.5,
+      timestamp: EXEMPLAR_TIME,
+      filteredAttributes: { 'extra-attr': 'extra-value' },
+      spanId: 'aabbccdd11223344',
+      traceId: '00112233445566778899aabbccddeeff',
+    };
+
+    const exemplarWithoutTrace: Exemplar = {
+      value: 10,
+      timestamp: EXEMPLAR_TIME,
+      filteredAttributes: {},
+      spanId: undefined,
+      traceId: undefined,
+    };
+
+    const expectedExemplarWithTrace = {
+      filteredAttributes: [
+        {
+          key: 'extra-attr',
+          value: { stringValue: 'extra-value' },
+        },
+      ],
+      timeUnixNano: encodeAsLongBits(EXEMPLAR_TIME),
+      asDouble: 42.5,
+      // the PROTOBUF encoder turns hex span/trace ids into bytes, matching the
+      // proto wire format (Mimir rejects exemplars with non-bytes ids)
+      spanId: hexToBinary('aabbccdd11223344'),
+      traceId: hexToBinary('00112233445566778899aabbccddeeff'),
+    };
+
+    const expectedExemplarWithoutTrace = {
+      filteredAttributes: [],
+      timeUnixNano: encodeAsLongBits(EXEMPLAR_TIME),
+      asDouble: 10,
+      spanId: undefined,
+      traceId: undefined,
+    };
+
+    it('serializes exemplars on sum data points', () => {
+      const metricData: MetricData = {
+        descriptor: {
+          description: 'a counter',
+          name: 'counter',
+          unit: '1',
+          valueType: ValueType.DOUBLE,
+        },
+        aggregationTemporality: AggregationTemporality.DELTA,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: true,
+        dataPoints: [
+          {
+            value: 42.5,
+            startTime: START_TIME,
+            endTime: END_TIME,
+            attributes: ATTRIBUTES,
+            exemplars: [exemplarWithTrace],
+          },
+        ],
+      };
+      const metrics = createResourceMetrics([metricData]);
+      const exportRequest = createExportMetricsServiceRequest(
+        [metrics],
+        PROTOBUF_ENCODER
+      );
+
+      const dataPoint =
+        exportRequest.resourceMetrics![0].scopeMetrics![0].metrics![0].sum!
+          .dataPoints![0];
+      assert.ok(dataPoint.exemplars, 'exemplars should be present');
+      assert.strictEqual(dataPoint.exemplars!.length, 1);
+      assert.deepStrictEqual(
+        dataPoint.exemplars![0],
+        expectedExemplarWithTrace
+      );
+    });
+
+    it('serializes exemplars without trace context', () => {
+      const metricData: MetricData = {
+        descriptor: {
+          description: 'a gauge',
+          name: 'gauge',
+          unit: '1',
+          valueType: ValueType.DOUBLE,
+        },
+        aggregationTemporality: AggregationTemporality.CUMULATIVE,
+        dataPointType: DataPointType.GAUGE,
+        dataPoints: [
+          {
+            value: 10,
+            startTime: START_TIME,
+            endTime: END_TIME,
+            attributes: ATTRIBUTES,
+            exemplars: [exemplarWithoutTrace],
+          },
+        ],
+      };
+      const metrics = createResourceMetrics([metricData]);
+      const exportRequest = createExportMetricsServiceRequest(
+        [metrics],
+        PROTOBUF_ENCODER
+      );
+
+      const dataPoint =
+        exportRequest.resourceMetrics![0].scopeMetrics![0].metrics![0].gauge!
+          .dataPoints![0];
+      assert.ok(dataPoint.exemplars, 'exemplars should be present');
+      assert.strictEqual(dataPoint.exemplars!.length, 1);
+      assert.deepStrictEqual(
+        dataPoint.exemplars![0],
+        expectedExemplarWithoutTrace
+      );
+    });
+
+    it('serializes exemplars on histogram data points', () => {
+      const metricData: MetricData = {
+        descriptor: {
+          description: 'a histogram',
+          name: 'hist',
+          unit: '1',
+          valueType: ValueType.INT,
+        },
+        aggregationTemporality: AggregationTemporality.DELTA,
+        dataPointType: DataPointType.HISTOGRAM,
+        dataPoints: [
+          {
+            value: {
+              sum: 42.5,
+              count: 1,
+              min: 42.5,
+              max: 42.5,
+              buckets: {
+                boundaries: [10, 50, 100],
+                counts: [0, 1, 0, 0],
+              },
+            },
+            startTime: START_TIME,
+            endTime: END_TIME,
+            attributes: ATTRIBUTES,
+            exemplars: [exemplarWithTrace],
+          },
+        ],
+      };
+      const metrics = createResourceMetrics([metricData]);
+      const exportRequest = createExportMetricsServiceRequest(
+        [metrics],
+        PROTOBUF_ENCODER
+      );
+
+      const dataPoint =
+        exportRequest.resourceMetrics![0].scopeMetrics![0].metrics![0]
+          .histogram!.dataPoints![0];
+      assert.ok(dataPoint.exemplars, 'exemplars should be present');
+      assert.strictEqual(dataPoint.exemplars!.length, 1);
+      assert.deepStrictEqual(
+        dataPoint.exemplars![0],
+        expectedExemplarWithTrace
+      );
+    });
+
+    it('serializes exemplars on exponential histogram data points', () => {
+      const metricData: MetricData = {
+        descriptor: {
+          description: 'an exp histogram',
+          name: 'xhist',
+          unit: '1',
+          valueType: ValueType.INT,
+        },
+        aggregationTemporality: AggregationTemporality.CUMULATIVE,
+        dataPointType: DataPointType.EXPONENTIAL_HISTOGRAM,
+        dataPoints: [
+          {
+            value: {
+              sum: 42.5,
+              count: 1,
+              min: 42.5,
+              max: 42.5,
+              zeroCount: 0,
+              scale: 1,
+              positive: { offset: 0, bucketCounts: [1] },
+              negative: { offset: 0, bucketCounts: [0] },
+            },
+            startTime: START_TIME,
+            endTime: END_TIME,
+            attributes: ATTRIBUTES,
+            exemplars: [exemplarWithTrace],
+          },
+        ],
+      };
+      const metrics = createResourceMetrics([metricData]);
+      const exportRequest = createExportMetricsServiceRequest(
+        [metrics],
+        PROTOBUF_ENCODER
+      );
+
+      const dataPoint =
+        exportRequest.resourceMetrics![0].scopeMetrics![0].metrics![0]
+          .exponentialHistogram!.dataPoints![0];
+      assert.ok(dataPoint.exemplars, 'exemplars should be present');
+      assert.strictEqual(dataPoint.exemplars!.length, 1);
+      assert.deepStrictEqual(
+        dataPoint.exemplars![0],
+        expectedExemplarWithTrace
+      );
+    });
+
+    it('omits exemplars when not present on data points', () => {
+      const metrics = createResourceMetrics([
+        createCounterData(10, AggregationTemporality.DELTA),
+      ]);
+      const exportRequest = createExportMetricsServiceRequest(
+        [metrics],
+        PROTOBUF_ENCODER
+      );
+
+      const dataPoint =
+        exportRequest.resourceMetrics![0].scopeMetrics![0].metrics![0].sum!
+          .dataPoints![0];
+      assert.strictEqual(
+        dataPoint.exemplars,
+        undefined,
+        'exemplars should not be present when not provided'
+      );
+    });
+
+    it('round-trips exemplars through the protobuf serializer wire bytes', () => {
+      // Regression test: the direct protobuf serializer must emit exemplars
+      // (it does not go through createExportMetricsServiceRequest), and the
+      // span/trace ids must arrive as bytes on the wire.
+      const metricData: MetricData = {
+        descriptor: {
+          description: 'a histogram',
+          name: 'hist',
+          unit: '1',
+          valueType: ValueType.DOUBLE,
+        },
+        aggregationTemporality: AggregationTemporality.CUMULATIVE,
+        dataPointType: DataPointType.HISTOGRAM,
+        dataPoints: [
+          {
+            value: {
+              sum: 42.5,
+              count: 1,
+              min: 42.5,
+              max: 42.5,
+              buckets: {
+                boundaries: [10, 50, 100],
+                counts: [0, 1, 0, 0],
+              },
+            },
+            startTime: START_TIME,
+            endTime: END_TIME,
+            attributes: ATTRIBUTES,
+            exemplars: [exemplarWithTrace],
+          },
+        ],
+      };
+      const serialized = ProtobufMetricsSerializer.serializeRequest(
+        createResourceMetrics([metricData])
+      );
+      assert.ok(serialized, 'serialized response is undefined');
+      const decoded =
+        signals.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest.decode(
+          serialized
+        );
+      const dataPoint =
+        decoded.resourceMetrics![0].scopeMetrics![0].metrics![0].histogram!
+          .dataPoints![0];
+      assert.strictEqual(dataPoint.exemplars!.length, 1);
+      const exemplar = dataPoint.exemplars![0];
+      assert.strictEqual(exemplar.asDouble, 42.5);
+      assert.strictEqual(
+        Buffer.from(exemplar.spanId!).toString('hex'),
+        'aabbccdd11223344'
+      );
+      assert.strictEqual(
+        Buffer.from(exemplar.traceId!).toString('hex'),
+        '00112233445566778899aabbccddeeff'
       );
     });
   });

@@ -91,6 +91,7 @@ describe('SumAggregator', () => {
             startTime,
             endTime,
             value: 3,
+            exemplars: undefined,
           },
         ],
       };

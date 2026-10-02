@@ -99,22 +99,22 @@ export class HistogramAccumulation implements Accumulation {
  */
 export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
   public kind: AggregatorKind.HISTOGRAM = AggregatorKind.HISTOGRAM;
-  private readonly _boundaries: number[];
+  readonly boundaries: number[];
   private readonly _recordMinMax: boolean;
 
   /**
-   * @param _boundaries sorted upper bounds of recorded values.
+   * @param boundaries sorted upper bounds of recorded values.
    * @param _recordMinMax If set to true, min and max will be recorded. Otherwise, min and max will not be recorded.
    */
   constructor(boundaries: number[], recordMinMax: boolean) {
-    this._boundaries = boundaries;
+    this.boundaries = boundaries;
     this._recordMinMax = recordMinMax;
   }
 
   createAccumulation(startTime: HrTime) {
     return new HistogramAccumulation(
       startTime,
-      this._boundaries,
+      this.boundaries,
       this._recordMinMax
     );
   }
@@ -221,29 +221,32 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
       descriptor,
       aggregationTemporality,
       dataPointType: DataPointType.HISTOGRAM,
-      dataPoints: accumulationByAttributes.map(([attributes, accumulation]) => {
-        const pointValue = accumulation.toPointValue();
+      dataPoints: accumulationByAttributes.map(
+        ([attributes, accumulation, exemplars]) => {
+          const pointValue = accumulation.toPointValue();
 
-        // determine if instrument allows negative values.
-        const allowsNegativeValues =
-          descriptor.type === InstrumentType.GAUGE ||
-          descriptor.type === InstrumentType.UP_DOWN_COUNTER ||
-          descriptor.type === InstrumentType.OBSERVABLE_GAUGE ||
-          descriptor.type === InstrumentType.OBSERVABLE_UP_DOWN_COUNTER;
+          // determine if instrument allows negative values.
+          const allowsNegativeValues =
+            descriptor.type === InstrumentType.GAUGE ||
+            descriptor.type === InstrumentType.UP_DOWN_COUNTER ||
+            descriptor.type === InstrumentType.OBSERVABLE_GAUGE ||
+            descriptor.type === InstrumentType.OBSERVABLE_UP_DOWN_COUNTER;
 
-        return {
-          attributes,
-          startTime: accumulation.startTime,
-          endTime,
-          value: {
-            min: pointValue.hasMinMax ? pointValue.min : undefined,
-            max: pointValue.hasMinMax ? pointValue.max : undefined,
-            sum: !allowsNegativeValues ? pointValue.sum : undefined,
-            buckets: pointValue.buckets,
-            count: pointValue.count,
-          },
-        };
-      }),
+          return {
+            attributes,
+            startTime: accumulation.startTime,
+            endTime,
+            value: {
+              min: pointValue.hasMinMax ? pointValue.min : undefined,
+              max: pointValue.hasMinMax ? pointValue.max : undefined,
+              sum: !allowsNegativeValues ? pointValue.sum : undefined,
+              buckets: pointValue.buckets,
+              count: pointValue.count,
+            },
+            exemplars,
+          };
+        }
+      ),
     };
   }
 }
