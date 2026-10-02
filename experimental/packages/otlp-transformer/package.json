@@ -80,7 +80,7 @@
     "karma-spec-reporter": "0.0.37",
     "karma-webpack": "5.0.1",
     "mocha": "11.8.0",
-    "nyc": "17.1.0",
+    "nyc": "18.0.0",
     "protobufjs": "8.8.0",
     "protobufjs-cli": "2.5.7",
     "ts-loader": "9.5.7",
