@@ -3,12 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type {
-  AnyValue,
-  Attributes,
-  Context,
-  TimeInput,
-} from '@opentelemetry/api';
+import type { AnyValue } from '../common/AnyValue';
+import type { Attributes } from '../common/Attributes';
+import type { TimeInput } from '../common/Time';
+import type { Context } from '../context/types';
 
 export enum SeverityNumber {
   UNSPECIFIED = 0,

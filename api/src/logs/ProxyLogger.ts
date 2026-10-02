@@ -3,26 +3,26 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Context } from '@opentelemetry/api';
+import type { Context } from '../context/types';
 import { NOOP_LOGGER } from './NoopLogger';
-import type { Logger } from './types/Logger';
-import type { LoggerOptions } from './types/LoggerOptions';
-import type { LogRecord } from './types/LogRecord';
-import type { SeverityNumber } from './types/LogRecord';
+import type { Logger } from './Logger';
+import type { LoggerOptions } from './LoggerOptions';
+import type { LogRecord } from './LogRecord';
+import type { SeverityNumber } from './LogRecord';
 
 export class ProxyLogger implements Logger {
   // When a real implementation is provided, this will be it
   private _delegate?: Logger;
   private _provider: LoggerDelegator;
   public readonly name: string;
-  public readonly version?: string | undefined;
-  public readonly options?: LoggerOptions | undefined;
+  public readonly version?: string;
+  public readonly options?: LoggerOptions;
 
   constructor(
     provider: LoggerDelegator,
     name: string,
-    version?: string | undefined,
-    options?: LoggerOptions | undefined
+    version?: string,
+    options?: LoggerOptions
   ) {
     this._provider = provider;
     this.name = name;

@@ -10,7 +10,7 @@ import type {
   SpanContext,
 } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
-import type { SeverityNumber } from '@opentelemetry/api-logs';
+import type { SeverityNumber } from '@opentelemetry/api';
 import type { Resource } from '@opentelemetry/resources';
 
 /**

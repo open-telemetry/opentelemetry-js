@@ -4,17 +4,17 @@
  */
 
 import * as assert from 'assert';
-import { _global, GLOBAL_LOGS_API_KEY } from '../../src/internal/global-utils';
-import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
-import { ProxyLoggerProvider } from '../../src/ProxyLoggerProvider';
+import { NoopLoggerProvider } from '../../../../src/logs/NoopLoggerProvider';
 
-const api1 = require('../../src');
+const api1 = require('../../../../src');
 
 // clear cache and load a second instance of the api
 for (const key of Object.keys(require.cache)) {
   delete require.cache[key];
 }
-const api2 = require('../../src');
+const api2 = require('../../../../src');
+
+const GLOBAL_API_SYMBOL_KEY = 'opentelemetry.js.api.1';
 
 describe('Global Utils', () => {
   // prove they are separate instances
@@ -28,13 +28,13 @@ describe('Global Utils', () => {
   beforeEach(() => {
     api1.logs.disable();
     api2.logs.disable();
+    // @ts-expect-error we are modifying internals for testing purposes here
+    delete globalThis[Symbol.for(GLOBAL_API_SYMBOL_KEY)];
   });
 
   it('should change the global logger provider', () => {
-    const original = api1.logs.getLoggerProvider();
     const newLoggerProvider = new NoopLoggerProvider();
     api1.logs.setGlobalLoggerProvider(newLoggerProvider);
-    assert.notStrictEqual(api1.logs.getLoggerProvider(), original);
     assert.strictEqual(api1.logs.getLoggerProvider(), newLoggerProvider);
   });
 
@@ -48,18 +48,21 @@ describe('Global Utils', () => {
 
   it('should disable both if one is disabled', () => {
     const original = api1.logs.getLoggerProvider();
+    const provider = new NoopLoggerProvider();
 
-    api1.logs.setGlobalLoggerProvider(new NoopLoggerProvider());
+    api1.logs.setGlobalLoggerProvider(provider);
 
-    assert.notStrictEqual(original, api1.logs.getLoggerProvider());
+    assert.strictEqual(api2.logs.getLoggerProvider(), provider);
     api2.logs.disable();
     assert.strictEqual(original, api1.logs.getLoggerProvider());
   });
 
-  it('should return the module no op implementation if the version is a mismatch', () => {
-    api1.logs.setGlobalLoggerProvider(new ProxyLoggerProvider());
-    const afterSet = _global[GLOBAL_LOGS_API_KEY]!(-1);
-
-    assert.ok(afterSet instanceof NoopLoggerProvider);
+  it('should not register if the version is a mismatch', () => {
+    // @ts-expect-error we are modifying internals for testing purposes here
+    globalThis[Symbol.for(GLOBAL_API_SYMBOL_KEY)] = { version: '0.0.1' };
+    assert.strictEqual(
+      api1.logs.setGlobalLoggerProvider(new NoopLoggerProvider()),
+      false
+    );
   });
 });

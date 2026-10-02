@@ -115,7 +115,6 @@
     "webpack-cli": "7.2.3"
   },
   "dependencies": {
-    "@opentelemetry/api-logs": "0.300.0-development.0",
     "@opentelemetry/core": "3.0.0-development.0",
     "@opentelemetry/resources": "3.0.0-development.0",
     "@opentelemetry/semantic-conventions": "^1.29.0"

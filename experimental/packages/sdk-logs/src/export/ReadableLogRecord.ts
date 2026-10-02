@@ -11,7 +11,7 @@ import type {
   SpanContext,
 } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
-import type { SeverityNumber } from '@opentelemetry/api-logs';
+import type { SeverityNumber } from '@opentelemetry/api';
 
 export interface ReadableLogRecord {
   readonly hrTime: HrTime;

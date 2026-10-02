@@ -4,7 +4,7 @@
  */
 
 import * as assert from 'assert';
-import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
+import { NoopLoggerProvider } from '../../../../src/logs/NoopLoggerProvider';
 
 describe('NoopLoggerProvider', () => {
   const loggerProvider = new NoopLoggerProvider();

@@ -4,13 +4,13 @@
  */
 
 import * as assert from 'assert';
-import type { Logger } from '../../src';
-import { logs } from '../../src';
-import { ProxyLoggerProvider } from '../../src/ProxyLoggerProvider';
-import { NoopLogger } from '../../src/NoopLogger';
-import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
+import { logs } from '../../../../src/logs-api';
+import type { Logger } from '../../../../src/logs/Logger';
+import { ProxyLoggerProvider } from '../../../../src/logs/ProxyLoggerProvider';
+import { NoopLogger } from '../../../../src/logs/NoopLogger';
+import { NoopLoggerProvider } from '../../../../src/logs/NoopLoggerProvider';
 
-describe('API', () => {
+describe('LogsAPI', () => {
   const dummyLogger = new NoopLogger();
 
   it('should expose a logger provider via getLoggerProvider', () => {
@@ -36,10 +36,9 @@ describe('API', () => {
     it('should not allow overriding global provider if already set', () => {
       const provider1 = new TestLoggerProvider();
       const provider2 = new TestLoggerProvider();
-      logs.setGlobalLoggerProvider(provider1);
-      assert.equal(logs.getLoggerProvider(), provider1);
-      logs.setGlobalLoggerProvider(provider2);
-      assert.equal(logs.getLoggerProvider(), provider1);
+      assert.strictEqual(logs.setGlobalLoggerProvider(provider1), true);
+      assert.strictEqual(logs.setGlobalLoggerProvider(provider2), false);
+      assert.strictEqual(logs.getLoggerProvider(), provider1);
     });
   });
 

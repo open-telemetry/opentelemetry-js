@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Attributes } from '@opentelemetry/api';
+import type { Attributes } from '../common/Attributes';
 
 export interface LoggerOptions {
   /**

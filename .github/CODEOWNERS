@@ -20,7 +20,6 @@
 
 # Maintainers own the API packages: strict stability guarantees require extensive review
 api/ @open-telemetry/javascript-maintainers
-experimental/packages/api-logs/ @open-telemetry/javascript-maintainers
 
 # Any browser-specific code is co-owned by Browser SIG and JS SIG (list more packages here as needed):
 bundler-tests/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers

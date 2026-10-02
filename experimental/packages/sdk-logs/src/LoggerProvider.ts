@@ -7,8 +7,8 @@ import type {
   LoggerProvider as ILoggerProvider,
   LoggerOptions as ILoggerOptions,
   Logger as ILogger,
-} from '@opentelemetry/api-logs';
-import { createNoopLogger } from '@opentelemetry/api-logs';
+} from '@opentelemetry/api';
+import { createNoopLogger } from '@opentelemetry/api';
 import { defaultResource } from '@opentelemetry/resources';
 import { BindOnceFuture, cleanSimpleAttributes } from '@opentelemetry/core';
 

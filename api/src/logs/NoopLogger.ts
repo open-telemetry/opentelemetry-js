@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Logger } from './types/Logger';
-import type { LogRecord } from './types/LogRecord';
+import type { Logger } from './Logger';
+import type { LogRecord } from './LogRecord';
 
 export class NoopLogger implements Logger {
   emit(_logRecord: LogRecord): void {}
