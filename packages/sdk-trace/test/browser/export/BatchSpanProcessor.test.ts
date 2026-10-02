@@ -124,7 +124,7 @@ describeBrowser('BatchSpanProcessor', () => {
 
     describe('by the pagehide event', () => {
       testDocumentHide(() => {
-        document.dispatchEvent(pageHideEvent);
+        window.dispatchEvent(pageHideEvent);
       });
     });
   });

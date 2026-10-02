@@ -23,6 +23,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 * fix(sdk-metrics): guard against a missing or empty name to MeterProvider#getMeter [#7105](https://github.com/open-telemetry/opentelemetry-js/pull/7105) @trentm
 * fix: resolve the ESM build through the `default` export condition instead of `import`, so a resolver that activates neither `import` nor `require` still finds an entry point [#7132](https://github.com/open-telemetry/opentelemetry-js/pull/7132) @overbalance
+* fix(sdk-trace): listen for `pagehide` on `window` instead of `document`, so the browser `BatchSpanProcessor` flush on page hide actually runs [#7153](https://github.com/open-telemetry/opentelemetry-js/pull/7153) @adityareddy-dev
 
 ### :books: Documentation
 
