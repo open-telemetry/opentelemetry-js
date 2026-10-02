@@ -68,7 +68,7 @@
     "@opentelemetry/api": "^1.3.0"
   },
   "dependencies": {
-    "@grpc/grpc-js": "^1.14.3",
+    "@grpc/grpc-js": "^1.14.5",
     "@opentelemetry/core": "3.0.0-development.0",
     "@opentelemetry/otlp-exporter-base": "0.300.0-development.0",
     "@opentelemetry/otlp-transformer": "0.300.0-development.0"
