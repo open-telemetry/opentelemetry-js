@@ -51,6 +51,7 @@ export type ExponentialHistogramAggregationOption = {
   options?: {
     recordMinMax?: boolean;
     maxSize?: number;
+    maxScale?: number;
   };
 };
 
@@ -76,7 +77,8 @@ export function toAggregation(option: AggregationOption): Aggregation {
       const expOption = option as ExponentialHistogramAggregationOption;
       return new ExponentialHistogramAggregation(
         expOption.options?.maxSize,
-        expOption.options?.recordMinMax
+        expOption.options?.recordMinMax,
+        expOption.options?.maxScale
       );
     }
     case AggregationType.EXPLICIT_BUCKET_HISTOGRAM: {
