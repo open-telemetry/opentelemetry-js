@@ -46,11 +46,9 @@ module.exports = {
       }
     ),
     new webpack.ProvidePlugin({
-      // Make a global `process` variable that points to the `process` package,
-      // because the `util` package expects there to be a global variable named `process`.
-      // Thanks to https://stackoverflow.com/a/65018686/14239942
-      // NOTE: I wish there was a better way as this pollutes the tests with a defined 'process' global.
-      process: 'process/browser.js'
+      // Not a global: only modules with a free `process` (such as util) get
+      // it. Absolute, since isolated installs hide `process` from those modules.
+      process: require.resolve('process/browser.js')
     }),
     // Benchmark.js checks for AMD's define function which doesn't exist in webpack.
     // NOTE: This pollutes tests with a defined 'self.define' global.

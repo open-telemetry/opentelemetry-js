@@ -10,7 +10,6 @@
     "entryPointStrategy": "packages",
     "entryPoints": [
       "api",
-      "experimental/packages/api-logs",
       "experimental/packages/configuration",
       "experimental/packages/exporter-logs-otlp-grpc",
       "experimental/packages/exporter-logs-otlp-http",
@@ -44,8 +43,6 @@
       "packages/opentelemetry-exporter-zipkin",
       "packages/opentelemetry-propagator-b3",
       "packages/opentelemetry-resources",
-      "packages/opentelemetry-sdk-trace-base",
-      "packages/opentelemetry-sdk-trace-web",
       "packages/sdk-metrics",
       "packages/sdk-trace",
       "semantic-conventions"
@@ -63,9 +60,6 @@
   "references": [
     {
       "path": "api"
-    },
-    {
-      "path": "experimental/packages/api-logs"
     },
     {
       "path": "experimental/packages/configuration"
@@ -165,12 +159,6 @@
     },
     {
       "path": "packages/opentelemetry-resources"
-    },
-    {
-      "path": "packages/opentelemetry-sdk-trace-base"
-    },
-    {
-      "path": "packages/opentelemetry-sdk-trace-web"
     },
     {
       "path": "packages/sdk-metrics"

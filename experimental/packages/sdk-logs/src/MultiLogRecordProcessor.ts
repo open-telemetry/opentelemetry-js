@@ -8,7 +8,7 @@ import { callWithTimeout } from '@opentelemetry/core';
 import type { Context } from '@opentelemetry/api';
 import type { LogRecordProcessor } from './LogRecordProcessor';
 import type { ReadWriteLogRecord } from './export/ReadWriteLogRecord';
-import type { SeverityNumber } from '@opentelemetry/api-logs';
+import type { SeverityNumber } from '@opentelemetry/api';
 import type { ForceFlushOptions } from './types';
 
 /**

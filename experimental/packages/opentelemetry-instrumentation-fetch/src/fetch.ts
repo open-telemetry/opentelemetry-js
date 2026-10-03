@@ -86,6 +86,7 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
 
 /**
  * This class represents a fetch plugin for auto instrumentation
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation#fetch
  */
 export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentationConfig> {
   readonly component: string = 'fetch';
@@ -129,8 +130,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       childSpan,
       corsPreFlightRequest,
       this.getConfig().ignoreNetworkEvents,
-      undefined,
-      true
+      undefined
     );
     childSpan.end(
       corsPreFlightRequest[web.PerformanceTimingNames.RESPONSE_END]
@@ -281,8 +281,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         span,
         mainRequest,
         this.getConfig().ignoreNetworkEvents,
-        undefined,
-        true
+        undefined
       );
     }
   }

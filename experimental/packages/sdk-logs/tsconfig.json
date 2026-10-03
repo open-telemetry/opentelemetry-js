@@ -28,9 +28,6 @@
     },
     {
       "path": "../../../semantic-conventions"
-    },
-    {
-      "path": "../api-logs"
     }
   ]
 }

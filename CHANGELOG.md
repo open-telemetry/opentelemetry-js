@@ -13,11 +13,16 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :boom: Breaking Changes
 
+* chore(sdk-trace-base, sdk-trace-web)!: remove the `@opentelemetry/sdk-trace-base` and `@opentelemetry/sdk-trace-web` packages [#7117](https://github.com/open-telemetry/opentelemetry-js/issues/7117)
+  * The sdk-trace-base, sdk-trace-web, and sdk-trace-node packages have been replaced by the `@opentelemetry/sdk-trace` package.
+    See the [3.x migration guide](doc/3.x/migration-guide.md) for full migration instructions.
+
 ### :rocket: Features
 
 ### :bug: Bug Fixes
 
 * fix(sdk-metrics): guard against a missing or empty name to MeterProvider#getMeter [#7105](https://github.com/open-telemetry/opentelemetry-js/pull/7105) @trentm
+* fix: resolve the ESM build through the `default` export condition instead of `import`, so a resolver that activates neither `import` nor `require` still finds an entry point [#7132](https://github.com/open-telemetry/opentelemetry-js/pull/7132) @overbalance
 
 ### :books: Documentation
 
@@ -25,6 +30,14 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 * chore: declare the Node.js and npm version floors that the tsdown build requires via `devEngines` [#7093](https://github.com/open-telemetry/opentelemetry-js/pull/7093) @overbalance
   * The migration to tsdown raised the toolchain a contributor needs to build this repo, but nothing declared it. Contributors now build on Node.js `^24.11.1 || >=26.0.0` with npm `>=11.10.0`; both are advisory and warn rather than fail. The published packages are unaffected and still support Node.js `>=22.15.0`, which the test matrix continues to cover.
+* test(bundler-tests): typecheck packages under legacy module resolution [#7127](https://github.com/open-telemetry/opentelemetry-js/pull/7127) @overbalance
+* chore: remove the redundant `module` field from `package.json`; bundlers resolve the ESM build through the `exports` map [#7130](https://github.com/open-telemetry/opentelemetry-js/pull/7130) @overbalance
+* test(bundler-tests): bundle the platform packages for iOS and Android with Metro and Expo, and load them under Jest's jsdom environment [#7131](https://github.com/open-telemetry/opentelemetry-js/pull/7131) @overbalance
+* fix(verify-pack): read the npm 12 `pack --json` output, which is keyed by package name instead of an array [#7133](https://github.com/open-telemetry/opentelemetry-js/pull/7133) @overbalance
+* fix(karma): resolve plugins and the `process` shim from the repo root, so browser tests run with isolated installs [#7137](https://github.com/open-telemetry/opentelemetry-js/pull/7137) @overbalance
+* fix(nx): key the `version` target defaults by the target name, so a cache hit restores the generated `src/version.ts` [#7134](https://github.com/open-telemetry/opentelemetry-js/pull/7134) @overbalance
+* fix(nx): make the `test`, `test:browser` and `test:webworker` targets compile their dependencies first, since tests load dependencies from their `dist` [#7139](https://github.com/open-telemetry/opentelemetry-js/pull/7139) @overbalance
+* fix(verify-pack): extract tarballs under the root `node_modules`, so workspace dependencies resolve and entry points load fully instead of being skipped [#7138](https://github.com/open-telemetry/opentelemetry-js/pull/7138) @overbalance
 
 ## 3.0.0-development.0
 
@@ -87,6 +100,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 * fix(sdk-trace-base): avoid a Webpack self-reference error in CommonJS output [#6981](https://github.com/open-telemetry/opentelemetry-js/issues/6981) @sansynx
 * fix(sdk-metrics): ignore `Infinity` in exponential histograms [#7015](https://github.com/open-telemetry/opentelemetry-js/pull/7015) @mwear
+* fix(core): cap tracestate list-members when calling `TraceState.set()` so a 32-member list cannot grow past the W3C limit [#6964](https://github.com/open-telemetry/opentelemetry-js/pull/6964) @Zuhef
 
 ### :house: Internal
 

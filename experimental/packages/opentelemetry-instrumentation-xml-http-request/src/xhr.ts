@@ -83,6 +83,7 @@ export interface XMLHttpRequestInstrumentationConfig
 
 /**
  * This class represents a XMLHttpRequest plugin for auto instrumentation
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation#xhr-xmlhttprequest
  */
 export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRequestInstrumentationConfig> {
   readonly component: string = 'xml-http-request';
@@ -154,8 +155,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         childSpan,
         corsPreFlightRequest,
         this.getConfig().ignoreNetworkEvents,
-        undefined,
-        true
+        undefined
       );
       childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
     });
@@ -295,8 +295,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         span,
         mainRequest,
         this.getConfig().ignoreNetworkEvents,
-        undefined,
-        true
+        undefined
       );
     }
   }

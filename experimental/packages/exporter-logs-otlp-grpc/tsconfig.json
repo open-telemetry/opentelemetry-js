@@ -16,9 +16,6 @@
       "path": "../../../packages/opentelemetry-resources"
     },
     {
-      "path": "../api-logs"
-    },
-    {
       "path": "../otlp-exporter-base"
     },
     {

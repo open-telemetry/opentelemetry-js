@@ -17,6 +17,8 @@ export type { SessionPublisher } from './types/SessionPublisher';
 export type { SessionObserver } from './types/SessionObserver';
 export type { SessionStore } from './types/SessionStore';
 
+// All the following exports are deprecated.
+// See https://github.com/open-telemetry/opentelemetry-js/issues/7114
 export type {
   PerformanceEntries,
   PerformanceLegacy,
@@ -30,6 +32,7 @@ export { PerformanceTimingNames } from './enums/PerformanceTimingNames';
 export {
   addSpanNetworkEvent,
   addSpanNetworkEvents,
+  getElementXPath,
   getResource,
   hasKey,
   normalizeUrl,

@@ -1,0 +1,27 @@
+{
+  "name": "bundler-tests-react-native-metro",
+  "private": true,
+  "scripts": {
+    "test:bundle": "npm i && node test-bundle.mjs"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "file:../../../api",
+    "@opentelemetry/core": "file:../../../packages/opentelemetry-core",
+    "@opentelemetry/exporter-logs-otlp-http": "file:../../../experimental/packages/exporter-logs-otlp-http",
+    "@opentelemetry/exporter-logs-otlp-proto": "file:../../../experimental/packages/exporter-logs-otlp-proto",
+    "@opentelemetry/exporter-metrics-otlp-http": "file:../../../experimental/packages/opentelemetry-exporter-metrics-otlp-http",
+    "@opentelemetry/exporter-metrics-otlp-proto": "file:../../../experimental/packages/opentelemetry-exporter-metrics-otlp-proto",
+    "@opentelemetry/exporter-trace-otlp-http": "file:../../../experimental/packages/exporter-trace-otlp-http",
+    "@opentelemetry/exporter-trace-otlp-proto": "file:../../../experimental/packages/exporter-trace-otlp-proto",
+    "@opentelemetry/exporter-zipkin": "file:../../../packages/opentelemetry-exporter-zipkin",
+    "@opentelemetry/instrumentation": "file:../../../experimental/packages/opentelemetry-instrumentation",
+    "@opentelemetry/resources": "file:../../../packages/opentelemetry-resources",
+    "@opentelemetry/sdk-logs": "file:../../../experimental/packages/sdk-logs",
+    "@opentelemetry/sdk-trace": "file:../../../packages/sdk-trace"
+  },
+  "devDependencies": {
+    "@babel/runtime": "^7",
+    "@react-native/metro-config": "^0.87",
+    "metro": "^0.87"
+  }
+}

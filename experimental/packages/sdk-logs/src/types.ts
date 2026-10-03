@@ -4,7 +4,7 @@
  */
 
 import type { Resource } from '@opentelemetry/resources';
-import type { SeverityNumber } from '@opentelemetry/api-logs';
+import type { SeverityNumber } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import type { MeterProvider } from '@opentelemetry/api';
 import type { LogRecordProcessor } from './LogRecordProcessor';

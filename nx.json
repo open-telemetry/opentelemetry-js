@@ -37,13 +37,28 @@
         "compile"
       ]
     },
+    "test": {
+      "dependsOn": [
+        "^compile"
+      ]
+    },
+    "test:browser": {
+      "dependsOn": [
+        "^compile"
+      ]
+    },
+    "test:webworker": {
+      "dependsOn": [
+        "^compile"
+      ]
+    },
     "lint": {
       "inputs": [
         "{projectRoot}/src/**/*.ts",
         "{projectRoot}/test/**/*.ts"
       ]
     },
-    "version:update": {
+    "version": {
       "inputs": [
         "{projectRoot}/package.json"
       ],

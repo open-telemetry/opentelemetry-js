@@ -20,7 +20,7 @@ import {
   TraceFlags,
 } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
-import { sanitizeAttributes, suppressTracing } from '@opentelemetry/core';
+import { cleanAttributes, suppressTracing } from '@opentelemetry/core';
 import * as assert from 'assert';
 import type { Sampler, Span, SpanProcessor } from '../../src';
 import { AlwaysOffSampler, AlwaysOnSampler, SamplingDecision } from '../../src';
@@ -37,6 +37,11 @@ function getTestTracerImpl(
   const tracerProvider = new TracerProvider({ sampler, spanProcessors });
   return tracerProvider.getTracer('default', '0.0.1') as Tracer;
 }
+
+const NO_ATTR_LIMITS = {
+  attributeCountLimit: Infinity,
+  attributeValueLengthLimit: Infinity,
+};
 
 describe('Tracer', () => {
   class TestSampler implements Sampler {
@@ -55,12 +60,17 @@ describe('Tracer', () => {
       links: Link[]
     ) {
       // The attributes object should be valid.
-      assert.deepStrictEqual(sanitizeAttributes(attributes), attributes);
+      const { attributes: cleanedAttrs } = cleanAttributes(
+        attributes,
+        NO_ATTR_LIMITS
+      );
+      assert.deepStrictEqual(cleanedAttrs, attributes);
       links.forEach(link => {
-        assert.deepStrictEqual(
-          sanitizeAttributes(link.attributes),
-          link.attributes
+        const { attributes: cleanedLinkAttrs } = cleanAttributes(
+          link.attributes,
+          NO_ATTR_LIMITS
         );
+        assert.deepStrictEqual(cleanedLinkAttrs, link.attributes);
       });
       return {
         decision: SamplingDecision.RECORD_AND_SAMPLED,
