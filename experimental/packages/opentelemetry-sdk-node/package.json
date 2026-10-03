@@ -86,7 +86,7 @@
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
     "mocha": "11.8.0",
-    "nyc": "17.1.0",
+    "nyc": "18.0.0",
     "sinon": "18.0.1",
     "ts-loader": "9.5.7",
     "typescript": "5.2.2"
