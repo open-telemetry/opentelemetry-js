@@ -4,6 +4,7 @@
  */
 import * as assert from 'assert';
 import { HttpInstrumentation } from '../../src/http';
+import { expectModulePatching } from '../utils/modulePatching';
 import type { AddressInfo } from 'net';
 import * as nock from 'nock';
 import * as sinon from 'sinon';
@@ -38,7 +39,10 @@ describe('HttpInstrumentation', () => {
       nock.cleanAll();
       nock.enableNetConnect();
       instrumentation.enable();
-      assert.strictEqual(isWrapped(http.Server.prototype.emit), true);
+      assert.strictEqual(
+        isWrapped(http.Server.prototype.emit),
+        expectModulePatching
+      );
       instrumentation.setTracerProvider(provider);
 
       server = http.createServer((request, response) => {
