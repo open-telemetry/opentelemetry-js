@@ -1,0 +1,17 @@
+{
+  "name": "logs-example",
+  "version": "0.211.0",
+  "private": true,
+  "scripts": {
+    "start": "node index.mjs",
+    "align-api-deps": "node ../../scripts/align-api-deps.mjs"
+  },
+  "// TODO: replace 'dependencies' with this once there are releases with GA sdk-logs": {
+    "@opentelemetry/api": "^1.9.1",
+    "@opentelemetry/sdk-logs": "3.0.0-development.0"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "../../api",
+    "@opentelemetry/sdk-logs": "../../sdk-logs"
+  }
+}

@@ -229,7 +229,7 @@ The current version for each package can be found in the respective `package.jso
 | ------- | ----------- | ----------- |
 | Tracing | Stable      | Stable      |
 | Metrics | Stable      | Stable      |
-| Logs    | Development | Development |
+| Logs    | Stable      | Stable      |
 
 For a more detailed breakdown of feature support see the [specification compliance matrix][compliance-matrix].
 

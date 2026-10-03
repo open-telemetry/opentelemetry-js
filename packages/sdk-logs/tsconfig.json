@@ -1,5 +1,5 @@
 {
-  "extends": "../../../tsconfig.base.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "lib": [
       "es2022",
@@ -15,19 +15,19 @@
   ],
   "references": [
     {
-      "path": "../../../api"
+      "path": "../../api"
     },
     {
-      "path": "../../../packages/opentelemetry-core"
+      "path": "../../packages/opentelemetry-core"
     },
     {
-      "path": "../../../packages/opentelemetry-resources"
+      "path": "../../packages/opentelemetry-resources"
     },
     {
-      "path": "../../../packages/sdk-metrics"
+      "path": "../../packages/sdk-metrics"
     },
     {
-      "path": "../../../semantic-conventions"
+      "path": "../../semantic-conventions"
     }
   ]
 }

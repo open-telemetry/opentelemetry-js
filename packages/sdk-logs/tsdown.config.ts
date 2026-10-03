@@ -1,5 +1,5 @@
 import { defineConfig } from 'tsdown';
-import baseConfig from '../../../tsdown.config.ts';
+import baseConfig from '../../tsdown.config.ts';
 
 // Platform barrels stay as entries so tsdown keeps the indirection in dist,
 // letting package.json#browser path-swap node->browser for bundlers.
