@@ -194,8 +194,8 @@ interface LoggerConfig {
   /** Drop logs from unsampled traces (default: false) */
   traceBased?: boolean;
 
-  /** Disable this logger completely (default: false) */
-  disabled?: boolean;
+  /** Enable this logger (default: true; false disables it completely) */
+  enabled?: boolean;
 }
 ```
 
