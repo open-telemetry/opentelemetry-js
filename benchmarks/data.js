@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1790987540494,
+  "lastUpdate": 1791184734045,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -114799,6 +114799,184 @@ window.BENCHMARK_DATA = {
             "range": "±0.96%",
             "unit": "ops/sec",
             "extra": "91 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "47067795+JacksonWeber@users.noreply.github.com",
+            "name": "Jackson Weber",
+            "username": "JacksonWeber"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "3244673499730d5f4c84b546630961f399fabed9",
+          "message": "test(sdk-metrics): fix concurrent forceFlush timing flake (#7162)\n\nSigned-off-by: Jackson Weber <jacksonweber@microsoft.com>\nCo-authored-by: Copilot App <223556219+Copilot@users.noreply.github.com>",
+          "timestamp": "2026-10-05T07:05:02Z",
+          "tree_id": "a932f423f25475609cb83a2e139b18a7d019ed73",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/3244673499730d5f4c84b546630961f399fabed9"
+        },
+        "date": 1791184732800,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "generateTraceId",
+            "value": 5949962,
+            "range": "±2.80%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "generateSpanId",
+            "value": 7981479,
+            "range": "±0.72%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 398808,
+            "range": "±1.03%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes w/ setAttributes)",
+            "value": 407039,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "addEvent (128 attributes)",
+            "value": 39008,
+            "range": "±0.98%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "addLink (128 attributes)",
+            "value": 34317,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 376388,
+            "range": "±0.37%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "parseBaggageHeaderString simple",
+            "value": 2842380,
+            "range": "±2.77%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "parseBaggageHeaderString with metadata",
+            "value": 3097137,
+            "range": "±0.70%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "parseBaggageHeaderString URI encoded",
+            "value": 3030856,
+            "range": "±0.84%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "parseBaggageHeaderString complex",
+            "value": 1511111,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "Counter.add (fixed attributes)",
+            "value": 19836779,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "Counter.add (varied attributes, 100 combos)",
+            "value": 17333367,
+            "range": "±2.89%",
+            "unit": "ops/sec",
+            "extra": "85 samples"
+          },
+          {
+            "name": "Counter.add (with view attribute processor)",
+            "value": 1884693,
+            "range": "±1.67%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "context.active() x100",
+            "value": 6840798,
+            "range": "±2.49%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "trace.getTracerProvider() x100",
+            "value": 15142175,
+            "range": "±0.82%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "transform 512 spans (protobuf)",
+            "value": 428,
+            "range": "±0.37%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 512 spans (json)",
+            "value": 756,
+            "range": "±2.32%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "transform 512 logs (protobuf)",
+            "value": 451,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 512 logs (json)",
+            "value": 846,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 512 metrics (protobuf)",
+            "value": 501,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "transform 512 metrics (json)",
+            "value": 453,
+            "range": "±0.48%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
           }
         ]
       }
