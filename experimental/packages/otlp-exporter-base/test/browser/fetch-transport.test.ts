@@ -5,7 +5,7 @@
 
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import { context } from '@opentelemetry/api';
+import { context, createContextKey } from '@opentelemetry/api';
 import { isTracingSuppressed } from '@opentelemetry/core';
 import { StackContextManager } from '@opentelemetry/sdk-trace';
 import { createFetchTransport } from '../../src/transport/fetch-transport';
@@ -16,7 +16,6 @@ import type {
   ExportResponseFailure,
   ExportResponseSuccess,
 } from '../../src';
-import { createContextKey } from '@opentelemetry/api';
 
 const testTransportParameters = {
   url: 'http://example.test',
@@ -41,7 +40,7 @@ const MAX_KEEPALIVE_BODY_SIZE = 60 * 1024;
 // 9 is the max concurrent keepalive requests
 const MAX_KEEPALIVE_REQUESTS = 9;
 // Only microtasks run after page unload: reach `fetch` within this many turns.
-const MAX_MICROTASKS_TURNS = 100;
+const MAX_MICROTASK_TURNS = 100;
 
 // Delivers one chunk, then stays open until the request is aborted.
 function neverEndingBodyAbortedBy(
@@ -160,7 +159,7 @@ describe('FetchTransport', function () {
             {
               foo: 'foo-value',
               bar: 'bar-value',
-              'Content-Type': 'application/json',
+              'content-type': 'application/json',
             }
           );
         } catch (e) {
@@ -1168,7 +1167,7 @@ describe('FetchTransport', function () {
 
     // `deflate` is a format `CompressionStream` supports but not an OTLP option.
     for (const compression of ['GZIP', 'deflate']) {
-      it(`sends uncompressed and warns once for an unsupported compression '${compression}'`, async function () {
+      it(`sends uncompressed and warns once for the unsupported compression '${compression}'`, async function () {
         // arrange
         const fetchStub = sinon
           .stub(globalThis, 'fetch')
@@ -1197,11 +1196,11 @@ describe('FetchTransport', function () {
       const fetchStub = sinon
         .stub(globalThis, 'fetch')
         .resolves(new Response('', { status: 200 }));
-      const transport = createFetchTransport(testTransportParameters);
+      const transport = createFetchTransport(gzipTransportParameters);
 
       // act
       const sent = transport.send(testPayload, requestTimeout);
-      for (let i = 0; i < MAX_MICROTASKS_TURNS && !fetchStub.called; i++) {
+      for (let i = 0; i < MAX_MICROTASK_TURNS && !fetchStub.called; i++) {
         await Promise.resolve();
       }
 
