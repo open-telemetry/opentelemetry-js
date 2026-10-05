@@ -16,6 +16,7 @@ import type {
   ExportResponseFailure,
   ExportResponseSuccess,
 } from '../../src';
+import { createContextKey } from '@opentelemetry/api';
 
 const testTransportParameters = {
   url: 'http://example.test',
@@ -24,6 +25,12 @@ const testTransportParameters = {
     bar: 'bar-value',
     'Content-Type': 'application/json',
   }),
+  compression: 'none' as const,
+};
+
+const gzipTransportParameters = {
+  ...testTransportParameters,
+  compression: 'gzip' as const,
 };
 
 const requestTimeout = 1000;
@@ -33,6 +40,8 @@ const testPayload = Uint8Array.from([1, 2, 3]);
 const MAX_KEEPALIVE_BODY_SIZE = 60 * 1024;
 // 9 is the max concurrent keepalive requests
 const MAX_KEEPALIVE_REQUESTS = 9;
+// Only microtasks run after page unload: reach `fetch` within this many turns.
+const MAX_MICROTASKS_TURNS = 100;
 
 // Delivers one chunk, then stays open until the request is aborted.
 function neverEndingBodyAbortedBy(
@@ -54,6 +63,13 @@ function neverEndingBodyAbortedBy(
       signal?.addEventListener('abort', abort);
     },
   });
+}
+
+async function gunzip(body: BodyInit | null | undefined): Promise<Uint8Array> {
+  const stream = new Blob([body as BlobPart])
+    .stream()
+    .pipeThrough(new DecompressionStream('gzip'));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
 }
 
 // The drain settles after `send()` resolves; a macrotask turn flushes it.
@@ -135,12 +151,16 @@ describe('FetchTransport', function () {
             testTransportParameters.url,
             {
               method: 'POST',
-              headers: {
-                foo: 'foo-value',
-                bar: 'bar-value',
-                'Content-Type': 'application/json',
-              },
               body: testPayload,
+            }
+          );
+          const requestInit = fetchStub.firstCall.args[1] as RequestInit;
+          assert.deepStrictEqual(
+            Object.fromEntries(new Headers(requestInit.headers)),
+            {
+              foo: 'foo-value',
+              bar: 'bar-value',
+              'Content-Type': 'application/json',
             }
           );
         } catch (e) {
@@ -351,6 +371,27 @@ describe('FetchTransport', function () {
         }
         done();
       }, done /* catch any rejections */);
+    });
+
+    it('keeps the caller context for the fetch call when the body is compressed first', async function () {
+      const key = createContextKey('caller-context-key');
+      let callerValueDuringFetch: unknown;
+      let suppressedDuringFetch: boolean | undefined;
+      sinon.stub(globalThis, 'fetch').callsFake(() => {
+        callerValueDuringFetch = context.active().getValue(key);
+        suppressedDuringFetch = isTracingSuppressed(context.active());
+        return Promise.resolve(new Response('', { status: 200 }));
+      });
+      const transport = createFetchTransport(gzipTransportParameters);
+
+      const response = await context.with(
+        context.active().setValue(key, 'caller-value'),
+        () => transport.send(testPayload, requestTimeout)
+      );
+
+      assert.strictEqual(response.status, 'success');
+      assert.strictEqual(callerValueDuringFetch, 'caller-value');
+      assert.strictEqual(suppressedDuringFetch, true);
     });
 
     it('suppresses tracing on retries, which run from a timer', function (done) {
@@ -1073,6 +1114,251 @@ describe('FetchTransport', function () {
         true,
         'keepalive should be re-enabled after failed request completes'
       );
+    });
+  });
+
+  describe('compression', function () {
+    function contentEncodingOf(requestInit: RequestInit): string | null {
+      return new Headers(requestInit.headers).get('Content-Encoding');
+    }
+
+    function assertSentUncompressed(fetchStub: sinon.SinonStub): void {
+      for (const call of fetchStub.getCalls()) {
+        const requestInit = call.args[1] as RequestInit;
+        assert.strictEqual(requestInit.body, testPayload);
+        assert.strictEqual(contentEncodingOf(requestInit), null);
+      }
+    }
+
+    it('sends a gzip-compressed body with a Content-Encoding header', async function () {
+      // arrange
+      const fetchStub = sinon
+        .stub(globalThis, 'fetch')
+        .resolves(new Response('', { status: 200 }));
+      const transport = createFetchTransport(gzipTransportParameters);
+
+      // act
+      const result = await transport.send(testPayload, requestTimeout);
+
+      // assert
+      assert.strictEqual(result.status, 'success');
+      const requestInit = fetchStub.firstCall.args[1] as RequestInit;
+      assert.deepStrictEqual(await gunzip(requestInit.body), testPayload);
+      const headers = new Headers(requestInit.headers);
+      assert.strictEqual(headers.get('Content-Encoding'), 'gzip');
+      assert.strictEqual(headers.get('foo'), 'foo-value');
+      assert.strictEqual(headers.get('Content-Type'), 'application/json');
+    });
+
+    it('sends the body as-is without a Content-Encoding header when compression is none', async function () {
+      // arrange
+      const fetchStub = sinon
+        .stub(globalThis, 'fetch')
+        .resolves(new Response('', { status: 200 }));
+      const transport = createFetchTransport(testTransportParameters);
+
+      // act
+      await transport.send(testPayload, requestTimeout);
+
+      // assert
+      const requestInit = fetchStub.firstCall.args[1] as RequestInit;
+      assert.strictEqual(requestInit.body, testPayload);
+      assert.strictEqual(contentEncodingOf(requestInit), null);
+    });
+
+    // `deflate` is a format `CompressionStream` supports but not an OTLP option.
+    for (const compression of ['GZIP', 'deflate']) {
+      it(`sends uncompressed and warns once for an unsupported compression '${compression}'`, async function () {
+        // arrange
+        const fetchStub = sinon
+          .stub(globalThis, 'fetch')
+          .resolves(new Response('', { status: 200 }));
+        const { warn } = registerMockDiagLogger();
+        const transport = createFetchTransport({
+          ...testTransportParameters,
+          compression: compression as 'gzip',
+        });
+
+        // act
+        await transport.send(testPayload, requestTimeout);
+        await transport.send(testPayload, requestTimeout);
+
+        // assert
+        assertSentUncompressed(fetchStub);
+        sinon.assert.calledOnceWithMatch(
+          warn,
+          `compression '${compression}' is not supported`
+        );
+      });
+    }
+
+    it('calls fetch without waiting for a task, so an export started on page unload is still sent', async function () {
+      // arrange
+      const fetchStub = sinon
+        .stub(globalThis, 'fetch')
+        .resolves(new Response('', { status: 200 }));
+      const transport = createFetchTransport(testTransportParameters);
+
+      // act
+      const sent = transport.send(testPayload, requestTimeout);
+      for (let i = 0; i < MAX_MICROTASKS_TURNS && !fetchStub.called; i++) {
+        await Promise.resolve();
+      }
+
+      // assert
+      sinon.assert.calledOnce(fetchStub);
+      await sent;
+    });
+
+    it('charges the keepalive budget with the compressed size', async function () {
+      // arrange
+      // Over the keepalive limit before compression, far under it after.
+      const compressiblePayload = new Uint8Array(MAX_KEEPALIVE_BODY_SIZE * 2);
+      const pending = responseWithPendingBody();
+      const fetchStub = sinon.stub(globalThis, 'fetch');
+      fetchStub.onCall(0).resolves(pending.response);
+      fetchStub.onCall(1).resolves(new Response('', { status: 200 }));
+
+      try {
+        // act - the first request holds its budget until its body drains
+        await createFetchTransport(gzipTransportParameters).send(
+          compressiblePayload,
+          requestTimeout
+        );
+        // Fits only if the first request was charged its compressed size
+        await createFetchTransport(testTransportParameters).send(
+          new Uint8Array(MAX_KEEPALIVE_BODY_SIZE - 1024),
+          requestTimeout
+        );
+
+        // assert
+        assert.strictEqual(
+          (fetchStub.firstCall.args[1] as RequestInit).keepalive,
+          true
+        );
+        assert.strictEqual(
+          (fetchStub.secondCall.args[1] as RequestInit).keepalive,
+          true
+        );
+      } finally {
+        // An open body would keep the budget charged for the next tests.
+        pending.closeBody();
+      }
+    });
+
+    it('replaces a user-provided Content-Encoding header in any letter case', async function () {
+      // arrange
+      const fetchStub = sinon
+        .stub(globalThis, 'fetch')
+        .resolves(new Response('', { status: 200 }));
+      const transport = createFetchTransport({
+        ...gzipTransportParameters,
+        headers: async () => ({
+          'Content-Type': 'application/json',
+          'content-encoding': 'identity',
+        }),
+      });
+
+      // act
+      await transport.send(testPayload, requestTimeout);
+
+      // assert
+      const requestInit = fetchStub.firstCall.args[1] as RequestInit;
+      assert.strictEqual(contentEncodingOf(requestInit), 'gzip');
+    });
+
+    for (const [runtime, compressionStream] of [
+      ['has no CompressionStream', undefined],
+      [
+        'cannot gzip with CompressionStream',
+        class {
+          constructor() {
+            throw new TypeError('Unsupported compression format');
+          }
+        },
+      ],
+    ] as const) {
+      it(`sends uncompressed and warns once when the runtime ${runtime}`, async function () {
+        // arrange
+        sinon.stub(globalThis, 'CompressionStream').value(compressionStream);
+        const fetchStub = sinon
+          .stub(globalThis, 'fetch')
+          .resolves(new Response('', { status: 200 }));
+        const { warn } = registerMockDiagLogger();
+        const transport = createFetchTransport(gzipTransportParameters);
+
+        // act
+        await transport.send(testPayload, requestTimeout);
+        await transport.send(testPayload, requestTimeout);
+
+        // assert
+        assertSentUncompressed(fetchStub);
+        sinon.assert.calledOnceWithMatch(
+          warn,
+          "compression 'gzip' is not supported"
+        );
+      });
+    }
+
+    it('sends uncompressed and warns on every request whose compression fails mid-stream', async function () {
+      // arrange
+      sinon.stub(globalThis, 'CompressionStream').value(
+        class extends TransformStream<Uint8Array, Uint8Array> {
+          constructor() {
+            super({
+              transform() {
+                throw new Error('compression failed');
+              },
+            });
+          }
+        }
+      );
+      const fetchStub = sinon
+        .stub(globalThis, 'fetch')
+        .resolves(new Response('', { status: 200 }));
+      const { warn } = registerMockDiagLogger();
+      const transport = createFetchTransport(gzipTransportParameters);
+
+      // act
+      const results = [
+        await transport.send(testPayload, requestTimeout),
+        await transport.send(testPayload, requestTimeout),
+      ];
+
+      // assert
+      assert.deepStrictEqual(
+        results.map(result => result.status),
+        ['success', 'success']
+      );
+      assertSentUncompressed(fetchStub);
+      sinon.assert.calledTwice(warn);
+      sinon.assert.alwaysCalledWithMatch(warn, 'gzip compression failed');
+    });
+
+    it('compresses the body again on retry', async function () {
+      // arrange
+      const fetchStub = sinon.stub(globalThis, 'fetch');
+      fetchStub
+        .onCall(0)
+        .resolves(
+          new Response('', { status: 503, headers: { 'Retry-After': '0' } })
+        );
+      fetchStub.onCall(1).resolves(new Response('', { status: 200 }));
+      const transport = createRetryingTransport({
+        transport: createFetchTransport(gzipTransportParameters),
+      });
+
+      // act
+      const result = await transport.send(testPayload, requestTimeout);
+
+      // assert
+      assert.strictEqual(result.status, 'success');
+      assert.strictEqual(fetchStub.callCount, 2);
+      for (const call of fetchStub.getCalls()) {
+        const requestInit = call.args[1] as RequestInit;
+        assert.deepStrictEqual(await gunzip(requestInit.body), testPayload);
+        assert.strictEqual(contentEncodingOf(requestInit), 'gzip');
+      }
     });
   });
 
