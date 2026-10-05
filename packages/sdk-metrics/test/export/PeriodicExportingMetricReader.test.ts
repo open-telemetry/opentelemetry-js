@@ -33,6 +33,7 @@ import {
   DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
 } from '../../src/export/AggregationSelector';
 import { ValueType, diag } from '@opentelemetry/api';
+import { testResource } from '../util';
 
 const MAX_32_BIT_INT = 2 ** 31 - 1;
 
@@ -644,6 +645,7 @@ describe('PeriodicExportingMetricReader', () => {
     // to ensure that p3 piggybacks on the fresh export started by p2,
     // rather than starting a third one.
     it('should reuse concurrent fresh export if started while waiting', async () => {
+      const clock = sinon.useFakeTimers();
       const events: string[] = [];
       const exporter = new TestMetricExporter();
       exporter.export = (metrics, callback) => {
@@ -664,20 +666,33 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       reader.setMetricProducer(
-        new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+        new TestMetricProducer({
+          resourceMetrics: { resource: testResource, scopeMetrics },
+          errors: [],
+        })
       );
 
       // Start p1 (export 1)
       const p1 = reader.forceFlush();
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await clock.tickAsync(10);
+      assert.deepStrictEqual(events, ['export start']);
 
       // Start p2 (will wait for p1, then start export 2)
       const p2 = reader.forceFlush();
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await clock.tickAsync(10);
 
       // Start p3 (will wait for p1, and should then wait for p2's export instead of starting export 3)
       const p3 = reader.forceFlush();
 
+      await clock.tickAsync(30);
+      assert.deepStrictEqual(events, [
+        'export start',
+        'export end',
+        'forceFlush start',
+        'export start',
+      ]);
+
+      await clock.tickAsync(50);
       await Promise.all([p1, p2, p3]);
 
       assert.deepStrictEqual(events, [
@@ -690,7 +705,9 @@ describe('PeriodicExportingMetricReader', () => {
         'forceFlush start',
       ]);
 
-      await reader.shutdown();
+      const shutdown = reader.shutdown();
+      await clock.tickAsync(50);
+      await shutdown;
     });
   });
 
