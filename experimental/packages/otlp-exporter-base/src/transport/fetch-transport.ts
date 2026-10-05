@@ -309,7 +309,7 @@ function isCompressionStreamFormatSupported(
   format: CompressionFormat
 ): boolean {
   try {
-    new CompressionStream(format);
+    new globalThis.CompressionStream(format);
     return true;
   } catch {
     return false;
@@ -328,7 +328,7 @@ async function compressWithCompressionStream(
       controller.close();
     },
   })
-    .pipeThrough(new CompressionStream(format))
+    .pipeThrough(new globalThis.CompressionStream(format))
     .getReader();
 
   const chunks: Uint8Array[] = [];
