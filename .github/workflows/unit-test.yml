@@ -10,7 +10,45 @@ permissions:
   contents: read
 
 jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+          node-version: ^26.3.0
+
+      - name: Bootstrap
+        run: npm ci --ignore-scripts
+
+      - name: Build 🔧
+        run: npm run compile
+
+      # Nx's local cache is machine-bound; share only the build outputs.
+      - name: Upload compiled packages
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: compiled-packages-${{ github.run_id }}
+          path: |
+            **/dist
+            **/build
+            **/src/version.ts
+            !**/node_modules/**
+            !.nx/**
+          include-hidden-files: true
+          if-no-files-found: error
+          overwrite: true
+          retention-days: 1
+
   node-tests:
+    needs: compile
     strategy:
       fail-fast: false
       matrix:
@@ -36,17 +74,23 @@ jobs:
       - name: Bootstrap
         run: npm ci --ignore-scripts
 
-      - name: Build 🔧
-        run: npm run compile
+      - name: Generate protocol fixtures
+        run: npm run precompile
 
-      # The compile above runs on the repo's pinned build Node (^26.3.0).
-      # Switch to the matrix Node version so tests exercise every supported
-      # runtime.
+      - name: Download compiled packages
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: compiled-packages-${{ github.run_id }}
+          path: .
+
+      # The build runs on the repo's pinned Node (^26.3.0). Switch to the matrix
+      # version so tests exercise every supported runtime.
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: ${{ matrix.node_version }}
 
-      - run: npm test
+      # The compile job already satisfies the tests' build dependencies.
+      - run: npm test -- --excludeTaskDependencies
 
       - name: Report Coverage
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6.0.2
