@@ -23,6 +23,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :rocket: Features
 
+* feat(instrumentation-http): add an experimental `useDiagnosticsChannel` option [#6947](https://github.com/open-telemetry/opentelemetry-js/pull/6947) @YangJonghun
 * refactor!(api-logs): remove AnyValue-related types in favor of new types in the `api` package [#6780](https://github.com/open-telemetry/opentelemetry-js/pull/6780) @trentm
   * The `AnyValue`, `LogBody`, and `LogAttributes` types are no longer exported by the `api-logs` package.
     Instead, use the `AnyValue` and `Attributes` types from the latest `@opentelemetry/api` package.
