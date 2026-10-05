@@ -11,11 +11,11 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :rocket: Features
 
-* feat(otlp-exporter-base): gzip request bodies in the browser fetch transport when `compression` is `gzip`
-  * Compression uses the built-in `CompressionStream` API. Runtimes without gzip support in `CompressionStream` send uncompressed requests and log a warning once per exporter.
+* feat(otlp-exporter-base): support the `compression` option in browser OTLP HTTP exporters
+  * `compression: CompressionAlgorithm.GZIP` gzips export requests with the built-in `CompressionStream` API, as Node.js exporters already do. Runtimes without gzip support in `CompressionStream` send uncompressed requests and log a warning once per exporter.
   * The keepalive budget is charged with the compressed size, so more telemetry fits into the requests that survive page unload.
+  * A `compression` option passed to browser exporters or to the deprecated `createOtlpSendBeaconExportDelegate()` was previously ignored but is now applied.
   * Cross-origin collectors must list `Content-Encoding` in `Access-Control-Allow-Headers`.
-  * The deprecated `createOtlpSendBeaconExportDelegate()` now applies the `compression` option it is given instead of ignoring it.
 
 ### :bug: Bug Fixes
 

@@ -25,12 +25,6 @@ export interface OTLPExporterNodeConfigBase extends OTLPExporterConfigBase {
    */
   keepAlive?: boolean;
   /**
-   * Compression algorithm for outgoing OTLP HTTP requests.
-   *
-   * @defaultValue CompressionAlgorithm.NONE
-   */
-  compression?: CompressionAlgorithm;
-  /**
    * Custom HTTP agent options or a factory function for creating agents.
    *
    * @remarks
@@ -59,9 +53,4 @@ export interface OTLPExporterNodeConfigBase extends OTLPExporterConfigBase {
    * Ref: https://opentelemetry.io/docs/specs/otel/protocol/exporter/#user-agent
    */
   userAgent?: string;
-}
-
-export enum CompressionAlgorithm {
-  NONE = 'none',
-  GZIP = 'gzip',
 }
