@@ -9,6 +9,16 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: Features
 
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 1.10.0-development.0
+
+### :rocket: Features
+
 * feat(api): integrate the Logs API into `@opentelemetry/api` [#4862](https://github.com/open-telemetry/opentelemetry-js/pull/4862) @hectorhdzg
 * feat(api): add imperative `context.attach()` for setting context across callback boundaries that `with()` cannot wrap. [#6845](https://github.com/open-telemetry/opentelemetry-js/pull/6845) @pichlermarc
   * `attach()` returns a `Token` whose `dispose()` method restores the previous context. Use `token.dispose()` to detach.
