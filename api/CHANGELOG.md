@@ -15,7 +15,7 @@ All notable changes to this project will be documented in this file.
 
 ### :house: Internal
 
-## 1.10.0-development.0
+## 1.10.0-development.1
 
 ### :rocket: Features
 
