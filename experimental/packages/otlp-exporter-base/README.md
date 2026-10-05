@@ -49,7 +49,7 @@ Node.js exporters read these environment variables:
 | `httpAgentOptions.key`  | `OTEL_EXPORTER_OTLP_CLIENT_KEY`         | `OTEL_EXPORTER_OTLP_{TRACES,METRICS,LOGS}_CLIENT_KEY`                                                                    |
 | `userAgent`             | Not supported                           | Not supported                                                                                                            |
 
-Browser exporters gzip with the built-in `CompressionStream` API and send uncompressed requests in runtime without it. A cross-origin collector must list `Content-Encoding` in `Access-Control-Allow-Headers` for them.
+Browser exporters gzip with the built-in `CompressionStream` API and send uncompressed requests in runtimes without it. A cross-origin collector must list `Content-Encoding` in `Access-Control-Allow-Headers` for them.
 
 ## GRPC
 

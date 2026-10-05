@@ -138,7 +138,7 @@ class FetchTransport implements IExporterTransport {
       // Resolve headers before entering the suppressed fetch context.
       const headers = new Headers(await this._parameters.headers());
       if (compressed) {
-        headers.set('Content-Encoding', 'gzip');
+        headers.set('Content-Encoding', this._compression);
       }
       const response = await context.with(suppressedContext, () =>
         fetchApi(url.href, {
@@ -291,7 +291,8 @@ async function drainResponseBody(response: Response): Promise<void> {
 }
 
 /**
- * Whether `value` is an OTLP compression this runtime can apply with `CompressionStream`.
+ * Whether `value` is an OTLP compression this runtime can apply with
+ * `CompressionStream`.
  */
 function isSupportedCompression(value: string): value is SupportedCompression {
   return (
@@ -319,8 +320,8 @@ async function compressWithCompressionStream(
   data: Uint8Array,
   format: CompressionFormat
 ): Promise<Blob> {
-  // Read with a stream reader: `Response.arrayBuffer()` waits for a task in some
-  // engines, which never runs once the page unloads.
+  // Read with a stream reader: `Response.arrayBuffer()` waits for a task in
+  // some engines, which never runs once the page unloads.
   const reader = new ReadableStream<Uint8Array>({
     start(controller) {
       controller.enqueue(data);
@@ -329,6 +330,7 @@ async function compressWithCompressionStream(
   })
     .pipeThrough(new CompressionStream(format))
     .getReader();
+
   const chunks: Uint8Array[] = [];
   for (;;) {
     const { done, value } = await reader.read();
