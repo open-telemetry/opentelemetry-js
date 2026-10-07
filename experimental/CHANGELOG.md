@@ -26,6 +26,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 * feat(instrumentation): add `isEnabled()` to the browser `InstrumentationBase`, matching Node.js [#7140](https://github.com/open-telemetry/opentelemetry-js/pull/7140) @overbalance
   * `FetchInstrumentation` and `XMLHttpRequestInstrumentation` override it to report whether they are active, which stays false when patching throws.
+* feat(otlp-exporter-base): add a `maxRequestSize` option (default 64 MiB, `0` disables); OTLP exporters drop larger requests instead of sending them [#7167](https://github.com/open-telemetry/opentelemetry-js/pull/7167) @DavidTraina
 
 ### :bug: Bug Fixes
 
