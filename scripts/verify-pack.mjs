@@ -6,9 +6,11 @@
 
 // Packs every publishable workspace package, then loads the require/import
 // targets of every `exports` and `imports` entry (or main/module) from the
-// extracted tarball and existence-checks types/main/module files. Catches
-// broken `exports`/`imports` maps, missing files in `files`, and CJS/ESM
-// interop bugs that unit tests (which run against TS source) can't see.
+// extracted tarball and existence-checks types/main/module files. Then resolves
+// every node-conditional specifier with and without the node condition. Catches
+// broken `exports`/`imports` maps, condition-order mistakes, missing files in
+// `files`, and CJS/ESM interop bugs that unit tests (which run against TS
+// source) can't see.
 
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
@@ -18,6 +20,8 @@ import {
   readFileSync,
   rmSync,
   existsSync,
+  realpathSync,
+  writeFileSync,
 } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -88,6 +92,7 @@ for (const { dir, pkg } of targets) {
         failures.push(`${label} :: exports "${subpath}" falls back to ${fallback}, not the import target ${esm}`);
       }
     }
+    checkConditions(extracted, pkg, label);
     console.log(failures.length === failuresBefore ? `  ok   ${label}` : `  FAIL ${label}`);
   } catch (err) {
     failures.push(`${label} :: pack/extract failed: ${err.message}`);
@@ -250,4 +255,82 @@ function visit(push, subpath, node, cond) {
       visit(push, subpath, child, key === 'default' ? cond : key);
     }
   }
+}
+
+// Node picks the first matching key, so a node branch placed after
+// import/require loads fine yet is unreachable. Resolve from inside the
+// extracted package and compare with the branch the map names.
+function checkConditions(extracted, pkg, label) {
+  const specs = [];
+  // Without a node key every resolver, Node included, gets the browser build.
+  if (pkg.imports?.['#platform'] && !pkg.imports['#platform'].node) {
+    failures.push(`${label} :: imports "#platform" has no node branch`);
+  }
+  for (const [key, map] of Object.entries(pkg.imports ?? {})) {
+    if (map?.node) specs.push({ spec: key, map });
+  }
+  for (const [sub, map] of Object.entries(subpathMap(pkg.exports))) {
+    if (map?.node) specs.push({ spec: pkg.name + sub.slice(1), map });
+  }
+  if (specs.length === 0) return;
+  // Node reports real paths, so compare against the real path of `extracted`.
+  const root = realpathSync(extracted);
+
+  const probe = path.join(extracted, '__verify-pack-probe.mjs');
+  writeFileSync(
+    probe,
+    [
+      "import { createRequire } from 'node:module';",
+      "import { fileURLToPath } from 'node:url';",
+      'const require = createRequire(import.meta.url);',
+      'const specs = JSON.parse(process.argv[2]);',
+      'console.log(JSON.stringify(specs.map(s => ({',
+      '  import: fileURLToPath(import.meta.resolve(s)),',
+      '  require: require.resolve(s),',
+      '}))));',
+    ].join('\n')
+  );
+  let resolved;
+  try {
+    const out = execFileSync(
+      process.execPath,
+      [probe, JSON.stringify(specs.map(s => s.spec))],
+      { cwd: extracted, encoding: 'utf8' }
+    );
+    resolved = JSON.parse(out);
+  } catch (err) {
+    failures.push(`${label} :: resolving [node] threw: ${err.message}`);
+    return;
+  }
+  specs.forEach(({ spec, map }, i) => {
+    const nodeTargets = leaves(map.node);
+    for (const kind of ['import', 'require']) {
+      const nodeTarget = leaf(map.node, kind);
+      const expected = path.resolve(root, nodeTarget ?? '');
+      if (resolved[i][kind] !== expected) {
+        failures.push(
+          `${label} :: ${kind}("${spec}") [node] -> ` +
+            `${path.relative(root, resolved[i][kind])}, expected ${path.relative(root, expected)}`
+        );
+      }
+      // Node always activates node, so simulate the resolvers that do not.
+      const fallback = resolveConditions(map, new Set([kind]));
+      if (fallback === undefined || nodeTargets.includes(fallback)) {
+        failures.push(`${label} :: ${kind}("${spec}") without node -> ${fallback ?? 'nothing'}, expected a non-node target`);
+      }
+    }
+  });
+}
+
+// The target a resolver with only `kind` active reaches in a condition map.
+function leaf(node, kind) {
+  if (typeof node === 'string') return node;
+  if (!node || typeof node !== 'object') return undefined;
+  return leaf(node[kind] ?? node.default, kind);
+}
+
+function leaves(node) {
+  if (typeof node === 'string') return [node];
+  if (!node || typeof node !== 'object') return [];
+  return Object.values(node).flatMap(leaves);
 }
