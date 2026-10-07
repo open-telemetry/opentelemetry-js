@@ -11,6 +11,7 @@ import Metro from 'metro';
 
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 const entry = 'src/index.js';
+const NODE_IMPL = /[\\/]dist[\\/](?:.+[\\/])?platform[\\/]node[\\/]/;
 const packages = [
   ...readFileSync(path.join(projectRoot, entry), 'utf8').matchAll(/^import '(.+)';$/gm),
 ].map(m => m[1]);
@@ -50,7 +51,7 @@ for (const platform of ['ios', 'android']) {
     continue;
   }
   for (const file of bundled) {
-    if (/[\\/]dist[\\/]platform[\\/]node[\\/]/.test(file)) {
+    if (NODE_IMPL.test(file)) {
       failures.push(`${platform}: bundled node implementation ${file}`);
     }
   }

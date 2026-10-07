@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 const outDir = path.join(projectRoot, 'dist');
+const NODE_IMPL = /[\\/]dist[\\/](?:.+[\\/])?platform[\\/]node[\\/]/;
 const packages = [
   ...readFileSync(path.join(projectRoot, 'src/index.js'), 'utf8').matchAll(/^import '(.+)';$/gm),
 ].map(m => m[1]);
@@ -44,7 +45,7 @@ for (const platform of platforms) {
     file => path.join(projectRoot, file)
   );
   for (const file of bundled) {
-    if (/[\\/]dist[\\/]platform[\\/]node[\\/]/.test(file)) {
+    if (NODE_IMPL.test(file)) {
       failures.push(`${platform}: bundled node implementation ${file}`);
     }
   }
