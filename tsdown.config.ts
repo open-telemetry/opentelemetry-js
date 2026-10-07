@@ -22,8 +22,8 @@ export default defineConfig({
     // The .d.ts must not reference #platform, which node10 consumers cannot resolve.
     dts: { neverBundle: [] },
   },
-  // The tsc resolver follows the tsconfig otel condition to the node barrel.
-  // The oxc default hardcodes its conditions.
+  // The tsc resolver follows the tsconfig otel condition to the node barrel; the default
+  // dts-resolver hardcodes types/typings/import/require, which reach the browser dist.
   dts: hasPlatform ? { resolver: 'tsc' } : undefined,
   outExtensions: ({ format }) => ({
     js: format === 'cjs' ? '.cjs' : '.mjs',

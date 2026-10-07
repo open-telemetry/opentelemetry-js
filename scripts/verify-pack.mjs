@@ -171,8 +171,8 @@ function collectEntries(pkg) {
   for (const field of ['main', 'module', 'types']) {
     if (typeof pkg[field] === 'string') push('exists', `#${field}`, pkg[field]);
   }
-  // Node only loads the node branch through the root entry, so load each
-  // browser barrel directly. The otel branch points at src, which is not packed.
+  // Node reaches only the node branch through the root entry, so load every imports
+  // leaf directly. The otel branch points at src, which is not packed.
   for (const [specifier, map] of Object.entries(pkg.imports ?? {})) {
     visit(push, specifier, map && typeof map === 'object' ? { ...map, otel: undefined } : map, null);
   }
@@ -337,7 +337,8 @@ function checkDeclarations(extracted, label) {
   }
 }
 
-// The target a resolver with only `kind` active reaches in a condition map.
+// The `kind` (else `default`) target of a condition map, ignoring key order: a `default`
+// listed before `kind` makes Node's pick differ and fail the compare.
 function leaf(node, kind) {
   if (typeof node === 'string') return node;
   if (!node || typeof node !== 'object') return undefined;
