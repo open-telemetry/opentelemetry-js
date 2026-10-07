@@ -15,6 +15,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 * feat!: replace the top-level `browser` field in `package.json` with `#platform` subpath imports [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
   * Resolvers that apply the `node` condition, such as Node.js, load the Node.js implementation. All others, including browsers, web workers, edge runtimes and React Native, load the browser implementation with no configuration. Bundlers without `imports` support fail to resolve `#platform`; see the migration guide.
+  * webpack 5 needs `enhanced-resolve` 5.8.2 or later, which webpack 5.54 and later require.
+  * Parcel needs package exports enabled, and cannot resolve `#platform` from CommonJS `require()`.
   * The package roots' type declarations describe the Node.js implementation.
 * feat(resources)!: remove the `./detectors/platform` and `./detectors/platform/browser` subpath exports [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
   * Import the detectors from the package root instead.
