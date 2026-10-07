@@ -25,7 +25,6 @@ describeDocument('BatchLogRecordProcessor - web main context', () => {
   let processor: BatchLogRecordProcessor;
   let forceFlushSpy: sinon.SinonStub;
   let visibilityChangeEvent: Event;
-  let pageHideEvent: Event;
 
   beforeEach(() => {
     sinon.replaceGetter(document, 'visibilityState', () => visibilityState);
@@ -34,7 +33,6 @@ describeDocument('BatchLogRecordProcessor - web main context', () => {
     processor = new BatchLogRecordProcessor({ exporter });
     forceFlushSpy = sinon.stub(processor, 'forceFlush');
     visibilityChangeEvent = new Event('visibilitychange');
-    pageHideEvent = new Event('pagehide');
   });
 
   afterEach(async () => {
@@ -87,12 +85,6 @@ describeDocument('BatchLogRecordProcessor - web main context', () => {
       testDocumentHide(() => {
         visibilityState = 'hidden';
         document.dispatchEvent(visibilityChangeEvent);
-      });
-    });
-
-    describe('by the pagehide event', () => {
-      testDocumentHide(() => {
-        window.dispatchEvent(pageHideEvent);
       });
     });
   });

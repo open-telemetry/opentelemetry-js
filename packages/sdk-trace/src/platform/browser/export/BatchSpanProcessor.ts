@@ -9,7 +9,6 @@ import { globalErrorHandler } from '@opentelemetry/core';
 
 export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcessorBrowserOptions> {
   private _visibilityChangeListener?: () => void;
-  private _pageHideListener?: () => void;
 
   constructor(options: BatchSpanProcessorBrowserOptions) {
     super(options);
@@ -28,21 +27,10 @@ export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcesso
           });
         }
       };
-      this._pageHideListener = () => {
-        this.forceFlush().catch(error => {
-          globalErrorHandler(error);
-        });
-      };
       document.addEventListener(
         'visibilitychange',
         this._visibilityChangeListener
       );
-
-      // use 'pagehide' event as a fallback for Safari; see https://bugs.webkit.org/show_bug.cgi?id=116769
-      // 'pagehide' is dispatched on the window and does not reach the document
-      if (typeof window !== 'undefined') {
-        window.addEventListener('pagehide', this._pageHideListener);
-      }
     }
   }
 
@@ -53,9 +41,6 @@ export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcesso
           'visibilitychange',
           this._visibilityChangeListener
         );
-      }
-      if (this._pageHideListener && typeof window !== 'undefined') {
-        window.removeEventListener('pagehide', this._pageHideListener);
       }
     }
   }
