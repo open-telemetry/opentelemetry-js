@@ -24,6 +24,7 @@ import type {
   SpanExporter,
   SpanLimits,
   SpanProcessor,
+  TracerConfigurator,
 } from '@opentelemetry/sdk-trace';
 import {
   AlwaysOffSampler,
@@ -1425,6 +1426,66 @@ export function createIdGeneratorFromConfig(
   }
 }
 
+function matchesWildcardPattern(
+  name: string,
+  pattern: readonly string[]
+): boolean {
+  // Dynamic programming bounds matching to O(name.length * pattern.length)
+  // time and O(pattern.length) space, without regex backtracking.
+  const matches: boolean[] = new Array(pattern.length + 1).fill(false);
+  matches[0] = true;
+  for (let i = 0; i < pattern.length; i++) {
+    matches[i + 1] = matches[i] && pattern[i] === '*';
+  }
+
+  for (const character of name) {
+    let previous = matches[0];
+    matches[0] = false;
+    for (let i = 0; i < pattern.length; i++) {
+      const previousMatch = matches[i + 1];
+      matches[i + 1] =
+        pattern[i] === '*'
+          ? matches[i] || previousMatch
+          : previous && (pattern[i] === '?' || pattern[i] === character);
+      previous = previousMatch;
+    }
+  }
+  return matches[pattern.length];
+}
+
+function createTracerConfiguratorFromConfig(
+  config: TracerProviderConfigModel['tracer_configurator/development']
+): TracerConfigurator | undefined {
+  if (!config) {
+    return undefined;
+  }
+
+  checkConfigUse('ExperimentalTracerConfigurator', config, [
+    'default_config',
+    'tracers',
+  ]);
+  checkConfigUse('ExperimentalTracerConfig', config.default_config, [
+    'enabled',
+  ]);
+  const defaultConfig = { enabled: config.default_config?.enabled ?? true };
+  const matchers = (config.tracers ?? []).map(matcher => {
+    checkConfigUse('ExperimentalTracerMatcherAndConfig', matcher, [
+      'name',
+      'config',
+    ]);
+    checkConfigUse('ExperimentalTracerConfig', matcher.config, ['enabled']);
+    return {
+      pattern: Array.from(matcher.name),
+      config: { enabled: matcher.config.enabled ?? true },
+    };
+  });
+
+  return scope =>
+    matchers.find(matcher =>
+      matchesWildcardPattern(scope.name, matcher.pattern)
+    )?.config ?? defaultConfig;
+}
+
 export function createTracerProviderFromConfig(
   resource: Resource,
   tracer_provider: TracerProviderConfigModel,
@@ -1439,15 +1500,18 @@ export function createTracerProviderFromConfig(
   );
   const sampler = createSamplerFromConfig(tracer_provider.sampler);
   const idGenerator = createIdGeneratorFromConfig(tracer_provider.id_generator);
+  const tracerConfigurator = createTracerConfiguratorFromConfig(
+    tracer_provider['tracer_configurator/development']
+  );
 
   checkConfigUse('TracerProvider', tracer_provider, [
     'processors',
     'limits',
     'sampler',
     'id_generator',
+    'tracer_configurator/development',
   ]);
 
-  // TODO(6960): 'tracer_configurator/development', TracerProvider doesn't currently support this
   // TODO(6624): meterProvider, if SDK health metrics enabled
   return new TracerProvider({
     resource,
@@ -1455,5 +1519,6 @@ export function createTracerProviderFromConfig(
     spanLimits,
     sampler,
     idGenerator,
+    tracerConfigurator,
   });
 }
