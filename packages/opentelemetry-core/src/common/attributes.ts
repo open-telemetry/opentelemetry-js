@@ -296,13 +296,21 @@ function isAnyValueInternal(
     return true;
   }
 
-  // This leaves objects and arrays. Check for circular references.
+  // This leaves objects and arrays. Check for circular references. Only the
+  // values on the path currently being walked are tracked, so a value that is
+  // referenced more than once without forming a cycle remains valid: it still
+  // serializes to a finite tree.
   if (visited.has(val)) {
     // Circular reference detected - reject it
     return false;
   }
   visited.add(val);
+  const isValid = isAnyValueObject(val, visited);
+  visited.delete(val);
+  return isValid;
+}
 
+function isAnyValueObject(val: object, visited: WeakSet<object>): boolean {
   // Arrays (can contain any AnyValue, including heterogeneous)
   if (Array.isArray(val)) {
     for (const item of val) {
