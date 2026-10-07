@@ -13,7 +13,12 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :boom: Breaking Changes
 
+* fix(sdk-logs)!: replace `LoggerConfig.disabled` with `enabled` to match the specification [#7160](https://github.com/open-telemetry/opentelemetry-js/issues/7160)
+  * Replace `disabled: true` with `enabled: false`, and `disabled: false` with `enabled: true`. Loggers remain enabled by default.
+
 ### :rocket: Features
+
+* chore(sdk-logs): mark `@opentelemetry/sdk-logs` as stable [#7143](https://github.com/open-telemetry/opentelemetry-js/issues/7143) @trentm
 
 ### :bug: Bug Fixes
 

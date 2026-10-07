@@ -3,8 +3,6 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-**Note: This is an experimental package under active development. New releases may include breaking changes.**
-
 OpenTelemetry logs module contains the foundation for all logs SDKs of [opentelemetry-js](https://github.com/open-telemetry/opentelemetry-js).
 
 Used standalone, this module provides methods for manual instrumentation of code, offering full control over recording logs for client-side JavaScript (browser) and Node.js.
@@ -201,7 +199,7 @@ interface LoggerConfig {
 
 ## Example
 
-See [examples/logs](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/examples/logs)
+See [examples/logs](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/logs)
 
 ## Useful links
 

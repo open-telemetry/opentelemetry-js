@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sdk-logs",
-  "version": "0.300.0-development.1",
+  "version": "3.0.0-development.1",
   "description": "OpenTelemetry logs SDK",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -46,7 +46,7 @@
     "access": "public"
   },
   "author": "OpenTelemetry Authors",
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/sdk-logs",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-logs",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -68,11 +68,11 @@
     "tdd:browser": "karma start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "version": "node ../../../scripts/version-update.js",
+    "version": "node ../../scripts/version-update.js",
     "watch": "tsdown --watch --no-clean",
-    "prewatch": "node ../../../scripts/version-update.js",
-    "peer-api-check": "node ../../../scripts/peer-api-check.mjs",
-    "align-api-deps": "node ../../../scripts/align-api-deps.mjs"
+    "prewatch": "node ../../scripts/version-update.js",
+    "peer-api-check": "node ../../scripts/peer-api-check.mjs",
+    "align-api-deps": "node ../../scripts/align-api-deps.mjs"
   },
   "keywords": [
     "opentelemetry",
@@ -106,7 +106,7 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.37",
     "karma-webpack": "5.0.1",
-    "mocha": "11.8.0",
+    "mocha": "12.0.3",
     "nyc": "18.0.0",
     "sinon": "18.0.1",
     "ts-loader": "9.5.7",

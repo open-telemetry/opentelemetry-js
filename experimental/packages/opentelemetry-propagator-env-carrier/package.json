@@ -56,7 +56,7 @@
     "@opentelemetry/core": "3.0.0-development.1",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
-    "mocha": "11.8.0",
+    "mocha": "12.0.3",
     "nyc": "18.0.0",
     "typescript": "5.2.2"
   },

@@ -9,12 +9,14 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :boom: Breaking Changes
 
-* fix(sdk-logs)!: replace experimental `LoggerConfig.disabled` with `enabled` to match the specification [#7160](https://github.com/open-telemetry/opentelemetry-js/issues/7160)
-  * Replace `disabled: true` with `enabled: false`, and `disabled: false` with `enabled: true`. Loggers remain enabled by default.
+* feat(sdk-logs): mark `@opentelemetry/sdk-logs` as stable [#7143](https://github.com/open-telemetry/opentelemetry-js/issues/7143) @trentm
+  * See [the stable CHANGELOG](../CHANGELOG.md) for future changes to the sdk-logs package.
 
 ### :rocket: Features
 
 ### :bug: Bug Fixes
+
+* fix(otlp-transformer): accept DOM `TextDecoder` in `ProtobufReader` typing [#7169](https://github.com/open-telemetry/opentelemetry-js/pull/7169) @overbalance
 
 ### :books: Documentation
 

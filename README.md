@@ -229,7 +229,7 @@ The current version for each package can be found in the respective `package.jso
 | ------- | ----------- | ----------- |
 | Tracing | Stable      | Stable      |
 | Metrics | Stable      | Stable      |
-| Logs    | Development | Development |
+| Logs    | Stable      | Stable      |
 
 For a more detailed breakdown of feature support see the [specification compliance matrix][compliance-matrix].
 
@@ -288,7 +288,7 @@ Typically, members of this are [component owners](https://github.com/open-teleme
 - [Florencia Acosta](https://github.com/facostaembrace), Embrace
 - [henrinormak](https://github.com/henrinormak)
 - [Jackson Weber](https://github.com/JacksonWeber), Microsoft
-- [Jaryk](https://github.com/Ugzuzg), Volvo Cars
+- [Jaryk](https://github.com/Ugzuzg)
 - [Jonathan Lee](https://github.com/jj22ee)
 - [Jonathan Munz](https://github.com/jpmunz), Embrace
 - [kirrg001](https://github.com/kirrg001), Instana
