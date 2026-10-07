@@ -17,8 +17,8 @@ registerHooks({
       const conditions = ['otel', ...context.conditions];
       return nextResolve(specifier, {
         ...context,
-        // Node 22.15 passes require() conditions as an internal SafeSet (not instanceof
-        // Set) and calls .has() on them.
+        // Node 22.15-22.18 and 24.0-24.4 pass require() conditions as a SafeSet (not instanceof
+        // Set) and call .has() on the result; later versions pass an array and reject a Set.
         conditions:
           typeof context.conditions.has === 'function'
             ? new Set(conditions)
