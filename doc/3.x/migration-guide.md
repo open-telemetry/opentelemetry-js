@@ -31,7 +31,7 @@ const { logs, SeverityNumber } = require('@opentelemetry/api');
 
 ## Platform-specific code resolves through `package.json` conditions
 
-Packages with separate Node.js and browser implementations (`@opentelemetry/core`, `@opentelemetry/resources`, `@opentelemetry/sdk-trace`, `@opentelemetry/sdk-logs`, `@opentelemetry/instrumentation`, `@opentelemetry/exporter-zipkin` and the OTLP HTTP and protobuf exporters) no longer ship a top-level `browser` field in `package.json`. They select the Node.js implementation with the `node` condition on the `#platform` subpath under `imports`, and every other environment gets the browser implementation from the `require` and `default` branches. Their `./platform` and `./platform/browser` subpath exports (`./detectors/platform` and `./detectors/platform/browser` in `@opentelemetry/resources`) are removed; import from the package root.
+Packages with separate Node.js and browser implementations (`@opentelemetry/core`, `@opentelemetry/resources`, `@opentelemetry/sdk-trace`, `@opentelemetry/sdk-logs`, `@opentelemetry/instrumentation`, `@opentelemetry/exporter-zipkin` and the OTLP HTTP and protobuf exporters) no longer ship a top-level `browser` field in `package.json`. They select the Node.js implementation with the `node` condition on the `#platform` subpath under `imports`, and every other environment gets the browser implementation from the `require` and `default` branches.
 
 Your bundler must support the `imports` and `exports` fields; one without `imports` support fails to resolve `#platform`. webpack 5 needs `enhanced-resolve` 5.8.2 or later, which webpack 5.54 and later require. React Native needs Metro 0.81.3 or later: React Native 0.79 and later, or 0.76 to 0.78 with an updated Metro.
 
@@ -216,22 +216,6 @@ const timer = setTimeout(() => {}, 1000);
 if (typeof timer !== 'number') {
   timer.unref();
 }
-```
-
----
-
-## `@opentelemetry/resources`
-
-### Removed: `./detectors/platform` subpath exports
-
-`@opentelemetry/resources/detectors/platform` and `@opentelemetry/resources/detectors/platform/browser` are gone on every platform. Import the detectors from the package root. In browsers they remain no-ops.
-
-```ts
-// before
-import { hostDetector } from '@opentelemetry/resources/detectors/platform';
-
-// after
-import { hostDetector } from '@opentelemetry/resources';
 ```
 
 ---
