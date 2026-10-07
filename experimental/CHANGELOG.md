@@ -14,6 +14,9 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :rocket: Features
 
+* feat(instrumentation): add `isEnabled()` to the browser `InstrumentationBase`, matching Node.js [#7140](https://github.com/open-telemetry/opentelemetry-js/pull/7140) @overbalance
+  * `FetchInstrumentation` and `XMLHttpRequestInstrumentation` override it to report whether they are active, which stays false when patching fails.
+
 ### :bug: Bug Fixes
 
 * fix(otlp-transformer): accept DOM `TextDecoder` in `ProtobufReader` typing [#7169](https://github.com/open-telemetry/opentelemetry-js/pull/7169) @overbalance
