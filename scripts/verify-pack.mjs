@@ -262,9 +262,12 @@ function visit(push, subpath, node, cond) {
 // extracted package and compare with the branch the map names.
 function checkConditions(extracted, pkg, label) {
   const specs = [];
-  // Without a node key every resolver, Node included, gets the browser build.
-  if (pkg.imports?.['#platform'] && !pkg.imports['#platform'].node) {
-    failures.push(`${label} :: imports "#platform" has no node branch`);
+  // Without otel the mocha and karma hooks silently test dist; without node every
+  // resolver, Node included, gets the browser build.
+  for (const cond of ['otel', 'node']) {
+    if (pkg.imports?.['#platform'] && !pkg.imports['#platform'][cond]) {
+      failures.push(`${label} :: imports "#platform" has no ${cond} branch`);
+    }
   }
   for (const [key, map] of Object.entries(pkg.imports ?? {})) {
     if (map?.node) specs.push({ spec: key, map });
