@@ -97,7 +97,7 @@ describe('alignApiRange', function () {
     it('a cycle leaves no trace on the range', function () {
       const before = '>=1.4.0 <1.10.0';
       let range = before;
-      for (const version of ['1.10.0-development.0', '1.10.0-development.1', '1.10.0-rc.0']) {
+      for (const version of ['1.10.0-development.1', '1.10.0-development.1', '1.10.0-rc.0']) {
         range = alignApiRange(range, version);
       }
       assert.strictEqual(

@@ -7,8 +7,8 @@
     "align-api-deps": "node ../../scripts/align-api-deps.mjs"
   },
   "// TODO: replace 'dependencies' with this once there are releases with GA sdk-logs": {
-    "@opentelemetry/api": "^1.9.1",
-    "@opentelemetry/sdk-logs": "3.0.0-development.0"
+    "@opentelemetry/api": "^1.9.1 || 1.10.0-development.1",
+    "@opentelemetry/sdk-logs": "3.0.0-development.1"
   },
   "dependencies": {
     "@opentelemetry/api": "../../api",
