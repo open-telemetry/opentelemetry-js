@@ -9,6 +9,18 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :boom: Breaking Changes
 
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 0.300.0-development.1
+
+### :boom: Breaking Changes
+
 * feat(api-logs)!: move the Logs API to `@opentelemetry/api` and remove the standalone `@opentelemetry/api-logs` package [#4862](https://github.com/open-telemetry/opentelemetry-js/pull/4862) @hectorhdzg
 * fix(exporter-prometheus)!: stop reading Prometheus exporter host and port environment variables in the exporter constructor [#6966](https://github.com/open-telemetry/opentelemetry-js/pull/6966) @LarryHu0217
 * chore(web-common)!: clean up and deprecate network span utils [#7114](https://github.com/open-telemetry/opentelemetry-js/issues/7114)
@@ -36,8 +48,6 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
   * This was accidentally missed when moving utilities from sdk-trace-web to web-common.
 * fix(opentelemetry-browser-detector): mark the package side-effect free so bundlers can tree-shake it [#7135](https://github.com/open-telemetry/opentelemetry-js/pull/7135) @overbalance
 * fix: resolve the ESM build through the `default` export condition instead of `import`, so a resolver that activates neither `import` nor `require` still finds an entry point [#7132](https://github.com/open-telemetry/opentelemetry-js/pull/7132) @overbalance
-
-### :books: Documentation
 
 ### :house: Internal
 
