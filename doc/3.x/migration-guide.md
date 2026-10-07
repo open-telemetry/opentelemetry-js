@@ -44,7 +44,7 @@ Node.js always applies the `node` condition. These bundler setups also resolve t
 | Vite | SSR, unless the package is bundled with [`ssr.noExternal`](https://vite.dev/config/ssr-options#ssr-noexternal) and [`ssr.target`](https://vite.dev/config/ssr-options#ssr-target) is `'webworker'` |
 | Rollup with `@rollup/plugin-node-resolve` | [`exportConditions`](https://github.com/rollup/plugins/tree/master/packages/node-resolve#exportconditions) includes `'node'` |
 | Parcel | the target [`context`](https://parceljs.org/features/targets/#context) is `node`, `electron-main` or `electron-renderer` (see below) |
-| Jest | [`testEnvironment`](https://jestjs.io/docs/configuration#testenvironment-node--jsdom--string) is `node`, or on Jest 30, a test loads the package with `require()` (see below) |
+| Jest | [`testEnvironment`](https://jestjs.io/docs/configuration#testenvironment-node--jsdom--string) is `node`, or on Jest 30, the tests do not run as native ESM (see below) |
 
 A bundle that runs on Node.js but is built without the `node` condition contains the browser implementation. This happens with esbuild `platform: 'neutral'`, Rollup's default `exportConditions`, a webpack `target` that mixes browsers and Node.js (such as `['web', 'node']` or `'universal'`), and a webpack `resolve.conditionNames` or Vite [`ssr.resolve.conditions`](https://vite.dev/config/ssr-options#ssr-resolve-conditions) list that leaves out the defaults (`'...'` in webpack, `...defaultServerConditions` in Vite). Add `node` to that bundler's conditions.
 
