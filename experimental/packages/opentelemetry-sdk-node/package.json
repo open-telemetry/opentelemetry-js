@@ -72,7 +72,7 @@
     "@opentelemetry/otlp-grpc-exporter-base": "0.300.0-development.1",
     "@opentelemetry/propagator-b3": "3.0.0-development.1",
     "@opentelemetry/resources": "3.0.0-development.1",
-    "@opentelemetry/sdk-logs": "0.300.0-development.1",
+    "@opentelemetry/sdk-logs": "3.0.0-development.1",
     "@opentelemetry/sdk-metrics": "3.0.0-development.1",
     "@opentelemetry/sdk-trace": "3.0.0-development.1",
     "@opentelemetry/semantic-conventions": "^1.29.0"

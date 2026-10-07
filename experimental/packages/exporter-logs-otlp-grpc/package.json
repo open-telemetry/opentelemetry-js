@@ -75,7 +75,7 @@
     "@opentelemetry/otlp-exporter-base": "0.300.0-development.1",
     "@opentelemetry/otlp-grpc-exporter-base": "0.300.0-development.1",
     "@opentelemetry/otlp-transformer": "0.300.0-development.1",
-    "@opentelemetry/sdk-logs": "0.300.0-development.1"
+    "@opentelemetry/sdk-logs": "3.0.0-development.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-logs-otlp-grpc",
   "sideEffects": false

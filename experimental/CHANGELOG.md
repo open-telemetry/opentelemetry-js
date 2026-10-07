@@ -9,6 +9,9 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :boom: Breaking Changes
 
+* feat(sdk-logs): mark `@opentelemetry/sdk-logs` as stable [#7143](https://github.com/open-telemetry/opentelemetry-js/issues/7143) @trentm
+  * See [the stable CHANGELOG](../CHANGELOG.md) for future changes to the sdk-logs package.
+
 ### :rocket: Features
 
 ### :bug: Bug Fixes

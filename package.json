@@ -96,6 +96,7 @@
     "experimental/packages/*",
     "experimental/examples/*",
     "integration-tests/*",
+    "examples/logs",
     "examples/opentelemetry-web",
     "examples/http",
     "examples/https",
