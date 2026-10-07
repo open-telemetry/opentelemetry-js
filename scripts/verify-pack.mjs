@@ -92,6 +92,7 @@ for (const { dir, pkg } of targets) {
         failures.push(`${label} :: exports "${subpath}" falls back to ${fallback}, not the import target ${esm}`);
       }
     }
+    checkDeclarations(extracted, label);
     checkConditions(extracted, pkg, label);
     console.log(failures.length === failuresBefore ? `  ok   ${label}` : `  FAIL ${label}`);
   } catch (err) {
@@ -323,6 +324,17 @@ function checkConditions(extracted, pkg, label) {
       }
     }
   });
+}
+
+// A declaration that still names #platform came from a dts build whose resolver
+// skipped the otel condition; node10 consumers cannot resolve it.
+function checkDeclarations(extracted, label) {
+  for (const file of readdirSync(extracted, { recursive: true })) {
+    if (!/\.d\.[cm]?ts$/.test(file)) continue;
+    if (/['"]#platform['"]/.test(readFileSync(path.join(extracted, file), 'utf8'))) {
+      failures.push(`${label} :: ${file} references #platform`);
+    }
+  }
 }
 
 // The target a resolver with only `kind` active reaches in a condition map.
