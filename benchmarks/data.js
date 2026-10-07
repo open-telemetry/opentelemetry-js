@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791332113648,
+  "lastUpdate": 1791363810652,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -115511,6 +115511,184 @@ window.BENCHMARK_DATA = {
             "range": "±3.94%",
             "unit": "ops/sec",
             "extra": "89 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "974bf13c52124cdb787aa6a8958155a4c9b1e5fc",
+          "message": "test(semantic-conventions): drop unused size-check (#7154)",
+          "timestamp": "2026-10-07T08:50:50Z",
+          "tree_id": "0739ec45717c3c8d1f5e97f5a7166f60e8e19035",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/974bf13c52124cdb787aa6a8958155a4c9b1e5fc"
+        },
+        "date": 1791363809376,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "generateTraceId",
+            "value": 6260882,
+            "range": "±2.72%",
+            "unit": "ops/sec",
+            "extra": "88 samples"
+          },
+          {
+            "name": "generateSpanId",
+            "value": 8044722,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 404707,
+            "range": "±0.85%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes w/ setAttributes)",
+            "value": 368389,
+            "range": "±2.87%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "addEvent (128 attributes)",
+            "value": 37938,
+            "range": "±2.50%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "addLink (128 attributes)",
+            "value": 35619,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 378784,
+            "range": "±0.37%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "parseBaggageHeaderString simple",
+            "value": 2942439,
+            "range": "±2.93%",
+            "unit": "ops/sec",
+            "extra": "88 samples"
+          },
+          {
+            "name": "parseBaggageHeaderString with metadata",
+            "value": 3139832,
+            "range": "±0.18%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "parseBaggageHeaderString URI encoded",
+            "value": 2978270,
+            "range": "±1.03%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "parseBaggageHeaderString complex",
+            "value": 1528881,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "88 samples"
+          },
+          {
+            "name": "Counter.add (fixed attributes)",
+            "value": 18504461,
+            "range": "±2.65%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
+          },
+          {
+            "name": "Counter.add (varied attributes, 100 combos)",
+            "value": 19665343,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "Counter.add (with view attribute processor)",
+            "value": 1821877,
+            "range": "±1.66%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "context.active() x100",
+            "value": 6418760,
+            "range": "±2.57%",
+            "unit": "ops/sec",
+            "extra": "83 samples"
+          },
+          {
+            "name": "trace.getTracerProvider() x100",
+            "value": 15281402,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 512 spans (protobuf)",
+            "value": 400,
+            "range": "±2.78%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "transform 512 spans (json)",
+            "value": 690,
+            "range": "±0.61%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "transform 512 logs (protobuf)",
+            "value": 435,
+            "range": "±0.46%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "transform 512 logs (json)",
+            "value": 766,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 512 metrics (protobuf)",
+            "value": 490,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 512 metrics (json)",
+            "value": 455,
+            "range": "±0.61%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
           }
         ]
       }
