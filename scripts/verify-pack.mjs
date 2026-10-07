@@ -4,13 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// Packs every publishable workspace package, then loads the require/import
-// targets of every `exports` and `imports` entry (or main/module) from the
-// extracted tarball and existence-checks types/main/module files. Then resolves
-// every node-conditional specifier with and without the node condition. Catches
-// broken `exports`/`imports` maps, condition-order mistakes, missing files in
-// `files`, and CJS/ESM interop bugs that unit tests (which run against TS
-// source) can't see.
+// Packs every publishable package, loads every exports/imports target from the tarball and
+// resolves node-conditional specifiers with and without node: catches broken maps, misordered
+// conditions, `files` omissions and CJS/ESM interop bugs that source-based unit tests cannot see.
 
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
@@ -258,9 +254,8 @@ function visit(push, subpath, node, cond) {
   }
 }
 
-// Node picks the first matching key, so a node branch placed after
-// import/require loads fine yet is unreachable. Resolve from inside the
-// extracted package and compare with the branch the map names.
+// Node picks the first matching key, so a node branch after import/require loads yet is
+// unreachable. Resolve from inside the extracted package and compare with the branch the map names.
 function checkConditions(extracted, pkg, label) {
   const specs = [];
   // Without otel the mocha and karma hooks silently test dist; without node every
