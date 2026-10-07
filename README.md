@@ -163,7 +163,7 @@ This minimum support level is subject to change as the project evolves and as th
 
 ### React Native Support
 
-React Native and Expo apps use the browser implementations. They require React Native 0.76 or later, whose Metro resolves `package.json` `imports`. Metro does not apply the `node` condition, so builds need no Metro configuration.
+React Native and Expo apps use the browser implementations. They require Metro 0.81.3 or later, the first Metro that resolves `package.json` `imports`: React Native 0.79 and later, or 0.76 to 0.78 with an updated Metro. Metro does not apply the `node` condition, so builds need no Metro configuration.
 
 ## TypeScript Support
 

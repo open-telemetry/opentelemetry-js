@@ -33,7 +33,7 @@ const { logs, SeverityNumber } = require('@opentelemetry/api');
 
 Packages with separate Node.js and browser implementations (`@opentelemetry/core`, `@opentelemetry/resources`, `@opentelemetry/sdk-trace`, `@opentelemetry/sdk-logs`, `@opentelemetry/instrumentation`, `@opentelemetry/exporter-zipkin` and the OTLP HTTP and protobuf exporters) no longer ship a top-level `browser` field in `package.json`. They select the Node.js implementation with the `node` condition on the `#platform` subpath under `imports`, and every other environment gets the browser implementation from the `require` and `default` branches. Their `./platform` and `./platform/browser` subpath exports (`./detectors/platform` and `./detectors/platform/browser` in `@opentelemetry/resources`) are removed; import from the package root.
 
-Your bundler must support the `imports` and `exports` fields; one without `imports` support fails to resolve `#platform`. webpack 5 needs `enhanced-resolve` 5.8.2 or later, which webpack 5.54 and later require. React Native needs version 0.76 or later.
+Your bundler must support the `imports` and `exports` fields; one without `imports` support fails to resolve `#platform`. webpack 5 needs `enhanced-resolve` 5.8.2 or later, which webpack 5.54 and later require. React Native needs Metro 0.81.3 or later: React Native 0.79 and later, or 0.76 to 0.78 with an updated Metro.
 
 Node.js always applies the `node` condition. These bundler setups also resolve the Node.js implementation; all other setups, including browsers, web workers, edge runtimes and React Native, resolve the browser implementation:
 
