@@ -5,13 +5,13 @@
 
 export type { ResourceDetectionConfig } from './config';
 export { detectResources } from './detect-resources';
-export { envDetector } from './detectors/EnvDetector';
 export {
+  envDetector,
   hostDetector,
   osDetector,
   processDetector,
   serviceInstanceIdDetector,
-} from '#platform';
+} from './detectors';
 export type { Resource } from './Resource';
 export {
   resourceFromAttributes,

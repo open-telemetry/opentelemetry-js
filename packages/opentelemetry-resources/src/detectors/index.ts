@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+export { envDetector } from './EnvDetector';
 export {
   hostDetector,
   osDetector,
   processDetector,
   serviceInstanceIdDetector,
-} from './NoopDetector';
+} from '#platform';
+export { noopDetector } from './NoopDetector';
