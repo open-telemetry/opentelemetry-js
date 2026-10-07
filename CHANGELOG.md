@@ -13,19 +13,31 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :boom: Breaking Changes
 
+### :rocket: Features
+
+* chore(sdk-logs): mark `@opentelemetry/sdk-logs` as stable [#7143](https://github.com/open-telemetry/opentelemetry-js/issues/7143) @trentm
+
+### :bug: Bug Fixes
+
+* fix(sdk-trace): listen for `pagehide` on `window` instead of `document`, so the browser `BatchSpanProcessor` flush on page hide actually runs [#7153](https://github.com/open-telemetry/opentelemetry-js/pull/7153) @adityareddy-dev
+* fix(sdk-logs): listen for `pagehide` on `window` instead of `document`, so the browser `BatchLogRecordProcessor` flush on page hide actually runs [#7153](https://github.com/open-telemetry/opentelemetry-js/pull/7153) @adityareddy-dev
+
+### :books: Documentation
+
+### :house: Internal
+
+## 3.0.0-development.1
+
+### :boom: Breaking Changes
+
 * chore(sdk-trace-base, sdk-trace-web)!: remove the `@opentelemetry/sdk-trace-base` and `@opentelemetry/sdk-trace-web` packages [#7117](https://github.com/open-telemetry/opentelemetry-js/issues/7117)
   * The sdk-trace-base, sdk-trace-web, and sdk-trace-node packages have been replaced by the `@opentelemetry/sdk-trace` package.
     See the [3.x migration guide](doc/3.x/migration-guide.md) for full migration instructions.
-
-### :rocket: Features
 
 ### :bug: Bug Fixes
 
 * fix(sdk-metrics): guard against a missing or empty name to MeterProvider#getMeter [#7105](https://github.com/open-telemetry/opentelemetry-js/pull/7105) @trentm
 * fix: resolve the ESM build through the `default` export condition instead of `import`, so a resolver that activates neither `import` nor `require` still finds an entry point [#7132](https://github.com/open-telemetry/opentelemetry-js/pull/7132) @overbalance
-* fix(sdk-trace): listen for `pagehide` on `window` instead of `document`, so the browser `BatchSpanProcessor` flush on page hide actually runs [#7153](https://github.com/open-telemetry/opentelemetry-js/pull/7153) @adityareddy-dev
-
-### :books: Documentation
 
 ### :house: Internal
 

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/resources",
-  "version": "3.0.0-development.0",
+  "version": "3.0.0-development.1",
   "description": "OpenTelemetry SDK resources",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -85,7 +85,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/api": ">=1.9.1 <1.10.0",
+    "@opentelemetry/api": ">=1.9.1 <1.11.0 || 1.10.0-development.1",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
@@ -97,19 +97,19 @@
     "karma-mocha-webworker": "1.3.0",
     "karma-spec-reporter": "0.0.37",
     "karma-webpack": "5.0.1",
-    "mocha": "11.8.0",
+    "mocha": "12.0.3",
     "nock": "13.5.6",
-    "nyc": "17.1.0",
+    "nyc": "18.0.0",
     "sinon": "18.0.1",
     "typescript": "5.2.2",
     "webpack": "5.108.4",
     "webpack-cli": "7.2.3"
   },
   "peerDependencies": {
-    "@opentelemetry/api": ">=1.9.1 <1.10.0"
+    "@opentelemetry/api": ">=1.9.1 <1.11.0 || 1.10.0-development.1"
   },
   "dependencies": {
-    "@opentelemetry/core": "3.0.0-development.0",
+    "@opentelemetry/core": "3.0.0-development.1",
     "@opentelemetry/semantic-conventions": "^1.29.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-resources",

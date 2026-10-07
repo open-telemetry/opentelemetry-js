@@ -18,11 +18,16 @@
     "@opentelemetry/opentelemetry-browser-detector": "file:../../../experimental/packages/opentelemetry-browser-detector",
     "@opentelemetry/propagator-b3": "file:../../../packages/opentelemetry-propagator-b3",
     "@opentelemetry/resources": "file:../../../packages/opentelemetry-resources",
-    "@opentelemetry/sdk-logs": "file:../../../experimental/packages/sdk-logs",
+    "@opentelemetry/sdk-logs": "file:../../../packages/sdk-logs",
     "@opentelemetry/sdk-metrics": "file:../../../packages/sdk-metrics",
     "@opentelemetry/sdk-trace": "file:../../../packages/sdk-trace",
     "next": "^15",
     "react": "^18",
     "react-dom": "^18"
+  },
+  "overrides": {
+    "next": {
+      "@opentelemetry/api": "1.10.0-development.1"
+    }
   }
 }

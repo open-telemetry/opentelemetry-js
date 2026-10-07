@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/core",
-  "version": "3.0.0-development.0",
+  "version": "3.0.0-development.1",
   "description": "OpenTelemetry Core provides constants and utilities shared by all OpenTelemetry SDK packages.",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -86,7 +86,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/api": ">=1.9.1 <1.10.0",
+    "@opentelemetry/api": ">=1.9.1 <1.11.0 || 1.10.0-development.1",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
@@ -98,15 +98,15 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.37",
     "karma-webpack": "5.0.1",
-    "mocha": "11.8.0",
-    "nyc": "17.1.0",
+    "mocha": "12.0.3",
+    "nyc": "18.0.0",
     "sinon": "18.0.1",
     "ts-loader": "9.5.7",
     "typescript": "5.2.2",
     "webpack": "5.108.4"
   },
   "peerDependencies": {
-    "@opentelemetry/api": ">=1.9.1 <1.10.0"
+    "@opentelemetry/api": ">=1.9.1 <1.11.0 || 1.10.0-development.1"
   },
   "dependencies": {
     "@opentelemetry/semantic-conventions": "^1.29.0"
