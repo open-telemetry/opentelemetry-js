@@ -204,6 +204,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       this._tasksCount = 0;
       return;
     }
+    if (this._tasksCount === 0 && this.getConfig().clearTimingResources) {
       performance.clearResourceTimings();
       this._usedResources = new WeakSet<PerformanceResourceTiming>();
     }
