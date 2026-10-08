@@ -593,7 +593,8 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     }
   }
 
-  /** False after disable() or a failed patch; disable() leaves the global wrapped. */
+  /** False before enable(), after disable(), or when patching throws; disable() leaves
+   * XMLHttpRequest.prototype patched. */
   override isEnabled(): boolean {
     return this._isEnabled === true;
   }
