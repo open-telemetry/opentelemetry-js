@@ -12,14 +12,12 @@ services:
       - "4317:4317"
       - "4318:4318"
     depends_on:
-      - jaeger-all-in-one
+      - jaeger
 
   # Jaeger
-  jaeger-all-in-one:
+  jaeger:
     image: jaegertracing/jaeger:latest
     ports:
       - "16686:16686"
-      - "14268:14268"
-      - "14250"
 
 

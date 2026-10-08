@@ -38,10 +38,19 @@ describe('ieee754 helpers', () => {
     });
   });
 
-  describe('getSignificand', () => {
-    it('returns expected values', () => {
-      // The number 1.5 has a single most-significant bit set, i.e., 1<<51.
-      assert.strictEqual(ieee754.getSignificand(1.5), Math.pow(2, 51));
+  describe('isPowerOfTwo', () => {
+    it('is true for exact powers of two', () => {
+      assert.strictEqual(ieee754.isPowerOfTwo(1), true);
+      assert.strictEqual(ieee754.isPowerOfTwo(2), true);
+      assert.strictEqual(ieee754.isPowerOfTwo(0.5), true);
+      assert.strictEqual(ieee754.isPowerOfTwo(Math.pow(2, 52)), true);
+      assert.strictEqual(ieee754.isPowerOfTwo(Math.pow(2, -1022)), true);
+    });
+
+    it('is false for non-powers of two', () => {
+      assert.strictEqual(ieee754.isPowerOfTwo(1.5), false);
+      assert.strictEqual(ieee754.isPowerOfTwo(3), false);
+      assert.strictEqual(ieee754.isPowerOfTwo(1 + Math.pow(2, -52)), false);
     });
   });
 });

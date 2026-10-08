@@ -60,4 +60,7 @@ export const DEFAULT_QUERY_STRINGS_TO_REDACT = [
   'Signature',
   'AWSAccessKeyId',
   'X-Goog-Signature',
+  'X-Amz-Signature',
+  'X-Amz-Credential',
+  'X-Amz-Security-Token',
 ] as const;

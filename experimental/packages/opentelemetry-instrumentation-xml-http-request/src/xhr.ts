@@ -9,14 +9,14 @@ import {
   InstrumentationBase,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
-import { hrTime, isUrlIgnored, otperformance } from '@opentelemetry/core';
+import { hrTime, isUrlIgnored } from '@opentelemetry/core';
 import {
   addSpanNetworkEvents,
   getResource,
   PerformanceTimingNames as PTN,
   shouldPropagateTraceHeaders,
   parseUrl,
-} from '@opentelemetry/sdk-trace-web';
+} from '@opentelemetry/web-common';
 import {
   ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
@@ -83,6 +83,7 @@ export interface XMLHttpRequestInstrumentationConfig
 
 /**
  * This class represents a XMLHttpRequest plugin for auto instrumentation
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation#xhr-xmlhttprequest
  */
 export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRequestInstrumentationConfig> {
   readonly component: string = 'xml-http-request';
@@ -154,8 +155,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         childSpan,
         corsPreFlightRequest,
         this.getConfig().ignoreNetworkEvents,
-        undefined,
-        true
+        undefined
       );
       childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
     });
@@ -241,7 +241,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    */
   private _clearResources() {
     if (this._tasksCount === 0 && this.getConfig().clearTimingResources) {
-      (otperformance as unknown as Performance).clearResourceTimings();
+      performance.clearResourceTimings();
       this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
       this._usedResources = new WeakSet<PerformanceResourceTiming>();
     }
@@ -269,7 +269,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       // then OBSERVER_WAIT_TIME_MS and observer didn't collect enough
       // information
       // ts thinks this is the perf_hooks module, but it is the browser performance api
-      resources = (otperformance as unknown as Performance).getEntriesByType(
+      resources = performance.getEntriesByType(
         'resource'
       ) as PerformanceResourceTiming[];
     }
@@ -295,8 +295,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         span,
         mainRequest,
         this.getConfig().ignoreNetworkEvents,
-        undefined,
-        true
+        undefined
       );
     }
   }

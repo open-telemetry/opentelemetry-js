@@ -3,7 +3,11 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-**Note: This is an experimental package under active development. New releases may include breaking changes.**
+> [!NOTE]
+> `@opentelemetry/instrumentation-fetch` is deprecated.
+> Vendors and users should plan moving to [instrumentations being developed in the opentelemetry-browser repository](https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation#readme),
+> specifically [`@opentelemetry/browser-instrumentation/experimental/fetch`](https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation#fetch).
+> Note that while the `@opentelemetry/browser-instrumentation` instrumentations cover the same Browser technologies, the emitted telemetry differs significantly.
 
 This module provides auto instrumentation for web using [fetch](https://developer.mozilla.org/en-US/docs/Web/API/fetch).
 (Note: This instrumentation does **not** instrument [Node.js' fetch](https://nodejs.org/api/globals.html#fetch). See [`@opentelemetry/instrumentation-undici`](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/packages/instrumentation-undici) for that.)
@@ -17,22 +21,22 @@ npm install --save @opentelemetry/instrumentation-fetch
 ## Usage
 
 ```js
+import { context, trace } from '@opentelemetry/api';
 import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,
-  WebTracerProvider,
-} from '@opentelemetry/sdk-trace-web';
+  TracerProvider,
+} from '@opentelemetry/sdk-trace';
 import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
-const provider = new WebTracerProvider({
+const provider = new TracerProvider({
   spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
 });
 
-provider.register({
-  contextManager: new ZoneContextManager(),
-});
+context.setGlobalContextManager(new ZoneContextManager().enable());
+trace.setGlobalTracerProvider(provider);
 
 registerInstrumentations({
   instrumentations: [new FetchInstrumentation()],
@@ -40,12 +44,11 @@ registerInstrumentations({
 
 // or plugin can be also initialised separately and then set the tracer provider or meter provider
 const fetchInstrumentation = new FetchInstrumentation();
-const provider = new WebTracerProvider({
+const provider = new TracerProvider({
   spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
 });
-provider.register({
-  contextManager: new ZoneContextManager(),
-});
+context.setGlobalContextManager(new ZoneContextManager().enable());
+trace.setGlobalTracerProvider(provider);
 fetchInstrumentation.setTracerProvider(provider);
 
 // and some test

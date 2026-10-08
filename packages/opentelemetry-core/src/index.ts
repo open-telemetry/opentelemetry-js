@@ -6,7 +6,17 @@
 export { W3CBaggagePropagator } from './baggage/propagation/W3CBaggagePropagator';
 export { AnchoredClock } from './common/anchored-clock';
 export type { Clock } from './common/anchored-clock';
-export { isAttributeValue, sanitizeAttributes } from './common/attributes';
+export {
+  AddAttributeDecision,
+  maybeAddAttribute,
+  maybeAddSimpleAttribute,
+  cleanAttributes,
+  cleanSimpleAttributes,
+  isAnyValue,
+  isSimpleAttributeValue,
+  sanitizeAttributes,
+  isAttributeValue,
+} from './common/attributes';
 export {
   globalErrorHandler,
   setGlobalErrorHandler,
@@ -14,7 +24,6 @@ export {
 export { loggingErrorHandler } from './common/logging-error-handler';
 export {
   addHrTimes,
-  getTimeOrigin,
   hrTime,
   hrTimeDuration,
   hrTimeToMicroseconds,
@@ -27,19 +36,16 @@ export {
   millisToHrTime,
   timeInputToHrTime,
 } from './common/time';
-export { unrefTimer } from './common/timer-util';
 export type { ErrorHandler, InstrumentationScope } from './common/types';
 export { ExportResultCode } from './ExportResult';
 export type { ExportResult } from './ExportResult';
 export { parseKeyPairsIntoRecord } from './baggage/utils';
 export {
   SDK_INFO,
-  _globalThis,
   getStringFromEnv,
   getBooleanFromEnv,
   getNumberFromEnv,
   getStringListFromEnv,
-  otperformance,
 } from './platform';
 export { CompositePropagator } from './propagation/composite';
 export type { CompositePropagatorConfig } from './propagation/composite';

@@ -5,7 +5,7 @@
 
 import type { Span } from '@opentelemetry/api';
 import { context, SpanKind, propagation } from '@opentelemetry/api';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -34,7 +34,9 @@ const customAttributeFunction = (span: Span): void => {
 
 describe('Packages', () => {
   beforeEach(() => {
-    context.setGlobalContextManager(new AsyncHooksContextManager().enable());
+    context.setGlobalContextManager(
+      new AsyncLocalStorageContextManager().enable()
+    );
   });
 
   afterEach(() => {

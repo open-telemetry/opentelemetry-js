@@ -4,7 +4,6 @@
  */
 
 import type * as api from '@opentelemetry/api';
-import { otperformance as performance } from '../platform';
 
 const NANOSECOND_DIGITS = 9;
 const NANOSECOND_DIGITS_IN_MILLIS = 6;
@@ -22,13 +21,6 @@ export function millisToHrTime(epochMillis: number): api.HrTime {
   // Round sub-nanosecond accuracy to nanosecond.
   const nanos = Math.round((epochMillis % 1000) * MILLISECONDS_TO_NANOSECONDS);
   return [seconds, nanos];
-}
-
-/**
- * @deprecated Use `performance.timeOrigin` directly.
- */
-export function getTimeOrigin(): number {
-  return performance.timeOrigin;
 }
 
 /**

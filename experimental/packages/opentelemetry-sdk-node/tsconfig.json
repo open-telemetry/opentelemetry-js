@@ -25,16 +25,7 @@
       "path": "../../../packages/opentelemetry-propagator-b3"
     },
     {
-      "path": "../../../packages/opentelemetry-propagator-jaeger"
-    },
-    {
       "path": "../../../packages/opentelemetry-resources"
-    },
-    {
-      "path": "../../../packages/opentelemetry-sdk-trace-base"
-    },
-    {
-      "path": "../../../packages/opentelemetry-sdk-trace-node"
     },
     {
       "path": "../../../packages/sdk-metrics"
@@ -44,9 +35,6 @@
     },
     {
       "path": "../../../semantic-conventions"
-    },
-    {
-      "path": "../api-logs"
     },
     {
       "path": "../configuration"
@@ -91,7 +79,7 @@
       "path": "../otlp-grpc-exporter-base"
     },
     {
-      "path": "../sdk-logs"
+      "path": "../../../packages/sdk-logs"
     }
   ]
 }

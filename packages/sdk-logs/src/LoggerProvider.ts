@@ -1,0 +1,128 @@
+/*
+ * Copyright The OpenTelemetry Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+import { diag } from '@opentelemetry/api';
+import type {
+  LoggerProvider as ILoggerProvider,
+  LoggerOptions as ILoggerOptions,
+  Logger as ILogger,
+} from '@opentelemetry/api';
+import { createNoopLogger } from '@opentelemetry/api';
+import { defaultResource } from '@opentelemetry/resources';
+import { BindOnceFuture, cleanSimpleAttributes } from '@opentelemetry/core';
+
+import type { ForceFlushOptions, LoggerProviderOptions } from './types';
+import { Logger } from './Logger';
+import {
+  DEFAULT_LOGGER_CONFIGURATOR,
+  LoggerProviderSharedState,
+} from './internal/LoggerProviderSharedState';
+import {
+  getInstrumentationScopeKey,
+  type LogInstrumentationScope,
+} from './internal/utils';
+
+export const DEFAULT_LOGGER_NAME = 'unknown';
+
+export class LoggerProvider implements ILoggerProvider {
+  private _shutdownOnce: BindOnceFuture<void>;
+  private readonly _sharedState: LoggerProviderSharedState;
+
+  constructor(config: LoggerProviderOptions = {}) {
+    const mergedConfig = {
+      resource: config.resource ?? defaultResource(),
+      logRecordLimits: {
+        attributeCountLimit: config.logRecordLimits?.attributeCountLimit ?? 128,
+        attributeValueLengthLimit:
+          config.logRecordLimits?.attributeValueLengthLimit ?? Infinity,
+      },
+      loggerConfigurator:
+        config.loggerConfigurator ?? DEFAULT_LOGGER_CONFIGURATOR,
+      processors: config.processors ?? [],
+      meterProvider: config.meterProvider,
+    };
+    this._sharedState = new LoggerProviderSharedState(
+      mergedConfig.resource,
+      mergedConfig.logRecordLimits,
+      mergedConfig.processors,
+      mergedConfig.loggerConfigurator,
+      mergedConfig.meterProvider
+    );
+    this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
+  }
+
+  /**
+   * Get a logger with the configuration of the LoggerProvider.
+   */
+  public getLogger(
+    name: string,
+    version?: string,
+    options?: ILoggerOptions
+  ): ILogger {
+    if (this._shutdownOnce.isCalled) {
+      diag.warn('A shutdown LoggerProvider cannot provide a Logger');
+      return createNoopLogger();
+    }
+
+    if (!name) {
+      diag.warn('Logger requested without instrumentation scope name.');
+    }
+    const loggerName = name || DEFAULT_LOGGER_NAME;
+    const instrumentationScope: LogInstrumentationScope = {
+      name: loggerName,
+      version,
+      schemaUrl: options?.schemaUrl,
+      // Intentionally limit instrumentation scope attributes to *simple* value
+      // types. OTEP 4485 says:
+      // > OTel SDK MAY support setting complex attributes on [...] instrumentation scope.
+      // This limit could be lifted later if there is a demonstrated need.
+      ...cleanSimpleAttributes(
+        options?.attributes,
+        this._sharedState.logRecordLimits
+      ),
+    };
+    const key = getInstrumentationScopeKey(instrumentationScope);
+    if (!this._sharedState.loggers.has(key)) {
+      this._sharedState.loggers.set(
+        key,
+        new Logger(instrumentationScope, this._sharedState)
+      );
+    }
+
+    return this._sharedState.loggers.get(key)!;
+  }
+
+  /**
+   * Notifies all registered LogRecordProcessor to flush any buffered data.
+   *
+   * Returns a promise which is resolved when all flushes are complete.
+   */
+  public forceFlush(options?: ForceFlushOptions): Promise<void> {
+    // do not flush after shutdown
+    if (this._shutdownOnce.isCalled) {
+      diag.warn('invalid attempt to force flush after LoggerProvider shutdown');
+      return this._shutdownOnce.promise;
+    }
+    return this._sharedState.activeProcessor.forceFlush(options);
+  }
+
+  /**
+   * Flush all buffered data and shut down the LoggerProvider and all registered
+   * LogRecordProcessor.
+   *
+   * Returns a promise which is resolved when all flushes are complete.
+   */
+  public shutdown(): Promise<void> {
+    if (this._shutdownOnce.isCalled) {
+      diag.warn('shutdown may only be called once per LoggerProvider');
+      return this._shutdownOnce.promise;
+    }
+    return this._shutdownOnce.call();
+  }
+
+  private _shutdown(): Promise<void> {
+    this._sharedState.hasShutdown = true;
+    return this._sharedState.activeProcessor.shutdown();
+  }
+}

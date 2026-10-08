@@ -53,9 +53,9 @@ export type PeriodicExportingMetricReaderOptions = {
     default?: number;
   };
   /**
-   * The maximum batch size for exports. If configured, the reader will split
-   * batches larger than this size into smaller batches.
-   * @experimental
+   * The maximum number of metric data points in a batch that are provided to a
+   * single export. If configured, the reader will split batches larger than
+   * this size into smaller batches.
    */
   maxExportBatchSize?: number;
 };

@@ -73,6 +73,13 @@ export class MeterProvider implements IMeterProvider {
       return createNoopMeter();
     }
 
+    if (typeof name !== 'string' || name.length === 0) {
+      diag.warn(
+        'Invalid MeterProvider instrumentation scope name, using empty string'
+      );
+      name = '';
+    }
+
     return this._sharedState.getMeterSharedState({
       name,
       version,

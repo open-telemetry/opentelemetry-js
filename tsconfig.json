@@ -1,11 +1,15 @@
 {
   "extends": "./tsconfig.base.json",
   "files": [],
+  "include": [
+    "tsdown.config.ts",
+    "**/tsdown.config.ts",
+    "**/tsdown.*.config.ts"
+  ],
   "typedocOptions": {
     "entryPointStrategy": "packages",
     "entryPoints": [
       "api",
-      "experimental/packages/api-logs",
       "experimental/packages/configuration",
       "experimental/packages/exporter-logs-otlp-grpc",
       "experimental/packages/exporter-logs-otlp-http",
@@ -30,22 +34,15 @@
       "experimental/packages/otlp-transformer",
       "experimental/packages/sampler-composite",
       "experimental/packages/sampler-jaeger-remote",
-      "experimental/packages/sdk-logs",
-      "experimental/packages/shim-opencensus",
       "experimental/packages/web-common",
       "packages/opentelemetry-context-async-hooks",
       "packages/opentelemetry-context-zone",
       "packages/opentelemetry-context-zone-peer-dep",
       "packages/opentelemetry-core",
-      "packages/opentelemetry-exporter-jaeger",
       "packages/opentelemetry-exporter-zipkin",
       "packages/opentelemetry-propagator-b3",
-      "packages/opentelemetry-propagator-jaeger",
       "packages/opentelemetry-resources",
-      "packages/opentelemetry-sdk-trace-base",
-      "packages/opentelemetry-sdk-trace-node",
-      "packages/opentelemetry-sdk-trace-web",
-      "packages/opentelemetry-shim-opentracing",
+      "packages/sdk-logs",
       "packages/sdk-metrics",
       "packages/sdk-trace",
       "semantic-conventions"
@@ -63,9 +60,6 @@
   "references": [
     {
       "path": "api"
-    },
-    {
-      "path": "experimental/packages/api-logs"
     },
     {
       "path": "experimental/packages/configuration"
@@ -140,12 +134,6 @@
       "path": "experimental/packages/sampler-jaeger-remote"
     },
     {
-      "path": "experimental/packages/sdk-logs"
-    },
-    {
-      "path": "experimental/packages/shim-opencensus"
-    },
-    {
       "path": "experimental/packages/web-common"
     },
     {
@@ -161,31 +149,16 @@
       "path": "packages/opentelemetry-core"
     },
     {
-      "path": "packages/opentelemetry-exporter-jaeger"
-    },
-    {
       "path": "packages/opentelemetry-exporter-zipkin"
     },
     {
       "path": "packages/opentelemetry-propagator-b3"
     },
     {
-      "path": "packages/opentelemetry-propagator-jaeger"
-    },
-    {
       "path": "packages/opentelemetry-resources"
     },
     {
-      "path": "packages/opentelemetry-sdk-trace-base"
-    },
-    {
-      "path": "packages/opentelemetry-sdk-trace-node"
-    },
-    {
-      "path": "packages/opentelemetry-sdk-trace-web"
-    },
-    {
-      "path": "packages/opentelemetry-shim-opentracing"
+      "path": "packages/sdk-logs"
     },
     {
       "path": "packages/sdk-metrics"

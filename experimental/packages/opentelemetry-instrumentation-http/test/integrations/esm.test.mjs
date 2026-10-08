@@ -31,8 +31,8 @@ import {
   TracerProvider,
 } from '@opentelemetry/sdk-trace';
 
-import { assertSpan } from '../../build/test/utils/assertSpan.js';
-import { HttpInstrumentation } from '../../build/src/index.js';
+import { assertSpan } from '../../build/assertSpan.mjs';
+import { HttpInstrumentation } from '../../dist/index.mjs';
 
 const memoryExporter = new InMemorySpanExporter();
 const provider = new TracerProvider({

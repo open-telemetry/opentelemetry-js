@@ -45,6 +45,7 @@ const common = {
       path.resolve(directory),
       'node_modules',
     ],
+    fallback: { 'path': require.resolve('path-browserify') },
     extensions: ['.ts', '.js', '.jsx', '.json'],
   },
   optimization: {

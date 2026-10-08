@@ -1,0 +1,122 @@
+{
+  "name": "@opentelemetry/sdk-logs",
+  "version": "3.0.0-development.1",
+  "description": "OpenTelemetry logs SDK",
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      },
+      "default": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      }
+    },
+    "./platform": {
+      "require": {
+        "types": "./dist/platform/index.d.cts",
+        "default": "./dist/platform/index.cjs"
+      },
+      "default": {
+        "types": "./dist/platform/index.d.mts",
+        "default": "./dist/platform/index.mjs"
+      }
+    },
+    "./platform/browser": {
+      "require": {
+        "types": "./dist/platform/browser/index.d.cts",
+        "default": "./dist/platform/browser/index.cjs"
+      },
+      "default": {
+        "types": "./dist/platform/browser/index.d.mts",
+        "default": "./dist/platform/browser/index.mjs"
+      }
+    }
+  },
+  "browser": {
+    "./dist/platform/node/export/BatchLogRecordProcessor.mjs": "./dist/platform/browser/export/BatchLogRecordProcessor.mjs",
+    "./dist/platform/node/export/BatchLogRecordProcessor.cjs": "./dist/platform/browser/export/BatchLogRecordProcessor.cjs",
+    "./dist/platform/index.mjs": "./dist/platform/browser/index.mjs",
+    "./dist/platform/index.cjs": "./dist/platform/browser/index.cjs"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "OpenTelemetry Authors",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-logs",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-telemetry/opentelemetry-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "engines": {
+    "node": ">=22.15.0"
+  },
+  "scripts": {
+    "prepublishOnly": "npm run compile",
+    "compile": "tsdown",
+    "clean": "rimraf dist build",
+    "test": "nyc mocha 'test/**/*.test.ts'",
+    "test:browser": "karma start --single-run",
+    "tdd": "npm run test -- --watch-extensions ts --watch",
+    "tdd:browser": "karma start",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "version": "node ../../scripts/version-update.js",
+    "watch": "tsdown --watch --no-clean",
+    "prewatch": "node ../../scripts/version-update.js",
+    "peer-api-check": "node ../../scripts/peer-api-check.mjs",
+    "align-api-deps": "node ../../scripts/align-api-deps.mjs"
+  },
+  "keywords": [
+    "opentelemetry",
+    "nodejs",
+    "logs",
+    "stats",
+    "profiling"
+  ],
+  "files": [
+    "doc",
+    "LICENSE",
+    "README.md",
+    "dist"
+  ],
+  "sideEffects": false,
+  "peerDependencies": {
+    "@opentelemetry/api": ">=1.9.1 <1.11.0 || 1.10.0-development.1"
+  },
+  "devDependencies": {
+    "@babel/core": "7.29.7",
+    "@babel/preset-env": "7.29.7",
+    "@opentelemetry/api": ">=1.9.1 <1.11.0 || 1.10.0-development.1",
+    "@opentelemetry/sdk-metrics": "3.0.0-development.1",
+    "@types/mocha": "10.0.10",
+    "@types/node": "18.19.130",
+    "@types/sinon": "17.0.4",
+    "babel-plugin-istanbul": "8.0.0",
+    "karma": "6.4.4",
+    "karma-chrome-launcher": "3.2.0",
+    "karma-coverage": "2.2.1",
+    "karma-mocha": "2.0.1",
+    "karma-spec-reporter": "0.0.37",
+    "karma-webpack": "5.0.1",
+    "mocha": "12.0.3",
+    "nyc": "18.0.0",
+    "sinon": "18.0.1",
+    "ts-loader": "9.5.7",
+    "typescript": "5.2.2",
+    "webpack": "5.108.4",
+    "webpack-cli": "7.2.3"
+  },
+  "dependencies": {
+    "@opentelemetry/core": "3.0.0-development.1",
+    "@opentelemetry/resources": "3.0.0-development.1",
+    "@opentelemetry/semantic-conventions": "^1.29.0"
+  }
+}

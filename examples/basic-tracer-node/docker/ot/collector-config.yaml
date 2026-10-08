@@ -9,12 +9,10 @@ receivers:
           - https://*
 
 exporters:
-  jaeger:
-    endpoint: jaeger-all-in-one:14250
+  otlp:
+    endpoint: jaeger:4317
     tls:
       insecure: true
-    sending_queue:
-      batch:
 
 service:
   telemetry:
@@ -23,4 +21,4 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      exporters: [jaeger]
+      exporters: [otlp]

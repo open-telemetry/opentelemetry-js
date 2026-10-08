@@ -4,8 +4,6 @@
  */
 export {
   SDK_INFO,
-  _globalThis,
-  otperformance,
   getBooleanFromEnv,
   getStringFromEnv,
   getNumberFromEnv,

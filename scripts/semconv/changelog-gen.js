@@ -42,8 +42,9 @@ function slugify(s) {
 }
 
 /**
- * Given some JS `src` (typically from OTel build/esnext/... output), return
- * whether the given export name `k` is marked `@deprecated`.
+ * Given some JS `src` (from OTel `dist/*.mjs` or pre-tsdown
+ * `build/esnext/*.js` output), return whether the given export name `k` is
+ * marked `@deprecated`.
  *
  * Some of this parsing is shared with "contrib/scripts/gen-semconv-ts.js".
  *
@@ -52,10 +53,12 @@ function slugify(s) {
  *    `true` if marked deprecated.
  */
 function isDeprecated(src, k) {
-  const re = new RegExp(`^export const ${k} = .*;$`, 'm')
+  // tsdown `dist/*.mjs` declares `const k = ...` with one trailing aggregated
+  // `export {...}`; pre-tsdown `build/esnext/*.js` declares `export const k = ...`.
+  const re = new RegExp(`^(?:export )?const ${k} = .*;$`, 'm')
   const match = re.exec(src);
   if (!match) {
-    throw new Error(`could not find the "${k}" export in semconv build/esnext/ source files`);
+    throw new Error(`could not find the "${k}" export in semconv dist/ (or pre-tsdown build/esnext/) source files`);
   }
 
   // Find a preceding block comment, if any.
@@ -301,27 +304,47 @@ function semconvChangelogGen(aVer=undefined, bVer=undefined) {
   }
 
   console.log(`Comparing exports between versions ${aVer} and ${bVer}`)
+  // tsdown ships `dist/*.cjs` + `dist/*.mjs`; pre-tsdown npm tarballs shipped
+  // `build/src/*.js` (CJS) + `build/esnext/*.js` (ESM with jsdoc).
+  const LAYOUTS = {
+    dist: {name: 'dist', cjs: b => `dist/${b}_*.cjs`, esm: b => `dist/${b}_*.mjs`},
+    build: {name: 'build', cjs: b => `build/src/${b}_*.js`, esm: b => `build/esnext/${b}_*.js`},
+  };
+  // Pick one layout per directory; never silently mix the two generations.
+  const layoutFor = (dir) => {
+    if (globSync(path.join(dir, 'dist/*.cjs')).length) {
+      return LAYOUTS.dist;
+    }
+    if (dir === localDir) {
+      throw new Error(`no dist/ output in "${dir}": run "npm run compile" in semantic-conventions first`);
+    }
+    if (globSync(path.join(dir, 'build/src/*.js')).length) {
+      return LAYOUTS.build;
+    }
+    throw new Error(`no built semconv exports found in "${dir}"`);
+  };
+  const globOrThrow = (dir, relPattern) => {
+    const paths = globSync(path.join(dir, relPattern));
+    if (!paths.length) {
+      throw new Error(`no files match "${relPattern}" in "${dir}": incomplete build?`);
+    }
+    return paths;
+  };
+  const aLayout = layoutFor(aDir);
+  const bLayout = layoutFor(bDir);
+  console.log(`Export layouts: ${aVer}=${aLayout.name}, ${bVer}=${bLayout.name}`);
+  const readSrc = (paths) => paths.map(f => fs.readFileSync(f, 'utf8')).join('\n\n');
   const stableChInfo = summarizeChanges({
-    // require('.../build/src/stable_*.js') from previous and current.
-    prev: Object.assign(...globSync(path.join(aDir, 'build/src/stable_*.js')).map(require)),
-    curr: Object.assign(...globSync(path.join(bDir, 'build/src/stable_*.js')).map(require)),
-    // Load '.../build/esnext/stable_*.js' sources to use for parsing jsdoc comments.
-    prevSrc: globSync(path.join(aDir, 'build/esnext/stable_*.js'))
-      .map(f => fs.readFileSync(f, 'utf8'))
-      .join('\n\n'),
-    currSrc: globSync(path.join(bDir, 'build/esnext/stable_*.js'))
-      .map(f => fs.readFileSync(f, 'utf8'))
-      .join('\n\n'),
+    prev: Object.assign({}, ...globOrThrow(aDir, aLayout.cjs('stable')).map(require)),
+    curr: Object.assign({}, ...globOrThrow(bDir, bLayout.cjs('stable')).map(require)),
+    prevSrc: readSrc(globOrThrow(aDir, aLayout.esm('stable'))),
+    currSrc: readSrc(globOrThrow(bDir, bLayout.esm('stable'))),
   });
   const unstableChInfo = summarizeChanges({
-    prev: Object.assign(...globSync(path.join(aDir, 'build/src/experimental_*.js')).map(require)),
-    curr: Object.assign(...globSync(path.join(bDir, 'build/src/experimental_*.js')).map(require)),
-    prevSrc: globSync(path.join(aDir, 'build/esnext/experimental_*.js'))
-      .map(f => fs.readFileSync(f, 'utf8'))
-      .join('\n\n'),
-    currSrc: globSync(path.join(bDir, 'build/esnext/experimental_*.js'))
-      .map(f => fs.readFileSync(f, 'utf8'))
-      .join('\n\n'),
+    prev: Object.assign({}, ...globOrThrow(aDir, aLayout.cjs('experimental')).map(require)),
+    curr: Object.assign({}, ...globOrThrow(bDir, bLayout.cjs('experimental')).map(require)),
+    prevSrc: readSrc(globOrThrow(aDir, aLayout.esm('experimental'))),
+    currSrc: readSrc(globOrThrow(bDir, bLayout.esm('experimental'))),
   });
 
   // Render the "change info" into a Markdown summary for the changelog.

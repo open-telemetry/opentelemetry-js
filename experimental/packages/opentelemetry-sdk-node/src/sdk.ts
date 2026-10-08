@@ -3,8 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { metrics, trace, diag, DiagConsoleLogger } from '@opentelemetry/api';
-import { logs } from '@opentelemetry/api-logs';
+import {
+  metrics,
+  trace,
+  diag,
+  DiagConsoleLogger,
+  logs,
+} from '@opentelemetry/api';
 import type { Instrumentation } from '@opentelemetry/instrumentation';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import type {
@@ -45,6 +50,7 @@ import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import type { NodeSDKConfiguration } from './types';
 import {
   getBooleanFromEnv,
+  getNumberFromEnv,
   getStringFromEnv,
   getStringListFromEnv,
   diagLogLevelFromString,
@@ -118,7 +124,12 @@ function getMetricReadersFromEnv(): IMetricReader[] {
         })
       );
     } else if (exporter === 'prometheus') {
-      metricReaders.push(new PrometheusMetricExporter());
+      metricReaders.push(
+        new PrometheusMetricExporter({
+          host: getStringFromEnv('OTEL_EXPORTER_PROMETHEUS_HOST'),
+          port: getNumberFromEnv('OTEL_EXPORTER_PROMETHEUS_PORT'),
+        })
+      );
     } else {
       diag.warn(
         `Unsupported OTEL_METRICS_EXPORTER value: "${exporter}". Supported values are: otlp, console, prometheus, none.`
@@ -198,23 +209,10 @@ export class NodeSDK {
 
     this._serviceName = configuration.serviceName;
 
-    if (configuration.spanProcessor) {
-      diag.warn(
-        "The 'spanProcessor' option is deprecated. Please use 'spanProcessors' instead."
-      );
-    }
-
     if (configuration.logRecordProcessors) {
       this._loggerProviderConfig = {
         logRecordProcessors: configuration.logRecordProcessors,
       };
-    } else if (configuration.logRecordProcessor) {
-      this._loggerProviderConfig = {
-        logRecordProcessors: [configuration.logRecordProcessor],
-      };
-      diag.warn(
-        "The 'logRecordProcessor' option is deprecated. Please use 'logRecordProcessors' instead."
-      );
     }
 
     if (configuration.metricReaders) {
@@ -222,14 +220,6 @@ export class NodeSDK {
         readers: configuration.metricReaders,
         views: configuration.views,
       };
-    } else if (configuration.metricReader) {
-      this._meterProviderConfig = {
-        readers: [configuration.metricReader],
-        views: configuration.views,
-      };
-      diag.warn(
-        "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
-      );
     } else {
       this._meterProviderConfig = {
         readers: getMetricReadersFromEnv(),
@@ -305,12 +295,10 @@ export class NodeSDK {
       }
     }
 
-    // Determine `spanProcessors` from multiple possible options.
+    // Determine `spanProcessors` from configuration options.
     let spanProcessors: SpanProcessor[];
     if (this._configuration?.spanProcessors) {
       spanProcessors = this._configuration.spanProcessors;
-    } else if (this._configuration?.spanProcessor) {
-      spanProcessors = [this._configuration.spanProcessor];
     } else if (this._configuration?.traceExporter) {
       spanProcessors = [
         createBatchSpanProcessorFromEnv(

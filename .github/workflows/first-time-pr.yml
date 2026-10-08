@@ -10,7 +10,7 @@ jobs:
   welcome:
     permissions:
       pull-requests: write # required by the shared workflow to add a label and post the welcome comment
-    uses: open-telemetry/shared-workflows/.github/workflows/first-time-pr.yml@a4036f5b7201b7f6dc609cc7200d0648a254413b # v0.1.1
+    uses: open-telemetry/shared-workflows/.github/workflows/first-time-pr.yml@d9b812f9924a121c6a8276ea2f9e6f5b622cdd4d # v0.10.0
     with:
       custom_message: |
 

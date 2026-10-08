@@ -9,7 +9,7 @@ import type { Resource } from '@opentelemetry/resources';
 import type { SpanLimits, SpanProcessor } from '../../src';
 import type { TracerProvider } from '../../src';
 
-export const validAttributes = {
+export const validSimpleAttributes = {
   string: 'string',
   number: 0,
   bool: true,
@@ -18,13 +18,20 @@ export const validAttributes = {
   'array<bool>': [true, false],
 };
 
-export const invalidAttributes = {
-  // invalid attribute type object
+export const validAttributes = {
+  ...validSimpleAttributes,
+  null: null,
+  byteArray: new Uint8Array([104, 101, 108, 108, 111]), // 'hello' ords
   object: { foo: 'bar' },
-  // invalid attribute inhomogenous array
   'non-homogeneous-array': [0, ''],
-  // This empty length attribute should not be set
+};
+
+export const invalidAttributes = {
   '': 'empty-key',
+  func: () => {},
+  uint32Array: new Uint32Array([1, 2, 3]),
+  bigInt: 1152921504606846976n,
+  bigInt64Array: new BigInt64Array([1n, 2n, 3n]),
 };
 
 export function assertAssignable<T>(val: T): asserts val is T {}
@@ -74,6 +81,8 @@ export function cheatResourceFromTracerProvider(
 ): Resource {
   return (tracerProvider as any)._resource;
 }
-export function cheatSpanLimitsFromTracer(tracer: ApiTracer): SpanLimits {
+export function cheatSpanLimitsFromTracer(
+  tracer: ApiTracer
+): Required<SpanLimits> {
   return (tracer as any)._spanLimits;
 }

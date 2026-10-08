@@ -43,8 +43,6 @@ registerInstrumentations({
 });
 ```
 
-See [examples/grpc-js](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/grpc-js) for examples.
-
 ### gRPC Instrumentation Options
 
 gRPC instrumentation accepts the following configuration:

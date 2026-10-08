@@ -44,6 +44,7 @@ describe('PrometheusExporter', () => {
   describe('constructor', () => {
     it('should construct an exporter', async () => {
       const exporter = new PrometheusExporter();
+      await exporter.startServer();
       assert.ok(typeof exporter.startServer === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
       await exporter.shutdown();
@@ -95,6 +96,7 @@ describe('PrometheusExporter', () => {
       const port = PrometheusExporter.DEFAULT_OPTIONS.port;
       const endpoint = PrometheusExporter.DEFAULT_OPTIONS.endpoint;
       const exporter = new PrometheusExporter();
+      await exporter.startServer();
       const url = `http://localhost:${port}${endpoint}`;
       await request(url);
       await exporter.shutdown();
@@ -108,6 +110,7 @@ describe('PrometheusExporter', () => {
         port,
         endpoint,
       });
+      await exporter.startServer();
       const url = `http://localhost:${port}${endpoint}`;
       await request(url);
       await exporter.shutdown();
@@ -123,14 +126,20 @@ describe('PrometheusExporter', () => {
       sinon.assert.calledOnce(mockServer.unref);
     });
 
-    it('should listen on environmentally set host and port', () => {
+    it('should not read host and port from the environment', () => {
       process.env.OTEL_EXPORTER_PROMETHEUS_HOST = '127.0.0.1';
       process.env.OTEL_EXPORTER_PROMETHEUS_PORT = '1234';
-      const exporter = new PrometheusExporter({}, async () => {
-        await exporter.shutdown();
+      const exporter = new PrometheusExporter({
+        preventServerStart: true,
       });
-      assert.strictEqual(exporter['_host'], '127.0.0.1');
-      assert.strictEqual(exporter['_port'], 1234);
+      assert.strictEqual(
+        exporter['_host'],
+        PrometheusExporter.DEFAULT_OPTIONS.host
+      );
+      assert.strictEqual(
+        exporter['_port'],
+        PrometheusExporter.DEFAULT_OPTIONS.port
+      );
     });
 
     it('should not require endpoints to start with a slash', async () => {
@@ -154,6 +163,7 @@ describe('PrometheusExporter', () => {
         port,
         endpoint,
       });
+      await exporter.startServer();
       const url = `http://localhost:${port}/invalid`;
 
       await assert.rejects(request(url), { statusCode: 404 });
@@ -194,6 +204,7 @@ describe('PrometheusExporter', () => {
 
     beforeEach(async () => {
       exporter = new PrometheusExporter();
+      await exporter.startServer();
       meterProvider = new MeterProvider({
         readers: [exporter],
       });
@@ -459,7 +470,8 @@ describe('PrometheusExporter', () => {
     let counter: Counter;
     let exporter: PrometheusExporter;
 
-    function setup(reader: PrometheusExporter) {
+    async function setup(reader: PrometheusExporter) {
+      await reader.startServer();
       meterProvider = new MeterProvider({
         readers: [exporter],
       });
@@ -477,7 +489,7 @@ describe('PrometheusExporter', () => {
       exporter = new PrometheusExporter({
         prefix: 'test_prefix',
       });
-      setup(exporter);
+      await setup(exporter);
       const body = await request('http://localhost:9464/metrics');
       const lines = body.split('\n');
 
@@ -495,7 +507,7 @@ describe('PrometheusExporter', () => {
         port: 8080,
       });
 
-      setup(exporter);
+      await setup(exporter);
       const body = await request('http://localhost:8080/metrics');
       const lines = body.split('\n');
 
@@ -513,7 +525,7 @@ describe('PrometheusExporter', () => {
         endpoint: '/test',
       });
 
-      setup(exporter);
+      await setup(exporter);
       const body = await request('http://localhost:9464/test');
       const lines = body.split('\n');
 
@@ -530,7 +542,7 @@ describe('PrometheusExporter', () => {
       exporter = new PrometheusExporter({
         appendTimestamp: true,
       });
-      setup(exporter);
+      await setup(exporter);
       const body = await request('http://localhost:9464/metrics');
       const lines = body.split('\n');
 
@@ -547,7 +559,7 @@ describe('PrometheusExporter', () => {
       exporter = new PrometheusExporter({
         withResourceConstantLabels: /.*/,
       });
-      setup(exporter);
+      await setup(exporter);
       const body = await request('http://localhost:9464/metrics');
       const lines = body.split('\n');
 
@@ -564,7 +576,7 @@ describe('PrometheusExporter', () => {
       exporter = new PrometheusExporter({
         withResourceConstantLabels: /telemetry.sdk.language|telemetry.sdk.name/,
       });
-      setup(exporter);
+      await setup(exporter);
       const body = await request('http://localhost:9464/metrics');
       const lines = body.split('\n');
 
@@ -579,7 +591,7 @@ describe('PrometheusExporter', () => {
 
     it('should omit target_info if withoutTargetInfo is true', async () => {
       exporter = new PrometheusExporter({ withoutTargetInfo: true });
-      setup(exporter);
+      await setup(exporter);
       const body = await request('http://localhost:9464/metrics');
 
       assert.deepStrictEqual(body.includes('target_info'), false);
@@ -587,7 +599,7 @@ describe('PrometheusExporter', () => {
 
     it('should omit scope labels if withoutScopeInfo is true', async () => {
       exporter = new PrometheusExporter({ withoutScopeInfo: true });
-      setup(exporter);
+      await setup(exporter);
       const body = await request('http://localhost:9464/metrics');
       const lines = body.split('\n');
 

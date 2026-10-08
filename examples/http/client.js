@@ -1,8 +1,9 @@
 'use strict';
 
-const api = require('@opentelemetry/api');
-const tracer = require('./tracer')('example-http-client');
 const http = require('http');
+const { trace } = require('@opentelemetry/api');
+
+const tracer = trace.getTracer('example-http');
 
 /** A function which makes requests and handles response. */
 function makeRequest() {

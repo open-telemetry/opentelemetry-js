@@ -11,7 +11,7 @@ import {
   SpanKind,
   trace,
 } from '@opentelemetry/api';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import type { ContextManager } from '@opentelemetry/api';
 import {
   TracerProvider,
@@ -49,7 +49,6 @@ let server: https.Server;
 const serverPort = 32345;
 const protocol = 'https';
 const hostname = 'localhost';
-const serverName = 'my.server.name';
 const pathname = '/test';
 const memoryExporter = new InMemorySpanExporter();
 const provider = new TracerProvider({
@@ -80,7 +79,7 @@ describe('HttpsInstrumentation', () => {
   let contextManager: ContextManager;
 
   beforeEach(() => {
-    contextManager = new AsyncHooksContextManager().enable();
+    contextManager = new AsyncLocalStorageContextManager().enable();
     propagation.setGlobalPropagator(new DummyPropagation());
     context.setGlobalContextManager(contextManager);
   });
@@ -183,7 +182,6 @@ describe('HttpsInstrumentation', () => {
             return false;
           },
           applyCustomAttributesOnSpan: customAttributeFunction,
-          serverName,
         });
         instrumentation.enable();
         server = https.createServer(
@@ -231,7 +229,6 @@ describe('HttpsInstrumentation', () => {
           resHeaders: result.resHeaders,
           reqHeaders: result.reqHeaders,
           component: 'https',
-          serverName,
         };
 
         assert.strictEqual(spans.length, 2);

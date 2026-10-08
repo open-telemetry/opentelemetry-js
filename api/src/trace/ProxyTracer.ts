@@ -23,6 +23,7 @@ export class ProxyTracer implements Tracer {
   private _provider: TracerDelegator;
   public readonly name: string;
   public readonly version?: string;
+  /** @since 1.1.0 */
   public readonly options?: TracerOptions;
 
   constructor(

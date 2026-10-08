@@ -35,7 +35,6 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace';
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
-import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import type { ConfigurationModel } from '@opentelemetry/configuration';
 import type {
@@ -207,15 +206,6 @@ export function getPropagatorFromEnv(): TextMapPropagator | null | undefined {
     [
       'b3multi',
       () => new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
-    ],
-    [
-      'jaeger',
-      () => {
-        diag.warn(
-          'The Jaeger propagator is deprecated and will be removed in a future release. Use the W3C TraceContext propagator ("tracecontext") instead.'
-        );
-        return new JaegerPropagator();
-      },
     ],
   ]);
 

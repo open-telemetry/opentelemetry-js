@@ -18,16 +18,16 @@
       "path": "../../../api"
     },
     {
+      "path": "../../../packages/opentelemetry-core"
+    },
+    {
       "path": "../../../packages/sdk-trace"
     },
     {
       "path": "../../../semantic-conventions"
     },
     {
-      "path": "../api-logs"
-    },
-    {
-      "path": "../sdk-logs"
+      "path": "../../../packages/sdk-logs"
     }
   ]
 }

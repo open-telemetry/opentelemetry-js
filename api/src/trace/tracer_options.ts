@@ -6,7 +6,7 @@
 /**
  * An interface describes additional metadata of a tracer.
  *
- * @since 1.3.0
+ * @since 1.1.0
  */
 export interface TracerOptions {
   /**

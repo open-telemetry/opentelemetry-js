@@ -21,15 +21,35 @@
       "inputs": [
         "{projectRoot}/src/**/*.ts",
         "{projectRoot}/test/**/*.ts",
-        "{projectRoot}/**/*.proto"
+        "{projectRoot}/**/*.proto",
+        "{projectRoot}/package.json",
+        "{projectRoot}/tsdown.config.ts",
+        "{projectRoot}/tsdown.*.config.ts",
+        "{workspaceRoot}/tsdown.config.ts",
+        "{workspaceRoot}/package-lock.json"
       ],
       "outputs": [
-        "{projectRoot}/build"
+        "{projectRoot}/dist"
       ]
     },
     "watch": {
       "dependsOn": [
         "compile"
+      ]
+    },
+    "test": {
+      "dependsOn": [
+        "^compile"
+      ]
+    },
+    "test:browser": {
+      "dependsOn": [
+        "^compile"
+      ]
+    },
+    "test:webworker": {
+      "dependsOn": [
+        "^compile"
       ]
     },
     "lint": {
@@ -38,7 +58,7 @@
         "{projectRoot}/test/**/*.ts"
       ]
     },
-    "version:update": {
+    "version": {
       "inputs": [
         "{projectRoot}/package.json"
       ],

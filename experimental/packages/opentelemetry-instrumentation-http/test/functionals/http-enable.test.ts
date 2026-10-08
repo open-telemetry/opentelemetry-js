@@ -20,6 +20,7 @@ import {
 } from '@opentelemetry/sdk-trace';
 import {
   ATTR_CLIENT_ADDRESS,
+  ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
   ATTR_HTTP_ROUTE,
@@ -42,7 +43,7 @@ import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
 import type { ContextManager } from '@opentelemetry/api';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import type {
   ClientRequest,
   IncomingMessage,
@@ -68,7 +69,6 @@ const serverPort = 22346;
 const protocol = 'http';
 const hostname = 'localhost';
 const pathname = '/test';
-const serverName = 'my.server.name';
 const memoryExporter = new InMemorySpanExporter();
 const provider = new TracerProvider({
   spanProcessors: [new SimpleSpanProcessor({ exporter: memoryExporter })],
@@ -140,7 +140,7 @@ describe('HttpInstrumentation', () => {
   });
 
   beforeEach(() => {
-    contextManager = new AsyncHooksContextManager().enable();
+    contextManager = new AsyncLocalStorageContextManager().enable();
     context.setGlobalContextManager(contextManager);
   });
 
@@ -303,7 +303,6 @@ describe('HttpInstrumentation', () => {
           responseHook: responseHookFunction,
           startIncomingSpanHook: startIncomingSpanHookFunction,
           startOutgoingSpanHook: startOutgoingSpanHookFunction,
-          serverName,
         });
         instrumentation.enable();
         server = http.createServer((request, response) => {
@@ -344,6 +343,10 @@ describe('HttpInstrumentation', () => {
           if (request.url?.includes('/withQuery')) {
             assert.match(request.url, /withQuery\?foo=bar$/);
           }
+          const status = request.url?.match(/\/status\/(\d+)/);
+          if (status) {
+            response.statusCode = Number(status[1]);
+          }
           response.end('Test Server Response');
         });
 
@@ -379,7 +382,6 @@ describe('HttpInstrumentation', () => {
           resHeaders: result.resHeaders,
           reqHeaders: result.reqHeaders,
           component: 'http',
-          serverName,
         };
 
         assert.strictEqual(spans.length, 2);
@@ -416,6 +418,43 @@ describe('HttpInstrumentation', () => {
         assert.strictEqual(span.kind, SpanKind.SERVER);
         assert.strictEqual(span.attributes[ATTR_HTTP_ROUTE], 'TheRoute');
         assert.strictEqual(span.name, 'GET TheRoute');
+      });
+
+      it('should set error.type to the status code on a failing span', async () => {
+        await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}/status/500`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        const incomingSpan = spans.find(s => s.kind === SpanKind.SERVER);
+        const outgoingSpan = spans.find(s => s.kind === SpanKind.CLIENT);
+        assert.ok(incomingSpan);
+        assert.ok(outgoingSpan);
+
+        for (const span of [incomingSpan, outgoingSpan]) {
+          assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
+          assert.strictEqual(span.attributes[ATTR_ERROR_TYPE], '500');
+        }
+      });
+
+      it('should treat 4xx as an error on the client span only', async () => {
+        await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}/status/404`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        const incomingSpan = spans.find(s => s.kind === SpanKind.SERVER);
+        const outgoingSpan = spans.find(s => s.kind === SpanKind.CLIENT);
+        assert.ok(incomingSpan);
+        assert.ok(outgoingSpan);
+
+        assert.strictEqual(incomingSpan.status.code, SpanStatusCode.UNSET);
+        assert.strictEqual(
+          incomingSpan.attributes[ATTR_ERROR_TYPE],
+          undefined,
+          "a 4xx is the caller's error, not the server's"
+        );
+
+        assert.strictEqual(outgoingSpan.status.code, SpanStatusCode.ERROR);
+        assert.strictEqual(outgoingSpan.attributes[ATTR_ERROR_TYPE], '404');
       });
 
       const httpErrorCodes = [
@@ -1148,6 +1187,119 @@ describe('HttpInstrumentation', () => {
         );
       });
 
+      it('should not throw when `host` is not a string and `hostname` is set', async () => {
+        // Node.js ignores a non-string `host` option when `hostname` is a
+        // valid string, so the instrumentation must accept these options too.
+        // See https://github.com/open-telemetry/opentelemetry-js/issues/6967
+        await new Promise<void>((resolve, reject) => {
+          const req = http.request(
+            {
+              hostname,
+              port: serverPort,
+              path: pathname,
+              host: new URL(
+                `${protocol}://stale.example.com`
+              ) as unknown as string,
+            },
+            res => {
+              res.resume();
+              res.on('end', resolve);
+              res.on('error', reject);
+            }
+          );
+          req.on('error', reject);
+          req.end();
+        });
+
+        const spans = memoryExporter.getFinishedSpans();
+        const outgoingSpan = spans.find(s => s.kind === SpanKind.CLIENT);
+        assert.ok(outgoingSpan);
+        assert.strictEqual(
+          outgoingSpan.attributes[ATTR_SERVER_ADDRESS],
+          hostname
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes[ATTR_SERVER_PORT],
+          serverPort
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes[ATTR_URL_FULL],
+          `${protocol}://${hostname}:${serverPort}${pathname}`
+        );
+      });
+
+      it('should handle URL-like objects (e.g. cross-realm or polyfilled URLs) like Node.js does', async () => {
+        // Node.js detects URL objects by shape (`href` and `origin`), not by
+        // `instanceof`. URL objects from other realms or polyfills keep their
+        // properties as prototype getters, which `Object.assign` cannot see,
+        // so mis-classifying them as an options object misdirects the request.
+        const realUrl = new URL(
+          `${protocol}://${hostname}:${serverPort}${pathname}`
+        );
+        const urlLike = Object.create({
+          get href() {
+            return realUrl.href;
+          },
+          get origin() {
+            return realUrl.origin;
+          },
+          get protocol() {
+            return realUrl.protocol;
+          },
+          get username() {
+            return realUrl.username;
+          },
+          get password() {
+            return realUrl.password;
+          },
+          get host() {
+            return realUrl.host;
+          },
+          get hostname() {
+            return realUrl.hostname;
+          },
+          get port() {
+            return realUrl.port;
+          },
+          get pathname() {
+            return realUrl.pathname;
+          },
+          get search() {
+            return realUrl.search;
+          },
+          get hash() {
+            return realUrl.hash;
+          },
+        });
+
+        await new Promise<void>((resolve, reject) => {
+          const req = http.request(urlLike, res => {
+            assert.strictEqual(res.statusCode, 200);
+            res.resume();
+            res.on('end', resolve);
+            res.on('error', reject);
+          });
+          req.on('error', reject);
+          req.end();
+        });
+
+        const spans = memoryExporter.getFinishedSpans();
+        const outgoingSpan = spans.find(s => s.kind === SpanKind.CLIENT);
+        assert.ok(outgoingSpan);
+        assert.strictEqual(
+          outgoingSpan.attributes[ATTR_SERVER_ADDRESS],
+          hostname
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes[ATTR_SERVER_PORT],
+          serverPort
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes[ATTR_URL_FULL],
+          `${protocol}://${hostname}:${serverPort}${pathname}`
+        );
+      });
+
       it('should generate semconv 1.27 server spans with route when RPC metadata is available', async () => {
         const response = await httpRequest.get(
           `${protocol}://${hostname}:${serverPort}${pathname}/setroute`
@@ -1569,7 +1721,7 @@ describe('HttpInstrumentation', () => {
       );
     });
 
-    it('should not modify URLs with empty query parameters', async () => {
+    it('should redact sensitive query parameters with empty values', async () => {
       await httpRequest.get(
         `${protocol}://${hostname}:${serverPort}${pathname}?sig=&empty=`
       );
@@ -1578,7 +1730,7 @@ describe('HttpInstrumentation', () => {
 
       assert.strictEqual(
         outgoingSpan.attributes[ATTR_URL_FULL],
-        `${protocol}://${hostname}:${serverPort}${pathname}?sig=&empty=`
+        `${protocol}://${hostname}:${serverPort}${pathname}?sig=REDACTED&empty=`
       );
     });
 

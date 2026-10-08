@@ -1,6 +1,5 @@
-const { context, trace } = require('@opentelemetry/api');
-const { ConsoleSpanExporter, SimpleSpanProcessor } = require( '@opentelemetry/sdk-trace-base');
-const { WebTracerProvider } = require( '@opentelemetry/sdk-trace-web');
+const { context, trace, propagation } = require('@opentelemetry/api');
+const { ConsoleSpanExporter, SimpleSpanProcessor, TracerProvider } = require( '@opentelemetry/sdk-trace');
 const { XMLHttpRequestInstrumentation } = require( '@opentelemetry/instrumentation-xml-http-request');
 const { ZoneContextManager } = require( '@opentelemetry/context-zone');
 const { OTLPTraceExporter } = require( '@opentelemetry/exporter-trace-otlp-http');
@@ -9,7 +8,7 @@ const { registerInstrumentations } = require( '@opentelemetry/instrumentation');
 const { resourceFromAttributes } = require('@opentelemetry/resources');
 const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 
-const providerWithZone = new WebTracerProvider({
+const providerWithZone = new TracerProvider({
   resource: resourceFromAttributes({
     [ATTR_SERVICE_NAME]: 'xml-http-web-service'
   }),
@@ -17,15 +16,14 @@ const providerWithZone = new WebTracerProvider({
   // to your exporter. Using the SimpleSpanProcessor here as it sends the spans immediately to the
   // exporter without delay
   spanProcessors: [
-    new SimpleSpanProcessor(new ConsoleSpanExporter()),
-    new SimpleSpanProcessor(new OTLPTraceExporter()),
+    new SimpleSpanProcessor({ exporter: new ConsoleSpanExporter() }),
+    new SimpleSpanProcessor({ exporter: new OTLPTraceExporter() }),
   ]
 });
 
-providerWithZone.register({
-  contextManager: new ZoneContextManager(),
-  propagator: new B3Propagator(),
-});
+trace.setGlobalTracerProvider(providerWithZone);
+propagation.setGlobalPropagator(new B3Propagator());
+context.setGlobalContextManager(new ZoneContextManager().enable());
 
 registerInstrumentations({
   instrumentations: [
@@ -38,7 +36,7 @@ registerInstrumentations({
   ],
 });
 
-const webTracerWithZone = providerWithZone.getTracer('example-tracer-web');
+const tracerWithZone = providerWithZone.getTracer('example-tracer-web');
 
 const getData = (url) => new Promise((resolve, reject) => {
   const req = new XMLHttpRequest();
@@ -62,7 +60,7 @@ const prepareClickEvent = () => {
 
   const onClick = () => {
     for (let i = 0, j = 5; i < j; i += 1) {
-      const span1 = webTracerWithZone.startSpan(`files-series-info-${i}`);
+      const span1 = tracerWithZone.startSpan(`files-series-info-${i}`);
       context.with(trace.setSpan(context.active(), span1), () => {
         getData(url1).then((_data) => {
           trace.getSpan(context.active()).addEvent('fetching-span1-completed');

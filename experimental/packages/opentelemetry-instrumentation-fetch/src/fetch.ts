@@ -17,7 +17,7 @@ import {
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import * as core from '@opentelemetry/core';
-import * as web from '@opentelemetry/sdk-trace-web';
+import * as web from '@opentelemetry/web-common';
 import { ATTR_HTTP_REQUEST_BODY_SIZE } from './semconv';
 import {
   ATTR_ERROR_TYPE,
@@ -80,6 +80,7 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
 
 /**
  * This class represents a fetch plugin for auto instrumentation
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation#fetch
  */
 export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentationConfig> {
   readonly component: string = 'fetch';
@@ -123,8 +124,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       childSpan,
       corsPreFlightRequest,
       this.getConfig().ignoreNetworkEvents,
-      undefined,
-      true
+      undefined
     );
     childSpan.end(
       corsPreFlightRequest[web.PerformanceTimingNames.RESPONSE_END]
@@ -304,8 +304,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         span,
         mainRequest,
         this.getConfig().ignoreNetworkEvents,
-        undefined,
-        true
+        undefined
       );
     }
   }
