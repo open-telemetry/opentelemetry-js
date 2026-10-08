@@ -138,11 +138,12 @@ export interface BatchLogRecordProcessorOptions
   /** The maximum queue size. After the size is reached log records are dropped.
    * The default value is 2048. */
   maxQueueSize?: number;
-}
 
-export interface BatchLogRecordProcessorBrowserOptions
-  extends BatchLogRecordProcessorOptions {
-  /** Disable flush when a user navigates to a new page, closes the tab or the browser, or,
+  /** Browser only: disable flush when a user navigates to a new page, closes the tab or the browser, or,
    * on mobile, switches to a different app. Auto flush is enabled by default. */
   disableAutoFlushOnDocumentHide?: boolean;
 }
+
+/** @deprecated Use {@link BatchLogRecordProcessorOptions}, which includes the browser-only options. */
+export type BatchLogRecordProcessorBrowserOptions =
+  BatchLogRecordProcessorOptions;

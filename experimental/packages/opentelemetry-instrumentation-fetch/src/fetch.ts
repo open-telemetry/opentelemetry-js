@@ -580,6 +580,12 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     }
   }
 
+  /** False before enable(), after disable(), or when patching throws; disable() leaves
+   * globalThis.fetch wrapped. */
+  override isEnabled(): boolean {
+    return this._isEnabled === true;
+  }
+
   /**
    * deactivates fetch instrumentation
    */
