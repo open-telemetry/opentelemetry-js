@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { OTLPTraceExporter } from '../src';
+import { OTLPTraceExporter, createOtlpGrpcSpanExporter } from '../src';
 import type { ServerTestContext } from './utils';
 import { startServer, TestMetricReader } from './utils';
 import * as assert from 'assert';
@@ -94,5 +94,27 @@ describe('OTLPTraceExporter', function () {
     );
     assert.ok(scopeMetrics);
     await meterProvider.shutdown();
+  });
+
+  describe('createOtlpGrpcSpanExporter', function () {
+    it('successfully exports data', async () => {
+      // arrange
+      const tracerProvider = new TracerProvider({
+        spanProcessors: [
+          new SimpleSpanProcessor({
+            exporter: createOtlpGrpcSpanExporter({
+              url: 'http://localhost:1501',
+            }),
+          }),
+        ],
+      });
+
+      // act
+      tracerProvider.getTracer('test-tracer').startSpan('test-span').end();
+      await tracerProvider.shutdown();
+
+      // assert
+      assert.strictEqual(serverTestContext.requests.length, 1);
+    });
   });
 });

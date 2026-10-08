@@ -3,11 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { OTLPMetricExporter } from '../src';
+import { OTLPMetricExporter, createOtlpGrpcMetricExporter } from '../src';
 import type { ServerTestContext } from './utils';
 import { startServer, TestMetricReader } from './utils';
 import * as assert from 'assert';
+import { AggregationTemporalityPreference } from '@opentelemetry/exporter-metrics-otlp-http';
 import {
+  AggregationTemporality,
+  InstrumentType,
   MeterProvider,
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
@@ -93,5 +96,61 @@ describe('OTLPMetricsExporter', function () {
     );
     assert.ok(scopeMetrics);
     await meterProvider.shutdown();
+  });
+
+  describe('createOtlpGrpcMetricExporter', function () {
+    afterEach(function () {
+      delete process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE;
+    });
+
+    it('does not read OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE from the environment', function () {
+      process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'delta';
+
+      // control: the class-based exporter keeps using the environment
+      assert.equal(
+        new OTLPMetricExporter().selectAggregationTemporality(
+          InstrumentType.COUNTER
+        ),
+        AggregationTemporality.DELTA
+      );
+
+      // the factory-created exporter uses the specification default instead
+      assert.equal(
+        createOtlpGrpcMetricExporter().selectAggregationTemporality!(
+          InstrumentType.COUNTER
+        ),
+        AggregationTemporality.CUMULATIVE
+      );
+    });
+
+    it('honors an explicit temporalityPreference over the specification default', function () {
+      process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE =
+        'cumulative';
+
+      assert.equal(
+        createOtlpGrpcMetricExporter({
+          temporalityPreference: AggregationTemporalityPreference.DELTA,
+        }).selectAggregationTemporality!(InstrumentType.COUNTER),
+        AggregationTemporality.DELTA
+      );
+    });
+
+    it('successfully exports data', async () => {
+      // arrange
+      const exporter = createOtlpGrpcMetricExporter({
+        url: 'http://localhost:1502',
+      });
+      const meterProvider = new MeterProvider({
+        readers: [new PeriodicExportingMetricReader({ exporter })],
+      });
+
+      // act
+      meterProvider.getMeter('test-meter').createCounter('test-counter').add(1);
+      await meterProvider.forceFlush();
+
+      // assert
+      assert.strictEqual(serverTestContext.requests.length, 1);
+      await meterProvider.shutdown();
+    });
   });
 });

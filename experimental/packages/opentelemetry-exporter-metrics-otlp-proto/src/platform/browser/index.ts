@@ -3,4 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export { OTLPMetricExporter } from './OTLPMetricExporter';
+export {
+  createOtlpProtoMetricExporter,
+  OTLPMetricExporter,
+} from './OTLPMetricExporter';

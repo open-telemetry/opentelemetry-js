@@ -6,11 +6,16 @@
 import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';
+import { syncBuiltinESMExports } from 'module';
 import { Stream } from 'stream';
 
+import { type Attributes } from '@opentelemetry/api';
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { TracerProvider, SimpleSpanProcessor } from '@opentelemetry/sdk-trace';
-import { OTLPTraceExporter } from '../../src/platform/node';
+import {
+  createOtlpHttpSpanExporter,
+  OTLPTraceExporter,
+} from '../../src/platform/node';
 import { TestMetricReader } from '../utils';
 
 /*
@@ -20,10 +25,38 @@ import { TestMetricReader } from '../utils';
  * - `@opentelemetry/otlp-transformer`: Everything regarding serialization and transforming internal representations to OTLP
  */
 
+function stubSuccessfulHttpRequest(): void {
+  (sinon.stub(http, 'request') as sinon.SinonStub).callsFake(
+    (...args: unknown[]) => {
+      const responseCallback =
+        typeof args[args.length - 1] === 'function'
+          ? (args[args.length - 1] as (res: unknown) => void)
+          : null;
+      const fakeRequest = new Stream.PassThrough();
+      Object.defineProperty(fakeRequest, 'setTimeout', {
+        value: function (_timeout: number) {},
+      });
+      fakeRequest.on('finish', () => {
+        if (responseCallback) {
+          const fakeResponse = new Stream.PassThrough() as any;
+          fakeResponse.statusCode = 200;
+          fakeResponse.statusMessage = 'OK';
+          fakeResponse.headers = {};
+          responseCallback(fakeResponse);
+          fakeResponse.end();
+        }
+      });
+      return fakeRequest as any;
+    }
+  );
+  syncBuiltinESMExports();
+}
+
 describe('OTLPTraceExporter', () => {
   describe('export', () => {
     afterEach(() => {
       sinon.restore();
+      syncBuiltinESMExports();
     });
 
     it('successfully exports data', done => {
@@ -38,6 +71,7 @@ describe('OTLPTraceExporter', () => {
       });
 
       sinon.stub(http, 'request').returns(fakeRequest as any);
+      syncBuiltinESMExports();
       let buff = Buffer.from('');
       fakeRequest.on('finish', async () => {
         try {
@@ -74,5 +108,100 @@ describe('OTLPTraceExporter', () => {
 
       tracerProvider.getTracer('test-tracer').startSpan('test-span').end();
     });
+  });
+});
+
+describe('createOtlpHttpSpanExporter', () => {
+  beforeEach(() => {
+    stubSuccessfulHttpRequest();
+  });
+
+  afterEach(() => {
+    delete process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT;
+    sinon.restore();
+    syncBuiltinESMExports();
+  });
+
+  async function collectServerAttributes(
+    metricReader: TestMetricReader
+  ): Promise<Attributes[]> {
+    const { resourceMetrics } = await metricReader.collect();
+    const scopeMetrics = resourceMetrics.scopeMetrics.find(
+      sm => sm.scope.name === '@opentelemetry/otlp-exporter'
+    );
+    return (
+      scopeMetrics?.metrics.flatMap(metric =>
+        metric.dataPoints.map(dataPoint => dataPoint.attributes)
+      ) ?? []
+    );
+  }
+
+  it('returns an exporter that does not use configuration from the environment', async () => {
+    process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT =
+      'http://127.0.0.1:9/v1/traces';
+
+    const metricReader = new TestMetricReader();
+    const meterProvider = new MeterProvider({
+      readers: [metricReader],
+    });
+    const tracerProvider = new TracerProvider({
+      spanProcessors: [
+        new SimpleSpanProcessor({
+          exporter: createOtlpHttpSpanExporter({
+            selfObsMeterProvider: meterProvider,
+          }),
+        }),
+      ],
+    });
+
+    tracerProvider.getTracer('test-tracer').startSpan('test-span').end();
+    await tracerProvider.shutdown();
+
+    const serverAttributes = await collectServerAttributes(metricReader);
+    assert.ok(
+      serverAttributes.some(
+        attrs =>
+          attrs['server.address'] === 'localhost' &&
+          attrs['server.port'] === 4318
+      ),
+      `expected exporter metrics to target the default endpoint, got ${JSON.stringify(
+        serverAttributes
+      )}`
+    );
+    await meterProvider.shutdown();
+  });
+
+  it('control: the class-based exporter keeps using the environment', async () => {
+    process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT =
+      'http://127.0.0.1:9/v1/traces';
+
+    const metricReader = new TestMetricReader();
+    const meterProvider = new MeterProvider({
+      readers: [metricReader],
+    });
+    const tracerProvider = new TracerProvider({
+      spanProcessors: [
+        new SimpleSpanProcessor({
+          exporter: new OTLPTraceExporter({
+            selfObsMeterProvider: meterProvider,
+          }),
+        }),
+      ],
+    });
+
+    tracerProvider.getTracer('test-tracer').startSpan('test-span').end();
+    await tracerProvider.shutdown();
+
+    const serverAttributes = await collectServerAttributes(metricReader);
+    assert.ok(
+      serverAttributes.some(
+        attrs =>
+          attrs['server.address'] === '127.0.0.1' && attrs['server.port'] === 9
+      ),
+      `expected exporter metrics to target the env-provided endpoint, got ${JSON.stringify(
+        serverAttributes
+      )}`
+    );
+    await meterProvider.shutdown();
   });
 });
