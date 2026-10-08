@@ -31,7 +31,6 @@ describeBrowser('BatchSpanProcessor', () => {
   let processor: BatchSpanProcessor;
   let forceFlushSpy: sinon.SinonStub;
   let visibilityChangeEvent: Event;
-  let pageHideEvent: Event;
   let globalErrorHandlerStub: sinon.SinonStub;
 
   beforeEach(() => {
@@ -43,7 +42,6 @@ describeBrowser('BatchSpanProcessor', () => {
       .stub(processor, 'forceFlush')
       .returns(Promise.resolve());
     visibilityChangeEvent = new Event('visibilitychange');
-    pageHideEvent = new Event('pagehide');
     globalErrorHandlerStub = sinon.stub();
     setGlobalErrorHandler(globalErrorHandlerStub);
   });
@@ -119,12 +117,6 @@ describeBrowser('BatchSpanProcessor', () => {
       testDocumentHide(() => {
         visibilityState = 'hidden';
         document.dispatchEvent(visibilityChangeEvent);
-      });
-    });
-
-    describe('by the pagehide event', () => {
-      testDocumentHide(() => {
-        document.dispatchEvent(pageHideEvent);
       });
     });
   });
