@@ -2109,7 +2109,7 @@ describe('fetch', () => {
       // in Chrome the observer callback happens to run first, so deleting
       // takeRecords() could leave the describe above green. Starving the
       // callback makes the drain the only possible source of entries.
-      describe('when the `PerformanceObserver` callback never runs', () => {
+      describe('when the `PerformanceObserver` callback is a no-op that keeps no entries', () => {
         if (!PerformanceObserver?.supportedEntryTypes?.includes('resource')) {
           // eslint-disable-next-line no-console
           console.warn(
