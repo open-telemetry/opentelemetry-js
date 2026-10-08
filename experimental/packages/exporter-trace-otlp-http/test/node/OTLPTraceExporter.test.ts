@@ -8,9 +8,13 @@ import * as http from 'http';
 import * as sinon from 'sinon';
 import { Stream } from 'stream';
 
+import { type Attributes } from '@opentelemetry/api';
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { TracerProvider, SimpleSpanProcessor } from '@opentelemetry/sdk-trace';
-import { OTLPTraceExporter } from '../../src/platform/node';
+import {
+  createOtlpHttpSpanExporter,
+  OTLPTraceExporter,
+} from '../../src/platform/node';
 import { TestMetricReader } from '../utils';
 
 /*
@@ -74,5 +78,95 @@ describe('OTLPTraceExporter', () => {
 
       tracerProvider.getTracer('test-tracer').startSpan('test-span').end();
     });
+  });
+});
+
+describe('createOtlpHttpSpanExporter', () => {
+  afterEach(() => {
+    delete process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT;
+  });
+
+  async function collectServerAttributes(
+    metricReader: TestMetricReader
+  ): Promise<Attributes[]> {
+    const { resourceMetrics } = await metricReader.collect();
+    const scopeMetrics = resourceMetrics.scopeMetrics.find(
+      sm => sm.scope.name === '@opentelemetry/otlp-exporter'
+    );
+    return (
+      scopeMetrics?.metrics.flatMap(metric =>
+        metric.dataPoints.map(dataPoint => dataPoint.attributes)
+      ) ?? []
+    );
+  }
+
+  it('returns an exporter that does not use configuration from the environment', async () => {
+    process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT =
+      'http://127.0.0.1:9/v1/traces';
+
+    const metricReader = new TestMetricReader();
+    const meterProvider = new MeterProvider({
+      readers: [metricReader],
+    });
+    const tracerProvider = new TracerProvider({
+      spanProcessors: [
+        new SimpleSpanProcessor({
+          exporter: createOtlpHttpSpanExporter({
+            selfObsMeterProvider: meterProvider,
+          }),
+        }),
+      ],
+    });
+
+    // The exporter records the endpoint it targets in its own metrics,
+    // synchronously when the export starts, so no request needs to complete
+    // for this assertion (and there is nothing to shut down for it).
+    tracerProvider.getTracer('test-tracer').startSpan('test-span').end();
+
+    const serverAttributes = await collectServerAttributes(metricReader);
+    assert.ok(
+      serverAttributes.some(
+        attrs =>
+          attrs['server.address'] === 'localhost' &&
+          attrs['server.port'] === 4318
+      ),
+      `expected exporter metrics to target the default endpoint, got ${JSON.stringify(
+        serverAttributes
+      )}`
+    );
+    await meterProvider.shutdown();
+  });
+
+  it('control: the class-based exporter keeps using the environment', async () => {
+    process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT =
+      'http://127.0.0.1:9/v1/traces';
+
+    const metricReader = new TestMetricReader();
+    const meterProvider = new MeterProvider({
+      readers: [metricReader],
+    });
+    const tracerProvider = new TracerProvider({
+      spanProcessors: [
+        new SimpleSpanProcessor({
+          exporter: new OTLPTraceExporter({
+            selfObsMeterProvider: meterProvider,
+          }),
+        }),
+      ],
+    });
+
+    tracerProvider.getTracer('test-tracer').startSpan('test-span').end();
+
+    const serverAttributes = await collectServerAttributes(metricReader);
+    assert.ok(
+      serverAttributes.some(
+        attrs =>
+          attrs['server.address'] === '127.0.0.1' && attrs['server.port'] === 9
+      ),
+      `expected exporter metrics to target the env-provided endpoint, got ${JSON.stringify(
+        serverAttributes
+      )}`
+    );
+    await meterProvider.shutdown();
   });
 });

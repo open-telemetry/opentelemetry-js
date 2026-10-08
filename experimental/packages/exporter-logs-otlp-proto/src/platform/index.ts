@@ -2,4 +2,4 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-export { OTLPLogExporter } from './node';
+export { createOtlpProtoLogExporter, OTLPLogExporter } from './node';

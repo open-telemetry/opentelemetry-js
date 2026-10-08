@@ -3,4 +3,4 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export { OTLPLogExporter } from './node';
+export { createOtlpHttpLogExporter, OTLPLogExporter } from './node';
