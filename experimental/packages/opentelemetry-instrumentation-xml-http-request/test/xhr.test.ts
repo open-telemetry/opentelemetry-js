@@ -268,6 +268,35 @@ describe('xhr', () => {
         xhrInstrumentation!.enable();
         assert.doesNotThrow(() => xhrInstrumentation!.enable());
       });
+
+      it('should report isEnabled() false when _wrap fails', () => {
+        xhrInstrumentation!.enable();
+        assert.strictEqual(xhrInstrumentation!.isEnabled(), false);
+      });
+    });
+
+    describe('when XMLHttpRequest prototype methods are missing', () => {
+      // `shimmer.wrap` returns undefined instead of throwing when the target
+      // is absent or not a function, so this is a distinct failure path.
+      beforeEach(() => {
+        xhrInstrumentation = new XMLHttpRequestInstrumentation({
+          enabled: false,
+        });
+        // @ts-expect-error access internal property for testing
+        sinon.stub(xhrInstrumentation, '_wrap').returns(undefined);
+      });
+
+      it('should report isEnabled() false when _wrap returns undefined', () => {
+        xhrInstrumentation!.enable();
+        assert.strictEqual(xhrInstrumentation!.isEnabled(), false);
+      });
+
+      it('should retry wrapping on the next enable()', () => {
+        xhrInstrumentation!.enable();
+        xhrInstrumentation!.enable();
+        // @ts-expect-error access internal property for testing
+        assert.strictEqual(xhrInstrumentation!._wrap.callCount, 4);
+      });
     });
 
     describe('when XMLHttpRequest prototype methods can be wrapped', () => {
@@ -279,6 +308,10 @@ describe('xhr', () => {
         const xhttp2 = new XMLHttpRequest();
         assert.ok(isWrapped(xhttp2.open), 'open method should be wrapped');
         assert.ok(isWrapped(xhttp2.send), 'send method should be wrapped');
+        assert.strictEqual(xhrInstrumentation.isEnabled(), true);
+        xhrInstrumentation.disable();
+        assert.ok(isWrapped(xhttp2.open), 'disable() leaves open wrapped');
+        assert.strictEqual(xhrInstrumentation.isEnabled(), false);
         // @ts-expect-error -- property added by instrumentation.wrap(...)
         XMLHttpRequest.prototype.send.__unwrap();
         // @ts-expect-error -- property added by instrumentation.wrap(...)

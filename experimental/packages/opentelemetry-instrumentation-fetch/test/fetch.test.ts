@@ -237,8 +237,10 @@ describe('fetch', () => {
       assert.ok(!isWrapped(window.fetch));
       fetchInstrumentation = new FetchInstrumentation({ enabled: false });
       assert.ok(!isWrapped(window.fetch));
+      assert.strictEqual(fetchInstrumentation.isEnabled(), false);
       fetchInstrumentation.enable();
       assert.ok(isWrapped(window.fetch));
+      assert.strictEqual(fetchInstrumentation.isEnabled(), true);
     });
 
     it('should not unwrap global fetch when disabled', () => {
@@ -246,6 +248,7 @@ describe('fetch', () => {
       assert.ok(isWrapped(window.fetch));
       fetchInstrumentation.disable();
       assert.ok(isWrapped(window.fetch));
+      assert.strictEqual(fetchInstrumentation.isEnabled(), false);
 
       // Avoids ERROR in the logs when calling `disable()` again during cleanup
       fetchInstrumentation = undefined;
@@ -284,6 +287,33 @@ describe('fetch', () => {
       it('should allow enable() to be retried after _wrap fails', () => {
         fetchInstrumentation!.enable();
         assert.doesNotThrow(() => fetchInstrumentation!.enable());
+      });
+
+      it('should report isEnabled() false when _wrap fails', () => {
+        fetchInstrumentation!.enable();
+        assert.strictEqual(fetchInstrumentation!.isEnabled(), false);
+      });
+    });
+
+    describe('when the fetch property is missing', () => {
+      // `shimmer.wrap` returns undefined instead of throwing when the target
+      // is absent or not a function, so this is a distinct failure path.
+      beforeEach(() => {
+        fetchInstrumentation = new FetchInstrumentation({ enabled: false });
+        // @ts-expect-error access internal property for testing
+        sinon.stub(fetchInstrumentation, '_wrap').returns(undefined);
+      });
+
+      it('should report isEnabled() false when _wrap returns undefined', () => {
+        fetchInstrumentation!.enable();
+        assert.strictEqual(fetchInstrumentation!.isEnabled(), false);
+      });
+
+      it('should retry wrapping on the next enable()', () => {
+        fetchInstrumentation!.enable();
+        fetchInstrumentation!.enable();
+        // @ts-expect-error access internal property for testing
+        assert.strictEqual(fetchInstrumentation!._wrap.callCount, 2);
       });
     });
 

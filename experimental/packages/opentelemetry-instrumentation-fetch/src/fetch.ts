@@ -568,7 +568,14 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     try {
       // `_wrap` throws if a third-party script has locked globalThis.fetch via
       // Object.defineProperty(window, 'fetch', { writable: false, ... }).
-      this._wrap(globalThis, 'fetch', this._patchConstructor());
+      const wrapped = this._wrap(globalThis, 'fetch', this._patchConstructor());
+      // `_wrap` returns undefined without throwing when the target is missing.
+      if (!wrapped) {
+        this._diag.warn(
+          'globalThis.fetch is missing or not a function; instrumentation will not be enabled.'
+        );
+        return;
+      }
       this._isFetchPatched = true;
       this._isEnabled = true;
     } catch (err) {

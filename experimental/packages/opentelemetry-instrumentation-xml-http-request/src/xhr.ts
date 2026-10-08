@@ -577,8 +577,23 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
 
     try {
       this._diag.debug('applying patch to', this.moduleName, this.version);
-      this._wrap(XMLHttpRequest.prototype, 'open', this._patchOpen());
-      this._wrap(XMLHttpRequest.prototype, 'send', this._patchSend());
+      const open = this._wrap(
+        XMLHttpRequest.prototype,
+        'open',
+        this._patchOpen()
+      );
+      const send = this._wrap(
+        XMLHttpRequest.prototype,
+        'send',
+        this._patchSend()
+      );
+      // `_wrap` returns undefined without throwing when the target is missing.
+      if (!open || !send) {
+        this._diag.warn(
+          'XMLHttpRequest.prototype.open or .send is missing or not a function; instrumentation will not be enabled.'
+        );
+        return;
+      }
       this._isXhrPatched = true;
       this._isEnabled = true;
     } catch (err) {
