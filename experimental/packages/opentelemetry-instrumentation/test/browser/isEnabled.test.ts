@@ -52,4 +52,29 @@ describe('InstrumentationBase#isEnabled (browser)', function () {
     assert.strictEqual(instrumentation.isEnabled(), false);
     assert.strictEqual(disableCalls, 1);
   });
+
+  it('is unchanged when enable() or disable() throws', function () {
+    class ThrowingInstrumentation extends InstrumentationBase {
+      shouldThrow = false;
+      override enable() {
+        if (this.shouldThrow) throw new Error('enable failed');
+      }
+      override disable() {
+        if (this.shouldThrow) throw new Error('disable failed');
+      }
+      init() {}
+    }
+    const instrumentation = new ThrowingInstrumentation('test', '1.0.0', {
+      enabled: false,
+    });
+    instrumentation.shouldThrow = true;
+    assert.throws(() => instrumentation.enable(), /enable failed/);
+    assert.strictEqual(instrumentation.isEnabled(), false);
+
+    instrumentation.shouldThrow = false;
+    instrumentation.enable();
+    instrumentation.shouldThrow = true;
+    assert.throws(() => instrumentation.disable(), /disable failed/);
+    assert.strictEqual(instrumentation.isEnabled(), true);
+  });
 });
