@@ -516,7 +516,7 @@ describe('fetch', () => {
 
           const fetchInstrumentation = new FetchInstrumentation();
           const dummySpanExporter = new DummySpanExporter();
-          const webTracerProvider = new WebTracerProvider({
+          const webTracerProvider = new TracerProvider({
             spanProcessors: [
               new tracing.SimpleSpanProcessor({ exporter: dummySpanExporter }),
             ],
