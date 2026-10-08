@@ -24,9 +24,19 @@
   "Update homepage location": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/template",
   "license": "Apache-2.0",
   "Add these only if the package has platform-conditional code (see @opentelemetry/core for a real example)": {
-    "browser": {
-      "./dist/platform/node/index.mjs": "./dist/platform/browser/index.mjs",
-      "./dist/platform/node/index.cjs": "./dist/platform/browser/index.cjs"
+    "imports": {
+      "#platform": {
+        "otel": {
+          "node": "./src/platform/node/index.ts",
+          "default": "./src/platform/browser/index.ts"
+        },
+        "node": {
+          "require": "./dist/platform/node/index.cjs",
+          "default": "./dist/platform/node/index.mjs"
+        },
+        "require": "./dist/platform/browser/index.cjs",
+        "default": "./dist/platform/browser/index.mjs"
+      }
     }
   },
   "repository": {

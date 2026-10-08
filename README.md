@@ -129,13 +129,14 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 ## Supported Runtimes
 
-| Platform Version    | Supported                                     |
-| ------------------- | --------------------------------------------- |
-| Node.js `v26`       | :heavy_check_mark:                            |
-| Node.js `v24`       | :heavy_check_mark:                            |
-| Node.js `v22`       | :heavy_check_mark:                            |
-| Other Node Versions | See [Node Support](#node-support)             |
-| Web Browsers        | See [Browser Support](#browser-support) below |
+| Platform Version    | Supported                                               |
+| ------------------- | ------------------------------------------------------- |
+| Node.js `v26`       | :heavy_check_mark:                                      |
+| Node.js `v24`       | :heavy_check_mark:                                      |
+| Node.js `v22`       | :heavy_check_mark:                                      |
+| Other Node Versions | See [Node Support](#node-support)                       |
+| Web Browsers        | See [Browser Support](#browser-support) below           |
+| React Native, Expo  | See [React Native Support](#react-native-support) below |
 
 ### Node Support
 
@@ -159,6 +160,10 @@ to transpile the code and provide any necessary polyfills for the missing featur
 environments. Any support issues that arise from using a browser or runtime that does not support ES2022 will be closed as "won't fix".
 
 This minimum support level is subject to change as the project evolves and as the underlying language features evolve.
+
+### React Native Support
+
+React Native and Expo apps use the browser implementations. They require Metro 0.81.3 or later, the first Metro that resolves `package.json` `imports`: React Native 0.79 and later, or 0.76 to 0.78 with an updated Metro. Metro does not apply the `node` condition, so builds need no Metro configuration.
 
 ## TypeScript Support
 
@@ -285,12 +290,12 @@ Typically, members of this are [component owners](https://github.com/open-teleme
 - [Daniel Li](https://github.com/d4nyll)
 - [dashpole](https://github.com/dashpole)
 - [dylanrussell](https://github.com/dylanrussell)
-- [Florencia Acosta](https://github.com/facostaembrace), Embrace
+- [Florencia Acosta](https://github.com/facostaembrace), Palo Alto Networks
 - [henrinormak](https://github.com/henrinormak)
 - [Jackson Weber](https://github.com/JacksonWeber), Microsoft
 - [Jaryk](https://github.com/Ugzuzg)
 - [Jonathan Lee](https://github.com/jj22ee)
-- [Jonathan Munz](https://github.com/jpmunz), Embrace
+- [Jonathan Munz](https://github.com/jpmunz), Palo Alto Networks
 - [kirrg001](https://github.com/kirrg001), Instana
 - [MartenH](https://github.com/mhennoch), Splunk
 - [Mike Goldsmith](https://github.com/MikeGoldsmith), Honeycomb

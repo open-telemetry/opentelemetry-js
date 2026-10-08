@@ -8,7 +8,6 @@ import { BatchLogRecordProcessorBase } from '../../../export/BatchLogRecordProce
 
 export class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BatchLogRecordProcessorOptions> {
   private _visibilityChangeListener?: () => void;
-  private _pageHideListener?: () => void;
 
   constructor(options: BatchLogRecordProcessorOptions) {
     super(options);
@@ -25,9 +24,6 @@ export class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BatchLo
         this._visibilityChangeListener
       );
     }
-    if (this._pageHideListener) {
-      document.removeEventListener('pagehide', this._pageHideListener);
-    }
   }
 
   private _onInit(options: BatchLogRecordProcessorOptions): void {
@@ -42,15 +38,9 @@ export class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BatchLo
         void this.forceFlush();
       }
     };
-    this._pageHideListener = () => {
-      void this.forceFlush();
-    };
     document.addEventListener(
       'visibilitychange',
       this._visibilityChangeListener
     );
-
-    // use 'pagehide' event as a fallback for Safari; see https://bugs.webkit.org/show_bug.cgi?id=116769
-    document.addEventListener('pagehide', this._pageHideListener);
   }
 }
