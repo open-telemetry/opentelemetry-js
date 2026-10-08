@@ -21,7 +21,7 @@ export {
 } from './configuration/shared-configuration';
 export type { OtlpSharedConfiguration } from './configuration/shared-configuration';
 
-export { CompressionAlgorithm } from './configuration/legacy-node-configuration';
+export { CompressionAlgorithm } from './configuration/legacy-base-configuration';
 export type { OTLPExporterNodeConfigBase } from './configuration/legacy-node-configuration';
 export type { OTLPExporterConfigBase } from './configuration/legacy-base-configuration';
 export type { IOtlpExportDelegate } from './otlp-export-delegate';

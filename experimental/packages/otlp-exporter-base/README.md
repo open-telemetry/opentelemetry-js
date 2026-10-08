@@ -19,7 +19,9 @@ npm install --save @opentelemetry/otlp-exporter-base
 
 HTTP JSON and HTTP/protobuf exporters for traces, metrics, and logs share these configuration options.
 Node.js exporters accept `OTLPExporterNodeConfigBase`, which also includes the options from `OTLPExporterConfigBase`.
-Configuration precedence is: programmatic options, then per-signal environment variables, then general environment variables, then built-in defaults.
+Browser exporters accept `OTLPExporterConfigBase`.
+In Node.js, configuration precedence is: programmatic options, then per-signal environment variables, then general environment variables, then built-in defaults.
+Browser exporters do not read environment variables.
 
 | Option             | Type                                                          | Default                                             | Description                                                                                                                              |
 | ------------------ | ------------------------------------------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
@@ -27,10 +29,12 @@ Configuration precedence is: programmatic options, then per-signal environment v
 | `headers`          | `Record<string, string> \| HeadersFactory`                    | `undefined`                                         | Custom HTTP headers. A factory function may be async and must not throw. Exporters still apply required transport headers.               |
 | `concurrencyLimit` | `number`                                                      | `30`                                                | Maximum number of in-flight export requests.                                                                                             |
 | `timeoutMillis`    | `number`                                                      | `10000`                                             | Maximum time, in milliseconds, to wait for each batch export.                                                                            |
-| `compression`      | `CompressionAlgorithm.NONE \| CompressionAlgorithm.GZIP`      | `CompressionAlgorithm.NONE`                         | Compression for outgoing OTLP HTTP requests in Node.js.                                                                                  |
+| `compression`      | `CompressionAlgorithm.NONE \| CompressionAlgorithm.GZIP`      | `CompressionAlgorithm.NONE`                         | Compression for outgoing OTLP HTTP requests.                                                                                             |
 | `keepAlive`        | `boolean`                                                     | `true`                                              | Sets `keepAlive` on the Node.js HTTP or HTTPS agent created by the exporter. A `keepAlive` value in `httpAgentOptions` takes precedence. |
 | `httpAgentOptions` | `http.AgentOptions \| https.AgentOptions \| HttpAgentFactory` | Agent options with `keepAlive: true`                | Custom Node.js HTTP or HTTPS agent options, or a factory function that receives the request protocol and returns an agent.               |
 | `userAgent`        | `string`                                                      | The exporter's default user agent                   | Prefix to add to the exporter's default `User-Agent` header in Node.js.                                                                  |
+
+Node.js exporters read these environment variables:
 
 | Option                  | General environment variable            | Signal-specific environment variables                                                                                    |
 | ----------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
@@ -44,6 +48,8 @@ Configuration precedence is: programmatic options, then per-signal environment v
 | `httpAgentOptions.cert` | `OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE` | `OTEL_EXPORTER_OTLP_{TRACES,METRICS,LOGS}_CLIENT_CERTIFICATE`                                                            |
 | `httpAgentOptions.key`  | `OTEL_EXPORTER_OTLP_CLIENT_KEY`         | `OTEL_EXPORTER_OTLP_{TRACES,METRICS,LOGS}_CLIENT_KEY`                                                                    |
 | `userAgent`             | Not supported                           | Not supported                                                                                                            |
+
+Browser exporters gzip with the built-in `CompressionStream` API and send uncompressed requests in runtimes without it. A cross-origin collector must list `Content-Encoding` in `Access-Control-Allow-Headers` for them.
 
 ## GRPC
 

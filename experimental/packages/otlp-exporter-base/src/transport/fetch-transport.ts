@@ -44,19 +44,46 @@ let pendingBodySize = 0;
  */
 let pendingKeepaliveCount = 0;
 
+const SUPPORTED_COMPRESSIONS = [
+  'gzip',
+] as const satisfies readonly CompressionFormat[];
+type SupportedCompression = (typeof SUPPORTED_COMPRESSIONS)[number];
+
 export interface FetchTransportParameters {
   url: string;
   headers: HeadersFactory;
+  compression: 'gzip' | 'none';
 }
 
 class FetchTransport implements IExporterTransport {
   private _parameters: FetchTransportParameters;
+  private _compression: SupportedCompression | 'none';
 
   constructor(parameters: FetchTransportParameters) {
     this._parameters = parameters;
+    const { compression } = parameters;
+    if (compression === 'none' || isSupportedCompression(compression)) {
+      this._compression = compression;
+    } else {
+      diag.warn(
+        `compression '${String(compression)}' is not supported, sending exports uncompressed`
+      );
+      this._compression = 'none';
+    }
   }
 
   async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
+    // Captured before the first `await`, which a synchronous context manager
+    // would not survive.
+    const suppressedContext = suppressTracing(context.active());
+
+    // Compressed first so that the keepalive budget counts the bytes sent.
+    const compressed =
+      this._compression === 'none'
+        ? undefined
+        : await this._compress(data, this._compression);
+    const body = compressed ?? data;
+
     const abortController = new AbortController();
     const timeout = setTimeout(() => abortController.abort(), timeoutMillis);
     // Fetch API may be wrapped by an instrumentation like `@opentelemetry/instrumentation-fetch`.
@@ -71,7 +98,7 @@ class FetchTransport implements IExporterTransport {
       fetchApi = fetchApi.__original;
     }
 
-    const requestSize = data.byteLength;
+    const requestSize = compressed ? compressed.size : data.byteLength;
 
     // Determine if we can use keepalive based on cumulative browser limits.
     // We must check BEFORE adding to pending totals to avoid exceeding limits.
@@ -89,10 +116,6 @@ class FetchTransport implements IExporterTransport {
         `keepalive disabled: ${(requestSize / 1024).toFixed(1)}KB payload, ${pendingKeepaliveCount} pending (${reason})`
       );
     }
-
-    // Captured before the first `await`, which a synchronous context manager
-    // would not survive.
-    const suppressedContext = suppressTracing(context.active());
 
     // Idempotent so that a double call cannot drive the counters negative,
     // which would defeat the cap check above for every later request.
@@ -113,12 +136,15 @@ class FetchTransport implements IExporterTransport {
     try {
       const url = new URL(this._parameters.url);
       // Resolve headers before entering the suppressed fetch context.
-      const headers = await this._parameters.headers();
+      const headers = new Headers(await this._parameters.headers());
+      if (compressed) {
+        headers.set('Content-Encoding', this._compression);
+      }
       const response = await context.with(suppressedContext, () =>
         fetchApi(url.href, {
           method: 'POST',
           headers,
-          body: data,
+          body,
           signal: abortController.signal,
           keepalive: useKeepalive,
           mode: globalThis.location
@@ -182,6 +208,20 @@ class FetchTransport implements IExporterTransport {
 
   shutdown() {
     // Intentionally left empty, nothing to do.
+  }
+
+  private async _compress(
+    data: Uint8Array,
+    format: CompressionFormat
+  ): Promise<Blob | undefined> {
+    try {
+      return await compressWithCompressionStream(data, format);
+    } catch (error) {
+      diag.warn(
+        `${format} compression failed, sending export uncompressed: ${error}`
+      );
+      return undefined;
+    }
   }
 }
 
@@ -247,5 +287,56 @@ async function drainResponseBody(response: Response): Promise<void> {
     // The export outcome is decided by the response status, a body that cannot
     // be read must not change it.
     diag.debug(`error reading export response body: ${error}`);
+  }
+}
+
+/**
+ * Whether `value` is an OTLP compression this runtime can apply with
+ * `CompressionStream`.
+ */
+function isSupportedCompression(value: string): value is SupportedCompression {
+  return (
+    SUPPORTED_COMPRESSIONS.some(compression => compression === value) &&
+    isCompressionStreamFormatSupported(value as SupportedCompression)
+  );
+}
+
+/**
+ * Whether the runtime can compress `format` with `CompressionStream`, which is
+ * missing in older runtimes and throws for an unsupported format.
+ */
+function isCompressionStreamFormatSupported(
+  format: CompressionFormat
+): boolean {
+  try {
+    new globalThis.CompressionStream(format);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function compressWithCompressionStream(
+  data: Uint8Array,
+  format: CompressionFormat
+): Promise<Blob> {
+  // Read with a stream reader: `Response.arrayBuffer()` waits for a task in
+  // some engines, which never runs once the page unloads.
+  const reader = new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(data);
+      controller.close();
+    },
+  })
+    .pipeThrough(new globalThis.CompressionStream(format))
+    .getReader();
+
+  const chunks: Uint8Array[] = [];
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) {
+      return new Blob(chunks);
+    }
+    chunks.push(value);
   }
 }

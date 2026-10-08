@@ -48,10 +48,21 @@ export interface OTLPExporterConfigBase {
    * @defaultValue 10000
    */
   timeoutMillis?: number;
+  /**
+   * Compression algorithm for outgoing OTLP HTTP requests.
+   *
+   * @defaultValue CompressionAlgorithm.NONE
+   */
+  compression?: CompressionAlgorithm;
 
   /**
    * MeterProvider to record metrics for the exporter itself.
    * @experimental This option is experimental and is subject to breaking changes in minor releases.
    */
   selfObsMeterProvider?: MeterProvider;
+}
+
+export enum CompressionAlgorithm {
+  NONE = 'none',
+  GZIP = 'gzip',
 }

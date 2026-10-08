@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { TracerProvider, SimpleSpanProcessor } from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
@@ -61,6 +62,38 @@ describe('OTLPTraceExporter', () => {
       );
       assert.ok(scopeMetrics);
       await meterProvider.shutdown();
+    });
+
+    it('should send gzip-compressed data when compression is gzip', async function () {
+      // arrange
+      const stubFetch = sinon
+        .stub(window, 'fetch')
+        .resolves(new Response('', { status: 200 }));
+      const tracerProvider = new TracerProvider({
+        spanProcessors: [
+          new SimpleSpanProcessor({
+            exporter: new OTLPTraceExporter({
+              compression: CompressionAlgorithm.GZIP,
+            }),
+          }),
+        ],
+      });
+
+      // act
+      tracerProvider.getTracer('test-tracer').startSpan('test-span').end();
+      await tracerProvider.shutdown();
+
+      // assert
+      const request = new Request(...stubFetch.args[0]);
+      assert.strictEqual(request.headers.get('Content-Encoding'), 'gzip');
+      const decompressed = (await request.blob())
+        .stream()
+        .pipeThrough(new DecompressionStream('gzip'));
+      const body = JSON.parse(await new Response(decompressed).text());
+      assert.strictEqual(
+        body.resourceSpans[0].scopeSpans[0].spans[0].name,
+        'test-span'
+      );
     });
   });
 });
