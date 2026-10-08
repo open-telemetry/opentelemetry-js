@@ -169,6 +169,27 @@ describe('attributes', () => {
         assert.equal(isAnyValue(v), false);
       });
     }
+
+    it('should accept a value referenced more than once', () => {
+      const shared = { a: 'test' };
+
+      assert.equal(isAnyValue([shared, shared]), true);
+      assert.equal(isAnyValue({ first: shared, second: shared }), true);
+    });
+
+    it('should accept an array referenced more than once', () => {
+      const shared = ['a', 'b'];
+
+      assert.equal(isAnyValue([shared, shared]), true);
+    });
+
+    it('should still reject a cycle through a shared value', () => {
+      const shared: Record<string, unknown> = { a: 'test' };
+      const outer: Record<string, unknown> = { first: shared, second: shared };
+      shared.parent = outer;
+
+      assert.equal(isAnyValue(outer), false);
+    });
   });
 
   describe('isSimpleAttributeValue', () => {
