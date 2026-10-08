@@ -129,13 +129,14 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 ## Supported Runtimes
 
-| Platform Version    | Supported                                     |
-| ------------------- | --------------------------------------------- |
-| Node.js `v26`       | :heavy_check_mark:                            |
-| Node.js `v24`       | :heavy_check_mark:                            |
-| Node.js `v22`       | :heavy_check_mark:                            |
-| Other Node Versions | See [Node Support](#node-support)             |
-| Web Browsers        | See [Browser Support](#browser-support) below |
+| Platform Version    | Supported                                               |
+| ------------------- | ------------------------------------------------------- |
+| Node.js `v26`       | :heavy_check_mark:                                      |
+| Node.js `v24`       | :heavy_check_mark:                                      |
+| Node.js `v22`       | :heavy_check_mark:                                      |
+| Other Node Versions | See [Node Support](#node-support)                       |
+| Web Browsers        | See [Browser Support](#browser-support) below           |
+| React Native, Expo  | See [React Native Support](#react-native-support) below |
 
 ### Node Support
 
@@ -159,6 +160,10 @@ to transpile the code and provide any necessary polyfills for the missing featur
 environments. Any support issues that arise from using a browser or runtime that does not support ES2022 will be closed as "won't fix".
 
 This minimum support level is subject to change as the project evolves and as the underlying language features evolve.
+
+### React Native Support
+
+React Native and Expo apps use the browser implementations. They require Metro 0.81.3 or later, the first Metro that resolves `package.json` `imports`: React Native 0.79 and later, or 0.76 to 0.78 with an updated Metro. Metro does not apply the `node` condition, so builds need no Metro configuration.
 
 ## TypeScript Support
 

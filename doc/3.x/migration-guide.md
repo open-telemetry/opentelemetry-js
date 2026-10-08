@@ -29,6 +29,55 @@ const { logs, SeverityNumber } = require('@opentelemetry/api');
 
 ---
 
+## Platform-specific code resolves through `package.json` conditions
+
+Packages with separate Node.js and browser implementations (`@opentelemetry/core`, `@opentelemetry/resources`, `@opentelemetry/sdk-trace`, `@opentelemetry/sdk-logs`, `@opentelemetry/instrumentation`, `@opentelemetry/exporter-zipkin` and the OTLP HTTP and protobuf exporters) no longer ship a top-level `browser` field in `package.json`. They select the Node.js implementation with the `node` condition on the `#platform` subpath under `imports`, and every other environment gets the browser implementation from the `require` and `default` branches.
+
+Your bundler must support the `imports` and `exports` fields; one without `imports` support fails to resolve `#platform`. webpack 5 needs `enhanced-resolve` 5.8.2 or later, which webpack 5.54 and later require. Jest needs 29.4 or later. React Native needs Metro 0.81.3 or later: React Native 0.79 and later, or 0.76 to 0.78 with an updated Metro.
+
+Node.js always applies the `node` condition. These bundler setups also resolve the Node.js implementation; all other setups, including browsers, web workers, edge runtimes and React Native, resolve the browser implementation:
+
+| Tool | Node.js implementation when |
+| --- | --- |
+| webpack | [`target`](https://webpack.js.org/configuration/target/) is a Node.js target, such as `'node'` or `'electron-main'`, or [`resolve.conditionNames`](https://webpack.js.org/configuration/resolve/#resolveconditionnames) includes `'node'` |
+| esbuild | [`platform`](https://esbuild.github.io/api/#platform) is `'node'`, or [`conditions`](https://esbuild.github.io/api/#conditions) includes `'node'` |
+| Vite | SSR, unless the package is bundled with [`ssr.noExternal`](https://vite.dev/config/ssr-options#ssr-noexternal) and [`ssr.target`](https://vite.dev/config/ssr-options#ssr-target) is `'webworker'` |
+| Rollup with `@rollup/plugin-node-resolve` | [`exportConditions`](https://github.com/rollup/plugins/tree/master/packages/node-resolve#exportconditions) includes `'node'` |
+| Parcel | the target [`context`](https://parceljs.org/features/targets/#context) is `node`, `electron-main` or `electron-renderer` (see below) |
+| Jest | [`testEnvironment`](https://jestjs.io/docs/configuration#testenvironment-node--jsdom--string) is `node`, or on Jest 30, the tests do not run as native ESM (see below) |
+
+A bundle that runs on Node.js but is built without the `node` condition contains the browser implementation. This happens with esbuild `platform: 'neutral'`, Rollup's default `exportConditions`, a webpack `target` that mixes browsers and Node.js (such as `['web', 'node']` or `'universal'`), and a webpack `resolve.conditionNames` or Vite [`ssr.resolve.conditions`](https://vite.dev/config/ssr-options#ssr-resolve-conditions) list that leaves out the defaults (`'...'` in webpack, `...defaultServerConditions` in Vite). Add `node` to that bundler's conditions.
+
+Parcel resolves `#platform` only when [package exports are enabled](https://parceljs.org/features/dependency-resolution/#enabling-package-exports), and only from ESM `import`. Enable them in the app's `package.json`:
+
+```json
+{
+  "@parcel/resolver-default": {
+    "packageExports": true
+  }
+}
+```
+
+Under Parcel, CommonJS code that calls `require()` on these packages, including CommonJS dependencies, fails with `Failed to resolve '#platform'`.
+
+Jest 30's CommonJS runtime always applies the `node` condition, including in the `jsdom` environment ([jestjs/jest#16476](https://github.com/jestjs/jest/issues/16476)), and [`customExportConditions`](https://jestjs.io/docs/configuration#custom-export-conditions) does not change that. To load the browser implementations under `jsdom`, run the tests as native ESM, or set a custom [`resolver`](https://jestjs.io/docs/configuration#resolver-string) that drops `node` when `browser` is present:
+
+```js
+module.exports = (request, options) =>
+  options.defaultResolver(request, {
+    ...options,
+    conditions: options.conditions?.includes('browser')
+      ? options.conditions.filter(c => c !== 'node')
+      : options.conditions,
+  });
+```
+
+Where tests load the browser implementations, `getStringFromEnv()` returns `undefined` and `InstrumentationBase` does not patch Node.js modules.
+
+The package roots' type declarations describe the Node.js implementation, because they are generated from the Node.js entry point and the package root has no platform-specific types branch.
+
+---
+
 ## `@opentelemetry/propagator-jaeger` (package removed)
 
 The `@opentelemetry/propagator-jaeger` package has been removed. The Jaeger propagator is deprecated in favour of the W3C TraceContext propagator.
