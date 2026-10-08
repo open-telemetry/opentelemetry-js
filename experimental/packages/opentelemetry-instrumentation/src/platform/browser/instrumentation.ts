@@ -26,8 +26,8 @@ export abstract class InstrumentationBase<
   ) {
     super(instrumentationName, instrumentationVersion, config);
 
-    // Subclasses override enable/disable without calling super, so wrap them; a throw
-    // leaves the flag unchanged. A class-field enable/disable would replace this wrapper.
+    // enable/disable are abstract, so the base can only observe calls by wrapping them;
+    // a throw leaves the flag unchanged. A class-field enable/disable would replace this wrapper.
     const enable = this.enable;
     const disable = this.disable;
     this.enable = () => {
@@ -44,8 +44,8 @@ export abstract class InstrumentationBase<
     }
   }
 
-  /** Whether enable() was called more recently than disable(). Tracks calls
-   * only: a subclass that returns early from enable() still reads as enabled. */
+  /** Whether enable() was called more recently than disable(). Tracks calls only: a
+   * subclass enable() that returns early still reads as enabled; one that throws leaves it unchanged. */
   public isEnabled(): boolean {
     return this.#enabled;
   }
