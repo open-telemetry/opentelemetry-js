@@ -19,11 +19,11 @@ export interface LoggerConfig {
   /**
    * A boolean indication of whether the logger is enabled.
    * If a Logger is disabled, it behaves equivalently to a No-op Logger.
-   * Defaults to false (loggers are enabled by default).
+   * Defaults to true (loggers are enabled by default).
    *
    * @experimental This feature is in development as per the OpenTelemetry specification.
    */
-  disabled?: boolean;
+  enabled?: boolean;
 
   /**
    * A SeverityNumber indicating the minimum severity level for log records to be processed.

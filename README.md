@@ -290,12 +290,12 @@ Typically, members of this are [component owners](https://github.com/open-teleme
 - [Daniel Li](https://github.com/d4nyll)
 - [dashpole](https://github.com/dashpole)
 - [dylanrussell](https://github.com/dylanrussell)
-- [Florencia Acosta](https://github.com/facostaembrace), Embrace
+- [Florencia Acosta](https://github.com/facostaembrace), Palo Alto Networks
 - [henrinormak](https://github.com/henrinormak)
 - [Jackson Weber](https://github.com/JacksonWeber), Microsoft
 - [Jaryk](https://github.com/Ugzuzg)
 - [Jonathan Lee](https://github.com/jj22ee)
-- [Jonathan Munz](https://github.com/jpmunz), Embrace
+- [Jonathan Munz](https://github.com/jpmunz), Palo Alto Networks
 - [kirrg001](https://github.com/kirrg001), Instana
 - [MartenH](https://github.com/mhennoch), Splunk
 - [Mike Goldsmith](https://github.com/MikeGoldsmith), Honeycomb
