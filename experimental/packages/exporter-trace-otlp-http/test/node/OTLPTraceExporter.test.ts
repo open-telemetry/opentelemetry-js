@@ -6,6 +6,7 @@
 import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';
+import { syncBuiltinESMExports } from 'module';
 import { Stream } from 'stream';
 
 import { type Attributes } from '@opentelemetry/api';
@@ -24,10 +25,38 @@ import { TestMetricReader } from '../utils';
  * - `@opentelemetry/otlp-transformer`: Everything regarding serialization and transforming internal representations to OTLP
  */
 
+function stubSuccessfulHttpRequest(): void {
+  (sinon.stub(http, 'request') as sinon.SinonStub).callsFake(
+    (...args: unknown[]) => {
+      const responseCallback =
+        typeof args[args.length - 1] === 'function'
+          ? (args[args.length - 1] as (res: unknown) => void)
+          : null;
+      const fakeRequest = new Stream.PassThrough();
+      Object.defineProperty(fakeRequest, 'setTimeout', {
+        value: function (_timeout: number) {},
+      });
+      fakeRequest.on('finish', () => {
+        if (responseCallback) {
+          const fakeResponse = new Stream.PassThrough() as any;
+          fakeResponse.statusCode = 200;
+          fakeResponse.statusMessage = 'OK';
+          fakeResponse.headers = {};
+          responseCallback(fakeResponse);
+          fakeResponse.end();
+        }
+      });
+      return fakeRequest as any;
+    }
+  );
+  syncBuiltinESMExports();
+}
+
 describe('OTLPTraceExporter', () => {
   describe('export', () => {
     afterEach(() => {
       sinon.restore();
+      syncBuiltinESMExports();
     });
 
     it('successfully exports data', done => {
@@ -42,6 +71,7 @@ describe('OTLPTraceExporter', () => {
       });
 
       sinon.stub(http, 'request').returns(fakeRequest as any);
+      syncBuiltinESMExports();
       let buff = Buffer.from('');
       fakeRequest.on('finish', async () => {
         try {
@@ -82,8 +112,14 @@ describe('OTLPTraceExporter', () => {
 });
 
 describe('createOtlpHttpSpanExporter', () => {
+  beforeEach(() => {
+    stubSuccessfulHttpRequest();
+  });
+
   afterEach(() => {
     delete process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT;
+    sinon.restore();
+    syncBuiltinESMExports();
   });
 
   async function collectServerAttributes(
@@ -118,10 +154,8 @@ describe('createOtlpHttpSpanExporter', () => {
       ],
     });
 
-    // The exporter records the endpoint it targets in its own metrics,
-    // synchronously when the export starts, so no request needs to complete
-    // for this assertion (and there is nothing to shut down for it).
     tracerProvider.getTracer('test-tracer').startSpan('test-span').end();
+    await tracerProvider.shutdown();
 
     const serverAttributes = await collectServerAttributes(metricReader);
     assert.ok(
@@ -156,6 +190,7 @@ describe('createOtlpHttpSpanExporter', () => {
     });
 
     tracerProvider.getTracer('test-tracer').startSpan('test-span').end();
+    await tracerProvider.shutdown();
 
     const serverAttributes = await collectServerAttributes(metricReader);
     assert.ok(
