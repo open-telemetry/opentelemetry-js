@@ -469,6 +469,33 @@ describe('Logger', () => {
     });
   });
 
+  describe('logger configuration', () => {
+    for (const enabled of [true, false, undefined]) {
+      it(`should ${enabled === false ? 'drop' : 'emit'} records with enabled=${enabled}`, () => {
+        const { logger, logExporter } = setupLoggerProvider('simple', [
+          { pattern: '*', config: { enabled } },
+        ]);
+
+        assert.strictEqual(logger.enabled(), enabled !== false);
+        logger.emit({ body: 'configured message' });
+        assert.strictEqual(
+          logExporter.getFinishedLogRecords().length,
+          enabled === false ? 0 : 1
+        );
+      });
+    }
+
+    it('should enable loggers when no configuration pattern matches', () => {
+      const { logger, logExporter } = setupLoggerProvider('simple', [
+        { pattern: 'other-logger', config: { enabled: false } },
+      ]);
+
+      assert.ok(logger.enabled());
+      logger.emit({ body: 'default message' });
+      assert.strictEqual(logExporter.getFinishedLogRecords().length, 1);
+    });
+  });
+
   describe('enabled', () => {
     describe('with default configuration and disabled log processors', () => {
       const { logger } = setupLoggerProvider('noop');
@@ -518,7 +545,7 @@ describe('Logger', () => {
       const { loggerProvider } = setupLoggerProvider('noop', [
         {
           pattern: 'disabled-logger',
-          config: { disabled: true },
+          config: { enabled: false },
         },
         {
           pattern: 'warn-logger',
@@ -561,7 +588,7 @@ describe('Logger', () => {
       const { loggerProvider } = setupLoggerProvider('simple', [
         {
           pattern: 'disabled-logger',
-          config: { disabled: true },
+          config: { enabled: false },
         },
         {
           pattern: 'warn-logger',

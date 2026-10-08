@@ -80,7 +80,7 @@ export class Logger implements ILogger {
 
     const loggerConfig = this._loggerConfig;
 
-    if (loggerConfig.disabled) {
+    if (!loggerConfig.enabled) {
       return false;
     }
 

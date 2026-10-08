@@ -21,7 +21,7 @@ import { LoggerMetrics } from '../LoggerMetrics';
 import { VERSION } from '../version';
 
 const DEFAULT_LOGGER_CONFIG: Required<LoggerConfig> = {
-  disabled: false,
+  enabled: true,
   minimumSeverity: SeverityNumber.UNSPECIFIED,
   traceBased: false,
 };

@@ -13,7 +13,7 @@ import type { LoggerConfig, LoggerConfigurator } from '../types';
  * @experimental This feature is in development as per the OpenTelemetry specification.
  */
 const DEFAULT_LOGGER_CONFIG: Required<LoggerConfig> = {
-  disabled: false,
+  enabled: true,
   minimumSeverity: SeverityNumber.UNSPECIFIED,
   traceBased: false,
 };
@@ -73,7 +73,7 @@ export function createLoggerConfigurator(
       if (matchesPattern(loggerName, pattern)) {
         // Compute complete config by merging with defaults
         return {
-          disabled: config.disabled ?? DEFAULT_LOGGER_CONFIG.disabled,
+          enabled: config.enabled ?? DEFAULT_LOGGER_CONFIG.enabled,
           minimumSeverity:
             config.minimumSeverity ?? DEFAULT_LOGGER_CONFIG.minimumSeverity,
           traceBased: config.traceBased ?? DEFAULT_LOGGER_CONFIG.traceBased,
