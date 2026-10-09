@@ -377,6 +377,20 @@ describe('Span', () => {
           assert.strictEqual(span.attributes['foo99'], 'bar99');
           assert.strictEqual(span.attributes['foo149'], undefined);
         });
+
+        it('should count initial attributes toward the limit', () => {
+          const span = new TracerProvider({
+            spanLimits: { attributeCountLimit: 2 },
+          })
+            .getTracer('default')
+            .startSpan(name, { attributes: { a: 1 } }) as SpanImpl;
+          span.setAttribute('b', 2);
+          span.setAttribute('c', 3);
+          span.end();
+
+          assert.deepStrictEqual(span.attributes, { a: 1, b: 2 });
+          assert.strictEqual(span.droppedAttributesCount, 1);
+        });
       });
 
       describe('when "attributeValueLengthLimit" option defined', () => {
