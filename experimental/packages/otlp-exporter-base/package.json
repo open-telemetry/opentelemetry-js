@@ -36,6 +36,16 @@
       }
     }
   },
+  "typesVersions": {
+    "*": {
+      "node-http": [
+        "./dist/platform/node/index.d.cts"
+      ],
+      "browser-http": [
+        "./dist/index-browser-http.d.cts"
+      ]
+    }
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",

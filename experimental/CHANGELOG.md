@@ -20,6 +20,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
   * Import from the package root instead.
 * feat(otlp-exporter-base)!: export `OTLPExporterNodeConfigBase` from `@opentelemetry/otlp-exporter-base/node-http` instead of the package root [#7172](https://github.com/open-telemetry/opentelemetry-js/pull/7172) @overbalance
   * The root entry is shared with browsers and no longer references Node.js `http` types. `CompressionAlgorithm` stays on the root.
+  * `typesVersions` maps `./node-http` and `./browser-http` for TypeScript projects on `moduleResolution: node`, which cannot read `exports` subpaths.
 
 ### :rocket: Features
 
