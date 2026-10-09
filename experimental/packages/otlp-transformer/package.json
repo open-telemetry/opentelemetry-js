@@ -39,6 +39,7 @@
     "prepublishOnly": "npm run compile",
     "precompile": "npm run protos",
     "compile": "tsdown",
+    "typecheck:browser": "tsc -p tsconfig.browser.json",
     "clean": "rimraf dist build",
     "protos": "npm run submodule && npm run protos:generate",
     "protos:generate:js": "npm run protos:generate:js:tests",

@@ -20,6 +20,7 @@
   "scripts": {
     "prepublishOnly": "npm run compile",
     "compile": "tsdown",
+    "typecheck:browser": "tsc -p tsconfig.browser.json",
     "clean": "rimraf dist build",
     "test": "nyc mocha 'test/**/*.test.ts'",
     "test:bench": "node test/performance/benchmark/internal-benchmarks.js && node test/performance/benchmark/public-benchmarks.js | tee .benchmark-results.txt",

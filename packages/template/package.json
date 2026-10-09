@@ -52,6 +52,7 @@
   "scripts": {
     "prepublishOnly": "npm run compile",
     "compile": "tsdown",
+    "typecheck:browser": "tsc -p tsconfig.browser.json",
     "version": "node ../../scripts/version-update.js",
     "clean": "rimraf dist build",
     "peer-api-check": "node ../../scripts/peer-api-check.mjs",

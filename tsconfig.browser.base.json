@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    // node16 always applies the node condition; bundler never does, so the
+    // inherited otel condition sends #platform to its default (browser) barrel.
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "lib": ["es2022", "dom", "dom.iterable"],
+    // No @types/node: Node globals and modules in browser-reachable code are errors.
+    "types": [],
+    "noEmit": true,
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "incremental": false
+  }
+}

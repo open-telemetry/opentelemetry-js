@@ -50,6 +50,7 @@
   "scripts": {
     "prepublishOnly": "npm run compile",
     "compile": "tsdown",
+    "typecheck:browser": "tsc -p tsconfig.browser.json",
     "clean": "rimraf dist build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
