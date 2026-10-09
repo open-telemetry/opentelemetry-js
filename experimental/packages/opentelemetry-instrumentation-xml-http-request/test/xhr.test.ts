@@ -276,13 +276,25 @@ describe('xhr', () => {
     });
 
     describe('when XMLHttpRequest prototype methods are missing', () => {
-      // `shimmer.wrap` returns undefined instead of throwing when the target
-      // is absent or not a function, so this is a distinct failure path.
+      // The `typeof` pre-check in `enable()` exists because `shimmer.wrap`
+      // returns undefined instead of throwing on an absent or non-function target.
+      let sendStub: sinon.SinonStub;
+
       beforeEach(() => {
-        sinon.stub(XMLHttpRequest.prototype, 'send').value(undefined);
+        sendStub = sinon
+          .stub(XMLHttpRequest.prototype, 'send')
+          .value(undefined);
         xhrInstrumentation = new XMLHttpRequestInstrumentation({
           enabled: false,
         });
+      });
+
+      afterEach(() => {
+        // A failed assertion must not leak the patched prototype into later tests.
+        for (const name of ['open', 'send'] as const) {
+          const fn = XMLHttpRequest.prototype[name];
+          if (isWrapped(fn)) fn.__unwrap();
+        }
       });
 
       it('should report isEnabled() false and wrap nothing', () => {
@@ -291,9 +303,17 @@ describe('xhr', () => {
         assert.ok(!isWrapped(XMLHttpRequest.prototype.open));
       });
 
+      it('should report isEnabled() false when only open is missing', () => {
+        sendStub.restore();
+        sinon.stub(XMLHttpRequest.prototype, 'open').value(undefined);
+        xhrInstrumentation!.enable();
+        assert.strictEqual(xhrInstrumentation!.isEnabled(), false);
+        assert.ok(!isWrapped(XMLHttpRequest.prototype.send));
+      });
+
       it('should wrap open once when enable() is retried after send appears', () => {
         xhrInstrumentation!.enable();
-        sinon.restore();
+        sendStub.restore();
         xhrInstrumentation!.enable();
         assert.strictEqual(xhrInstrumentation!.isEnabled(), true);
         const open = XMLHttpRequest.prototype.open;
@@ -303,8 +323,6 @@ describe('xhr', () => {
           !isWrapped(open.__original),
           'open must not be double-wrapped'
         );
-        send.__unwrap();
-        open.__unwrap();
       });
 
       it('should warn that the instrumentation will not be enabled', () => {

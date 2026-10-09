@@ -565,17 +565,20 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       return;
     }
 
+    // `_wrap` returns undefined, without throwing, when the target is missing
+    // or not a function, and reports it through console.error rather than diag.
+    if (typeof globalThis.fetch !== 'function') {
+      this._diag.warn(
+        'globalThis.fetch is missing or not a function; instrumentation will not be enabled. ' +
+          'Register the instrumentation after any fetch polyfill, or call enable() once fetch is available.'
+      );
+      return;
+    }
+
     try {
       // `_wrap` throws if a third-party script has locked globalThis.fetch via
       // Object.defineProperty(window, 'fetch', { writable: false, ... }).
-      const wrapped = this._wrap(globalThis, 'fetch', this._patchConstructor());
-      // `_wrap` returns undefined without throwing when the target is missing.
-      if (!wrapped) {
-        this._diag.warn(
-          'globalThis.fetch is missing or not a function; instrumentation will not be enabled.'
-        );
-        return;
-      }
+      this._wrap(globalThis, 'fetch', this._patchConstructor());
       this._isFetchPatched = true;
       this._isEnabled = true;
     } catch (err) {
@@ -587,7 +590,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     }
   }
 
-  /** False before enable(), after disable(), or when patching throws; disable() leaves
+  /** False before enable(), after disable(), or when patching fails; disable() leaves
    * globalThis.fetch wrapped. */
   override isEnabled(): boolean {
     return this._isEnabled === true;
