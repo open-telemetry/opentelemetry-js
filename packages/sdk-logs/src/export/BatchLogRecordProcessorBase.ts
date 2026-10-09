@@ -144,7 +144,7 @@ export abstract class BatchLogRecordProcessorBase<
 
   private _currentExport: ExportOperation | null = null;
   private _finishedLogRecords: ReadWriteLogRecord[] = [];
-  private _timer: NodeJS.Timeout | number | undefined;
+  private _timer: ReturnType<typeof setTimeout> | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
   private _flushing: boolean = false;
 
@@ -360,10 +360,7 @@ export abstract class BatchLogRecordProcessorBase<
       this._exportOneBatch();
     }, this._scheduledDelayMillis);
 
-    // Unref timer so it doesn't keep process alive
-    if (typeof this._timer !== 'number') {
-      this._timer.unref();
-    }
+    unrefTimer(this._timer);
   }
 
   private _clearTimer() {
@@ -374,4 +371,10 @@ export abstract class BatchLogRecordProcessorBase<
   }
 
   protected abstract onShutdown(): void;
+}
+
+// Node.js timers keep the process alive unless unref'd; browsers return a number.
+function unrefTimer(timer: ReturnType<typeof setTimeout>): void {
+  const handle = timer as number | { unref?: () => void };
+  if (typeof handle !== 'number') handle.unref?.();
 }

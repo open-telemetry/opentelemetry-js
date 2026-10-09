@@ -36,7 +36,7 @@ export abstract class BatchSpanProcessorBase<
 
   private _isExporting = false;
   private _finishedSpans: ReadableSpan[] = [];
-  private _timer: NodeJS.Timeout | number | undefined;
+  private _timer: ReturnType<typeof setTimeout> | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
   private _droppedSpansCount: number = 0;
 
@@ -243,11 +243,7 @@ export abstract class BatchSpanProcessorBase<
     }
     if (this._timer !== undefined) return;
     this._timer = setTimeout(() => flush(), this._scheduledDelayMillis);
-
-    // depending on runtime, this may be a 'number' or NodeJS.Timeout
-    if (typeof this._timer !== 'number') {
-      this._timer.unref();
-    }
+    unrefTimer(this._timer);
   }
 
   private _clearTimer() {
@@ -258,4 +254,10 @@ export abstract class BatchSpanProcessorBase<
   }
 
   protected abstract onShutdown(): void;
+}
+
+// Node.js timers keep the process alive unless unref'd; browsers return a number.
+function unrefTimer(timer: ReturnType<typeof setTimeout>): void {
+  const handle = timer as number | { unref?: () => void };
+  if (typeof handle !== 'number') handle.unref?.();
 }

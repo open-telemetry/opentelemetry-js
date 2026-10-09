@@ -62,6 +62,18 @@ describe('BatchSpanProcessorBase', () => {
     sinon.restore();
   });
 
+  describe('timer', () => {
+    it('unrefs the scheduled timer so it does not keep Node.js alive', () => {
+      const unref = sinon.spy();
+      sinon
+        .stub(globalThis, 'setTimeout')
+        .returns({ unref } as unknown as ReturnType<typeof setTimeout>);
+      const processor = new BatchSpanProcessor({ exporter });
+      processor.onEnd(createSampledSpan(name));
+      assert.strictEqual(unref.callCount, 1);
+    });
+  });
+
   describe('constructor', () => {
     it('should create a BatchSpanProcessor instance', () => {
       const processor = new BatchSpanProcessor({ exporter });
