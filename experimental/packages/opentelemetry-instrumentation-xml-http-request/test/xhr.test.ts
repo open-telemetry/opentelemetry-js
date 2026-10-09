@@ -299,14 +299,11 @@ describe('xhr', () => {
         const open = XMLHttpRequest.prototype.open;
         const send = XMLHttpRequest.prototype.send;
         assert.ok(isWrapped(open) && isWrapped(send));
-        // @ts-expect-error -- property added by instrumentation.wrap(...)
         assert.ok(
           !isWrapped(open.__original),
           'open must not be double-wrapped'
         );
-        // @ts-expect-error -- property added by instrumentation.wrap(...)
         send.__unwrap();
-        // @ts-expect-error -- property added by instrumentation.wrap(...)
         open.__unwrap();
       });
     });
