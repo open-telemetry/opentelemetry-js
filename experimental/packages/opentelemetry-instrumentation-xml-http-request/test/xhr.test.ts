@@ -306,6 +306,22 @@ describe('xhr', () => {
         send.__unwrap();
         open.__unwrap();
       });
+
+      it('should warn that the instrumentation will not be enabled', () => {
+        const diagLogger = new api.DiagConsoleLogger();
+        const spyWarn = sinon.stub(diagLogger, 'warn');
+        api.diag.setLogger(diagLogger, api.DiagLogLevel.ALL);
+        try {
+          xhrInstrumentation!.enable();
+          sinon.assert.calledOnceWithMatch(
+            spyWarn,
+            sinon.match.string,
+            sinon.match(/missing or not a function/)
+          );
+        } finally {
+          api.diag.disable();
+        }
+      });
     });
 
     describe('when XMLHttpRequest prototype methods can be wrapped', () => {

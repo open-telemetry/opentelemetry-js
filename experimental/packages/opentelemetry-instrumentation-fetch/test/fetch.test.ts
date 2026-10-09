@@ -318,6 +318,22 @@ describe('fetch', () => {
         assert.strictEqual(fetchInstrumentation!.isEnabled(), true);
         assert.ok(isWrapped(globalThis.fetch));
       });
+
+      it('should warn that the instrumentation will not be enabled', () => {
+        const diagLogger = new api.DiagConsoleLogger();
+        const spyWarn = sinon.stub(diagLogger, 'warn');
+        api.diag.setLogger(diagLogger, api.DiagLogLevel.ALL);
+        try {
+          fetchInstrumentation!.enable();
+          sinon.assert.calledOnceWithMatch(
+            spyWarn,
+            sinon.match.string,
+            sinon.match(/missing or not a function/)
+          );
+        } finally {
+          api.diag.disable();
+        }
+      });
     });
 
     it('should return a Promise<Response> compatible with WebAssembly.compileStreaming', async () => {
