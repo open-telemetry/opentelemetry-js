@@ -8,6 +8,7 @@ import * as sinon from 'sinon';
 import * as path from 'path';
 import { InstrumentationBase } from '../../src';
 import type { InstrumentationModuleDefinition } from '../../src/';
+import { RequireInTheMiddleSingleton } from '../../src/platform/node/RequireInTheMiddleSingleton';
 import {
   InstrumentationNodeModuleDefinition,
   InstrumentationNodeModuleFile,
@@ -29,6 +30,37 @@ class TestInstrumentation extends InstrumentationBase {
 }
 
 describe('InstrumentationBase', function () {
+  describe('constructor/enable without module definitions', function () {
+    let getInstanceStub: sinon.SinonStub;
+
+    class EmptyInstrumentation extends InstrumentationBase {
+      constructor(config = {}) {
+        super('@opentelemetry/instrumentation-empty-test', '0.0.0', config);
+      }
+
+      init() {}
+    }
+
+    beforeEach(() => {
+      getInstanceStub = sinon.stub(RequireInTheMiddleSingleton, 'getInstance');
+    });
+
+    afterEach(() => {
+      getInstanceStub.restore();
+    });
+
+    it('should not initialize require-in-the-middle in the constructor', function () {
+      new EmptyInstrumentation();
+      sinon.assert.notCalled(getInstanceStub);
+    });
+
+    it('should not initialize require-in-the-middle on enable', function () {
+      const instrumentation = new EmptyInstrumentation({ enabled: false });
+      instrumentation.enable();
+      sinon.assert.notCalled(getInstanceStub);
+    });
+  });
+
   describe('_onRequire - core module', function () {
     let instrumentation: TestInstrumentation;
     let modulePatchSpy: sinon.SinonSpy;
