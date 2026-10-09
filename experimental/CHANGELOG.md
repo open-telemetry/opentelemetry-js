@@ -18,7 +18,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
   * The package roots' type declarations describe the Node.js implementation.
 * feat(instrumentation, exporter-*-otlp-http, exporter-*-otlp-proto)!: remove the `./platform` and `./platform/browser` subpath exports [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
   * Import from the package root instead.
-* feat(otlp-exporter-base)!: export `OTLPExporterNodeConfigBase` from `@opentelemetry/otlp-exporter-base/node-http` instead of the package root [#0000](https://github.com/open-telemetry/opentelemetry-js/pull/0000) @overbalance
+* feat(otlp-exporter-base)!: export `OTLPExporterNodeConfigBase` from `@opentelemetry/otlp-exporter-base/node-http` instead of the package root [#7172](https://github.com/open-telemetry/opentelemetry-js/pull/7172) @overbalance
   * The root entry is shared with browsers and no longer references Node.js `http` types. `CompressionAlgorithm` stays on the root.
 
 ### :rocket: Features
@@ -30,7 +30,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 * fix(instrumentation-fetch, instrumentation-xml-http-request): leave the instrumentation disabled when `globalThis.fetch` or `XMLHttpRequest.prototype.open`/`send` is missing or not a function, instead of reporting it enabled and never retrying [#7171](https://github.com/open-telemetry/opentelemetry-js/pull/7171) @overbalance
 * fix(otlp-transformer): accept DOM `TextDecoder` in `ProtobufReader` typing [#7169](https://github.com/open-telemetry/opentelemetry-js/pull/7169) @overbalance
-* fix(exporter-metrics-otlp-proto): type the browser `OTLPMetricExporter` config as `OTLPExporterConfigBase`, it accepted the Node.js config type and silently ignored `compression`, `keepAlive` and `httpAgentOptions` [#0000](https://github.com/open-telemetry/opentelemetry-js/pull/0000) @overbalance
+* fix(exporter-metrics-otlp-proto): type the browser `OTLPMetricExporter` config as `OTLPExporterConfigBase`, it accepted the Node.js config type and silently ignored `compression`, `keepAlive` and `httpAgentOptions` [#7172](https://github.com/open-telemetry/opentelemetry-js/pull/7172) @overbalance
 
 ### :books: Documentation
 
