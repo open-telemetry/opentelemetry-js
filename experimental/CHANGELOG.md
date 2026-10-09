@@ -31,13 +31,13 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 * fix(instrumentation-fetch, instrumentation-xml-http-request): leave the instrumentation disabled when `globalThis.fetch` or `XMLHttpRequest.prototype.open`/`send` is missing or not a function, instead of reporting it enabled and never retrying [#7171](https://github.com/open-telemetry/opentelemetry-js/pull/7171) @overbalance
 * fix(otlp-transformer): accept DOM `TextDecoder` in `ProtobufReader` typing [#7169](https://github.com/open-telemetry/opentelemetry-js/pull/7169) @overbalance
-* fix(exporter-metrics-otlp-proto): type the browser `OTLPMetricExporter` config as `OTLPExporterConfigBase`, it accepted the Node.js config type and silently ignored `compression`, `keepAlive` and `httpAgentOptions` [#7172](https://github.com/open-telemetry/opentelemetry-js/pull/7172) @overbalance
 
 ### :books: Documentation
 
 ### :house: Internal
 
 * refactor(otlp-transformer): encode base64 through `#platform`, so the browser build no longer references `Buffer` [#7173](https://github.com/open-telemetry/opentelemetry-js/pull/7173) @overbalance
+* refactor(exporter-metrics-otlp-proto): type the browser `OTLPMetricExporter` config as `OTLPExporterConfigBase`, matching the other browser exporters [#7172](https://github.com/open-telemetry/opentelemetry-js/pull/7172) @overbalance
 
 ## 0.300.0-development.1
 
