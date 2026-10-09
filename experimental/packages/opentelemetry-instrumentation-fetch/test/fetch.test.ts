@@ -237,8 +237,10 @@ describe('fetch', () => {
       assert.ok(!isWrapped(window.fetch));
       fetchInstrumentation = new FetchInstrumentation({ enabled: false });
       assert.ok(!isWrapped(window.fetch));
+      assert.strictEqual(fetchInstrumentation.isEnabled(), false);
       fetchInstrumentation.enable();
       assert.ok(isWrapped(window.fetch));
+      assert.strictEqual(fetchInstrumentation.isEnabled(), true);
     });
 
     it('should not unwrap global fetch when disabled', () => {
@@ -246,6 +248,7 @@ describe('fetch', () => {
       assert.ok(isWrapped(window.fetch));
       fetchInstrumentation.disable();
       assert.ok(isWrapped(window.fetch));
+      assert.strictEqual(fetchInstrumentation.isEnabled(), false);
 
       // Avoids ERROR in the logs when calling `disable()` again during cleanup
       fetchInstrumentation = undefined;
@@ -284,6 +287,52 @@ describe('fetch', () => {
       it('should allow enable() to be retried after _wrap fails', () => {
         fetchInstrumentation!.enable();
         assert.doesNotThrow(() => fetchInstrumentation!.enable());
+      });
+
+      it('should report isEnabled() false when _wrap fails', () => {
+        fetchInstrumentation!.enable();
+        assert.strictEqual(fetchInstrumentation!.isEnabled(), false);
+      });
+    });
+
+    describe('when the fetch property is missing', () => {
+      // `shimmer.wrap` returns undefined instead of throwing when the target
+      // is absent or not a function, so this is a distinct failure path.
+      let fetchStub: sinon.SinonStub;
+
+      beforeEach(() => {
+        fetchInstrumentation = new FetchInstrumentation({ enabled: false });
+        fetchStub = sinon.stub(globalThis, 'fetch').value(undefined);
+      });
+
+      it('should report isEnabled() false and assign nothing to fetch', () => {
+        fetchInstrumentation!.enable();
+        assert.strictEqual(fetchInstrumentation!.isEnabled(), false);
+        assert.strictEqual(globalThis.fetch, undefined);
+      });
+
+      it('should wrap fetch when enable() is retried after fetch appears', () => {
+        fetchInstrumentation!.enable();
+        fetchStub.restore();
+        fetchInstrumentation!.enable();
+        assert.strictEqual(fetchInstrumentation!.isEnabled(), true);
+        assert.ok(isWrapped(globalThis.fetch));
+      });
+
+      it('should warn that the instrumentation will not be enabled', () => {
+        const diagLogger = new api.DiagConsoleLogger();
+        const spyWarn = sinon.stub(diagLogger, 'warn');
+        api.diag.setLogger(diagLogger, api.DiagLogLevel.ALL);
+        try {
+          fetchInstrumentation!.enable();
+          sinon.assert.calledOnceWithMatch(
+            spyWarn,
+            sinon.match.string,
+            sinon.match(/missing or not a function/)
+          );
+        } finally {
+          api.diag.disable();
+        }
       });
     });
 

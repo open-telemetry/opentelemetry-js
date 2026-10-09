@@ -26,6 +26,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :bug: Bug Fixes
 
+* fix(instrumentation-fetch, instrumentation-xml-http-request): leave the instrumentation disabled when `globalThis.fetch` or `XMLHttpRequest.prototype.open`/`send` is missing or not a function, instead of reporting it enabled and never retrying [#7171](https://github.com/open-telemetry/opentelemetry-js/pull/7171) @overbalance
 * fix(otlp-transformer): accept DOM `TextDecoder` in `ProtobufReader` typing [#7169](https://github.com/open-telemetry/opentelemetry-js/pull/7169) @overbalance
 
 ### :books: Documentation

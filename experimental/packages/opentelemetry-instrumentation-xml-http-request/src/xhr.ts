@@ -577,8 +577,20 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
 
     try {
       this._diag.debug('applying patch to', this.moduleName, this.version);
-      this._wrap(XMLHttpRequest.prototype, 'open', this._patchOpen());
-      this._wrap(XMLHttpRequest.prototype, 'send', this._patchSend());
+      const proto = XMLHttpRequest.prototype;
+      // `_wrap` returns undefined, without throwing, on a missing or non-function
+      // target, so a lone wrapped `open` would escape the catch and re-wrap on retry.
+      for (const name of ['open', 'send'] as const) {
+        if (typeof proto[name] !== 'function') {
+          this._diag.warn(
+            `XMLHttpRequest.prototype.${name} is missing or not a function; instrumentation will not be enabled. ` +
+              'Register the instrumentation after any XMLHttpRequest polyfill, or call enable() once it is available.'
+          );
+          return;
+        }
+      }
+      this._wrap(proto, 'open', this._patchOpen());
+      this._wrap(proto, 'send', this._patchSend());
       this._isXhrPatched = true;
       this._isEnabled = true;
     } catch (err) {
@@ -593,7 +605,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     }
   }
 
-  /** False before enable(), after disable(), or when patching throws; disable() leaves
+  /** False before enable(), after disable(), or when patching fails; disable() leaves
    * XMLHttpRequest.prototype patched. */
   override isEnabled(): boolean {
     return this._isEnabled === true;
