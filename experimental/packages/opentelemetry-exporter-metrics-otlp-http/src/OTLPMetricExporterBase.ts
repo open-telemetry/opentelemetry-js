@@ -103,10 +103,42 @@ const DEFAULT_AGGREGATION = Object.freeze({
   type: AggregationType.DEFAULT,
 });
 
+function chooseAggregationSelectorFromEnvironment(): AggregationSelector {
+  const configuredAggregation = (
+    getStringFromEnv(
+      'OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION'
+    ) ?? 'explicit_bucket_histogram'
+  ).toLowerCase();
+
+  let histogramAggregation: AggregationOption;
+  switch (configuredAggregation) {
+    case 'base2_exponential_bucket_histogram':
+      histogramAggregation = { type: AggregationType.EXPONENTIAL_HISTOGRAM };
+      break;
+    case 'explicit_bucket_histogram':
+      histogramAggregation = {
+        type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+      };
+      break;
+    default:
+      diag.warn(
+        `OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION is set to '${configuredAggregation}', but only 'explicit_bucket_histogram' and 'base2_exponential_bucket_histogram' are allowed. Using default instead.`
+      );
+      return () => DEFAULT_AGGREGATION;
+  }
+
+  return instrumentType =>
+    instrumentType === InstrumentType.HISTOGRAM
+      ? histogramAggregation
+      : DEFAULT_AGGREGATION;
+}
+
 function chooseAggregationSelector(
   config: OTLPMetricExporterOptions | undefined
 ): AggregationSelector {
-  return config?.aggregationPreference ?? (() => DEFAULT_AGGREGATION);
+  return (
+    config?.aggregationPreference ?? chooseAggregationSelectorFromEnvironment()
+  );
 }
 
 export class OTLPMetricExporterBase
