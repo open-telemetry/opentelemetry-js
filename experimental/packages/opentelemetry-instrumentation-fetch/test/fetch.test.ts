@@ -1866,6 +1866,34 @@ describe('fetch', () => {
         assertNoDebugMessages();
       });
 
+      it('should forward Request body and init when URL is ignored', async () => {
+        const { response } = await tracedFetch({
+          handlers: [
+            msw.http.post('/api/ignored.json', async ({ request }) => {
+              return msw.HttpResponse.json({
+                body: await request.text(),
+                header: request.headers.get('x-from-init'),
+              });
+            }),
+          ],
+          callback: () =>
+            fetch(
+              new Request('/api/ignored.json', {
+                method: 'POST',
+                body: 'request body',
+              }),
+              { headers: { 'x-from-init': 'init value' } }
+            ),
+          expectExport: false,
+        });
+
+        assert.deepStrictEqual(await response.json(), {
+          body: 'request body',
+          header: 'init value',
+        });
+        assertDebugMessage();
+      });
+
       it('should not create any spans for ignored request', async () => {
         await tracedFetch({
           callback: () => fetch('/api/ignored.json'),
