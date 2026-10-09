@@ -298,22 +298,25 @@ describe('fetch', () => {
     describe('when the fetch property is missing', () => {
       // `shimmer.wrap` returns undefined instead of throwing when the target
       // is absent or not a function, so this is a distinct failure path.
+      let fetchStub: sinon.SinonStub;
+
       beforeEach(() => {
         fetchInstrumentation = new FetchInstrumentation({ enabled: false });
-        // @ts-expect-error access internal property for testing
-        sinon.stub(fetchInstrumentation, '_wrap').returns(undefined);
+        fetchStub = sinon.stub(globalThis, 'fetch').value(undefined);
       });
 
-      it('should report isEnabled() false when _wrap returns undefined', () => {
+      it('should report isEnabled() false and assign nothing to fetch', () => {
         fetchInstrumentation!.enable();
         assert.strictEqual(fetchInstrumentation!.isEnabled(), false);
+        assert.strictEqual(globalThis.fetch, undefined);
       });
 
-      it('should retry wrapping on the next enable()', () => {
+      it('should wrap fetch when enable() is retried after fetch appears', () => {
         fetchInstrumentation!.enable();
+        fetchStub.restore();
         fetchInstrumentation!.enable();
-        // @ts-expect-error access internal property for testing
-        assert.strictEqual(fetchInstrumentation!._wrap.callCount, 2);
+        assert.strictEqual(fetchInstrumentation!.isEnabled(), true);
+        assert.ok(isWrapped(globalThis.fetch));
       });
     });
 
