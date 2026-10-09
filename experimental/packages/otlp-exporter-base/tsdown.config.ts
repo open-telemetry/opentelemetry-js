@@ -6,6 +6,6 @@ export default defineConfig({
   entry: [
     'src/index.ts',
     'src/platform/node/index.ts',
-    'src/index-browser-http.ts',
+    'src/platform/browser/index.ts',
   ],
 });

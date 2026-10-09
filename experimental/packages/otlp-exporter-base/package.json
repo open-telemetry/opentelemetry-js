@@ -27,12 +27,12 @@
     },
     "./browser-http": {
       "require": {
-        "types": "./dist/index-browser-http.d.cts",
-        "default": "./dist/index-browser-http.cjs"
+        "types": "./dist/platform/browser/index.d.cts",
+        "default": "./dist/platform/browser/index.cjs"
       },
       "default": {
-        "types": "./dist/index-browser-http.d.mts",
-        "default": "./dist/index-browser-http.mjs"
+        "types": "./dist/platform/browser/index.d.mts",
+        "default": "./dist/platform/browser/index.mjs"
       }
     }
   },
@@ -42,7 +42,7 @@
         "./dist/platform/node/index.d.cts"
       ],
       "browser-http": [
-        "./dist/index-browser-http.d.cts"
+        "./dist/platform/browser/index.d.cts"
       ]
     }
   },
