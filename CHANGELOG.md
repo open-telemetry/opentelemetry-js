@@ -35,6 +35,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :bug: Bug Fixes
 
+* fix(resources): read `process.argv0` for the default service name through `#platform`, so the browser build no longer touches `globalThis.process` [#0000](https://github.com/open-telemetry/opentelemetry-js/pull/0000) @overbalance
+
 ### :books: Documentation
 
 ### :house: Internal

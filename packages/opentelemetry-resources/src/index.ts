@@ -18,7 +18,7 @@ export {
   defaultResource,
   emptyResource,
 } from './ResourceImpl';
-export { defaultServiceName } from './default-service-name';
+export { defaultServiceName } from '#platform';
 export type {
   ResourceDetector,
   DetectedResource,
