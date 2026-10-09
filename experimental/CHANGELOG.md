@@ -32,7 +32,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :house: Internal
 
-* refactor(otlp-transformer): encode base64 through `#platform`, so the browser build no longer references `Buffer` [#0000](https://github.com/open-telemetry/opentelemetry-js/pull/0000) @overbalance
+* refactor(otlp-transformer): encode base64 through `#platform`, so the browser build no longer references `Buffer` [#7173](https://github.com/open-telemetry/opentelemetry-js/pull/7173) @overbalance
 
 ## 0.300.0-development.1
 
