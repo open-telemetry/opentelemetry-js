@@ -76,6 +76,18 @@ describe('BatchLogRecordProcessorBase', () => {
     setGlobalErrorHandler(loggingErrorHandler);
   });
 
+  describe('timer', () => {
+    it('unrefs the scheduled timer so it does not keep Node.js alive', () => {
+      const unref = sinon.spy();
+      sinon
+        .stub(globalThis, 'setTimeout')
+        .returns({ unref } as unknown as ReturnType<typeof setTimeout>);
+      const processor = new BatchLogRecordProcessor({ exporter });
+      processor.onEmit(createLogRecord());
+      assert.strictEqual(unref.callCount, 1);
+    });
+  });
+
   describe('constructor', () => {
     it('should create a BatchLogRecordProcessor instance', () => {
       const processor = new BatchLogRecordProcessor({ exporter });

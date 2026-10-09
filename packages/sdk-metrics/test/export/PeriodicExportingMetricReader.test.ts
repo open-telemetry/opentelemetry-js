@@ -172,6 +172,22 @@ describe('PeriodicExportingMetricReader', () => {
     scopeMetrics: scopeMetrics,
   };
 
+  describe('timer', () => {
+    it('unrefs the export interval so it does not keep Node.js alive', () => {
+      const unref = sinon.spy();
+      sinon
+        .stub(globalThis, 'setInterval')
+        .returns({ unref } as unknown as ReturnType<typeof setInterval>);
+      const reader = new PeriodicExportingMetricReader({
+        exporter: new TestDeltaMetricExporter(),
+        exportIntervalMillis: 1000,
+        exportTimeoutMillis: 500,
+      });
+      reader.setMetricProducer(new TestMetricProducer());
+      assert.strictEqual(unref.callCount, 1);
+    });
+  });
+
   describe('constructor', () => {
     it('should construct PeriodicExportingMetricReader without exceptions', () => {
       const exporter = new TestDeltaMetricExporter();
