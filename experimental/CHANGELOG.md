@@ -7,6 +7,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ## Unreleased
 
+
 ### :boom: Breaking Changes
 
 * feat(sdk-logs): mark `@opentelemetry/sdk-logs` as stable [#7143](https://github.com/open-telemetry/opentelemetry-js/issues/7143) @trentm
@@ -133,7 +134,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 ### :rocket: Features
 
 * feat(sdk-logs): deprecate `SdkLogRecord` in favor of `ReadWriteLogRecord` [#6939](https://github.com/open-telemetry/opentelemetry-js/pull/6939) @pichlermarc
-
+* feat(sdk-metrics): support `*` and `?` wildcards in `createAllowListAttributesProcessor` and `createDenyListAttributesProcessor` [#6995](https://github.com/open-telemetry/opentelemetry-js/pull/6995) @SaiprasadDash
 ### :bug: Bug Fixes
 
 * fix(instrumentation-http): do not crash on or misdirect outgoing requests whose options Node.js itself accepts, such as a non-string `host` alongside a valid `hostname`, or a `URL` argument from another realm or a polyfill [#6969](https://github.com/open-telemetry/opentelemetry-js/pull/6969) @RaphaelManke

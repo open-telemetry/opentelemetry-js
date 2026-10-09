@@ -52,6 +52,61 @@ describe('AllowListProcessor', () => {
       }
     );
   });
+
+  it('should support * wildcard to match zero or more characters', () => {
+    const processor = createAllowListAttributesProcessor([
+      'http.request.header.*',
+    ]);
+    assert.deepStrictEqual(
+      processor.process(
+        {
+          'http.request.header.content-type': 'application/json',
+          'http.request.header.': 'edgeCase',
+          'http.response.header.content-type': 'application/json',
+        },
+        context.active()
+      ),
+      {
+        'http.request.header.content-type': 'application/json',
+        'http.request.header.': 'edgeCase',
+      }
+    );
+  });
+
+  it('should support ? wildcard to match exactly one character', () => {
+    const processor = createAllowListAttributesProcessor(['attr?']);
+    assert.deepStrictEqual(
+      processor.process(
+        {
+          attr1: 'a',
+          attr2: 'b',
+          attr10: 'c',
+          attr: 'd',
+        },
+        context.active()
+      ),
+      {
+        attr1: 'a',
+        attr2: 'b',
+      }
+    );
+  });
+
+  it('should treat other regex meta characters as literal', () => {
+    const processor = createAllowListAttributesProcessor(['a.b+c']);
+    assert.deepStrictEqual(
+      processor.process(
+        {
+          'a.b+c': 'kept',
+          axbyc: 'dropped',
+        },
+        context.active()
+      ),
+      {
+        'a.b+c': 'kept',
+      }
+    );
+  });
 });
 
 describe('DenyListProcessor', () => {
@@ -68,6 +123,29 @@ describe('DenyListProcessor', () => {
       ),
       {
         baz: 'bazValue',
+      }
+    );
+  });
+
+  it('should support wildcards when denying attributes', () => {
+    const processor = createDenyListAttributesProcessor([
+      '*.password',
+      'temp_?',
+    ]);
+    assert.deepStrictEqual(
+      processor.process(
+        {
+          'user.password': 'secret',
+          'db.password': 'secret',
+          username: 'kept',
+          temp_1: 'dropped',
+          temp_12: 'kept',
+        },
+        context.active()
+      ),
+      {
+        username: 'kept',
+        temp_12: 'kept',
       }
     );
   });
