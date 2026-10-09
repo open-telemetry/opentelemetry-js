@@ -67,6 +67,6 @@ export function createOtlpHttpExportDelegate<Internal, Response>(
         meterProvider
       ),
     },
-    { timeout: options.timeoutMillis }
+    { timeout: options.timeoutMillis, maxRequestSize: options.maxRequestSize }
   );
 }

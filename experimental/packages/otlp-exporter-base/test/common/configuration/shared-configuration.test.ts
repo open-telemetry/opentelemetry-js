@@ -22,6 +22,7 @@ export function testSharedConfigBehavior<T extends OtlpSharedConfiguration>(
   testDefaults.timeoutMillis = 1;
   testDefaults.compression = 'none';
   testDefaults.concurrencyLimit = 2;
+  testDefaults.maxRequestSize = 3;
 
   describe('timeout', function () {
     it('uses user provided timeout over fallback', () => {
@@ -111,6 +112,35 @@ export function testSharedConfigBehavior<T extends OtlpSharedConfiguration>(
     it('uses default if none other are specified', () => {
       const config = sut({}, {}, testDefaults);
       assert.deepEqual(config.concurrencyLimit, testDefaults.concurrencyLimit);
+    });
+  });
+
+  describe('maxRequestSize', function () {
+    it('uses user provided maxRequestSize over fallback', () => {
+      const config = sut(
+        {
+          maxRequestSize: 10,
+        },
+        {
+          maxRequestSize: 20,
+        },
+        testDefaults
+      );
+      assert.deepEqual(config.maxRequestSize, 10);
+    });
+    it('uses fallback maxRequestSize over default', () => {
+      const config = sut(
+        {},
+        {
+          maxRequestSize: 30,
+        },
+        testDefaults
+      );
+      assert.deepEqual(config.maxRequestSize, 30);
+    });
+    it('uses default if none other are specified', () => {
+      const config = sut({}, {}, testDefaults);
+      assert.deepEqual(config.maxRequestSize, testDefaults.maxRequestSize);
     });
   });
 }
