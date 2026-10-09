@@ -8,5 +8,6 @@ export {
   createOtlpHttpExportDelegate,
   createOtlpHttpExporterMetrics,
 } from './otlp-http-export-delegate';
-export { getSharedConfigurationFromEnvironment } from './configuration/shared-env-configuration';
+export { getSharedConfigurationFromEnvironment } from '../../configuration/shared-env-configuration';
 export { convertLegacyHttpOptions } from './configuration/convert-legacy-node-http-options';
+export type { OTLPExporterNodeConfigBase } from './configuration/legacy-node-configuration';

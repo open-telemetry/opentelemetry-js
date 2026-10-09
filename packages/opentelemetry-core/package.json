@@ -34,6 +34,7 @@
   "scripts": {
     "prepublishOnly": "npm run compile",
     "compile": "tsdown",
+    "typecheck:browser": "tsc -p tsconfig.browser.json",
     "clean": "rimraf dist build",
     "test": "nyc mocha 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "karma start --single-run",

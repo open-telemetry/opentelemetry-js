@@ -35,6 +35,7 @@
   "scripts": {
     "clean": "rimraf dist build",
     "compile": "tsdown",
+    "typecheck:browser": "tsc -p tsconfig.browser.json",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "peer-api-check": "node ../../../scripts/peer-api-check.mjs",

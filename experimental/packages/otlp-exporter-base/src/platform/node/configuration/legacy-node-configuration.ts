@@ -7,7 +7,8 @@
 import type * as http from 'http';
 import type * as https from 'https';
 
-import type { OTLPExporterConfigBase } from './legacy-base-configuration';
+import type { OTLPExporterConfigBase } from '../../../configuration/legacy-base-configuration';
+import type { CompressionAlgorithm } from '../../../configuration/compression';
 import type { HttpAgentFactory } from './otlp-node-http-configuration';
 
 /**
@@ -59,9 +60,4 @@ export interface OTLPExporterNodeConfigBase extends OTLPExporterConfigBase {
    * Ref: https://opentelemetry.io/docs/specs/otel/protocol/exporter/#user-agent
    */
   userAgent?: string;
-}
-
-export enum CompressionAlgorithm {
-  NONE = 'none',
-  GZIP = 'gzip',
 }

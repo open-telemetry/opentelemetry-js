@@ -18,6 +18,9 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
   * The package roots' type declarations describe the Node.js implementation.
 * feat(instrumentation, exporter-*-otlp-http, exporter-*-otlp-proto)!: remove the `./platform` and `./platform/browser` subpath exports [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
   * Import from the package root instead.
+* feat(otlp-exporter-base)!: export `OTLPExporterNodeConfigBase` from `@opentelemetry/otlp-exporter-base/node-http` instead of the package root [#7172](https://github.com/open-telemetry/opentelemetry-js/pull/7172) @overbalance
+  * The root entry is shared with browsers and no longer references Node.js `http` types. `CompressionAlgorithm` stays on the root.
+  * `typesVersions` maps `./node-http` and `./browser-http` for TypeScript projects on `moduleResolution: node`, which cannot read `exports` subpaths.
 
 ### :rocket: Features
 
@@ -34,6 +37,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 ### :house: Internal
 
 * refactor(otlp-transformer): encode base64 through `#platform`, so the browser build no longer references `Buffer` [#7173](https://github.com/open-telemetry/opentelemetry-js/pull/7173) @overbalance
+* refactor(exporter-metrics-otlp-proto): type the browser `OTLPMetricExporter` config as `OTLPExporterConfigBase`, matching the other browser exporters [#7172](https://github.com/open-telemetry/opentelemetry-js/pull/7172) @overbalance
 
 ## 0.300.0-development.1
 

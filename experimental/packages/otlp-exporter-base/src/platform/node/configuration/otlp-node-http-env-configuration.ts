@@ -6,8 +6,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { getStringFromEnv, parseKeyPairsIntoRecord } from '@opentelemetry/core';
 import { diag } from '@opentelemetry/api';
-import { getSharedConfigurationFromEnvironment } from './shared-env-configuration';
-import { wrapStaticHeadersInFunction } from './shared-configuration';
+import { getSharedConfigurationFromEnvironment } from '../../../configuration/shared-env-configuration';
+import { wrapStaticHeadersInFunction } from '../../../configuration/shared-configuration';
 import type { OtlpNodeHttpConfiguration } from './otlp-node-http-configuration';
 import { httpAgentFactoryFromOptions } from './otlp-node-http-configuration';
 

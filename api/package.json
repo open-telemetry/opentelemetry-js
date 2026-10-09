@@ -30,6 +30,7 @@
   "scripts": {
     "clean": "rimraf dist build",
     "compile": "tsdown",
+    "typecheck:browser": "tsc -p tsconfig.browser.json",
     "lint:fix": "eslint . --fix",
     "lint": "eslint . && npm run cycle-check",
     "test:browser": "karma start --single-run",
