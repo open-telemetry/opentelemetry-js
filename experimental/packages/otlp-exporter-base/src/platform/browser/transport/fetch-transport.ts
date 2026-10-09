@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { IExporterTransport } from '../exporter-transport';
-import type { ExportResponse } from '../export-response';
+import type { IExporterTransport } from '../../../exporter-transport';
+import type { ExportResponse } from '../../../export-response';
 import { context, diag } from '@opentelemetry/api';
 import { suppressTracing } from '@opentelemetry/core';
 import {
   isExportHTTPErrorRetryable,
   parseRetryAfterToMills,
-} from '../is-export-retryable';
-import type { HeadersFactory } from '../configuration/otlp-http-configuration';
+} from '../../../is-export-retryable';
+import type { HeadersFactory } from '../../../configuration/otlp-http-configuration';
 
 /**
  * Maximum total body size for concurrent keepalive requests.

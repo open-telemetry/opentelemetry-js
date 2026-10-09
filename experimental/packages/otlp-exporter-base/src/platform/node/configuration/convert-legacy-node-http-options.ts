@@ -12,9 +12,9 @@ import {
   getNodeHttpConfigurationDefaults,
   mergeOtlpNodeHttpConfigurationWithDefaults,
 } from './otlp-node-http-configuration';
-import { httpAgentFactoryFromOptions } from '../index-node-http';
+import { httpAgentFactoryFromOptions } from './otlp-node-http-configuration';
 import { getNodeHttpConfigurationFromEnvironment } from './otlp-node-http-env-configuration';
-import { convertLegacyHeaders } from './convert-legacy-http-options';
+import { convertLegacyHeaders } from '../../../configuration/convert-legacy-http-options';
 
 function convertLegacyAgentOptions(
   config: OTLPExporterNodeConfigBase

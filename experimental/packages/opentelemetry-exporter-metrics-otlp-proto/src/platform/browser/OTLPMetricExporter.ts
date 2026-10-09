@@ -6,7 +6,7 @@
 import { type MeterProvider } from '@opentelemetry/api';
 import type { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPMetricExporterBase } from '@opentelemetry/exporter-metrics-otlp-http';
-import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import type { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 import {
   MetricsExporterMetricsHelper,
   ProtobufMetricsSerializer,
@@ -20,9 +20,7 @@ import { OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER } from '../../semco
 
 export class OTLPMetricExporter extends OTLPMetricExporterBase {
   private readonly _url: string | undefined;
-  constructor(
-    config: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions = {}
-  ) {
+  constructor(config: OTLPExporterConfigBase & OTLPMetricExporterOptions = {}) {
     super(
       createLegacyOtlpBrowserExportDelegate(
         config,

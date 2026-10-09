@@ -2,11 +2,11 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import type { OtlpHttpConfiguration } from './otlp-http-configuration';
+import type { OtlpHttpConfiguration } from '../../../configuration/otlp-http-configuration';
 import {
   getHttpConfigurationDefaults,
   mergeOtlpHttpConfigurationWithDefaults,
-} from './otlp-http-configuration';
+} from '../../../configuration/otlp-http-configuration';
 
 // NOTE: do not change these imports to be actual imports, otherwise they WILL break `@opentelemetry/instrumentation-http`
 import type * as http from 'http';

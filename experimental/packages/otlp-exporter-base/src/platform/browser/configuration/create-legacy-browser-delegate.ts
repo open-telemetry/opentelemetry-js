@@ -10,10 +10,10 @@ import type {
 } from '@opentelemetry/otlp-transformer';
 import { createOtlpFetchExportDelegate } from '../otlp-browser-http-export-delegate';
 import { convertLegacyBrowserHttpOptions } from './convert-legacy-browser-http-options';
-import type { IOtlpExportDelegate } from '../otlp-export-delegate';
-import type { OTLPExporterConfigBase } from './legacy-base-configuration';
-import { ATTR_HTTP_RESPONSE_STATUS_CODE } from '../semconv';
-import { ExporterMetrics } from '../ExporterMetrics';
+import type { IOtlpExportDelegate } from '../../../otlp-export-delegate';
+import type { OTLPExporterConfigBase } from '../../../configuration/legacy-base-configuration';
+import { ATTR_HTTP_RESPONSE_STATUS_CODE } from '../../../semconv';
+import { ExporterMetrics } from '../../../ExporterMetrics';
 
 /**
  * @deprecated

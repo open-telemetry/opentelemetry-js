@@ -6,13 +6,13 @@ import type * as http from 'http';
 import type * as https from 'https';
 import * as zlib from 'zlib';
 import { Readable } from 'stream';
-import type { ExportResponse } from '../export-response';
+import type { ExportResponse } from '../../../export-response';
 import {
   isExportHTTPErrorRetryable,
   parseRetryAfterToMills,
-} from '../is-export-retryable';
-import { OTLPExporterError } from '../types';
-import { VERSION } from '../version';
+} from '../../../is-export-retryable';
+import { OTLPExporterError } from '../../../types';
+import { VERSION } from '../../../version';
 
 const DEFAULT_USER_AGENT = `OTel-OTLP-Exporter-JavaScript/${VERSION}`;
 
