@@ -279,23 +279,35 @@ describe('xhr', () => {
       // `shimmer.wrap` returns undefined instead of throwing when the target
       // is absent or not a function, so this is a distinct failure path.
       beforeEach(() => {
+        sinon.stub(XMLHttpRequest.prototype, 'send').value(undefined);
         xhrInstrumentation = new XMLHttpRequestInstrumentation({
           enabled: false,
         });
-        // @ts-expect-error access internal property for testing
-        sinon.stub(xhrInstrumentation, '_wrap').returns(undefined);
       });
 
-      it('should report isEnabled() false when _wrap returns undefined', () => {
+      it('should report isEnabled() false and wrap nothing', () => {
         xhrInstrumentation!.enable();
         assert.strictEqual(xhrInstrumentation!.isEnabled(), false);
+        assert.ok(!isWrapped(XMLHttpRequest.prototype.open));
       });
 
-      it('should retry wrapping on the next enable()', () => {
+      it('should wrap open once when enable() is retried after send appears', () => {
         xhrInstrumentation!.enable();
+        sinon.restore();
         xhrInstrumentation!.enable();
-        // @ts-expect-error access internal property for testing
-        assert.strictEqual(xhrInstrumentation!._wrap.callCount, 4);
+        assert.strictEqual(xhrInstrumentation!.isEnabled(), true);
+        const open = XMLHttpRequest.prototype.open;
+        const send = XMLHttpRequest.prototype.send;
+        assert.ok(isWrapped(open) && isWrapped(send));
+        // @ts-expect-error -- property added by instrumentation.wrap(...)
+        assert.ok(
+          !isWrapped(open.__original),
+          'open must not be double-wrapped'
+        );
+        // @ts-expect-error -- property added by instrumentation.wrap(...)
+        send.__unwrap();
+        // @ts-expect-error -- property added by instrumentation.wrap(...)
+        open.__unwrap();
       });
     });
 
