@@ -7,8 +7,8 @@
 // as they'd be imported before the http/https modules can be wrapped.
 import type * as https from 'https';
 import type * as http from 'http';
-import type { ExportResponse } from '../export-response';
-import type { IExporterTransport } from '../exporter-transport';
+import type { ExportResponse } from '../../../export-response';
+import type { IExporterTransport } from '../../../exporter-transport';
 import { sendWithHttp } from './http-transport-utils';
 import type { NodeHttpRequestParameters } from './node-http-transport-types';
 

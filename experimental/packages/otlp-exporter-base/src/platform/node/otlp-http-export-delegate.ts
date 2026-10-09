@@ -5,19 +5,19 @@
 
 import type { MeterProvider } from '@opentelemetry/api';
 
-import type { IOtlpExportDelegate } from './otlp-export-delegate';
-import { createOtlpExportDelegate } from './otlp-export-delegate';
+import type { IOtlpExportDelegate } from '../../otlp-export-delegate';
+import { createOtlpExportDelegate } from '../../otlp-export-delegate';
 import type {
   IExporterMetricsHelper,
   ISerializer,
 } from '@opentelemetry/otlp-transformer';
 import { createHttpExporterTransport } from './transport/http-exporter-transport';
-import { createBoundedQueueExportPromiseHandler } from './bounded-queue-export-promise-handler';
-import { createRetryingTransport } from './retrying-transport';
+import { createBoundedQueueExportPromiseHandler } from '../../bounded-queue-export-promise-handler';
+import { createRetryingTransport } from '../../retrying-transport';
 import type { OtlpNodeHttpConfiguration } from './configuration/otlp-node-http-configuration';
-import { OTLPExporterError } from './types';
-import { ATTR_HTTP_RESPONSE_STATUS_CODE } from './semconv';
-import { ExporterMetrics } from './ExporterMetrics';
+import { OTLPExporterError } from '../../types';
+import { ATTR_HTTP_RESPONSE_STATUS_CODE } from '../../semconv';
+import { ExporterMetrics } from '../../ExporterMetrics';
 
 export function createOtlpHttpExporterMetrics<Internal>(
   metricsComponentType: string,

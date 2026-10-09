@@ -7,7 +7,7 @@ import {
   getHttpConfigurationDefaults,
   mergeOtlpHttpConfigurationWithDefaults,
 } from './otlp-http-configuration';
-import type { OTLPExporterNodeConfigBase } from './legacy-node-configuration';
+import type { OTLPExporterConfigBase } from './legacy-base-configuration';
 import { convertLegacyHeaders } from './convert-legacy-http-options';
 
 /**
@@ -18,7 +18,7 @@ import { convertLegacyHeaders } from './convert-legacy-http-options';
  * @param requiredHeaders
  */
 export function convertLegacyBrowserHttpOptions(
-  config: OTLPExporterNodeConfigBase,
+  config: OTLPExporterConfigBase,
   signalResourcePath: string,
   requiredHeaders: Record<string, string>
 ): OtlpHttpConfiguration {
