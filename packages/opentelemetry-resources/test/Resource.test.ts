@@ -16,7 +16,7 @@ import * as sinon from 'sinon';
 import { describeBrowser, describeNode } from './util';
 import type { DetectedResourceAttributes } from '../src';
 import { defaultResource, emptyResource, resourceFromAttributes } from '../src';
-import { _clearDefaultServiceNameCache } from '../src/default-service-name';
+import { _clearDefaultServiceNameCache } from '../src/detectors/platform/node/default-service-name';
 import * as EventEmitter from 'events';
 
 describe('Resource', () => {

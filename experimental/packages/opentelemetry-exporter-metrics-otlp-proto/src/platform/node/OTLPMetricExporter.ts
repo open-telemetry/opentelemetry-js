@@ -6,7 +6,7 @@
 import { type MeterProvider } from '@opentelemetry/api';
 import type { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPMetricExporterBase } from '@opentelemetry/exporter-metrics-otlp-http';
-import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base/node-http';
 import {
   MetricsExporterMetricsHelper,
   ProtobufMetricsSerializer,

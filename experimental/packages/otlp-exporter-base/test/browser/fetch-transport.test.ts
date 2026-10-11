@@ -8,7 +8,7 @@ import * as assert from 'assert';
 import { context } from '@opentelemetry/api';
 import { isTracingSuppressed } from '@opentelemetry/core';
 import { StackContextManager } from '@opentelemetry/sdk-trace';
-import { createFetchTransport } from '../../src/transport/fetch-transport';
+import { createFetchTransport } from '../../src/platform/browser/transport/fetch-transport';
 import { createRetryingTransport } from '../../src/retrying-transport';
 import { registerMockDiagLogger, withResolvers } from '../common/test-utils';
 import type {

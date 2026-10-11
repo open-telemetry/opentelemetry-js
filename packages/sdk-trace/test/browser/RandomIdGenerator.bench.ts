@@ -4,7 +4,7 @@
  */
 
 import * as Benchmark from 'benchmark';
-import { RandomIdGenerator } from '../../src/platform';
+import { RandomIdGenerator } from '../../src/platform/browser';
 
 const idGenerator = new RandomIdGenerator();
 

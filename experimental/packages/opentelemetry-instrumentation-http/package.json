@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation-http",
-  "version": "0.300.0-development.0",
+  "version": "0.300.0-development.1",
   "description": "OpenTelemetry instrumentation for `node:http` and `node:https` http client and server modules",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -23,8 +23,8 @@
     "clean": "rimraf dist build",
     "test:cjs": "nyc --silent mocha test/**/*.test.ts",
     "test:cjs:diagch": "nyc --silent --no-clean mocha --require ./test/utils/enableDiagnosticsChannelMode.ts test/**/*.test.ts",
-    "test:esm": "nyc --silent --no-clean node --experimental-loader=@opentelemetry/instrumentation/hook.mjs ../../../scripts/run-mocha.mjs 'test/**/*.test.mjs'",
-    "test:double-instr": "nyc --silent --no-clean node --experimental-loader=@opentelemetry/instrumentation/hook.mjs ../../../scripts/run-mocha.mjs 'test/integrations/double-instr.test.cjs'",
+    "test:esm": "nyc --silent --no-clean mocha --experimental-loader=@opentelemetry/instrumentation/hook.mjs 'test/**/*.test.mjs'",
+    "test:double-instr": "nyc --silent --no-clean mocha --experimental-loader=@opentelemetry/instrumentation/hook.mjs 'test/integrations/double-instr.test.cjs'",
     "test": "npm run test:cjs && npm run test:cjs:diagch && npm run test:esm && npm run test:double-instr && nyc report",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "lint": "eslint .",
@@ -59,17 +59,17 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/api": "1.9.1",
-    "@opentelemetry/context-async-hooks": "3.0.0-development.0",
-    "@opentelemetry/sdk-metrics": "3.0.0-development.0",
-    "@opentelemetry/sdk-trace": "3.0.0-development.0",
+    "@opentelemetry/api": "1.10.0-development.1",
+    "@opentelemetry/context-async-hooks": "3.0.0-development.1",
+    "@opentelemetry/sdk-metrics": "3.0.0-development.1",
+    "@opentelemetry/sdk-trace": "3.0.0-development.1",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/request-promise-native": "1.0.21",
     "@types/sinon": "17.0.4",
     "@types/superagent": "8.1.11",
     "axios": "1.20.0",
-    "mocha": "11.8.0",
+    "mocha": "12.0.3",
     "nock": "13.5.6",
     "nyc": "18.0.0",
     "sinon": "18.0.1",
@@ -77,11 +77,11 @@
     "typescript": "5.2.2"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^1.3.0"
+    "@opentelemetry/api": "^1.3.0 || 1.10.0-development.1"
   },
   "dependencies": {
-    "@opentelemetry/core": "3.0.0-development.0",
-    "@opentelemetry/instrumentation": "0.300.0-development.0",
+    "@opentelemetry/core": "3.0.0-development.1",
+    "@opentelemetry/instrumentation": "0.300.0-development.1",
     "@opentelemetry/semantic-conventions": "^1.29.0",
     "fast-uri": "4.2.1",
     "forwarded-parse": "2.1.2"
