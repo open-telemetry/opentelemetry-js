@@ -18,7 +18,7 @@ npm install --save @opentelemetry/otlp-exporter-base
 ## HTTP exporter configuration
 
 HTTP JSON and HTTP/protobuf exporters for traces, metrics, and logs share these configuration options.
-Node.js exporters accept `OTLPExporterNodeConfigBase`, which also includes the options from `OTLPExporterConfigBase`.
+Node.js exporters accept `OTLPExporterNodeConfigBase`, exported from `@opentelemetry/otlp-exporter-base/node-http`, which also includes the options from `OTLPExporterConfigBase`.
 Browser exporters accept `OTLPExporterConfigBase`.
 In Node.js, configuration precedence is: programmatic options, then per-signal environment variables, then general environment variables, then built-in defaults.
 Browser exporters do not read environment variables.

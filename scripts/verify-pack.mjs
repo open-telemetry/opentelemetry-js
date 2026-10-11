@@ -4,11 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// Packs every publishable workspace package, then loads the require/import
-// targets of every `exports` entry (or main/module) from the extracted tarball
-// and existence-checks types/browser/main/module files. Catches broken
-// `exports` maps, missing files in `files`, and CJS/ESM interop bugs that
-// unit tests (which run against TS source) can't see.
+// Packs every publishable package, loads every exports/imports target from the tarball and
+// resolves node-conditional specifiers with and without node: catches broken maps, misordered
+// conditions, `files` omissions and CJS/ESM interop bugs that source-based unit tests cannot see.
 
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
@@ -18,6 +16,8 @@ import {
   readFileSync,
   rmSync,
   existsSync,
+  realpathSync,
+  writeFileSync,
 } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -88,6 +88,8 @@ for (const { dir, pkg } of targets) {
         failures.push(`${label} :: exports "${subpath}" falls back to ${fallback}, not the import target ${esm}`);
       }
     }
+    checkDeclarations(extracted, label);
+    checkConditions(extracted, pkg, label);
     console.log(failures.length === failuresBefore ? `  ok   ${label}` : `  FAIL ${label}`);
   } catch (err) {
     failures.push(`${label} :: pack/extract failed: ${err.message}`);
@@ -161,15 +163,14 @@ function collectEntries(pkg) {
     if (pkg.main) visit(push, '.', pkg.main, 'require');
     if (pkg.module) visit(push, '.', pkg.module, 'import');
   }
-  // Top-level fields and browser-map files must ship even when `exports` wins.
+  // Top-level fields must ship even when `exports` wins.
   for (const field of ['main', 'module', 'types']) {
     if (typeof pkg[field] === 'string') push('exists', `#${field}`, pkg[field]);
   }
-  if (pkg.browser && typeof pkg.browser === 'object') {
-    for (const [from, to] of Object.entries(pkg.browser)) {
-      if (from.startsWith('./')) push('exists', '#browser', from);
-      if (typeof to === 'string' && to.startsWith('./')) push('exists', '#browser', to);
-    }
+  // Node reaches only the node branch through the root entry, so load every imports
+  // leaf directly. The otel branch points at src, which is not packed.
+  for (const [specifier, map] of Object.entries(pkg.imports ?? {})) {
+    visit(push, specifier, map && typeof map === 'object' ? { ...map, otel: undefined } : map, null);
   }
   return out;
 }
@@ -251,4 +252,96 @@ function visit(push, subpath, node, cond) {
       visit(push, subpath, child, key === 'default' ? cond : key);
     }
   }
+}
+
+// Node picks the first matching key, so a node branch after import/require loads yet is
+// unreachable. Resolve from inside the extracted package and compare with the branch the map names.
+function checkConditions(extracted, pkg, label) {
+  const specs = [];
+  // Without otel the mocha and karma hooks silently test dist; without node every
+  // resolver, Node included, gets the browser build.
+  for (const cond of ['otel', 'node']) {
+    if (pkg.imports?.['#platform'] && !pkg.imports['#platform'][cond]) {
+      failures.push(`${label} :: imports "#platform" has no ${cond} branch`);
+    }
+  }
+  for (const [key, map] of Object.entries(pkg.imports ?? {})) {
+    if (map?.node) specs.push({ spec: key, map });
+  }
+  for (const [sub, map] of Object.entries(subpathMap(pkg.exports))) {
+    if (map?.node) specs.push({ spec: pkg.name + sub.slice(1), map });
+  }
+  if (specs.length === 0) return;
+  // Node reports real paths, so compare against the real path of `extracted`.
+  const root = realpathSync(extracted);
+
+  const probe = path.join(extracted, '__verify-pack-probe.mjs');
+  writeFileSync(
+    probe,
+    [
+      "import { createRequire } from 'node:module';",
+      "import { fileURLToPath } from 'node:url';",
+      'const require = createRequire(import.meta.url);',
+      'const specs = JSON.parse(process.argv[2]);',
+      'console.log(JSON.stringify(specs.map(s => ({',
+      '  import: fileURLToPath(import.meta.resolve(s)),',
+      '  require: require.resolve(s),',
+      '}))));',
+    ].join('\n')
+  );
+  let resolved;
+  try {
+    const out = execFileSync(
+      process.execPath,
+      [probe, JSON.stringify(specs.map(s => s.spec))],
+      { cwd: extracted, encoding: 'utf8' }
+    );
+    resolved = JSON.parse(out);
+  } catch (err) {
+    failures.push(`${label} :: resolving [node] threw: ${err.message}`);
+    return;
+  }
+  specs.forEach(({ spec, map }, i) => {
+    const nodeTargets = leaves(map.node);
+    for (const kind of ['import', 'require']) {
+      const nodeTarget = leaf(map.node, kind);
+      const expected = path.resolve(root, nodeTarget ?? '');
+      if (resolved[i][kind] !== expected) {
+        failures.push(
+          `${label} :: ${kind}("${spec}") [node] -> ` +
+            `${path.relative(root, resolved[i][kind])}, expected ${path.relative(root, expected)}`
+        );
+      }
+      // Node always activates node, so simulate the resolvers that do not.
+      const fallback = resolveConditions(map, new Set([kind]));
+      if (fallback === undefined || nodeTargets.includes(fallback)) {
+        failures.push(`${label} :: ${kind}("${spec}") without node -> ${fallback ?? 'nothing'}, expected a non-node target`);
+      }
+    }
+  });
+}
+
+// A declaration that still names #platform came from a dts build whose resolver
+// skipped the otel condition; node10 consumers cannot resolve it.
+function checkDeclarations(extracted, label) {
+  for (const file of readdirSync(extracted, { recursive: true })) {
+    if (!/\.d\.[cm]?ts$/.test(file)) continue;
+    if (/['"]#platform['"]/.test(readFileSync(path.join(extracted, file), 'utf8'))) {
+      failures.push(`${label} :: ${file} references #platform`);
+    }
+  }
+}
+
+// The `kind` (else `default`) target of a condition map, ignoring key order: a `default`
+// listed before `kind` makes Node's pick differ and fail the compare.
+function leaf(node, kind) {
+  if (typeof node === 'string') return node;
+  if (!node || typeof node !== 'object') return undefined;
+  return leaf(node[kind] ?? node.default, kind);
+}
+
+function leaves(node) {
+  if (typeof node === 'string') return [node];
+  if (!node || typeof node !== 'object') return [];
+  return Object.values(node).flatMap(leaves);
 }

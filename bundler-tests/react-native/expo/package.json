@@ -17,7 +17,7 @@
     "@opentelemetry/exporter-zipkin": "file:../../../packages/opentelemetry-exporter-zipkin",
     "@opentelemetry/instrumentation": "file:../../../experimental/packages/opentelemetry-instrumentation",
     "@opentelemetry/resources": "file:../../../packages/opentelemetry-resources",
-    "@opentelemetry/sdk-logs": "file:../../../experimental/packages/sdk-logs",
+    "@opentelemetry/sdk-logs": "file:../../../packages/sdk-logs",
     "@opentelemetry/sdk-trace": "file:../../../packages/sdk-trace",
     "expo": "^57",
     "react": "19.2.3",

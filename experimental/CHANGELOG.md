@@ -9,8 +9,23 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :boom: Breaking Changes
 
+* feat(sdk-logs): mark `@opentelemetry/sdk-logs` as stable [#7143](https://github.com/open-telemetry/opentelemetry-js/issues/7143) @trentm
+  * See [the stable CHANGELOG](../CHANGELOG.md) for future changes to the sdk-logs package.
+* feat!: replace the top-level `browser` field in `package.json` with `#platform` subpath imports [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
+  * Resolvers that apply the `node` condition, such as Node.js, load the Node.js implementation. All others, including browsers, web workers, edge runtimes and React Native, load the browser implementation with no configuration. Bundlers without `imports` support fail to resolve `#platform`; see the migration guide.
+  * webpack 5 needs `enhanced-resolve` 5.8.2 or later, which webpack 5.54 and later require.
+  * Parcel needs package exports enabled, and cannot resolve `#platform` from CommonJS `require()`.
+  * The package roots' type declarations describe the Node.js implementation.
+* feat(instrumentation, exporter-*-otlp-http, exporter-*-otlp-proto)!: remove the `./platform` and `./platform/browser` subpath exports [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
+  * Import from the package root instead.
+* feat(otlp-exporter-base)!: export `OTLPExporterNodeConfigBase` from `@opentelemetry/otlp-exporter-base/node-http` instead of the package root [#7172](https://github.com/open-telemetry/opentelemetry-js/pull/7172) @overbalance
+  * The root entry is shared with browsers and no longer references Node.js `http` types. `CompressionAlgorithm` stays on the root.
+  * `typesVersions` maps `./node-http` and `./browser-http` for TypeScript projects on `moduleResolution: node`, which cannot read `exports` subpaths.
+
 ### :rocket: Features
 
+* feat(instrumentation): add `isEnabled()` to the browser `InstrumentationBase`, matching Node.js [#7140](https://github.com/open-telemetry/opentelemetry-js/pull/7140) @overbalance
+  * `FetchInstrumentation` and `XMLHttpRequestInstrumentation` override it to report whether they are active, which stays false when patching throws.
 * feat(otlp-exporter-base): support the `compression` option in browser OTLP HTTP exporters [#7166](https://github.com/open-telemetry/opentelemetry-js/pull/7166) @YangJonghun
   * `compression: CompressionAlgorithm.GZIP` gzips export requests with the built-in `CompressionStream` API, as Node.js exporters already do. Runtimes without gzip support in `CompressionStream` send uncompressed requests and log a warning once per exporter.
   * The keepalive budget is charged with the compressed size, so more telemetry fits into the requests that survive page unload.
@@ -19,9 +34,15 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :bug: Bug Fixes
 
+* fix(instrumentation-fetch, instrumentation-xml-http-request): leave the instrumentation disabled when `globalThis.fetch` or `XMLHttpRequest.prototype.open`/`send` is missing or not a function, instead of reporting it enabled and never retrying [#7171](https://github.com/open-telemetry/opentelemetry-js/pull/7171) @overbalance
+* fix(otlp-transformer): accept DOM `TextDecoder` in `ProtobufReader` typing [#7169](https://github.com/open-telemetry/opentelemetry-js/pull/7169) @overbalance
+
 ### :books: Documentation
 
 ### :house: Internal
+
+* refactor(otlp-transformer): encode base64 through `#platform`, so the browser build no longer references `Buffer` [#7173](https://github.com/open-telemetry/opentelemetry-js/pull/7173) @overbalance
+* refactor(exporter-metrics-otlp-proto): type the browser `OTLPMetricExporter` config as `OTLPExporterConfigBase`, matching the other browser exporters [#7172](https://github.com/open-telemetry/opentelemetry-js/pull/7172) @overbalance
 
 ## 0.300.0-development.1
 

@@ -1,13 +1,13 @@
 import { defineConfig } from 'tsdown';
 import baseConfig from '../../../tsdown.config.ts';
 
-// Platform barrels stay as entries so tsdown keeps the indirection in dist,
-// letting package.json#browser path-swap node->browser for bundlers.
+// Both platform barrels stay as entries so each package.json#imports condition
+// for #platform has a real file to resolve to.
 export default defineConfig({
   ...baseConfig,
   entry: [
     'src/index.ts',
-    'src/platform/index.ts',
+    'src/platform/node/index.ts',
     'src/platform/browser/index.ts',
   ],
 });
