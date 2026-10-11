@@ -8,7 +8,6 @@ import type * as http from 'http';
 import type * as https from 'https';
 
 import type { OTLPExporterConfigBase } from '../../../configuration/legacy-base-configuration';
-import type { CompressionAlgorithm } from '../../../configuration/compression';
 import type { HttpAgentFactory } from './otlp-node-http-configuration';
 
 /**

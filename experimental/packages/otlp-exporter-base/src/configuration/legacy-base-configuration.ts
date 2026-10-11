@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import type { MeterProvider } from '@opentelemetry/api';
+import type { CompressionAlgorithm } from './compression';
 import type { HeadersFactory } from './otlp-http-configuration';
 
 export interface OTLPExporterConfigBase {
@@ -60,9 +61,4 @@ export interface OTLPExporterConfigBase {
    * @experimental This option is experimental and is subject to breaking changes in minor releases.
    */
   selfObsMeterProvider?: MeterProvider;
-}
-
-export enum CompressionAlgorithm {
-  NONE = 'none',
-  GZIP = 'gzip',
 }
