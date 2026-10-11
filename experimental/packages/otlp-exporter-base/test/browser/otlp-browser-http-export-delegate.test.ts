@@ -6,8 +6,8 @@
 import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { ExportResultCode } from '@opentelemetry/core';
-import { createOtlpFetchExportDelegate } from '../../src/otlp-browser-http-export-delegate';
-import { createOtlpSendBeaconExportDelegate } from '../../src/index-browser-http';
+import { createOtlpFetchExportDelegate } from '../../src/platform/browser/otlp-browser-http-export-delegate';
+import { createOtlpSendBeaconExportDelegate } from '../../src/platform/browser';
 import { ExporterMetrics } from '../../src';
 
 const noopMetrics = new ExporterMetrics({

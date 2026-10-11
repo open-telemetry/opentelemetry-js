@@ -4,7 +4,7 @@
  */
 
 import * as assert from 'assert';
-import { convertLegacyBrowserHttpOptions } from '../../../src/configuration/convert-legacy-browser-http-options';
+import { convertLegacyBrowserHttpOptions } from '../../../src/platform/browser/configuration/convert-legacy-browser-http-options';
 import { CompressionAlgorithm } from '../../../src';
 
 describe('convertLegacyBrowserHttpOptions', function () {
