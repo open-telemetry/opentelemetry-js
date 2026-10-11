@@ -77,15 +77,16 @@ class FetchTransport implements IExporterTransport {
     // would not survive.
     const suppressedContext = suppressTracing(context.active());
 
+    const abortController = new AbortController();
+    const timeout = setTimeout(() => abortController.abort(), timeoutMillis);
+
     // Compressed first so that the keepalive budget counts the bytes sent.
     const compressed =
       this._compression === 'none'
         ? undefined
-        : await this._compress(data, this._compression);
+        : await this._compress(data, this._compression, abortController.signal);
     const body = compressed ?? data;
 
-    const abortController = new AbortController();
-    const timeout = setTimeout(() => abortController.abort(), timeoutMillis);
     // Fetch API may be wrapped by an instrumentation like `@opentelemetry/instrumentation-fetch`.
     // In that case the instrumentation would create a new Span for this request,
     // creating an indirect endless loop Export -> Span -> Export.
@@ -212,14 +213,19 @@ class FetchTransport implements IExporterTransport {
 
   private async _compress(
     data: Uint8Array,
-    format: CompressionFormat
+    format: CompressionFormat,
+    signal: AbortSignal
   ): Promise<Blob | undefined> {
     try {
-      return await compressWithCompressionStream(data, format);
+      return await compressWithCompressionStream(data, format, signal);
     } catch (error) {
-      diag.warn(
-        `${format} compression failed, sending export uncompressed: ${error}`
-      );
+      // Not warned on timeout: `fetch` rejects on the aborted signal, so nothing
+      // is sent.
+      if (!signal.aborted) {
+        diag.warn(
+          `${format} compression failed, sending export uncompressed: ${error}`
+        );
+      }
       return undefined;
     }
   }
@@ -318,25 +324,26 @@ function isCompressionStreamFormatSupported(
 
 async function compressWithCompressionStream(
   data: Uint8Array,
-  format: CompressionFormat
+  format: CompressionFormat,
+  signal: AbortSignal
 ): Promise<Blob> {
-  // Read with a stream reader: `Response.arrayBuffer()` waits for a task in
-  // some engines, which never runs once the page unloads.
-  const reader = new ReadableStream<Uint8Array>({
+  // Read with `pipeTo`: `Response.arrayBuffer()` waits for a task in some
+  // engines, which never runs once the page unloads.
+  const chunks: Uint8Array[] = [];
+  await new ReadableStream<Uint8Array>({
     start(controller) {
       controller.enqueue(data);
       controller.close();
     },
   })
     .pipeThrough(new globalThis.CompressionStream(format))
-    .getReader();
-
-  const chunks: Uint8Array[] = [];
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) {
-      return new Blob(chunks);
-    }
-    chunks.push(value);
-  }
+    .pipeTo(
+      new WritableStream({
+        write(chunk) {
+          chunks.push(chunk);
+        },
+      }),
+      { signal }
+    );
+  return new Blob(chunks);
 }

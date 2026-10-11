@@ -1334,6 +1334,65 @@ describe('FetchTransport', function () {
       sinon.assert.alwaysCalledWithMatch(warn, 'gzip compression failed');
     });
 
+    it('fails when compression takes longer than the timeout', async function () {
+      // arrange
+      // Barely compressible, so gzip takes far longer than the timeout.
+      const slowPayload = new Uint8Array(4 * 1024 * 1024); // 4MB
+      for (let i = 0; i < slowPayload.length; i += 65536) {
+        crypto.getRandomValues(slowPayload.subarray(i, i + 65536));
+      }
+      // Settles after a task, as a real request does, so a due timer runs first.
+      sinon.stub(globalThis, 'fetch').callsFake(
+        (_input, init) =>
+          new Promise((resolve, reject) => {
+            init?.signal?.addEventListener('abort', () => {
+              reject(init.signal?.reason);
+            });
+            setTimeout(() => resolve(new Response('', { status: 200 })), 0);
+          })
+      );
+      const transport = createFetchTransport(gzipTransportParameters);
+      const shortTimeout = 10;
+
+      // act
+      const result = await transport.send(slowPayload, shortTimeout);
+
+      // assert
+      assert.strictEqual(result.status, 'failure');
+    });
+
+    it('aborts a stalled compression and fails without sending when the timeout fires', async function () {
+      // arrange
+      const cancel = sinon.spy();
+      sinon.stub(globalThis, 'CompressionStream').value(
+        class {
+          readonly writable = new WritableStream<Uint8Array>();
+          readonly readable = new ReadableStream<Uint8Array>({ cancel });
+        }
+      );
+      const fetchStub = sinon
+        .stub(globalThis, 'fetch')
+        .callsFake(async (_input, init) => {
+          init?.signal?.throwIfAborted();
+          return new Response('', { status: 200 });
+        });
+      const { warn } = registerMockDiagLogger();
+      const transport = createFetchTransport(gzipTransportParameters);
+      const shortTimeout = 10;
+
+      // act
+      const result = await transport.send(testPayload, shortTimeout);
+
+      // assert
+      assert.strictEqual(result.status, 'failure');
+      assert.strictEqual(
+        (fetchStub.firstCall.args[1] as RequestInit).signal?.aborted,
+        true
+      );
+      sinon.assert.calledOnce(cancel);
+      sinon.assert.notCalled(warn);
+    });
+
     it('compresses the body again on retry', async function () {
       // arrange
       const fetchStub = sinon.stub(globalThis, 'fetch');
