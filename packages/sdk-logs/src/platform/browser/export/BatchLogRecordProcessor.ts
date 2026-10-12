@@ -5,6 +5,7 @@
 
 import type { BatchLogRecordProcessorOptions } from '../../../types';
 import { BatchLogRecordProcessorBase } from '../../../export/BatchLogRecordProcessorBase';
+import { globalErrorHandler } from '@opentelemetry/core';
 
 export class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BatchLogRecordProcessorOptions> {
   private _visibilityChangeListener?: () => void;
@@ -35,7 +36,9 @@ export class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BatchLo
     }
     this._visibilityChangeListener = () => {
       if (document.visibilityState === 'hidden') {
-        void this.forceFlush();
+        this.forceFlush().catch(error => {
+          globalErrorHandler(error);
+        });
       }
     };
     document.addEventListener(
