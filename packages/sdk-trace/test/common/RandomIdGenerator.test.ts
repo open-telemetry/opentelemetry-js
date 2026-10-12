@@ -40,3 +40,17 @@ describe('randomSpanId', () => {
     assert.notDeepStrictEqual(spanId1, spanId2);
   });
 });
+
+describe('RandomIdGenerator members', () => {
+  it('declares generateTraceId and generateSpanId as own properties', () => {
+    const gen = new RandomIdGenerator();
+    assert.ok(Object.prototype.hasOwnProperty.call(gen, 'generateTraceId'));
+    assert.ok(Object.prototype.hasOwnProperty.call(gen, 'generateSpanId'));
+  });
+
+  it('generates valid ids when called detached from the instance', () => {
+    const { generateTraceId, generateSpanId } = new RandomIdGenerator();
+    assert.match(generateTraceId(), /^[a-f0-9]{32}$/);
+    assert.match(generateSpanId(), /^[a-f0-9]{16}$/);
+  });
+});
