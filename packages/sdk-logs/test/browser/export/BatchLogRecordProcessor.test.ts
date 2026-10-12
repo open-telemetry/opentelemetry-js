@@ -96,11 +96,15 @@ describeDocument('BatchLogRecordProcessor - web main context', () => {
         _onInit(): void {}
       }
       const subProcessor = new Subclass({ exporter });
-      const subForceFlushSpy = sinon.stub(subProcessor, 'forceFlush');
+      const subForceFlushSpy = sinon
+        .stub(subProcessor, 'forceFlush')
+        .resolves();
       visibilityState = 'hidden';
       document.dispatchEvent(visibilityChangeEvent);
       assert.strictEqual(subForceFlushSpy.callCount, 1);
       await subProcessor.shutdown();
+      document.dispatchEvent(visibilityChangeEvent);
+      assert.strictEqual(subForceFlushSpy.callCount, 1);
     });
   });
 

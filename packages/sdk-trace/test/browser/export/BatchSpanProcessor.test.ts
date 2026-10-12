@@ -135,6 +135,8 @@ describeBrowser('BatchSpanProcessor', () => {
       document.dispatchEvent(visibilityChangeEvent);
       assert.strictEqual(subForceFlushSpy.callCount, 1);
       await subProcessor.shutdown();
+      document.dispatchEvent(visibilityChangeEvent);
+      assert.strictEqual(subForceFlushSpy.callCount, 1);
     });
   });
 
