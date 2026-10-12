@@ -7,7 +7,10 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as path from 'path';
 import { InstrumentationBase } from '../../src';
-import type { InstrumentationModuleDefinition } from '../../src/';
+import type {
+  InstrumentationConfig,
+  InstrumentationModuleDefinition,
+} from '../../src/';
 import {
   InstrumentationNodeModuleDefinition,
   InstrumentationNodeModuleFile,
@@ -355,6 +358,42 @@ describe('InstrumentationBase', function () {
 
       assert.strictEqual(instrumentation._enabled, 'subclass-enabled');
       assert.deepStrictEqual(instrumentation._modules, ['subclass-modules']);
+    });
+  });
+
+  describe('subclass hooks called during base construction', function () {
+    it('should return false from isEnabled() without throwing', function () {
+      // InstrumentationAbstract calls these hooks before the node #private fields exist.
+      const seen: Array<[string, boolean]> = [];
+
+      class HookInstrumentation extends InstrumentationBase {
+        constructor() {
+          super('@opentelemetry/instrumentation-hook-test', '0.0.0', {
+            enabled: false,
+          });
+        }
+
+        override setConfig(config: InstrumentationConfig): void {
+          seen.push(['setConfig', this.isEnabled()]);
+          super.setConfig(config);
+        }
+
+        protected override _updateMetricInstruments(): void {
+          seen.push(['_updateMetricInstruments', this.isEnabled()]);
+        }
+
+        init() {
+          return [];
+        }
+      }
+
+      const instrumentation = new HookInstrumentation();
+
+      assert.deepStrictEqual(seen.slice(0, 2), [
+        ['setConfig', false],
+        ['_updateMetricInstruments', false],
+      ]);
+      assert.strictEqual(instrumentation.isEnabled(), false);
     });
   });
 });

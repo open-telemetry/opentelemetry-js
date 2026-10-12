@@ -23,6 +23,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
   * `typesVersions` maps `./node-http` and `./browser-http` for TypeScript projects on `moduleResolution: node`, which cannot read `exports` subpaths.
 * fix(instrumentation)!: make the Node.js `InstrumentationBase` internals ES private fields, so subclasses can declare members such as `_enabled` or `_modules` without a type error or overwriting base state [#7192](https://github.com/open-telemetry/opentelemetry-js/pull/7192) @overbalance
   * Code that read these internals through casts or bracket access, such as `instrumentation['_enabled']`, gets `undefined`; use `isEnabled()` instead.
+  * Calling `enable()` or `disable()` from a `setConfig()` or `_updateMetricInstruments()` override during construction throws, because the private state does not exist yet; `isEnabled()` returns `false` there.
 
 ### :rocket: Features
 

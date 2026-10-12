@@ -344,7 +344,7 @@ export abstract class InstrumentationBase<
   }
 
   public isEnabled(): boolean {
-    return this.#enabled;
+    return #enabled in this && this.#enabled;
   }
 }
 
