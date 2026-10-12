@@ -37,6 +37,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :house: Internal
 
+* chore(exporter-metrics-otlp-http): remove the unused `@opentelemetry/resources` dependency [#7200](https://github.com/open-telemetry/opentelemetry-js/pull/7200) @overbalance
 * chore(web-common): remove the unused `@opentelemetry/semantic-conventions` dependency [#7196](https://github.com/open-telemetry/opentelemetry-js/pull/7196) @overbalance
 * refactor(otlp-transformer): encode base64 through `#platform`, so the browser build no longer references `Buffer` [#7173](https://github.com/open-telemetry/opentelemetry-js/pull/7173) @overbalance
 * refactor(exporter-metrics-otlp-proto): type the browser `OTLPMetricExporter` config as `OTLPExporterConfigBase`, matching the other browser exporters [#7172](https://github.com/open-telemetry/opentelemetry-js/pull/7172) @overbalance
