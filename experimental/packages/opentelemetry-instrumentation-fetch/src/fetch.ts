@@ -28,7 +28,12 @@ import {
   ATTR_SERVER_PORT,
   ATTR_URL_FULL,
 } from '@opentelemetry/semantic-conventions';
-import type { FetchError, FetchResponse, SpanData } from './types';
+import type {
+  FetchError,
+  FetchResponse,
+  PropagateTraceHeaderCorsUrls,
+  SpanData,
+} from './types';
 import {
   getFetchBodyLength,
   normalizeHttpRequestMethod,
@@ -67,7 +72,7 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
   // is not available
   clearTimingResources?: boolean;
   // urls which should include trace headers when origin doesn't match
-  propagateTraceHeaderCorsUrls?: web.PropagateTraceHeaderCorsUrls;
+  propagateTraceHeaderCorsUrls?: PropagateTraceHeaderCorsUrls;
   /**
    * URLs that partially match any regex in ignoreUrls will not be traced.
    * In addition, URLs that are _exact matches_ of strings in ignoreUrls will
