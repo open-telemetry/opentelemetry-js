@@ -44,18 +44,17 @@ export class RandomIdGenerator implements IdGenerator {
    * Returns a random 16-byte trace ID formatted/encoded as a 32 lowercase hex
    * characters corresponding to 128 bits.
    */
-  generateTraceId = getIdGenerator(TRACE_BUFFER);
+  generateTraceId(): string {
+    randomFill(TRACE_BUFFER);
+    return toHex(TRACE_BUFFER);
+  }
 
   /**
    * Returns a random 8-byte span ID formatted/encoded as a 16 lowercase hex
    * characters corresponding to 64 bits.
    */
-  generateSpanId = getIdGenerator(SPAN_BUFFER);
-}
-
-function getIdGenerator(buf: Uint8Array): () => string {
-  return function generateId() {
-    randomFill(buf);
-    return toHex(buf);
-  };
+  generateSpanId(): string {
+    randomFill(SPAN_BUFFER);
+    return toHex(SPAN_BUFFER);
+  }
 }

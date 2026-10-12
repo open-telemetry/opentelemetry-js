@@ -42,10 +42,26 @@ describe('randomSpanId', () => {
 });
 
 describe('RandomIdGenerator members', () => {
-  it('declares generateTraceId and generateSpanId as own properties', () => {
+  it('declares generateTraceId and generateSpanId as prototype methods', () => {
     const gen = new RandomIdGenerator();
-    assert.ok(Object.prototype.hasOwnProperty.call(gen, 'generateTraceId'));
-    assert.ok(Object.prototype.hasOwnProperty.call(gen, 'generateSpanId'));
+    assert.ok(!Object.prototype.hasOwnProperty.call(gen, 'generateTraceId'));
+    assert.ok(!Object.prototype.hasOwnProperty.call(gen, 'generateSpanId'));
+  });
+
+  it('uses a subclass method override', () => {
+    class MethodOverride extends RandomIdGenerator {
+      override generateTraceId(): string {
+        return 'method';
+      }
+    }
+    assert.strictEqual(new MethodOverride().generateTraceId(), 'method');
+  });
+
+  it('uses a subclass property override', () => {
+    class PropertyOverride extends RandomIdGenerator {
+      override generateTraceId = (): string => 'property';
+    }
+    assert.strictEqual(new PropertyOverride().generateTraceId(), 'property');
   });
 
   it('generates valid ids when called detached from the instance', () => {
