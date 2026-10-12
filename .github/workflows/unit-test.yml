@@ -107,6 +107,9 @@ jobs:
       - name: Verify packed artifacts
         run: npm run verify-pack
 
+      - name: Type check packed artifacts
+        run: npm run verify-pack:types
+
   browser-tests:
     runs-on: ubuntu-latest
     steps:
