@@ -53,6 +53,18 @@ describe('InstrumentationBase#isEnabled (browser)', function () {
     assert.strictEqual(disableCalls, 1);
   });
 
+  it('constructs and tracks state when enable() and disable() are not overridden', function () {
+    class InitOnlyInstrumentation extends InstrumentationBase {
+      init() {}
+    }
+    const instrumentation = new InitOnlyInstrumentation('test', '1.0.0', {
+      enabled: true,
+    });
+    assert.strictEqual(instrumentation.isEnabled(), true);
+    instrumentation.disable();
+    assert.strictEqual(instrumentation.isEnabled(), false);
+  });
+
   it('is unchanged when enable() or disable() throws', function () {
     class ThrowingInstrumentation extends InstrumentationBase {
       shouldThrow = false;
