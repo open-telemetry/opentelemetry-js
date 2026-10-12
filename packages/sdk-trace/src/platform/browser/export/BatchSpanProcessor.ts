@@ -8,19 +8,19 @@ import type { BatchSpanProcessorOptions } from '../../../types';
 import { globalErrorHandler } from '@opentelemetry/core';
 
 export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcessorOptions> {
-  private _visibilityChangeListener?: () => void;
+  #visibilityChangeListener?: () => void;
 
   constructor(options: BatchSpanProcessorOptions) {
     super(options);
-    this.onInit(options);
+    this.#onInit(options);
   }
 
-  private onInit(options: BatchSpanProcessorOptions): void {
+  #onInit(options: BatchSpanProcessorOptions): void {
     if (
       options.disableAutoFlushOnDocumentHide !== true &&
       typeof document !== 'undefined'
     ) {
-      this._visibilityChangeListener = () => {
+      this.#visibilityChangeListener = () => {
         if (document.visibilityState === 'hidden') {
           this.forceFlush().catch(error => {
             globalErrorHandler(error);
@@ -29,17 +29,17 @@ export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcesso
       };
       document.addEventListener(
         'visibilitychange',
-        this._visibilityChangeListener
+        this.#visibilityChangeListener
       );
     }
   }
 
   protected onShutdown(): void {
     if (typeof document !== 'undefined') {
-      if (this._visibilityChangeListener) {
+      if (this.#visibilityChangeListener) {
         document.removeEventListener(
           'visibilitychange',
-          this._visibilityChangeListener
+          this.#visibilityChangeListener
         );
       }
     }

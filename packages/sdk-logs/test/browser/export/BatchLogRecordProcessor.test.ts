@@ -89,6 +89,21 @@ describeDocument('BatchLogRecordProcessor - web main context', () => {
     });
   });
 
+  describe('when a subclass declares members with the same names', () => {
+    it('should still force flush log records on document hide', async () => {
+      class Subclass extends BatchLogRecordProcessor {
+        _visibilityChangeListener?: () => void = undefined;
+        _onInit(): void {}
+      }
+      const subProcessor = new Subclass({ exporter });
+      const subForceFlushSpy = sinon.stub(subProcessor, 'forceFlush');
+      visibilityState = 'hidden';
+      document.dispatchEvent(visibilityChangeEvent);
+      assert.strictEqual(subForceFlushSpy.callCount, 1);
+      await subProcessor.shutdown();
+    });
+  });
+
   describe('when document becomes visible', () => {
     it('should NOT force flush log records', () => {
       assert.strictEqual(forceFlushSpy.callCount, 0);

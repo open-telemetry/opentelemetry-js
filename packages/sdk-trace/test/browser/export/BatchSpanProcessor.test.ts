@@ -121,6 +121,23 @@ describeBrowser('BatchSpanProcessor', () => {
     });
   });
 
+  describe('when a subclass declares members with the same names', () => {
+    it('should still force flush spans on document hide', async () => {
+      class Subclass extends BatchSpanProcessor {
+        _visibilityChangeListener?: () => void = undefined;
+        onInit(): void {}
+      }
+      const subProcessor = new Subclass({ exporter });
+      const subForceFlushSpy = sinon
+        .stub(subProcessor, 'forceFlush')
+        .resolves();
+      visibilityState = 'hidden';
+      document.dispatchEvent(visibilityChangeEvent);
+      assert.strictEqual(subForceFlushSpy.callCount, 1);
+      await subProcessor.shutdown();
+    });
+  });
+
   describe('when document becomes visible', () => {
     it('should NOT force flush spans', () => {
       assert.strictEqual(forceFlushSpy.callCount, 0);
