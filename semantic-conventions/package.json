@@ -30,6 +30,7 @@
   "scripts": {
     "prepublishOnly": "npm run compile",
     "compile": "tsdown",
+    "typecheck:browser": "tsc -p tsconfig.browser.json",
     "clean": "rimraf dist build",
     "version": "node ../scripts/version-update.js",
     "watch": "tsdown --watch --no-clean",
