@@ -14,136 +14,147 @@ import {
 } from '../../src/';
 
 const MODULE_NAME = 'test-module';
-const MODULE_FILE_NAME = 'test-module-file';
 const MODULE_VERSION = '0.1.0';
 const WILDCARD_VERSION = '*';
-const MODULE_DIR = '/random/dir';
-const CORE_MODULE = 'random_core';
+const NO_VERSION_MODULE = 'test-no-version-module';
+const NO_VERSION_FILE = `${NO_VERSION_MODULE}/lib/file.js`;
 
-class TestInstrumentation extends InstrumentationBase {
-  constructor() {
-    super(MODULE_NAME, MODULE_VERSION, {});
+type Patchable = Record<string, unknown> & { __patched?: boolean };
+
+const passThrough = <T>(moduleExports: T): T => moduleExports;
+
+// Dropping the require.cache entry makes require-in-the-middle run its hooks again.
+function requireFresh<T>(id: string): T {
+  delete require.cache[require.resolve(id)];
+  return require(id);
+}
+
+function createInstrumentation(
+  definition: InstrumentationModuleDefinition
+): InstrumentationBase {
+  class TestInstrumentation extends InstrumentationBase {
+    constructor() {
+      super(MODULE_NAME, MODULE_VERSION, { enabled: false });
+    }
+
+    init() {
+      return definition;
+    }
   }
-
-  init() {}
+  return new TestInstrumentation();
 }
 
 describe('InstrumentationBase', function () {
-  describe('_onRequire - core module', function () {
-    let instrumentation: TestInstrumentation;
-    let modulePatchSpy: sinon.SinonSpy;
-    beforeEach(() => {
-      instrumentation = new TestInstrumentation();
-      modulePatchSpy = sinon.spy();
+  describe('require hook - core module', function () {
+    let instrumentation: InstrumentationBase;
+    afterEach(() => instrumentation.disable());
+
+    // Each test needs a core module not yet required through the shared hook, which caches it.
+    it('should not patch a core module required while disabled', function () {
+      const patchSpy = sinon.spy(passThrough);
+      const definition: InstrumentationModuleDefinition =
+        new InstrumentationNodeModuleDefinition('dgram', ['*'], patchSpy);
+      instrumentation = createInstrumentation(definition);
+      instrumentation.enable();
+      instrumentation.disable();
+
+      const moduleExports = require('dgram');
+
+      assert.strictEqual(definition.moduleExports, moduleExports);
+      sinon.assert.notCalled(patchSpy);
     });
 
-    describe('AND module is not enabled', function () {
-      it('should not patch the module', function () {
-        // @ts-expect-error access internal property for testing
-        instrumentation._enabled = false;
-        const moduleExports = {};
-        const instrumentationModule = {
-          name: CORE_MODULE,
-          patch: modulePatchSpy as unknown,
-        } as InstrumentationModuleDefinition;
-
-        // @ts-expect-error access internal property for testing
-        instrumentation._onRequire<unknown>(
-          instrumentationModule,
-          moduleExports,
-          CORE_MODULE,
-          undefined
+    it('should patch a core module required while enabled', function () {
+      const patchSpy = sinon.spy(passThrough);
+      const definition: InstrumentationModuleDefinition =
+        new InstrumentationNodeModuleDefinition(
+          'trace_events',
+          ['*'],
+          patchSpy
         );
+      instrumentation = createInstrumentation(definition);
+      instrumentation.enable();
 
-        assert.strictEqual(instrumentationModule.moduleExports, moduleExports);
-        sinon.assert.notCalled(modulePatchSpy);
-      });
-    });
+      const moduleExports = require('trace_events');
 
-    describe('AND module is enabled', function () {
-      it('should patch the module', function () {
-        // @ts-expect-error access internal property for testing
-        instrumentation._enabled = true;
-        const moduleExports = {};
-        const instrumentationModule = {
-          name: CORE_MODULE,
-          patch: modulePatchSpy as unknown,
-        } as InstrumentationModuleDefinition;
-
-        // @ts-expect-error access internal property for testing
-        instrumentation._onRequire<unknown>(
-          instrumentationModule,
-          moduleExports,
-          CORE_MODULE,
-          undefined
-        );
-
-        assert.strictEqual(instrumentationModule.moduleExports, moduleExports);
-        sinon.assert.calledOnceWithExactly(modulePatchSpy, moduleExports);
-      });
+      assert.strictEqual(definition.moduleExports, moduleExports);
+      sinon.assert.calledOnceWithExactly(patchSpy, moduleExports);
     });
   });
 
-  describe('_onRequire - module version is not available', function () {
-    // For all of these cases, there is no indication of the actual module version,
-    // so we require there to be a wildcard supported version.
-
-    let instrumentation: TestInstrumentation;
+  describe('require hook - module version is not available', function () {
+    // The fixture package.json has no version, so only a wildcard supported version matches.
+    let instrumentation: InstrumentationBase;
     let modulePatchSpy: sinon.SinonSpy;
+    let filePatchSpy: sinon.SinonSpy;
 
     beforeEach(() => {
-      instrumentation = new TestInstrumentation();
-      // @ts-expect-error access internal property for testing
-      instrumentation._enabled = true;
-      modulePatchSpy = sinon.spy();
+      modulePatchSpy = sinon.spy(passThrough);
+      filePatchSpy = sinon.spy(passThrough);
     });
+    afterEach(() => instrumentation.disable());
+
+    function enableFor(definition: InstrumentationModuleDefinition): void {
+      instrumentation = createInstrumentation(definition);
+      instrumentation.enable();
+    }
+
+    function fileDefinition(
+      supportedVersions: string[],
+      fileCount: number
+    ): InstrumentationModuleDefinition {
+      const files = Array.from(
+        { length: fileCount },
+        () =>
+          new InstrumentationNodeModuleFile(
+            NO_VERSION_FILE,
+            supportedVersions,
+            filePatchSpy,
+            () => {}
+          )
+      );
+      return new InstrumentationNodeModuleDefinition(
+        NO_VERSION_MODULE,
+        supportedVersions,
+        modulePatchSpy,
+        undefined,
+        files
+      );
+    }
 
     describe('when patching a module', function () {
       describe('AND there is no wildcard supported version', function () {
         it('should not patch module', function () {
-          const moduleExports = {};
-          const instrumentationModule = {
-            supportedVersions: [`^${MODULE_VERSION}`],
-            name: MODULE_NAME,
-            patch: modulePatchSpy as unknown,
-          } as InstrumentationModuleDefinition;
+          const definition: InstrumentationModuleDefinition =
+            new InstrumentationNodeModuleDefinition(
+              NO_VERSION_MODULE,
+              [`^${MODULE_VERSION}`],
+              modulePatchSpy
+            );
+          enableFor(definition);
 
-          // @ts-expect-error access internal property for testing
-          instrumentation._onRequire<unknown>(
-            instrumentationModule,
-            moduleExports,
-            MODULE_NAME,
-            MODULE_DIR
-          );
+          requireFresh(NO_VERSION_MODULE);
 
-          assert.strictEqual(instrumentationModule.moduleVersion, undefined);
-          assert.strictEqual(instrumentationModule.moduleExports, undefined);
+          assert.strictEqual(definition.moduleVersion, undefined);
+          assert.strictEqual(definition.moduleExports, undefined);
           sinon.assert.notCalled(modulePatchSpy);
         });
       });
 
       describe('AND there is a wildcard supported version', function () {
         it('should patch module', function () {
-          const moduleExports = {};
-          const instrumentationModule = {
-            supportedVersions: [`^${MODULE_VERSION}`, WILDCARD_VERSION],
-            name: MODULE_NAME,
-            patch: modulePatchSpy as unknown,
-          } as InstrumentationModuleDefinition;
+          const definition: InstrumentationModuleDefinition =
+            new InstrumentationNodeModuleDefinition(
+              NO_VERSION_MODULE,
+              [`^${MODULE_VERSION}`, WILDCARD_VERSION],
+              modulePatchSpy
+            );
+          enableFor(definition);
 
-          // @ts-expect-error access internal property for testing
-          instrumentation._onRequire<unknown>(
-            instrumentationModule,
-            moduleExports,
-            MODULE_NAME,
-            MODULE_DIR
-          );
+          const moduleExports = requireFresh(NO_VERSION_MODULE);
 
-          assert.strictEqual(instrumentationModule.moduleVersion, undefined);
-          assert.strictEqual(
-            instrumentationModule.moduleExports,
-            moduleExports
-          );
+          assert.strictEqual(definition.moduleVersion, undefined);
+          assert.strictEqual(definition.moduleExports, moduleExports);
           sinon.assert.calledOnceWithExactly(
             modulePatchSpy,
             moduleExports,
@@ -154,39 +165,15 @@ describe('InstrumentationBase', function () {
     });
 
     describe('when patching module files', function () {
-      let filePatchSpy: sinon.SinonSpy;
-
-      beforeEach(() => {
-        filePatchSpy = sinon.stub().callsFake(exports => exports);
-      });
-
       describe('AND there is no wildcard supported version', function () {
         it('should not patch module file', function () {
-          const moduleExports = {};
-          const supportedVersions = [`^${MODULE_VERSION}`];
-          const instrumentationModule = {
-            supportedVersions,
-            name: MODULE_NAME,
-            patch: modulePatchSpy as unknown,
-            files: [
-              {
-                name: MODULE_FILE_NAME,
-                supportedVersions,
-                patch: filePatchSpy as unknown,
-              },
-            ],
-          } as InstrumentationModuleDefinition;
+          const definition = fileDefinition([`^${MODULE_VERSION}`], 1);
+          enableFor(definition);
 
-          // @ts-expect-error access internal property for testing
-          instrumentation._onRequire<unknown>(
-            instrumentationModule,
-            moduleExports,
-            MODULE_FILE_NAME,
-            MODULE_DIR
-          );
+          requireFresh(NO_VERSION_FILE);
 
-          assert.strictEqual(instrumentationModule.moduleVersion, undefined);
-          assert.strictEqual(instrumentationModule.moduleExports, undefined);
+          assert.strictEqual(definition.moduleVersion, undefined);
+          assert.strictEqual(definition.files[0].moduleExports, undefined);
           sinon.assert.notCalled(modulePatchSpy);
           sinon.assert.notCalled(filePatchSpy);
         });
@@ -194,34 +181,16 @@ describe('InstrumentationBase', function () {
 
       describe('AND there is a wildcard supported version', function () {
         it('should patch module file', function () {
-          const moduleExports = {};
-          const supportedVersions = [`^${MODULE_VERSION}`, WILDCARD_VERSION];
-          const instrumentationModule = {
-            supportedVersions,
-            name: MODULE_NAME,
-            patch: modulePatchSpy as unknown,
-            files: [
-              {
-                name: MODULE_FILE_NAME,
-                supportedVersions,
-                patch: filePatchSpy as unknown,
-              },
-            ],
-          } as InstrumentationModuleDefinition;
-
-          // @ts-expect-error access internal property for testing
-          instrumentation._onRequire<unknown>(
-            instrumentationModule,
-            moduleExports,
-            MODULE_FILE_NAME,
-            MODULE_DIR
+          const definition = fileDefinition(
+            [`^${MODULE_VERSION}`, WILDCARD_VERSION],
+            1
           );
+          enableFor(definition);
 
-          assert.strictEqual(instrumentationModule.moduleVersion, undefined);
-          assert.strictEqual(
-            instrumentationModule.files[0].moduleExports,
-            moduleExports
-          );
+          const moduleExports = requireFresh(NO_VERSION_FILE);
+
+          assert.strictEqual(definition.moduleVersion, undefined);
+          assert.strictEqual(definition.files[0].moduleExports, moduleExports);
           sinon.assert.notCalled(modulePatchSpy);
           sinon.assert.calledOnceWithExactly(
             filePatchSpy,
@@ -233,43 +202,17 @@ describe('InstrumentationBase', function () {
 
       describe('AND there is multiple patches for the same file', function () {
         it('should patch the same file twice', function () {
-          const moduleExports = {};
-          const supportedVersions = [`^${MODULE_VERSION}`, WILDCARD_VERSION];
-          const instrumentationModule = {
-            supportedVersions,
-            name: MODULE_NAME,
-            patch: modulePatchSpy as unknown,
-            files: [
-              {
-                name: MODULE_FILE_NAME,
-                supportedVersions,
-                patch: filePatchSpy as unknown,
-              },
-              {
-                name: MODULE_FILE_NAME,
-                supportedVersions,
-                patch: filePatchSpy as unknown,
-              },
-            ],
-          } as InstrumentationModuleDefinition;
+          const definition = fileDefinition(
+            [`^${MODULE_VERSION}`, WILDCARD_VERSION],
+            2
+          );
+          enableFor(definition);
 
-          // @ts-expect-error access internal property for testing
-          instrumentation._onRequire<unknown>(
-            instrumentationModule,
-            moduleExports,
-            MODULE_FILE_NAME,
-            MODULE_DIR
-          );
+          const moduleExports = requireFresh(NO_VERSION_FILE);
 
-          assert.strictEqual(instrumentationModule.moduleVersion, undefined);
-          assert.strictEqual(
-            instrumentationModule.files[0].moduleExports,
-            moduleExports
-          );
-          assert.strictEqual(
-            instrumentationModule.files[1].moduleExports,
-            moduleExports
-          );
+          assert.strictEqual(definition.moduleVersion, undefined);
+          assert.strictEqual(definition.files[0].moduleExports, moduleExports);
+          assert.strictEqual(definition.files[1].moduleExports, moduleExports);
           sinon.assert.notCalled(modulePatchSpy);
           sinon.assert.calledTwice(filePatchSpy);
         });
@@ -367,6 +310,51 @@ describe('InstrumentationBase', function () {
         instrumentation.enable();
         assert.equal(exportsPatched.__patched, true, 'after re-enable');
       });
+    });
+  });
+
+  describe('subclass with fields named like base internals', function () {
+    class FieldNameInstrumentation extends InstrumentationBase {
+      _enabled = 'subclass-enabled';
+      _modules = ['subclass-modules'];
+
+      constructor() {
+        super('@opentelemetry/instrumentation-field-name-test', '0.0.0', {
+          enabled: false,
+        });
+      }
+
+      init() {
+        return new InstrumentationNodeModuleDefinition(
+          NO_VERSION_MODULE,
+          ['*'],
+          (exports: Patchable) => {
+            exports.__patched = true;
+            return exports;
+          },
+          (exports: Patchable) => {
+            exports.__patched = false;
+            return exports;
+          }
+        );
+      }
+    }
+
+    it('should compile and keep the base state separate', function () {
+      const instrumentation = new FieldNameInstrumentation();
+      assert.strictEqual(instrumentation.isEnabled(), false);
+
+      instrumentation.enable();
+      assert.strictEqual(instrumentation.isEnabled(), true);
+      const exports = requireFresh<Patchable>(NO_VERSION_MODULE);
+      assert.strictEqual(exports.__patched, true, 'after enable');
+
+      instrumentation.disable();
+      assert.strictEqual(instrumentation.isEnabled(), false);
+      assert.strictEqual(exports.__patched, false, 'after disable');
+
+      assert.strictEqual(instrumentation._enabled, 'subclass-enabled');
+      assert.deepStrictEqual(instrumentation._modules, ['subclass-modules']);
     });
   });
 });

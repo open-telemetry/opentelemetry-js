@@ -33,11 +33,11 @@ export abstract class InstrumentationBase<
   extends InstrumentationAbstract<ConfigType>
   implements types.Instrumentation<ConfigType>
 {
-  private _modules: InstrumentationModuleDefinition[];
-  private _hooks: (Hooked | HookRequire)[] = [];
-  private _requireInTheMiddleSingleton: RequireInTheMiddleSingleton =
+  #modules: InstrumentationModuleDefinition[];
+  #hooks: (Hooked | HookRequire)[] = [];
+  #requireInTheMiddleSingleton: RequireInTheMiddleSingleton =
     RequireInTheMiddleSingleton.getInstance();
-  private _enabled = false;
+  #enabled = false;
 
   constructor(
     instrumentationName: string,
@@ -52,7 +52,7 @@ export abstract class InstrumentationBase<
       modules = [modules];
     }
 
-    this._modules = (modules as InstrumentationModuleDefinition[]) || [];
+    this.#modules = (modules as InstrumentationModuleDefinition[]) || [];
 
     if (this._config.enabled) {
       this.enable();
@@ -131,12 +131,12 @@ export abstract class InstrumentationBase<
     });
   };
 
-  private _warnOnPreloadedModules(): void {
+  #warnOnPreloadedModules(): void {
     // Access require via globalThis to prevent webpack from analyzing it as a dependency expression
     const nodeRequire = globalThis.require;
     if (!nodeRequire?.resolve || !nodeRequire?.cache) return;
 
-    this._modules.forEach((module: InstrumentationModuleDefinition) => {
+    this.#modules.forEach((module: InstrumentationModuleDefinition) => {
       const { name } = module;
       try {
         const resolvedModule = nodeRequire.resolve(name);
@@ -152,7 +152,7 @@ export abstract class InstrumentationBase<
     });
   }
 
-  private _extractPackageVersion(baseDir: string): string | undefined {
+  #extractPackageVersion(baseDir: string): string | undefined {
     try {
       const json = readFileSync(path.join(baseDir, 'package.json'), {
         encoding: 'utf8',
@@ -166,7 +166,7 @@ export abstract class InstrumentationBase<
     return undefined;
   }
 
-  private _onRequire<T>(
+  #onRequire<T>(
     module: InstrumentationModuleDefinition,
     exports: T,
     name: string,
@@ -175,7 +175,7 @@ export abstract class InstrumentationBase<
     if (!baseDir) {
       if (typeof module.patch === 'function') {
         module.moduleExports = exports;
-        if (this._enabled) {
+        if (this.#enabled) {
           this._diag.debug(
             'Applying instrumentation patch for nodejs core module on require hook',
             {
@@ -188,7 +188,7 @@ export abstract class InstrumentationBase<
       return exports;
     }
 
-    const version = this._extractPackageVersion(baseDir);
+    const version = this.#extractPackageVersion(baseDir);
     module.moduleVersion = version;
     if (module.name === name) {
       // main module
@@ -197,7 +197,7 @@ export abstract class InstrumentationBase<
       ) {
         if (typeof module.patch === 'function') {
           module.moduleExports = exports;
-          if (this._enabled) {
+          if (this.#enabled) {
             this._diag.debug(
               'Applying instrumentation patch for module on require hook',
               {
@@ -222,7 +222,7 @@ export abstract class InstrumentationBase<
     );
     return supportedFileInstrumentations.reduce<T>((patchedExports, file) => {
       file.moduleExports = patchedExports;
-      if (this._enabled) {
+      if (this.#enabled) {
         this._diag.debug(
           'Applying instrumentation patch for nodejs module file on require hook',
           {
@@ -241,14 +241,14 @@ export abstract class InstrumentationBase<
   }
 
   public enable(): void {
-    if (this._enabled) {
+    if (this.#enabled) {
       return;
     }
-    this._enabled = true;
+    this.#enabled = true;
 
     // already hooked, just call patch again
-    if (this._hooks.length > 0) {
-      for (const module of this._modules) {
+    if (this.#hooks.length > 0) {
+      for (const module of this.#modules) {
         if (typeof module.patch === 'function' && module.moduleExports) {
           this._diag.debug(
             'Applying instrumentation patch for nodejs module on instrumentation enabled',
@@ -276,8 +276,8 @@ export abstract class InstrumentationBase<
       return;
     }
 
-    this._warnOnPreloadedModules();
-    for (const module of this._modules) {
+    this.#warnOnPreloadedModules();
+    for (const module of this.#modules) {
       const hookFn: HookFn = (exports, name, baseDir) => {
         if (!baseDir && path.isAbsolute(name)) {
           // Change IITM `name` and `baseDir` values to match what RITM returns.
@@ -287,10 +287,10 @@ export abstract class InstrumentationBase<
           name = parsedPath.name;
           baseDir = parsedPath.dir;
         }
-        return this._onRequire<typeof exports>(module, exports, name, baseDir);
+        return this.#onRequire<typeof exports>(module, exports, name, baseDir);
       };
       const onRequire: OnRequireFn = (exports, name, baseDir) => {
-        return this._onRequire<typeof exports>(module, exports, name, baseDir);
+        return this.#onRequire<typeof exports>(module, exports, name, baseDir);
       };
 
       // `RequireInTheMiddleSingleton` does not support absolute paths.
@@ -298,25 +298,25 @@ export abstract class InstrumentationBase<
       // require-in-the-middle `Hook`.
       const hook = path.isAbsolute(module.name)
         ? new HookRequire([module.name], { internals: true }, onRequire)
-        : this._requireInTheMiddleSingleton.register(module.name, onRequire);
+        : this.#requireInTheMiddleSingleton.register(module.name, onRequire);
 
-      this._hooks.push(hook);
+      this.#hooks.push(hook);
       const esmHook = new HookImport(
         [module.name],
         { internals: true },
         <HookFn>hookFn
       );
-      this._hooks.push(esmHook);
+      this.#hooks.push(esmHook);
     }
   }
 
   public disable(): void {
-    if (!this._enabled) {
+    if (!this.#enabled) {
       return;
     }
-    this._enabled = false;
+    this.#enabled = false;
 
-    for (const module of this._modules) {
+    for (const module of this.#modules) {
       if (typeof module.unpatch === 'function' && module.moduleExports) {
         this._diag.debug(
           'Removing instrumentation patch for nodejs module on instrumentation disabled',
@@ -344,7 +344,7 @@ export abstract class InstrumentationBase<
   }
 
   public isEnabled(): boolean {
-    return this._enabled;
+    return this.#enabled;
   }
 }
 

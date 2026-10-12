@@ -21,6 +21,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 * feat(otlp-exporter-base)!: export `OTLPExporterNodeConfigBase` from `@opentelemetry/otlp-exporter-base/node-http` instead of the package root [#7172](https://github.com/open-telemetry/opentelemetry-js/pull/7172) @overbalance
   * The root entry is shared with browsers and no longer references Node.js `http` types. `CompressionAlgorithm` stays on the root.
   * `typesVersions` maps `./node-http` and `./browser-http` for TypeScript projects on `moduleResolution: node`, which cannot read `exports` subpaths.
+* fix(instrumentation)!: make the Node.js `InstrumentationBase` internals ES private fields, so subclasses can declare members such as `_enabled` or `_modules` without a type error or overwriting base state [#0000](https://github.com/open-telemetry/opentelemetry-js/pull/0000) @overbalance
+  * Code that read these internals through casts or bracket access, such as `instrumentation['_enabled']`, gets `undefined`; use `isEnabled()` instead.
 
 ### :rocket: Features
 
