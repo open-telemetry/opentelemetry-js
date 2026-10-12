@@ -37,6 +37,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 * fix(sdk-trace): count attributes passed to `startSpan` toward `attributeCountLimit` [#7176](https://github.com/open-telemetry/opentelemetry-js/pull/7176) @overbalance
 * fix(resources): read `process.argv0` for the default service name through `#platform`, so the browser build no longer touches `globalThis.process` [#7173](https://github.com/open-telemetry/opentelemetry-js/pull/7173) @overbalance
+* fix(core): accept attribute values with shared (non-circular) object references [#7068](https://github.com/open-telemetry/opentelemetry-js/pull/7068) @rajanpanth
 
 ### :books: Documentation
 
