@@ -35,7 +35,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :bug: Bug Fixes
 
-* fix(sdk-trace, sdk-logs): make the browser `BatchSpanProcessor` and `BatchLogRecordProcessor` document-hide flush members `#private`, so subclass members with the same names no longer disable the flush [#0000](https://github.com/open-telemetry/opentelemetry-js/pull/0000) @overbalance
+* fix(sdk-trace, sdk-logs): make the browser `BatchSpanProcessor` and `BatchLogRecordProcessor` document-hide flush members `#private`, so subclass members with the same names no longer disable the flush [#7191](https://github.com/open-telemetry/opentelemetry-js/pull/7191) @overbalance
 * fix(sdk-trace): count attributes passed to `startSpan` toward `attributeCountLimit` [#7176](https://github.com/open-telemetry/opentelemetry-js/pull/7176) @overbalance
 * fix(resources): read `process.argv0` for the default service name through `#platform`, so the browser build no longer touches `globalThis.process` [#7173](https://github.com/open-telemetry/opentelemetry-js/pull/7173) @overbalance
 
