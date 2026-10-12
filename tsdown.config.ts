@@ -1,10 +1,18 @@
 import { readFileSync } from 'node:fs';
 import { defineConfig } from 'tsdown';
 
-const { imports }: { imports?: Record<string, unknown> } = JSON.parse(
-  readFileSync('package.json', 'utf8')
-);
-const hasPlatform = imports?.['#platform'] !== undefined;
+const pkg: {
+  imports?: Record<string, unknown>;
+  dependencies?: Record<string, string>;
+  peerDependencies?: Record<string, string>;
+  optionalDependencies?: Record<string, string>;
+} = JSON.parse(readFileSync('package.json', 'utf8'));
+const hasPlatform = pkg.imports?.['#platform'] !== undefined;
+const declared = Object.keys({
+  ...pkg.dependencies,
+  ...pkg.peerDependencies,
+  ...pkg.optionalDependencies,
+});
 
 // Shared tsdown options. Per-package configs import this and spread it,
 // adding their own `entry` (and any rare per-package overrides like `outDir`
@@ -19,6 +27,9 @@ export default defineConfig({
   deps: {
     // Left resolvable, #platform would bundle whatever dist holds at build time.
     neverBundle: ['#platform'],
+    // Consumers install only these: an emitted import of anything else, .d.ts
+    // included, fails to resolve under isolated installs.
+    onlyImport: ['#platform', ...declared],
     // The .d.ts must not reference #platform, which node10 consumers cannot resolve.
     dts: { neverBundle: [] },
   },
