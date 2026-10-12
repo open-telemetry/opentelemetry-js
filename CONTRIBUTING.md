@@ -21,7 +21,7 @@ We'd love your help!
   - [Linting](#linting)
   - [Generating docs](#generating-docs)
   - [Adding a package](#adding-a-package)
-  - [Platform conditional exports](#platform-conditional-exports)
+  - [Platform conditional code](#platform-conditional-code)
 
 ## OpenTelemetry JS SIG
 
@@ -228,7 +228,7 @@ npm ci
 
 ### Compile modules
 
-All modules are built with [tsdown](https://tsdown.dev/), orchestrated by nx: `npm run compile` builds each package's workspace dependencies before the package itself and caches results between runs. Building requires Node.js >= 22.18 (CI builds on Node ^26.3.0); tests still run on every supported Node version.
+All modules are built with [tsdown](https://tsdown.dev/), orchestrated by nx: `npm run compile` builds each package's workspace dependencies before the package itself and caches results between runs. Building requires a Node.js version matching `devEngines.runtime` in the root `package.json` (CI builds on Node ^26.3.0); tests still run on every supported Node version.
 
 ```sh
 # Build all modules
@@ -240,8 +240,10 @@ npm run clean
 
 These commands can also be run for specific packages instead of the whole project, which can speed up compilations while developing.
 
-**NOTE**: To run commands in specific packages (compile, lint, etc), please ensure you are using at least `7.x`
-version of `npm`.
+**NOTE**: Please use npm `11.10.0` or newer, the first version that supports the `min-release-age`
+setting in `.npmrc`. Older npm reports it as an unknown config; upgrade npm rather than deleting the
+line to silence the warning, which would drop the release cooldown for everyone. Node.js 24 before
+`24.14.1` bundles npm `11.6.x`, so on that line upgrade with `npm i -g npm@latest`.
 
 ```sh
 # Build a single module and all of its dependencies
@@ -355,10 +357,12 @@ The document will be available under `docs` path.
 
 To add a new package, copy `packages/template` to your new package directory and modify the `package.json` file to reflect your desired package settings. If the package will not support browser, the `karma.conf.js` file may be deleted. Per-package compiler options live in `tsdown.config.ts`, which imports the shared options from the workspace root `tsdown.config.ts` and adds an `entry` list; override fields like `target` only when you have a concrete reason to (see `api/tsdown.config.ts` for an example).
 
-After adding the package, run `npm install` from the root of the project to install all dependencies in your new package. For packages with platform-conditional code (browser vs node), add a `browser` field to the `package.json` that path-swaps the relevant `./dist/*.mjs` and `./dist/*.cjs` files; see `@opentelemetry/core`'s `package.json` for a working example.
+After adding the package, run `npm install` from the root of the project to install all dependencies in your new package.
 
-### Platform conditional exports
+### Platform conditional code
 
 Universal packages are packages that can be used in both web browsers and
 Node.js environment. These packages may be implemented on top of different
 platform APIs to achieve the same goal.
+
+For packages with platform-conditional code (browser vs node), import it through `#platform` and declare that subpath under `imports` in `package.json` with `otel` and `node` conditions, and point `require` and `default` at the browser implementation. List `src/platform/node/index.ts` and `src/platform/browser/index.ts` as `entry` in the package's `tsdown.config.ts`, since `#platform` stays external and nothing else emits them. See `@opentelemetry/core` for a working example. The `otel` condition points at `src`, so tests and type-checks never depend on a build of the package itself.

@@ -165,11 +165,6 @@ const exporter = new OTLPTraceExporter(collectorOptions);
 
  > Settings configured programmatically take precedence over environment variables. Per-signal environment variables take precedence over non-per-signal environment variables.
 
-## Running opentelemetry-collector locally to see the traces
-
-1. Go to `examples/otlp-exporter-node`
-2. Follow the instructions there to inspect traces.
-
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

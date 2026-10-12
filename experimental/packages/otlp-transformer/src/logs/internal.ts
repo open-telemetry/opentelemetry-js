@@ -18,7 +18,7 @@ import {
   toAnyValue,
   toAttributes,
 } from '../common/internal';
-import type { SeverityNumber } from '@opentelemetry/api-logs';
+import type { SeverityNumber } from '@opentelemetry/api';
 
 export function createExportLogsServiceRequest(
   logRecords: ReadableLogRecord[],

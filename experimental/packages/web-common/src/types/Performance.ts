@@ -5,6 +5,9 @@
 
 import type { PerformanceTimingNames } from '../enums/PerformanceTimingNames';
 
+/**
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
+ */
 export type PerformanceEntries = {
   [PerformanceTimingNames.CONNECT_END]?: number;
   [PerformanceTimingNames.CONNECT_START]?: number;
@@ -33,6 +36,7 @@ export type PerformanceEntries = {
 /**
  * This interface defines a fallback to read performance metrics,
  * this happens for example on Safari Mac
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export interface PerformanceLegacy {
   timing?: PerformanceEntries;
@@ -41,6 +45,7 @@ export interface PerformanceLegacy {
 /**
  * This interface is used in {@link getResource} function to return
  *     main request and it's corresponding PreFlight request
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export interface PerformanceResourceTimingInfo {
   corsPreFlightRequest?: PerformanceResourceTiming;

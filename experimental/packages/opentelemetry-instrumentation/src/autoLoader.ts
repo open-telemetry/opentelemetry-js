@@ -4,7 +4,7 @@
  */
 
 import { trace, metrics } from '@opentelemetry/api';
-import { logs } from '@opentelemetry/api-logs';
+import { logs } from '@opentelemetry/api';
 import {
   disableInstrumentations,
   enableInstrumentations,

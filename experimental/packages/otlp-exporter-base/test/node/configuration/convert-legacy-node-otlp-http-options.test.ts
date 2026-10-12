@@ -6,7 +6,7 @@
 import * as sinon from 'sinon';
 import * as assert from 'assert';
 import type * as https from 'https';
-import { convertLegacyHttpOptions } from '../../../src/configuration/convert-legacy-node-http-options';
+import { convertLegacyHttpOptions } from '../../../src/platform/node/configuration/convert-legacy-node-http-options';
 import { registerMockDiagLogger } from '../../common/test-utils';
 
 describe('convertLegacyHttpOptions', function () {

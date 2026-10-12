@@ -86,6 +86,7 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
 
 /**
  * This class represents a fetch plugin for auto instrumentation
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation#fetch
  */
 export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentationConfig> {
   readonly component: string = 'fetch';
@@ -129,8 +130,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       childSpan,
       corsPreFlightRequest,
       this.getConfig().ignoreNetworkEvents,
-      undefined,
-      true
+      undefined
     );
     childSpan.end(
       corsPreFlightRequest[web.PerformanceTimingNames.RESPONSE_END]
@@ -281,8 +281,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         span,
         mainRequest,
         this.getConfig().ignoreNetworkEvents,
-        undefined,
-        true
+        undefined
       );
     }
   }
@@ -566,6 +565,16 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       return;
     }
 
+    // `_wrap` returns undefined, without throwing, when the target is missing
+    // or not a function, and reports it through console.error rather than diag.
+    if (typeof globalThis.fetch !== 'function') {
+      this._diag.warn(
+        'globalThis.fetch is missing or not a function; instrumentation will not be enabled. ' +
+          'Register the instrumentation after any fetch polyfill, or call enable() once fetch is available.'
+      );
+      return;
+    }
+
     try {
       // `_wrap` throws if a third-party script has locked globalThis.fetch via
       // Object.defineProperty(window, 'fetch', { writable: false, ... }).
@@ -579,6 +588,12 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         err
       );
     }
+  }
+
+  /** False before enable(), after disable(), or when patching fails; disable() leaves
+   * globalThis.fetch wrapped. */
+  override isEnabled(): boolean {
+    return this._isEnabled === true;
   }
 
   /**

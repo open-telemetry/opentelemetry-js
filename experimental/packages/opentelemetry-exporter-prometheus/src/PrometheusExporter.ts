@@ -65,14 +65,8 @@ export class PrometheusExporter extends MetricReader {
         OTEL_COMPONENT_TYPE_VALUE_PROMETHEUS_HTTP_TEXT_METRIC_EXPORTER,
       metricProducers: config.metricProducers,
     });
-    this._host =
-      config.host ||
-      process.env.OTEL_EXPORTER_PROMETHEUS_HOST ||
-      PrometheusExporter.DEFAULT_OPTIONS.host;
-    this._port =
-      config.port ||
-      Number(process.env.OTEL_EXPORTER_PROMETHEUS_PORT) ||
-      PrometheusExporter.DEFAULT_OPTIONS.port;
+    this._host = config.host || PrometheusExporter.DEFAULT_OPTIONS.host;
+    this._port = config.port || PrometheusExporter.DEFAULT_OPTIONS.port;
     this._prefix = config.prefix || PrometheusExporter.DEFAULT_OPTIONS.prefix;
     this._appendTimestamp =
       typeof config.appendTimestamp === 'boolean'

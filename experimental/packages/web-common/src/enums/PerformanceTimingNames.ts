@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+/**
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
+ */
 export enum PerformanceTimingNames {
   CONNECT_END = 'connectEnd',
   CONNECT_START = 'connectStart',

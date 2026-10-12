@@ -1,6 +1,7 @@
 {
   "name": "opentelemetry",
   "version": "0.1.0",
+  "private": true,
   "description": "OpenTelemetry is a distributed tracing and stats collection framework.",
   "scripts": {
     "precompile": "npm run submodule && nx run-many -t protos:generate",
@@ -56,12 +57,12 @@
     "benchmark": "2.1.4",
     "eslint": "10.10.0",
     "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-n": "18.3.0",
+    "eslint-plugin-n": "18.4.1",
     "eslint-plugin-prettier": "5.5.6",
     "eslint-plugin-yet-another-license-header": "1.0.0",
     "gh-pages": "6.3.0",
     "glob": "13.0.6",
-    "globals": "17.12.0",
+    "globals": "17.13.0",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.2.0",
     "karma-coverage": "2.2.1",
@@ -72,8 +73,8 @@
     "lerna": "10.0.1",
     "linkinator": "7.6.1",
     "markdownlint-cli2": "0.23.2",
-    "mocha": "11.8.0",
-    "nx": "22.7.9",
+    "mocha": "12.0.3",
+    "nx": "22.7.12",
     "prettier": "3.6.2",
     "process": "0.11.10",
     "publint": "0.3.24",
@@ -96,10 +97,22 @@
     "experimental/packages/*",
     "experimental/examples/*",
     "integration-tests/*",
-    "examples/otlp-exporter-node",
+    "examples/logs",
     "examples/opentelemetry-web",
     "examples/http",
     "examples/https",
     "examples/esm-http-ts"
-  ]
+  ],
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "^24.11.1 || >=26.0.0",
+      "onFail": "warn"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": ">=11.10.0",
+      "onFail": "warn"
+    }
+  }
 }
