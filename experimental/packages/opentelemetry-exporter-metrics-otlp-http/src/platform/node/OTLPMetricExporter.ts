@@ -8,7 +8,7 @@ import type { PushMetricExporter } from '@opentelemetry/sdk-metrics';
 import type { OTLPMetricExporterOptions } from '../../OTLPMetricExporterOptions';
 import { AggregationTemporalityPreference } from '../../OTLPMetricExporterOptions';
 import { OTLPMetricExporterBase } from '../../OTLPMetricExporterBase';
-import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base/node-http';
 import {
   JsonMetricsSerializer,
   MetricsExporterMetricsHelper,

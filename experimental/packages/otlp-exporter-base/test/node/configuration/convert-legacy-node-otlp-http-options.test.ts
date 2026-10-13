@@ -9,7 +9,7 @@ import type * as https from 'https';
 import {
   convertLegacyHttpOptions,
   convertLegacyHttpOptionsWithoutEnv,
-} from '../../../src/configuration/convert-legacy-node-http-options';
+} from '../../../src/platform/node/configuration/convert-legacy-node-http-options';
 import { registerMockDiagLogger } from '../../common/test-utils';
 
 describe('convertLegacyHttpOptions', function () {

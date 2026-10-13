@@ -20,7 +20,7 @@ import type {
 } from './types';
 import { ParentBasedSampler } from './sampler/ParentBasedSampler';
 import { AlwaysOnSampler } from './sampler/AlwaysOnSampler';
-import { RandomIdGenerator } from './platform';
+import { RandomIdGenerator } from '#platform';
 import type { InspectFn, InspectStylizeOptions } from './inspect';
 import {
   formatInspect,

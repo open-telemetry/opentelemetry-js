@@ -7,6 +7,7 @@ import type { Fixed64, LongBits } from './internal-types';
 import type { HrTime } from '@opentelemetry/api';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { hexToBinary } from './hex-to-binary';
+import { encodeBase64 } from '#platform';
 
 export function hrTimeToNanos(hrTime: HrTime): bigint {
   const NANOSECONDS = BigInt(1_000_000_000);
@@ -80,17 +81,5 @@ export const JSON_ENCODER: Encoder = {
   encodeHrTime: encodeTimestamp,
   encodeSpanContext: identity,
   encodeOptionalSpanContext: identity,
-  encodeUint8Array: (bytes: Uint8Array): string => {
-    if (typeof Buffer !== 'undefined') {
-      return Buffer.from(bytes).toString('base64');
-    }
-
-    // implementation note: not using spread operator and passing to
-    // btoa to avoid stack overflow on large Uint8Arrays
-    const chars = new Array(bytes.length);
-    for (let i = 0; i < bytes.length; i++) {
-      chars[i] = String.fromCharCode(bytes[i]);
-    }
-    return btoa(chars.join(''));
-  },
+  encodeUint8Array: encodeBase64,
 };

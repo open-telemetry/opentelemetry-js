@@ -16,6 +16,20 @@
       }
     }
   },
+  "imports": {
+    "#platform": {
+      "otel": {
+        "node": "./src/platform/node/index.ts",
+        "default": "./src/platform/browser/index.ts"
+      },
+      "node": {
+        "require": "./dist/platform/node/index.cjs",
+        "default": "./dist/platform/node/index.mjs"
+      },
+      "require": "./dist/platform/browser/index.cjs",
+      "default": "./dist/platform/browser/index.mjs"
+    }
+  },
   "private": false,
   "publishConfig": {
     "access": "public"

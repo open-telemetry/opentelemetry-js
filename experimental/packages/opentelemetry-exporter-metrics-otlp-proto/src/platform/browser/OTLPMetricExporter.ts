@@ -10,7 +10,7 @@ import {
   AggregationTemporalityPreference,
   OTLPMetricExporterBase,
 } from '@opentelemetry/exporter-metrics-otlp-http';
-import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import type { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 import {
   MetricsExporterMetricsHelper,
   ProtobufMetricsSerializer,
@@ -24,9 +24,7 @@ import { OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER } from '../../semco
 
 export class OTLPMetricExporter extends OTLPMetricExporterBase {
   private readonly _url: string | undefined;
-  constructor(
-    config: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions = {}
-  ) {
+  constructor(config: OTLPExporterConfigBase & OTLPMetricExporterOptions = {}) {
     super(
       createLegacyOtlpBrowserExportDelegate(
         config,
@@ -70,7 +68,7 @@ export class OTLPMetricExporter extends OTLPMetricExporterBase {
  * environment is the caller's responsibility.
  */
 export function createOtlpProtoMetricExporter(
-  config: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions = {}
+  config: OTLPExporterConfigBase & OTLPMetricExporterOptions = {}
 ): PushMetricExporter {
   return new OTLPMetricExporterBase(
     createLegacyOtlpBrowserExportDelegate(

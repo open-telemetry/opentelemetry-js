@@ -10,7 +10,7 @@ import {
   AggregationTemporalityPreference,
   OTLPMetricExporterBase,
 } from '@opentelemetry/exporter-metrics-otlp-http';
-import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base/node-http';
 import {
   MetricsExporterMetricsHelper,
   ProtobufMetricsSerializer,
