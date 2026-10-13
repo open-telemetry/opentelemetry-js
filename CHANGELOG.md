@@ -35,6 +35,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :bug: Bug Fixes
 
+* fix(sdk-trace): declare the Node.js `RandomIdGenerator`'s `generateTraceId` and `generateSpanId` as prototype methods, matching the browser class, so subclasses can override them as methods [#7190](https://github.com/open-telemetry/opentelemetry-js/pull/7190) @overbalance
+  * They are no longer own properties of the instance. Calling them detached from the instance still works.
 * fix(sdk-trace): count attributes passed to `startSpan` toward `attributeCountLimit` [#7176](https://github.com/open-telemetry/opentelemetry-js/pull/7176) @overbalance
 * fix(resources): read `process.argv0` for the default service name through `#platform`, so the browser build no longer touches `globalThis.process` [#7173](https://github.com/open-telemetry/opentelemetry-js/pull/7173) @overbalance
 * fix(core): return `false` instead of `undefined` from the browser `getBooleanFromEnv`, matching the Node.js implementation and the published `boolean` return type [#7188](https://github.com/open-telemetry/opentelemetry-js/pull/7188) @overbalance
