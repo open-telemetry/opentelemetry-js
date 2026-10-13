@@ -43,6 +43,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :house: Internal
 
+* build: fail the tsdown build when an emitted chunk, JS or declarations, contains a module from outside the package, such as a workspace package missing from `dependencies` [#7195](https://github.com/open-telemetry/opentelemetry-js/pull/7195) @overbalance
 * refactor(sdk-trace): remove the `pagehide` listener from the browser `BatchSpanProcessor`, it was registered on `document` and never ran, and `visibilitychange` already flushes on unload [#7153](https://github.com/open-telemetry/opentelemetry-js/pull/7153) @adityareddy-dev
 * refactor(sdk-logs): remove the `pagehide` listener from the browser `BatchLogRecordProcessor`, it was registered on `document` and never ran, and `visibilitychange` already flushes on unload [#7153](https://github.com/open-telemetry/opentelemetry-js/pull/7153) @adityareddy-dev
 * refactor(sdk-trace, sdk-logs, sdk-metrics): type batch and periodic timers with `ReturnType<typeof setTimeout>` instead of `NodeJS.Timeout`, so the shared code compiles without Node.js types [#7174](https://github.com/open-telemetry/opentelemetry-js/pull/7174) @overbalance
