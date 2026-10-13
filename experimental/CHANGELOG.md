@@ -37,8 +37,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :rocket: Features
 
-* feat(instrumentation): add `isEnabled()` to the browser `InstrumentationBase`, matching Node.js [#7140](https://github.com/open-telemetry/opentelemetry-js/pull/7140) @overbalance
-  * `FetchInstrumentation` and `XMLHttpRequestInstrumentation` override it to report whether they are active, which stays false when patching throws.
+* feat(instrumentation): add `isEnabled()` to the browser `InstrumentationBase`; fetch and XHR report false when patching throws [#7140](https://github.com/open-telemetry/opentelemetry-js/pull/7140) @overbalance
 
 ### :bug: Bug Fixes
 
@@ -50,7 +49,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :house: Internal
 
-* refactor(instrumentation): track the browser `InstrumentationBase` enabled state in a TS-private `_enabled` instead of an ES `#enabled`, matching the Node.js base [#7201](https://github.com/open-telemetry/opentelemetry-js/pull/7201) @overbalance
+* refactor(instrumentation): track the browser `InstrumentationBase` enabled state in a TS-private `_enabled` [#7201](https://github.com/open-telemetry/opentelemetry-js/pull/7201) @overbalance
 * chore(web-common): remove the unused `@opentelemetry/semantic-conventions` dependency [#7196](https://github.com/open-telemetry/opentelemetry-js/pull/7196) @overbalance
 * refactor(otlp-transformer): encode base64 through `#platform`, so the browser build no longer references `Buffer` [#7173](https://github.com/open-telemetry/opentelemetry-js/pull/7173) @overbalance
 * refactor(exporter-metrics-otlp-proto): type the browser `OTLPMetricExporter` config as `OTLPExporterConfigBase` [#7172](https://github.com/open-telemetry/opentelemetry-js/pull/7172) @overbalance
