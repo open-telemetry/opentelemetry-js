@@ -16,8 +16,8 @@ export abstract class InstrumentationBase<
   extends InstrumentationAbstract<ConfigType>
   implements types.Instrumentation<ConfigType>
 {
-  // Matches the Node.js base, so both platforms declare the same shape.
-  private _enabled = false;
+  /** Set by subclasses in enable() and disable(); matches the Node.js base. */
+  protected _enabled = false;
 
   constructor(
     instrumentationName: string,
@@ -26,26 +26,12 @@ export abstract class InstrumentationBase<
   ) {
     super(instrumentationName, instrumentationVersion, config);
 
-    // enable/disable are abstract, so the base can only observe calls by wrapping them;
-    // a throw leaves the flag unchanged. A class-field enable/disable would replace this wrapper.
-    const enable = this.enable;
-    const disable = this.disable;
-    this.enable = () => {
-      enable.call(this);
-      this._enabled = true;
-    };
-    this.disable = () => {
-      disable.call(this);
-      this._enabled = false;
-    };
-
     if (this._config.enabled) {
       this.enable();
     }
   }
 
-  /** Whether enable() was called more recently than disable(). Tracks calls only: a
-   * subclass enable() that returns early still reads as enabled; one that throws leaves it unchanged. */
+  /** Whether the instrumentation is active. Subclasses that never set `_enabled` read false. */
   public isEnabled(): boolean {
     return this._enabled;
   }
