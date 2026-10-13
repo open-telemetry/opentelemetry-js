@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import type { MeterProvider } from '@opentelemetry/api';
+import type { CompressionAlgorithm } from './compression';
 import type { HeadersFactory } from './otlp-http-configuration';
 
 export interface OTLPExporterConfigBase {
@@ -48,6 +49,12 @@ export interface OTLPExporterConfigBase {
    * @defaultValue 10000
    */
   timeoutMillis?: number;
+  /**
+   * Compression algorithm for outgoing OTLP HTTP requests.
+   *
+   * @defaultValue CompressionAlgorithm.NONE
+   */
+  compression?: CompressionAlgorithm;
 
   /**
    * MeterProvider to record metrics for the exporter itself.

@@ -38,6 +38,11 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 * feat(instrumentation): add `isEnabled()` to the browser `InstrumentationBase`, matching Node.js [#7140](https://github.com/open-telemetry/opentelemetry-js/pull/7140) @overbalance
   * `FetchInstrumentation` and `XMLHttpRequestInstrumentation` override it to report whether they are active, which stays false when patching throws.
+* feat(otlp-exporter-base): support the `compression` option in browser OTLP HTTP exporters [#7166](https://github.com/open-telemetry/opentelemetry-js/pull/7166) @YangJonghun
+  * `compression: CompressionAlgorithm.GZIP` gzips export requests with the built-in `CompressionStream` API, as Node.js exporters already do. Runtimes without gzip support in `CompressionStream` send uncompressed requests and log a warning once per exporter.
+  * The keepalive budget is charged with the compressed size, so more telemetry fits into the requests that survive page unload.
+  * A `compression` option passed to browser exporters or to the deprecated `createOtlpSendBeaconExportDelegate()` was previously ignored but is now applied.
+  * Cross-origin collectors must list `Content-Encoding` in `Access-Control-Allow-Headers`.
 
 ### :bug: Bug Fixes
 

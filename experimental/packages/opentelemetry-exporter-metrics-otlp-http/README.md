@@ -16,7 +16,7 @@ npm install --save @opentelemetry/exporter-metrics-otlp-http
 ## Shared HTTP exporter options
 
 This exporter uses the shared HTTP options documented in [`@opentelemetry/otlp-exporter-base`][otlp-exporter-base-config].
-That includes `url`, `headers`, `timeoutMillis`, `concurrencyLimit`, and Node.js options such as `compression`, `keepAlive`, `httpAgentOptions`, and `userAgent`.
+That includes `url`, `headers`, `timeoutMillis`, `concurrencyLimit`, `compression`, and Node.js options such as `keepAlive`, `httpAgentOptions`, and `userAgent`.
 
 ## Service Name
 
