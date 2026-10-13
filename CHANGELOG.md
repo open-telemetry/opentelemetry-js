@@ -37,8 +37,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 ### :rocket: Features
 
 * chore(sdk-logs): mark `@opentelemetry/sdk-logs` as stable [#7143](https://github.com/open-telemetry/opentelemetry-js/issues/7143) @trentm
-* feat(sdk-trace): add the browser-only `disableAutoFlushOnDocumentHide` to `BatchSpanProcessorOptions`; deprecate `BatchSpanProcessorBrowserOptions` [#7140](https://github.com/open-telemetry/opentelemetry-js/pull/7140) @overbalance
-* feat(sdk-logs): add the browser-only `disableAutoFlushOnDocumentHide` to `BatchLogRecordProcessorOptions`; deprecate `BatchLogRecordProcessorBrowserOptions` [#7140](https://github.com/open-telemetry/opentelemetry-js/pull/7140) @overbalance
+* feat(sdk-trace, sdk-logs): add the browser-only `disableAutoFlushOnDocumentHide` to `BatchSpanProcessorOptions` and `BatchLogRecordProcessorOptions`, deprecate `BatchSpanProcessorBrowserOptions` and `BatchLogRecordProcessorBrowserOptions` [#7140](https://github.com/open-telemetry/opentelemetry-js/pull/7140) @overbalance
 
 ### :bug: Bug Fixes
 
