@@ -8,7 +8,7 @@ import {
   SimpleLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
-import { OTLPLogExporter } from '../src';
+import { OTLPLogExporter, createOtlpGrpcLogExporter } from '../src';
 import type { ServerTestContext } from './utils';
 import { startServer, TestMetricReader } from './utils';
 import * as assert from 'assert';
@@ -99,5 +99,29 @@ describe('OTLPLogExporter', function () {
     );
     assert.ok(scopeMetrics);
     await meterProvider.shutdown();
+  });
+
+  describe('createOtlpGrpcLogExporter', function () {
+    it('successfully exports data', async () => {
+      // arrange
+      const loggerProvider = new LoggerProvider({
+        processors: [
+          new SimpleLogRecordProcessor({
+            exporter: createOtlpGrpcLogExporter({
+              url: 'http://localhost:1503',
+            }),
+          }),
+        ],
+      });
+
+      // act
+      loggerProvider.getLogger('test-logger').emit({
+        body: 'test-body',
+      });
+      await loggerProvider.shutdown();
+
+      // assert
+      assert.strictEqual(serverTestContext.requests.length, 1);
+    });
   });
 });

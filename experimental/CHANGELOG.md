@@ -25,6 +25,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 ### :rocket: Features
 
 * feat(instrumentation): add `isEnabled()` to the browser `InstrumentationBase`, matching Node.js [#7140](https://github.com/open-telemetry/opentelemetry-js/pull/7140) @overbalance
+* feat(otlp-exporter-base): add `createOtlp*Exporter()` factory functions to the OTLP trace, metric and log exporter packages (`-otlp-http`, `-otlp-proto`, `-otlp-grpc`); unlike the exporter classes, they do not read `OTEL_EXPORTER_OTLP_*` environment variables, which makes them suitable for use with declarative configuration [#6959](https://github.com/open-telemetry/opentelemetry-js/issues/6959) @pacocartones
   * `FetchInstrumentation` and `XMLHttpRequestInstrumentation` override it to report whether they are active, which stays false when patching throws.
 
 ### :bug: Bug Fixes

@@ -4,12 +4,17 @@
  */
 
 import {
+  AggregationTemporality,
+  InstrumentType,
   MeterProvider,
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { OTLPMetricExporter } from '../../src/platform/browser';
+import {
+  createOtlpProtoMetricExporter,
+  OTLPMetricExporter,
+} from '../../src/platform/browser';
 import { TestMetricReader } from '../utils';
 
 /*
@@ -63,5 +68,16 @@ describe('OTLPMetricExporter', () => {
       assert.ok(scopeMetrics);
       await meterProvider.shutdown();
     });
+  });
+});
+
+describe('createOtlpProtoMetricExporter', () => {
+  it('uses the specification default temporality without reading the environment', function () {
+    assert.strictEqual(
+      createOtlpProtoMetricExporter().selectAggregationTemporality!(
+        InstrumentType.COUNTER
+      ),
+      AggregationTemporality.CUMULATIVE
+    );
   });
 });

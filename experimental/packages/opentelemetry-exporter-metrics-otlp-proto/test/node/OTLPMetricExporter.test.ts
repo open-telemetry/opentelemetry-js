@@ -8,7 +8,11 @@ import * as http from 'http';
 import * as sinon from 'sinon';
 
 import { OTLPMetricExporter } from '../../src/platform/node';
+import { createOtlpProtoMetricExporter } from '../../src/platform/node';
+import { AggregationTemporalityPreference } from '@opentelemetry/exporter-metrics-otlp-http';
 import {
+  AggregationTemporality,
+  InstrumentType,
   MeterProvider,
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
@@ -99,5 +103,43 @@ describe('OTLPMetricExporter', () => {
       // act
       meterProvider.forceFlush();
     });
+  });
+});
+
+describe('createOtlpProtoMetricExporter', () => {
+  afterEach(() => {
+    delete process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE;
+  });
+
+  it('does not read OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE from the environment', () => {
+    process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'delta';
+
+    // control: the class-based exporter keeps using the environment
+    assert.equal(
+      new OTLPMetricExporter().selectAggregationTemporality(
+        InstrumentType.COUNTER
+      ),
+      AggregationTemporality.DELTA
+    );
+
+    // the factory-created exporter uses the specification default instead
+    assert.equal(
+      createOtlpProtoMetricExporter().selectAggregationTemporality!(
+        InstrumentType.COUNTER
+      ),
+      AggregationTemporality.CUMULATIVE
+    );
+  });
+
+  it('honors an explicit temporalityPreference over the specification default', () => {
+    process.env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE =
+      'cumulative';
+
+    assert.equal(
+      createOtlpProtoMetricExporter({
+        temporalityPreference: AggregationTemporalityPreference.DELTA,
+      }).selectAggregationTemporality!(InstrumentType.COUNTER),
+      AggregationTemporality.DELTA
+    );
   });
 });
