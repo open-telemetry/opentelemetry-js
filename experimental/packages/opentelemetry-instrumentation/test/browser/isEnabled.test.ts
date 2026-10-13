@@ -6,7 +6,7 @@
 import * as assert from 'assert';
 import { InstrumentationBase } from '../../src/platform/browser';
 
-class TrackingInstrumentation extends InstrumentationBase {
+class TestInstrumentation extends InstrumentationBase {
   override enable() {
     this._enabled = true;
   }
@@ -24,19 +24,19 @@ class UntrackedInstrumentation extends InstrumentationBase {
 
 describe('InstrumentationBase#isEnabled (browser)', function () {
   it('is true after construction with the default config', function () {
-    const instrumentation = new TrackingInstrumentation('test', '1.0.0', {});
+    const instrumentation = new TestInstrumentation('test', '1.0.0', {});
     assert.strictEqual(instrumentation.isEnabled(), true);
   });
 
   it('is false when constructed with enabled: false', function () {
-    const instrumentation = new TrackingInstrumentation('test', '1.0.0', {
+    const instrumentation = new TestInstrumentation('test', '1.0.0', {
       enabled: false,
     });
     assert.strictEqual(instrumentation.isEnabled(), false);
   });
 
   it('follows the _enabled flag set by enable() and disable()', function () {
-    const instrumentation = new TrackingInstrumentation('test', '1.0.0', {
+    const instrumentation = new TestInstrumentation('test', '1.0.0', {
       enabled: false,
     });
     instrumentation.enable();
@@ -51,7 +51,7 @@ describe('InstrumentationBase#isEnabled (browser)', function () {
   });
 
   it('keeps enable() and disable() on the prototype', function () {
-    const instrumentation = new TrackingInstrumentation('test', '1.0.0', {});
+    const instrumentation = new TestInstrumentation('test', '1.0.0', {});
     assert.ok(!Object.hasOwn(instrumentation, 'enable'));
     assert.ok(!Object.hasOwn(instrumentation, 'disable'));
   });
