@@ -11,6 +11,10 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :rocket: Features
 
+* feat(instrumentation)!: make `InstrumentationBase#_enabled` protected on both platforms [#7202](https://github.com/open-telemetry/opentelemetry-js/pull/7202) @overbalance
+  * The browser base no longer tracks `enable()` and `disable()` calls. Browser subclasses set `_enabled` themselves; one that never sets it reports `isEnabled()` as false.
+  * A browser subclass that declares its own `private _enabled` fails to compile; rename it or declare it `protected`.
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
