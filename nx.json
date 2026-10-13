@@ -7,12 +7,25 @@
         "cacheableOperations": [
           "compile",
           "lint",
+          "typecheck:browser",
           "version"
         ]
       }
     }
   },
   "targetDefaults": {
+    "typecheck:browser": {
+      "dependsOn": ["version", "^compile"],
+      "inputs": [
+        "{projectRoot}/src/**/*.ts",
+        "{projectRoot}/tsconfig.browser.json",
+        "{projectRoot}/package.json",
+        "^default",
+        "{workspaceRoot}/tsconfig.base.json",
+        "{workspaceRoot}/tsconfig.browser.base.json",
+        "{workspaceRoot}/package-lock.json"
+      ]
+    },
     "compile": {
       "dependsOn": [
         "version",

@@ -24,6 +24,7 @@
   "scripts": {
     "prepublishOnly": "npm run compile",
     "compile": "tsdown",
+    "typecheck:browser": "tsc -p tsconfig.browser.json",
     "clean": "rimraf dist build",
     "test": "nyc mocha 'test/**/*.test.ts'",
     "tdd": "npm run test -- --watch-extensions ts --watch",
