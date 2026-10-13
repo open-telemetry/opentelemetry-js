@@ -13,6 +13,18 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :boom: Breaking Changes
 
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 3.0.0-rc.0
+
+### :boom: Breaking Changes
+
 * feat!: replace the top-level `browser` field in `package.json` with `#platform` subpath imports [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
   * Resolvers that apply the `node` condition, such as Node.js, load the Node.js implementation. All others, including browsers, web workers, edge runtimes and React Native, load the browser implementation with no configuration. Bundlers without `imports` support fail to resolve `#platform`; see the migration guide.
   * webpack 5 needs `enhanced-resolve` 5.8.2 or later, which webpack 5.54 and later require.
@@ -41,8 +53,6 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 * fix(sdk-trace): count attributes passed to `startSpan` toward `attributeCountLimit` [#7176](https://github.com/open-telemetry/opentelemetry-js/pull/7176) @overbalance
 * fix(resources): read `process.argv0` for the default service name through `#platform`, so the browser build no longer touches `globalThis.process` [#7173](https://github.com/open-telemetry/opentelemetry-js/pull/7173) @overbalance
 * fix(core): return `false` instead of `undefined` from the browser `getBooleanFromEnv`, matching the Node.js implementation and the published `boolean` return type [#7188](https://github.com/open-telemetry/opentelemetry-js/pull/7188) @overbalance
-
-### :books: Documentation
 
 ### :house: Internal
 

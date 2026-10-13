@@ -9,6 +9,18 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :boom: Breaking Changes
 
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 0.300.0-rc.0
+
+### :boom: Breaking Changes
+
 * feat(sdk-logs): mark `@opentelemetry/sdk-logs` as stable [#7143](https://github.com/open-telemetry/opentelemetry-js/issues/7143) @trentm
   * See [the stable CHANGELOG](../CHANGELOG.md) for future changes to the sdk-logs package.
 * feat!: replace the top-level `browser` field in `package.json` with `#platform` subpath imports [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
@@ -34,8 +46,6 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 * fix(instrumentation-fetch, instrumentation-xml-http-request): leave the instrumentation disabled when `globalThis.fetch` or `XMLHttpRequest.prototype.open`/`send` is missing or not a function, instead of reporting it enabled and never retrying [#7171](https://github.com/open-telemetry/opentelemetry-js/pull/7171) @overbalance
 * fix(instrumentation): move `InstrumentationNodeModuleFile` behind `#platform`, so the root type declarations no longer import Node.js `path` [#7177](https://github.com/open-telemetry/opentelemetry-js/issues/7177) @overbalance
 * fix(otlp-transformer): accept DOM `TextDecoder` in `ProtobufReader` typing [#7169](https://github.com/open-telemetry/opentelemetry-js/pull/7169) @overbalance
-
-### :books: Documentation
 
 ### :house: Internal
 
