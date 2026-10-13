@@ -7,8 +7,8 @@ export function getStringFromEnv(_: string): string | undefined {
   return undefined;
 }
 
-export function getBooleanFromEnv(_: string): boolean | undefined {
-  return undefined;
+export function getBooleanFromEnv(_: string): boolean {
+  return false;
 }
 
 export function getNumberFromEnv(_: string): number | undefined {
