@@ -120,6 +120,15 @@ describe('attributes', () => {
     a16_Null: null,
   };
 
+  // Some attribute values are *accepted* as AnyValue, but are changed by
+  // a `cleanAttributes`.
+  const attrTypesExtendedChangedByClean: any = {
+    a14_ObjWithUndefinedProps: { spam: 'eggs', anUndefined: undefined },
+  };
+  const attrTypesExtendedChangedByClean_After: any = {
+    a14_ObjWithUndefinedProps: { spam: 'eggs' },
+  };
+
   const attrTypesDroppedSilently: any = {
     a17_Undefined: undefined,
     [Symbol.for('a18_SymbolFor')]: 'strVal',
@@ -142,6 +151,7 @@ describe('attributes', () => {
   const allTheAttrTypes: any = {
     ...attrTypesSimple,
     ...attrTypesExtended,
+    ...attrTypesExtendedChangedByClean,
     ...attrTypesDroppedSilently,
     ...attrTypesDroppedWithWarning,
   };
@@ -155,6 +165,7 @@ describe('attributes', () => {
     for (const [k, v] of Object.entries({
       ...attrTypesSimple,
       ...attrTypesExtended,
+      ...attrTypesExtendedChangedByClean,
     })) {
       it(`${k} -> true`, () => {
         assert.equal(isAnyValue(v), true);
@@ -180,6 +191,7 @@ describe('attributes', () => {
 
     for (const [k, v] of Object.entries({
       ...attrTypesExtended,
+      ...attrTypesExtendedChangedByClean,
       ...attrTypesDroppedSilently,
       ...attrTypesDroppedWithWarning,
     })) {
@@ -199,6 +211,7 @@ describe('attributes', () => {
       assert.deepStrictEqual(attributes, {
         ...attrTypesSimple,
         ...attrTypesExtended,
+        ...attrTypesExtendedChangedByClean_After,
       });
       assert.equal(
         droppedAttributesCount,
@@ -315,6 +328,7 @@ describe('attributes', () => {
       assert.equal(
         droppedAttributesCount,
         Object.keys(attrTypesExtended).length +
+          Object.keys(attrTypesExtendedChangedByClean).length +
           Object.keys(attrTypesDroppedWithWarning).length
       );
     });
@@ -432,6 +446,7 @@ describe('attributes', () => {
     for (const [k, v] of Object.entries({
       ...attrTypesSimple,
       ...attrTypesExtended,
+      ...attrTypesExtendedChangedByClean,
     })) {
       it(`ADD_NEW ${k}`, () => {
         const attributes = { a: 1, b: 2 };
@@ -446,7 +461,11 @@ describe('attributes', () => {
           currentAttributesCount: Object.keys(attributes).length,
         });
 
-        assert.deepStrictEqual(attributes, { a: 1, b: 2, [k]: v });
+        const expectedV =
+          k in attrTypesExtendedChangedByClean
+            ? attrTypesExtendedChangedByClean_After[k]
+            : v;
+        assert.deepStrictEqual(attributes, { a: 1, b: 2, [k]: expectedV });
         assert.equal(decision, AddAttributeDecision.ADD_NEW);
       });
     }
@@ -487,6 +506,7 @@ describe('attributes', () => {
     for (const [k, v] of Object.entries({
       ...attrTypesDroppedWithWarning,
       ...attrTypesExtended,
+      ...attrTypesExtendedChangedByClean,
     })) {
       it(`${k} -> DROP_INVALID`, () => {
         const attributes = { foo: 'bar' };
