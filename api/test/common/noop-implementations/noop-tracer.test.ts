@@ -8,6 +8,7 @@ import * as sinon from 'sinon';
 import type { Span, SpanContext } from '../../../src';
 import {
   context,
+  createNoopTracer,
   ROOT_CONTEXT,
   SpanKind,
   trace,
@@ -91,5 +92,11 @@ describe('NoopTracer', function () {
       tracer.startActiveSpan(name, opts, context.active(), fn),
       1
     );
+  });
+});
+
+describe('createNoopTracer', function () {
+  it('should return NoopTracer', function () {
+    assert.ok(createNoopTracer() instanceof NoopTracer);
   });
 });
