@@ -53,6 +53,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :house: Internal
 
+* build: lint published packages for unused dependencies with knip, as part of `npm run lint` [#7200](https://github.com/open-telemetry/opentelemetry-js/pull/7200) @overbalance
+* chore(exporter-zipkin): move `@opentelemetry/resources` to `devDependencies`, since only tests use it [#7200](https://github.com/open-telemetry/opentelemetry-js/pull/7200) @overbalance
 * build: fail the tsdown build when its output includes a module from outside the package [#7195](https://github.com/open-telemetry/opentelemetry-js/pull/7195) @overbalance
 * refactor(sdk-trace): remove the `pagehide` listener from the browser `BatchSpanProcessor`, it was registered on `document` and never ran, and `visibilitychange` already flushes on unload [#7153](https://github.com/open-telemetry/opentelemetry-js/pull/7153) @adityareddy-dev
 * refactor(sdk-logs): remove the `pagehide` listener from the browser `BatchLogRecordProcessor`, it was registered on `document` and never ran, and `visibilitychange` already flushes on unload [#7153](https://github.com/open-telemetry/opentelemetry-js/pull/7153) @adityareddy-dev

@@ -70,6 +70,7 @@
     "@babel/core": "7.29.7",
     "@babel/preset-env": "7.29.7",
     "@opentelemetry/api": "^1.0.0 || 1.10.0-rc.0",
+    "@opentelemetry/resources": "3.0.0-rc.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
@@ -96,7 +97,6 @@
   },
   "dependencies": {
     "@opentelemetry/core": "3.0.0-rc.0",
-    "@opentelemetry/resources": "3.0.0-rc.0",
     "@opentelemetry/sdk-trace": "3.0.0-rc.0",
     "@opentelemetry/semantic-conventions": "^1.29.0"
   },
