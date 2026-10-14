@@ -9,7 +9,7 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: Features
 
-* perf(api): register the tracer provider directly to avoid forwarding tracer lookups @jpdefo
+* perf(api): register the tracer provider directly to avoid forwarding tracer lookups [#7204](https://github.com/open-telemetry/opentelemetry-js/pull/7204) @jpdefo
 
 ### :bug: Bug Fixes
 
