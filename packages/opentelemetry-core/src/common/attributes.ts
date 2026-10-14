@@ -154,7 +154,8 @@ function maybeAddAttributeInternal(
 
 /**
  * Clean a given set of attributes.
- * - `undefined` values are silently dropped
+ * - `undefined` values, at the top-level and properties of nested objects,
+ *   are silently dropped
  * - invalid attribute value types are removed, with a warning
  * - attribute count and value length *limits* are applied
  *
@@ -323,8 +324,12 @@ function isAnyValueInternal(
   }
 
   // Plain objects
-  for (const key of Object.keys(obj)) {
-    if (!isAnyValueInternal(obj[key], visited)) {
+  for (const k of Object.keys(obj)) {
+    const v = obj[k];
+    // Allow undefined properties on an object. This allows the pattern of
+    // building structured objects with optional fields. The undefined
+    // properties will be dropped by `cleanAttributes` and `maybeAddAttribute`.
+    if (v !== undefined && !isAnyValueInternal(v, visited)) {
       return false;
     }
   }
@@ -392,8 +397,13 @@ function copyAndTruncAnyValue(val: AnyValue, limit: number): AnyValue {
   // Plain objects
   const truncObj: Record<string, AnyValue> = {};
   const obj = val as Record<string, AnyValue>;
-  for (const key of Object.keys(obj)) {
-    truncObj[key] = copyAndTruncAnyValue(obj[key], limit);
+  for (const k of Object.keys(obj)) {
+    const v = obj[k];
+    // Silently drop undefined properties. They are allowed by isAnyValue()
+    // with the expectation they will be dropped here.
+    if (v !== undefined) {
+      truncObj[k] = copyAndTruncAnyValue(obj[k], limit);
+    }
   }
   return truncObj;
 }
