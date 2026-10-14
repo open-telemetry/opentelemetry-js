@@ -29,17 +29,14 @@ For ESM, the `NODE_OPTIONS` for the startup command should include `--import ./t
 ## Instrumentation Hook Required for ESM
 
 If your application is written in JavaScript as ESM, or compiled to ESM from TypeScript, then a loader hook is required to properly patch instrumentation.
-The custom hook for ESM instrumentation is `--experimental-loader=@opentelemetry/instrumentation/hook.mjs`.
-This flag must be passed to the `node` binary, which is often done as a startup command and/or in the `NODE_OPTIONS` environment variable.
+The custom hook for ESM instrumentation is `--import=@opentelemetry/instrumentation/register.mjs`, or you can `import '@opentelemetry/instrumentation/register.mjs` 
+in your instrumentation file. This flag must be passed to the `node` binary, which is often done as a startup command and/or in the `NODE_OPTIONS` environment variable.
 
 ### Additional Notes on Experimental Loaders
 
 Though the OpenTelemetry loader currently relies on `import-in-the-middle`, direct usage of `import-in-the-middle/hook.mjs` may cease to work in the future.
-The only currently supported loader hook is `@opentelemetry/instrumentation/hook.mjs`.
-
-**Note:** Eventually the recommendation for how to setup OpenTelemetry for usage with ESM will change to no longer require `--experimental-loader=@opentelemetry/instrumentation/hook.mjs`.
-Instead the bootstrap code (in `./telemetry.js`) will use Node.js's newer `module.register(...)`.
-Refer to this [issue](https://github.com/open-telemetry/opentelemetry-js/issues/4933) for details.
+The only currently supported loader hooks is `@opentelemetry/instrumentation/register.mjs`, or `@opentelemetry/instrumentation/register-hooks.mjs` and/or `@opentelemetry/instrumentation/hook.mjs`
+for custom registration code.
 
 Because of ongoing issues with loaders running TypeScript code as ESM in development environments, results may vary.
 
@@ -60,7 +57,7 @@ node --require @opentelemetry/auto-instrumentations-node/register app.js
 Startup command for ESM:
 
 ```sh
-node --experimental-loader=@opentelemetry/instrumentation/hook.mjs --import @opentelemetry/auto-instrumentations-node/register app.js
+node --import=@opentelemetry/instrumentation/register.mjs --import @opentelemetry/auto-instrumentations-node/register app.js
 ```
 
 ## Examples
@@ -114,5 +111,5 @@ node --require ./telemetry.js app.js
 Startup command for compiled ESM:
 
 ```sh
-node --experimental-loader=@opentelemetry/instrumentation/hook.mjs --import ./telemetry.js app.js
+node --import=@opentelemetry/instrumentation/register.mjs --import ./telemetry.js app.js
 ```
