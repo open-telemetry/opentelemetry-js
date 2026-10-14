@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: Features
 
+* perf(api): register the tracer provider directly to avoid forwarding tracer lookups @jpdefo
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
