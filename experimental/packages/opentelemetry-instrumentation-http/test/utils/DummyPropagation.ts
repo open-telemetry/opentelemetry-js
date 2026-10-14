@@ -2,8 +2,12 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import type { Context, TextMapPropagator } from '@opentelemetry/api';
-import { trace, TraceFlags } from '@opentelemetry/api';
+import type {
+  Context,
+  TextMapPropagator,
+  TextMapSetter,
+} from '@opentelemetry/api';
+import { defaultTextMapSetter, trace, TraceFlags } from '@opentelemetry/api';
 import type * as http from 'http';
 
 export class DummyPropagation implements TextMapPropagator {
@@ -21,11 +25,19 @@ export class DummyPropagation implements TextMapPropagator {
     }
     return context;
   }
-  inject(context: Context, headers: { [custom: string]: string }): void {
+  inject(
+    context: Context,
+    carrier: unknown,
+    setter: TextMapSetter = defaultTextMapSetter
+  ): void {
     const spanContext = trace.getSpanContext(context);
     if (!spanContext) return;
-    headers[DummyPropagation.TRACE_CONTEXT_KEY] = spanContext.traceId;
-    headers[DummyPropagation.SPAN_CONTEXT_KEY] = spanContext.spanId;
+    setter.set(
+      carrier,
+      DummyPropagation.TRACE_CONTEXT_KEY,
+      spanContext.traceId
+    );
+    setter.set(carrier, DummyPropagation.SPAN_CONTEXT_KEY, spanContext.spanId);
   }
   fields(): string[] {
     return [
