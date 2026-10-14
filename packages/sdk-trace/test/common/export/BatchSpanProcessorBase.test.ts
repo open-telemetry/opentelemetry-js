@@ -453,6 +453,29 @@ describe('BatchSpanProcessorBase', () => {
 
         assert.strictEqual(exporter.getFinishedSpans().length, 1);
       });
+
+      it('should wait for a shared pending resource only once per flush', async () => {
+        const resource = resourceFromAttributes({
+          async: new Promise<string>(resolve =>
+            setTimeout(() => resolve('fromasync'), 1)
+          ),
+        });
+        const waitSpy = sinon.spy(resource, 'waitForAsyncAttributes');
+        const tracer = new TracerProvider({ resource }).getTracer('default');
+
+        // stay within one batch (maxExportBatchSize is 5 in this suite)
+        for (let i = 0; i < 4; i++) {
+          const span = tracer.startSpan('test') as Span;
+          span.end();
+          processor.onStart(span, ROOT_CONTEXT);
+          processor.onEnd(span);
+        }
+
+        await processor.forceFlush();
+
+        assert.strictEqual(waitSpy.callCount, 1);
+        assert.strictEqual(exporter.getFinishedSpans().length, 4);
+      });
     });
 
     describe('flushing spans with exporter triggering instrumentation', () => {
