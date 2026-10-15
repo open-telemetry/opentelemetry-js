@@ -17,6 +17,7 @@ import type {
   BatchLogRecordProcessorOptions,
   LogRecordLimits,
   ReadWriteLogRecord,
+  ReadableLogRecord,
   LogRecordExporter,
 } from '../../../src';
 import { InMemoryLogRecordExporter } from '../../../src';
@@ -474,6 +475,77 @@ describe('BatchLogRecordProcessorBase', () => {
   });
 
   describe('forceFlush', () => {
+    for (const operation of ['forceFlush', 'shutdown'] as const) {
+      it(`waits for an overlapping ${operation} and exports newer records`, async () => {
+        const pending = withResolvers<void>();
+        const started = withResolvers<void>();
+        const flush = sinon.stub(exporter, 'forceFlush');
+        flush.onFirstCall().callsFake(() => {
+          started.resolve();
+          return pending.promise;
+        });
+        flush.resolves();
+        const exportSpy = sinon.spy(exporter, 'export');
+        const processor = new BatchLogRecordProcessor({ exporter });
+        const first = createLogRecord();
+        const second = createLogRecord();
+        processor.onEmit(first);
+        const initial = processor.forceFlush();
+        await started.promise;
+        processor.onEmit(second);
+        let completed = false;
+        const overlapping = processor[operation]().then(() => {
+          completed = true;
+        });
+        await Promise.resolve();
+        await Promise.resolve();
+        const resolvedEarly = completed;
+        pending.resolve();
+        await Promise.all([initial, overlapping]);
+        assert.strictEqual(resolvedEarly, false);
+        assert.deepStrictEqual(
+          exportSpy.args.flatMap(args => args[0]),
+          [first, second]
+        );
+        await processor.shutdown();
+      });
+    }
+
+    it('recovers after exporter forceFlush rejects with an export in progress', async () => {
+      const pending = withResolvers<void>();
+      const started = withResolvers<void>();
+      const records: ReadableLogRecord[] = [];
+      const customExporter: LogRecordExporter = {
+        export: (logs, callback) => {
+          records.push(...logs);
+          started.resolve();
+          pending.promise.then(() =>
+            callback({ code: ExportResultCode.SUCCESS })
+          );
+        },
+        forceFlush: sinon
+          .stub()
+          .onFirstCall()
+          .rejects(new Error('flush failed'))
+          .resolves(),
+        shutdown: async () => {},
+      };
+      const processor = new BatchLogRecordProcessor({
+        exporter: customExporter,
+        maxExportBatchSize: 1,
+      });
+      const first = createLogRecord();
+      const second = createLogRecord();
+      processor.onEmit(first);
+      await started.promise;
+      processor.onEmit(second);
+      await assert.rejects(processor.forceFlush(), /flush failed/);
+      pending.resolve();
+      await processor.forceFlush();
+      assert.deepStrictEqual(records, [first, second]);
+      await processor.shutdown();
+    });
+
     it('should force flush on demand', async () => {
       const processor = new BatchLogRecordProcessor({
         exporter,
