@@ -147,6 +147,7 @@ export abstract class BatchLogRecordProcessorBase<
   private _timer: ReturnType<typeof setTimeout> | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
   private _flushing: boolean = false;
+  private _flushPromise: Promise<void> | undefined;
 
   constructor(options: T) {
     this._exporter = options.exporter;
@@ -219,64 +220,76 @@ export abstract class BatchLogRecordProcessorBase<
    * for all other cases _exportOneBatch should be used
    * */
   private async _flushAll(): Promise<void> {
-    // Guard against concurrent flushes. Concurrent .forceFlush() calls will
-    // return without waiting for the in-progress flush to finish.
-    if (this._flushing) {
-      return;
-    }
-    this._flushing = true;
-
-    // Grab the current set of finished log records, because the spec says:
-    // > ... for which the LogRecordProcessor had already received events prior to the call to ForceFlush ...
-    let toFlush = this._finishedLogRecords;
-    this._finishedLogRecords = [];
-
-    // Clear timer to prevent concurrent exports
-    this._clearTimer();
-
-    // Wait for any in-progress export to complete. Capture the reference
-    // into a local because `_exportOneBatch` may null out `this._currentExport`
-    // from its completion handler while we are awaiting below.
-    const inFlight = this._currentExport;
-    if (inFlight !== null) {
-      // speed up execution for current export
-      await this._exporter.forceFlush();
-      await inFlight.exportCompleted;
-      this._currentExport = null;
-    }
-
-    // Now flush all batches sequentially to avoid race conditions
-    while (toFlush.length > 0) {
-      let batch;
-      if (toFlush.length <= this._maxExportBatchSize) {
-        batch = toFlush;
-        toFlush = [];
-      } else {
-        batch = toFlush.splice(0, this._maxExportBatchSize);
-      }
-
-      const exportOp = new ExportOperation(
-        this._exporter,
-        batch,
-        this._exportTimeoutMillis,
-        this._metrics
-      );
-      this._currentExport = exportOp;
-
-      // await export scheduled, then force flush exporter to speed up export
+    while (this._flushPromise !== undefined) {
       try {
-        await exportOp.exportScheduled;
+        await this._flushPromise;
+      } catch {
+        // A failed flush must not prevent the next caller from retrying.
+      }
+    }
+    const flush = this._flushAllOnce();
+    this._flushPromise = flush;
+    try {
+      await flush;
+    } finally {
+      this._flushPromise = undefined;
+    }
+  }
+
+  private async _flushAllOnce(): Promise<void> {
+    this._flushing = true;
+    try {
+      // Clear timer to prevent concurrent exports
+      this._clearTimer();
+
+      // Wait for any in-progress export to complete. Capture the reference
+      // into a local because `_exportOneBatch` may null out `this._currentExport`
+      // from its completion handler while we are awaiting below.
+      const inFlight = this._currentExport;
+      if (inFlight !== null) {
+        // speed up execution for current export
         await this._exporter.forceFlush();
-        await exportOp.exportCompleted;
-      } catch (e) {
-        globalErrorHandler(e);
-      } finally {
+        await inFlight.exportCompleted;
         this._currentExport = null;
       }
-    }
 
-    this._flushing = false;
-    this._maybeStartTimer();
+      // Keep buffered records available if flushing an in-progress export fails.
+      let toFlush = this._finishedLogRecords;
+      this._finishedLogRecords = [];
+
+      // Now flush all batches sequentially to avoid race conditions
+      while (toFlush.length > 0) {
+        let batch;
+        if (toFlush.length <= this._maxExportBatchSize) {
+          batch = toFlush;
+          toFlush = [];
+        } else {
+          batch = toFlush.splice(0, this._maxExportBatchSize);
+        }
+
+        const exportOp = new ExportOperation(
+          this._exporter,
+          batch,
+          this._exportTimeoutMillis,
+          this._metrics
+        );
+        this._currentExport = exportOp;
+
+        // await export scheduled, then force flush exporter to speed up export
+        try {
+          await exportOp.exportScheduled;
+          await this._exporter.forceFlush();
+          await exportOp.exportCompleted;
+        } catch (e) {
+          globalErrorHandler(e);
+        } finally {
+          this._currentExport = null;
+        }
+      }
+    } finally {
+      this._flushing = false;
+      this._maybeStartTimer();
+    }
   }
 
   /**
