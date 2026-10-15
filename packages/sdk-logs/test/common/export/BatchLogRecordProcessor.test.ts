@@ -546,6 +546,54 @@ describe('BatchLogRecordProcessorBase', () => {
       await processor.shutdown();
     });
 
+    it('splits buffered records into batches of maxExportBatchSize', async () => {
+      const started = withResolvers<void>();
+      const batches: ReadableLogRecord[][] = [];
+      const pending: Array<() => void> = [];
+      const customExporter: LogRecordExporter = {
+        export: (logs, callback) => {
+          batches.push(logs);
+          pending.push(() => callback({ code: ExportResultCode.SUCCESS }));
+          started.resolve();
+        },
+        forceFlush: async () => {
+          pending.splice(0).forEach(done => done());
+        },
+        shutdown: async () => {},
+      };
+      const processor = new BatchLogRecordProcessor({
+        exporter: customExporter,
+        maxExportBatchSize: 2,
+        maxQueueSize: 10,
+      });
+      processor.onEmit(createLogRecord());
+      processor.onEmit(createLogRecord());
+      await started.promise;
+      for (let i = 0; i < 5; i++) {
+        processor.onEmit(createLogRecord());
+      }
+      await processor.forceFlush();
+      assert.deepStrictEqual(
+        batches.map(batch => batch.length),
+        [2, 2, 2, 1]
+      );
+      await processor.shutdown();
+    });
+
+    it('reports an exporter forceFlush failure while flushing buffered records', async () => {
+      const expectedError = new Error('flush failed');
+      sinon.stub(exporter, 'forceFlush').rejects(expectedError);
+      const errorHandlerSpy = sinon.spy();
+      setGlobalErrorHandler(errorHandlerSpy);
+      const processor = new BatchLogRecordProcessor({ exporter });
+      const logRecord = createLogRecord();
+      processor.onEmit(logRecord);
+      await processor.forceFlush();
+      sinon.assert.calledOnceWithExactly(errorHandlerSpy, expectedError);
+      assert.deepStrictEqual(exporter.getFinishedLogRecords(), [logRecord]);
+      await processor.shutdown();
+    });
+
     it('should force flush on demand', async () => {
       const processor = new BatchLogRecordProcessor({
         exporter,
