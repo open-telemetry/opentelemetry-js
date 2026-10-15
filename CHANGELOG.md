@@ -17,6 +17,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :bug: Bug Fixes
 
+* fix(sdk-logs): wait for overlapping flushes and recover after exporter flush failures @adityareddy-dev
+
 ### :books: Documentation
 
 ### :house: Internal
