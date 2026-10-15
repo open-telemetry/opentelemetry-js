@@ -17,6 +17,7 @@ export interface OtlpSharedConfiguration {
   timeoutMillis: number;
   concurrencyLimit: number;
   compression: 'gzip' | 'none';
+  maxRequestSize?: number;
 }
 
 export function validateTimeoutMillis(timeoutMillis: number) {
@@ -62,6 +63,10 @@ export function mergeOtlpSharedConfigurationWithDefaults(
       userProvidedConfiguration.compression ??
       fallbackConfiguration.compression ??
       defaultConfiguration.compression,
+    maxRequestSize:
+      userProvidedConfiguration.maxRequestSize ??
+      fallbackConfiguration.maxRequestSize ??
+      defaultConfiguration.maxRequestSize,
   };
 }
 
@@ -70,5 +75,6 @@ export function getSharedConfigurationDefaults(): OtlpSharedConfiguration {
     timeoutMillis: 10000,
     concurrencyLimit: 30,
     compression: 'none',
+    maxRequestSize: 64 * 1024 * 1024,
   };
 }

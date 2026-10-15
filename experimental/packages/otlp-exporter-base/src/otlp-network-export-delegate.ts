@@ -24,6 +24,6 @@ export function createOtlpNetworkExportDelegate<Internal, Response>(
       promiseHandler: createBoundedQueueExportPromiseHandler(options),
       metrics,
     },
-    { timeout: options.timeoutMillis }
+    { timeout: options.timeoutMillis, maxRequestSize: options.maxRequestSize }
   );
 }
