@@ -17,7 +17,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :bug: Bug Fixes
 
-* fix(sdk-logs): wait for overlapping flushes and recover after exporter flush failures @adityareddy-dev
+* fix(sdk-logs): wait for overlapping flushes and recover after exporter flush failures [#7210](https://github.com/open-telemetry/opentelemetry-js/pull/7210) @adityareddy-dev
 
 * fix(core): no longer *drop* an attribute value that is an object that has `undefined` properties [#7207](https://github.com/open-telemetry/opentelemetry-js/issues/7207) @trentm
   * `isAnyValue()` now returns true for `{aStr: 'bob', anUndefined: undefined}`. This restores the behavior of the old `isLogAttributeValue` from version 2.x of the `sdk-logs` package.
