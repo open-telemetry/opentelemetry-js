@@ -121,8 +121,11 @@ class FetchTransport implements IExporterTransport {
           body: data,
           signal: abortController.signal,
           keepalive: useKeepalive,
+          // `location.origin` reports the URL's origin even when the document's
+          // origin is opaque ("null", e.g. a sandboxed iframe), where a
+          // same-origin request is rejected; `globalThis.origin` does not.
           mode: globalThis.location
-            ? globalThis.location.origin === url.origin
+            ? globalThis.origin === url.origin
               ? 'same-origin'
               : 'cors'
             : 'no-cors',
