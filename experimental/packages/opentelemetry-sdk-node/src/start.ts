@@ -16,7 +16,6 @@ import {
   propagation,
 } from '@opentelemetry/api';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
-import type { SDKComponents, SDKOptions } from './types';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import {
   diagLogLevelFromString,
