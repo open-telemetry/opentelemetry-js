@@ -1,0 +1,11 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "include": ["dependencies"],
+  "ignoreWorkspaces": [
+    "e2e-tests",
+    "examples/**",
+    "experimental/examples/**",
+    "integration-tests/**",
+    "packages/template"
+  ]
+}

@@ -1,20 +1,33 @@
 {
   "name": "@opentelemetry/otlp-transformer",
-  "version": "0.300.0-development.0",
+  "version": "0.300.0-rc.0",
   "description": "Transform OpenTelemetry SDK data into OTLP",
   "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
   "exports": {
     ".": {
-      "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
-      },
       "require": {
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
+      },
+      "default": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
       }
+    }
+  },
+  "imports": {
+    "#platform": {
+      "otel": {
+        "node": "./src/platform/node/index.ts",
+        "default": "./src/platform/browser/index.ts"
+      },
+      "node": {
+        "require": "./dist/platform/node/index.cjs",
+        "default": "./dist/platform/node/index.mjs"
+      },
+      "require": "./dist/platform/browser/index.cjs",
+      "default": "./dist/platform/browser/index.mjs"
     }
   },
   "private": false,
@@ -66,10 +79,10 @@
     "dist"
   ],
   "peerDependencies": {
-    "@opentelemetry/api": "^1.3.0"
+    "@opentelemetry/api": "^1.9.1 || 1.10.0-rc.0"
   },
   "devDependencies": {
-    "@opentelemetry/api": "1.9.1",
+    "@opentelemetry/api": "1.10.0-rc.0",
     "@types/mocha": "10.0.10",
     "@types/sinon": "^17.0.4",
     "@types/webpack-env": "1.18.8",
@@ -80,8 +93,8 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.37",
     "karma-webpack": "5.0.1",
-    "mocha": "11.8.0",
-    "nyc": "17.1.0",
+    "mocha": "12.0.3",
+    "nyc": "18.0.0",
     "protobufjs": "8.8.0",
     "protobufjs-cli": "2.5.7",
     "ts-loader": "9.5.7",
@@ -89,12 +102,11 @@
     "webpack": "5.108.4"
   },
   "dependencies": {
-    "@opentelemetry/api-logs": "0.300.0-development.0",
-    "@opentelemetry/core": "3.0.0-development.0",
-    "@opentelemetry/resources": "3.0.0-development.0",
-    "@opentelemetry/sdk-logs": "0.300.0-development.0",
-    "@opentelemetry/sdk-metrics": "3.0.0-development.0",
-    "@opentelemetry/sdk-trace": "3.0.0-development.0"
+    "@opentelemetry/core": "3.0.0-rc.0",
+    "@opentelemetry/resources": "3.0.0-rc.0",
+    "@opentelemetry/sdk-logs": "3.0.0-rc.0",
+    "@opentelemetry/sdk-metrics": "3.0.0-rc.0",
+    "@opentelemetry/sdk-trace": "3.0.0-rc.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-transformer",
   "sideEffects": false

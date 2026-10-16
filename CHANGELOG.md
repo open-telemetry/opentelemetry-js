@@ -19,14 +19,74 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :bug: Bug Fixes
 
-* fix(sdk-metrics): guard against a missing or empty name to MeterProvider#getMeter [#7105](https://github.com/open-telemetry/opentelemetry-js/pull/7105) @trentm
+* fix(core): no longer *drop* an attribute value that is an object that has `undefined` properties [#7207](https://github.com/open-telemetry/opentelemetry-js/issues/7207) @trentm
+  * `isAnyValue()` now returns true for `{aStr: 'bob', anUndefined: undefined}`. This restores the behavior of the old `isLogAttributeValue` from version 2.x of the `sdk-logs` package.
+  * "Cleaning" of attributes, by `cleanAttributes()` and `maybeAddAttribute()`, will now drop undefined properties from objects. For example, `logger.emit(attributes: {myAttr: {aStr: 'bob', anUndefined: undefined}, ...)` will include `attributes: {myAttr: {aStr: 'bob'}}`.
 
 ### :books: Documentation
 
 ### :house: Internal
 
+## 3.0.0-rc.0
+
+### :boom: Breaking Changes
+
+* feat!: replace the `browser` field in `package.json` with `#platform` subpath imports [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
+  * Resolvers with the `node` condition load the Node.js build; all others load the browser build. Bundlers without `imports` support fail; see the migration guide.
+  * webpack needs 5.54 or later. Parcel needs package exports enabled and cannot resolve `#platform` from `require()`.
+  * Root type declarations describe the Node.js build.
+* feat(resources)!: remove the `./detectors/platform` and `./detectors/platform/browser` subpath exports; import from the package root [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
+* feat(core, sdk-trace, sdk-logs, exporter-zipkin)!: remove the `./platform` and `./platform/browser` subpath exports; import from the package root [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
+* fix(sdk-logs)!: replace `LoggerConfig.disabled` with `enabled` to match the specification [#7160](https://github.com/open-telemetry/opentelemetry-js/issues/7160)
+  * Replace `disabled: true` with `enabled: false`, and `disabled: false` with `enabled: true`. Loggers remain enabled by default.
+
+### :rocket: Features
+
+* chore(sdk-logs): mark `@opentelemetry/sdk-logs` as stable [#7143](https://github.com/open-telemetry/opentelemetry-js/issues/7143) @trentm
+* feat(sdk-trace, sdk-logs): add the browser-only `disableAutoFlushOnDocumentHide` to `BatchSpanProcessorOptions` and `BatchLogRecordProcessorOptions`, deprecate `BatchSpanProcessorBrowserOptions` and `BatchLogRecordProcessorBrowserOptions` [#7140](https://github.com/open-telemetry/opentelemetry-js/pull/7140) @overbalance
+
+### :bug: Bug Fixes
+
+* fix(sdk-trace): make the Node.js `RandomIdGenerator` id generators prototype methods, so subclasses can override them [#7190](https://github.com/open-telemetry/opentelemetry-js/pull/7190) @overbalance
+* fix(sdk-logs): report a rejected document-hide flush to the global error handler [#7187](https://github.com/open-telemetry/opentelemetry-js/pull/7187) @overbalance
+* fix(sdk-trace): count attributes passed to `startSpan` toward `attributeCountLimit` [#7176](https://github.com/open-telemetry/opentelemetry-js/pull/7176) @overbalance
+* fix(resources): stop reading `globalThis.process` in the browser build [#7173](https://github.com/open-telemetry/opentelemetry-js/pull/7173) @overbalance
+* fix(core): return `false` instead of `undefined` from the browser `getBooleanFromEnv` [#7188](https://github.com/open-telemetry/opentelemetry-js/pull/7188) @overbalance
+
+### :house: Internal
+
+* build: lint published packages for unused dependencies with knip, as part of `npm run lint` [#7200](https://github.com/open-telemetry/opentelemetry-js/pull/7200) @overbalance
+* chore(exporter-zipkin): move `@opentelemetry/resources` to `devDependencies`, since only tests use it [#7200](https://github.com/open-telemetry/opentelemetry-js/pull/7200) @overbalance
+* build: fail the tsdown build when its output includes a module from outside the package [#7195](https://github.com/open-telemetry/opentelemetry-js/pull/7195) @overbalance
+* refactor(sdk-trace): remove the `pagehide` listener from the browser `BatchSpanProcessor`, it was registered on `document` and never ran, and `visibilitychange` already flushes on unload [#7153](https://github.com/open-telemetry/opentelemetry-js/pull/7153) @adityareddy-dev
+* refactor(sdk-logs): remove the `pagehide` listener from the browser `BatchLogRecordProcessor`, it was registered on `document` and never ran, and `visibilitychange` already flushes on unload [#7153](https://github.com/open-telemetry/opentelemetry-js/pull/7153) @adityareddy-dev
+* refactor(sdk-trace, sdk-logs, sdk-metrics): type timers with `ReturnType<typeof setTimeout>` instead of `NodeJS.Timeout` [#7174](https://github.com/open-telemetry/opentelemetry-js/pull/7174) @overbalance
+
+## 3.0.0-development.1
+
+### :boom: Breaking Changes
+
+* chore(sdk-trace-base, sdk-trace-web)!: remove the `@opentelemetry/sdk-trace-base` and `@opentelemetry/sdk-trace-web` packages [#7117](https://github.com/open-telemetry/opentelemetry-js/issues/7117)
+  * The sdk-trace-base, sdk-trace-web, and sdk-trace-node packages have been replaced by the `@opentelemetry/sdk-trace` package.
+    See the [3.x migration guide](doc/3.x/migration-guide.md) for full migration instructions.
+
+### :bug: Bug Fixes
+
+* fix(sdk-metrics): guard against a missing or empty name to MeterProvider#getMeter [#7105](https://github.com/open-telemetry/opentelemetry-js/pull/7105) @trentm
+* fix: resolve the ESM build through the `default` export condition instead of `import`, so a resolver that activates neither `import` nor `require` still finds an entry point [#7132](https://github.com/open-telemetry/opentelemetry-js/pull/7132) @overbalance
+
+### :house: Internal
+
 * chore: declare the Node.js and npm version floors that the tsdown build requires via `devEngines` [#7093](https://github.com/open-telemetry/opentelemetry-js/pull/7093) @overbalance
   * The migration to tsdown raised the toolchain a contributor needs to build this repo, but nothing declared it. Contributors now build on Node.js `^24.11.1 || >=26.0.0` with npm `>=11.10.0`; both are advisory and warn rather than fail. The published packages are unaffected and still support Node.js `>=22.15.0`, which the test matrix continues to cover.
+* test(bundler-tests): typecheck packages under legacy module resolution [#7127](https://github.com/open-telemetry/opentelemetry-js/pull/7127) @overbalance
+* chore: remove the redundant `module` field from `package.json`; bundlers resolve the ESM build through the `exports` map [#7130](https://github.com/open-telemetry/opentelemetry-js/pull/7130) @overbalance
+* test(bundler-tests): bundle the platform packages for iOS and Android with Metro and Expo, and load them under Jest's jsdom environment [#7131](https://github.com/open-telemetry/opentelemetry-js/pull/7131) @overbalance
+* fix(verify-pack): read the npm 12 `pack --json` output, which is keyed by package name instead of an array [#7133](https://github.com/open-telemetry/opentelemetry-js/pull/7133) @overbalance
+* fix(karma): resolve plugins and the `process` shim from the repo root, so browser tests run with isolated installs [#7137](https://github.com/open-telemetry/opentelemetry-js/pull/7137) @overbalance
+* fix(nx): key the `version` target defaults by the target name, so a cache hit restores the generated `src/version.ts` [#7134](https://github.com/open-telemetry/opentelemetry-js/pull/7134) @overbalance
+* fix(nx): make the `test`, `test:browser` and `test:webworker` targets compile their dependencies first, since tests load dependencies from their `dist` [#7139](https://github.com/open-telemetry/opentelemetry-js/pull/7139) @overbalance
+* fix(verify-pack): extract tarballs under the root `node_modules`, so workspace dependencies resolve and entry points load fully instead of being skipped [#7138](https://github.com/open-telemetry/opentelemetry-js/pull/7138) @overbalance
 
 ## 3.0.0-development.0
 
@@ -89,6 +149,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 * fix(sdk-trace-base): avoid a Webpack self-reference error in CommonJS output [#6981](https://github.com/open-telemetry/opentelemetry-js/issues/6981) @sansynx
 * fix(sdk-metrics): ignore `Infinity` in exponential histograms [#7015](https://github.com/open-telemetry/opentelemetry-js/pull/7015) @mwear
+* fix(core): cap tracestate list-members when calling `TraceState.set()` so a 32-member list cannot grow past the W3C limit [#6964](https://github.com/open-telemetry/opentelemetry-js/pull/6964) @Zuhef
 
 ### :house: Internal
 

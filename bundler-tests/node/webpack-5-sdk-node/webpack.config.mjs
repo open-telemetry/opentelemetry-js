@@ -11,7 +11,8 @@ export default {
   resolve: {
     mainFields: ['main'],
   },
-  ignoreWarnings: [/Critical dependency/],
+  // debug's optional supports-color require only resolves when it is hoisted.
+  ignoreWarnings: [/Critical dependency/, /Can't resolve 'supports-color'/],
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),

@@ -32,6 +32,30 @@ export class TraceStateImpl implements TraceState {
   set(key: string, value: string): TraceStateImpl {
     // TODO: Benchmark the different approaches(map vs list) and
     // use the faster one.
+    const currValue = this._internalState.get(key);
+
+    // Get the length the serialized list would have after the mutation
+    // - for existing keys only the length of the value changes
+    // - for new keys it is the key & value length plus
+    //   - +1 for the key/value splitter
+    //   - +1 for the separator if there are other keys
+    let newLength = this.serialize().length;
+    if (typeof currValue === 'string') {
+      newLength += value.length - currValue.length;
+    } else {
+      // A list can hold at most 32 list-members, so a new key is only
+      // accepted while there is room for it. Updating an existing key does
+      // not change the count and is always allowed.
+      if (this._internalState.size >= MAX_TRACE_STATE_ITEMS) {
+        return this;
+      }
+      newLength +=
+        key.length + value.length + (this._internalState.size > 0 ? 2 : 1);
+    }
+    if (newLength > MAX_TRACE_STATE_LEN) {
+      return this;
+    }
+
     const traceState = this._clone();
     if (traceState._internalState.has(key)) {
       traceState._internalState.delete(key);

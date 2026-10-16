@@ -11,5 +11,5 @@ export {
   osDetector,
   processDetector,
   serviceInstanceIdDetector,
-} from './platform';
+} from '#platform';
 export { noopDetector } from './NoopDetector';

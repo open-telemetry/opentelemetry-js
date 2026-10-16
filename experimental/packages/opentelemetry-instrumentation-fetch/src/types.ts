@@ -32,3 +32,9 @@ export interface SpanData {
   spanUrl: string;
   startTime: HrTime;
 }
+
+export type PropagateTraceHeaderCorsUrl = string | RegExp;
+
+export type PropagateTraceHeaderCorsUrls =
+  | PropagateTraceHeaderCorsUrl
+  | PropagateTraceHeaderCorsUrl[];

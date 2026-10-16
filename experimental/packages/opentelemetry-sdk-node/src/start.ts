@@ -10,12 +10,13 @@ import {
   context,
   diag,
   DiagConsoleLogger,
+  logs,
   metrics,
   trace,
   propagation,
 } from '@opentelemetry/api';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
-import { logs } from '@opentelemetry/api-logs';
+import type { SDKComponents, SDKOptions } from './types';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import {
   diagLogLevelFromString,

@@ -1,7 +1,7 @@
 # Overview
 
 This example shows how to
-use [@opentelemetry/sdk-trace-web](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-web)
+use [@opentelemetry/sdk-trace](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-trace)
 with different plugins and setup to instrument your JavaScript code running in the browser.
 
 ## Installation
@@ -119,12 +119,6 @@ Included Components
 
 - TracerProvider
 - ZipkinExporter
-
-## Useful links
-
-- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For more information on web tracing,
-  visit: <https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-web>
 
 ## LICENSE
 
