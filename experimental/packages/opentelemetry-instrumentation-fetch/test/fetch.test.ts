@@ -254,6 +254,18 @@ describe('fetch', () => {
       fetchInstrumentation = undefined;
     });
 
+    it('should re-enable without wrapping fetch twice', () => {
+      fetchInstrumentation = new FetchInstrumentation();
+      fetchInstrumentation.disable();
+      fetchInstrumentation.enable();
+      assert.strictEqual(fetchInstrumentation.isEnabled(), true);
+      assert.ok(isWrapped(window.fetch));
+      assert.ok(
+        !isWrapped(window.fetch.__original),
+        'fetch must not be double-wrapped'
+      );
+    });
+
     describe('when the fetch property cannot be wrapped', () => {
       // Simulate the production failure mode (third-party scripts locking
       // `globalThis.fetch` via `Object.defineProperty` with `writable: false,

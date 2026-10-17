@@ -13,40 +13,55 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :boom: Breaking Changes
 
-* feat!: replace the top-level `browser` field in `package.json` with `#platform` subpath imports [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
-  * Resolvers that apply the `node` condition, such as Node.js, load the Node.js implementation. All others, including browsers, web workers, edge runtimes and React Native, load the browser implementation with no configuration. Bundlers without `imports` support fail to resolve `#platform`; see the migration guide.
-  * webpack 5 needs `enhanced-resolve` 5.8.2 or later, which webpack 5.54 and later require.
-  * Parcel needs package exports enabled, and cannot resolve `#platform` from CommonJS `require()`.
-  * The package roots' type declarations describe the Node.js implementation.
-* feat(resources)!: remove the `./detectors/platform` and `./detectors/platform/browser` subpath exports [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
-  * Import the detectors from the package root instead.
-* feat(core, sdk-trace, sdk-logs, exporter-zipkin)!: remove the `./platform` and `./platform/browser` subpath exports [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
-  * Import from the package root instead.
+### :rocket: Features
+
+* feat(sdk-trace, sdk-logs): include the `cause` chain and the `errors` of an `AggregateError` in the `exception.stacktrace` attribute when recording an exception [#5600](https://github.com/open-telemetry/opentelemetry-js/issues/5600) @SahinurDEV
+  * The stack of the recorded exception is kept as-is; nested errors are appended after it, a `cause` on a line prefixed with `Caused by:` and each `AggregateError` child indented and prefixed with `[errors][<index>]:`.
+
+### :bug: Bug Fixes
+
+* fix(core): no longer *drop* an attribute value that is an object that has `undefined` properties [#7207](https://github.com/open-telemetry/opentelemetry-js/issues/7207) @trentm
+  * `isAnyValue()` now returns true for `{aStr: 'bob', anUndefined: undefined}`. This restores the behavior of the old `isLogAttributeValue` from version 2.x of the `sdk-logs` package.
+  * "Cleaning" of attributes, by `cleanAttributes()` and `maybeAddAttribute()`, will now drop undefined properties from objects. For example, `logger.emit(attributes: {myAttr: {aStr: 'bob', anUndefined: undefined}, ...)` will include `attributes: {myAttr: {aStr: 'bob'}}`.
+
+### :books: Documentation
+
+### :house: Internal
+
+## 3.0.0-rc.0
+
+### :boom: Breaking Changes
+
+* feat!: replace the `browser` field in `package.json` with `#platform` subpath imports [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
+  * Resolvers with the `node` condition load the Node.js build; all others load the browser build. Bundlers without `imports` support fail; see the migration guide.
+  * webpack needs 5.54 or later. Parcel needs package exports enabled and cannot resolve `#platform` from `require()`.
+  * Root type declarations describe the Node.js build.
+* feat(resources)!: remove the `./detectors/platform` and `./detectors/platform/browser` subpath exports; import from the package root [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
+* feat(core, sdk-trace, sdk-logs, exporter-zipkin)!: remove the `./platform` and `./platform/browser` subpath exports; import from the package root [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
 * fix(sdk-logs)!: replace `LoggerConfig.disabled` with `enabled` to match the specification [#7160](https://github.com/open-telemetry/opentelemetry-js/issues/7160)
   * Replace `disabled: true` with `enabled: false`, and `disabled: false` with `enabled: true`. Loggers remain enabled by default.
 
 ### :rocket: Features
 
 * chore(sdk-logs): mark `@opentelemetry/sdk-logs` as stable [#7143](https://github.com/open-telemetry/opentelemetry-js/issues/7143) @trentm
-* feat(sdk-trace): add `disableAutoFlushOnDocumentHide` to `BatchSpanProcessorOptions` and deprecate `BatchSpanProcessorBrowserOptions` [#7140](https://github.com/open-telemetry/opentelemetry-js/pull/7140) @overbalance
-  * The option applies only in browsers and is ignored in Node.js.
-* feat(sdk-logs): add `disableAutoFlushOnDocumentHide` to `BatchLogRecordProcessorOptions` and deprecate `BatchLogRecordProcessorBrowserOptions` [#7140](https://github.com/open-telemetry/opentelemetry-js/pull/7140) @overbalance
-  * The option applies only in browsers and is ignored in Node.js.
-* feat(sdk-trace, sdk-logs): include the `cause` chain and the `errors` of an `AggregateError` in the `exception.stacktrace` attribute when recording an exception [#5600](https://github.com/open-telemetry/opentelemetry-js/issues/5600) @SahinurDEV
-  * The stack of the recorded exception is kept as-is; nested errors are appended after it, a `cause` on a line prefixed with `Caused by:` and each `AggregateError` child indented and prefixed with `[errors][<index>]:`.
+* feat(sdk-trace, sdk-logs): add the browser-only `disableAutoFlushOnDocumentHide` to `BatchSpanProcessorOptions` and `BatchLogRecordProcessorOptions`, deprecate `BatchSpanProcessorBrowserOptions` and `BatchLogRecordProcessorBrowserOptions` [#7140](https://github.com/open-telemetry/opentelemetry-js/pull/7140) @overbalance
 
 ### :bug: Bug Fixes
 
+* fix(sdk-trace): make the Node.js `RandomIdGenerator` id generators prototype methods, so subclasses can override them [#7190](https://github.com/open-telemetry/opentelemetry-js/pull/7190) @overbalance
+* fix(sdk-logs): report a rejected document-hide flush to the global error handler [#7187](https://github.com/open-telemetry/opentelemetry-js/pull/7187) @overbalance
 * fix(sdk-trace): count attributes passed to `startSpan` toward `attributeCountLimit` [#7176](https://github.com/open-telemetry/opentelemetry-js/pull/7176) @overbalance
-* fix(resources): read `process.argv0` for the default service name through `#platform`, so the browser build no longer touches `globalThis.process` [#7173](https://github.com/open-telemetry/opentelemetry-js/pull/7173) @overbalance
-
-### :books: Documentation
+* fix(resources): stop reading `globalThis.process` in the browser build [#7173](https://github.com/open-telemetry/opentelemetry-js/pull/7173) @overbalance
+* fix(core): return `false` instead of `undefined` from the browser `getBooleanFromEnv` [#7188](https://github.com/open-telemetry/opentelemetry-js/pull/7188) @overbalance
 
 ### :house: Internal
 
+* build: lint published packages for unused dependencies with knip, as part of `npm run lint` [#7200](https://github.com/open-telemetry/opentelemetry-js/pull/7200) @overbalance
+* chore(exporter-zipkin): move `@opentelemetry/resources` to `devDependencies`, since only tests use it [#7200](https://github.com/open-telemetry/opentelemetry-js/pull/7200) @overbalance
+* build: fail the tsdown build when its output includes a module from outside the package [#7195](https://github.com/open-telemetry/opentelemetry-js/pull/7195) @overbalance
 * refactor(sdk-trace): remove the `pagehide` listener from the browser `BatchSpanProcessor`, it was registered on `document` and never ran, and `visibilitychange` already flushes on unload [#7153](https://github.com/open-telemetry/opentelemetry-js/pull/7153) @adityareddy-dev
 * refactor(sdk-logs): remove the `pagehide` listener from the browser `BatchLogRecordProcessor`, it was registered on `document` and never ran, and `visibilitychange` already flushes on unload [#7153](https://github.com/open-telemetry/opentelemetry-js/pull/7153) @adityareddy-dev
-* refactor(sdk-trace, sdk-logs, sdk-metrics): type batch and periodic timers with `ReturnType<typeof setTimeout>` instead of `NodeJS.Timeout`, so the shared code compiles without Node.js types [#7174](https://github.com/open-telemetry/opentelemetry-js/pull/7174) @overbalance
+* refactor(sdk-trace, sdk-logs, sdk-metrics): type timers with `ReturnType<typeof setTimeout>` instead of `NodeJS.Timeout` [#7174](https://github.com/open-telemetry/opentelemetry-js/pull/7174) @overbalance
 
 ## 3.0.0-development.1
 
