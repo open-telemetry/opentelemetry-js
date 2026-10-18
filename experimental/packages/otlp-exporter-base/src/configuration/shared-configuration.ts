@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { diag } from '@opentelemetry/api';
 import type { HeadersFactory } from './otlp-http-configuration';
 
 /**
@@ -27,6 +28,22 @@ export function validateTimeoutMillis(timeoutMillis: number) {
   throw new Error(
     `Configuration: timeoutMillis is invalid, expected number greater than 0 (actual: '${timeoutMillis}')`
   );
+}
+
+function validateMaxRequestSize(
+  maxRequestSize: number | undefined,
+  defaultMaxRequestSize: number | undefined
+): number | undefined {
+  if (
+    maxRequestSize == null ||
+    (Number.isFinite(maxRequestSize) && maxRequestSize >= 0)
+  ) {
+    return maxRequestSize;
+  }
+  diag.warn(
+    `Configuration: maxRequestSize is invalid, expected number greater than or equal to 0 (actual: ${maxRequestSize})`
+  );
+  return defaultMaxRequestSize;
 }
 
 export function wrapStaticHeadersInFunction(
@@ -63,10 +80,12 @@ export function mergeOtlpSharedConfigurationWithDefaults(
       userProvidedConfiguration.compression ??
       fallbackConfiguration.compression ??
       defaultConfiguration.compression,
-    maxRequestSize:
+    maxRequestSize: validateMaxRequestSize(
       userProvidedConfiguration.maxRequestSize ??
-      fallbackConfiguration.maxRequestSize ??
-      defaultConfiguration.maxRequestSize,
+        fallbackConfiguration.maxRequestSize ??
+        defaultConfiguration.maxRequestSize,
+      defaultConfiguration.maxRequestSize
+    ),
   };
 }
 

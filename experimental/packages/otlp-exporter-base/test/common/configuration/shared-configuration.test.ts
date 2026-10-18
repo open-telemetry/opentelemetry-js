@@ -4,6 +4,8 @@
  */
 
 import * as assert from 'assert';
+import * as sinon from 'sinon';
+import { diag } from '@opentelemetry/api';
 import type { OtlpSharedConfiguration } from '../../../src';
 import { mergeOtlpSharedConfigurationWithDefaults } from '../../../src';
 import { validateTimeoutMillis } from '../../../src/configuration/shared-configuration';
@@ -116,6 +118,10 @@ export function testSharedConfigBehavior<T extends OtlpSharedConfiguration>(
   });
 
   describe('maxRequestSize', function () {
+    afterEach(function () {
+      sinon.restore();
+    });
+
     it('uses user provided maxRequestSize over fallback', () => {
       const config = sut(
         {
@@ -142,6 +148,27 @@ export function testSharedConfigBehavior<T extends OtlpSharedConfiguration>(
       const config = sut({}, {}, testDefaults);
       assert.deepEqual(config.maxRequestSize, testDefaults.maxRequestSize);
     });
+    it('keeps 0 to disable the limit', () => {
+      const warnStub = sinon.stub(diag, 'warn');
+      const config = sut(
+        { maxRequestSize: 0 },
+        { maxRequestSize: 20 },
+        testDefaults
+      );
+      sinon.assert.notCalled(warnStub);
+      assert.strictEqual(config.maxRequestSize, 0);
+    });
+    for (const maxRequestSize of [-1, NaN, Infinity]) {
+      it(`warns and uses default when maxRequestSize is ${maxRequestSize}`, () => {
+        const warnStub = sinon.stub(diag, 'warn');
+        const config = sut({ maxRequestSize }, {}, testDefaults);
+        sinon.assert.calledOnceWithExactly(
+          warnStub,
+          `Configuration: maxRequestSize is invalid, expected number greater than or equal to 0 (actual: ${maxRequestSize})`
+        );
+        assert.strictEqual(config.maxRequestSize, testDefaults.maxRequestSize);
+      });
+    }
   });
 }
 
