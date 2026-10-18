@@ -23,96 +23,148 @@ const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
  * @deprecated Use TraceState from "@opentelemetry/core". This will be removed in the next major version.
  */
 export class TraceStateImpl implements TraceState {
-  private _internalState: Map<string, string> = new Map();
+  private _length: number;
+  private _rawTraceState: string;
+  private _internalState: Map<string, string> | undefined;
 
   constructor(rawTraceState?: string) {
-    if (rawTraceState) this._parse(rawTraceState);
+    this._rawTraceState =
+      typeof rawTraceState === 'string' ? rawTraceState : '';
+    this._length = this._rawTraceState.length;
   }
 
   set(key: string, value: string): TraceStateImpl {
-    // TODO: Benchmark the different approaches(map vs list) and
-    // use the faster one.
-    const traceState = this._clone();
-    if (traceState._internalState.has(key)) {
-      traceState._internalState.delete(key);
+    if (!validateKey(key) || !validateValue(value)) {
+      return this;
     }
-    traceState._internalState.set(key, value);
-    return traceState;
+
+    const currState = this._getState();
+    const currValue = currState.get(key);
+    // Get the new length depending if we already have a value or not
+    // - for existing keys we add the difference between the length of the values
+    // - for new keys is the key & value lenght plus
+    //   - +1 for the key/value splitter
+    //   - +1 for the separator if there are other keys
+    let newLength = this._length;
+    if (typeof currValue === 'string') {
+      newLength += value.length - currValue.length;
+    } else {
+      newLength += key.length + value.length + (currState.size > 0 ? 2 : 1);
+    }
+    if (newLength > MAX_TRACE_STATE_LEN) {
+      return this;
+    }
+
+    const newState = new Map(currState);
+    newState.delete(key);
+    newState.set(key, value);
+    return this._fromState(newState, newLength);
   }
 
   unset(key: string): TraceStateImpl {
-    const traceState = this._clone();
-    traceState._internalState.delete(key);
-    return traceState;
+    const currState = this._getState();
+    const currValue = currState.get(key);
+
+    // No need to create a new instance if the key does not exist
+    if (typeof currValue !== 'string') {
+      return this;
+    }
+
+    // Get the new length depending if we already have a value or not
+    // - for existing keys we substract key and value length plus
+    //   - +1 for the key/value splitter
+    //   - +1 for the separator if there are other keys
+    let newLength = this._length - (key.length + currValue.length + 1);
+    if (currState.size > 1) {
+      // remove separator from length if there's no key or only one.
+      newLength = newLength - 1;
+    }
+
+    const newState = new Map(currState);
+    newState.delete(key);
+    return this._fromState(newState, newLength);
   }
 
   get(key: string): string | undefined {
-    return this._internalState.get(key);
+    const currState = this._getState();
+    return currState.get(key);
   }
 
   serialize(): string {
-    return (
-      Array.from(this._internalState.keys())
-        // Use reduceRight() because keys are stored in reverse insertion order.
-        .reduceRight((agg: string[], key) => {
-          agg.push(key + LIST_MEMBER_KEY_VALUE_SPLITTER + this.get(key));
-          return agg;
-        }, [])
-        .join(LIST_MEMBERS_SEPARATOR)
-    );
+    // Maps put new entries at the end. We prepend the seralized entry
+    // to get the right order according to the spec (updated members go 1st)
+    let serialized = '';
+    let index = 0;
+    for (const entry of this._getState()) {
+      if (index > 0) {
+        serialized = LIST_MEMBERS_SEPARATOR + serialized;
+      }
+      serialized =
+        `${entry[0]}${LIST_MEMBER_KEY_VALUE_SPLITTER}${entry[1]}` + serialized;
+      index++;
+    }
+    return serialized;
   }
 
-  private _parse(rawTraceState: string) {
-    const vendorMembers = rawTraceState.split(LIST_MEMBERS_SEPARATOR);
-    // This Map will have the order reversed (most recent member first)
-    const vendorEntries = new Map<string, string>();
+  private _getState(): Map<string, string> {
+    if (this._internalState) {
+      return this._internalState;
+    }
+
+    // Not parsed yet, lets do it
+    const vendorMembers = this._rawTraceState.split(LIST_MEMBERS_SEPARATOR);
+
+    // This Map will have the order reversed
+    const vendorEntries = new Map();
     let currentLength = 0;
 
     for (const member of vendorMembers) {
-      const listMember = member.trim(); // Optional Whitespace (OWS) handling
-      const i = listMember.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
-      if (i === -1) {
+      const m = member.trim();
+      const idx = m.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
+      if (idx === -1) {
         continue;
       }
 
-      const key = listMember.slice(0, i);
-      const value = listMember.slice(i + 1);
+      const key = m.slice(0, idx);
+      const value = m.slice(idx + 1);
       if (!validateKey(key) || !validateValue(value)) {
-        // TODO: Consider to add warning log
         continue;
       }
 
-      // Skip the member if adding it would exceed the max tracestate
-      // length, but keep checking the remaining (older) members.
+      // Skip if adding the new member exceeds the length
       const futureLength =
-        currentLength + listMember.length + (vendorEntries.size > 0 ? 1 : 0);
+        currentLength + m.length + (vendorEntries.size > 0 ? 1 : 0);
       if (futureLength > MAX_TRACE_STATE_LEN) {
         continue;
       }
 
+      // All good, add it
       vendorEntries.set(key, value);
       currentLength = futureLength;
 
+      // Check if we reached the max items
       if (vendorEntries.size >= MAX_TRACE_STATE_ITEMS) {
         break;
       }
     }
 
-    // Reverse to match the internal reverse-insertion-order convention
-    // (oldest first) used by get()/serialize().
+    // Now we set the length & the Map in the right order
+    this._length = currentLength;
     this._internalState = new Map(
       Array.from(vendorEntries.entries()).reverse()
     );
+    return this._internalState;
   }
 
-  // @ts-expect-error TS6133 Accessed in tests only.
-  private _keys(): string[] {
-    return Array.from(this._internalState.keys()).reverse();
-  }
-
-  private _clone(): TraceStateImpl {
-    const traceState = new TraceStateImpl();
-    traceState._internalState = new Map(this._internalState);
+  private _fromState(
+    state: Map<string, string>,
+    length: number
+  ): TraceStateImpl {
+    const traceState = Object.create(
+      TraceStateImpl.prototype
+    ) as TraceStateImpl;
+    traceState._internalState = state;
+    traceState._length = length;
     return traceState;
   }
 }
