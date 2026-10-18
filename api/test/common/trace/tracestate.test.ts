@@ -5,7 +5,6 @@
 
 import * as assert from 'assert';
 import { createTraceState } from '../../../src/trace/internal/utils';
-import type { TraceStateImpl } from '../../../src/trace/internal/tracestate-impl';
 
 describe('TraceState', function () {
   describe('.serialize()', function () {
@@ -40,9 +39,70 @@ describe('TraceState', function () {
       assert.deepStrictEqual(state.serialize(), 'a=1');
       assert.strictEqual(orgState.serialize(), 'c=4,b=3,a=1');
     });
+
+    it('must not create a new createTraceState when the entry does not exist', function () {
+      const orgState = createTraceState('c=4,b=3,a=1');
+      const state = orgState.unset('d');
+      assert.strictEqual(orgState, state);
+      assert.deepStrictEqual(orgState.serialize(), 'c=4,b=3,a=1');
+    });
+
+    describe('when adding a new list member', function () {
+      it('must not create a new createTraceState if the value is to long', function () {
+        const orgState = createTraceState('a=1,b=2');
+        const state = orgState.set('c', '3'.repeat(257));
+        assert.strictEqual(orgState, state);
+        assert.deepStrictEqual(orgState.serialize(), 'a=1,b=2');
+      });
+
+      it('must not create a new createTraceState if makes exceed the total limit', function () {
+        const tracestate = 'a=' + '1'.repeat(200) + ',b=' + '2'.repeat(200);
+        const orgState = createTraceState(tracestate);
+        const state = orgState.set('c', '3'.repeat(200)); // this makes it exceed 512
+        assert.strictEqual(orgState, state);
+        assert.deepStrictEqual(orgState.serialize(), tracestate);
+      });
+    });
+
+    describe('when updating a list member', function () {
+      it('must not create a new createTraceState if the value is to long', function () {
+        const orgState = createTraceState('a=1,b=2');
+        const state = orgState.set('b', '3'.repeat(257));
+        assert.strictEqual(orgState, state);
+        assert.deepStrictEqual(orgState.serialize(), 'a=1,b=2');
+      });
+
+      it('must not create a new createTraceState if makes exceed the total limit', function () {
+        const tracestate = 'a=' + '1'.repeat(200) + ',b=' + '2'.repeat(200);
+        const orgState = createTraceState(tracestate);
+        const state = orgState.set('c', '3'.repeat(200)); // this makes it exceed 512
+        assert.strictEqual(orgState, state);
+        assert.deepStrictEqual(orgState.serialize(), tracestate);
+      });
+    });
   });
 
   describe('.parse()', function () {
+    it('must remove invalid entries when serializing', function () {
+      // valid
+      let tracestate = 'a=1';
+      let state = createTraceState(tracestate);
+      assert.deepStrictEqual(state.serialize(), tracestate);
+
+      // invalid: value exceeds 256 chars
+      tracestate = 'a=' + 'b'.repeat(512);
+      state = createTraceState(tracestate);
+      assert.deepStrictEqual(state.serialize(), '');
+
+      // invalid: too many entries
+      tracestate = new Array(32)
+        .fill(0)
+        .map((_: null, num: number) => `a${num}=${num}`)
+        .join(',');
+      state = createTraceState(tracestate + ',a32=32');
+      assert.deepStrictEqual(state.serialize(), tracestate);
+    });
+
     it('must successfully parse valid state value', function () {
       const state = createTraceState(
         'vendorname2=opaqueValue2,vendorname1=opaqueValue1'
@@ -68,7 +128,7 @@ describe('TraceState', function () {
       assert.deepStrictEqual(state.serialize(), 'c=d');
     });
 
-    it('must drop states which cannot be parsed', function () {
+    it('must skip list-members that cannot be parsed', function () {
       const state = createTraceState('a=1,b,c=3');
       assert.deepStrictEqual(state.get('a'), '1');
       assert.deepStrictEqual(state.get('b'), undefined);
@@ -76,9 +136,10 @@ describe('TraceState', function () {
       assert.deepStrictEqual(state.serialize(), 'a=1,c=3');
     });
 
-    it('must skip states that only have a single value with an equal sign', function () {
-      const state = createTraceState('a=1=');
+    it('must skip list-members that only have a single value with an equal sign', function () {
+      const state = createTraceState('a=1=,b=2');
       assert.deepStrictEqual(state.get('a'), undefined);
+      assert.deepStrictEqual(state.get('b'), '2');
     });
 
     it('must successfully parse valid state keys', function () {
@@ -96,20 +157,23 @@ describe('TraceState', function () {
     });
 
     it('must truncate states with too many items', function () {
-      const state = createTraceState(
-        new Array(33)
-          .fill(0)
-          .map((_: null, num: number) => `a${num}=${num}`)
-          .join(',')
-      ) as TraceStateImpl;
-      assert.deepStrictEqual(state['_keys']().length, 32);
-      assert.deepStrictEqual(state.get('a0'), '0');
-      assert.deepStrictEqual(state.get('a31'), '31');
-      assert.deepStrictEqual(
-        state.get('a32'),
-        undefined,
-        'should truncate from the tail'
-      );
+      const tracestate = new Array(33)
+        .fill(0)
+        .map((_: null, num: number) => `a${num}=${num}`);
+      const state = createTraceState(tracestate.join(','));
+
+      tracestate.forEach((member, index) => {
+        const [key, value] = member.split('=');
+        if (index < 32) {
+          assert.deepStrictEqual(state.get(key), value);
+        } else {
+          assert.deepStrictEqual(
+            state.get(key),
+            undefined,
+            'should truncate from the tail'
+          );
+        }
+      });
     });
 
     it('should not count invalid items towards max limit', function () {
@@ -122,14 +186,15 @@ describe('TraceState', function () {
       tracestate.splice(15, 0, 'invalid.middle.key.b=2');
       tracestate.splice(15, 0, 'invalid.middle.key.c=3');
 
-      const state = createTraceState(tracestate.join(',')) as TraceStateImpl;
+      const state = createTraceState(tracestate.join(','));
 
-      assert.deepStrictEqual(state['_keys']().length, 32);
-      assert.deepStrictEqual(state.get('a0'), '0');
-      assert.deepStrictEqual(state.get('a31'), '31');
+      assert.deepStrictEqual(state.get('invalid.prefix.key'), undefined);
       assert.deepStrictEqual(state.get('invalid.middle.key.a'), undefined);
       assert.deepStrictEqual(state.get('invalid.middle.key.b'), undefined);
       assert.deepStrictEqual(state.get('invalid.middle.key.c'), undefined);
+      for (let i = 0; i < 32; i++) {
+        assert.deepStrictEqual(state.get(`a${i}`), `${i}`);
+      }
     });
   });
 });
