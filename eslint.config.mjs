@@ -46,9 +46,6 @@ export default tseslint.config(
       'experimental/packages/otlp-transformer/test/generated/**',
       // protobuf-ts generated test fixtures (buf generate output, gitignored).
       'experimental/packages/opentelemetry-instrumentation-grpc/test/proto/**',
-      // protobuf-generated example sources.
-      'examples/grpc-js/helloworld_pb.js',
-      'examples/grpc-js/helloworld_grpc_pb.js',
       'semantic-conventions/src/experimental_attributes.ts',
       'semantic-conventions/src/experimental_metrics.ts',
       'semantic-conventions/src/stable_attributes.ts',
@@ -171,7 +168,6 @@ export default tseslint.config(
       'experimental/examples/**/*.{js,mjs,cjs}',
     ],
     languageOptions: {
-      sourceType: 'commonjs',
       globals: {
         ...globals.node,
         ...globals.mocha,
@@ -220,16 +216,6 @@ export default tseslint.config(
     files: ['packages/opentelemetry-context-zone-peer-dep/**/*.ts'],
     languageOptions: {
       globals: { Zone: 'readonly' },
-    },
-  },
-
-  // shim-opencensus carries an upstream OpenCensus header for one file.
-  {
-    files: [
-      'experimental/packages/shim-opencensus/src/OpenCensusMetricProducer.ts',
-    ],
-    rules: {
-      'yet-another-license-header/header': 'off',
     },
   },
 

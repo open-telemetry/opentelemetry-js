@@ -7,6 +7,7 @@ import { isValidSpanId, SpanKind } from '@opentelemetry/api';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import type { ReadableSpan } from '@opentelemetry/sdk-trace';
 import {
+  ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
   ATTR_NETWORK_PEER_ADDRESS,
@@ -34,7 +35,6 @@ export const assertSpan = (
     reqHeaders?: http.OutgoingHttpHeaders;
     path?: string | null;
     forceStatus?: SpanStatus;
-    serverName?: string;
     component: string;
     noNetPeer?: boolean; // we don't expect net peer info when request throw before being sent
     error?: Exception;
@@ -79,6 +79,14 @@ export const assertSpan = (
     }
   );
 
+  // A forced status comes from an exception, which carries its own error.type.
+  if (!validations.forceStatus) {
+    assert.strictEqual(
+      span.attributes[ATTR_ERROR_TYPE],
+      utils.parseErrorType(span.kind, validations.httpStatusCode)
+    );
+  }
+
   assert.ok(span.endTime, 'must be finished');
   assert.ok(hrTimeToNanoseconds(span.duration), 'must have positive duration');
 
@@ -115,13 +123,6 @@ export const assertSpan = (
       validations.path || validations.pathname,
       'must have url.path'
     );
-    if (validations.serverName) {
-      assert.ok(span.attributes[ATTR_SERVER_PORT], 'must have server.port');
-      assert.ok(
-        span.attributes[ATTR_NETWORK_PEER_ADDRESS],
-        'must have network.peer.address'
-      );
-    }
     assert.strictEqual(
       span.attributes[ATTR_URL_SCHEME],
       validations.component,

@@ -3,27 +3,26 @@
   "version": "1.43.0",
   "description": "OpenTelemetry semantic conventions",
   "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
   "exports": {
     ".": {
-      "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
-      },
       "require": {
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
+      },
+      "default": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
       }
     },
     "./incubating": {
-      "import": {
-        "types": "./dist/index-incubating.d.mts",
-        "default": "./dist/index-incubating.mjs"
-      },
       "require": {
         "types": "./dist/index-incubating.d.cts",
         "default": "./dist/index-incubating.cjs"
+      },
+      "default": {
+        "types": "./dist/index-incubating.d.mts",
+        "default": "./dist/index-incubating.mjs"
       }
     }
   },
@@ -34,9 +33,8 @@
     "clean": "rimraf dist build",
     "version": "node ../scripts/version-update.js",
     "watch": "tsdown --watch --no-clean",
-    "peer-api-check": "node ../scripts/peer-api-check.js",
-    "size-check": "npm run compile && mocha 'test/**/*.test.ts'",
-    "align-api-deps": "node ../scripts/align-api-deps.js"
+    "peer-api-check": "node ../scripts/peer-api-check.mjs",
+    "align-api-deps": "node ../scripts/align-api-deps.mjs"
   },
   "keywords": [
     "opentelemetry",
@@ -60,18 +58,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@size-limit/file": "^13.0.0",
-    "@size-limit/time": "^13.0.0",
-    "@size-limit/webpack": "^13.0.0",
-    "@types/mocha": "10.0.10",
     "@types/node": "^14.18.63",
-    "@types/sinon": "17.0.4",
-    "mocha": "11.8.0",
-    "nock": "13.5.6",
-    "nyc": "17.1.0",
-    "sinon": "18.0.1",
-    "size-limit": "^13.0.0",
-    "ts-node": "10.9.2",
     "typescript": "5.2.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/semantic-conventions",

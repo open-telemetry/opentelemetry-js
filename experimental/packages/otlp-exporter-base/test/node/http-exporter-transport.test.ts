@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { createHttpExporterTransport } from '../../src/transport/http-exporter-transport';
-import { MAX_RESPONSE_BODY_SIZE } from '../../src/transport/http-transport-utils';
+import { createHttpExporterTransport } from '../../src/platform/node/transport/http-exporter-transport';
+import { MAX_RESPONSE_BODY_SIZE } from '../../src/platform/node/transport/http-transport-utils';
 import * as http from 'http';
 import * as assert from 'assert';
 import * as sinon from 'sinon';

@@ -37,7 +37,6 @@ export class TraceStateImpl implements TraceState {
     if (!validateKey(key) || !validateValue(value)) {
       return this;
     }
-
     const currState = this._getState();
     const currValue = currState.get(key);
     // Get the new length depending if we already have a value or not
@@ -49,12 +48,17 @@ export class TraceStateImpl implements TraceState {
     if (typeof currValue === 'string') {
       newLength += value.length - currValue.length;
     } else {
+      // A list can hold at most 32 list-members, so a new key is only
+      // accepted while there is room for it. Updating an existing key does
+      // not change the count and is always allowed.
+      if (currState.size >= MAX_TRACE_STATE_ITEMS) {
+        return this;
+      }
       newLength += key.length + value.length + (currState.size > 0 ? 2 : 1);
     }
     if (newLength > MAX_TRACE_STATE_LEN) {
       return this;
     }
-
     const newState = new Map(currState);
     newState.delete(key);
     newState.set(key, value);

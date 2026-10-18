@@ -9,6 +9,8 @@ const karmaBaseConfig = require('../../../karma.base');
 module.exports = config => {
   config.set(
     Object.assign({}, karmaBaseConfig, {
+      frameworks: karmaBaseConfig.frameworks.concat(['jquery-1.8.3']),
+      plugins: karmaBaseConfig.plugins.concat([require('karma-jquery')]),
       webpack: karmaWebpackConfig,
     })
   );

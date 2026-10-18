@@ -37,7 +37,7 @@ The current `SpanExporter` interface contains 2 methods:
 
 - `shutdown`: Shuts down the exporter. This is an opportunity for exporter to do any cleanup required. `Shutdown` should be called only once for each Exporter instance. After the call to `Shutdown` subsequent calls to Export are not allowed and should return `FailedNotRetryable` error.
 
-Please refer to the [Zipkin Exporter][zipkin-exporter] or [Jaeger Exporter][jaeger-exporter] for more comprehensive examples.
+Please refer to the [Zipkin Exporter][zipkin-exporter] for more comprehensive examples.
 
 ## Metrics
 
@@ -83,6 +83,5 @@ A `MetricReader` can initiate a metric collection request with `MetricReader.col
 Please refer to the [Prometheus Exporter][prometheus-exporter] for more comprehensive examples.
 
 [zipkin-exporter]: https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-exporter-zipkin
-[jaeger-exporter]: https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-exporter-jaeger
 [otlp-exporter]: https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-exporter-metrics-otlp-grpc
 [prometheus-exporter]: https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-exporter-prometheus

@@ -28,6 +28,22 @@ function releaseLineOf(parsed) {
 }
 
 /**
+ * The bump type that finalizes an in-flight pre-release, i.e. the one the cycle was started
+ * with. Used to tell a maintainer which bump to select - see releaseLineOf().
+ *
+ * @param {string} current An in-flight pre-release version, e.g. `1.10.0-rc.0`.
+ * @returns {'patch' | 'minor' | 'major'}
+ * @throws {Error} If the version cannot be parsed.
+ */
+export function releaseLineOfVersion(current) {
+  const parsed = semver.parse(current);
+  if (parsed == null) {
+    throw new Error(`Cannot parse version "${current}"`);
+  }
+  return releaseLineOf(parsed);
+}
+
+/**
  * Compute the next version.
  *
  * @param {string} current Current version, e.g. `2.10.0` or `3.0.0-development.1`.

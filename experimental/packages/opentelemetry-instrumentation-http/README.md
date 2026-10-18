@@ -61,7 +61,6 @@ Options                                 | Type                                  
 `ignoreOutgoingRequestHook`             | `IgnoreOutgoingRequestFunction`            | Function for filtering outgoing requests. HTTP instrumentation will not trace outgoing requests for which the function returns `true`.
 `disableOutgoingRequestInstrumentation` | `boolean`                                  | Set to true to avoid instrumenting outgoing requests at all. This can be helpful when another instrumentation handles outgoing requests.
 `disableIncomingRequestInstrumentation` | `boolean`                                  | Set to true to avoid instrumenting incoming requests at all. This can be helpful when another instrumentation handles incoming requests.
-`serverName`                            | `string`                                   | **Deprecated.** No longer used. Stable HTTP semantic conventions do not include the `http.server_name` attribute; this option has no effect.
 `requireParentforOutgoingSpans`         | Boolean                                    | Require that is a parent span to create new span for outgoing requests.
 `requireParentforIncomingSpans`         | Boolean                                    | Require that is a parent span to create new span for incoming requests.
 `redactedQueryParams`                   | `string[]`                                 | **Experimental.** Query parameter names whose values are redacted on outgoing (client) spans. Replaces the built-in list. See [Query parameter redaction](#query-parameter-redaction).
@@ -136,7 +135,6 @@ v1.23.0 semconv                     | Short Description
 (not included)                      | The size of the uncompressed response payload body after transport decoding. (In semconv v1.23.0 this is defined by `http.response.body.size`, which is experimental and opt-in.)
 no change                           | The matched route (path template).
 `url.scheme`                        | The URI scheme identifying the used protocol
-`server.address`                    | The primary server name of the matched virtual host
 `http.response.status_code`         | HTTP response status code
 `url.path` and `url.query`          | The URI path and query component
 `url.full`                          | Full HTTP request URL in the form `scheme://host[:port]/path?query[#fragment]`

@@ -209,7 +209,6 @@ describe('create-from-config', () => {
           { baggage: null },
           { b3: null },
           { b3multi: null },
-          { jaeger: null },
         ],
       });
       assert.deepEqual(propagator?.fields(), [
@@ -222,7 +221,6 @@ describe('create-from-config', () => {
         'x-b3-flags',
         'x-b3-sampled',
         'x-b3-parentspanid',
-        'uber-trace-id',
       ]);
     });
 

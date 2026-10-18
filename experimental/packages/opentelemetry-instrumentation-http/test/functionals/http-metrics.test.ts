@@ -32,7 +32,7 @@ instrumentation.disable();
 
 import * as http from 'http';
 import { getRPCMetadata, RPCType } from '@opentelemetry/core';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 
 let server: http.Server;
 const serverPort = 22346;
@@ -53,7 +53,7 @@ describe('metrics', () => {
   let contextManager: ContextManager;
 
   beforeEach(() => {
-    contextManager = new AsyncHooksContextManager().enable();
+    contextManager = new AsyncLocalStorageContextManager().enable();
     context.setGlobalContextManager(contextManager);
     instrumentation['_updateMetricInstruments']();
     metricsMemoryExporter.reset();

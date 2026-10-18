@@ -10,8 +10,7 @@ import {
   writeHrTimeAsFixed64,
 } from '../../src/common/protobuf/common-serializer';
 import * as signals from '../generated/signals';
-import type { AnyValue } from '@opentelemetry/api-logs';
-import type { HrTime } from '@opentelemetry/api';
+import type { AnyValue, HrTime } from '@opentelemetry/api';
 import { uint8ArrayToBase64 } from '../utils';
 
 /**

@@ -11,13 +11,15 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :bug: Bug Fixes
 
+* fix: resolve the ESM build through the `default` export condition instead of `import` [#7132](https://github.com/open-telemetry/opentelemetry-js/pull/7132) @overbalance
+
 ### :books: Documentation
 
 ### :house: Internal
 
-* build: migrate the package build from `tsc` to `tsdown`, emitting dual CJS/ESM output from a single `dist/` directory [#6293](https://github.com/open-telemetry/opentelemetry-js/pull/6293) @overbalance
-  * The public entry points are unchanged: `@opentelemetry/semantic-conventions` and `@opentelemetry/semantic-conventions/incubating`. This package already declared an `exports` map, so deep imports such as `@opentelemetry/semantic-conventions/build/src/...` were rejected before this change and continue to be.
-  * The emitted files moved out of `build/src` (CJS), `build/esm` and `build/esnext` (ESM) into `dist/`, using `.cjs`/`.mjs` extensions with matching `.d.cts`/`.d.mts` declarations. The non-standard `esnext` condition has been dropped in favour of the standard `import`/`require` conditions.
+* build: migrate the build from `tsc` to `tsdown` [#6293](https://github.com/open-telemetry/opentelemetry-js/pull/6293) @overbalance
+  * Output moved from `build/` to `dist/` as `.cjs`/`.mjs`, and the non-standard `esnext` condition is dropped. Public entry points are unchanged.
+* chore: remove the redundant `module` field from `package.json` [#7130](https://github.com/open-telemetry/opentelemetry-js/pull/7130) @overbalance
 
 ## 1.43.0
 

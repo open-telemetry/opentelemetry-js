@@ -1,19 +1,18 @@
 {
   "name": "@opentelemetry/sdk-metrics",
-  "version": "2.11.0",
+  "version": "3.0.0-rc.0",
   "description": "OpenTelemetry metrics SDK",
   "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
   "exports": {
     ".": {
-      "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
-      },
       "require": {
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
+      },
+      "default": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
       }
     }
   },
@@ -32,8 +31,8 @@
     "version": "node ../../scripts/version-update.js",
     "watch": "tsdown --watch --no-clean",
     "prewatch": "node ../../scripts/version-update.js",
-    "peer-api-check": "node ../../scripts/peer-api-check.js",
-    "align-api-deps": "node ../../scripts/align-api-deps.js"
+    "peer-api-check": "node ../../scripts/peer-api-check.mjs",
+    "align-api-deps": "node ../../scripts/align-api-deps.mjs"
   },
   "keywords": [
     "opentelemetry",
@@ -45,7 +44,7 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "engines": {
-    "node": "^18.19.0 || >=20.6.0"
+    "node": ">=22.15.0"
   },
   "files": [
     "doc",
@@ -59,7 +58,7 @@
   "devDependencies": {
     "@babel/core": "7.29.7",
     "@babel/preset-env": "7.29.7",
-    "@opentelemetry/api": ">=1.9.0 <1.10.0",
+    "@opentelemetry/api": ">=1.9.0 <1.11.0 || 1.10.0-rc.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "@types/sinon": "17.0.4",
@@ -68,10 +67,10 @@
     "karma-chrome-launcher": "3.2.0",
     "karma-coverage": "2.2.1",
     "karma-mocha": "2.0.1",
-    "karma-spec-reporter": "0.0.36",
+    "karma-spec-reporter": "0.0.37",
     "karma-webpack": "5.0.1",
-    "mocha": "11.8.0",
-    "nyc": "17.1.0",
+    "mocha": "12.0.3",
+    "nyc": "18.0.0",
     "sinon": "18.0.1",
     "ts-loader": "9.5.7",
     "typescript": "5.2.2",
@@ -79,11 +78,11 @@
     "webpack-cli": "7.2.3"
   },
   "peerDependencies": {
-    "@opentelemetry/api": ">=1.9.0 <1.10.0"
+    "@opentelemetry/api": ">=1.9.0 <1.11.0 || 1.10.0-rc.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "2.11.0",
-    "@opentelemetry/resources": "2.11.0"
+    "@opentelemetry/core": "3.0.0-rc.0",
+    "@opentelemetry/resources": "3.0.0-rc.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-metrics",
   "sideEffects": false

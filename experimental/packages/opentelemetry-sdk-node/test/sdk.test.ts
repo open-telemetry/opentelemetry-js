@@ -9,13 +9,11 @@ import {
   trace,
   diag,
   DiagLogLevel,
+  logs,
   metrics,
   DiagConsoleLogger,
 } from '@opentelemetry/api';
-import {
-  AsyncHooksContextManager,
-  AsyncLocalStorageContextManager,
-} from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
 import {
   AggregationTemporality,
@@ -54,7 +52,6 @@ import {
   defaultResource,
 } from '@opentelemetry/resources';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { logs } from '@opentelemetry/api-logs';
 import {
   SimpleLogRecordProcessor,
   InMemoryLogRecordExporter,
@@ -119,6 +116,8 @@ describe('NodeSDK', () => {
 
   afterEach(() => {
     Sinon.restore();
+    delete process.env.OTEL_EXPORTER_PROMETHEUS_HOST;
+    delete process.env.OTEL_EXPORTER_PROMETHEUS_PORT;
   });
 
   describe('Basic Registration', () => {
@@ -279,7 +278,7 @@ describe('NodeSDK', () => {
       });
 
       const sdk = new NodeSDK({
-        metricReader: metricReader,
+        metricReaders: [metricReader],
         autoDetectResources: false,
       });
 
@@ -335,62 +334,6 @@ describe('NodeSDK', () => {
       // Verify that both metric readers are registered
       const sharedState = (meterProvider as any)['_sharedState'];
       assert.strictEqual(sharedState.metricCollectors.length, 2);
-
-      await sdk.shutdown();
-    });
-
-    it('should show deprecation warning when using metricReader option', async () => {
-      const exporter = new ConsoleMetricExporter();
-      const metricReader = new PeriodicExportingMetricReader({
-        exporter: exporter,
-        exportIntervalMillis: 100,
-        exportTimeoutMillis: 100,
-      });
-
-      const warnSpy = Sinon.spy(diag, 'warn');
-
-      const sdk = new NodeSDK({
-        metricReader: metricReader,
-        autoDetectResources: false,
-      });
-
-      sdk.start();
-
-      // Verify deprecation warning was shown
-      Sinon.assert.calledWith(
-        warnSpy,
-        "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
-      );
-
-      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
-
-      await sdk.shutdown();
-    });
-
-    it('should not show deprecation warning when using metricReaders option', async () => {
-      const exporter = new ConsoleMetricExporter();
-      const metricReader = new PeriodicExportingMetricReader({
-        exporter: exporter,
-        exportIntervalMillis: 100,
-        exportTimeoutMillis: 100,
-      });
-
-      const warnSpy = Sinon.spy(diag, 'warn');
-
-      const sdk = new NodeSDK({
-        metricReaders: [metricReader],
-        autoDetectResources: false,
-      });
-
-      sdk.start();
-
-      // Verify no metricReader deprecation warning was shown
-      Sinon.assert.neverCalledWith(
-        warnSpy,
-        "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
-      );
-
-      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
 
       await sdk.shutdown();
     });
@@ -559,7 +502,7 @@ describe('NodeSDK', () => {
         exporter: logRecordExporter,
       });
       const sdk = new NodeSDK({
-        logRecordProcessor: logRecordProcessor,
+        logRecordProcessors: [logRecordProcessor],
         autoDetectResources: false,
       });
 
@@ -620,7 +563,8 @@ describe('NodeSDK', () => {
 
     it('should register a context manager if only a context manager is provided', async () => {
       // arrange
-      const expectedContextManager = new AsyncHooksContextManager();
+      class MycontextManager extends AsyncLocalStorageContextManager {}
+      const expectedContextManager = new MycontextManager();
       const sdk = new NodeSDK({
         contextManager: expectedContextManager,
       });
@@ -735,7 +679,7 @@ describe('NodeSDK', () => {
     });
 
     const sdk = new NodeSDK({
-      metricReader: metricReader,
+      metricReaders: [metricReader],
       views: [
         {
           name: 'test-view',
@@ -1194,7 +1138,7 @@ describe('NodeSDK', () => {
       });
 
       const sdk = new NodeSDK({
-        metricReader: metricReader,
+        metricReaders: [metricReader],
         autoDetectResources: false,
       });
       sdk.start();
@@ -1257,7 +1201,7 @@ describe('NodeSDK', () => {
       });
       const sdk = new NodeSDK({
         idGenerator,
-        spanProcessor,
+        spanProcessors: [spanProcessor],
       });
       sdk.start();
 
@@ -1735,14 +1679,43 @@ describe('NodeSDK', () => {
 
     it('should use prometheus if that is set', async () => {
       process.env.OTEL_METRICS_EXPORTER = 'prometheus';
+      process.env.OTEL_EXPORTER_PROMETHEUS_HOST = '127.0.0.1';
+      process.env.OTEL_EXPORTER_PROMETHEUS_PORT = '1234';
       delete process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL;
+      const startServerStub = Sinon.stub(
+        PrometheusMetricExporter.prototype,
+        'startServer'
+      ).resolves();
       const sdk = new NodeSDK();
       sdk.start();
       const meterProvider = metrics.getMeterProvider();
       const sharedState = (meterProvider as any)['_sharedState'];
-      assert.ok(
-        sharedState.metricCollectors[0]._metricReader instanceof
-          PrometheusMetricExporter
+      const metricReader = sharedState.metricCollectors[0]._metricReader;
+      assert.ok(metricReader instanceof PrometheusMetricExporter);
+      assert.strictEqual(metricReader['_host'], '127.0.0.1');
+      assert.strictEqual(metricReader['_port'], 1234);
+      Sinon.assert.calledOnce(startServerStub);
+      await sdk.shutdown();
+    });
+
+    it('should use prometheus defaults for invalid environment values', async () => {
+      process.env.OTEL_METRICS_EXPORTER = 'prometheus';
+      process.env.OTEL_EXPORTER_PROMETHEUS_HOST = ' ';
+      process.env.OTEL_EXPORTER_PROMETHEUS_PORT = 'invalid';
+      delete process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL;
+      Sinon.stub(PrometheusMetricExporter.prototype, 'startServer').resolves();
+      const sdk = new NodeSDK();
+      sdk.start();
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      const metricReader = sharedState.metricCollectors[0]._metricReader;
+      assert.strictEqual(
+        metricReader['_host'],
+        PrometheusMetricExporter.DEFAULT_OPTIONS.host
+      );
+      assert.strictEqual(
+        metricReader['_port'],
+        PrometheusMetricExporter.DEFAULT_OPTIONS.port
       );
       await sdk.shutdown();
     });
@@ -1845,7 +1818,7 @@ describe('NodeSDK', () => {
       const exporter = new ConsoleSpanExporter();
       const spanProcessor = new SimpleSpanProcessor({ exporter });
       const sdk = new NodeSDK({
-        spanProcessor,
+        spanProcessors: [spanProcessor],
       });
       sdk.start();
       const listOfProcessors = getSdkSpanProcessors(sdk);
