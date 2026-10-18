@@ -19,6 +19,10 @@ describe('parseRetryAfterToMills', function () {
     [' 5 ', 5 * 1000],
     ['1000abc', undefined],
     ['not-a-date', undefined],
+    // Non-integers that Date would otherwise coerce into a bogus past
+    // timestamp (new Date('1.5') is Jan 5 2001) and retry immediately.
+    ['1.5', undefined],
+    ['+5', undefined],
     // future timestamp
     ['Fri, 20 Jan 2023 00:00:01 GMT', 1000],
     // Past timestamp

@@ -27,7 +27,17 @@ export function parseRetryAfterToMills(
     return seconds > 0 ? seconds * 1000 : -1;
   }
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After#directives
-  const delay = new Date(trimmedRetryAfter).getTime() - Date.now();
+  // Every HTTP-date form (RFC 9110: IMF-fixdate, RFC 850, asctime) begins with
+  // a day-of-week name. Requiring one stops `Date` from coercing non-date
+  // strings into bogus timestamps: `new Date('1.5')` is Jan 5 2001 and
+  // `new Date('+5')` is a 2001 date, both of which look like a past "HTTP-date"
+  // and would trigger an immediate retry.
+  const isHttpDate = /^(Mon|Tue|Wed|Thu|Fri|Sat|Sun)[a-z]*[,\s]/.test(
+    trimmedRetryAfter
+  );
+  const delay = isHttpDate
+    ? new Date(trimmedRetryAfter).getTime() - Date.now()
+    : NaN;
 
   if (Number.isNaN(delay)) {
     // Neither delay-seconds nor a parseable HTTP-date. Returning undefined
