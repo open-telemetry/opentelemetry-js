@@ -337,8 +337,12 @@ describe('startNodeSDK', function () {
     );
 
     const tracerProvider = trace.getTracerProvider();
-    const spanProcessors = (tracerProvider as any)._delegate
-      ._activeSpanProcessor._spanProcessors as SpanProcessor[];
+    assert.strictEqual(
+      tracerProvider,
+      setGlobalTracerProviderSpy.lastCall.args[0]
+    );
+    const spanProcessors = (tracerProvider as any)._activeSpanProcessor
+      ._spanProcessors as SpanProcessor[];
     assert.strictEqual(spanProcessors.length, 4);
 
     assert.ok(spanProcessors[0] instanceof BatchSpanProcessor);
@@ -523,7 +527,11 @@ describe('startNodeSDK', function () {
 
     const getSdkSpanProcessors = () => {
       const tracerProvider = trace.getTracerProvider();
-      return (tracerProvider as any)._delegate._activeSpanProcessor
+      assert.strictEqual(
+        tracerProvider,
+        setGlobalTracerProviderSpy.lastCall.args[0]
+      );
+      return (tracerProvider as any)._activeSpanProcessor
         ._spanProcessors as SpanProcessor[];
     };
 
