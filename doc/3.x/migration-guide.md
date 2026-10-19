@@ -217,9 +217,9 @@ import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace';
 const provider = new TracerProvider({
   spanProcessors: [
-    new BatchSpanProcessor(new OTLPTraceExporter({
+    new BatchSpanProcessor({exporter: new OTLPTraceExporter({
       endpoint: 'https://collector.example.com:4318/v1/traces',
-    }))
+    })})
   ]
 });
 ```
