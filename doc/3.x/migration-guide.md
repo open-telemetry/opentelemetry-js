@@ -206,9 +206,9 @@ import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace';
 const provider = new TracerProvider({
   spanProcessors: [
-    new BatchSpanProcessor(new JaegerExporter({
+    new BatchSpanProcessor({ exporter: new JaegerExporter({
       endpoint: 'https://collector.example.com:14268/api/traces',
-    }))
+    })})
   ]
 });
 
