@@ -25,6 +25,14 @@ describe('time', () => {
   });
 
   describe('#hrTime', () => {
+    beforeEach(() => {
+      // Keep Date.now() in step with the stubbed performance clock so these
+      // tests exercise conversion, not drift correction.
+      sinon
+        .stub(Date, 'now')
+        .callsFake(() => performance.timeOrigin + performance.now());
+    });
+
     it('should return hrtime now', () => {
       sinon.stub(performance, 'timeOrigin').value(11.5);
       sinon.stub(performance, 'now').callsFake(() => 11.3);
@@ -74,6 +82,97 @@ describe('time', () => {
     });
   });
 
+  describe('#hrTime drift correction', () => {
+    const timeOrigin = 1_000_000;
+    let perfNow: number;
+    let dateNow: number;
+
+    beforeEach(() => {
+      sinon.stub(performance, 'timeOrigin').value(timeOrigin);
+      sinon.stub(performance, 'now').callsFake(() => perfNow);
+      sinon.stub(Date, 'now').callsFake(() => dateNow);
+      // Anchor with both clocks agreeing, so earlier tests cannot leak state.
+      perfNow = 500;
+      dateNow = timeOrigin + perfNow;
+      hrTime();
+    });
+
+    it('should follow Date.now() after performance.now() pauses during a sleep', () => {
+      const sleepMs = 60 * 60 * 1000;
+      perfNow = 600;
+      dateNow = timeOrigin + perfNow + sleepMs;
+
+      assert.deepStrictEqual(hrTime(), [4600, 600000000]);
+    });
+
+    it('should not move a performance timestamp taken before a sleep', () => {
+      const sleepMs = 60 * 60 * 1000;
+      perfNow = 600;
+      dateNow = timeOrigin + perfNow + sleepMs;
+
+      assert.deepStrictEqual(hrTime(550), [1000, 550000000]);
+      assert.deepStrictEqual(timeInputToHrTime(550), [1000, 550000000]);
+    });
+
+    it('should correct a performance timestamp taken after a sleep', () => {
+      const sleepMs = 60 * 60 * 1000;
+      perfNow = 600;
+      dateNow = timeOrigin + perfNow + sleepMs;
+      hrTime();
+
+      perfNow = 700;
+      dateNow = timeOrigin + perfNow + sleepMs;
+      assert.deepStrictEqual(hrTime(650), [4600, 650000000]);
+      assert.deepStrictEqual(timeInputToHrTime(650), [4600, 650000000]);
+    });
+
+    it('should convert each performance timestamp with the drift of its segment', () => {
+      const sleepMs = 60 * 60 * 1000;
+      perfNow = 600;
+      dateNow = timeOrigin + perfNow + sleepMs;
+      hrTime();
+
+      perfNow = 800;
+      dateNow = timeOrigin + perfNow + 2 * sleepMs;
+      hrTime();
+
+      perfNow = 900;
+      dateNow = timeOrigin + perfNow + 2 * sleepMs;
+      assert.deepStrictEqual(hrTime(550), [1000, 550000000]);
+      assert.deepStrictEqual(hrTime(700), [4600, 700000000]);
+      assert.deepStrictEqual(hrTime(850), [8200, 850000000]);
+    });
+
+    it('should not re-anchor for divergence below the threshold', () => {
+      perfNow = 600.25;
+      dateNow = timeOrigin + 600 + 5;
+
+      assert.deepStrictEqual(hrTime(), [1000, 600250000]);
+    });
+
+    it('should re-anchor when Date.now() moves backwards past the threshold', () => {
+      const stepMs = 60 * 60 * 1000;
+      perfNow = 600;
+      dateNow = timeOrigin + perfNow + stepMs;
+      hrTime();
+
+      dateNow = timeOrigin + perfNow;
+      assert.deepStrictEqual(hrTime(), [1000, 600000000]);
+    });
+
+    it('should keep the anchor stable while clocks stay within the threshold', () => {
+      const sleepMs = 60 * 60 * 1000;
+      perfNow = 600;
+      dateNow = timeOrigin + perfNow + sleepMs;
+      hrTime();
+
+      // Date.now() jitter after the re-anchor must not move timestamps.
+      perfNow = 700.5;
+      dateNow = timeOrigin + 700 + sleepMs + 3;
+      assert.deepStrictEqual(hrTime(), [4600, 700500000]);
+    });
+  });
+
   describe('#timeInputToHrTime', () => {
     it('should convert Date hrTime', () => {
       const timeInput = new Date(1609297640313);
@@ -105,6 +204,8 @@ describe('time', () => {
 
     it('should convert performance.now() hrTime', () => {
       sinon.stub(performance, 'timeOrigin').value(111.5);
+      sinon.stub(performance, 'now').returns(20);
+      sinon.stub(Date, 'now').returns(131.5);
 
       const timeInput = 11.9;
       const output = timeInputToHrTime(timeInput);

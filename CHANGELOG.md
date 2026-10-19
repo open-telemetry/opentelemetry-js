@@ -17,6 +17,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :bug: Bug Fixes
 
+* fix(core): re-anchor `hrTime()` to `Date.now()` when the performance clock falls behind the wall clock, for example after the host sleeps. A passed performance timestamp keeps the correction from when it was taken [#7218](https://github.com/open-telemetry/opentelemetry-js/pull/7218) @overbalance
 * fix(core): no longer *drop* an attribute value that is an object that has `undefined` properties [#7207](https://github.com/open-telemetry/opentelemetry-js/issues/7207) @trentm
   * `isAnyValue()` now returns true for `{aStr: 'bob', anUndefined: undefined}`. This restores the behavior of the old `isLogAttributeValue` from version 2.x of the `sdk-logs` package.
   * "Cleaning" of attributes, by `cleanAttributes()` and `maybeAddAttribute()`, will now drop undefined properties from objects. For example, `logger.emit(attributes: {myAttr: {aStr: 'bob', anUndefined: undefined}, ...)` will include `attributes: {myAttr: {aStr: 'bob'}}`.
