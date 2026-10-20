@@ -132,7 +132,7 @@ import type { AnyValue, Attributes } from '@opentelemetry/api';
 
 Some JS SDK packages include separate Node.js and browser implementations of some code. These packages no longer ship a top-level `browser` field in `package.json`. Instead they resolve the appropriate implementation with [`package.json` conditions](https://nodejs.org/api/packages.html#conditional-exports) using the "exports" and "imports" fields. They select the Node.js implementation with the `node` condition on the `#platform` subpath under `imports`, and every other environment gets the browser implementation from the `require` and `default` branches.
 
-The SDK packages with platform-specific code are: `@opentelemetry/core`, `@opentelemetry/resources`, `@opentelemetry/sdk-trace`, `@opentelemetry/sdk-logs`, `@opentelemetry/instrumentation`, `@opentelemetry/exporter-zipkin`, `@opentelemetry/otlp-transformer` and the OTLP HTTP and protobuf exporters.
+The SDK packages with platform-specific code are: `@opentelemetry/core`, `@opentelemetry/resources`, `@opentelemetry/sdk-trace`, `@opentelemetry/sdk-logs`, `@opentelemetry/instrumentation`, `@opentelemetry/exporter-zipkin`, `@opentelemetry/otlp-transformer` and the OTLP HTTP and protobuf exporters. Their root type declarations describe the Node.js build.
 
 **Your bundler must support the `imports` and `exports` fields**; one without `imports` support fails to resolve `#platform`. Webpack 5 needs `enhanced-resolve` 5.8.2 or later, which webpack 5.54 and later require. Jest needs 29.4 or later. React Native needs Metro 0.81.3 or later: React Native 0.79 and later, or 0.76 to 0.78 with an updated Metro.
 
