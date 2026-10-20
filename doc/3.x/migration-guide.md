@@ -310,8 +310,7 @@ const instrumentations = [
 
 ### Removed: `TracerProviderOptions.forceFlushTimeoutMillis`
 
-`forceFlushTimeoutMillis` on `TracerProviderOptions` has been removed. Pass
-instead. The default timeout is 30000ms.
+`forceFlushTimeoutMillis` on `TracerProviderOptions` has been removed. Pass `{ timeoutMillis }` to `forceFlush()` instead. The default timeout is 30000ms.
 
 ```ts
 // before
