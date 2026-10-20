@@ -2,7 +2,7 @@
 
 > [!IMPORTANT]
 > The `@opentelemetry/sdk-trace-node` package has been removed in favor of `@opentelemetry/sdk-trace`.
-> See [the migration notes](../../doc/3.x/migration-guide.md#opentelemetrysdk-trace-node-package-removed).
+> See [the migration notes](../../doc/3.x/migration-guide.md#-opentelemetrysdk-trace-node-package-removed).
 >
 > Use [the "v2.11.0" git tag to see the package source code for the last sdk-trace-node release](https://github.com/open-telemetry/opentelemetry-js/tree/v2.11.0/packages/opentelemetry-sdk-trace-node).
 

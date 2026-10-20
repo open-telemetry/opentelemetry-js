@@ -2,7 +2,7 @@
 
 > [!IMPORTANT]
 > The `@opentelemetry/sdk-trace-web` package has been removed in favor of `@opentelemetry/sdk-trace`.
-> See [the migration notes](../../doc/3.x/migration-guide.md#opentelemetrysdk-trace-base-package-removed).
+> See [the migration notes](../../doc/3.x/migration-guide.md#-opentelemetrysdk-trace-base-package-removed).
 > See also the current, active development of a [Browser SDK in the opentelemetry-browser.git repo](https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/sdk/).
 >
 > Use [the "v2.11.0" git tag to see the package source code for the last sdk-trace-web release](https://github.com/open-telemetry/opentelemetry-js/tree/v2.11.0/packages/opentelemetry-sdk-trace-web).
