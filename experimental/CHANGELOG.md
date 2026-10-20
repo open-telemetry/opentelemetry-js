@@ -42,7 +42,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
   * The emitted files moved out of `build/src` (CJS), `build/esm` and `build/esnext` (ESM) into `dist/`, using `.cjs`/`.mjs` extensions with matching `.d.cts`/`.d.mts` declarations.
   * `<package>/package.json` is no longer importable for the same reason. Read a package's version from your own dependency metadata, or use `SDK_INFO` from `@opentelemetry/core` for the SDK version.
   * The non-standard `esnext` entry point has been removed; tools that preferred it fall back to `module` (ESM) or `main` (CJS).
-  * Packages that ship separate Node.js and browser implementations export them under explicit subpaths, for example `@opentelemetry/sdk-logs/platform`. If you depend on something that is only reachable through a deep import, please open an issue so it can be considered for the public API.
+  * If you depend on something that is only reachable through a deep import, please open an issue so it can be considered for the public API.
 * feat(sdk-node)!: remove `"jaeger"` propagator from `@opentelemetry/sdk-node` [#7077](https://github.com/open-telemetry/opentelemetry-js/pull/7077)
   * `OTEL_PROPAGATORS=jaeger` and `{ jaeger: null }` in the configuration object are no longer recognised. Replace with `"tracecontext"`.
   * See the [3.x migration guide](../doc/3.x/migration-guide.md) for full instructions.

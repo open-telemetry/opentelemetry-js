@@ -37,7 +37,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
   * The emitted files moved out of `build/src` (CJS), `build/esm` and `build/esnext` (ESM) into `dist/`, using `.cjs`/`.mjs` extensions with matching `.d.cts`/`.d.mts` declarations.
   * `<package>/package.json` is no longer importable for the same reason. Read a package's version from your own dependency metadata, or use `SDK_INFO` from `@opentelemetry/core` for the SDK version.
   * The non-standard `esnext` entry point has been removed; tools that preferred it fall back to `module` (ESM) or `main` (CJS).
-  * Packages that ship separate Node.js and browser implementations export them under explicit subpaths, for example `@opentelemetry/core/platform`. If you depend on something that is only reachable through a deep import, please open an issue so it can be considered for the public API.
+  * If you depend on something that is only reachable through a deep import, please open an issue so it can be considered for the public API.
 * feat(core)!: remove deprecated `getTimeOrigin`, `otperformance`, `_globalThis`, and `unrefTimer` from `@opentelemetry/core` [#7053](https://github.com/open-telemetry/opentelemetry-js/pull/7053)
   * `getTimeOrigin()` — use `performance.timeOrigin` directly.
   * `otperformance` — use the global `performance` object directly.
