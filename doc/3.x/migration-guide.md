@@ -352,7 +352,7 @@ import type { LoggerProviderOptions } from '@opentelemetry/sdk-logs';
 
 ### Removed: `AsyncHooksContextManager` context manager
 
-`AsyncHooksContextManager` is no longer used in the SDK and its the [recommended API](https://nodejs.org/api/async_context.html#class-asynclocalstorage) for context propagation.
+`AsyncHooksContextManager` has been removed. Use `AsyncLocalStorageContextManager`, which is built on [`AsyncLocalStorage`](https://nodejs.org/api/async_context.html#class-asynclocalstorage), the recommended Node.js API for context propagation.
 
 ```ts
 // before
