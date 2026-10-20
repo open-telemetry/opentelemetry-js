@@ -118,6 +118,16 @@ import { logs, SeverityNumber } from '@opentelemetry/api';
 
 - `logs.setGlobalLoggerProvider(provider)` now returns a boolean indicating whether registration succeeded. The standalone `@opentelemetry/api-logs` implementation returned the registered `LoggerProvider`. Use `logs.getLoggerProvider()` when the provider instance is needed.
 
+- The `AnyValue`, `AnyValueMap`, `LogBody`, and `LogAttributes` types from `@opentelemetry/api-logs` were not carried over. Replace `AnyValue` and `LogBody` with `AnyValue`, and `AnyValueMap` and `LogAttributes` with `Attributes`, from `@opentelemetry/api`.
+
+```ts
+// before
+import type { AnyValue, AnyValueMap, LogAttributes, LogBody } from '@opentelemetry/api-logs';
+
+// after
+import type { AnyValue, Attributes } from '@opentelemetry/api';
+```
+
 ## Bundler requirements for packages with platform-specific code
 
 Some JS SDK packages include separate Node.js and browser implementations of some code. These packages no longer ship a top-level `browser` field in `package.json`. Instead they resolve the appropriate implementation with [`package.json` conditions](https://nodejs.org/api/packages.html#conditional-exports) using the "exports" and "imports" fields. They select the Node.js implementation with the `node` condition on the `#platform` subpath under `imports`, and every other environment gets the browser implementation from the `require` and `default` branches.
