@@ -29,14 +29,6 @@ export interface TracerProviderOptions {
   idGenerator?: IdGenerator;
 
   /**
-   * How long the forceFlush can run before it is cancelled.
-   * The default value is 30000ms
-   *
-   * @deprecated Configure the timeout when calling `TracerProvider.forceFlush()` instead.
-   */
-  forceFlushTimeoutMillis?: number;
-
-  /**
    * List of SpanProcessor for the tracer
    */
   spanProcessors?: SpanProcessor[];
@@ -52,7 +44,7 @@ export interface TracerProviderOptions {
 export interface ForceFlushOptions {
   /**
    * How long the force flush can run before it is cancelled.
-   * Falls back to the timeout configured in `TracerProviderOptions`.
+   * Defaults to 30000ms.
    */
   timeoutMillis?: number;
 }
@@ -65,7 +57,7 @@ export interface ForceFlushOptions {
 export interface TracerOptions {
   resource: Resource;
   sampler: Sampler;
-  spanLimits: SpanLimits;
+  spanLimits: Required<SpanLimits>;
   idGenerator: IdGenerator;
   spanProcessor: SpanProcessor;
   meterProvider: MeterProvider;
@@ -122,12 +114,11 @@ export interface BatchSpanProcessorOptions extends SpanProcessorOptions {
   /** The maximum queue size. After the size is reached spans are dropped.
    * The default value is 2048. */
   maxQueueSize?: number;
-}
 
-/** Interface configuration for BatchSpanProcessor on browser */
-export interface BatchSpanProcessorBrowserOptions
-  extends BatchSpanProcessorOptions {
-  /** Disable flush when a user navigates to a new page, closes the tab or the browser, or,
+  /** Browser only: disable flush when a user navigates to a new page, closes the tab or the browser, or,
    * on mobile, switches to a different app. Auto flush is enabled by default. */
   disableAutoFlushOnDocumentHide?: boolean;
 }
+
+/** @deprecated Use {@link BatchSpanProcessorOptions}, which includes the browser-only options. */
+export type BatchSpanProcessorBrowserOptions = BatchSpanProcessorOptions;

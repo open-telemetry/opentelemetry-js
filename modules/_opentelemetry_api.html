@@ -45,22 +45,6 @@
 
 <h2 id="version-compatibility" class="tsd-anchor-link">Version Compatibility<a href="#version-compatibility" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
 <p>Because the npm installer and node module resolution algorithm could potentially allow two or more copies of any given package to exist within the same <code>node_modules</code> structure, the OpenTelemetry API takes advantage of a variable on the <code>global</code> object to store the global API. When an API method in the API package is called, it checks if this <code>global</code> API exists and proxies calls to it if and only if it is a compatible API version. This means if a package has a dependency on an OpenTelemetry API version which is not compatible with the API used by the end user, the package will receive a no-op implementation of the API.</p>
-<h2 id="upgrade-guidelines" class="tsd-anchor-link">Upgrade Guidelines<a href="#upgrade-guidelines" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<h3 id="0210-to-100" class="tsd-anchor-link">0.21.0 to 1.0.0<a href="#0210-to-100" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<p>No breaking changes</p>
-<h3 id="0200-to-0210" class="tsd-anchor-link">0.20.0 to 0.21.0<a href="#0200-to-0210" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<ul>
-<li><a href="https://github.com/open-telemetry/opentelemetry-js-api/issues/78">#78</a> <code>api.context.bind</code> arguments reversed and <code>context</code> is now a required argument.</li>
-<li><a href="https://github.com/open-telemetry/opentelemetry-js-api/issues/46">#46</a> Noop classes and singletons are no longer exported. To create a noop span it is recommended to use <code>api.trace.wrapSpanContext</code> with <code>INVALID_SPAN_CONTEXT</code> instead of using the <code>NOOP_TRACER</code>.</li>
-</ul>
-<h3 id="100-rc3-to-0200" class="tsd-anchor-link">1.0.0-rc.3 to 0.20.0<a href="#100-rc3-to-0200" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<ul>
-<li>Removing <code>TimedEvent</code> which was not part of spec</li>
-<li><code>HttpBaggage</code> renamed to <code>HttpBaggagePropagator</code></li>
-<li><a href="https://github.com/open-telemetry/opentelemetry-js-api/pull/45">#45</a> <code>Span#context</code> renamed to <code>Span#spanContext</code></li>
-<li><a href="https://github.com/open-telemetry/opentelemetry-js-api/pull/47">#47</a> <code>getSpan</code>/<code>setSpan</code>/<code>getSpanContext</code>/<code>setSpanContext</code> moved to <code>trace</code> namespace</li>
-<li><a href="https://github.com/open-telemetry/opentelemetry-js-api/pull/55">#55</a> <code>getBaggage</code>/<code>setBaggage</code>/<code>createBaggage</code> moved to <code>propagation</code> namespace</li>
-</ul>
 <h2 id="useful-links" class="tsd-anchor-link">Useful links<a href="#useful-links" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
 <ul>
 <li>For more information on OpenTelemetry, visit: <a href="https://opentelemetry.io/">https://opentelemetry.io/</a></li>
@@ -95,12 +79,6 @@
 <li><a href="#install-dependencies"><span>Install <wbr/>Dependencies</span></a></li>
 <li><a href="#trace-your-application"><span>Trace <wbr/>Your <wbr/>Application</span></a></li></ul></li>
 <li><a href="#version-compatibility"><span>Version <wbr/>Compatibility</span></a></li>
-<li><a href="#upgrade-guidelines"><span>Upgrade <wbr/>Guidelines</span></a></li>
-<li>
-<ul>
-<li><a href="#0210-to-100"><span>0.21.0 to 1.0.0</span></a></li>
-<li><a href="#0200-to-0210"><span>0.20.0 to 0.21.0</span></a></li>
-<li><a href="#100-rc3-to-0200"><span>1.0.0-<wbr/>rc.3 to 0.20.0</span></a></li></ul></li>
 <li><a href="#useful-links"><span>Useful links</span></a></li>
 <li><a href="#license"><span>License</span></a></li></ul>
 <details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Modules"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Modules</summary>
