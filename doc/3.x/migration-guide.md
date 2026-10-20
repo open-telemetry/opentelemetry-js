@@ -15,6 +15,8 @@ For background on the 3.0 release, see the [3.x announcement](announcement.md).
 
 Per [OpenTelemetry guidelines](https://opentelemetry.io/docs/specs/otel/versioning-and-stability/#sdk-support), the 2.x versions of stable SDK packages will be supported for one year from the 3.0.0 release.
 
+Optionally, use the third-party [otel-js-upgrade](https://github.com/adityareddy-dev/otel-js-upgrade) codemod to preview supported JavaScript and TypeScript changes. Review its reported manual steps and the rest of this guide before applying changes.
+
 If you have questions, reach the OTel JS community on [#otel-js](https://cloud-native.slack.com/archives/C01NL1GRPQR) in the [CNCF Slack](https://slack.cncf.io/), [open a Discussion](https://github.com/open-telemetry/opentelemetry-js/issues/new?template=discussion.md), or join the weekly [OTel JS SIG call](https://docs.google.com/document/d/1tCyoQK49WVcE-x8oryZOTTToFm7sIeUhxFPm9g-qL1k/edit).
 
 ## What is OTel JS SDK 3.x?
@@ -559,8 +561,8 @@ const sdk = new NodeSDK({
 ### Removed: `tracing` namespace re-export
 
 The deprecated namespace re-export `tracing` (re-exporting `@opentelemetry/sdk-trace-base`) has been removed from `@opentelemetry/sdk-node`.
-Import directly from the sdk-trace-base package.
-<!-- TODO: replace this advice with a sdk-trace-base migration section once sdk-trace-base package is removed -->
+Import directly from `@opentelemetry/sdk-trace`.
+See the [sdk-trace-base migration section above](#opentelemetrysdk-trace-base-package-removed).
 
 ```ts
 // before
@@ -568,7 +570,7 @@ import { tracing } from '@opentelemetry/sdk-node';
 const exporter = new tracing.ConsoleSpanExporter();
 
 // after
-import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-base';
+import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace';
 const exporter = new ConsoleSpanExporter();
 ```
 
