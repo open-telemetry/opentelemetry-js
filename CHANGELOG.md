@@ -19,6 +19,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :books: Documentation
 
+* docs: clarify the 3.x migration guide steps and link the upgrade codemod [#7219](https://github.com/open-telemetry/opentelemetry-js/pull/7219) @adityareddy-dev
+
 ### :house: Internal
 
 ## 3.0.0
