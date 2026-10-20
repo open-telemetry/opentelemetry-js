@@ -91,11 +91,11 @@ Node.js v18 and v20 reached [end-of-life](https://github.com/nodejs/release#read
 > Related issues and PRs:
 > [#6420](https://github.com/open-telemetry/opentelemetry-js/issues/6420)
 
-## Dual CJS/ESM exports
+## 💥 Dual CJS/ESM exports
 
 Packages now ship proper ES Module (ESM) and CommonJS (CJS) exports. The result should be much more friendly to ESM and bundler users.
 
-This is **not** expected to be a breaking change. However, the internal paths in packages have changed, and all packages now define [entry points via "exports" in package.json](https://nodejs.org/api/packages.html#exports). This will break any users doing deep imports into these packages. Deep imports were not considered supported. `<package>/package.json` is also no longer importable; use `SDK_INFO` from `@opentelemetry/core` for the SDK version.
+Imports by package name are unaffected. However, the internal paths in packages have changed, and all packages now define [entry points via "exports" in package.json](https://nodejs.org/api/packages.html#exports). This will break any users doing deep imports into these packages. Deep imports were not considered supported. `<package>/package.json` is also no longer importable; use `SDK_INFO` from `@opentelemetry/core` for the SDK version.
 
 > [!NOTE]
 > Related issues and PRs:
@@ -128,7 +128,7 @@ import type { AnyValue, AnyValueMap, LogAttributes, LogBody } from '@opentelemet
 import type { AnyValue, Attributes } from '@opentelemetry/api';
 ```
 
-## Bundler requirements for packages with platform-specific code
+## 💥 Bundler requirements for packages with platform-specific code
 
 Some JS SDK packages include separate Node.js and browser implementations of some code. These packages no longer ship a top-level `browser` field in `package.json`. Instead they resolve the appropriate implementation with [`package.json` conditions](https://nodejs.org/api/packages.html#conditional-exports) using the "exports" and "imports" fields. They select the Node.js implementation with the `node` condition on the `#platform` subpath under `imports`, and every other environment gets the browser implementation from the `require` and `default` branches.
 
@@ -136,7 +136,7 @@ The SDK packages with platform-specific code are: `@opentelemetry/core`, `@opent
 
 **Your bundler must support the `imports` and `exports` fields**; one without `imports` support fails to resolve `#platform`. Webpack 5 needs `enhanced-resolve` 5.8.2 or later, which webpack 5.54 and later require. Jest needs 29.4 or later. React Native needs Metro 0.81.3 or later: React Native 0.79 and later, or 0.76 to 0.78 with an updated Metro.
 
-This is **not** expected to be a breaking change, as all supported bundler versions support `imports` and `exports`.
+Bundlers at or above these versions need no changes, except under Parcel and Jest 30 (see below).
 
 <details>
 <summary>Platform and bundler details</summary>
@@ -235,7 +235,7 @@ const provider = new TracerProvider({
 });
 ```
 
-## `@opentelemetry/instrumentation-http` API changes
+## 💥 `@opentelemetry/instrumentation-http` API changes
 
 - Removed: `HttpInstrumentationConfig.serverName`
   The `serverName` option on `HttpInstrumentationConfig` has been removed. It had no effect — stable HTTP semantic conventions do not include the `http.server_name` attribute. Remove the option from any `setConfig()` or constructor call.
@@ -259,7 +259,7 @@ const instrumentations = [
 ];
 ```
 
-## `@opentelemetry/core` API changes
+## 💥 `@opentelemetry/core` API changes
 
 - `getTimeOrigin()` -> `performance.timeOrigin`
   `getTimeOrigin()` was a thin wrapper around `performance.timeOrigin`. Use `performance.timeOrigin` directly.
@@ -316,7 +316,7 @@ const instrumentations = [
     }
     ```
 
-## `@opentelemetry/sdk-trace`
+## 💥 `@opentelemetry/sdk-trace`
 
 ### Removed: `TracerProviderOptions.forceFlushTimeoutMillis`
 
@@ -332,7 +332,7 @@ const provider = new TracerProvider();
 await provider.forceFlush({ timeoutMillis: 5000 });
 ```
 
-## `@opentelemetry/sdk-logs`
+## 💥 `@opentelemetry/sdk-logs`
 
 ### Removed: `SdkLogRecord` type alias
 
@@ -358,7 +358,7 @@ import type { LoggerProviderConfig } from '@opentelemetry/sdk-logs';
 import type { LoggerProviderOptions } from '@opentelemetry/sdk-logs';
 ```
 
-## `@opentelemetry/context-async-hooks`
+## 💥 `@opentelemetry/context-async-hooks`
 
 ### Removed: `AsyncHooksContextManager` context manager
 
@@ -372,7 +372,7 @@ import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 ```
 
-## `@opentelemetry/sdk-trace-base` (package removed)
+## 💥 `@opentelemetry/sdk-trace-base` (package removed)
 
 Starting in Jun 2026, the `@opentelemetry/sdk-trace` package was created to replace the `@opentelemetry/sdk-trace-base`, `@opentelemetry/sdk-trace-node`, and `@opentelemetry/sdk-trace-web` packages.
 With the SDK 3.0 release, the `@opentelemetry/sdk-trace-base` package has been removed in favor of the `@opentelemetry/sdk-trace` package.
@@ -415,7 +415,7 @@ For [SDK environment variable support](https://opentelemetry.io/docs/specs/otel/
 > [#6817](https://github.com/open-telemetry/opentelemetry-js/pull/6817)
 > [#6504](https://github.com/open-telemetry/opentelemetry-js/pull/6504)
 
-## `@opentelemetry/sdk-trace-node` (package removed)
+## 💥 `@opentelemetry/sdk-trace-node` (package removed)
 
 Starting in Jun 2026, the `@opentelemetry/sdk-trace` package was created to replace the `@opentelemetry/sdk-trace-base`, `@opentelemetry/sdk-trace-node`, and `@opentelemetry/sdk-trace-web` packages.
 With the SDK 3.0 release, the `@opentelemetry/sdk-trace-node` package has been removed in favor of the `@opentelemetry/sdk-trace` package.
@@ -449,14 +449,14 @@ propagation.setGlobalPropagator(new CompositePropagator({
 ```
 
 - sdk-trace-node [re-exported much of `sdk-trace-base`](https://github.com/open-telemetry/opentelemetry-js/blob/v2.11.0/packages/opentelemetry-sdk-trace-node/src/index.ts#L8-L37).
-  See the [sdk-trace-base migration section above](#opentelemetrysdk-trace-base-package-removed).
+  See the [sdk-trace-base migration section above](#-opentelemetrysdk-trace-base-package-removed).
 
 > [!NOTE]
 > Related issues and PRs:
 > [#6775](https://github.com/open-telemetry/opentelemetry-js/pull/6775)
 > [#6851](https://github.com/open-telemetry/opentelemetry-js/pull/6851)
 
-## `@opentelemetry/sdk-trace-web` (package removed)
+## 💥 `@opentelemetry/sdk-trace-web` (package removed)
 
 Starting in Jun 2026, the `@opentelemetry/sdk-trace` package was created to replace the `@opentelemetry/sdk-trace-base`, `@opentelemetry/sdk-trace-node`, and `@opentelemetry/sdk-trace-web` packages.
 With the SDK 3.0 release, the `@opentelemetry/sdk-trace-web` package has been removed in favor of the `@opentelemetry/sdk-trace` package.
@@ -495,14 +495,14 @@ propagation.setGlobalPropagator(propagator);
   It is recommended that web-related instrumentations avoid these implementations and, if needed, *copy* them.
 
 - sdk-trace-web [re-exported much of `sdk-trace-base`](https://github.com/open-telemetry/opentelemetry-js/blob/v2.11.0/packages/opentelemetry-sdk-trace-web/src/index.ts#L28-L57).
-  See the [sdk-trace-base migration section above](#opentelemetrysdk-trace-base-package-removed).
+  See the [sdk-trace-base migration section above](#-opentelemetrysdk-trace-base-package-removed).
 
 > [!NOTE]
 > Related issues and PRs:
 > [#6775](https://github.com/open-telemetry/opentelemetry-js/pull/6775)
 > [#7058](https://github.com/open-telemetry/opentelemetry-js/pull/7058)
 
-## `@opentelemetry/sdk-node`
+## 💥 `@opentelemetry/sdk-node`
 
 ### Removed: `NodeSDKConfiguration.logRecordProcessor`
 
@@ -565,7 +565,7 @@ const sdk = new NodeSDK({
 
 The deprecated namespace re-export `tracing` (re-exporting `@opentelemetry/sdk-trace-base`) has been removed from `@opentelemetry/sdk-node`.
 As well, the sdk-trace-base package has been *removed*, in favor of the sdk-trace package.
-See the [sdk-trace-base migration section above](#opentelemetrysdk-trace-base-package-removed).
+See the [sdk-trace-base migration section above](#-opentelemetrysdk-trace-base-package-removed).
 
 ```ts
 // before
