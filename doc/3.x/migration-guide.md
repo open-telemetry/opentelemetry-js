@@ -79,6 +79,7 @@ The OpenTelemetry JS SIG is responsible for numerous packages, all published to 
 | @opentelemetry/sampler-jaeger-remote | 0.300.0 |
 | @opentelemetry/sdk-node | 0.300.0 |
 | @opentelemetry/web-common | 0.300.0 |
+
 </details>
 
 ## 💥 Node.js supported versions
