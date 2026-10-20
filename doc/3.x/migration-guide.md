@@ -551,6 +551,7 @@ propagation.setGlobalPropagator(propagator);
   These have all been moved to the [web-common package](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/web-common).
   Those utilities have also *been deprecated*.
   It is recommended that web-related instrumentations avoid these implementations and, if needed, *copy* them.
+  `addSpanNetworkEvents()` no longer accepts the fifth `skipOldSemconvContentLengthAttrs` argument; remove it from calls.
 
 - sdk-trace-web [re-exported much of `sdk-trace-base`](https://github.com/open-telemetry/opentelemetry-js/blob/v2.11.0/packages/opentelemetry-sdk-trace-web/src/index.ts#L28-L57).
   See the [sdk-trace-base migration section above](#-opentelemetrysdk-trace-base-package-removed).
@@ -559,6 +560,7 @@ propagation.setGlobalPropagator(propagator);
 > Related issues and PRs:
 > [#6775](https://github.com/open-telemetry/opentelemetry-js/pull/6775)
 > [#7058](https://github.com/open-telemetry/opentelemetry-js/pull/7058)
+> [#7114](https://github.com/open-telemetry/opentelemetry-js/issues/7114)
 
 ## 💥 `@opentelemetry/sdk-node`
 
