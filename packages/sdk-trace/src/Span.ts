@@ -22,7 +22,6 @@ import type { InstrumentationScope } from '@opentelemetry/core';
 import {
   addHrTimes,
   millisToHrTime,
-  hrTime,
   hrTimeDuration,
   isTimeInput,
   isTimeInputHrTime,
@@ -359,8 +358,10 @@ export class SpanImpl implements Span {
   private _getTime(inp?: TimeInput): HrTime {
     if (typeof inp === 'number' && inp <= performance.now()) {
       // must be a performance timestamp
-      // apply correction and convert to hrtime
-      return hrTime(inp + this._performanceOffset);
+      // apply correction and convert to hrtime; hrTime() would correct again
+      return millisToHrTime(
+        performance.timeOrigin + inp + this._performanceOffset
+      );
     }
 
     if (typeof inp === 'number') {

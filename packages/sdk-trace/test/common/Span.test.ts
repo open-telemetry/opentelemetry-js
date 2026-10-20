@@ -160,6 +160,32 @@ describe('Span', () => {
     assert.ok(hrTimeToNanoseconds(span.duration) >= 0);
   });
 
+  it('should apply the clock correction once to a performance timestamp after a sleep', () => {
+    const sleepMs = 60 * 60 * 1000;
+    const timeOrigin = hrTimeToMilliseconds(performanceTimeOrigin);
+    let perfNow = 500;
+    sinon.stub(performance, 'now').callsFake(() => perfNow);
+    sinon.stub(Date, 'now').callsFake(() => timeOrigin + perfNow + sleepMs);
+
+    const span = new SpanImpl({
+      scope: tracer.instrumentationScope,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
+      spanContext,
+      name,
+      kind: SpanKind.SERVER,
+      spanLimits: cheatSpanLimitsFromTracer(tracer),
+      spanProcessor: tracer['_spanProcessor'],
+    });
+    perfNow = 700;
+    span.end(650);
+
+    assert.strictEqual(
+      Math.round(hrTimeToMilliseconds(span.endTime)),
+      Math.round(timeOrigin + 650 + sleepMs)
+    );
+  });
+
   it('should have valid event.time', () => {
     const span = new SpanImpl({
       scope: tracer.instrumentationScope,

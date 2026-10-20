@@ -23,17 +23,75 @@ export function millisToHrTime(epochMillis: number): api.HrTime {
   return [seconds, nanos];
 }
 
+// performance.now() can stop advancing while the host sleeps, and Date.now()
+// can step; past this divergence the wall clock wins.
+const CLOCK_DRIFT_THRESHOLD_MS = 1000;
+// Bounds memory. Timestamps older than the oldest kept segment take its drift.
+const MAX_CLOCK_DRIFT_SEGMENTS = 16;
+
+interface ClockDriftSegment {
+  startPerformanceNow: number;
+  driftMs: number;
+}
+
+// Ordered by startPerformanceNow. A segment starts at the first read after the
+// clocks diverge.
+const clockDriftSegments: ClockDriftSegment[] = [
+  { startPerformanceNow: 0, driftMs: 0 },
+];
+
+function updateClockDrift(currentPerformanceNow: number): void {
+  const drift = Date.now() - (performance.timeOrigin + currentPerformanceNow);
+  const latest = clockDriftSegments[clockDriftSegments.length - 1];
+  if (Math.abs(drift - latest.driftMs) <= CLOCK_DRIFT_THRESHOLD_MS) {
+    return;
+  }
+  // Keep the list ordered if a segment already starts at or after this read.
+  while (
+    clockDriftSegments.length > 0 &&
+    clockDriftSegments[clockDriftSegments.length - 1].startPerformanceNow >=
+      currentPerformanceNow
+  ) {
+    clockDriftSegments.pop();
+  }
+  clockDriftSegments.push({
+    startPerformanceNow: currentPerformanceNow,
+    driftMs: drift,
+  });
+  if (clockDriftSegments.length > MAX_CLOCK_DRIFT_SEGMENTS) {
+    clockDriftSegments.shift();
+  }
+}
+
+function getClockDrift(performanceNow: number): number {
+  for (let i = clockDriftSegments.length - 1; i > 0; i--) {
+    if (clockDriftSegments[i].startPerformanceNow <= performanceNow) {
+      return clockDriftSegments[i].driftMs;
+    }
+  }
+  return clockDriftSegments[0].driftMs;
+}
+
 /**
  * Returns an hrtime calculated via performance component.
+ *
+ * The result is re-anchored to `Date.now()` when the performance clock and the
+ * wall clock diverge by more than one second, for example after the host
+ * sleeps. A passed `performanceNow` gets the correction that applied when it
+ * was taken, so a timestamp from before a sleep is not moved by that sleep.
+ *
  * @param performanceNow
  */
 export function hrTime(performanceNow?: number): api.HrTime {
-  const timeOrigin = millisToHrTime(performance.timeOrigin);
-  const now = millisToHrTime(
-    typeof performanceNow === 'number' ? performanceNow : performance.now()
+  const currentPerformanceNow = performance.now();
+  updateClockDrift(currentPerformanceNow);
+  const now =
+    typeof performanceNow === 'number' ? performanceNow : currentPerformanceNow;
+  const timeOrigin = millisToHrTime(
+    performance.timeOrigin + getClockDrift(now)
   );
 
-  return addHrTimes(timeOrigin, now);
+  return addHrTimes(timeOrigin, millisToHrTime(now));
 }
 
 /**

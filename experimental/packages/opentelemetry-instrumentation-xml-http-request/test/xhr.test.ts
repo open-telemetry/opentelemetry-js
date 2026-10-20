@@ -992,6 +992,9 @@ describe('xhr', () => {
         });
 
         function timedOutRequest(done: any) {
+          // Keep the fake performance clock in step with the fake Date so
+          // hrTime() does not re-anchor; start past the fixture resources.
+          fakeNow = 100;
           api.context.with(
             api.trace.setSpan(api.context.active(), rootSpan),
             () => {
@@ -999,12 +1002,13 @@ describe('xhr', () => {
                 new XMLHttpRequest(),
                 url,
                 () => {
+                  fakeNow += XHR_TIMEOUT;
                   timer.tick(XHR_TIMEOUT);
                 },
                 testAsync
               ).then(() => {
-                fakeNow = 0;
                 timer.tick(1000);
+                fakeNow = 0;
                 done();
               });
             }
@@ -1875,6 +1879,9 @@ describe('xhr', () => {
         });
 
         function timedOutRequest(done: any) {
+          // Keep the fake performance clock in step with the fake Date so
+          // hrTime() does not re-anchor; start past the fixture resources.
+          fakeNow = 100;
           api.context.with(
             api.trace.setSpan(api.context.active(), rootSpan),
             () => {
@@ -1883,12 +1890,13 @@ describe('xhr', () => {
                 url,
                 '{"embedded":"data"}',
                 () => {
+                  fakeNow += XHR_TIMEOUT;
                   timer.tick(XHR_TIMEOUT);
                 },
                 testAsync
               ).then(() => {
-                fakeNow = 0;
                 timer.tick(1000);
+                fakeNow = 0;
                 done();
               });
             }
