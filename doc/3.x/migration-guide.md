@@ -231,18 +231,18 @@ const provider = new TracerProvider({
 
 ```ts
 // before
-import { HTTPInstrumentation } from '@opentelemetry/instrumentation-http';
+import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
 const instrumentations = [
-  new HTTPInstrumentation({
+  new HttpInstrumentation({
     serverName: 'my.server.name',
     // ... other options
   });
 ];
 
 // after
-import { HTTPInstrumentation } from '@opentelemetry/instrumentation-http';
+import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
 const instrumentations = [
-  new HTTPInstrumentation({
+  new HttpInstrumentation({
     // ... other options (serverName removed)
   });
 ];
