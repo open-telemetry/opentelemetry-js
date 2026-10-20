@@ -204,7 +204,7 @@ The `@opentelemetry/exporter-jaeger` package has been removed. Jaeger has deprec
 ```ts
 // before
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
-import { BatchSpanProcessor } from '@opentelemetry/sdk-trace';
+import { BatchSpanProcessor, TracerProvider } from '@opentelemetry/sdk-trace';
 const provider = new TracerProvider({
   spanProcessors: [
     new BatchSpanProcessor({ exporter: new JaegerExporter({
@@ -215,7 +215,7 @@ const provider = new TracerProvider({
 
 // after (using OTLP Proto over HTTP)
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
-import { BatchSpanProcessor } from '@opentelemetry/sdk-trace';
+import { BatchSpanProcessor, TracerProvider } from '@opentelemetry/sdk-trace';
 const provider = new TracerProvider({
   spanProcessors: [
     new BatchSpanProcessor({exporter: new OTLPTraceExporter({
@@ -237,7 +237,7 @@ const instrumentations = [
   new HttpInstrumentation({
     serverName: 'my.server.name',
     // ... other options
-  });
+  }),
 ];
 
 // after
@@ -245,7 +245,7 @@ import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
 const instrumentations = [
   new HttpInstrumentation({
     // ... other options (serverName removed)
-  });
+  }),
 ];
 ```
 
@@ -542,12 +542,12 @@ import { NodeSDK } from '@opentelemetry/sdk-node';
 import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace';
 
 const sdk = new NodeSDK({
-  spanProcessor: new SimpleSpanProcessor(exporter),
+  spanProcessor: new SimpleSpanProcessor({ exporter }),
 });
 
 // after
 const sdk = new NodeSDK({
-  spanProcessors: [new SimpleSpanProcessor(exporter)],
+  spanProcessors: [new SimpleSpanProcessor({ exporter })],
 });
 ```
 
@@ -622,11 +622,11 @@ The namespace re-export `logs` (re-exporting `@opentelemetry/sdk-logs`) has been
 ```ts
 // before
 import { logs } from '@opentelemetry/sdk-node';
-const processor = new logs.SimpleLogRecordProcessor(exporter);
+const processor = new logs.SimpleLogRecordProcessor({ exporter });
 
 // after
 import { SimpleLogRecordProcessor } from '@opentelemetry/sdk-logs';
-const processor = new SimpleLogRecordProcessor(exporter);
+const processor = new SimpleLogRecordProcessor({ exporter });
 ```
 
 ### Removed: `metrics` namespace re-export
