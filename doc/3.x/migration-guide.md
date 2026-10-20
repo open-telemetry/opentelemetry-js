@@ -322,8 +322,6 @@ const provider = new TracerProvider();
 await provider.forceFlush({ timeoutMillis: 5000 });
 ```
 
----
-
 ## `@opentelemetry/sdk-logs`
 
 ### Removed: `SdkLogRecord` type alias
@@ -349,8 +347,6 @@ import type { LoggerProviderConfig } from '@opentelemetry/sdk-logs';
 // after
 import type { LoggerProviderOptions } from '@opentelemetry/sdk-logs';
 ```
-
----
 
 ## `@opentelemetry/context-async-hooks`
 
