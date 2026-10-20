@@ -28,10 +28,10 @@ If your usage of OpenTelemetry does not *directly* use these packages -- for exa
 
 The OpenTelemetry JS SIG is responsible for numerous packages, all published to npm under the `@opentelemetry/` org, and developed in two git repositories: [opentelemetry-js.git](https://github.com/open-telemetry/opentelemetry-js) (sometimes called the "core" repo) and [opentelemetry-js-contrib.git](https://github.com/open-telemetry/opentelemetry-js-contrib) (the "contrib" repo). For the sake of this document, these packages can be grouped into these categories:
 
-1. The [API](../api/) package (`@opentelemetry/api`). The API is versioned independently of all other packages. The API package is *not* part of "the SDK", but it is getting a new *minor* release at the same time.
-2. The [Semantic Conventions](../semantic-conventions/) package (`@opentelemetry/semantic-conventions`). This package follows the [versioning](https://github.com/open-telemetry/semantic-conventions/releases) of the language-independent Semantic Conventions. It is *not* being changed as part of "JS SDK 3.x".
-3. [Stable packages from opentelemetry-js.git](../packages/). These are packages that have reached "1.x". These packages are all versioned together, and are at version "2.12.0" at the time of writing.
-4. [Unstable packages from opentelemetry-js.git](../experimental/packages/). These are packages deemed still experimental. They are all at "0.x" versions. These packages are all versioned together, and are at version "0.223.0" at the time of writing.
+1. The [API](../../api/) package (`@opentelemetry/api`). The API is versioned independently of all other packages. The API package is *not* part of "the SDK", but it is getting a new *minor* release at the same time.
+2. The [Semantic Conventions](../../semantic-conventions/) package (`@opentelemetry/semantic-conventions`). This package follows the [versioning](https://github.com/open-telemetry/semantic-conventions/releases) of the language-independent Semantic Conventions. It is *not* being changed as part of "JS SDK 3.x".
+3. [Stable packages from opentelemetry-js.git](../../packages/). These are packages that have reached "1.x". These packages are all versioned together, and are at version "2.12.0" at the time of writing.
+4. [Unstable packages from opentelemetry-js.git](../../experimental/packages/). These are packages deemed still experimental. They are all at "0.x" versions. These packages are all versioned together, and are at version "0.223.0" at the time of writing.
 5. All packages from opentelemetry-js-contrib.git. These packages are all versioned independently. These packages are not considered part of the "JS SDK 3.0" release. However, soon they will update to use JS SDK 3.x releases.
 6. Packages from [opentelemetry-browser.git](https://github.com/open-telemetry/opentelemetry-browser), owned by the OTel Browser SIG, also publish to npm under the `@opentelemetry/` org. These packages are not considered part of this "JS SDK 3.0". However, they will update to JS SDK 3.x releases soon.
 
@@ -571,7 +571,7 @@ const exporter = new ConsoleSpanExporter();
 
 The deprecated namespace re-export `node` (re-exporting `@opentelemetry/sdk-trace-node`) has been removed from `@opentelemetry/sdk-node`.
 As well, the sdk-trace-node package has been *removed*, in favor of the sdk-trace package.
-See the section on sdk-trace-node removal above.
+See the [sdk-trace-node migration section above](#-opentelemetrysdk-trace-node-package-removed).
 
 ```ts
 // before
