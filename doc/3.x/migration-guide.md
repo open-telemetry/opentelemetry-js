@@ -267,6 +267,30 @@ const instrumentations = [
 ];
 ```
 
+## 💥 `@opentelemetry/exporter-prometheus` API changes
+
+- `PrometheusExporter` now binds to `localhost` by default. Previously it bound to all interfaces. Pass `host` to keep accepting scrapes from other hosts.
+- `PrometheusExporter` no longer reads `OTEL_EXPORTER_PROMETHEUS_HOST` and `OTEL_EXPORTER_PROMETHEUS_PORT`. Pass `host` and `port` to the constructor. The sdk-node package still reads both variables when it creates the exporter.
+
+```ts
+// before
+import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
+// Binds to OTEL_EXPORTER_PROMETHEUS_HOST or all interfaces, on OTEL_EXPORTER_PROMETHEUS_PORT or 9464.
+const exporter = new PrometheusExporter();
+
+// after
+import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
+const exporter = new PrometheusExporter({
+  host: '0.0.0.0',
+  port: Number(process.env.OTEL_EXPORTER_PROMETHEUS_PORT) || 9464,
+});
+```
+
+> [!NOTE]
+> Related issues and PRs:
+> [#6599](https://github.com/open-telemetry/opentelemetry-js/pull/6599)
+> [#6966](https://github.com/open-telemetry/opentelemetry-js/pull/6966)
+
 ## 💥 `@opentelemetry/core` API changes
 
 - `getTimeOrigin()` -> `performance.timeOrigin`
