@@ -235,6 +235,14 @@ const provider = new TracerProvider({
 });
 ```
 
+## 💥 `@opentelemetry/shim-opentracing` package removed
+
+The `@opentelemetry/shim-opentracing` package has been removed. The OpenTelemetry specification [deprecated the OpenTracing compatibility requirements](https://github.com/open-telemetry/opentelemetry-specification/pull/4938). The last release is [2.12.0](https://www.npmjs.com/package/@opentelemetry/shim-opentracing/v/2.12.0) ([source](https://github.com/open-telemetry/opentelemetry-js/tree/v2.12.0/packages/opentelemetry-shim-opentracing/)). It declares a peer dependency of `@opentelemetry/api@>=1.0.0 <1.10.0`, so it cannot be installed alongside SDK 3.x. Migrate OpenTracing instrumentation to the OpenTelemetry API.
+
+## 💥 `@opentelemetry/shim-opencensus` package removed
+
+The `@opentelemetry/shim-opencensus` package has been removed. The OpenTelemetry specification [deprecated the OpenCensus compatibility requirements](https://github.com/open-telemetry/opentelemetry-specification/pull/5138). The last release is [0.223.0](https://www.npmjs.com/package/@opentelemetry/shim-opencensus/v/0.223.0) ([source](https://github.com/open-telemetry/opentelemetry-js/tree/experimental/v0.223.0/experimental/packages/shim-opencensus/)). It depends on the 2.12.0 releases of `@opentelemetry/core`, `@opentelemetry/resources`, and `@opentelemetry/sdk-metrics`, and is not supported with SDK 3.x. Migrate OpenCensus instrumentation to the OpenTelemetry API.
+
 ## 💥 `@opentelemetry/instrumentation-http` API changes
 
 - Removed: `HttpInstrumentationConfig.serverName`
