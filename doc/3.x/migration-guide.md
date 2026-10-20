@@ -19,7 +19,7 @@ If you have questions, reach the OTel JS community on [#otel-js](https://cloud-n
 
 ## What is OTel JS SDK 3.x?
 
-"OTel JS SDK 3.x" encompasses new releases of the `@opentelemetry/*` JavaScript packages published from the [opentelemetry-js.git](https://github.com/open-telemetry/opentelemetry-js) repository, except the API and semantic-conventions packages &mdash; categories 3 and 4 in the groupings below. The package versions for this new major will be `>=3.0.0` for the stable and `>=0.300.0` for the unstable packages. (The jump to `0.300.x` was intentional, to help signal that these packages are in the "3.x generation".)
+"OTel JS SDK 3.x" encompasses new releases of the `@opentelemetry/*` JavaScript packages published from the [opentelemetry-js.git](https://github.com/open-telemetry/opentelemetry-js) repository, except the API and semantic-conventions packages. The SDK packages are categories 3 and 4 in the groupings below. The package versions for this new major will be `>=3.0.0` for the stable and `>=0.300.0` for the unstable packages. (The jump to `0.300.x` was intentional, to help signal that these packages are in the "3.x generation".)
 
 If your usage of OpenTelemetry does not *directly* use these packages -- for example if you only use `@opentelemetry/auto-instrumentations-node` -- then you most likely will *not* need to change your code to migrate. You still need to be aware of the new minimum versions of Node.js, TypeScript, and ES that are supported.
 
@@ -95,7 +95,7 @@ Node.js v18 and v20 reached [end-of-life](https://github.com/nodejs/release#read
 
 Packages now ship proper ES Module (ESM) and CommonJS (CJS) exports. The result should be much more friendly to ESM and bundler users.
 
-This is **not** expected to be a breaking change. However, the internal paths in packages have changed, and all packages now defined [entry points via "exports" in package.json](https://nodejs.org/api/packages.html#exports). This will break any users doing deep imports into these packages. Deep imports were not considered supported.
+This is **not** expected to be a breaking change. However, the internal paths in packages have changed, and all packages now define [entry points via "exports" in package.json](https://nodejs.org/api/packages.html#exports). This will break any users doing deep imports into these packages. Deep imports were not considered supported.
 
 > [!NOTE]
 > Related issues and PRs:
@@ -120,7 +120,7 @@ import { logs, SeverityNumber } from '@opentelemetry/api';
 
 ## Bundler requirements for packages with platform-specific code
 
-Some JS SDK packages include separate Node.js and browser implementations of some code. These packages no longer ship a top-level `browser` field in `package.json`. Instead they resolve the appropriate implementation with [`package.json` conditions](https://nodejs.org/api/packages.html#conditional-exports) using the "exports" and "imports" fields. The select the Node.js implementation with the `node` condition on the `#platform` subpath under `imports`, and every other environment gets the browser implementation from the `require` and `default` branches.
+Some JS SDK packages include separate Node.js and browser implementations of some code. These packages no longer ship a top-level `browser` field in `package.json`. Instead they resolve the appropriate implementation with [`package.json` conditions](https://nodejs.org/api/packages.html#conditional-exports) using the "exports" and "imports" fields. They select the Node.js implementation with the `node` condition on the `#platform` subpath under `imports`, and every other environment gets the browser implementation from the `require` and `default` branches.
 
 The SDK packages with platform-specific code are: `@opentelemetry/core`, `@opentelemetry/resources`, `@opentelemetry/sdk-trace`, `@opentelemetry/sdk-logs`, `@opentelemetry/instrumentation`, `@opentelemetry/exporter-zipkin`, `@opentelemetry/otlp-transformer` and the OTLP HTTP and protobuf exporters.
 
@@ -172,7 +172,7 @@ module.exports = (request, options) =>
 
 ## 💥 `@opentelemetry/propagator-jaeger` package removed
 
-The `@opentelemetry/propagator-jaeger` package has been removed. The Jaeger propagator is deprecated in favour of the W3C TraceContext propagator.
+The `@opentelemetry/propagator-jaeger` package has been removed. The Jaeger propagator is deprecated in favor of the W3C TraceContext propagator.
 
 - Migrate to `W3CTraceContextPropagator` from `@opentelemetry/core`
 
@@ -364,7 +364,7 @@ import type { LoggerProviderOptions } from '@opentelemetry/sdk-logs';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 
 // after
-import { AsynLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 ```
 
 ## `@opentelemetry/sdk-trace-base` (package removed)
