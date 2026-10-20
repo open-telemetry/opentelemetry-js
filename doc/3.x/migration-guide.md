@@ -390,6 +390,32 @@ import type { LoggerProviderConfig } from '@opentelemetry/sdk-logs';
 import type { LoggerProviderOptions } from '@opentelemetry/sdk-logs';
 ```
 
+### Renamed: `LoggerConfig.disabled` -> `LoggerConfig.enabled`
+
+`LoggerConfig.disabled` has been replaced by `enabled`, matching the specification. Loggers remain enabled by default.
+
+```ts
+// before
+import { LoggerProvider, createLoggerConfigurator } from '@opentelemetry/sdk-logs';
+const provider = new LoggerProvider({
+  loggerConfigurator: createLoggerConfigurator([
+    { pattern: 'noisy-lib', config: { disabled: true } },
+  ]),
+});
+
+// after
+import { LoggerProvider, createLoggerConfigurator } from '@opentelemetry/sdk-logs';
+const provider = new LoggerProvider({
+  loggerConfigurator: createLoggerConfigurator([
+    { pattern: 'noisy-lib', config: { enabled: false } },
+  ]),
+});
+```
+
+> [!NOTE]
+> Related issues and PRs:
+> [#7160](https://github.com/open-telemetry/opentelemetry-js/issues/7160)
+
 ## 💥 `@opentelemetry/context-async-hooks`
 
 ### Removed: `AsyncHooksContextManager` context manager
