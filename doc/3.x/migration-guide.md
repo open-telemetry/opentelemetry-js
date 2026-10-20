@@ -193,7 +193,7 @@ propagation.setGlobalPropagator(new W3CTraceContextPropagator());
 > [!IMPORTANT]
 > This migration requires updating **every service in your system** that sends or receives trace context. Switching only some services will break distributed traces — a service still emitting `uber-trace-id` headers will not be correlated with a service that only reads `traceparent`. Migrate all services together, or run both propagators in parallel using `CompositePropagator` during a transition period.
 >
-> If you cannot yet migrate all services, you may continue using `@opentelemetry/propagator-jaeger@^2` with SDK 3.x by registering it manually after SDK setup. However, `@opentelemetry/propagator-jaeger@^2` has a peer dependency of `@opentelemetry/api@>=1.0.0 <1.10.0`, so you will not be able to advance to `@opentelemetry/api@1.10.0` or later while it remains in use.
+> If you cannot yet migrate all services, run that transition period on SDK 2.x before upgrading. `@opentelemetry/propagator-jaeger@^2` declares a peer dependency of `@opentelemetry/api@>=1.0.0 <1.10.0`, while `@opentelemetry/core@3` and the other core SDK packages require `@opentelemetry/api@>=1.10.0`, so the two cannot be installed together.
 
 ## 💥 `@opentelemetry/exporter-jaeger` package removed
 
