@@ -619,6 +619,26 @@ const sdk = new NodeSDK({
 });
 ```
 
+### Removed: `jaeger` propagator
+
+The `jaeger` propagator name is no longer recognized. With `NodeSDK`, `OTEL_PROPAGATORS=jaeger` logs a warning and the name is skipped. With `startNodeSDK`, a `jaeger` entry from `OTEL_PROPAGATORS` or the configuration file's `propagator.composite` list stops SDK setup: it logs `unknown TextMapPropagator in configuration: "jaeger"` and returns a no-op SDK. Use `tracecontext`, and see the [propagator-jaeger section above](#-opentelemetrypropagator-jaeger-package-removed) for the cross-service rollout.
+
+```yaml
+# before
+propagator:
+  composite:
+    - jaeger: null
+
+# after
+propagator:
+  composite:
+    - tracecontext: null
+```
+
+> [!NOTE]
+> Related issues and PRs:
+> [#7077](https://github.com/open-telemetry/opentelemetry-js/pull/7077)
+
 ### Removed: `tracing` namespace re-export
 
 The deprecated namespace re-export `tracing` (re-exporting `@opentelemetry/sdk-trace-base`) has been removed from `@opentelemetry/sdk-node`.
