@@ -31,8 +31,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
   * `NodeSDKConfiguration.logRecordProcessor` — use `logRecordProcessors` instead.
   * `NodeSDKConfiguration.metricReader` — use `metricReaders` instead.
   * `NodeSDKConfiguration.spanProcessor` — use `spanProcessors` instead.
-  * `export * as node from '@opentelemetry/sdk-node'` — import directly from `@opentelemetry/sdk-trace-node` instead.
-  * `export * as tracing from '@opentelemetry/sdk-node'` — import directly from `@opentelemetry/sdk-trace-base` instead.
+  * `export * as node from '@opentelemetry/sdk-node'` — import directly from `@opentelemetry/sdk-trace` instead; `@opentelemetry/sdk-trace-node` was removed in the same release.
+  * `export * as tracing from '@opentelemetry/sdk-node'` — import directly from `@opentelemetry/sdk-trace` instead; `@opentelemetry/sdk-trace-base` was removed in the same release.
 * feat(sdk-logs)!: remove deprecated `SdkLogRecord` type alias and `LoggerProviderConfig` type alias [#7062](https://github.com/open-telemetry/opentelemetry-js/pull/7062)
   * `SdkLogRecord` — use `ReadWriteLogRecord` instead.
   * `LoggerProviderConfig` — use `LoggerProviderOptions` instead.

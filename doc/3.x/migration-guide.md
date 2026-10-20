@@ -554,8 +554,8 @@ const sdk = new NodeSDK({
 ### Removed: `tracing` namespace re-export
 
 The deprecated namespace re-export `tracing` (re-exporting `@opentelemetry/sdk-trace-base`) has been removed from `@opentelemetry/sdk-node`.
-Import directly from the sdk-trace-base package.
-<!-- TODO: replace this advice with a sdk-trace-base migration section once sdk-trace-base package is removed -->
+As well, the sdk-trace-base package has been *removed*, in favor of the sdk-trace package.
+See the [sdk-trace-base migration section above](#opentelemetrysdk-trace-base-package-removed).
 
 ```ts
 // before
@@ -563,7 +563,7 @@ import { tracing } from '@opentelemetry/sdk-node';
 const exporter = new tracing.ConsoleSpanExporter();
 
 // after
-import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-base';
+import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace';
 const exporter = new ConsoleSpanExporter();
 ```
 
