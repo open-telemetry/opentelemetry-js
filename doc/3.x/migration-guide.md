@@ -243,6 +243,30 @@ The `@opentelemetry/shim-opentracing` package has been removed. The OpenTelemetr
 
 The `@opentelemetry/shim-opencensus` package has been removed. The OpenTelemetry specification [deprecated the OpenCensus compatibility requirements](https://github.com/open-telemetry/opentelemetry-specification/pull/5138). The last release is [0.223.0](https://www.npmjs.com/package/@opentelemetry/shim-opencensus/v/0.223.0) ([source](https://github.com/open-telemetry/opentelemetry-js/tree/experimental/v0.223.0/experimental/packages/shim-opencensus/)). It depends on the 2.12.0 releases of `@opentelemetry/core`, `@opentelemetry/resources`, and `@opentelemetry/sdk-metrics`, and is not supported with SDK 3.x. Migrate OpenCensus instrumentation to the OpenTelemetry API.
 
+## 💥 `@opentelemetry/instrumentation` API changes
+
+- `InstrumentationBase#_enabled` is now `protected` on both platforms. A browser subclass that declares its own `private _enabled` fails to compile; remove the declaration or make it `protected`.
+- The browser `InstrumentationBase` does not track `enable()` and `disable()` calls. Browser subclasses set `_enabled` themselves; one that never sets it reports `isEnabled()` as `false`.
+
+```ts
+// before
+class MyInstrumentation extends InstrumentationBase {
+  private _enabled = false;
+  enable() { /* patch */ this._enabled = true; }
+  disable() { /* unpatch */ this._enabled = false; }
+}
+
+// after
+class MyInstrumentation extends InstrumentationBase {
+  enable() { /* patch */ this._enabled = true; }
+  disable() { /* unpatch */ this._enabled = false; }
+}
+```
+
+> [!NOTE]
+> Related issues and PRs:
+> [#7202](https://github.com/open-telemetry/opentelemetry-js/pull/7202)
+
 ## 💥 `@opentelemetry/instrumentation-http` API changes
 
 - Removed: `HttpInstrumentationConfig.serverName`
