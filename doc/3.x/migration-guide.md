@@ -744,3 +744,19 @@ const resource = resources.resourceFromAttributes({ 'service.name': 'my-service'
 import { resourceFromAttributes } from '@opentelemetry/resources';
 const resource = resourceFromAttributes({ 'service.name': 'my-service' });
 ```
+
+## 💥 `@opentelemetry/otlp-exporter-base` API changes
+
+- `OTLPExporterNodeConfigBase` moved from the package root to the `@opentelemetry/otlp-exporter-base/node-http` subpath. `typesVersions` maps the subpath for `moduleResolution: node`.
+
+```ts
+// before
+import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+
+// after
+import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base/node-http';
+```
+
+> [!NOTE]
+> Related issues and PRs:
+> [#7172](https://github.com/open-telemetry/opentelemetry-js/pull/7172)
