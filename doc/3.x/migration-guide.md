@@ -21,7 +21,7 @@ If you have questions, reach the OTel JS community on [#otel-js](https://cloud-n
 
 "OTel JS SDK 3.x" encompasses new releases of the `@opentelemetry/*` JavaScript packages published from the [opentelemetry-js.git](https://github.com/open-telemetry/opentelemetry-js) repository, except the API and semantic-conventions packages. The SDK packages are categories 3 and 4 in the groupings below. The package versions for this new major will be `>=3.0.0` for the stable and `>=0.300.0` for the unstable packages. (The jump to `0.300.x` was intentional, to help signal that these packages are in the "3.x generation".)
 
-If your usage of OpenTelemetry does not *directly* use these packages -- for example if you only use `@opentelemetry/auto-instrumentations-node` -- then you most likely will *not* need to change your code to migrate. You still need to be aware of the new minimum versions of Node.js, TypeScript, and ES that are supported.
+If your usage of OpenTelemetry does not *directly* use these packages -- for example if you only use `@opentelemetry/auto-instrumentations-node` -- then you most likely will *not* need to change your code to migrate. You still need to be aware of the new minimum version of Node.js that is supported.
 
 <details>
 <summary>Categories of OpenTelemetry JS packages</summary>
