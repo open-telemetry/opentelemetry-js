@@ -95,7 +95,7 @@ Node.js v18 and v20 reached [end-of-life](https://github.com/nodejs/release#read
 
 Packages now ship proper ES Module (ESM) and CommonJS (CJS) exports. The result should be much more friendly to ESM and bundler users.
 
-This is **not** expected to be a breaking change. However, the internal paths in packages have changed, and all packages now define [entry points via "exports" in package.json](https://nodejs.org/api/packages.html#exports). This will break any users doing deep imports into these packages. Deep imports were not considered supported.
+This is **not** expected to be a breaking change. However, the internal paths in packages have changed, and all packages now define [entry points via "exports" in package.json](https://nodejs.org/api/packages.html#exports). This will break any users doing deep imports into these packages. Deep imports were not considered supported. `<package>/package.json` is also no longer importable; use `SDK_INFO` from `@opentelemetry/core` for the SDK version.
 
 > [!NOTE]
 > Related issues and PRs:
