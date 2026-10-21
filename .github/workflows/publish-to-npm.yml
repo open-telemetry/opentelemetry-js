@@ -9,12 +9,10 @@ on:
         default: 'auto'
         # 'auto' resolves to `latest` on main and to `latest-<major>` on a maintenance
         # branch (`v2.x` -> `latest-2`), so a maintenance release never takes `latest` from
-        # the newer line. Pick `latest` to deliberately hand it to a maintenance branch
-        # anyway, which is what you want while `main` publishes nothing but pre-releases -
-        # see doc/contributing/releasing.md#maintenance-branches.
+        # the newer line. Other options are deliberately left out on this branch to avoid handing
+        # `latest` back to the v2.x line.
         options:
           - auto
-          - latest
 
 permissions:
   contents: read
