@@ -7,9 +7,9 @@ The October 2026 releases also include a new *minor* version of the API package 
 
 Refer to the changelogs for full details:
 
-- [CHANGELOG for stable SDK packages](https://github.com/open-telemetry/opentelemetry-js/blob/main/CHANGELOG.md)
-- [CHANGELOG for experimental SDK packages](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/CHANGELOG.md)
-- [CHANGELOG for the API package](https://github.com/open-telemetry/opentelemetry-js/blob/main/api/CHANGELOG.md)
+- [CHANGELOG for stable SDK packages](https://github.com/open-telemetry/opentelemetry-js/blob/main/CHANGELOG.md#300)
+- [CHANGELOG for experimental SDK packages](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/CHANGELOG.md#03000)
+- [CHANGELOG for the API package](https://github.com/open-telemetry/opentelemetry-js/blob/main/api/CHANGELOG.md#1100)
 
 For background on the 3.0 release, see the [3.x announcement](announcement.md).
 
@@ -128,6 +128,78 @@ import type { AnyValue, AnyValueMap, LogAttributes, LogBody } from '@opentelemet
 import type { AnyValue, Attributes } from '@opentelemetry/api';
 ```
 
+> [!NOTE]
+> Related issues and PRs:
+> [#4862](https://github.com/open-telemetry/opentelemetry-js/pull/4862)
+
+## 💥 Support for complex attribute values
+
+> [!IMPORTANT]
+> * Simple attributes SHOULD be used whenever possible. Instrumentations SHOULD assume that backends do not index individual properties of complex attributes, that querying or aggregating on such properties is inefficient and complicated, and that reporting complex attributes carries higher performance overhead.
+> * Complex attributes and unsupported values MUST NOT be used with the Metrics SDK.
+>   For performance reasons, sdk-metrics does not guard against invalid attributes.
+
+Support has been added for attributes (for example span attributes, log record attributes) to have more complex values, according to [OTEP 4485](https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/4485-extending-attributes-to-support-complex-values.md).
+This means that *some* places that attributes are specified (see below), the user may provide a complex attribute value such as an object, a `null`, an array with mixed-type elements, etc.
+Generally this is **not** considered a breaking change for API users.
+However, there are a few cases where it could be breaking. See below.
+
+The set of allowed types is [defined as `AnyValue` in the spec](https://opentelemetry.io/docs/specs/otel/common/#anyvalue).
+The simple types supported before were primitives (string, boolean, number) and homogeneous arrays of those primitives.
+Complex types add: byte arrays (`Uint8Array`), arrays of `AnyValue`, mapping of string to AnyValue, and null.
+Notably for JavaScript, some types are excluded: `undefined`, `BigInt`, TypedArrays other than `Uint8Array`, subclasses of Object (e.g. `Date`, `Error`).
+
+In TypeScript, `AnyValue` and `Attributes` are defined with the loose `unknown` type.
+Using `unknown` allows future changes to support more types (e.g. `BigInt`) without needing to update the `@opentelemetry/api` package.
+See [the `AnyValue` comment for details and reasoning](https://github.com/open-telemetry/opentelemetry-js/blob/main/api/src/common/AnyValue.ts).
+
+```ts
+export type AnyValue = unknown;
+export interface Attributes {
+  [attributeKey: string]: AnyValue;
+}
+```
+
+The following table shows whether simple or complex attribute values are supported for all places in the OTel API and SDK with attributes.
+Cases that changed in JS SDK 3.0 are marked with an asterisk (\*).
+
+| Attributes usage | OTEP 4485 requirement | Attribute values supported |
+| ---------------- | --------------------- | -------------------------- |
+| resource         | MAY                   | simple (\*) |
+| span             | MUST                  | complex (\*) |
+| span link        | MUST                  | complex (\*) |
+| span event       | MAY                   | simple (span events are deprecated) |
+| metric           | MAY                   | simple (**not guarded**) |
+| log record       | MUST                  | complex |
+| logger instrumentation scope | MAY       | simple (\*) |
+| meter instrumentation scope  | MAY       | N/A (no attributes support yet) |
+| tracer instrumentation scope | MAY       | N/A (no attributes support yet) |
+| entity (identifying) | MAY               | N/A (no entities support yet) |
+| entity (descriptive) | MUST              | N/A (no entities support yet) |
+
+### 💥 Possible breaking changes with complex attributes
+
+- **SDK implementors.**
+  This is a **breaking change for SDK implementations**. To support `@opentelemetry/api` v1.10.0 they may need to support more attribute types for any APIs that accept `Attributes` or `AnyValue`. Implementors should refer to [this OTEP 4485 section](https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/4485-extending-attributes-to-support-complex-values.md#how) for "MUST / SHOULD" requirements for complex attributes handling. See also the [attributes-handling utilities provided by `@opentelemetry/core` to help](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-core/src/common/attributes.ts). For example, `cleanSimpleAttributes()` can be used to limit user-provided attributes to the set of value types supported in earlier `@opentelemetry/api` versions.
+
+- **Type narrowing with the `Attributes` type.**
+  This change is **typically not a breaking change for users** of `@opentelemetry/api`.
+  There is one possible breaking case: If a TypeScript user was using the `Attributes` type in their own code and using [TypeScript Narrowing](https://www.typescriptlang.org/docs/handbook/2/narrowing.html) to reduce an attribute value to an expected type ([example here](https://github.com/open-telemetry/opentelemetry-js/pull/6579#issuecomment-4345316200)).
+  It is expected that this usage should be rare and, likely, limited to SDK implementations, if at all.
+  (If this impacted your code, [please let us know](https://github.com/open-telemetry/opentelemetry-js/issues/new).)
+
+- **Using complex *resource* attributes.**
+  Complex attribute values for a [Resource](https://opentelemetry.io/docs/specs/otel/resource/) are no longer supported.
+  They will be dropped with a warning.
+
+- **Using complex *logger instrumentation scope* attributes.**
+  Complex attribute values for a Logger instrumentation scope (i.e. for the `LoggerProvider#getLogger(...)` API) are no longer supported.
+  They will be dropped with a warning.
+
+> [!NOTE]
+> Related issues and PRs:
+> [#6780](https://github.com/open-telemetry/opentelemetry-js/pull/6780)
+
 ## 💥 Bundler requirements for packages with platform-specific code
 
 Some JS SDK packages include separate Node.js and browser implementations of some code. These packages no longer ship a top-level `browser` field in `package.json`. Instead they resolve the appropriate implementation with [`package.json` conditions](https://nodejs.org/api/packages.html#conditional-exports) using the "exports" and "imports" fields. They select the Node.js implementation with the `node` condition on the `#platform` subpath under `imports`, and every other environment gets the browser implementation from the `require` and `default` branches.
@@ -179,6 +251,13 @@ module.exports = (request, options) =>
 ```
 
 </details>
+
+> [!NOTE]
+> Related issues and PRs:
+> [#6293](https://github.com/open-telemetry/opentelemetry-js/pull/6293)
+> [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141)
+> [#7132](https://github.com/open-telemetry/opentelemetry-js/pull/7132)
+> [#7130](https://github.com/open-telemetry/opentelemetry-js/pull/7130)
 
 ## 💥 `@opentelemetry/propagator-jaeger` package removed
 
@@ -317,7 +396,7 @@ const exporter = new PrometheusExporter({
 
 ## 💥 `@opentelemetry/core` API changes
 
-- `getTimeOrigin()` -> `performance.timeOrigin`
+- `getTimeOrigin()` -> `performance.timeOrigin`.
   `getTimeOrigin()` was a thin wrapper around `performance.timeOrigin`. Use `performance.timeOrigin` directly.
 
     ```ts
@@ -329,7 +408,7 @@ const exporter = new PrometheusExporter({
     const origin = performance.timeOrigin;
     ```
 
-- `otperformance` -> `performance`
+- `otperformance` -> `performance`.
   `otperformance` was a re-export of the global `performance` object. Use `performance` directly.
 
     ```ts
@@ -343,7 +422,7 @@ const exporter = new PrometheusExporter({
     const origin = performance.timeOrigin;
     ```
 
-- `_globalThis` -> `globalThis`
+- `_globalThis` -> `globalThis`.
   `_globalThis` was a re-export of the built-in `globalThis`. Use `globalThis` directly.
 
     ```ts
@@ -355,7 +434,7 @@ const exporter = new PrometheusExporter({
     globalThis.<something>;
     ```
 
-- `unrefTimer()` -> timer.unref() in Node.js
+- `unrefTimer()` -> timer.unref() in Node.js.
   `unrefTimer()` was a small utility that called `.unref()` on a timer object. Call `.unref()` directly in your own code.
   In Browser code this isn't relevant.
 
@@ -374,9 +453,7 @@ const exporter = new PrometheusExporter({
 
 ## 💥 `@opentelemetry/sdk-trace`
 
-### Removed: `TracerProviderOptions.forceFlushTimeoutMillis`
-
-`forceFlushTimeoutMillis` on `TracerProviderOptions` has been removed. Pass `{ timeoutMillis }` to `forceFlush()` instead. The default timeout is 30000ms.
+- `forceFlushTimeoutMillis` on `TracerProviderOptions` has been removed. Pass `{ timeoutMillis }` to `forceFlush()` instead. The default timeout is 30000ms.
 
 ```ts
 // before
@@ -388,11 +465,10 @@ const provider = new TracerProvider();
 await provider.forceFlush({ timeoutMillis: 5000 });
 ```
 
-## 💥 `@opentelemetry/sdk-logs`
+## 💥 `@opentelemetry/sdk-logs` API changes
 
-### Removed: `SdkLogRecord` type alias
-
-`SdkLogRecord` was a type alias for `ReadWriteLogRecord`. Use `ReadWriteLogRecord` directly.
+- Removed: `SdkLogRecord` type alias.
+  `SdkLogRecord` was a type alias for `ReadWriteLogRecord`. Use `ReadWriteLogRecord` directly.
 
 ```ts
 // before
@@ -402,9 +478,8 @@ import type { SdkLogRecord } from '@opentelemetry/sdk-logs';
 import type { ReadWriteLogRecord } from '@opentelemetry/sdk-logs';
 ```
 
-### Removed: `LoggerProviderConfig` type alias
-
-`LoggerProviderConfig` was a type alias for `LoggerProviderOptions`. Use `LoggerProviderOptions` directly.
+- Removed: `LoggerProviderConfig` type alias.
+  `LoggerProviderConfig` was a type alias for `LoggerProviderOptions`. Use `LoggerProviderOptions` directly.
 
 ```ts
 // before
@@ -414,9 +489,8 @@ import type { LoggerProviderConfig } from '@opentelemetry/sdk-logs';
 import type { LoggerProviderOptions } from '@opentelemetry/sdk-logs';
 ```
 
-### Renamed: `LoggerConfig.disabled` -> `LoggerConfig.enabled`
-
-`LoggerConfig.disabled` has been replaced by `enabled`, matching the specification. Loggers remain enabled by default.
+- Renamed: `LoggerConfig.disabled` -> `LoggerConfig.enabled`.
+  `LoggerConfig.disabled` has been replaced by `enabled`, matching the specification. Loggers remain enabled by default.
 
 ```ts
 // before
@@ -440,11 +514,10 @@ const provider = new LoggerProvider({
 > Related issues and PRs:
 > [#7160](https://github.com/open-telemetry/opentelemetry-js/issues/7160)
 
-## 💥 `@opentelemetry/context-async-hooks`
+## 💥 `@opentelemetry/context-async-hooks` API changes
 
-### Removed: `AsyncHooksContextManager` context manager
-
-`AsyncHooksContextManager` has been removed. Use `AsyncLocalStorageContextManager`, which is built on [`AsyncLocalStorage`](https://nodejs.org/api/async_context.html#class-asynclocalstorage), the recommended Node.js API for context propagation.
+- Removed: `AsyncHooksContextManager` context manager.
+  `AsyncHooksContextManager` has been removed. Use `AsyncLocalStorageContextManager`, which is built on [`AsyncLocalStorage`](https://nodejs.org/api/async_context.html#class-asynclocalstorage), the recommended Node.js API for context propagation.
 
 ```ts
 // before
@@ -586,11 +659,10 @@ propagation.setGlobalPropagator(propagator);
 > [#7058](https://github.com/open-telemetry/opentelemetry-js/pull/7058)
 > [#7114](https://github.com/open-telemetry/opentelemetry-js/issues/7114)
 
-## 💥 `@opentelemetry/sdk-node`
+## 💥 `@opentelemetry/sdk-node` API changes
 
-### Removed: `NodeSDKConfiguration.logRecordProcessor`
-
-The singular `logRecordProcessor` option on `NodeSDKConfiguration` has been removed. Use `logRecordProcessors` (array) instead.
+- Removed: `NodeSDKConfiguration.logRecordProcessor`.
+  The singular `logRecordProcessor` option on `NodeSDKConfiguration` has been removed. Use `logRecordProcessors` (array) instead.
 
 ```ts
 // before
@@ -607,9 +679,8 @@ const sdk = new NodeSDK({
 });
 ```
 
-### Removed: `NodeSDKConfiguration.metricReader`
-
-The singular `metricReader` option on `NodeSDKConfiguration` has been removed. Use `metricReaders` (array) instead.
+- Removed: `NodeSDKConfiguration.metricReader`.
+  The singular `metricReader` option on `NodeSDKConfiguration` has been removed. Use `metricReaders` (array) instead.
 
 ```ts
 // before
@@ -626,9 +697,8 @@ const sdk = new NodeSDK({
 });
 ```
 
-### Removed: `NodeSDKConfiguration.spanProcessor`
-
-The singular `spanProcessor` option on `NodeSDKConfiguration` has been removed. Use `spanProcessors` (array) instead.
+- Removed: `NodeSDKConfiguration.spanProcessor`.
+  The singular `spanProcessor` option on `NodeSDKConfiguration` has been removed. Use `spanProcessors` (array) instead.
 
 ```ts
 // before
@@ -645,9 +715,11 @@ const sdk = new NodeSDK({
 });
 ```
 
-### Removed: `jaeger` propagator
+- Removed: `jaeger` propagator.
 
-The `jaeger` propagator name is no longer recognized. With `NodeSDK`, `OTEL_PROPAGATORS=jaeger` logs a warning and the name is skipped. With `startNodeSDK`, a `jaeger` entry from `OTEL_PROPAGATORS` or the configuration file's `propagator.composite` list stops SDK setup: it logs `unknown TextMapPropagator in configuration: "jaeger"` and returns a no-op SDK. Use `tracecontext`, and see the [propagator-jaeger section above](#-opentelemetrypropagator-jaeger-package-removed) for the cross-service rollout.
+  The `jaeger` propagator name is no longer recognized. With `NodeSDK`, `OTEL_PROPAGATORS=jaeger` logs a warning and the name is skipped.
+  With `startNodeSDK()` (currently experimental), a `jaeger` entry from `OTEL_PROPAGATORS` or the configuration file's `propagator.composite` list stops SDK setup: it logs `unknown TextMapPropagator in configuration: "jaeger"` and returns a no-op SDK.
+  Use `tracecontext`, and see the [propagator-jaeger section above](#-opentelemetrypropagator-jaeger-package-removed) for the cross-service rollout.
 
 ```yaml
 # before
@@ -665,11 +737,11 @@ propagator:
 > Related issues and PRs:
 > [#7077](https://github.com/open-telemetry/opentelemetry-js/pull/7077)
 
-### Removed: `tracing` namespace re-export
+- Removed: `tracing` namespace re-export.
 
-The deprecated namespace re-export `tracing` (re-exporting `@opentelemetry/sdk-trace-base`) has been removed from `@opentelemetry/sdk-node`.
-As well, the sdk-trace-base package has been *removed*, in favor of the sdk-trace package.
-See the [sdk-trace-base migration section above](#-opentelemetrysdk-trace-base-package-removed).
+  The deprecated namespace re-export `tracing` (re-exporting `@opentelemetry/sdk-trace-base`) has been removed from `@opentelemetry/sdk-node`.
+  As well, the sdk-trace-base package has been *removed*, in favor of the sdk-trace package.
+  See the [sdk-trace-base migration section above](#-opentelemetrysdk-trace-base-package-removed).
 
 ```ts
 // before
@@ -681,11 +753,11 @@ import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace';
 const exporter = new ConsoleSpanExporter();
 ```
 
-### Removed: `node` namespace re-export
+- Removed: `node` namespace re-export.
 
-The deprecated namespace re-export `node` (re-exporting `@opentelemetry/sdk-trace-node`) has been removed from `@opentelemetry/sdk-node`.
-As well, the sdk-trace-node package has been *removed*, in favor of the sdk-trace package.
-See the [sdk-trace-node migration section above](#-opentelemetrysdk-trace-node-package-removed).
+  The deprecated namespace re-export `node` (re-exporting `@opentelemetry/sdk-trace-node`) has been removed from `@opentelemetry/sdk-node`.
+  As well, the sdk-trace-node package has been *removed*, in favor of the sdk-trace package.
+  See the [sdk-trace-node migration section above](#-opentelemetrysdk-trace-node-package-removed).
 
 ```ts
 // before
@@ -697,9 +769,9 @@ import { TracerProvider } from '@opentelemetry/sdk-trace';
 // See sdk-trace-node section above for migration to sdk-trace.
 ```
 
-### Removed: `api` and `contextBase` namespace re-exports
+- Removed: `api` and `contextBase` namespace re-exports.
 
-The namespace re-exports `api` and `contextBase` (both re-exporting `@opentelemetry/api`) have been removed from `@opentelemetry/sdk-node`. Import directly from `@opentelemetry/api`.
+  The namespace re-exports `api` and `contextBase` (both re-exporting `@opentelemetry/api`) have been removed from `@opentelemetry/sdk-node`. Import directly from `@opentelemetry/api`.
 
 ```ts
 // before
@@ -715,9 +787,9 @@ const tracer = trace.getTracer('my-lib');
 const ctx = context.active();
 ```
 
-### Removed: `core` namespace re-export
+- Removed: `core` namespace re-export.
 
-The namespace re-export `core` (re-exporting `@opentelemetry/core`) has been removed from `@opentelemetry/sdk-node`. Import directly from `@opentelemetry/core`.
+  The namespace re-export `core` (re-exporting `@opentelemetry/core`) has been removed from `@opentelemetry/sdk-node`. Import directly from `@opentelemetry/core`.
 
 ```ts
 // before
@@ -729,9 +801,9 @@ import { W3CTraceContextPropagator } from '@opentelemetry/core';
 const propagator = new W3CTraceContextPropagator();
 ```
 
-### Removed: `logs` namespace re-export
+- Removed: `logs` namespace re-export.
 
-The namespace re-export `logs` (re-exporting `@opentelemetry/sdk-logs`) has been removed from `@opentelemetry/sdk-node`. Import directly from `@opentelemetry/sdk-logs`.
+  The namespace re-export `logs` (re-exporting `@opentelemetry/sdk-logs`) has been removed from `@opentelemetry/sdk-node`. Import directly from `@opentelemetry/sdk-logs`.
 
 ```ts
 // before
@@ -743,9 +815,9 @@ import { SimpleLogRecordProcessor } from '@opentelemetry/sdk-logs';
 const processor = new SimpleLogRecordProcessor({ exporter });
 ```
 
-### Removed: `metrics` namespace re-export
+- Removed: `metrics` namespace re-export.
 
-The namespace re-export `metrics` (re-exporting `@opentelemetry/sdk-metrics`) has been removed from `@opentelemetry/sdk-node`. Import directly from `@opentelemetry/sdk-metrics`.
+  The namespace re-export `metrics` (re-exporting `@opentelemetry/sdk-metrics`) has been removed from `@opentelemetry/sdk-node`. Import directly from `@opentelemetry/sdk-metrics`.
 
 ```ts
 // before
@@ -757,9 +829,9 @@ import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 const reader = new PeriodicExportingMetricReader({ exporter });
 ```
 
-### Removed: `resources` namespace re-export
+- Removed: `resources` namespace re-export.
 
-The namespace re-export `resources` (re-exporting `@opentelemetry/resources`) has been removed from `@opentelemetry/sdk-node`. Import directly from `@opentelemetry/resources`.
+  The namespace re-export `resources` (re-exporting `@opentelemetry/resources`) has been removed from `@opentelemetry/sdk-node`. Import directly from `@opentelemetry/resources`.
 
 ```ts
 // before
