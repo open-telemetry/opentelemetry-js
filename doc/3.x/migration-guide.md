@@ -180,12 +180,12 @@ Cases that changed in JS SDK 3.0 are marked with an asterisk (\*).
 
 ### 💥 Possible breaking changes with complex attributes
 
-- **SDK implementors.**
-  This is a **breaking change for SDK implementations**. To support `@opentelemetry/api` v1.10.0 they may need to support more attribute types for any APIs that accept `Attributes` or `AnyValue`. Implementors should refer to [this OTEP 4485 section](https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/4485-extending-attributes-to-support-complex-values.md#how) for "MUST / SHOULD" requirements for complex attributes handling. See also the [attributes-handling utilities provided by `@opentelemetry/core` to help](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-core/src/common/attributes.ts). For example, `cleanSimpleAttributes()` can be used to limit user-provided attributes to the set of value types supported in earlier `@opentelemetry/api` versions.
+- **SDK implementations.**
+  This is a **breaking change for SDK implementors**. To support `@opentelemetry/api` v1.10.0 they may need to support more attribute types for any APIs that accept `Attributes` or `AnyValue`. Implementors should refer to [this OTEP 4485 section](https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/4485-extending-attributes-to-support-complex-values.md#how) for "MUST / SHOULD" requirements for complex attributes handling. See also the [attributes-handling utilities provided by `@opentelemetry/core` to help](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-core/src/common/attributes.ts). For example, `cleanSimpleAttributes()` can be used to limit user-provided attributes to the set of value types supported in earlier `@opentelemetry/api` versions.
 
 - **Type narrowing with the `Attributes` type.**
-  This change is **typically not a breaking change for users** of `@opentelemetry/api`.
-  There is one possible breaking case: If a TypeScript user was using the `Attributes` type in their own code and using [TypeScript Narrowing](https://www.typescriptlang.org/docs/handbook/2/narrowing.html) to reduce an attribute value to an expected type ([example here](https://github.com/open-telemetry/opentelemetry-js/pull/6579#issuecomment-4345316200)).
+  If a TypeScript user was using the `Attributes` type in their own code and using [TypeScript Narrowing](https://www.typescriptlang.org/docs/handbook/2/narrowing.html) to reduce an attribute value to an expected type,
+  the new `type Attributes` could result in a type-checking error ([example here](https://github.com/open-telemetry/opentelemetry-js/pull/6579#issuecomment-4345316200)).
   It is expected that this usage should be rare and, likely, limited to SDK implementations, if at all.
   (If this impacted your code, [please let us know](https://github.com/open-telemetry/opentelemetry-js/issues/new).)
 
