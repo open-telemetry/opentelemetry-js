@@ -135,8 +135,9 @@ import type { AnyValue, Attributes } from '@opentelemetry/api';
 ## 💥 Support for complex attribute values
 
 > [!IMPORTANT]
-> * Simple attributes SHOULD be used whenever possible. Instrumentations SHOULD assume that backends do not index individual properties of complex attributes, that querying or aggregating on such properties is inefficient and complicated, and that reporting complex attributes carries higher performance overhead.
-> * Complex attributes and unsupported values MUST NOT be used with the Metrics SDK.
+>
+> - Simple attributes SHOULD be used whenever possible. Instrumentations SHOULD assume that backends do not index individual properties of complex attributes, that querying or aggregating on such properties is inefficient and complicated, and that reporting complex attributes carries higher performance overhead.
+> - Complex attributes and unsupported values MUST NOT be used with the Metrics SDK.
 >   For performance reasons, sdk-metrics does not guard against invalid attributes.
 
 Support has been added for attributes (for example span attributes, log record attributes) to have more complex values, according to [OTEP 4485](https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/4485-extending-attributes-to-support-complex-values.md).
@@ -163,19 +164,19 @@ export interface Attributes {
 The following table shows whether simple or complex attribute values are supported for all places in the OTel API and SDK with attributes.
 Cases that changed in JS SDK 3.0 are marked with an asterisk (\*).
 
-| Attributes usage | OTEP 4485 requirement | Attribute values supported |
-| ---------------- | --------------------- | -------------------------- |
-| resource         | MAY                   | simple (\*) |
-| span             | MUST                  | complex (\*) |
-| span link        | MUST                  | complex (\*) |
-| span event       | MAY                   | simple (span events are deprecated) |
-| metric           | MAY                   | simple (**not guarded**) |
-| log record       | MUST                  | complex |
-| logger instrumentation scope | MAY       | simple (\*) |
-| meter instrumentation scope  | MAY       | N/A (no attributes support yet) |
-| tracer instrumentation scope | MAY       | N/A (no attributes support yet) |
-| entity (identifying) | MAY               | N/A (no entities support yet) |
-| entity (descriptive) | MUST              | N/A (no entities support yet) |
+| Attributes usage             | OTEP 4485 requirement | Attribute values supported          |
+| ---------------------------- | --------------------- | ----------------------------------- |
+| resource                     | MAY                   | simple (\*)                         |
+| span                         | MUST                  | complex (\*)                        |
+| span link                    | MUST                  | complex (\*)                        |
+| span event                   | MAY                   | simple (span events are deprecated) |
+| metric                       | MAY                   | simple (**not guarded**)            |
+| log record                   | MUST                  | complex                             |
+| logger instrumentation scope | MAY                   | simple (\*)                         |
+| meter instrumentation scope  | MAY                   | N/A (no attributes support yet)     |
+| tracer instrumentation scope | MAY                   | N/A (no attributes support yet)     |
+| entity (identifying)         | MAY                   | N/A (no entities support yet)       |
+| entity (descriptive)         | MUST                  | N/A (no entities support yet)       |
 
 ### 💥 Possible breaking changes with complex attributes
 
