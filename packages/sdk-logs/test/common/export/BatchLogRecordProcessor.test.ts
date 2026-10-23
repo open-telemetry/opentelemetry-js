@@ -521,6 +521,22 @@ describe('BatchLogRecordProcessorBase', () => {
       );
     });
 
+    it('should wait for a shared pending resource only once per flush', async () => {
+      const processor = new BatchLogRecordProcessor({ exporter });
+      const asyncResource = resourceFromAttributes({
+        async: new Promise<string>(resolve =>
+          setTimeout(() => resolve('fromasync'), 1)
+        ),
+      });
+      const waitSpy = sinon.spy(asyncResource, 'waitForAsyncAttributes');
+      for (let i = 0; i < 10; i++) {
+        processor.onEmit(createLogRecord(undefined, asyncResource));
+      }
+      await processor.forceFlush();
+      assert.strictEqual(waitSpy.callCount, 1);
+      assert.strictEqual(exporter.getFinishedLogRecords().length, 10);
+    });
+
     it('should call forceFlush on exporter when export is in progress', async () => {
       // arrange
       let exportCallback: ((result: ExportResult) => void) | undefined;
