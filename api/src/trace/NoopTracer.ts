@@ -88,6 +88,17 @@ export class NoopTracer implements Tracer {
   }
 }
 
+export const NOOP_TRACER = new NoopTracer();
+
+/**
+ * Create a no-op Tracer
+ *
+ * @since 1.10.0
+ */
+export function createNoopTracer(): Tracer {
+  return NOOP_TRACER;
+}
+
 function isSpanContext(spanContext: unknown): spanContext is SpanContext {
   return (
     spanContext !== null &&

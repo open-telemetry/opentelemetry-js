@@ -28,6 +28,7 @@ import {
   SimpleSpanProcessor,
 } from '../../src';
 import { TracerProvider } from '../../src';
+import { Tracer } from '../../src/Tracer';
 import { TestRecordOnlySampler } from './export/TestRecordOnlySampler';
 import {
   TestMetricReader,
@@ -297,6 +298,32 @@ describe('TracerProvider', () => {
     });
   });
 
+  describe('.getTracer()', () => {
+    it('should return no-op tracer when already shutdown', async () => {
+      const tracerProvider = new TracerProvider();
+      await tracerProvider.shutdown();
+
+      // returned tracer should be no-op, not instance of Tracer (from SDK)
+      const tracer = tracerProvider.getTracer('foo');
+      assert.ok(!(tracer instanceof Tracer));
+      const span = tracer.startSpan('test');
+      assert.strictEqual(span.isRecording(), false);
+    });
+
+    it('should emit diag.warn when already shutdown', async () => {
+      const warnStub = sinon.spy(diag, 'warn');
+      const tracerProvider = new TracerProvider();
+      await tracerProvider.shutdown();
+
+      tracerProvider.getTracer('foo');
+      sinon.assert.calledOnce(warnStub);
+      sinon.assert.calledWith(
+        warnStub,
+        'A shutdown TracerProvider cannot provide a Tracer'
+      );
+    });
+  });
+
   describe('.withSpan()', () => {
     it('should run context with NoopContextManager context manager', done => {
       const tracer = new TracerProvider().getTracer('default');
@@ -404,6 +431,40 @@ describe('TracerProvider', () => {
         rejection[0].message,
         'Span processor did not completed within timeout period of 30000 ms'
       );
+    });
+
+    it('should warn and return without flushing if already shutdown', async () => {
+      const warnStub = sinon.spy(diag, 'warn');
+      const spanProcessor = new NoopSpanProcessor();
+      const forceFlushStub = sinon.stub(spanProcessor, 'forceFlush').resolves();
+      const tracerProvider = new TracerProvider({
+        spanProcessors: [spanProcessor],
+      });
+
+      await tracerProvider.shutdown();
+      await tracerProvider.forceFlush();
+
+      sinon.assert.calledOnce(warnStub);
+      sinon.assert.calledWith(
+        warnStub,
+        'invalid attempt to force flush after TracerProvider shutdown'
+      );
+      sinon.assert.notCalled(forceFlushStub);
+    });
+  });
+
+  describe('.shutdown()', () => {
+    it('should only shutdown span processors once', async () => {
+      const spanProcessor = new NoopSpanProcessor();
+      const shutdownStub = sinon.stub(spanProcessor, 'shutdown').resolves();
+      const tracerProvider = new TracerProvider({
+        spanProcessors: [spanProcessor],
+      });
+
+      await tracerProvider.shutdown();
+      await tracerProvider.shutdown();
+
+      sinon.assert.calledOnce(shutdownStub);
     });
   });
 
