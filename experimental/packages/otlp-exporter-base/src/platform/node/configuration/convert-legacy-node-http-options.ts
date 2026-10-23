@@ -60,6 +60,7 @@ export function convertLegacyHttpOptions(
       concurrencyLimit: config.concurrencyLimit,
       timeoutMillis: config.timeoutMillis,
       compression: config.compression,
+      maxRequestSize: config.maxRequestSize,
       agentFactory: convertLegacyAgentOptions(config),
       userAgent: config.userAgent,
     },
