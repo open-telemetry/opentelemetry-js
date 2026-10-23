@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Context, HrTime, Attributes } from '@opentelemetry/api';
+import type { Context, Attributes } from '@opentelemetry/api';
 import { FixedSizeExemplarReservoirBase } from './ExemplarReservoir';
 
 /**
@@ -20,7 +20,7 @@ export class AlignedHistogramBucketExemplarReservoir extends FixedSizeExemplarRe
 
   private _findBucketIndex(
     value: number,
-    _timestamp: HrTime,
+    _timestamp: number,
     _attributes: Attributes,
     _ctx: Context
   ) {
@@ -34,7 +34,7 @@ export class AlignedHistogramBucketExemplarReservoir extends FixedSizeExemplarRe
 
   offer(
     value: number,
-    timestamp: HrTime,
+    timestamp: number,
     attributes: Attributes,
     ctx: Context
   ): void {
