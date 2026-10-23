@@ -1601,6 +1601,44 @@ describe('Span', () => {
       });
     });
 
+    describe('when exception has nested errors', () => {
+      it('should include the cause chain and aggregated errors in the stacktrace', () => {
+        const span = new SpanImpl({
+          scope: tracer.instrumentationScope,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
+          spanContext,
+          name,
+          kind: SpanKind.CLIENT,
+          spanLimits: cheatSpanLimitsFromTracer(tracer),
+          spanProcessor: tracer['_spanProcessor'],
+        });
+        // keep the expected stacktrace below the 100 chars attributeValueLengthLimit
+        const cause = new Error('i');
+        cause.stack = 'Error: i\n    at i';
+        const child = new TypeError('c');
+        child.stack = 'TypeError: c\n    at c';
+        const error = new AggregateError([child], 'o', { cause });
+        error.stack = 'AggregateError: o\n    at o';
+
+        span.recordException(error);
+
+        const event = span.events[0];
+        assert.deepStrictEqual(event.attributes, {
+          [ATTR_EXCEPTION_TYPE]: 'AggregateError',
+          [ATTR_EXCEPTION_MESSAGE]: 'o',
+          [ATTR_EXCEPTION_STACKTRACE]: [
+            'AggregateError: o',
+            '    at o',
+            '    [errors][0]: TypeError: c',
+            '        at c',
+            'Caused by: Error: i',
+            '    at i',
+          ].join('\n'),
+        });
+      });
+    });
+
     describe('when attributes are specified', () => {
       it('should store specified attributes', () => {
         const span = new SpanImpl({
