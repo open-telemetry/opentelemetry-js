@@ -47,9 +47,21 @@ export default tseslint.config(
       // protobuf-ts generated test fixtures (buf generate output, gitignored).
       'experimental/packages/opentelemetry-instrumentation-grpc/test/proto/**',
       'semantic-conventions/src/experimental_attributes.ts',
+      'semantic-conventions/src/experimental_events.ts',
       'semantic-conventions/src/experimental_metrics.ts',
       'semantic-conventions/src/stable_attributes.ts',
+      'semantic-conventions/src/stable_events.ts',
       'semantic-conventions/src/stable_metrics.ts',
+      // weaver-generated output, see "semantic-conventions-genai/scripts/generate.sh". The
+      // "stable_*" files are currently empty (every GenAI convention is still
+      // in development), but are listed so they stay ignored once GenAI
+      // conventions begin to stabilize.
+      'semantic-conventions-genai/src/experimental_attributes.ts',
+      'semantic-conventions-genai/src/experimental_events.ts',
+      'semantic-conventions-genai/src/experimental_metrics.ts',
+      'semantic-conventions-genai/src/stable_attributes.ts',
+      'semantic-conventions-genai/src/stable_events.ts',
+      'semantic-conventions-genai/src/stable_metrics.ts',
     ],
   },
 
