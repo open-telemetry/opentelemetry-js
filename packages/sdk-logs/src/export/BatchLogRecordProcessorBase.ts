@@ -224,19 +224,21 @@ export abstract class BatchLogRecordProcessorBase<
    * for all other cases _exportOneBatch should be used
    * */
   private async _flushAll(): Promise<void> {
-    while (this._flushPromise !== undefined) {
-      try {
-        await this._flushPromise;
-      } catch {
-        // A failed flush must not prevent the next caller from retrying.
-      }
-    }
-    const flush = this._flushAllOnce();
+    // Continue the chain even if the previous flush failed.
+    const flush =
+      this._flushPromise === undefined
+        ? this._flushAllOnce()
+        : this._flushPromise.then(
+            () => this._flushAllOnce(),
+            () => this._flushAllOnce()
+          );
     this._flushPromise = flush;
     try {
       await flush;
     } finally {
-      this._flushPromise = undefined;
+      if (this._flushPromise === flush) {
+        this._flushPromise = undefined;
+      }
     }
   }
 
