@@ -13,6 +13,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :bug: Bug Fixes
 
+* fix(instrumentation-http): don't unwrap http emit when patching https [#7227](https://github.com/open-telemetry/opentelemetry-js/pull/7227) @a-monteiro
 * fix(otlp-exporter-base): pick the browser fetch `mode` from the document origin, so exports from an opaque-origin document (e.g. a sandboxed iframe) no longer fail with `mode: 'same-origin'` [#7211](https://github.com/open-telemetry/opentelemetry-js/pull/7211) @MO2k4
 
 ### :books: Documentation
