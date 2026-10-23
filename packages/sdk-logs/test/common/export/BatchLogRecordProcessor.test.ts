@@ -511,6 +511,126 @@ describe('BatchLogRecordProcessorBase', () => {
       });
     }
 
+    it('drains newer records before many overlapping flush calls and shutdown complete', async () => {
+      const pending = withResolvers<void>();
+      const started = withResolvers<void>();
+      const flush = sinon.stub(exporter, 'forceFlush').resolves();
+      flush.onFirstCall().callsFake(() => {
+        started.resolve();
+        return pending.promise;
+      });
+      const exportSpy = sinon.spy(exporter, 'export');
+      const processor = new BatchLogRecordProcessor({ exporter });
+      const first = createLogRecord();
+      const second = createLogRecord();
+      processor.onEmit(first);
+      const initial = processor.forceFlush();
+      await started.promise;
+      processor.onEmit(second);
+      const completed: number[] = [];
+      const overlapping = Array.from({ length: 256 }, (_, index) =>
+        processor.forceFlush().then(() => {
+          assert.deepStrictEqual(
+            exportSpy.args.flatMap(args => args[0]),
+            [first, second]
+          );
+          completed.push(index);
+        })
+      );
+      const shutdown = processor.shutdown();
+      await Promise.resolve();
+      assert.deepStrictEqual(completed, []);
+      pending.resolve();
+      await Promise.all([initial, ...overlapping, shutdown]);
+      assert.deepStrictEqual(
+        completed,
+        Array.from({ length: 256 }, (_, index) => index)
+      );
+    });
+
+    it('keeps a later flush behind a queued flush when the first caller completes', async () => {
+      const firstPending = withResolvers<void>();
+      const firstStarted = withResolvers<void>();
+      const secondPending = withResolvers<void>();
+      const secondStarted = withResolvers<void>();
+      const flush = sinon.stub(exporter, 'forceFlush').resolves();
+      flush.onFirstCall().callsFake(() => {
+        firstStarted.resolve();
+        return firstPending.promise;
+      });
+      flush.onSecondCall().callsFake(() => {
+        secondStarted.resolve();
+        return secondPending.promise;
+      });
+      const processor = new BatchLogRecordProcessor({ exporter });
+      const records = Array.from({ length: 3 }, () => createLogRecord());
+      processor.onEmit(records[0]);
+      const first = processor.forceFlush();
+      await firstStarted.promise;
+      processor.onEmit(records[1]);
+      const second = processor.forceFlush();
+      firstPending.resolve();
+      await first;
+      await secondStarted.promise;
+      processor.onEmit(records[2]);
+      let completed = false;
+      const third = processor.forceFlush().then(() => {
+        completed = true;
+      });
+      await new Promise<void>(resolve => setTimeout(resolve, 0));
+      const completedEarly = completed;
+      secondPending.resolve();
+      await Promise.all([second, third]);
+      const exported = exporter.getFinishedLogRecords();
+      await processor.shutdown();
+      assert.strictEqual(completedEarly, false);
+      assert.deepStrictEqual(exported, records);
+    });
+
+    it('continues queued flush calls after exporter forceFlush rejects', async () => {
+      const pendingExport = withResolvers<void>();
+      const pendingFlush = withResolvers<void>();
+      const started = withResolvers<void>();
+      const records: ReadableLogRecord[] = [];
+      const expectedError = new Error('flush failed');
+      const flush = sinon.stub().resolves();
+      flush.onFirstCall().returns(pendingFlush.promise);
+      const customExporter: LogRecordExporter = {
+        export: (logs, callback) => {
+          records.push(...logs);
+          started.resolve();
+          pendingExport.promise.then(() =>
+            callback({ code: ExportResultCode.SUCCESS })
+          );
+        },
+        forceFlush: flush,
+        shutdown: async () => {},
+      };
+      const processor = new BatchLogRecordProcessor({
+        exporter: customExporter,
+        maxExportBatchSize: 1,
+      });
+      const first = createLogRecord();
+      const second = createLogRecord();
+      processor.onEmit(first);
+      await started.promise;
+      processor.onEmit(second);
+      const initial = processor.forceFlush();
+      const rejected = assert.rejects(
+        initial,
+        error => error === expectedError
+      );
+      const overlapping = Array.from({ length: 128 }, () =>
+        processor.forceFlush()
+      );
+      const shutdown = processor.shutdown();
+      pendingFlush.reject(expectedError);
+      await rejected;
+      pendingExport.resolve();
+      await Promise.all([...overlapping, shutdown]);
+      assert.deepStrictEqual(records, [first, second]);
+    });
+
     it('recovers after exporter forceFlush rejects with an export in progress', async () => {
       const pending = withResolvers<void>();
       const started = withResolvers<void>();
