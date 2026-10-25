@@ -44,6 +44,18 @@ let pendingBodySize = 0;
  */
 let pendingKeepaliveCount = 0;
 
+/**
+ * Number of body bytes that can still be sent with `keepalive` right now,
+ * given the requests already holding budget. Zero when the concurrent request
+ * limit is reached.
+ */
+export function getAvailableKeepaliveBudget(): number {
+  if (pendingKeepaliveCount >= MAX_KEEPALIVE_REQUESTS) {
+    return 0;
+  }
+  return Math.max(0, MAX_KEEPALIVE_BODY_SIZE - pendingBodySize);
+}
+
 export interface FetchTransportParameters {
   url: string;
   headers: HeadersFactory;
@@ -206,7 +218,7 @@ export function createFetchTransport(
   return new FetchTransport(parameters);
 }
 
-function isDocumentHidden(): boolean {
+export function isDocumentHidden(): boolean {
   return (
     typeof document !== 'undefined' && document.visibilityState === 'hidden'
   );
