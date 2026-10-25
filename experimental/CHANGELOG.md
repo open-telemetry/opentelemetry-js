@@ -14,6 +14,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 ### :bug: Bug Fixes
 
 * fix(otlp-exporter-base): pick the browser fetch `mode` from the document origin, so exports from an opaque-origin document (e.g. a sandboxed iframe) no longer fail with `mode: 'same-origin'` [#7211](https://github.com/open-telemetry/opentelemetry-js/pull/7211) @MO2k4
+* fix(otlp-exporter-base): warn when the browser fetch transport sends an export without `keepalive` while the page is hidden, since that export can be lost with the page [#7230](https://github.com/open-telemetry/opentelemetry-js/issues/7230) @adityareddy-dev
 
 ### :books: Documentation
 
