@@ -672,6 +672,44 @@ describe('FetchTransport', function () {
         sinon.assert.neverCalledWithMatch(debug, /keepalive disabled/);
       });
 
+      it('warns when the page becomes hidden while headers are pending', async function () {
+        const largePayload = new Uint8Array(MAX_KEEPALIVE_BODY_SIZE + 1);
+        const headers = withResolvers<Record<string, string>>();
+        const fetchStub = sinon
+          .stub(globalThis, 'fetch')
+          .resolves(new Response('', { status: 200 }));
+        const { warn, debug } = registerMockDiagLogger();
+        setVisibility('visible');
+
+        const transport = createFetchTransport({
+          ...testTransportParameters,
+          headers: () => headers.promise,
+        });
+        const pending = transport.send(largePayload, requestTimeout);
+        const fetchedWhileHeadersPending = fetchStub.called;
+
+        setVisibility('hidden');
+        headers.resolve({ foo: 'foo-value' });
+        const result = await pending;
+
+        assert.strictEqual(fetchedWhileHeadersPending, false);
+        assert.strictEqual(result.status, 'success');
+        sinon.assert.calledOnceWithMatch(
+          fetchStub,
+          testTransportParameters.url,
+          {
+            headers: { foo: 'foo-value' },
+            keepalive: false,
+          }
+        );
+        sinon.assert.calledOnceWithExactly(
+          warn,
+          `keepalive disabled: ${(largePayload.byteLength / 1024).toFixed(1)}KB payload, 0 pending (size limit); the page is hidden, so this export may be lost if the page is unloaded`
+        );
+        sinon.assert.callOrder(warn, fetchStub);
+        sinon.assert.neverCalledWithMatch(debug, /keepalive disabled/);
+      });
+
       it('does not warn when the export fits the keepalive budget', async function () {
         sinon
           .stub(globalThis, 'fetch')

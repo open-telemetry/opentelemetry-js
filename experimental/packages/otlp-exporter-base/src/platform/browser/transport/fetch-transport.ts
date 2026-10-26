@@ -83,18 +83,6 @@ class FetchTransport implements IExporterTransport {
     if (useKeepalive) {
       pendingBodySize += requestSize;
       pendingKeepaliveCount++;
-    } else {
-      const reason = wouldExceedSize ? 'size limit' : 'count limit';
-      const message = `keepalive disabled: ${(requestSize / 1024).toFixed(1)}KB payload, ${pendingKeepaliveCount} pending (${reason})`;
-      if (isDocumentHidden()) {
-        // A request without keepalive can be cancelled together with the page,
-        // and nothing else reports that the batch was lost.
-        diag.warn(
-          `${message}; the page is hidden, so this export may be lost if the page is unloaded`
-        );
-      } else {
-        diag.debug(message);
-      }
     }
 
     // Captured before the first `await`, which a synchronous context manager
@@ -121,6 +109,19 @@ class FetchTransport implements IExporterTransport {
       const url = new URL(this._parameters.url);
       // Resolve headers before entering the suppressed fetch context.
       const headers = await this._parameters.headers();
+      if (!useKeepalive) {
+        const reason = wouldExceedSize ? 'size limit' : 'count limit';
+        const message = `keepalive disabled: ${(requestSize / 1024).toFixed(1)}KB payload, ${pendingKeepaliveCount} pending (${reason})`;
+        if (isDocumentHidden()) {
+          // A request without keepalive can be cancelled together with the page,
+          // and nothing else reports that the batch was lost.
+          diag.warn(
+            `${message}; the page is hidden, so this export may be lost if the page is unloaded`
+          );
+        } else {
+          diag.debug(message);
+        }
+      }
       const response = await context.with(suppressedContext, () =>
         fetchApi(url.href, {
           method: 'POST',
