@@ -46,7 +46,7 @@ export const ANDROID_APP_STATE_VALUE_CREATED = "created" as const;
 export const ANDROID_APP_STATE_VALUE_FOREGROUND = "foreground" as const;
 
 /**
- * Uniquely identifies the framework API revision offered by a version (`os.version`) of the android operating system. More information can be found in the [Android API levels documentation](https://developer.android.com/guide/topics/manifest/uses-sdk-element#ApiLevels).
+ * Uniquely identifies the framework API revision offered by a version (`os.version`) of the Android operating system. More information can be found in the [Android API levels documentation](https://developer.android.com/guide/topics/manifest/uses-sdk-element#ApiLevels).
  *
  * @example 33
  * @example 32
@@ -103,7 +103,7 @@ export const ANDROID_STATE_VALUE_FOREGROUND = "foreground" as const;
 export const ATTR_APP_BUILD_ID = 'app.build_id' as const;
 
 /**
- * A unique identifier representing an instance of an end-user facing app crash.
+ * A unique identifier representing an instance of an end user facing app crash.
  *
  * @example 083d3d2d-9a0e-47f8-be3d-bc3c5538ba38
  *
@@ -273,7 +273,7 @@ export const ATTR_ARTIFACT_ATTESTATION_FILENAME = 'artifact.attestation.filename
 export const ATTR_ARTIFACT_ATTESTATION_HASH = 'artifact.attestation.hash' as const;
 
 /**
- * The id of the build [software attestation](https://slsa.dev/attestation-model).
+ * The ID of the build [software attestation](https://slsa.dev/attestation-model).
  *
  * @example 123
  *
@@ -282,14 +282,14 @@ export const ATTR_ARTIFACT_ATTESTATION_HASH = 'artifact.attestation.hash' as con
 export const ATTR_ARTIFACT_ATTESTATION_ID = 'artifact.attestation.id' as const;
 
 /**
- * The human readable file name of the artifact, typically generated during build and release processes. Often includes the package name and version in the file name.
+ * The human readable filename of the artifact, typically generated during build and release processes. Often includes the package name and version in the filename.
  *
  * @example golang-binary-amd64-v0.1.0
  * @example docker-image-amd64-v0.1.0
  * @example release-1.tar.gz
  * @example file-name-package.tar.gz
  *
- * @note This file name can also act as the [Package Name](https://slsa.dev/spec/v1.0/terminology#package-model)
+ * @note This filename can also act as the [Package Name](https://slsa.dev/spec/v1.0/terminology#package-model)
  * in cases where the package ecosystem maps accordingly.
  * Additionally, the artifact [can be published](https://slsa.dev/spec/v1.0/terminology#software-supply-chain)
  * for others, but that is not a guarantee.
@@ -1028,7 +1028,7 @@ export const ASPNETCORE_IDENTITY_USER_UPDATE_TYPE_VALUE_UPDATE = "update" as con
 /**
  * Enum value "user_name" for attribute {@link ATTR_ASPNETCORE_IDENTITY_USER_UPDATE_TYPE}.
  *
- * Identity user name updated.
+ * Identity username updated.
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1844,6 +1844,197 @@ export const ATTR_BROWSER_MOBILE = 'browser.mobile' as const;
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const ATTR_BROWSER_PLATFORM = 'browser.platform' as const;
+
+/**
+ * The delta between the current value and the last-reported value. See [delta](https://github.com/GoogleChrome/web-vitals?tab=readme-ov-file#report-only-the-delta-of-changes).
+ *
+ * @example 0.2
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_BROWSER_WEB_VITAL_DELTA = 'browser.web_vital.delta' as const;
+
+/**
+ * A unique ID representing this particular metric instance.
+ *
+ * @example v3-1677874579383-6381583661209
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_BROWSER_WEB_VITAL_ID = 'browser.web_vital.id' as const;
+
+/**
+ * Name of the web vital.
+ *
+ * @example cls
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_BROWSER_WEB_VITAL_NAME = 'browser.web_vital.name' as const;
+
+/**
+ * Enum value "cls" for attribute {@link ATTR_BROWSER_WEB_VITAL_NAME}.
+ *
+ * Cumulative Layout Shift. See [cls](https://web.dev/articles/cls).
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const BROWSER_WEB_VITAL_NAME_VALUE_CLS = "cls" as const;
+
+/**
+ * Enum value "fcp" for attribute {@link ATTR_BROWSER_WEB_VITAL_NAME}.
+ *
+ * First Contentful Paint. See [fcp](https://web.dev/articles/fcp).
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const BROWSER_WEB_VITAL_NAME_VALUE_FCP = "fcp" as const;
+
+/**
+ * Enum value "fid" for attribute {@link ATTR_BROWSER_WEB_VITAL_NAME}.
+ *
+ * First Input Delay. See [fid](https://web.dev/articles/fid).
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by Interaction to Next Paint (`inp`), which became a Core Web Vital in March 2024. See [inp](https://web.dev/articles/inp).
+ */
+export const BROWSER_WEB_VITAL_NAME_VALUE_FID = "fid" as const;
+
+/**
+ * Enum value "inp" for attribute {@link ATTR_BROWSER_WEB_VITAL_NAME}.
+ *
+ * Interaction to Next Paint. See [inp](https://web.dev/articles/inp).
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const BROWSER_WEB_VITAL_NAME_VALUE_INP = "inp" as const;
+
+/**
+ * Enum value "lcp" for attribute {@link ATTR_BROWSER_WEB_VITAL_NAME}.
+ *
+ * Largest Contentful Paint. See [lcp](https://web.dev/articles/lcp).
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const BROWSER_WEB_VITAL_NAME_VALUE_LCP = "lcp" as const;
+
+/**
+ * Enum value "ttfb" for attribute {@link ATTR_BROWSER_WEB_VITAL_NAME}.
+ *
+ * Time to First Byte. See [ttfb](https://web.dev/articles/ttfb).
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const BROWSER_WEB_VITAL_NAME_VALUE_TTFB = "ttfb" as const;
+
+/**
+ * The type of navigation, as reported by the [Navigation Timing API](https://developer.mozilla.org/docs/Web/API/PerformanceNavigationTiming/type), with additional values reported by the web-vitals library.
+ *
+ * @example navigate
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_BROWSER_WEB_VITAL_NAVIGATION_TYPE = 'browser.web_vital.navigation_type' as const;
+
+/**
+ * Enum value "back-forward" for attribute {@link ATTR_BROWSER_WEB_VITAL_NAVIGATION_TYPE}.
+ *
+ * Navigation through the browser's history traversal (e.g. back/forward buttons).
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const BROWSER_WEB_VITAL_NAVIGATION_TYPE_VALUE_BACK_FORWARD = "back-forward" as const;
+
+/**
+ * Enum value "back-forward-cache" for attribute {@link ATTR_BROWSER_WEB_VITAL_NAVIGATION_TYPE}.
+ *
+ * Navigation restoring a page from the back/forward cache (bfcache).
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const BROWSER_WEB_VITAL_NAVIGATION_TYPE_VALUE_BACK_FORWARD_CACHE = "back-forward-cache" as const;
+
+/**
+ * Enum value "navigate" for attribute {@link ATTR_BROWSER_WEB_VITAL_NAVIGATION_TYPE}.
+ *
+ * Navigation started by clicking a link, entering a URL, form submission, or a script operation.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const BROWSER_WEB_VITAL_NAVIGATION_TYPE_VALUE_NAVIGATE = "navigate" as const;
+
+/**
+ * Enum value "prerender" for attribute {@link ATTR_BROWSER_WEB_VITAL_NAVIGATION_TYPE}.
+ *
+ * Navigation to a page that was prerendered.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const BROWSER_WEB_VITAL_NAVIGATION_TYPE_VALUE_PRERENDER = "prerender" as const;
+
+/**
+ * Enum value "reload" for attribute {@link ATTR_BROWSER_WEB_VITAL_NAVIGATION_TYPE}.
+ *
+ * Navigation through a reload operation or a `Location.reload()` call.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const BROWSER_WEB_VITAL_NAVIGATION_TYPE_VALUE_RELOAD = "reload" as const;
+
+/**
+ * Enum value "restore" for attribute {@link ATTR_BROWSER_WEB_VITAL_NAVIGATION_TYPE}.
+ *
+ * Navigation restoring a page that was previously discarded by the browser.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const BROWSER_WEB_VITAL_NAVIGATION_TYPE_VALUE_RESTORE = "restore" as const;
+
+/**
+ * The rating of the web vital value against the "good", "needs improvement", and "poor" thresholds defined for the metric.
+ *
+ * @example good
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_BROWSER_WEB_VITAL_RATING = 'browser.web_vital.rating' as const;
+
+/**
+ * Enum value "good" for attribute {@link ATTR_BROWSER_WEB_VITAL_RATING}.
+ *
+ * The metric value is within the "good" threshold.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const BROWSER_WEB_VITAL_RATING_VALUE_GOOD = "good" as const;
+
+/**
+ * Enum value "needs-improvement" for attribute {@link ATTR_BROWSER_WEB_VITAL_RATING}.
+ *
+ * The metric value is within the "needs improvement" threshold.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const BROWSER_WEB_VITAL_RATING_VALUE_NEEDS_IMPROVEMENT = "needs-improvement" as const;
+
+/**
+ * Enum value "poor" for attribute {@link ATTR_BROWSER_WEB_VITAL_RATING}.
+ *
+ * The metric value is within the "poor" threshold.
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const BROWSER_WEB_VITAL_RATING_VALUE_POOR = "poor" as const;
+
+/**
+ * Value of the web vital.
+ *
+ * @example 1.0
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_BROWSER_WEB_VITAL_VALUE = 'browser.web_vital.value' as const;
 
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
@@ -2687,6 +2878,15 @@ export const CLOUD_PLATFORM_VALUE_ORACLE_CLOUD_COMPUTE = "oracle_cloud_compute" 
 export const CLOUD_PLATFORM_VALUE_ORACLE_CLOUD_OKE = "oracle_cloud_oke" as const;
 
 /**
+ * Enum value "scaleway_cloud_compute" for attribute {@link ATTR_CLOUD_PLATFORM}.
+ *
+ * Compute on Scaleway Cloud
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const CLOUD_PLATFORM_VALUE_SCALEWAY_CLOUD_COMPUTE = "scaleway_cloud_compute" as const;
+
+/**
  * Enum value "tencent_cloud_cvm" for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * Tencent Cloud Cloud Virtual Machine (CVM)
@@ -2809,6 +3009,15 @@ export const CLOUD_PROVIDER_VALUE_IBM_CLOUD = "ibm_cloud" as const;
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PROVIDER_VALUE_ORACLE_CLOUD = "oracle_cloud" as const;
+
+/**
+ * Enum value "scaleway_cloud" for attribute {@link ATTR_CLOUD_PROVIDER}.
+ *
+ * Scaleway Cloud
+ *
+ * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const CLOUD_PROVIDER_VALUE_SCALEWAY_CLOUD = "scaleway_cloud" as const;
 
 /**
  * Enum value "tencent_cloud" for attribute {@link ATTR_CLOUD_PROVIDER}.
@@ -3067,7 +3276,7 @@ export const ATTR_CLOUDFOUNDRY_SYSTEM_ID = 'cloudfoundry.system.id' as const;
  *
  * @note CloudFoundry defines the `instance_id` in the [Loggregator v2 envelope](https://github.com/cloudfoundry/loggregator-api#v2-envelope).
  * It is used for logs and metrics emitted by CloudFoundry. It is
- * supposed to contain the vm id for CloudFoundry components.
+ * supposed to contain the vm ID for CloudFoundry components.
  *
  * When system components are instrumented, values from the
  * [Bosh spec](https://bosh.io/docs/jobs/#properties-spec)
@@ -3227,7 +3436,7 @@ export const ATTR_CONTAINER_CSI_VOLUME_ID = 'container.csi.volume.id' as const;
  *
  * @example sha256:19c92d0a00d1b66d897bceaa7319bee0dd38a10a851c60bcec9474aa3f01e50f
  *
- * @note Docker defines a sha256 of the image id; `container.image.id` corresponds to the `Image` field from the Docker container inspect [API](https://docs.docker.com/reference/api/engine/version/v1.52/#tag/Container/operation/ContainerInspect) endpoint.
+ * @note Docker defines a sha256 of the image ID; `container.image.id` corresponds to the `Image` field from the Docker container inspect [API](https://docs.docker.com/reference/api/engine/version/v1.52/#tag/Container/operation/ContainerInspect) endpoint.
  * K8s defines a link to the container registry repository with digest `"imageID": "registry.azurecr.io /namespace/service/dockerfile@sha256:bdeabd40c3a8a492eaf9e8e44d0ebbb84bac7ee25ac0cf8a7159d25f62555625"`.
  * The ID is assigned by the container runtime and can vary in different environments. Consider using `oci.manifest.digest` if it is important to identify the same image in different environments/runtimes.
  *
@@ -3240,7 +3449,7 @@ export const ATTR_CONTAINER_IMAGE_ID = 'container.image.id' as const;
  *
  * @example nginx
  *
- * @note For example, a docker container label `app` with value `nginx` **SHOULD** be recorded as the `container.label.app` attribute with value `"nginx"`.
+ * @note For example, a Docker container label `app` with value `nginx` **SHOULD** be recorded as the `container.label.app` attribute with value `"nginx"`.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -4071,7 +4280,12 @@ export const ATTR_DB_OPERATION_PARAMETER = (key: string) => `db.operation.parame
  * up with the parameterized placeholders present in `db.query.text`.
  *
  * It is **RECOMMENDED** to capture the value as provided by the application
- * without attempting to do any case normalization.
+ * without attempting to do any case normalization or sanitization.
+ *
+ * Instrumentations **SHOULD NOT** capture `db.query.parameter.<key>` by default
+ * since values may contain PII or sensitive details.
+ * Application operators are expected to enable specific keys depending
+ * on their privacy and security considerations.
  *
  * `db.query.parameter.<key>` **SHOULD NOT** be captured on batch operations.
  *
@@ -4095,7 +4309,7 @@ export const ATTR_DB_QUERY_PARAMETER = (key: string) => `db.query.parameter.${ke
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Uncategorized.
+ * @deprecated Replaced by `db.namespace` (string).
  */
 export const ATTR_DB_REDIS_DATABASE_INDEX = 'db.redis.database_index' as const;
 
@@ -4996,7 +5210,7 @@ export const ATTR_DB_USER = 'db.user' as const;
 export const ATTR_DEPLOYMENT_ENVIRONMENT = 'deployment.environment' as const;
 
 /**
- * The id of the deployment.
+ * The ID of the deployment.
  *
  * @example 1208
  *
@@ -5040,7 +5254,7 @@ export const DEPLOYMENT_STATUS_VALUE_FAILED = "failed" as const;
 export const DEPLOYMENT_STATUS_VALUE_SUCCEEDED = "succeeded" as const;
 
 /**
- * Destination address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
+ * Destination address - domain name if available without reverse DNS lookup; otherwise, IP address or UNIX domain socket name.
  *
  * @example destination.example.com
  * @example 10.1.2.80
@@ -5908,7 +6122,7 @@ export const ATTR_FILE_DIRECTORY = 'file.directory' as const;
  * @example png
  * @example gz
  *
- * @note When the file name has multiple extensions (example.tar.gz), only the last one should be captured ("gz", not "tar.gz").
+ * @note When the filename has multiple extensions (example.tar.gz), only the last one should be captured ("gz", not "tar.gz").
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -5920,7 +6134,7 @@ export const ATTR_FILE_EXTENSION = 'file.extension' as const;
  * @example Zone.Identifier
  *
  * @note On Linux, a resource fork is used to store additional data with a filesystem object. A file always has at least one fork for the data portion, and additional forks may exist.
- * On NTFS, this is analogous to an Alternate Data Stream (ADS), and the default data stream for a file is just called $DATA. Zone.Identifier is commonly used by Windows to track contents downloaded from the Internet. An ADS is typically of the form: C:\\path\\to\\filename.extension:some_fork_name, and some_fork_name is the value that should populate `fork_name`. `filename.extension` should populate `file.name`, and `extension` should populate `file.extension`. The full path, `file.path`, will include the fork name.
+ * On NTFS, this is analogous to an Alternate Data Stream (ADS), and the default data stream for a file is just called $DATA. Zone.Identifier is commonly used by Windows to track contents downloaded from the internet. An ADS is typically of the form: C:\\path\\to\\filename.extension:some_fork_name, and some_fork_name is the value that should populate `fork_name`. `filename.extension` should populate `file.name`, and `extension` should populate `file.extension`. The full path, `file.path`, will include the fork name.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -6047,7 +6261,7 @@ export const ATTR_FILE_OWNER_ID = 'file.owner.id' as const;
 export const ATTR_FILE_OWNER_NAME = 'file.owner.name' as const;
 
 /**
- * Full path to the file, including the file name. It should include the drive letter, when appropriate.
+ * Full path to the file, including the filename. It should include the drive letter, when appropriate.
  *
  * @example /home/alice/example.png
  * @example C:\\Program Files\\MyApp\\myapp.exe
@@ -8539,7 +8753,7 @@ export const ATTR_HOST_IP = 'host.ip' as const;
 export const ATTR_HOST_MAC = 'host.mac' as const;
 
 /**
- * Name of the host. On Unix systems, it may contain what the hostname command returns, or the fully qualified hostname, or another name specified by the user.
+ * Name of the host. On UNIX systems, it may contain what the hostname command returns, or the fully qualified hostname, or another name specified by the user.
  *
  * @example opentelemetry-test
  *
@@ -10859,8 +11073,8 @@ export const ATTR_LOG_RECORD_ORIGINAL = 'log.record.original' as const;
  *
  * @example 01ARZ3NDEKTSV4RRFFQ69G5FAV
  *
- * @note If an id is provided, other log records with the same id will be considered duplicates and can be removed safely. This means, that two distinguishable log records **MUST** have different values.
- * The id **MAY** be an [Universally Unique Lexicographically Sortable Identifier (ULID)](https://github.com/ulid/spec), but other identifiers (e.g. UUID) may be used as needed.
+ * @note If an ID is provided, other log records with the same ID will be considered duplicates and can be removed safely. This means, that two distinguishable log records **MUST** have different values.
+ * The ID **MAY** be an [Universally Unique Lexicographically Sortable Identifier (ULID)](https://github.com/ulid/spec), but other identifiers (e.g. UUID) may be used as needed.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -11121,7 +11335,7 @@ export const MCP_METHOD_NAME_VALUE_TOOLS_LIST = "tools/list" as const;
 export const ATTR_MCP_PROTOCOL_VERSION = 'mcp.protocol.version' as const;
 
 /**
- * The value of the resource uri.
+ * The value of the resource URI.
  *
  * @example postgres://database/customers/schema
  * @example file:///home/user/documents/report.pdf
@@ -11243,8 +11457,8 @@ export const ATTR_MESSAGING_DESTINATION_ANONYMOUS = 'messaging.destination.anony
  * @example MyQueue
  * @example MyTopic
  *
- * @note Destination name **SHOULD** uniquely identify a specific queue, topic or other entity within the broker. If
- * the broker doesn't have such notion, the destination name **SHOULD** uniquely identify the broker.
+ * @note **SHOULD** uniquely identify a specific queue, topic or other entity within the broker. If
+ * the broker doesn't have such notion, it **SHOULD** uniquely identify the broker.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -11275,7 +11489,7 @@ export const ATTR_MESSAGING_DESTINATION_SUBSCRIPTION_NAME = 'messaging.destinati
  *
  * @example /customers/{customerId}
  *
- * @note Destination names could be constructed from templates. An example would be a destination name involving a user name or product id. Although the destination name in this case is of high cardinality, the underlying template is of low cardinality and can be effectively used for grouping and aggregation.
+ * @note Destination names could be constructed from templates. An example would be a destination name involving a username or product ID. Although the destination name in this case is of high cardinality, the underlying template is of low cardinality and can be effectively used for grouping and aggregation.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -11339,7 +11553,7 @@ export const ATTR_MESSAGING_EVENTHUBS_MESSAGE_ENQUEUED_TIME = 'messaging.eventhu
 export const ATTR_MESSAGING_GCP_PUBSUB_MESSAGE_ACK_DEADLINE = 'messaging.gcp_pubsub.message.ack_deadline' as const;
 
 /**
- * The ack id for a given message.
+ * The ack ID for a given message.
  *
  * @example "ack_id"
  *
@@ -11366,6 +11580,17 @@ export const ATTR_MESSAGING_GCP_PUBSUB_MESSAGE_DELIVERY_ATTEMPT = 'messaging.gcp
 export const ATTR_MESSAGING_GCP_PUBSUB_MESSAGE_ORDERING_KEY = 'messaging.gcp_pubsub.message.ordering_key' as const;
 
 /**
+ * The Kafka cluster ID, obtained from the broker metadata exposed through the Kafka client (or AdminClient) API.
+ *
+ * @example MkU3OEVBNTcwNTJENDM2Qk
+ *
+ * @note The cluster ID is a unique identifier reported by the Kafka broker. It identifies the cluster independently of the individual brokers the client is configured to connect to, and remains stable even if broker hostnames, IP addresses, or ports change.
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_MESSAGING_KAFKA_CLUSTER_ID = 'messaging.kafka.cluster.id' as const;
+
+/**
  * Deprecated, use `messaging.consumer.group.name` instead.
  *
  * @example "my-group"
@@ -11383,7 +11608,7 @@ export const ATTR_MESSAGING_KAFKA_CONSUMER_GROUP = 'messaging.kafka.consumer.gro
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Record string representation of the partition id in `messaging.destination.partition.id` attribute.
+ * @deprecated Record string representation of the partition ID in `messaging.destination.partition.id` attribute.
  */
 export const ATTR_MESSAGING_KAFKA_DESTINATION_PARTITION = 'messaging.kafka.destination.partition' as const;
 
@@ -11648,7 +11873,7 @@ export const ATTR_MESSAGING_ROCKETMQ_MESSAGE_DELIVERY_TIMESTAMP = 'messaging.roc
 export const ATTR_MESSAGING_ROCKETMQ_MESSAGE_GROUP = 'messaging.rocketmq.message.group' as const;
 
 /**
- * Key(s) of message, another way to mark message besides message id.
+ * Key(s) of message, another way to mark message besides message ID.
  *
  * @example ["keyA", "keyB"]
  *
@@ -12026,7 +12251,7 @@ export const NET_SOCK_FAMILY_VALUE_INET6 = "inet6" as const;
 /**
  * Enum value "unix" for attribute {@link ATTR_NET_SOCK_FAMILY}.
  *
- * Unix domain socket path
+ * UNIX domain socket path
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -12261,7 +12486,7 @@ export const NETWORK_CONNECTION_STATE_VALUE_SYN_SENT = "syn_sent" as const;
 export const NETWORK_CONNECTION_STATE_VALUE_TIME_WAIT = "time_wait" as const;
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a Wi-Fi connection.
  *
  * @example "LTE"
  *
@@ -12490,6 +12715,8 @@ export const NETWORK_CONNECTION_TYPE_VALUE_UNKNOWN = "unknown" as const;
 
 /**
  * Enum value "wifi" for attribute {@link ATTR_NETWORK_CONNECTION_TYPE}.
+ *
+ * Wi-Fi
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -12819,7 +13046,7 @@ export const ATTR_ORACLE_DB_PDB = 'oracle.db.pdb' as const;
  * @example db_high.adb.oraclecloud.com
  *
  * @note The effective service name for a connection can change during its lifetime,
- * for example after executing sql, `ALTER SESSION`. If an instrumentation cannot reliably
+ * for example after executing SQL, `ALTER SESSION`. If an instrumentation cannot reliably
  * obtain the current service name for each operation without issuing an additional
  * query (such as `SELECT SYS_CONTEXT`), it is **RECOMMENDED** to fall back to the
  * service name originally provided at connection establishment.
@@ -12918,7 +13145,7 @@ export const OS_TYPE_VALUE_FREEBSD = "freebsd" as const;
 /**
  * Enum value "hpux" for attribute {@link ATTR_OS_TYPE}.
  *
- * HP-UX (Hewlett Packard Unix)
+ * HP-UX (Hewlett Packard UNIX)
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -13039,7 +13266,7 @@ export const ATTR_OTEL_COMPONENT_TYPE = 'otel.component.type' as const;
 /**
  * Enum value "batching_log_processor" for attribute {@link ATTR_OTEL_COMPONENT_TYPE}.
  *
- * The builtin SDK batching log record processor
+ * The built-in SDK batching log record processor
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -13048,7 +13275,7 @@ export const OTEL_COMPONENT_TYPE_VALUE_BATCHING_LOG_PROCESSOR = "batching_log_pr
 /**
  * Enum value "batching_span_processor" for attribute {@link ATTR_OTEL_COMPONENT_TYPE}.
  *
- * The builtin SDK batching span processor
+ * The built-in SDK batching span processor
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -13138,7 +13365,7 @@ export const OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_SPAN_EXPORTER = "otlp_http_span
 /**
  * Enum value "periodic_metric_reader" for attribute {@link ATTR_OTEL_COMPONENT_TYPE}.
  *
- * The builtin SDK periodically exporting metric reader
+ * The built-in SDK periodically exporting metric reader
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -13156,7 +13383,7 @@ export const OTEL_COMPONENT_TYPE_VALUE_PROMETHEUS_HTTP_TEXT_METRIC_EXPORTER = "p
 /**
  * Enum value "simple_log_processor" for attribute {@link ATTR_OTEL_COMPONENT_TYPE}.
  *
- * The builtin SDK simple log record processor
+ * The built-in SDK simple log record processor
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -13165,7 +13392,7 @@ export const OTEL_COMPONENT_TYPE_VALUE_SIMPLE_LOG_PROCESSOR = "simple_log_proces
 /**
  * Enum value "simple_span_processor" for attribute {@link ATTR_OTEL_COMPONENT_TYPE}.
  *
- * The builtin SDK simple span processor
+ * The built-in SDK simple span processor
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -13362,7 +13589,7 @@ export const ATTR_PPROF_PROFILE_COMMENT = 'pprof.profile.comment' as const;
 export const ATTR_PPROF_PROFILE_DOC_URL = 'pprof.profile.doc_url' as const;
 
 /**
- * Frames with Function.function_name fully matching the regexp will be dropped from the samples, along with their successors.
+ * Frames with Function.function_name fully matching the regular expression will be dropped from the samples, along with their successors.
  *
  * @example /foobar/
  *
@@ -13371,7 +13598,7 @@ export const ATTR_PPROF_PROFILE_DOC_URL = 'pprof.profile.doc_url' as const;
 export const ATTR_PPROF_PROFILE_DROP_FRAMES = 'pprof.profile.drop_frames' as const;
 
 /**
- * Frames with Function.function_name fully matching the regexp will be kept, even if it matches drop_frames.
+ * Frames with Function.function_name fully matching the regular expression will be kept, even if it matches drop_frames.
  *
  * @example /bazinga/
  *
@@ -14412,9 +14639,7 @@ export const ATTR_RPC_MESSAGE_UNCOMPRESSED_SIZE = 'rpc.message.uncompressed_size
  * When the method is not recognized, for example, when the server receives
  * a request for a method that is not predefined on the server, or when
  * instrumentation is not able to reliably detect if the method is predefined,
- * the attribute **MUST** be set to `_OTHER`. In such cases, tracing
- * instrumentations **MUST** also set `rpc.method_original` attribute to
- * the original method value.
+ * the attribute **MUST** be set to `_OTHER`.
  *
  * If the RPC instrumentation could end up converting valid RPC methods to
  * `_OTHER`, then it **SHOULD** provide a way to configure the list of recognized
@@ -14757,7 +14982,7 @@ export const ATTR_SERVICE_PEER_NAME = 'service.peer.name' as const;
 export const ATTR_SERVICE_PEER_NAMESPACE = 'service.peer.namespace' as const;
 
 /**
- * A unique id to identify a session.
+ * A unique ID to identify a session.
  *
  * @example "00112233-4455-6677-8899-aabbccddeeff"
  *
@@ -14775,7 +15000,7 @@ export const ATTR_SESSION_ID = 'session.id' as const;
 export const ATTR_SESSION_PREVIOUS_ID = 'session.previous_id' as const;
 
 /**
- * Source address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
+ * Source address - domain name if available without reverse DNS lookup; otherwise, IP address or UNIX domain socket name.
  *
  * @example source.example.com
  * @example 10.1.2.80
@@ -15682,12 +15907,16 @@ export const ATTR_TLS_PROTOCOL_NAME = 'tls.protocol.name' as const;
 /**
  * Enum value "ssl" for attribute {@link ATTR_TLS_PROTOCOL_NAME}.
  *
+ * SSL
+ *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const TLS_PROTOCOL_NAME_VALUE_SSL = "ssl" as const;
 
 /**
  * Enum value "tls" for attribute {@link ATTR_TLS_PROTOCOL_NAME}.
+ *
+ * TLS
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -15822,7 +16051,7 @@ export const ATTR_URL_DOMAIN = 'url.domain' as const;
  * @example png
  * @example gz
  *
- * @note The file extension is only set if it exists, as not every url has a file extension. When the file name has multiple extensions `example.tar.gz`, only the last one should be captured `gz`, not `tar.gz`.
+ * @note The file extension is only set if it exists, as not every URL has a file extension. When the filename has multiple extensions `example.tar.gz`, only the last one should be captured `gz`, not `tar.gz`.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -15851,7 +16080,7 @@ export const ATTR_URL_ORIGINAL = 'url.original' as const;
 export const ATTR_URL_PORT = 'url.port' as const;
 
 /**
- * The highest registered url domain, stripped of the subdomain.
+ * The highest registered URL domain, stripped of the subdomain.
  *
  * @example example.com
  * @example foo.co.uk
@@ -15863,7 +16092,7 @@ export const ATTR_URL_PORT = 'url.port' as const;
 export const ATTR_URL_REGISTERED_DOMAIN = 'url.registered_domain' as const;
 
 /**
- * The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain. In a partially qualified domain, or if the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+ * The subdomain portion of a fully qualified domain name includes all of the names except the hostname under the registered_domain. In a partially qualified domain, or if the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
  *
  * @example east
  * @example sub2.sub1
