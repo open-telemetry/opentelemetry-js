@@ -307,12 +307,13 @@ export function createSpanLimitsFromEnv(): SpanLimits | undefined {
       getNumberFromEnv('OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT'),
     eventCountLimit: getNumberFromEnv('OTEL_SPAN_EVENT_COUNT_LIMIT'),
     linkCountLimit: getNumberFromEnv('OTEL_SPAN_LINK_COUNT_LIMIT'),
-    attributePerEventCountLimit: getNumberFromEnv(
-      'OTEL_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT'
-    ),
-    attributePerLinkCountLimit: getNumberFromEnv(
-      'OTEL_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT'
-    ),
+    // TODO: Phase out the "PER_{EVENT,LINK}" incorrect envvar names (https://github.com/open-telemetry/opentelemetry-js/issues/7242)
+    attributePerEventCountLimit:
+      getNumberFromEnv('OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT') ??
+      getNumberFromEnv('OTEL_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT'),
+    attributePerLinkCountLimit:
+      getNumberFromEnv('OTEL_LINK_ATTRIBUTE_COUNT_LIMIT') ??
+      getNumberFromEnv('OTEL_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT'),
   };
 }
 
