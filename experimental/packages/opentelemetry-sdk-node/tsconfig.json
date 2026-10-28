@@ -28,12 +28,6 @@
       "path": "../../../packages/opentelemetry-resources"
     },
     {
-      "path": "../../../packages/opentelemetry-sdk-trace-base"
-    },
-    {
-      "path": "../../../packages/opentelemetry-sdk-trace-node"
-    },
-    {
       "path": "../../../packages/sdk-metrics"
     },
     {
@@ -44,9 +38,6 @@
     },
     {
       "path": "../api-config"
-    },
-    {
-      "path": "../api-logs"
     },
     {
       "path": "../configuration"
@@ -91,7 +82,7 @@
       "path": "../otlp-grpc-exporter-base"
     },
     {
-      "path": "../sdk-logs"
+      "path": "../../../packages/sdk-logs"
     }
   ]
 }

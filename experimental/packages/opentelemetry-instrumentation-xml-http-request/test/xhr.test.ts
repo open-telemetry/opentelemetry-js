@@ -18,9 +18,9 @@ import { ZoneContextManager } from '@opentelemetry/context-zone';
 import * as tracing from '@opentelemetry/sdk-trace';
 import {
   PerformanceTimingNames as PTN,
-  WebTracerProvider,
   parseUrl,
-} from '@opentelemetry/sdk-trace-web';
+} from '@opentelemetry/web-common';
+import { TracerProvider } from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { ATTR_HTTP_REQUEST_BODY_SIZE } from '../src/semconv';
@@ -268,6 +268,78 @@ describe('xhr', () => {
         xhrInstrumentation!.enable();
         assert.doesNotThrow(() => xhrInstrumentation!.enable());
       });
+
+      it('should report isEnabled() false when _wrap fails', () => {
+        xhrInstrumentation!.enable();
+        assert.strictEqual(xhrInstrumentation!.isEnabled(), false);
+      });
+    });
+
+    describe('when XMLHttpRequest prototype methods are missing', () => {
+      // The `typeof` pre-check in `enable()` exists because `shimmer.wrap`
+      // returns undefined instead of throwing on an absent or non-function target.
+      let sendStub: sinon.SinonStub;
+
+      beforeEach(() => {
+        sendStub = sinon
+          .stub(XMLHttpRequest.prototype, 'send')
+          .value(undefined);
+        xhrInstrumentation = new XMLHttpRequestInstrumentation({
+          enabled: false,
+        });
+      });
+
+      afterEach(() => {
+        // A failed assertion must not leak the patched prototype into later tests.
+        for (const name of ['open', 'send'] as const) {
+          const fn = XMLHttpRequest.prototype[name];
+          if (isWrapped(fn)) fn.__unwrap();
+        }
+      });
+
+      it('should report isEnabled() false and wrap nothing', () => {
+        xhrInstrumentation!.enable();
+        assert.strictEqual(xhrInstrumentation!.isEnabled(), false);
+        assert.ok(!isWrapped(XMLHttpRequest.prototype.open));
+      });
+
+      it('should report isEnabled() false when only open is missing', () => {
+        sendStub.restore();
+        sinon.stub(XMLHttpRequest.prototype, 'open').value(undefined);
+        xhrInstrumentation!.enable();
+        assert.strictEqual(xhrInstrumentation!.isEnabled(), false);
+        assert.ok(!isWrapped(XMLHttpRequest.prototype.send));
+      });
+
+      it('should wrap open once when enable() is retried after send appears', () => {
+        xhrInstrumentation!.enable();
+        sendStub.restore();
+        xhrInstrumentation!.enable();
+        assert.strictEqual(xhrInstrumentation!.isEnabled(), true);
+        const open = XMLHttpRequest.prototype.open;
+        const send = XMLHttpRequest.prototype.send;
+        assert.ok(isWrapped(open) && isWrapped(send));
+        assert.ok(
+          !isWrapped(open.__original),
+          'open must not be double-wrapped'
+        );
+      });
+
+      it('should warn that the instrumentation will not be enabled', () => {
+        const diagLogger = new api.DiagConsoleLogger();
+        const spyWarn = sinon.stub(diagLogger, 'warn');
+        api.diag.setLogger(diagLogger, api.DiagLogLevel.ALL);
+        try {
+          xhrInstrumentation!.enable();
+          sinon.assert.calledOnceWithMatch(
+            spyWarn,
+            sinon.match.string,
+            sinon.match(/missing or not a function/)
+          );
+        } finally {
+          api.diag.disable();
+        }
+      });
     });
 
     describe('when XMLHttpRequest prototype methods can be wrapped', () => {
@@ -279,6 +351,28 @@ describe('xhr', () => {
         const xhttp2 = new XMLHttpRequest();
         assert.ok(isWrapped(xhttp2.open), 'open method should be wrapped');
         assert.ok(isWrapped(xhttp2.send), 'send method should be wrapped');
+        assert.strictEqual(xhrInstrumentation.isEnabled(), true);
+        xhrInstrumentation.disable();
+        assert.ok(isWrapped(xhttp2.open), 'disable() leaves open wrapped');
+        assert.strictEqual(xhrInstrumentation.isEnabled(), false);
+        // @ts-expect-error -- property added by instrumentation.wrap(...)
+        XMLHttpRequest.prototype.send.__unwrap();
+        // @ts-expect-error -- property added by instrumentation.wrap(...)
+        XMLHttpRequest.prototype.open.__unwrap();
+      });
+
+      it('should re-enable without wrapping open/send twice', () => {
+        xhrInstrumentation = new XMLHttpRequestInstrumentation();
+        xhrInstrumentation.disable();
+        xhrInstrumentation.enable();
+        assert.strictEqual(xhrInstrumentation.isEnabled(), true);
+        const open = XMLHttpRequest.prototype.open;
+        const send = XMLHttpRequest.prototype.send;
+        assert.ok(isWrapped(open) && isWrapped(send));
+        assert.ok(
+          !isWrapped(open.__original) && !isWrapped(send.__original),
+          'open/send must not be double-wrapped'
+        );
         // @ts-expect-error -- property added by instrumentation.wrap(...)
         XMLHttpRequest.prototype.send.__unwrap();
         // @ts-expect-error -- property added by instrumentation.wrap(...)
@@ -293,7 +387,7 @@ describe('xhr', () => {
       let requests: any[] = [];
       let contextManager: ZoneContextManager;
       let webTracerWithZone: api.Tracer;
-      let webTracerProviderWithZone: WebTracerProvider;
+      let webTracerProviderWithZone: TracerProvider;
       let dummySpanExporter: DummySpanExporter;
       let spyEntries: any;
       let fakeNow = 0;
@@ -352,7 +446,7 @@ describe('xhr', () => {
           ...config,
         });
         dummySpanExporter = new DummySpanExporter();
-        webTracerProviderWithZone = new WebTracerProvider({
+        webTracerProviderWithZone = new TracerProvider({
           spanProcessors: [
             new tracing.SimpleSpanProcessor({ exporter: dummySpanExporter }),
           ],

@@ -35,7 +35,7 @@ We aim to eventually automate this process as much as possible.
 
 Setting a **pre-release identifier** produces a pre-release version, which the publish
 workflow puts on the `canary` npm dist-tag instead of `latest` — so it is only installed
-by users who explicitly opt in (`npm install @opentelemetry/sdk-trace-node@canary`). This
+by users who explicitly opt in (`npm install @opentelemetry/sdk-trace@canary`). This
 is how pre-releases of the next major version are cut from `main` while it is still being
 developed.
 
@@ -129,7 +129,7 @@ keeps the version it already has, and everything involved stays on `canary`.
 > incompatible with every other API version at runtime. A tree using one must therefore
 > contain exactly one copy of `@opentelemetry/api`, at exactly that version.
 >
-> This is opt-in rather than a trap: a plain `npm install @opentelemetry/sdk-trace-node@canary`
+> This is opt-in rather than a trap: a plain `npm install @opentelemetry/sdk-trace@canary`
 > still resolves the API peer dependency to the latest *normal* version, because the widened
 > range admits it and npm does not pick a pre-release on its own. Testing against the
 > pre-release API takes an explicit `npm install @opentelemetry/api@canary`, and any
@@ -165,7 +165,7 @@ The workflows and inputs are the same as for `main`, with three differences:
 3. **The packages are published under a `latest-<major>` dist-tag rather than `latest`**, so
    that a `2.10.1` published after a `3.0.0-development.4` does not pull `latest` back to the
    older line. This follows the same convention as `express` (`latest` / `latest-4`). Users
-   opt in with `npm install @opentelemetry/sdk-trace-node@latest-2`.
+   opt in with `npm install @opentelemetry/sdk-trace@latest-2`.
 
 Publishing the GitHub release does **not** redeploy the API documentation site for a
 maintenance release. The site is built from a single tree and force-pushed to `gh-pages`, so

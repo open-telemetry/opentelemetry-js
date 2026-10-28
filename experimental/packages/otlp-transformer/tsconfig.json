@@ -29,10 +29,7 @@
       "path": "../../../packages/sdk-trace"
     },
     {
-      "path": "../api-logs"
-    },
-    {
-      "path": "../sdk-logs"
+      "path": "../../../packages/sdk-logs"
     }
   ]
 }

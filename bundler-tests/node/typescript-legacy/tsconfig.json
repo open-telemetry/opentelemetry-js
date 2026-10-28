@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es2022",
+    "strict": true,
+    "noEmit": true,
+    // Catches any nested inside a type (e.g. a constructor config), which IsAny misses.
+    "skipLibCheck": false,
+    // Keep the monorepo root's ambient @types out; a real consumer would not see them.
+    "types": []
+  },
+  "include": ["src"]
+}

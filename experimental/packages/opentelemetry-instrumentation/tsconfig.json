@@ -18,9 +18,6 @@
     },
     {
       "path": "../api-config"
-    },
-    {
-      "path": "../api-logs"
     }
   ]
 }

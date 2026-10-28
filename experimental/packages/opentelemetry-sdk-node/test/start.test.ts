@@ -12,12 +12,12 @@ import {
   trace,
   diag,
   DiagLogLevel,
+  logs,
   metrics,
   DiagConsoleLogger,
 } from '@opentelemetry/api';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
-import { logs } from '@opentelemetry/api-logs';
 import {
   SimpleLogRecordProcessor,
   ConsoleLogRecordExporter,

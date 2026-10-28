@@ -94,11 +94,6 @@ In addition to settings passed to the constructor, the exporter also supports co
 > Settings configured programmatically take precedence over environment variables. Per-signal environment variables take
 > precedence over non-per-signal environment variables.
 
-## Running opentelemetry-collector locally to see the metrics
-
-1. Go to `examples/otlp-exporter-node`
-2. Follow the instructions there to observe the metrics.
-
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

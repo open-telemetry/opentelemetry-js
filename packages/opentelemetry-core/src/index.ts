@@ -6,7 +6,17 @@
 export { W3CBaggagePropagator } from './baggage/propagation/W3CBaggagePropagator';
 export { AnchoredClock } from './common/anchored-clock';
 export type { Clock } from './common/anchored-clock';
-export { isAttributeValue, sanitizeAttributes } from './common/attributes';
+export {
+  AddAttributeDecision,
+  maybeAddAttribute,
+  maybeAddSimpleAttribute,
+  cleanAttributes,
+  cleanSimpleAttributes,
+  isAnyValue,
+  isSimpleAttributeValue,
+  sanitizeAttributes,
+  isAttributeValue,
+} from './common/attributes';
 export {
   globalErrorHandler,
   setGlobalErrorHandler,
@@ -36,7 +46,7 @@ export {
   getBooleanFromEnv,
   getNumberFromEnv,
   getStringListFromEnv,
-} from './platform';
+} from '#platform';
 export { CompositePropagator } from './propagation/composite';
 export type { CompositePropagatorConfig } from './propagation/composite';
 export {

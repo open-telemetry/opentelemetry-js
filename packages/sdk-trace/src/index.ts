@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+export { StackContextManager } from './StackContextManager';
 export { TracerProvider } from './TracerProvider';
-export { BatchSpanProcessor, RandomIdGenerator } from './platform';
+export { BatchSpanProcessor, RandomIdGenerator } from '#platform';
 export { ConsoleSpanExporter } from './export/ConsoleSpanExporter';
 export { InMemorySpanExporter } from './export/InMemorySpanExporter';
 export type { ReadableSpan } from './export/ReadableSpan';

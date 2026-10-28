@@ -1,14 +1,13 @@
 'use strict';
 
-const api = require('@opentelemetry/api');
-const tracer = require('./tracer')('example-http-server');
 const http = require('http');
+const { trace } = require('@opentelemetry/api');
+
+const tracer = trace.getTracer('example-http');
 
 /** Starts a HTTP server that receives requests on sample server port. */
 function startServer(port) {
-  // Creates a server
   const server = http.createServer(handleRequest);
-  // Starts the server
   server.listen(port, (err) => {
     if (err) {
       throw err;
@@ -19,16 +18,15 @@ function startServer(port) {
 
 /** A function which handles requests and send response. */
 function handleRequest(request, response) {
-  const currentSpan = api.trace.getActiveSpan();
-  // display traceid in the terminal
+  // We can look at the current span (created by instrumentation-http).
+  const currentSpan = trace.getActiveSpan();
   const traceId = currentSpan.spanContext().traceId;
   console.log(`traceId: ${traceId}`);
+
+  // We can start a new span for the processing `handleRequest`.
   const span = tracer.startSpan('handleRequest', {
-    kind: 1, // server
     attributes: { key: 'value' },
   });
-  // Annotate our span to capture metadata about the operation
-  span.addEvent('invoking handleRequest');
 
   const body = [];
   request.on('error', (err) => console.log(err));

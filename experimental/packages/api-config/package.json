@@ -1,9 +1,8 @@
 {
   "name": "@opentelemetry/api-config",
-  "version": "0.222.0",
+  "version": "0.300.0",
   "description": "Public declarative configuration API for OpenTelemetry",
   "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
@@ -41,9 +40,6 @@
   "publishConfig": {
     "access": "public"
   },
-  "dependencies": {
-    "@opentelemetry/api": "^1.3.0"
-  },
   "devDependencies": {
     "@types/mocha": "10.0.10",
     "@types/node": "^8.10.66",
@@ -56,8 +52,8 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.37",
     "karma-webpack": "5.0.1",
-    "mocha": "11.8.0",
-    "nyc": "17.1.0",
+    "mocha": "12.0.3",
+    "nyc": "18.0.0",
     "sinon": "18.0.1",
     "ts-loader": "9.5.7",
     "typescript": "5.2.2",
@@ -67,13 +63,13 @@
   "sideEffects": false,
   "exports": {
     ".": {
-      "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
-      },
       "require": {
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
+      },
+      "default": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
       }
     }
   }

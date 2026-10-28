@@ -14,9 +14,5 @@
     "src/**/*.ts",
     "test/**/*.ts"
   ],
-  "references": [
-    {
-      "path": "../../../api"
-    }
-  ]
+  "references": []
 }

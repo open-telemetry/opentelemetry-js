@@ -5,7 +5,7 @@
 
 import type { TracerProvider, MeterProvider } from '@opentelemetry/api';
 import type { Instrumentation } from './types';
-import type { LoggerProvider } from '@opentelemetry/api-logs';
+import type { LoggerProvider } from '@opentelemetry/api';
 import type { ConfigProvider } from '@opentelemetry/api-config';
 
 export interface AutoLoaderResult {

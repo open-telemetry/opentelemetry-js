@@ -24,14 +24,29 @@ If the SDK is initialized in a separate file (recommended), ensure it is importe
 
 For CJS, the `NODE_OPTIONS` for the startup command should include `--require ./telemetry.js`.
 
-For ESM, minimum Node.js version of `18.19.0` is required.
-The `NODE_OPTIONS` for the startup command should include `--import ./telemetry.js`.
+For ESM, the `NODE_OPTIONS` for the startup command should include `--import ./telemetry.js`.
 
 ## Instrumentation Hook Required for ESM
 
 If your application is written in JavaScript as ESM, or compiled to ESM from TypeScript, then a loader hook is required to properly patch instrumentation.
 The custom hook for ESM instrumentation is `--experimental-loader=@opentelemetry/instrumentation/hook.mjs`.
 This flag must be passed to the `node` binary, which is often done as a startup command and/or in the `NODE_OPTIONS` environment variable.
+
+### CJS Apps That Depend on ESM Packages
+
+The hook can be needed even when your application is CJS.
+Without it, instrumentations only patch modules loaded with `require()`.
+If one of your dependencies is ESM and loads an instrumented package with `import`, that package goes through the ESM loader and is not patched.
+
+For example, `@nestjs/platform-express@12` is ESM and imports `express`.
+In a CJS NestJS 12 app, `@opentelemetry/instrumentation-express` does not patch `express` unless the hook is registered, so the HTTP server spans have no `http.route`.
+
+If an instrumentation that should apply produces no spans in a CJS app, check whether the package it patches is imported from an ESM dependency.
+In that case, add the hook to the startup command:
+
+```sh
+node --experimental-loader=@opentelemetry/instrumentation/hook.mjs --require ./telemetry.js app.js
+```
 
 ### Additional Notes on Experimental Loaders
 
@@ -117,15 +132,3 @@ Startup command for compiled ESM:
 ```sh
 node --experimental-loader=@opentelemetry/instrumentation/hook.mjs --import ./telemetry.js app.js
 ```
-
-### ESM Options for Different Versions of Node.js
-
-The entire startup command should include the following `NODE_OPTIONS`:
-
-| Node.js Version   | NODE_OPTIONS                                                                              |
-| ----------------- | ----------------------------------------------------------------------------------------- |
-| 16.x              | `--require ./telemetry.cjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs` |
-| >=18.1.0 <18.19.0 | `--require ./telemetry.cjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs` |
-| ^18.19.0          | `--import ./telemetry.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
-| 20.x              | `--import ./telemetry.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
-| 22.x              | `--import ./telemetry.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |

@@ -47,6 +47,8 @@ counter.add(10, { pid: process.pid });
 
 With the above you should now be able to navigate to the Prometheus UI at: <http://localhost:9464/metrics>
 
+Metrics from different instrumentation scopes that translate to the same Prometheus metric name are exported together, with one set of metadata. Scope labels distinguish their samples by default. If descriptions or units conflict, the exporter selects the first non-empty value and logs a warning. If metric types conflict, the entire family is omitted and a warning is logged.
+
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

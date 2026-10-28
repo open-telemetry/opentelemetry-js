@@ -14,11 +14,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import type { Instrumentation } from '../../src';
 import { InstrumentationBase, registerInstrumentations } from '../../src';
-import type {
-  Logger,
-  LoggerOptions,
-  LoggerProvider,
-} from '@opentelemetry/api-logs';
+import type { Logger, LoggerOptions, LoggerProvider } from '@opentelemetry/api';
 import type {
   ConfigProperties,
   ConfigProvider,
