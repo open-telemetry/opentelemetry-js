@@ -44,6 +44,7 @@ export function sendWithHttp(
   data: Uint8Array,
   timeoutMillis: number
 ): Promise<ExportResponse> {
+  let deadline: ReturnType<typeof setTimeout> | undefined;
   return new Promise<ExportResponse>(resolve => {
     const parsedUrl = new URL(url);
 
@@ -135,13 +136,15 @@ export function sendWithHttp(
       });
     });
 
-    req.setTimeout(timeoutMillis, () => {
+    // One deadline for the whole export: `req.setTimeout` arms only once the socket has
+    // connected, so it left a connect that never completes (a dropped SYN) unbounded.
+    deadline = setTimeout(() => {
       req.destroy();
       resolve({
         status: 'retryable',
         error: new Error('Request timed out'),
       });
-    });
+    }, timeoutMillis);
 
     req.on('error', (error: Error) => {
       if (isHttpTransportNetworkErrorRetryable(error)) {
@@ -163,7 +166,7 @@ export function sendWithHttp(
         error,
       });
     });
-  });
+  }).finally(() => clearTimeout(deadline));
 }
 
 export function compressAndSend(
