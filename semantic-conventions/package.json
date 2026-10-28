@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/semantic-conventions",
-  "version": "1.43.0",
+  "version": "1.44.0",
   "description": "OpenTelemetry semantic conventions",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",

@@ -9,6 +9,16 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 1.44.0
+
+### :rocket: Features
+
 * feat: update semantic conventions to v1.44.0 [#7239](https://github.com/open-telemetry/opentelemetry-js/pull/7239)
   * Semantic Conventions v1.44.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1440) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
   * `@opentelemetry/semantic-conventions` (stable) changes: *none*
@@ -77,8 +87,6 @@ METRIC_SYSTEM_PROCESS_LIMIT                                // system.process.lim
 ### :bug: Bug Fixes
 
 * fix: resolve the ESM build through the `default` export condition instead of `import` [#7132](https://github.com/open-telemetry/opentelemetry-js/pull/7132) @overbalance
-
-### :books: Documentation
 
 ### :house: Internal
 
