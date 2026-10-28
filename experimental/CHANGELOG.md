@@ -13,6 +13,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :bug: Bug Fixes
 
+* fix(otlp-grpc-exporter-base): avoid an incomplete mTLS warning for root-CA-only TLS configuration ([#7235](https://github.com/open-telemetry/opentelemetry-js/issues/7235)) @LarryHu0217
 * fix(otlp-exporter-base): pick the browser fetch `mode` from the document origin, so exports from an opaque-origin document (e.g. a sandboxed iframe) no longer fail with `mode: 'same-origin'` [#7211](https://github.com/open-telemetry/opentelemetry-js/pull/7211) @MO2k4
 
 ### :books: Documentation

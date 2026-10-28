@@ -220,6 +220,99 @@ describe('getOtlpGrpcConfigurationFromEnvironment', function () {
   });
 
   describe('credentials', function () {
+    describe('root certificate TLS credentials', function () {
+      const signals = ['TRACES', 'METRICS', 'LOGS'];
+      const prefixes = [
+        'OTEL_EXPORTER_OTLP',
+        ...signals.map(signal => `OTEL_EXPORTER_OTLP_${signal}`),
+      ];
+      const envKeys = prefixes.flatMap(prefix =>
+        ['CERTIFICATE', 'CLIENT_KEY', 'CLIENT_CERTIFICATE', 'INSECURE'].map(
+          suffix => `${prefix}_${suffix}`
+        )
+      );
+      let savedEnv: Record<string, string | undefined>;
+
+      beforeEach(function () {
+        savedEnv = {};
+        for (const key of envKeys) {
+          savedEnv[key] = process.env[key];
+          delete process.env[key];
+        }
+      });
+
+      afterEach(function () {
+        for (const key of envKeys) {
+          if (savedEnv[key] === undefined) {
+            delete process.env[key];
+          } else {
+            process.env[key] = savedEnv[key];
+          }
+        }
+      });
+
+      for (const prefix of prefixes) {
+        const signal =
+          prefix === 'OTEL_EXPORTER_OTLP'
+            ? 'METRICS'
+            : prefix.split('_').pop()!;
+        for (const endpoint of [
+          'example.test:4317',
+          'https://example.test:4317',
+        ]) {
+          for (const pair of [
+            'unset',
+            'empty',
+            'blank',
+            'complete',
+            'key-only',
+            'cert-only',
+          ]) {
+            it(`uses ${prefix} TLS credentials with ${pair} client credentials at ${endpoint}`, function () {
+              const warn = sinon.stub(diag, 'warn');
+              const root = fs.readFileSync('./test/certs/ca.crt');
+              const key = fs.readFileSync('./test/certs/client.key');
+              const cert = fs.readFileSync('./test/certs/client.crt');
+              process.env[`${prefix}_CERTIFICATE`] = './test/certs/ca.crt';
+              if (pair === 'empty' || pair === 'blank') {
+                process.env[`${prefix}_CLIENT_KEY`] =
+                  pair === 'empty' ? '' : '   ';
+                process.env[`${prefix}_CLIENT_CERTIFICATE`] =
+                  pair === 'empty' ? '' : '   ';
+              } else {
+                if (pair === 'complete' || pair === 'key-only') {
+                  process.env[`${prefix}_CLIENT_KEY`] =
+                    './test/certs/client.key';
+                }
+                if (pair === 'complete' || pair === 'cert-only') {
+                  process.env[`${prefix}_CLIENT_CERTIFICATE`] =
+                    './test/certs/client.crt';
+                }
+              }
+
+              const config = getOtlpGrpcConfigurationFromEnv(signal);
+              const credentials = config.credentials?.(endpoint)();
+
+              assert.deepStrictEqual(
+                credentials,
+                pair === 'complete'
+                  ? createSslCredentials(root, key, cert)
+                  : createSslCredentials(root)
+              );
+              if (pair === 'key-only' || pair === 'cert-only') {
+                sinon.assert.calledOnceWithExactly(
+                  warn,
+                  'Client key and certificate must both be provided, but one was missing - attempting to create credentials from just the root certificate'
+                );
+              } else {
+                sinon.assert.notCalled(warn);
+              }
+            });
+          }
+        }
+      }
+    });
+
     afterEach(function () {
       delete process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
       delete process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT;
