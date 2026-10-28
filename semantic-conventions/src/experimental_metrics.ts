@@ -259,7 +259,7 @@ export const METRIC_CICD_SYSTEM_ERRORS = 'cicd.system.errors' as const;
 export const METRIC_CICD_WORKER_COUNT = 'cicd.worker.count' as const;
 
 /**
- * CPU time consumed.
+ * Total CPU time consumed.
  *
  * @note CPU time consumed by the specific container on all available CPU cores
  *
@@ -268,9 +268,9 @@ export const METRIC_CICD_WORKER_COUNT = 'cicd.worker.count' as const;
 export const METRIC_CONTAINER_CPU_TIME = 'container.cpu.time' as const;
 
 /**
- * Container's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs.
+ * Container's CPU usage, measured in CPUs. Range from 0 to the number of allocatable CPUs.
  *
- * @note CPU usage of the specific container on all available CPU cores, averaged over the sample window
+ * @note CPU usage of the specific container on all available CPU cores. It is calculated as the change in cumulative CPU time (container.cpu.time) over a measurement interval, divided by the elapsed time: usageCores = (cpuTimeEnd - cpuTimeStart) / elapsedSeconds
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -328,19 +328,21 @@ export const METRIC_CONTAINER_FILESYSTEM_USAGE = 'container.filesystem.usage' as
  *
  * @note Available memory for use.  This is defined as the memory limit - workingSetBytes. If memory limit is undefined, the available bytes is omitted.
  * In general, this metric can be derived from [cadvisor](https://github.com/google/cadvisor/blob/v0.53.0/docs/storage/prometheus.md#prometheus-container-metrics) and by subtracting the `container_memory_working_set_bytes` metric from the `container_spec_memory_limit_bytes` metric.
- * In K8s, this metric is derived from the [MemoryStats.AvailableBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field of the [PodStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats) of the Kubelet's stats API.
+ * In K8s, this metric is derived from the [MemoryStats.AvailableBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field of the [ContainerStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#ContainerStats) of the Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_CONTAINER_MEMORY_AVAILABLE = 'container.memory.available' as const;
 
 /**
- * Container memory paging faults.
+ * Deprecated, use `container.paging.faults` instead.
  *
  * @note In general, this metric can be derived from [cadvisor](https://github.com/google/cadvisor/blob/v0.53.0/docs/storage/prometheus.md#prometheus-container-metrics) and specifically the `container_memory_failures_total{failure_type=pgfault, scope=container}` and `container_memory_failures_total{failure_type=pgmajfault, scope=container}`metric.
  * In K8s, this metric is derived from the [MemoryStats.PageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) and [MemoryStats.MajorPageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field of the [PodStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats) of the Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `container.paging.faults`.
  */
 export const METRIC_CONTAINER_MEMORY_PAGING_FAULTS = 'container.memory.paging.faults' as const;
 
@@ -348,7 +350,7 @@ export const METRIC_CONTAINER_MEMORY_PAGING_FAULTS = 'container.memory.paging.fa
  * Container memory RSS.
  *
  * @note In general, this metric can be derived from [cadvisor](https://github.com/google/cadvisor/blob/v0.53.0/docs/storage/prometheus.md#prometheus-container-metrics) and specifically the `container_memory_rss` metric.
- * In K8s, this metric is derived from the [MemoryStats.RSSBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field of the [PodStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats) of the Kubelet's stats API.
+ * In K8s, this metric is derived from the [MemoryStats.RSSBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field of the [ContainerStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#ContainerStats) of the Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -357,7 +359,9 @@ export const METRIC_CONTAINER_MEMORY_RSS = 'container.memory.rss' as const;
 /**
  * Memory usage of the container.
  *
- * @note Memory usage of the container.
+ * @note Current memory usage, including all memory regardless of when it was accessed.
+ * In general, this metric can be derived from [cadvisor](https://github.com/google/cadvisor/blob/v0.53.0/docs/storage/prometheus.md#prometheus-container-metrics) and specifically the `container_memory_usage_bytes` metric.
+ * In K8s, this metric is derived from the [MemoryStats.UsageBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field of the [ContainerStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#ContainerStats) of the Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -367,7 +371,7 @@ export const METRIC_CONTAINER_MEMORY_USAGE = 'container.memory.usage' as const;
  * Container memory working set.
  *
  * @note In general, this metric can be derived from [cadvisor](https://github.com/google/cadvisor/blob/v0.53.0/docs/storage/prometheus.md#prometheus-container-metrics) and specifically the `container_memory_working_set_bytes` metric.
- * In K8s, this metric is derived from the [MemoryStats.WorkingSetBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field of the [PodStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats) of the Kubelet's stats API.
+ * In K8s, this metric is derived from the [MemoryStats.WorkingSetBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field of the [ContainerStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#ContainerStats) of the Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -381,6 +385,16 @@ export const METRIC_CONTAINER_MEMORY_WORKING_SET = 'container.memory.working_set
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_CONTAINER_NETWORK_IO = 'container.network.io' as const;
+
+/**
+ * Container memory paging faults.
+ *
+ * @note In general, this metric can be derived from [cadvisor](https://github.com/google/cadvisor/blob/v0.53.0/docs/storage/prometheus.md#prometheus-container-metrics) and specifically the `container_memory_failures_total{failure_type=pgfault, scope=container}` and `container_memory_failures_total{failure_type=pgmajfault, scope=container}`metric.
+ * In K8s, this metric is derived from the [MemoryStats.PageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) and [MemoryStats.MajorPageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field of the [ContainerStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#ContainerStats) of the Kubelet's stats API.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_CONTAINER_PAGING_FAULTS = 'container.paging.faults' as const;
 
 /**
  * The time the container has been running.
@@ -1988,7 +2002,7 @@ export const METRIC_K8S_NODE_ALLOCATABLE_PODS = 'k8s.node.allocatable.pods' as c
 export const METRIC_K8S_NODE_CONDITION_STATUS = 'k8s.node.condition.status' as const;
 
 /**
- * Amount of cpu allocatable on the node.
+ * Amount of CPU allocatable on the node.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2004,9 +2018,9 @@ export const METRIC_K8S_NODE_CPU_ALLOCATABLE = 'k8s.node.cpu.allocatable' as con
 export const METRIC_K8S_NODE_CPU_TIME = 'k8s.node.cpu.time' as const;
 
 /**
- * Node's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs.
+ * Node's CPU usage, measured in CPUs. Range from 0 to the number of allocatable CPUs.
  *
- * @note CPU usage of the specific Node on all available CPU cores, averaged over the sample window
+ * @note CPU usage of the specific Node on all available CPU cores. It is calculated as the change in cumulative CPU time (k8s.node.cpu.time) over a measurement interval, divided by the elapsed time: usageCores = (cpuTimeEnd - cpuTimeStart) / elapsedSeconds
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2044,6 +2058,30 @@ export const METRIC_K8S_NODE_FILESYSTEM_AVAILABLE = 'k8s.node.filesystem.availab
 export const METRIC_K8S_NODE_FILESYSTEM_CAPACITY = 'k8s.node.filesystem.capacity' as const;
 
 /**
+ * The total inodes in the node's root filesystem.
+ *
+ * @note This metric is derived from the
+ * [FsStats.Inodes](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats) field
+ * of the [NodeStats.Fs](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#NodeStats)
+ * of the Kubelet's stats API.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_NODE_FILESYSTEM_INODE_COUNT = 'k8s.node.filesystem.inode.count' as const;
+
+/**
+ * The free inodes in the node's root filesystem.
+ *
+ * @note This metric is derived from the
+ * [FsStats.InodesFree](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats) field
+ * of the [NodeStats.Fs](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#NodeStats)
+ * of the Kubelet's stats API.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_NODE_FILESYSTEM_INODE_FREE = 'k8s.node.filesystem.inode.free' as const;
+
+/**
  * Node filesystem usage.
  *
  * @note This may not equal capacity - available.
@@ -2075,12 +2113,14 @@ export const METRIC_K8S_NODE_MEMORY_ALLOCATABLE = 'k8s.node.memory.allocatable' 
 export const METRIC_K8S_NODE_MEMORY_AVAILABLE = 'k8s.node.memory.available' as const;
 
 /**
- * Node memory paging faults.
+ * Deprecated, use `k8s.node.paging.faults` instead.
  *
  * @note Cumulative number of major/minor page faults.
  * This metric is derived from the [MemoryStats.PageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) and [MemoryStats.MajorPageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) fields of the [NodeStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#NodeStats) of the Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `k8s.node.paging.faults`.
  */
 export const METRIC_K8S_NODE_MEMORY_PAGING_FAULTS = 'k8s.node.memory.paging.faults' as const;
 
@@ -2097,7 +2137,8 @@ export const METRIC_K8S_NODE_MEMORY_RSS = 'k8s.node.memory.rss' as const;
 /**
  * Memory usage of the Node.
  *
- * @note Total memory usage of the Node
+ * @note Total memory in use. This includes all memory regardless of when it was accessed.
+ * This metric is derived from the [MemoryStats.UsageBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field of the [NodeStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#NodeStats) of the Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2128,6 +2169,16 @@ export const METRIC_K8S_NODE_NETWORK_ERRORS = 'k8s.node.network.errors' as const
 export const METRIC_K8S_NODE_NETWORK_IO = 'k8s.node.network.io' as const;
 
 /**
+ * Node memory paging faults.
+ *
+ * @note Cumulative number of major/minor page faults.
+ * This metric is derived from the [MemoryStats.PageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) and [MemoryStats.MajorPageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) fields of the [NodeStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#NodeStats) of the Kubelet's stats API.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_NODE_PAGING_FAULTS = 'k8s.node.paging.faults' as const;
+
+/**
  * Amount of pods allocatable on the node.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -2144,9 +2195,9 @@ export const METRIC_K8S_NODE_POD_ALLOCATABLE = 'k8s.node.pod.allocatable' as con
 export const METRIC_K8S_NODE_SYSTEM_CONTAINER_CPU_TIME = 'k8s.node.system_container.cpu.time' as const;
 
 /**
- * Node's system container CPU usage, measured in cpus.
+ * Node's system container CPU usage, measured in CPUs.
  *
- * @note This metric is derived from the [CPUStats.UsageNanoCores](https://github.com/kubernetes/kubelet/blob/v0.35.2/pkg/apis/stats/v1alpha1/types.go#L233) field of the [ContainerStats](https://github.com/kubernetes/kubelet/blob/v0.35.2/pkg/apis/stats/v1alpha1/types.go#L157C6-L157C20) of [Node.SystemContainers](https://github.com/kubernetes/kubelet/blob/v0.35.2/pkg/apis/stats/v1alpha1/types.go#L40) of the Kubelet's stats API.
+ * @note CPU usage of the specific System Container on all available CPU cores. It is calculated as the change in cumulative CPU time (k8s.node.system_container.cpu.time) over a measurement interval, divided by the elapsed time: usageCores = (cpuTimeEnd - cpuTimeStart) / elapsedSeconds
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2241,9 +2292,9 @@ export const METRIC_K8S_PERSISTENTVOLUMECLAIM_STORAGE_REQUEST = 'k8s.persistentv
 export const METRIC_K8S_POD_CPU_TIME = 'k8s.pod.cpu.time' as const;
 
 /**
- * Pod's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs.
+ * Pod's CPU usage, measured in CPUs. Range from 0 to the number of allocatable CPUs.
  *
- * @note CPU usage of the specific Pod on all available CPU cores, averaged over the sample window
+ * @note CPU usage of the specific Pod on all available CPU cores. It is calculated as the change in cumulative CPU time (k8s.pod.cpu.time) over a measurement interval, divided by the elapsed time: usageCores = (cpuTimeEnd - cpuTimeStart) / elapsedSeconds
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2298,12 +2349,14 @@ export const METRIC_K8S_POD_FILESYSTEM_USAGE = 'k8s.pod.filesystem.usage' as con
 export const METRIC_K8S_POD_MEMORY_AVAILABLE = 'k8s.pod.memory.available' as const;
 
 /**
- * Pod memory paging faults.
+ * Deprecated, use `k8s.pod.paging.faults` instead.
  *
  * @note Cumulative number of major/minor page faults.
  * This metric is derived from the [MemoryStats.PageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) and [MemoryStats.MajorPageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field of the [PodStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats) of the Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `k8s.pod.paging.faults`.
  */
 export const METRIC_K8S_POD_MEMORY_PAGING_FAULTS = 'k8s.pod.memory.paging.faults' as const;
 
@@ -2320,7 +2373,8 @@ export const METRIC_K8S_POD_MEMORY_RSS = 'k8s.pod.memory.rss' as const;
 /**
  * Memory usage of the Pod.
  *
- * @note Total memory usage of the Pod
+ * @note Total memory in use. This includes all memory regardless of when it was accessed.
+ * This metric is derived from the [MemoryStats.UsageBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field of the [PodStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats) of the Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2349,6 +2403,16 @@ export const METRIC_K8S_POD_NETWORK_ERRORS = 'k8s.pod.network.errors' as const;
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_K8S_POD_NETWORK_IO = 'k8s.pod.network.io' as const;
+
+/**
+ * Pod memory paging faults.
+ *
+ * @note Cumulative number of major/minor page faults.
+ * This metric is derived from the [MemoryStats.PageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) and [MemoryStats.MajorPageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field of the [PodStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats) of the Kubelet's stats API.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_POD_PAGING_FAULTS = 'k8s.pod.paging.faults' as const;
 
 /**
  * Describes number of K8s Pods that are currently in a given phase.
@@ -3569,8 +3633,8 @@ export const METRIC_OTEL_SDK_EXPORTER_METRIC_DATA_POINT_INFLIGHT = 'otel.sdk.exp
 /**
  * The duration of exporting a batch of telemetry records.
  *
- * @note This metric defines successful operations using the full success definitions for [http](https://github.com/open-telemetry/opentelemetry-proto/blob/v1.5.0/docs/specification.md#full-success-1)
- * and [grpc](https://github.com/open-telemetry/opentelemetry-proto/blob/v1.5.0/docs/specification.md#full-success). Anything else is defined as an unsuccessful operation. For successful
+ * @note This metric defines successful operations using the full success definitions for [HTTP](https://github.com/open-telemetry/opentelemetry-proto/blob/v1.5.0/docs/specification.md#full-success-1)
+ * and [gRPC](https://github.com/open-telemetry/opentelemetry-proto/blob/v1.5.0/docs/specification.md#full-success). Anything else is defined as an unsuccessful operation. For successful
  * operations, `error.type` **MUST NOT** be set. For unsuccessful export operations, `error.type` **MUST** contain a relevant failure cause.
  * If the exporter retries failed export attempts, exactly one observation **MUST** be recorded per export operation,
  * covering the wall-clock duration from the start of the first attempt through the conclusion of the final attempt (including any backoff between attempts).
@@ -3644,9 +3708,14 @@ export const METRIC_OTEL_SDK_METRIC_READER_COLLECTION_DURATION = 'otel.sdk.metri
  *
  * @note For successful processing, `error.type` **MUST NOT** be set. For failed processing, `error.type` **MUST** contain the failure cause.
  * SDK Batching Log Record Processors **MUST** use `queue_full` as the value of `error.type` for log records dropped due to a full queue.
- * SDK Log Record Processors **MUST** use `already_shutdown` as the value of `error.type` for log records dropped because the processor has already been shut down.
- * For the SDK Simple and Batching Log Record Processor a log record is considered to be processed already when it has been submitted to the exporter,
- * not when the corresponding export call has finished.
+ * If a processor reports a log record dropped because it has already been shut down, `error.type` **MUST** be `already_shutdown`.
+ * Whether and when a processor drops such log records is governed by the SDK specification, not by this metric.
+ * For the SDK Simple and Batching Log Record Processors, a log record **MUST** be counted as successfully processed at the point the
+ * processor invokes the export operation. For batching processors, all log records in the batch passed to the exporter are counted
+ * at that point; log records accepted into the processor's queue but not yet passed to the exporter have not been processed.
+ * Implementations **MUST NOT** delay this count until the export operation concludes, and the outcome of the export operation,
+ * including an immediate failure of the invocation itself, **MUST NOT** affect this metric.
+ * Export outcomes are reported by `otel.sdk.exporter.log.exported`.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -3675,8 +3744,14 @@ export const METRIC_OTEL_SDK_PROCESSOR_LOG_QUEUE_SIZE = 'otel.sdk.processor.log.
  *
  * @note For successful processing, `error.type` **MUST NOT** be set. For failed processing, `error.type` **MUST** contain the failure cause.
  * SDK Batching Span Processors **MUST** use `queue_full` as the value of `error.type` for spans dropped due to a full queue.
- * SDK Span Processors **MUST** use `already_shutdown` as the value of `error.type` for spans dropped because the processor has already been shut down.
- * For the SDK Simple and Batching Span Processor a span is considered to be processed already when it has been submitted to the exporter, not when the corresponding export call has finished.
+ * If a processor reports a span dropped because it has already been shut down, `error.type` **MUST** be `already_shutdown`.
+ * Whether and when a processor drops such spans is governed by the SDK specification, not by this metric.
+ * For the SDK Simple and Batching Span Processors, a span **MUST** be counted as successfully processed at the point the processor
+ * invokes the export operation. For batching processors, all spans in the batch passed to the exporter are counted at that point;
+ * spans accepted into the processor's queue but not yet passed to the exporter have not been processed.
+ * Implementations **MUST NOT** delay this count until the export operation concludes, and the outcome of the export operation,
+ * including an immediate failure of the invocation itself, **MUST NOT** affect this metric.
+ * Export outcomes are reported by `otel.sdk.exporter.span.exported`.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -3783,11 +3858,25 @@ export const METRIC_PROCESS_CPU_UTILIZATION = 'process.cpu.utilization' as const
 export const METRIC_PROCESS_DISK_IO = 'process.disk.io' as const;
 
 /**
+ * Number of disk operations performed by the process.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_PROCESS_DISK_OPERATIONS = 'process.disk.operations' as const;
+
+/**
  * The amount of physical memory in use.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_PROCESS_MEMORY_USAGE = 'process.memory.usage' as const;
+
+/**
+ * Percentage of total physical memory that is used by the process.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_PROCESS_MEMORY_UTILIZATION = 'process.memory.utilization' as const;
 
 /**
  * The amount of committed virtual memory.
@@ -3820,6 +3909,13 @@ export const METRIC_PROCESS_OPEN_FILE_DESCRIPTOR_COUNT = 'process.open_file_desc
 export const METRIC_PROCESS_PAGING_FAULTS = 'process.paging.faults' as const;
 
 /**
+ * Number of pending signals for the process.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_PROCESS_SIGNALS_PENDING = 'process.signals_pending' as const;
+
+/**
  * Process threads count.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -3827,7 +3923,7 @@ export const METRIC_PROCESS_PAGING_FAULTS = 'process.paging.faults' as const;
 export const METRIC_PROCESS_THREAD_COUNT = 'process.thread.count' as const;
 
 /**
- * Number of unix file descriptors in use by the process.
+ * Number of UNIX file descriptors in use by the process.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -4343,14 +4439,14 @@ export const METRIC_SYSTEM_PAGING_FAULTS = 'system.paging.faults' as const;
 export const METRIC_SYSTEM_PAGING_OPERATIONS = 'system.paging.operations' as const;
 
 /**
- * Unix swap or windows pagefile usage.
+ * UNIX swap or windows pagefile usage.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_SYSTEM_PAGING_USAGE = 'system.paging.usage' as const;
 
 /**
- * Swap (unix) or pagefile (windows) utilization.
+ * Swap (UNIX) or pagefile (windows) utilization.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -4369,6 +4465,17 @@ export const METRIC_SYSTEM_PROCESS_COUNT = 'system.process.count' as const;
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_SYSTEM_PROCESS_CREATED = 'system.process.created' as const;
+
+/**
+ * The maximum number of concurrent processes/tasks allowed by the operating system.
+ *
+ * @note On Linux, this corresponds to `/proc/sys/kernel/pid_max` or `/proc/sys/kernel/threads-max`.
+ * A per-user process limit may also be retrieved via `getrlimit(RLIMIT_NPROC)`.
+ * On BSD-like systems, this corresponds to `sysctl kern.maxproc`. This metric is unsupported on Windows systems.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_SYSTEM_PROCESS_LIMIT = 'system.process.limit' as const;
 
 /**
  * The time the system has been running.
