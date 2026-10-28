@@ -15,13 +15,18 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :rocket: Features
 
+* feat(resources): Deprecate `envDetector` in favor of separate `resourceAttributesEnvDetector` and `serviceNameEnvDetector`. Also mark `serviceInstanceIdDetector` as stable (the `service.instance.id` semconv attribute is now stable). [#6999](https://github.com/open-telemetry/opentelemetry-js/pull/6999) @trentm
+
 ### :bug: Bug Fixes
+
+* fix(core): accept attribute values with shared (non-circular) object references [#7068](https://github.com/open-telemetry/opentelemetry-js/pull/7068) @rajanpanth
 
 ### :books: Documentation
 
 ### :house: Internal
 
 * perf(sdk-logs, sdk-trace): wait for each distinct pending resource once per batch instead of once per record [#7208](https://github.com/open-telemetry/opentelemetry-js/pull/7208) @shehjaddev
+* ci: update the W3C harness for Python 3.14 [#7236](https://github.com/open-telemetry/opentelemetry-js/pull/7236) @adityareddy-dev
 
 ## 3.0.0
 
