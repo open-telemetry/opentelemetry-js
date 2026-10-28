@@ -475,9 +475,12 @@ export function createResourceFromConfig(
             detectors.push(serviceInstanceIdDetector);
             break;
           default:
-            throw new Error(
-              `unknown ExperimentalResourceDetector name in configuration: "${name}"`
+            // An unknown resource detector should "warn and skip".
+            // https://opentelemetry.io/docs/specs/otel/configuration/sdk/#supported-sdk-plugin-components
+            diag.warn(
+              `unknown ExperimentalResourceDetector name in configuration: "${name}" (skipping)`
             );
+            break;
         }
       }
 
