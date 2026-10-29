@@ -411,6 +411,69 @@ describe('getOtlpGrpcConfigurationFromEnvironment', function () {
       assert.deepStrictEqual(credentials, expectedCredentials);
     });
 
+    it('should not warn when only root certificate is provided', function () {
+      // arrange
+      const spyLoggerWarn = sinon.stub(diag, 'warn');
+      const expectedCredentials = createSslCredentials(
+        Buffer.from(fs.readFileSync('./test/certs/ca.crt'))
+      );
+
+      process.env.OTEL_EXPORTER_OTLP_CERTIFICATE = './test/certs/ca.crt';
+      // OTEL_EXPORTER_OTLP_CLIENT_KEY not set
+      // OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE not set
+
+      // act
+      const config = getOtlpGrpcConfigurationFromEnv('METRICS');
+      const credentials = config.credentials?.('example.test:4317')();
+
+      // assert
+      sinon.assert.notCalled(spyLoggerWarn);
+      assert.deepStrictEqual(credentials, expectedCredentials);
+    });
+
+    it('should warn when client key and root certificate are missing', function () {
+      // arrange
+      const spyLoggerWarn = sinon.stub(diag, 'warn');
+      const expectedCredentials = createSslCredentials();
+
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE =
+        './test/certs/client.crt';
+      // OTEL_EXPORTER_OTLP_CERTIFICATE not set
+      // OTEL_EXPORTER_OTLP_CLIENT_KEY not set
+
+      // act
+      const config = getOtlpGrpcConfigurationFromEnv('METRICS');
+      const credentials = config.credentials?.('example.test:4317')();
+
+      // assert
+      sinon.assert.calledOnceWithExactly(
+        spyLoggerWarn,
+        'Client key and certificate must both be provided, but one was missing - attempting to create credentials from just the root certificate'
+      );
+      assert.deepStrictEqual(credentials, expectedCredentials);
+    });
+
+    it('should warn when client cert and root certificate are missing', function () {
+      // arrange
+      const spyLoggerWarn = sinon.stub(diag, 'warn');
+      const expectedCredentials = createSslCredentials();
+
+      process.env.OTEL_EXPORTER_OTLP_CLIENT_KEY = './test/certs/client.key';
+      // OTEL_EXPORTER_OTLP_CERTIFICATE not set
+      // OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE not set
+
+      // act
+      const config = getOtlpGrpcConfigurationFromEnv('METRICS');
+      const credentials = config.credentials?.('example.test:4317')();
+
+      // assert
+      sinon.assert.calledOnceWithExactly(
+        spyLoggerWarn,
+        'Client key and certificate must both be provided, but one was missing - attempting to create credentials from just the root certificate'
+      );
+      assert.deepStrictEqual(credentials, expectedCredentials);
+    });
+
     it('should not warn when root certificate is missing', function () {
       // arrange
       const spyLoggerWarn = sinon.stub(diag, 'warn');

@@ -196,14 +196,13 @@ function getCredentialsFromEnvIgnoreInsecure(
   const clientCertificate = getClientCertificateFromEnv(signalIdentifier);
   const rootCertificate = getRootCertificateFromEnv(signalIdentifier);
 
-  // if the chain is not intact, @grpc/grpc-js will throw. This is fine when a user provides it in code, but env var
+  // If only one half of the client pair is provided, @grpc/grpc-js will throw. This is fine when a user provides it in code, but env var
   // config is not allowed to throw, so we add this safeguard and try to make the best of it here.
-  const clientChainIntact = clientKey != null && clientCertificate != null;
-  if (rootCertificate != null && !clientChainIntact) {
+  if ((clientKey != null) !== (clientCertificate != null)) {
     diag.warn(
       'Client key and certificate must both be provided, but one was missing - attempting to create credentials from just the root certificate'
     );
-    return createSslCredentials(getRootCertificateFromEnv(signalIdentifier));
+    return createSslCredentials(rootCertificate);
   }
 
   return createSslCredentials(rootCertificate, clientKey, clientCertificate);
