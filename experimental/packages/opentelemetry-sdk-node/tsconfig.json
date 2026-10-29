@@ -79,7 +79,7 @@
       "path": "../otlp-grpc-exporter-base"
     },
     {
-      "path": "../sdk-logs"
+      "path": "../../../packages/sdk-logs"
     }
   ]
 }

@@ -34,7 +34,6 @@
       "experimental/packages/otlp-transformer",
       "experimental/packages/sampler-composite",
       "experimental/packages/sampler-jaeger-remote",
-      "experimental/packages/sdk-logs",
       "experimental/packages/web-common",
       "packages/opentelemetry-context-async-hooks",
       "packages/opentelemetry-context-zone",
@@ -43,6 +42,7 @@
       "packages/opentelemetry-exporter-zipkin",
       "packages/opentelemetry-propagator-b3",
       "packages/opentelemetry-resources",
+      "packages/sdk-logs",
       "packages/sdk-metrics",
       "packages/sdk-trace",
       "semantic-conventions"
@@ -134,9 +134,6 @@
       "path": "experimental/packages/sampler-jaeger-remote"
     },
     {
-      "path": "experimental/packages/sdk-logs"
-    },
-    {
       "path": "experimental/packages/web-common"
     },
     {
@@ -159,6 +156,9 @@
     },
     {
       "path": "packages/opentelemetry-resources"
+    },
+    {
+      "path": "packages/sdk-logs"
     },
     {
       "path": "packages/sdk-metrics"

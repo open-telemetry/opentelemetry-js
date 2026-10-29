@@ -11,16 +11,88 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :bug: Bug Fixes
 
-* fix: resolve the ESM build through the `default` export condition instead of `import`, so a resolver that activates neither `import` nor `require` still finds an entry point [#7132](https://github.com/open-telemetry/opentelemetry-js/pull/7132) @overbalance
-
 ### :books: Documentation
 
 ### :house: Internal
 
-* build: migrate the package build from `tsc` to `tsdown`, emitting dual CJS/ESM output from a single `dist/` directory [#6293](https://github.com/open-telemetry/opentelemetry-js/pull/6293) @overbalance
-  * The public entry points are unchanged: `@opentelemetry/semantic-conventions` and `@opentelemetry/semantic-conventions/incubating`. This package already declared an `exports` map, so deep imports such as `@opentelemetry/semantic-conventions/build/src/...` were rejected before this change and continue to be.
-  * The emitted files moved out of `build/src` (CJS), `build/esm` and `build/esnext` (ESM) into `dist/`, using `.cjs`/`.mjs` extensions with matching `.d.cts`/`.d.mts` declarations. The non-standard `esnext` condition has been dropped in favour of the standard `import`/`require` conditions.
-* chore: remove the redundant `module` field from `package.json`; bundlers resolve the ESM build through the `exports` map [#7130](https://github.com/open-telemetry/opentelemetry-js/pull/7130) @overbalance
+## 1.44.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.44.0 [#7239](https://github.com/open-telemetry/opentelemetry-js/pull/7239)
+  * Semantic Conventions v1.44.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1440) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *none*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *3 newly deprecated exports, 33 added exports*
+
+#### Unstable changes in v1.44.0
+
+<details>
+<summary>3 newly deprecated exports</summary>
+
+```js
+METRIC_CONTAINER_MEMORY_PAGING_FAULTS // container.memory.paging.faults: Replaced by `container.paging.faults`.
+METRIC_K8S_NODE_MEMORY_PAGING_FAULTS  // k8s.node.memory.paging.faults: Replaced by `k8s.node.paging.faults`.
+METRIC_K8S_POD_MEMORY_PAGING_FAULTS   // k8s.pod.memory.paging.faults: Replaced by `k8s.pod.paging.faults`.
+```
+
+</details>
+
+<details>
+<summary>33 added exports</summary>
+
+```js
+ATTR_BROWSER_WEB_VITAL_DELTA                               // browser.web_vital.delta
+ATTR_BROWSER_WEB_VITAL_ID                                  // browser.web_vital.id
+ATTR_BROWSER_WEB_VITAL_NAME                                // browser.web_vital.name
+  BROWSER_WEB_VITAL_NAME_VALUE_CLS                           // "cls"
+  BROWSER_WEB_VITAL_NAME_VALUE_FCP                           // "fcp"
+  BROWSER_WEB_VITAL_NAME_VALUE_FID                           // "fid"
+  BROWSER_WEB_VITAL_NAME_VALUE_INP                           // "inp"
+  BROWSER_WEB_VITAL_NAME_VALUE_LCP                           // "lcp"
+  BROWSER_WEB_VITAL_NAME_VALUE_TTFB                          // "ttfb"
+ATTR_BROWSER_WEB_VITAL_NAVIGATION_TYPE                     // browser.web_vital.navigation_type
+  BROWSER_WEB_VITAL_NAVIGATION_TYPE_VALUE_BACK_FORWARD       // "back-forward"
+  BROWSER_WEB_VITAL_NAVIGATION_TYPE_VALUE_BACK_FORWARD_CACHE // "back-forward-cache"
+  BROWSER_WEB_VITAL_NAVIGATION_TYPE_VALUE_NAVIGATE           // "navigate"
+  BROWSER_WEB_VITAL_NAVIGATION_TYPE_VALUE_PRERENDER          // "prerender"
+  BROWSER_WEB_VITAL_NAVIGATION_TYPE_VALUE_RELOAD             // "reload"
+  BROWSER_WEB_VITAL_NAVIGATION_TYPE_VALUE_RESTORE            // "restore"
+ATTR_BROWSER_WEB_VITAL_RATING                              // browser.web_vital.rating
+  BROWSER_WEB_VITAL_RATING_VALUE_GOOD                        // "good"
+  BROWSER_WEB_VITAL_RATING_VALUE_NEEDS_IMPROVEMENT           // "needs-improvement"
+  BROWSER_WEB_VITAL_RATING_VALUE_POOR                        // "poor"
+ATTR_BROWSER_WEB_VITAL_VALUE                               // browser.web_vital.value
+
+ATTR_MESSAGING_KAFKA_CLUSTER_ID                            // messaging.kafka.cluster.id
+
+CLOUD_PLATFORM_VALUE_SCALEWAY_CLOUD_COMPUTE                // "scaleway_cloud_compute"
+CLOUD_PROVIDER_VALUE_SCALEWAY_CLOUD                        // "scaleway_cloud"
+
+METRIC_CONTAINER_PAGING_FAULTS                             // container.paging.faults
+
+METRIC_K8S_NODE_FILESYSTEM_INODE_COUNT                     // k8s.node.filesystem.inode.count
+METRIC_K8S_NODE_FILESYSTEM_INODE_FREE                      // k8s.node.filesystem.inode.free
+METRIC_K8S_NODE_PAGING_FAULTS                              // k8s.node.paging.faults
+METRIC_K8S_POD_PAGING_FAULTS                               // k8s.pod.paging.faults
+
+METRIC_PROCESS_DISK_OPERATIONS                             // process.disk.operations
+METRIC_PROCESS_MEMORY_UTILIZATION                          // process.memory.utilization
+METRIC_PROCESS_SIGNALS_PENDING                             // process.signals_pending
+
+METRIC_SYSTEM_PROCESS_LIMIT                                // system.process.limit
+```
+
+</details>
+
+### :bug: Bug Fixes
+
+* fix: resolve the ESM build through the `default` export condition instead of `import` [#7132](https://github.com/open-telemetry/opentelemetry-js/pull/7132) @overbalance
+
+### :house: Internal
+
+* build: migrate the build from `tsc` to `tsdown` [#6293](https://github.com/open-telemetry/opentelemetry-js/pull/6293) @overbalance
+  * Output moved from `build/` to `dist/` as `.cjs`/`.mjs`, and the non-standard `esnext` condition is dropped. Public entry points are unchanged.
+* chore: remove the redundant `module` field from `package.json` [#7130](https://github.com/open-telemetry/opentelemetry-js/pull/7130) @overbalance
 
 ## 1.43.0
 

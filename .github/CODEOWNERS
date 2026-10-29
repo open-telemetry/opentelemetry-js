@@ -28,7 +28,6 @@ experimental/packages/**/*browser* @open-telemetry/browser-maintainers @open-tel
 experimental/packages/opentelemetry-browser-detector/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
 experimental/packages/opentelemetry-instrumentation-fetch/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
 experimental/packages/opentelemetry-instrumentation-xml-http-request/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
-experimental/packages/otlp-exporter-base/src/transport/fetch-transport.ts @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
 experimental/packages/web-common/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
 packages/opentelemetry-context-zone/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers
 packages/opentelemetry-context-zone-peer-dep/ @open-telemetry/browser-maintainers @open-telemetry/javascript-approvers

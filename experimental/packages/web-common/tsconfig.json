@@ -24,10 +24,7 @@
       "path": "../../../packages/sdk-trace"
     },
     {
-      "path": "../../../semantic-conventions"
-    },
-    {
-      "path": "../sdk-logs"
+      "path": "../../../packages/sdk-logs"
     }
   ]
 }

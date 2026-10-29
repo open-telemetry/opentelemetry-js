@@ -9,18 +9,58 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :boom: Breaking Changes
 
+* feat(sdk-node)!: The experimental `startNodeSdk()` code path for *environment-based* config (i.e. when not using a config file), has full option coverage. [#6999](https://github.com/open-telemetry/opentelemetry-js/pull/6999) @trentm
+  * `startNodeSdk()` should now be a viable replacement for `new NodeSDK()`, supporting similar (but not exactly the same) options for configuring most SDK components.
+  * `startNodeSDK()` has been *deprecated*, use `startNodeSdk()` (slight capitalization change).
+  * Two resource detectors have been added to the default set for `new NodeSDK()` users: `os` and `serviceinstance`. This means that when not specifying `OTEL_NODE_RESOURCE_DETECTORS`, the SDK Resource will include `os.*` and `service.instance.id` attributes.
+* refactor(configuration)!: The responsibility of the `configuration` package has been reduced to just the parsing, validation, and TypeScript types for declarative config files. [#6999](https://github.com/open-telemetry/opentelemetry-js/pull/6999) @trentm
+  * **Breaking:** The `configuration` package no longer supports creating a synthetic `ConfigurationModel` from environment variables.
+  * **Breaking:** The `configuration` package API has changed: `createConfigFactory()` has been replaced with `parseConfigFile().
+
 ### :rocket: Features
 
 ### :bug: Bug Fixes
 
+* fix(sdk-node): use `OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT` and `OTEL_LINK_ATTRIBUTE_COUNT_LIMIT` environment variables for span limits [#6999](https://github.com/open-telemetry/opentelemetry-js/pull/6999) @trentm
+  * Before this change, different environment variable names (see next point), that are *not* in the OTel spec were used. They will still be supported as a fallback for the spec names for a period of approximately six months.
+  * The `OTEL_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT` and `OTEL_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT` environment variables are **deprecated**. Support for them will be [removed sometime after six months](https://github.com/open-telemetry/opentelemetry-js/issues/7242), to allow transition to [the correct environment variables in the spec](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#span-limits).
+* fix(otlp-exporter-base): pick the browser fetch `mode` from the document origin, so exports from an opaque-origin document (e.g. a sandboxed iframe) no longer fail with `mode: 'same-origin'` [#7211](https://github.com/open-telemetry/opentelemetry-js/pull/7211) @MO2k4
+
 ### :books: Documentation
+
+* docs(exporters): update dead semantic conventions resource specification links in OTLP exporters [#7254](https://github.com/open-telemetry/opentelemetry-js/pull/7254) @helmipradita
 
 ### :house: Internal
 
-## 0.300.0-development.1
+## 0.300.0
 
 ### :boom: Breaking Changes
 
+* chore(shim-opencensus)!: remove the `@opentelemetry/shim-opencensus` package
+  * In the [OpenTelemetry Specification v1.58.0](https://github.com/open-telemetry/opentelemetry-specification/releases/tag/v1.58.0) the [OpenCensus compatibility requirements were deprecated](https://github.com/open-telemetry/opentelemetry-specification/pull/5138). The JavaScript OpenCensus shim package will not receive any more releases after the current [0.223.0 release](https://www.npmjs.com/package/@opentelemetry/shim-opencensus/v/0.223.0) ([source code for last release](https://github.com/open-telemetry/opentelemetry-js/tree/experimental/v0.223.0/experimental/packages/shim-opencensus/)).
+* feat(instrumentation-http)!: remove deprecated `serverName` field from `HttpInstrumentationConfig` [#7081](https://github.com/open-telemetry/opentelemetry-js/pull/7081)
+  * The `serverName` option had no effect; stable HTTP semantic conventions do not include `http.server_name`. Remove it from any `setConfig()` or constructor call.
+* feat(sdk-node)!: remove deprecated `NodeSDKConfiguration` fields `logRecordProcessor`, `metricReader`, `spanProcessor` and deprecated namespace re-exports `node`, `tracing`
+  * `NodeSDKConfiguration.logRecordProcessor` — use `logRecordProcessors` instead.
+  * `NodeSDKConfiguration.metricReader` — use `metricReaders` instead.
+  * `NodeSDKConfiguration.spanProcessor` — use `spanProcessors` instead.
+  * `export * as node from '@opentelemetry/sdk-node'` — import directly from `@opentelemetry/sdk-trace` instead; `@opentelemetry/sdk-trace-node` was removed in the same release.
+  * `export * as tracing from '@opentelemetry/sdk-node'` — import directly from `@opentelemetry/sdk-trace` instead; `@opentelemetry/sdk-trace-base` was removed in the same release.
+* feat(sdk-logs)!: remove deprecated `SdkLogRecord` type alias and `LoggerProviderConfig` type alias [#7062](https://github.com/open-telemetry/opentelemetry-js/pull/7062)
+  * `SdkLogRecord` — use `ReadWriteLogRecord` instead.
+  * `LoggerProviderConfig` — use `LoggerProviderOptions` instead.
+* feat!: migrate package builds from `tsc` to `tsdown`, emitting dual CJS/ESM output from a single `dist/` directory and declaring an `exports` map on every package [#6293](https://github.com/open-telemetry/opentelemetry-js/pull/6293) @overbalance
+  * Importing a package by its name is unaffected in both CommonJS and ESM, as is every subpath listed in its `exports` map.
+  * **Deep imports into the build output no longer resolve.** An `exports` map is an allowlist that Node.js and bundlers enforce, so specifiers such as `@opentelemetry/sdk-logs/build/src/...` or `@opentelemetry/sdk-logs/build/esm/...` now fail with `ERR_PACKAGE_PATH_NOT_EXPORTED`. Rewriting them to the new file layout does not help — unlisted subpaths are rejected whether or not the file exists.
+  * The emitted files moved out of `build/src` (CJS), `build/esm` and `build/esnext` (ESM) into `dist/`, using `.cjs`/`.mjs` extensions with matching `.d.cts`/`.d.mts` declarations.
+  * `<package>/package.json` is no longer importable for the same reason. Read a package's version from your own dependency metadata, or use `SDK_INFO` from `@opentelemetry/core` for the SDK version.
+  * The non-standard `esnext` entry point has been removed; tools that preferred it fall back to `module` (ESM) or `main` (CJS).
+  * If you depend on something that is only reachable through a deep import, please open an issue so it can be considered for the public API.
+* feat(sdk-node)!: remove `"jaeger"` propagator from `@opentelemetry/sdk-node` [#7077](https://github.com/open-telemetry/opentelemetry-js/pull/7077)
+  * `OTEL_PROPAGATORS=jaeger` and `{ jaeger: null }` in the configuration object are no longer recognised. Replace with `"tracecontext"`.
+  * See the [3.x migration guide](../doc/3.x/migration-guide.md) for full instructions.
+* fix(opentelemetry-exporter-prometheus)!: default exporter host to localhost [#6599](https://github.com/open-telemetry/opentelemetry-js/pull/6599) @cjihrig
+* chore!: bump minimum node.js version to >=22.15.0
 * feat(api-logs)!: move the Logs API to `@opentelemetry/api` and remove the standalone `@opentelemetry/api-logs` package [#4862](https://github.com/open-telemetry/opentelemetry-js/pull/4862) @hectorhdzg
 * fix(exporter-prometheus)!: stop reading Prometheus exporter host and port environment variables in the exporter constructor [#6966](https://github.com/open-telemetry/opentelemetry-js/pull/6966) @LarryHu0217
 * chore(web-common)!: clean up and deprecate network span utils [#7114](https://github.com/open-telemetry/opentelemetry-js/issues/7114)
@@ -32,6 +72,15 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
   * `logs` → import from `@opentelemetry/sdk-logs`
   * `metrics` → import from `@opentelemetry/sdk-metrics`
   * `resources` → import from `@opentelemetry/resources`
+* feat(sdk-logs): mark `@opentelemetry/sdk-logs` as stable [#7143](https://github.com/open-telemetry/opentelemetry-js/issues/7143) @trentm
+  * See [the stable CHANGELOG](../CHANGELOG.md) for future changes to the sdk-logs package.
+* feat!: replace the `browser` field in `package.json` with `#platform` subpath imports [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
+  * Resolvers with the `node` condition load the Node.js build; all others load the browser build. Bundlers without `imports` support fail; see the migration guide.
+  * webpack needs 5.54 or later. Parcel needs package exports enabled and cannot resolve `#platform` from `require()`.
+  * Root type declarations describe the Node.js build.
+* feat(instrumentation, exporter-*-otlp-http, exporter-*-otlp-proto)!: remove the `./platform` and `./platform/browser` subpath exports; import from the package root [#7141](https://github.com/open-telemetry/opentelemetry-js/pull/7141) @overbalance
+* feat(otlp-exporter-base)!: move `OTLPExporterNodeConfigBase` to `@opentelemetry/otlp-exporter-base/node-http` [#7172](https://github.com/open-telemetry/opentelemetry-js/pull/7172) @overbalance
+  * `typesVersions` maps the subpaths for `moduleResolution: node`.
 
 ### :rocket: Features
 
@@ -39,63 +88,40 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
   * The `AnyValue`, `LogBody`, and `LogAttributes` types are no longer exported by the `api-logs` package.
     Instead, use the `AnyValue` and `Attributes` types from the latest `@opentelemetry/api` package.
   * This is part of supporting [OTEP 4485](https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/4485-extending-attributes-to-support-complex-values.md#how).
-
-### :bug: Bug Fixes
-
-* fix(configuration): preserve zero-valued limits from environment variables [#7060](https://github.com/open-telemetry/opentelemetry-js/pull/7060) @DenisCDev
-* fix(otlp-exporter-base): release the keepalive budget once the response body drains, instead of holding up the export until it does [#7070](https://github.com/open-telemetry/opentelemetry-js/pull/7070) @overbalance
-* fix(web-common): export getElementXPath utility
-  * This was accidentally missed when moving utilities from sdk-trace-web to web-common.
-* fix(opentelemetry-browser-detector): mark the package side-effect free so bundlers can tree-shake it [#7135](https://github.com/open-telemetry/opentelemetry-js/pull/7135) @overbalance
-* fix: resolve the ESM build through the `default` export condition instead of `import`, so a resolver that activates neither `import` nor `require` still finds an entry point [#7132](https://github.com/open-telemetry/opentelemetry-js/pull/7132) @overbalance
-
-### :house: Internal
-
-* chore(instrumentation-fetch, instrumentation-xml-http-request): Soft-deprecate `@opentelemetry/instrumentation-fetch` and `@opentelemetry/instrumentation-xml-http-request` [#7109](https://github.com/open-telemetry/opentelemetry-js/issues/7109) @trentm
-  * Browser instrumentations in this repository are being (soft-)deprecated in favor of the new (and significantly different) [`@opentelemetry/browser-instrumentation` instrumentations](https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation#readme). "Soft" deprecation means exports have been marked with `@deprecated` and a notice added to READMEs, but the packages will *not* yet be `npm deprecate`'d to avoid loud notice to users while opentelemetry-browser.git is still in heavy development.
-* chore: remove the redundant `module` field from `package.json`; bundlers resolve the ESM build through the `exports` map [#7130](https://github.com/open-telemetry/opentelemetry-js/pull/7130) @overbalance
-
-## 0.300.0-development.0
-
-### :boom: Breaking Changes
-
-* chore(shim-opencensus)!: remove the `@opentelemetry/shim-opencensus` package
-  * In the [OpenTelemetry Specification v1.58.0](https://github.com/open-telemetry/opentelemetry-specification/releases/tag/v1.58.0) the [OpenCensus compatibility requirements were deprecated](https://github.com/open-telemetry/opentelemetry-specification/pull/5138). The JavaScript OpenCensus shim package will not receive any more releases after the current [0.222.0 release](https://www.npmjs.com/package/@opentelemetry/shim-opencensus/v/0.222.0) ([source code for last release](https://github.com/open-telemetry/opentelemetry-js/tree/experimental/v0.222.0/experimental/packages/shim-opencensus/)).
-* feat(instrumentation-http)!: remove deprecated `serverName` field from `HttpInstrumentationConfig` [#7081](https://github.com/open-telemetry/opentelemetry-js/pull/7081)
-  * The `serverName` option had no effect; stable HTTP semantic conventions do not include `http.server_name`. Remove it from any `setConfig()` or constructor call.
-* feat(sdk-node)!: remove deprecated `NodeSDKConfiguration` fields `logRecordProcessor`, `metricReader`, `spanProcessor` and deprecated namespace re-exports `node`, `tracing`
-  * `NodeSDKConfiguration.logRecordProcessor` — use `logRecordProcessors` instead.
-  * `NodeSDKConfiguration.metricReader` — use `metricReaders` instead.
-  * `NodeSDKConfiguration.spanProcessor` — use `spanProcessors` instead.
-  * `export * as node from '@opentelemetry/sdk-node'` — import directly from `@opentelemetry/sdk-trace-node` instead.
-  * `export * as tracing from '@opentelemetry/sdk-node'` — import directly from `@opentelemetry/sdk-trace-base` instead.
-* feat(sdk-logs)!: remove deprecated `SdkLogRecord` type alias and `LoggerProviderConfig` type alias [#7062](https://github.com/open-telemetry/opentelemetry-js/pull/7062)
-  * `SdkLogRecord` — use `ReadWriteLogRecord` instead.
-  * `LoggerProviderConfig` — use `LoggerProviderOptions` instead.
-* feat!: migrate package builds from `tsc` to `tsdown`, emitting dual CJS/ESM output from a single `dist/` directory and declaring an `exports` map on every package [#6293](https://github.com/open-telemetry/opentelemetry-js/pull/6293) @overbalance
-  * Importing a package by its name is unaffected in both CommonJS and ESM, as is every subpath listed in its `exports` map.
-  * **Deep imports into the build output no longer resolve.** An `exports` map is an allowlist that Node.js and bundlers enforce, so specifiers such as `@opentelemetry/sdk-logs/build/src/...` or `@opentelemetry/sdk-logs/build/esm/...` now fail with `ERR_PACKAGE_PATH_NOT_EXPORTED`. Rewriting them to the new file layout does not help — unlisted subpaths are rejected whether or not the file exists.
-  * The emitted files moved out of `build/src` (CJS), `build/esm` and `build/esnext` (ESM) into `dist/`, using `.cjs`/`.mjs` extensions with matching `.d.cts`/`.d.mts` declarations.
-  * `<package>/package.json` is no longer importable for the same reason. Read a package's version from your own dependency metadata, or use `SDK_INFO` from `@opentelemetry/core` for the SDK version.
-  * The non-standard `esnext` entry point has been removed; tools that preferred it fall back to `module` (ESM) or `main` (CJS).
-  * Packages that ship separate Node.js and browser implementations export them under explicit subpaths, for example `@opentelemetry/sdk-logs/platform`. If you depend on something that is only reachable through a deep import, please open an issue so it can be considered for the public API.
-* feat(sdk-node)!: remove `"jaeger"` propagator from `@opentelemetry/sdk-node` [#7077](https://github.com/open-telemetry/opentelemetry-js/pull/7077)
-  * `OTEL_PROPAGATORS=jaeger` and `{ jaeger: null }` in the configuration object are no longer recognised. Replace with `"tracecontext"`.
-  * See the [3.x migration guide](doc/3.x/migration-guide.md) for full instructions.
-* fix(opentelemetry-exporter-prometheus)!: default exporter host to localhost [#6599](https://github.com/open-telemetry/opentelemetry-js/pull/6599) @cjihrig
-* chore!: bump minimum node.js version to >=22.15.0
+* feat(instrumentation): add `isEnabled()` to the browser `InstrumentationBase`; fetch and XHR report false when patching throws [#7140](https://github.com/open-telemetry/opentelemetry-js/pull/7140) @overbalance
+* feat(instrumentation)!: make `InstrumentationBase#_enabled` protected on both platforms [#7202](https://github.com/open-telemetry/opentelemetry-js/pull/7202) @overbalance
+  * The browser base no longer tracks `enable()` and `disable()` calls. Browser subclasses set `_enabled` themselves; one that never sets it reports `isEnabled()` as false.
+  * A browser subclass that declares its own `private _enabled` fails to compile; rename it or declare it `protected`.
 
 ### :bug: Bug Fixes
 
 * fix(otlp-exporter-base): suppress tracing around the browser fetch transport's own request so a `fetch` instrumentation cannot create an export → span → export loop [#6948](https://github.com/open-telemetry/opentelemetry-js/pull/6948) @YangJonghun
 * fix(instrumentation-http): set `error.type` on spans whose status code makes them an error [#7061](https://github.com/open-telemetry/opentelemetry-js/pull/7061) @mwear
 * fix(exporter-prometheus): prevent duplicate metric metadata and keep metric families grouped across instrumentation scopes in Prometheus scrapes [#7047](https://github.com/open-telemetry/opentelemetry-js/pull/7047) @freben
+* fix(configuration): preserve zero-valued limits from environment variables [#7060](https://github.com/open-telemetry/opentelemetry-js/pull/7060) @DenisCDev
+* fix(otlp-exporter-base): release the keepalive budget once the response body drains, instead of holding up the export until it does [#7070](https://github.com/open-telemetry/opentelemetry-js/pull/7070) @overbalance
+* fix(web-common): export getElementXPath utility
+  * This was accidentally missed when moving utilities from sdk-trace-web to web-common.
+* fix(opentelemetry-browser-detector): mark the package side-effect free so bundlers can tree-shake it [#7135](https://github.com/open-telemetry/opentelemetry-js/pull/7135) @overbalance
+* fix: resolve the ESM build through the `default` export condition instead of `import`, so a resolver that activates neither `import` nor `require` still finds an entry point [#7132](https://github.com/open-telemetry/opentelemetry-js/pull/7132) @overbalance
+* fix(instrumentation-fetch): define `PropagateTraceHeaderCorsUrls` locally, so the types no longer import `@opentelemetry/web-common` [#7193](https://github.com/open-telemetry/opentelemetry-js/issues/7193) @overbalance
+* fix(web-common): declare `@opentelemetry/sdk-trace` and `@opentelemetry/sdk-logs` as dependencies [#7193](https://github.com/open-telemetry/opentelemetry-js/issues/7193) @overbalance
+* fix(instrumentation-fetch, instrumentation-xml-http-request): stay disabled when `fetch` or `XMLHttpRequest` `open`/`send` is missing, so a later `enable()` retries [#7171](https://github.com/open-telemetry/opentelemetry-js/pull/7171) @overbalance
+* fix(instrumentation): move `InstrumentationNodeModuleFile` behind `#platform`, so the root types no longer import Node.js `path` [#7177](https://github.com/open-telemetry/opentelemetry-js/issues/7177) @overbalance
+* fix(otlp-transformer): accept DOM `TextDecoder` in `ProtobufReader` typing [#7169](https://github.com/open-telemetry/opentelemetry-js/pull/7169) @overbalance
 
 ### :house: Internal
 
 * refactor(web-common, instrumentation-fetch, instrumentation-xml-http-request): move utils from `@opentelemetry/sdk-trace-web`
   into `@opentelemetry/web-common` and use them in `@opentelemetry/instrumentation-fetch` and `@opentelemetry/instrumentation-xml-http-request`.
   With this change the instrumentations do not depend on SDK packages and the utils are kept in a shared package so we avoid code duplication.
+* chore(instrumentation-fetch, instrumentation-xml-http-request): Soft-deprecate `@opentelemetry/instrumentation-fetch` and `@opentelemetry/instrumentation-xml-http-request` [#7109](https://github.com/open-telemetry/opentelemetry-js/issues/7109) @trentm
+  * Browser instrumentations in this repository are being (soft-)deprecated in favor of the new (and significantly different) [`@opentelemetry/browser-instrumentation` instrumentations](https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation#readme). "Soft" deprecation means exports have been marked with `@deprecated` and a notice added to READMEs, but the packages will *not* yet be `npm deprecate`'d to avoid loud notice to users while opentelemetry-browser.git is still in heavy development.
+* chore: remove the redundant `module` field from `package.json`; bundlers resolve the ESM build through the `exports` map [#7130](https://github.com/open-telemetry/opentelemetry-js/pull/7130) @overbalance
+* chore(exporter-metrics-otlp-http): remove the unused `@opentelemetry/resources` dependency [#7200](https://github.com/open-telemetry/opentelemetry-js/pull/7200) @overbalance
+* chore(web-common): remove the unused `@opentelemetry/semantic-conventions` dependency [#7196](https://github.com/open-telemetry/opentelemetry-js/pull/7196) @overbalance
+* refactor(otlp-transformer): encode base64 through `#platform`, so the browser build no longer references `Buffer` [#7173](https://github.com/open-telemetry/opentelemetry-js/pull/7173) @overbalance
+* refactor(exporter-metrics-otlp-proto): type the browser `OTLPMetricExporter` config as `OTLPExporterConfigBase` [#7172](https://github.com/open-telemetry/opentelemetry-js/pull/7172) @overbalance
 
 ## 0.222.0
 

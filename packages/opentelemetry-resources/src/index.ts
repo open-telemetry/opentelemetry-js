@@ -10,7 +10,9 @@ export {
   hostDetector,
   osDetector,
   processDetector,
+  resourceAttributesEnvDetector,
   serviceInstanceIdDetector,
+  serviceNameEnvDetector,
 } from './detectors';
 export type { Resource } from './Resource';
 export {
@@ -18,7 +20,7 @@ export {
   defaultResource,
   emptyResource,
 } from './ResourceImpl';
-export { defaultServiceName } from './default-service-name';
+export { defaultServiceName } from '#platform';
 export type {
   ResourceDetector,
   DetectedResource,
