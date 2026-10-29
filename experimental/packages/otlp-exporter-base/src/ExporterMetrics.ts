@@ -11,11 +11,6 @@ import {
   type UpDownCounter,
   createNoopMeter,
 } from '@opentelemetry/api';
-import {
-  hrTime,
-  hrTimeDuration,
-  hrTimeToMilliseconds,
-} from '@opentelemetry/core';
 import { type IExporterMetricsHelper } from '@opentelemetry/otlp-transformer';
 import {
   ATTR_ERROR_TYPE,
@@ -132,10 +127,10 @@ export class ExporterMetrics<Internal> {
 
   startExport(request: Internal): (error: Error | string | undefined) => void {
     const numItems = this.helper.countItems(request);
-    const startTime = hrTime();
+    const startTime = performance.now();
     this.inflight.add(numItems, this.standardAttrs);
     return (error: Error | string | undefined) => {
-      const endTime = hrTime();
+      const endTime = performance.now();
       this.inflight.add(-numItems, this.standardAttrs);
       const exportedAttrs = error
         ? {
@@ -149,8 +144,7 @@ export class ExporterMetrics<Internal> {
         ...exportedAttrs,
         ...this.responseAttributesFromError(error),
       };
-      const duration =
-        hrTimeToMilliseconds(hrTimeDuration(startTime, endTime)) / 1000;
+      const duration = (endTime - startTime) / 1000;
       this.duration.record(duration, durationAttrs);
     };
   }

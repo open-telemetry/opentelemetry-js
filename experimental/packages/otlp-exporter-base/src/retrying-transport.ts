@@ -43,7 +43,7 @@ class RetryingTransport implements IExporterTransport {
     let attempts = MAX_ATTEMPTS;
     let nextBackoff = INITIAL_BACKOFF;
 
-    const deadline = Date.now() + timeoutMillis;
+    const deadline = performance.now() + timeoutMillis;
     let result = await this._transport.send(data, timeoutMillis);
 
     while (result.status === 'retryable' && attempts > 0) {
@@ -58,7 +58,7 @@ class RetryingTransport implements IExporterTransport {
       const retryInMillis = result.retryInMillis ?? backoff;
 
       // return when expected retry time is after the export deadline.
-      const remainingTimeoutMillis = deadline - Date.now();
+      const remainingTimeoutMillis = deadline - performance.now();
       if (retryInMillis > remainingTimeoutMillis) {
         diag.info(
           `Export retry time ${Math.round(retryInMillis)}ms exceeds remaining timeout ${Math.round(

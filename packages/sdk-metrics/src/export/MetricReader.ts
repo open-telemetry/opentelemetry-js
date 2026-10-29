@@ -25,7 +25,6 @@ import type { AggregationOption } from '../view/AggregationOption';
 import type { CardinalitySelector } from './CardinalitySelector';
 import { MetricReaderMetrics } from './MetricReaderMetrics';
 import { VERSION } from '../version';
-import { hrTime, hrTimeDuration, hrTimeToSeconds } from '@opentelemetry/core';
 
 export interface MetricReaderOptions {
   /**
@@ -239,7 +238,7 @@ export abstract class MetricReader implements IMetricReader {
       throw new Error('MetricReader is shutdown');
     }
 
-    const startTime = hrTime();
+    const startTime = performance.now();
     const [sdkCollectionResults, ...additionalCollectionResults] =
       await Promise.all([
         this._sdkMetricProducer.collect({
@@ -251,14 +250,14 @@ export abstract class MetricReader implements IMetricReader {
           })
         ),
       ]);
-    const endTime = hrTime();
+    const endTime = performance.now();
 
     // Merge the results, keeping the SDK's Resource
     const errors = sdkCollectionResults.errors.concat(
       additionalCollectionResults.flatMap(result => result.errors)
     );
 
-    const collectDuration = hrTimeToSeconds(hrTimeDuration(startTime, endTime));
+    const collectDuration = (endTime - startTime) / 1000;
     this._selfObsMetrics.recordCollection(
       collectDuration,
       errors.length > 0

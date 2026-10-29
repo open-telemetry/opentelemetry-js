@@ -4,7 +4,6 @@
  */
 
 import type {
-  HrTime,
   Span,
   SpanOptions,
   SpanStatus,
@@ -22,14 +21,7 @@ import {
   ValueType,
 } from '@opentelemetry/api';
 import type { RPCMetadata } from '@opentelemetry/core';
-import {
-  hrTime,
-  hrTimeDuration,
-  hrTimeToMilliseconds,
-  suppressTracing,
-  RPCType,
-  setRPCMetadata,
-} from '@opentelemetry/core';
+import { suppressTracing, RPCType, setRPCMetadata } from '@opentelemetry/core';
 import type * as http from 'http';
 import type * as https from 'https';
 import type { Socket } from 'net';
@@ -369,7 +361,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   private _traceClientRequest(
     request: http.ClientRequest,
     span: Span,
-    startTime: HrTime,
+    startTime: number,
     metricAttributes: Attributes
   ): http.ClientRequest {
     if (this.getConfig().requestHook) {
@@ -578,7 +570,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         attributes: spanAttributes,
       };
 
-      const startTime = hrTime();
+      const startTime = performance.now();
 
       // request method and url.scheme are both required span attributes
       const metricAttributes: Attributes = {
@@ -715,7 +707,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         instrumentation.getConfig().enableSyntheticSourceDetection || false
       );
 
-      const startTime = hrTime();
+      const startTime = performance.now();
 
       // request method, server address, and server port are both required span attributes
       const metricAttributes: Attributes = {
@@ -807,7 +799,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     response: http.ServerResponse,
     span: Span,
     metricAttributes: Attributes,
-    startTime: HrTime
+    startTime: number
   ) {
     const attributes = getIncomingRequestAttributesOnResponse(response);
     metricAttributes = Object.assign(
@@ -854,7 +846,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   private _onOutgoingRequestError(
     span: Span,
     metricAttributes: Attributes,
-    startTime: HrTime,
+    startTime: number,
     error: Err
   ) {
     setSpanWithError(span, error);
@@ -866,7 +858,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   private _onServerResponseError(
     span: Span,
     metricAttributes: Attributes,
-    startTime: HrTime,
+    startTime: number,
     error: Err
   ) {
     setSpanWithError(span, error);
@@ -909,7 +901,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   private _closeHttpSpan(
     span: Span,
     spanKind: SpanKind,
-    startTime: HrTime,
+    startTime: number,
     metricAttributes: Attributes
   ) {
     if (!this._spanNotEnded.has(span)) {
@@ -920,7 +912,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     this._spanNotEnded.delete(span);
 
     // Record metrics
-    const duration = hrTimeToMilliseconds(hrTimeDuration(startTime, hrTime()));
+    const duration = performance.now() - startTime;
     if (spanKind === SpanKind.SERVER) {
       this._recordServerDuration(duration, metricAttributes);
     } else if (spanKind === SpanKind.CLIENT) {
