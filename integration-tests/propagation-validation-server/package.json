@@ -16,7 +16,7 @@
     "@opentelemetry/core": "3.0.0",
     "@opentelemetry/sdk-trace": "3.0.0",
     "axios": "1.20.0",
-    "body-parser": "2.3.0",
+    "body-parser": "2.4.0",
     "express": "5.1.0"
   },
   "devDependencies": {

@@ -24,19 +24,23 @@ import { OTEL_COMPONENT_TYPE_VALUE_BATCHING_LOG_PROCESSOR } from '../semconv';
 async function waitForResources(
   logRecords: ReadWriteLogRecord[]
 ): Promise<void> {
-  const pendingResources: Array<Promise<void>> = [];
+  // Log records from the same LoggerProvider usually share one Resource
+  // instance, so wait on each distinct pending resource only once.
+  let pendingResources: Set<ReadWriteLogRecord['resource']> | null = null;
   for (let i = 0, len = logRecords.length; i < len; i++) {
-    const logRecord = logRecords[i];
-    if (
-      logRecord.resource.asyncAttributesPending &&
-      logRecord.resource.waitForAsyncAttributes
-    ) {
-      pendingResources.push(logRecord.resource.waitForAsyncAttributes());
+    const resource = logRecords[i].resource;
+    if (resource.asyncAttributesPending && resource.waitForAsyncAttributes) {
+      pendingResources ??= new Set();
+      pendingResources.add(resource);
     }
   }
 
-  if (pendingResources != null && pendingResources.length > 0) {
-    await Promise.all(pendingResources);
+  if (pendingResources !== null) {
+    await Promise.all(
+      Array.from(pendingResources, resource =>
+        resource.waitForAsyncAttributes?.()
+      )
+    );
   }
 }
 
