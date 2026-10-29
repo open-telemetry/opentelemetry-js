@@ -161,11 +161,11 @@ describe('Span', () => {
   });
 
   it('should apply the clock correction once to a performance timestamp after a sleep', () => {
-    const sleepMs = 60 * 60 * 1000;
+    const sleepMillis = 60 * 60 * 1000;
     const timeOrigin = hrTimeToMilliseconds(performanceTimeOrigin);
     let perfNow = 500;
     sinon.stub(performance, 'now').callsFake(() => perfNow);
-    sinon.stub(Date, 'now').callsFake(() => timeOrigin + perfNow + sleepMs);
+    sinon.stub(Date, 'now').callsFake(() => timeOrigin + perfNow + sleepMillis);
 
     const span = new SpanImpl({
       scope: tracer.instrumentationScope,
@@ -182,8 +182,126 @@ describe('Span', () => {
 
     assert.strictEqual(
       Math.round(hrTimeToMilliseconds(span.endTime)),
-      Math.round(timeOrigin + 650 + sleepMs)
+      Math.round(timeOrigin + 650 + sleepMillis)
     );
+  });
+
+  describe('when performance.timeOrigin moves forward by the time asleep', () => {
+    const sleepMillis = 60 * 60 * 1000;
+    const timeOrigin = hrTimeToMilliseconds(performanceTimeOrigin);
+    let perfNow: number;
+    let dateNow: number;
+    let span: SpanImpl;
+
+    beforeEach(() => {
+      perfNow = 500;
+      dateNow = timeOrigin + perfNow;
+      sinon.stub(performance, 'now').callsFake(() => perfNow);
+      sinon.stub(Date, 'now').callsFake(() => dateNow);
+      span = new SpanImpl({
+        scope: tracer.instrumentationScope,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
+        spanContext,
+        name,
+        kind: SpanKind.SERVER,
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
+        spanProcessor: tracer['_spanProcessor'],
+      });
+      // The performance clock pauses while timeOrigin and Date.now() advance.
+      perfNow = 600;
+      dateNow = timeOrigin + perfNow + sleepMillis;
+      sinon.stub(performance, 'timeOrigin').value(timeOrigin + sleepMillis);
+    });
+
+    it('should not move a performance timestamp taken before the sleep', () => {
+      span.addEvent('before', undefined, 550);
+
+      assert.strictEqual(
+        Math.round(hrTimeToMilliseconds(span.events[0].time)),
+        Math.round(timeOrigin + 550)
+      );
+    });
+
+    it('should follow the wall clock for a timestamp taken after the sleep', () => {
+      span.addEvent('before', undefined, 550);
+      perfNow = 700;
+      dateNow = timeOrigin + perfNow + sleepMillis;
+      span.addEvent('after', undefined, 650);
+
+      assert.strictEqual(
+        Math.round(hrTimeToMilliseconds(span.events[1].time)),
+        Math.round(timeOrigin + 650 + sleepMillis)
+      );
+    });
+  });
+
+  describe('time of end() and addEvent() without a time after a sleep', () => {
+    const sleepMillis = 60 * 60 * 1000;
+    let perfNow: number;
+    let dateNow: number;
+
+    function startSpan(): SpanImpl {
+      perfNow = 500;
+      dateNow = hrTimeToMilliseconds(performanceTimeOrigin) + perfNow;
+      sinon.stub(performance, 'now').callsFake(() => perfNow);
+      sinon.stub(Date, 'now').callsFake(() => dateNow);
+      return new SpanImpl({
+        scope: tracer.instrumentationScope,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
+        spanContext,
+        name,
+        kind: SpanKind.SERVER,
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
+        spanProcessor: tracer['_spanProcessor'],
+      });
+    }
+
+    it('should end on the wall clock when the host slept', () => {
+      const span = startSpan();
+      perfNow += 100;
+      dateNow += 100 + sleepMillis;
+      span.end();
+
+      assert.strictEqual(
+        Math.round(hrTimeToMilliseconds(span.duration)),
+        100 + sleepMillis
+      );
+    });
+
+    it('should keep end() after an event stamped after the sleep', () => {
+      const span = startSpan();
+      perfNow += 100;
+      dateNow += 100 + sleepMillis;
+      span.addEvent('woke');
+      perfNow += 50;
+      dateNow += 50;
+      span.end();
+
+      assert.ok(
+        hrTimeToNanoseconds(span.endTime) >=
+          hrTimeToNanoseconds(span.events[0].time)
+      );
+    });
+
+    it('should not follow a wall clock that lags the performance clock', () => {
+      const span = startSpan();
+      perfNow += 100;
+      dateNow += 100 - sleepMillis;
+      span.end();
+
+      assert.strictEqual(Math.round(hrTimeToMilliseconds(span.duration)), 100);
+    });
+
+    it('should ignore a lead of at most one second', () => {
+      const span = startSpan();
+      perfNow += 100;
+      dateNow += 100 + 900;
+      span.end();
+
+      assert.strictEqual(Math.round(hrTimeToMilliseconds(span.duration)), 100);
+    });
   });
 
   it('should have valid event.time', () => {

@@ -17,11 +17,16 @@ import {
   hrTimeToTimeStamp,
   isTimeInput,
   addHrTimes,
+  _resetClockDrift,
 } from '../../src/common/time';
 
 describe('time', () => {
   afterEach(() => {
     sinon.restore();
+  });
+
+  beforeEach(() => {
+    _resetClockDrift();
   });
 
   describe('#hrTime', () => {
@@ -86,58 +91,58 @@ describe('time', () => {
     const timeOrigin = 1_000_000;
     let perfNow: number;
     let dateNow: number;
+    let timeOriginStub: sinon.SinonStub;
 
     beforeEach(() => {
-      sinon.stub(performance, 'timeOrigin').value(timeOrigin);
+      timeOriginStub = sinon.stub(performance, 'timeOrigin').value(timeOrigin);
       sinon.stub(performance, 'now').callsFake(() => perfNow);
       sinon.stub(Date, 'now').callsFake(() => dateNow);
-      // Anchor with both clocks agreeing, so earlier tests cannot leak state.
       perfNow = 500;
       dateNow = timeOrigin + perfNow;
       hrTime();
     });
 
     it('should follow Date.now() after performance.now() pauses during a sleep', () => {
-      const sleepMs = 60 * 60 * 1000;
+      const sleepMillis = 60 * 60 * 1000;
       perfNow = 600;
-      dateNow = timeOrigin + perfNow + sleepMs;
+      dateNow = timeOrigin + perfNow + sleepMillis;
 
       assert.deepStrictEqual(hrTime(), [4600, 600000000]);
     });
 
     it('should not move a performance timestamp taken before a sleep', () => {
-      const sleepMs = 60 * 60 * 1000;
+      const sleepMillis = 60 * 60 * 1000;
       perfNow = 600;
-      dateNow = timeOrigin + perfNow + sleepMs;
+      dateNow = timeOrigin + perfNow + sleepMillis;
 
       assert.deepStrictEqual(hrTime(550), [1000, 550000000]);
       assert.deepStrictEqual(timeInputToHrTime(550), [1000, 550000000]);
     });
 
     it('should correct a performance timestamp taken after a sleep', () => {
-      const sleepMs = 60 * 60 * 1000;
+      const sleepMillis = 60 * 60 * 1000;
       perfNow = 600;
-      dateNow = timeOrigin + perfNow + sleepMs;
+      dateNow = timeOrigin + perfNow + sleepMillis;
       hrTime();
 
       perfNow = 700;
-      dateNow = timeOrigin + perfNow + sleepMs;
+      dateNow = timeOrigin + perfNow + sleepMillis;
       assert.deepStrictEqual(hrTime(650), [4600, 650000000]);
       assert.deepStrictEqual(timeInputToHrTime(650), [4600, 650000000]);
     });
 
     it('should convert each performance timestamp with the drift of its segment', () => {
-      const sleepMs = 60 * 60 * 1000;
+      const sleepMillis = 60 * 60 * 1000;
       perfNow = 600;
-      dateNow = timeOrigin + perfNow + sleepMs;
+      dateNow = timeOrigin + perfNow + sleepMillis;
       hrTime();
 
       perfNow = 800;
-      dateNow = timeOrigin + perfNow + 2 * sleepMs;
+      dateNow = timeOrigin + perfNow + 2 * sleepMillis;
       hrTime();
 
       perfNow = 900;
-      dateNow = timeOrigin + perfNow + 2 * sleepMs;
+      dateNow = timeOrigin + perfNow + 2 * sleepMillis;
       assert.deepStrictEqual(hrTime(550), [1000, 550000000]);
       assert.deepStrictEqual(hrTime(700), [4600, 700000000]);
       assert.deepStrictEqual(hrTime(850), [8200, 850000000]);
@@ -150,25 +155,85 @@ describe('time', () => {
       assert.deepStrictEqual(hrTime(), [1000, 600250000]);
     });
 
-    it('should re-anchor when Date.now() moves backwards past the threshold', () => {
-      const stepMs = 60 * 60 * 1000;
+    it('should not move backwards when Date.now() steps back', () => {
+      const stepMillis = 60 * 60 * 1000;
       perfNow = 600;
-      dateNow = timeOrigin + perfNow + stepMs;
-      hrTime();
+      dateNow = timeOrigin + perfNow - stepMillis;
 
-      dateNow = timeOrigin + perfNow;
       assert.deepStrictEqual(hrTime(), [1000, 600000000]);
     });
 
-    it('should keep the anchor stable while clocks stay within the threshold', () => {
-      const sleepMs = 60 * 60 * 1000;
+    it('should keep a duration positive when Date.now() steps back between two reads', () => {
+      const stepMillis = 60 * 60 * 1000;
       perfNow = 600;
-      dateNow = timeOrigin + perfNow + sleepMs;
+      dateNow = timeOrigin + perfNow + stepMillis;
+      const start = hrTime();
+
+      perfNow = 700;
+      dateNow = timeOrigin + perfNow;
+      const end = hrTime();
+
+      assert.deepStrictEqual(hrTimeDuration(start, end), [0, 100000000]);
+    });
+
+    it('should keep converting with the recent segments after more than the history limit of sleeps', () => {
+      const sleepMillis = 10 * 60 * 1000;
+      for (let i = 1; i <= 150; i++) {
+        perfNow = 500 + i * 100;
+        dateNow = timeOrigin + perfNow + i * sleepMillis;
+        hrTime();
+      }
+
+      perfNow = 20_000;
+      dateNow = timeOrigin + perfNow + 150 * sleepMillis;
+      // 150th sleep started after perfNow 15500, the most recent 100 are kept.
+      assert.deepStrictEqual(
+        hrTimeToMilliseconds(hrTime(15_550)),
+        timeOrigin + 15_550 + 150 * sleepMillis
+      );
+      assert.deepStrictEqual(
+        hrTimeToMilliseconds(hrTime(10_550)),
+        timeOrigin + 10_550 + 100 * sleepMillis
+      );
+    });
+
+    describe('when performance.timeOrigin moves forward by the time asleep', () => {
+      const sleepMillis = 60 * 60 * 1000;
+
+      beforeEach(() => {
+        perfNow = 600;
+        dateNow = timeOrigin + perfNow;
+        hrTime();
+
+        // The performance clock pauses while timeOrigin and Date.now() advance.
+        timeOriginStub.value(timeOrigin + sleepMillis);
+        dateNow = timeOrigin + perfNow + sleepMillis;
+      });
+
+      it('should not move a performance timestamp taken before the sleep', () => {
+        assert.deepStrictEqual(hrTime(550), [1000, 550000000]);
+        assert.deepStrictEqual(timeInputToHrTime(550), [1000, 550000000]);
+      });
+
+      it('should follow the wall clock for a timestamp taken after the sleep', () => {
+        hrTime();
+        perfNow = 700;
+        dateNow = timeOrigin + perfNow + sleepMillis;
+
+        assert.deepStrictEqual(hrTime(650), [4600, 650000000]);
+        assert.deepStrictEqual(hrTime(), [4600, 700000000]);
+      });
+    });
+
+    it('should keep the anchor stable while clocks stay within the threshold', () => {
+      const sleepMillis = 60 * 60 * 1000;
+      perfNow = 600;
+      dateNow = timeOrigin + perfNow + sleepMillis;
       hrTime();
 
       // Date.now() jitter after the re-anchor must not move timestamps.
       perfNow = 700.5;
-      dateNow = timeOrigin + 700 + sleepMs + 3;
+      dateNow = timeOrigin + 700 + sleepMillis + 3;
       assert.deepStrictEqual(hrTime(), [4600, 700500000]);
     });
   });

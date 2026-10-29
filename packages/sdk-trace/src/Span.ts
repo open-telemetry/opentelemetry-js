@@ -75,6 +75,9 @@ type SpanOptions = Omit<APISpanOptions, 'root'> & {
 /**
  * This class represents a span.
  */
+// Same threshold hrTime() uses to decide the host slept.
+const SLEEP_THRESHOLD_MS = 1000;
+
 export class SpanImpl implements Span {
   // Below properties are included to implement ReadableSpan for export
   // purposes but are not intended to be written-to directly.
@@ -106,6 +109,15 @@ export class SpanImpl implements Span {
 
   private readonly _performanceStartTime: number;
   private readonly _performanceOffset: number;
+  // Safari moves performance.timeOrigin forward by the time asleep, so a
+  // timestamp keeps the origin that was in effect when it was taken.
+  private readonly _timeOrigins: {
+    startPerformanceNow: number;
+    origin: number;
+  }[];
+  private readonly _wallStartTime: number;
+  // Time the host slept while the span was open, measured against Date.now().
+  private _sleptMillis = 0;
   private readonly _startTimeProvided: boolean;
 
   /**
@@ -121,6 +133,10 @@ export class SpanImpl implements Span {
 
     this._spanContext = opts.spanContext;
     this._performanceStartTime = performance.now();
+    this._wallStartTime = now;
+    this._timeOrigins = [
+      { startPerformanceNow: 0, origin: performance.timeOrigin },
+    ];
     this._performanceOffset =
       now - (this._performanceStartTime + performance.timeOrigin);
     this._startTimeProvided = opts.startTime != null;
@@ -355,12 +371,28 @@ export class SpanImpl implements Span {
     this._spanProcessor.onEnd(this);
   }
 
+  private _getTimeOrigin(performanceNow: number): number {
+    const liveOrigin = performance.timeOrigin;
+    if (liveOrigin !== this._timeOrigins[this._timeOrigins.length - 1].origin) {
+      this._timeOrigins.push({
+        startPerformanceNow: performance.now(),
+        origin: liveOrigin,
+      });
+    }
+    for (let i = this._timeOrigins.length - 1; i > 0; i--) {
+      if (this._timeOrigins[i].startPerformanceNow <= performanceNow) {
+        return this._timeOrigins[i].origin;
+      }
+    }
+    return this._timeOrigins[0].origin;
+  }
+
   private _getTime(inp?: TimeInput): HrTime {
     if (typeof inp === 'number' && inp <= performance.now()) {
       // must be a performance timestamp
       // apply correction and convert to hrtime; hrTime() would correct again
       return millisToHrTime(
-        performance.timeOrigin + inp + this._performanceOffset
+        this._getTimeOrigin(inp) + inp + this._performanceOffset
       );
     }
 
@@ -383,7 +415,16 @@ export class SpanImpl implements Span {
     }
 
     const msDuration = performance.now() - this._performanceStartTime;
-    return addHrTimes(this.startTime, millisToHrTime(msDuration));
+    // performance.now() stops while the host sleeps. Follow Date.now() once it
+    // leads by more than a second; the lead only grows, so times never go back.
+    const lead = Date.now() - (this._wallStartTime + msDuration);
+    if (lead - this._sleptMillis > SLEEP_THRESHOLD_MS) {
+      this._sleptMillis = lead;
+    }
+    return addHrTimes(
+      this.startTime,
+      millisToHrTime(msDuration + this._sleptMillis)
+    );
   }
 
   isRecording(): boolean {

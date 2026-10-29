@@ -23,73 +23,92 @@ export function millisToHrTime(epochMillis: number): api.HrTime {
   return [seconds, nanos];
 }
 
-// performance.now() can stop advancing while the host sleeps, and Date.now()
-// can step; past this divergence the wall clock wins.
+// performance.now() can stop advancing while the host sleeps; past this lag
+// behind Date.now() the wall clock wins.
 const CLOCK_DRIFT_THRESHOLD_MS = 1000;
-// Bounds memory. Timestamps older than the oldest kept segment take its drift.
-const MAX_CLOCK_DRIFT_SEGMENTS = 16;
+// Bounds memory. Timestamps older than the oldest kept segment take its origin.
+const MAX_CLOCK_SEGMENTS = 100;
 
-interface ClockDriftSegment {
+interface ClockSegment {
   startPerformanceNow: number;
-  driftMs: number;
+  // Epoch milliseconds at performance.now() === 0 for timestamps in this segment.
+  origin: number;
 }
 
-// Ordered by startPerformanceNow. A segment starts at the first read after the
-// clocks diverge.
-const clockDriftSegments: ClockDriftSegment[] = [
-  { startPerformanceNow: 0, driftMs: 0 },
-];
+// Ordered by startPerformanceNow. Safari moves performance.timeOrigin forward
+// by the time asleep, so the origin each timestamp was taken under is kept
+// instead of re-reading the live value.
+const clockSegments: ClockSegment[] = [];
+let lastTimeOrigin = 0;
 
-function updateClockDrift(currentPerformanceNow: number): void {
-  const drift = Date.now() - (performance.timeOrigin + currentPerformanceNow);
-  const latest = clockDriftSegments[clockDriftSegments.length - 1];
-  if (Math.abs(drift - latest.driftMs) <= CLOCK_DRIFT_THRESHOLD_MS) {
-    return;
-  }
+function startClockSegment(startPerformanceNow: number, origin: number): void {
   // Keep the list ordered if a segment already starts at or after this read.
   while (
-    clockDriftSegments.length > 0 &&
-    clockDriftSegments[clockDriftSegments.length - 1].startPerformanceNow >=
-      currentPerformanceNow
+    clockSegments.length > 0 &&
+    clockSegments[clockSegments.length - 1].startPerformanceNow >=
+      startPerformanceNow
   ) {
-    clockDriftSegments.pop();
+    clockSegments.pop();
   }
-  clockDriftSegments.push({
-    startPerformanceNow: currentPerformanceNow,
-    driftMs: drift,
-  });
-  if (clockDriftSegments.length > MAX_CLOCK_DRIFT_SEGMENTS) {
-    clockDriftSegments.shift();
+  clockSegments.push({ startPerformanceNow, origin });
+  if (clockSegments.length > MAX_CLOCK_SEGMENTS) {
+    clockSegments.shift();
   }
 }
 
-function getClockDrift(performanceNow: number): number {
-  for (let i = clockDriftSegments.length - 1; i > 0; i--) {
-    if (clockDriftSegments[i].startPerformanceNow <= performanceNow) {
-      return clockDriftSegments[i].driftMs;
+function updateClock(currentPerformanceNow: number): void {
+  const timeOrigin = performance.timeOrigin;
+  if (clockSegments.length === 0) {
+    clockSegments.push({ startPerformanceNow: 0, origin: timeOrigin });
+  } else if (timeOrigin !== lastTimeOrigin) {
+    startClockSegment(currentPerformanceNow, timeOrigin);
+  }
+  lastTimeOrigin = timeOrigin;
+
+  const latest = clockSegments[clockSegments.length - 1];
+  const wallNow = Date.now();
+  // Forward only: a wall clock that steps back must not make hrTime() go back,
+  // since callers subtract two hrTime() values to get a duration.
+  if (
+    wallNow - (latest.origin + currentPerformanceNow) >
+    CLOCK_DRIFT_THRESHOLD_MS
+  ) {
+    startClockSegment(currentPerformanceNow, wallNow - currentPerformanceNow);
+  }
+}
+
+/** @internal For testing purposes only */
+export function _resetClockDrift(): void {
+  clockSegments.length = 0;
+}
+
+function getClockOrigin(performanceNow: number): number {
+  for (let i = clockSegments.length - 1; i > 0; i--) {
+    if (clockSegments[i].startPerformanceNow <= performanceNow) {
+      return clockSegments[i].origin;
     }
   }
-  return clockDriftSegments[0].driftMs;
+  return clockSegments[0].origin;
 }
 
 /**
  * Returns an hrtime calculated via performance component.
  *
- * The result is re-anchored to `Date.now()` when the performance clock and the
- * wall clock diverge by more than one second, for example after the host
- * sleeps. A passed `performanceNow` gets the correction that applied when it
- * was taken, so a timestamp from before a sleep is not moved by that sleep.
+ * The result is re-anchored to `Date.now()` when the performance clock falls
+ * more than one second behind the wall clock, for example after the host
+ * sleeps. It never moves backwards. A passed `performanceNow` gets the
+ * origin that applied when it was taken, so a timestamp from before a sleep
+ * is not moved by that sleep, including when the browser moves
+ * `performance.timeOrigin` forward by the time asleep.
  *
  * @param performanceNow
  */
 export function hrTime(performanceNow?: number): api.HrTime {
   const currentPerformanceNow = performance.now();
-  updateClockDrift(currentPerformanceNow);
+  updateClock(currentPerformanceNow);
   const now =
     typeof performanceNow === 'number' ? performanceNow : currentPerformanceNow;
-  const timeOrigin = millisToHrTime(
-    performance.timeOrigin + getClockDrift(now)
-  );
+  const timeOrigin = millisToHrTime(getClockOrigin(now));
 
   return addHrTimes(timeOrigin, millisToHrTime(now));
 }
