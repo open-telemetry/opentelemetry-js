@@ -39,6 +39,7 @@ import { VERSION } from './version';
 import {
   InstrumentationBase,
   InstrumentationNodeModuleDefinition,
+  isWrapped,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import { errorMonitor } from 'events';
@@ -238,8 +239,21 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           }
         }
         if (!this.getConfig().disableIncomingRequestInstrumentation) {
+          const serverPrototype = moduleExports.Server.prototype;
+          const emit = serverPrototype.emit;
+          // Where https.Server.prototype inherits emit from http.Server.prototype
+          // (e.g. Bun), _wrap would unwrap the inherited wrapper in place and
+          // leave http servers uninstrumented. Give the https prototype its own
+          // copy of the original first.
+          if (
+            !Object.prototype.hasOwnProperty.call(serverPrototype, 'emit') &&
+            isWrapped(emit)
+          ) {
+            serverPrototype.emit =
+              emit.__original as typeof serverPrototype.emit;
+          }
           this._wrap(
-            moduleExports.Server.prototype,
+            serverPrototype,
             'emit',
             this._getPatchIncomingRequestFunction('https')
           );
