@@ -19,6 +19,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :bug: Bug Fixes
 
+* fix(sdk-trace): wait for every processor before MultiSpanProcessor settles [#7245](https://github.com/open-telemetry/opentelemetry-js/issues/7245) @helmipradita
 * fix(core): accept attribute values with shared (non-circular) object references [#7068](https://github.com/open-telemetry/opentelemetry-js/pull/7068) @rajanpanth
 
 ### :books: Documentation
