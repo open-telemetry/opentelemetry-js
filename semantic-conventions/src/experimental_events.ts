@@ -163,7 +163,7 @@ export const EVENT_GEN_AI_CLIENT_INFERENCE_OPERATION_DETAILS = 'gen_ai.client.in
 export const EVENT_GEN_AI_CLIENT_OPERATION_EXCEPTION = 'gen_ai.client.operation.exception' as const;
 
 /**
- * This event captures the result of evaluating GenAI output for quality, accuracy, or other characteristics. This event **SHOULD** be parented to GenAI operation span being evaluated when possible or set `gen_ai.response.id` when span id is not available.
+ * This event captures the result of evaluating GenAI output for quality, accuracy, or other characteristics. This event **SHOULD** be parented to GenAI operation span being evaluated when possible or set `gen_ai.response.id` when span ID is not available.
  *
  * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
