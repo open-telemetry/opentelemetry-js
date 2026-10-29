@@ -21,6 +21,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :bug: Bug Fixes
 
+* fix(sdk-node): warn and skip, instead of erroring, on an unknown resource detector name in declarative config [#7252](https://github.com/open-telemetry/opentelemetry-js/pull/7252) @trentm
 * fix(sdk-node): use `OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT` and `OTEL_LINK_ATTRIBUTE_COUNT_LIMIT` environment variables for span limits [#6999](https://github.com/open-telemetry/opentelemetry-js/pull/6999) @trentm
   * Before this change, different environment variable names (see next point), that are *not* in the OTel spec were used. They will still be supported as a fallback for the spec names for a period of approximately six months.
   * The `OTEL_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT` and `OTEL_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT` environment variables are **deprecated**. Support for them will be [removed sometime after six months](https://github.com/open-telemetry/opentelemetry-js/issues/7242), to allow transition to [the correct environment variables in the spec](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#span-limits).
