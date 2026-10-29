@@ -48,6 +48,13 @@ export interface OTLPExporterConfigBase {
    * @defaultValue 10000
    */
   timeoutMillis?: number;
+  /**
+   * Maximum size, in bytes, of a serialized export request before compression.
+   * Larger requests are dropped without being sent. Set to `0` to disable.
+   *
+   * @defaultValue 67108864 (64 MiB)
+   */
+  maxRequestSize?: number;
 
   /**
    * MeterProvider to record metrics for the exporter itself.
