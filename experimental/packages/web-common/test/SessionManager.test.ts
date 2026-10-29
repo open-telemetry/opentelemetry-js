@@ -95,6 +95,39 @@ describe('SessionManager', () => {
     assert.strictEqual(sessionId, 'session-2');
   });
 
+  it('should reset session past max duration when its timer did not fire', () => {
+    config = {
+      sessionIdGenerator: idGenerator,
+      sessionStore: store,
+      maxDuration: 0.5,
+    };
+    sessionManager = new SessionManager(config);
+    sessionManager.getSessionId(); // Starts session-1
+
+    // The wall clock moves, the timers do not: the host slept.
+    clock.setSystemTime(Date.now() + 600);
+
+    assert.strictEqual(sessionManager.getSessionId(), 'session-2');
+  });
+
+  it('should not loop when an observer reads the session while it resets', () => {
+    config = {
+      sessionIdGenerator: idGenerator,
+      sessionStore: store,
+      maxDuration: 0.5,
+    };
+    sessionManager = new SessionManager(config);
+    sessionManager.getSessionId(); // Starts session-1
+    sessionManager.addObserver({
+      onSessionStarted: () => void sessionManager.getSession(),
+      onSessionEnded: () => void sessionManager.getSession(),
+    });
+
+    clock.setSystemTime(Date.now() + 600);
+
+    assert.strictEqual(sessionManager.getSessionId(), 'session-2');
+  });
+
   it('should resume max duration in a new instance', async () => {
     config = {
       sessionIdGenerator: idGenerator,

@@ -31,13 +31,14 @@ export class SessionManager implements SessionProvider, SessionPublisher {
   private _idGenerator: SessionIdGenerator;
   private _store: SessionStore;
   private _observers: SessionObserver[];
+  private _resetting = false;
 
   private _maxDuration?: number;
   private _maxDurationTimeoutId?: ReturnType<typeof setTimeout>;
 
   private _inactivityTimeout?: number;
   private _inactivityTimeoutId?: ReturnType<typeof setTimeout>;
-  private _lastActivityTimestamp: number = 0;
+  private _lastActivityTimestamp: number = -Infinity;
   private _inactivityResetDelay: number = 5000; // minimum time in ms between activities before timer is reset
 
   constructor(config: SessionManagerConfig) {
@@ -70,13 +71,22 @@ export class SessionManager implements SessionProvider, SessionPublisher {
       this.resetTimers();
     }
 
+    // setTimeout can pause while the host sleeps, so the max duration timer
+    // may not have fired by the time the session is read again.
+    if (
+      !this._resetting &&
+      this._maxDuration &&
+      Date.now() - this._session.startTimestamp >= this._maxDuration * 1000
+    ) {
+      this.resetSession();
+    }
+
     if (this._inactivityTimeout) {
-      if (
-        Date.now() - this._lastActivityTimestamp >
-        this._inactivityResetDelay
-      ) {
+      // Monotonic, so a wall clock step cannot suppress or force a timer reset.
+      const now = performance.now();
+      if (now - this._lastActivityTimestamp > this._inactivityResetDelay) {
         this.resetInactivityTimer();
-        this._lastActivityTimestamp = Date.now();
+        this._lastActivityTimestamp = now;
       }
     }
 
@@ -127,9 +137,15 @@ export class SessionManager implements SessionProvider, SessionPublisher {
   }
 
   private resetSession(): void {
-    this.endSession();
-    this.startSession();
-    this.resetTimers();
+    // Observers may call getSession() while the old session is still current.
+    this._resetting = true;
+    try {
+      this.endSession();
+      this.startSession();
+      this.resetTimers();
+    } finally {
+      this._resetting = false;
+    }
   }
 
   private resetTimers() {
