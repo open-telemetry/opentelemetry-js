@@ -25,6 +25,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :house: Internal
 
+* perf(sdk-logs, sdk-trace): wait for each distinct pending resource once per batch instead of once per record [#7208](https://github.com/open-telemetry/opentelemetry-js/pull/7208) @shehjaddev
 * ci: update the W3C harness for Python 3.14 [#7236](https://github.com/open-telemetry/opentelemetry-js/pull/7236) @adityareddy-dev
 
 ## 3.0.0
