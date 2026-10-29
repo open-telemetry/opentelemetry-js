@@ -15,6 +15,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :rocket: Features
 
+* feat(sdk-trace, sdk-logs): include the `cause` chain and the `errors` of an `AggregateError` in the `exception.stacktrace` attribute when recording an exception [#5600](https://github.com/open-telemetry/opentelemetry-js/issues/5600) @SahinurDEV
+  * The stack of the recorded exception is kept as-is; nested errors are appended after it, a `cause` on a line prefixed with `Caused by:` and each `AggregateError` child indented and prefixed with `[errors][<index>]:`.
 * feat(resources): Deprecate `envDetector` in favor of separate `resourceAttributesEnvDetector` and `serviceNameEnvDetector`. Also mark `serviceInstanceIdDetector` as stable (the `service.instance.id` semconv attribute is now stable). [#6999](https://github.com/open-telemetry/opentelemetry-js/pull/6999) @trentm
 
 ### :bug: Bug Fixes

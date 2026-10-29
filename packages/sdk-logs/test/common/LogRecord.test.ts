@@ -159,6 +159,19 @@ describe('LogRecord', () => {
       }
     });
 
+    it('should include the cause chain in exception.stacktrace', () => {
+      const cause = new Error('inner');
+      cause.stack = 'Error: inner\n    at inner:1:1';
+      const error = new Error('outer', { cause });
+      error.stack = 'Error: outer\n    at outer:1:1';
+      const { logRecord } = setup(undefined, { exception: error });
+
+      assert.strictEqual(
+        logRecord.attributes[ATTR_EXCEPTION_STACKTRACE],
+        'Error: outer\n    at outer:1:1\nCaused by: Error: inner\n    at inner:1:1'
+      );
+    });
+
     it('should not overwrite user-provided exception attributes', () => {
       const error = new Error('boom');
       const logRecordData: logsAPI.LogRecord = {
