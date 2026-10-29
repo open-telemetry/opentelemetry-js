@@ -20,6 +20,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 ### :bug: Bug Fixes
 
 * fix(core): accept attribute values with shared (non-circular) object references [#7068](https://github.com/open-telemetry/opentelemetry-js/pull/7068) @rajanpanth
+* fix(sdk-trace): return no-op tracer when TracerProvider is shutdown [#3211](https://github.com/open-telemetry/opentelemetry-js/issues/3211) @shubhamrai9122-creator
 
 ### :books: Documentation
 

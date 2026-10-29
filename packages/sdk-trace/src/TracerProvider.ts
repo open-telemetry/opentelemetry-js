@@ -7,7 +7,13 @@ import type {
   TracerProvider as ApiTracerProvider,
   Tracer as ApiTracer,
 } from '@opentelemetry/api';
-import { createNoopMeter } from '@opentelemetry/api';
+import {
+  createNoopMeter,
+  createNoopTracer,
+  ProxyTracerProvider,
+  diag,
+} from '@opentelemetry/api';
+import { BindOnceFuture } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import { defaultResource } from '@opentelemetry/resources';
 import type { SpanProcessor } from './SpanProcessor';
@@ -35,6 +41,15 @@ enum ForceFlushState {
   'unresolved',
 }
 
+const defaultNoopTracerProvider = new ProxyTracerProvider();
+
+function getNoopTracer(): ApiTracer {
+  if (typeof createNoopTracer === 'function') {
+    return createNoopTracer();
+  }
+  return defaultNoopTracerProvider.getTracer('noop');
+}
+
 /**
  * This class represents a basic tracer provider which platform libraries can extend
  */
@@ -43,11 +58,13 @@ export class TracerProvider implements ApiTracerProvider {
   private readonly _activeSpanProcessor: MultiSpanProcessor;
   private readonly _tracerOptions: TracerOptions;
   private readonly _tracers: Map<string, Tracer> = new Map();
+  private readonly _shutdownOnce: BindOnceFuture<void>;
 
   constructor(options: TracerProviderOptions = {}) {
     this._resource = options.resource ?? defaultResource();
     const spanProcessors = options.spanProcessors ?? [];
     this._activeSpanProcessor = new MultiSpanProcessor(spanProcessors);
+    this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
 
     this._tracerOptions = {
       resource: this._resource,
@@ -82,6 +99,12 @@ export class TracerProvider implements ApiTracerProvider {
     version?: string,
     options?: { schemaUrl?: string }
   ): ApiTracer {
+    // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk.md#shutdown
+    if (this._shutdownOnce.isCalled) {
+      diag.warn('A shutdown TracerProvider cannot provide a Tracer');
+      return getNoopTracer();
+    }
+
     const key = `${name}@${version || ''}:${options?.schemaUrl || ''}`;
     if (!this._tracers.has(key)) {
       this._tracers.set(
@@ -97,6 +120,10 @@ export class TracerProvider implements ApiTracerProvider {
   }
 
   forceFlush(options?: ForceFlushOptions): Promise<void> {
+    if (this._shutdownOnce.isCalled) {
+      diag.warn('invalid attempt to force flush after TracerProvider shutdown');
+      return this._shutdownOnce.promise;
+    }
     const timeout = options?.timeoutMillis ?? 30000;
     const promises = this._activeSpanProcessor['_spanProcessors'].map(
       (spanProcessor: SpanProcessor) => {
@@ -146,6 +173,10 @@ export class TracerProvider implements ApiTracerProvider {
   }
 
   shutdown(): Promise<void> {
+    return this._shutdownOnce.call();
+  }
+
+  private _shutdown(): Promise<void> {
     return this._activeSpanProcessor.shutdown();
   }
 
