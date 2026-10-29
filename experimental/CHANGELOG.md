@@ -28,6 +28,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :books: Documentation
 
+* docs(exporters): update dead semantic conventions resource specification links in OTLP exporters [#7254](https://github.com/open-telemetry/opentelemetry-js/pull/7254) @helmipradita
+
 ### :house: Internal
 
 ## 0.300.0
