@@ -23,6 +23,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :books: Documentation
 
+* docs(resources): update dead semantic conventions resource specification links [#7254](https://github.com/open-telemetry/opentelemetry-js/pull/7254) @helmipradita
+
 ### :house: Internal
 
 * perf(sdk-logs, sdk-trace): wait for each distinct pending resource once per batch instead of once per record [#7208](https://github.com/open-telemetry/opentelemetry-js/pull/7208) @shehjaddev
