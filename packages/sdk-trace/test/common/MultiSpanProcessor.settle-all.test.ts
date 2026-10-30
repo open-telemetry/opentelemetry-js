@@ -47,7 +47,7 @@ class ConfigurableProcessor implements SpanProcessor {
 
 /** Lets every already-queued microtask and timer callback run. */
 function tick(): Promise<void> {
-  return new Promise(resolve => setImmediate(resolve));
+  return new Promise(resolve => setTimeout(resolve, 0));
 }
 
 describe('MultiSpanProcessor settlement', () => {
