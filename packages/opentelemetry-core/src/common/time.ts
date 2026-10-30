@@ -4,6 +4,7 @@
  */
 
 import type * as api from '@opentelemetry/api';
+import { checkClockDrift, getTimeOrigin } from '#platform';
 
 const NANOSECOND_DIGITS = 9;
 const NANOSECOND_DIGITS_IN_MILLIS = 6;
@@ -25,15 +26,21 @@ export function millisToHrTime(epochMillis: number): api.HrTime {
 
 /**
  * Returns an hrtime calculated via performance component.
+ *
+ * In browsers, performance.now() can stop while the host sleeps. A time taken
+ * after a sleep is moved forward by the time asleep, and a time taken before
+ * it keeps its value.
  * @param performanceNow
  */
 export function hrTime(performanceNow?: number): api.HrTime {
-  const timeOrigin = millisToHrTime(performance.timeOrigin);
-  const now = millisToHrTime(
-    typeof performanceNow === 'number' ? performanceNow : performance.now()
-  );
+  // Before reading performance.now(), so a sleep found here applies to it.
+  checkClockDrift();
 
-  return addHrTimes(timeOrigin, now);
+  const now =
+    typeof performanceNow === 'number' ? performanceNow : performance.now();
+  const timeOrigin = millisToHrTime(getTimeOrigin(now));
+
+  return addHrTimes(timeOrigin, millisToHrTime(now));
 }
 
 /**
@@ -61,7 +68,8 @@ export function timeInputToHrTime(time: api.TimeInput): api.HrTime {
     // the current epoch time (~1994 in ms terms). We therefore treat any value
     // below half of performance.timeOrigin as a relative performance.now()
     // reading, and everything else as an absolute epoch-millisecond timestamp.
-    if (time < performance.timeOrigin / 2) {
+    // getTimeOrigin(0) is that timeOrigin as hrTime() reads it.
+    if (time < getTimeOrigin(0) / 2) {
       return hrTime(time);
     } else {
       // epoch milliseconds or performance.timeOrigin

@@ -10,3 +10,4 @@ export {
   getStringListFromEnv,
 } from './environment';
 export { SDK_INFO } from './sdk-info';
+export { checkClockDrift, getSleepBetween, getTimeOrigin } from './time-origin';

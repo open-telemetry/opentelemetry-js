@@ -20,6 +20,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 ### :bug: Bug Fixes
 
 * fix(core): accept attribute values with shared (non-circular) object references [#7068](https://github.com/open-telemetry/opentelemetry-js/pull/7068) @rajanpanth
+* fix(core, sdk-trace): keep timestamps on the wall clock after the host sleeps in browsers [#7256](https://github.com/open-telemetry/opentelemetry-js/pull/7256) @joaquin-diaz
+  * Adds `checkClockDrift()` and `getSleepBetween()` to `@opentelemetry/core`.
 
 ### :books: Documentation
 
