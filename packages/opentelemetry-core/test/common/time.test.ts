@@ -7,7 +7,6 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import type * as api from '@opentelemetry/api';
 import {
-  hrTime,
   timeInputToHrTime,
   hrTimeDuration,
   hrTimeToNanoseconds,
@@ -22,56 +21,6 @@ import {
 describe('time', () => {
   afterEach(() => {
     sinon.restore();
-  });
-
-  describe('#hrTime', () => {
-    it('should return hrtime now', () => {
-      sinon.stub(performance, 'timeOrigin').value(11.5);
-      sinon.stub(performance, 'now').callsFake(() => 11.3);
-
-      const output = hrTime();
-      assert.deepStrictEqual(output, [0, 22800000]);
-    });
-
-    it('should convert performance now', () => {
-      sinon.stub(performance, 'timeOrigin').value(11.5);
-      const performanceNow = 11.3;
-
-      const output = hrTime(performanceNow);
-      assert.deepStrictEqual(output, [0, 22800000]);
-    });
-
-    it('should handle nanosecond overflow', () => {
-      sinon.stub(performance, 'timeOrigin').value(11.5);
-      const performanceNow = 11.6;
-
-      const output = hrTime(performanceNow);
-      assert.deepStrictEqual(output, [0, 23100000]);
-    });
-
-    it('should allow passed "performanceNow" equal to 0', () => {
-      sinon.stub(performance, 'timeOrigin').value(11.5);
-      sinon.stub(performance, 'now').callsFake(() => 11.3);
-
-      const output = hrTime(0);
-      assert.deepStrictEqual(output, [0, 11500000]);
-    });
-
-    it('should use performance.now() when "performanceNow" is equal to undefined', () => {
-      sinon.stub(performance, 'timeOrigin').value(11.5);
-      sinon.stub(performance, 'now').callsFake(() => 11.3);
-
-      const output = hrTime(undefined);
-      assert.deepStrictEqual(output, [0, 22800000]);
-    });
-
-    it('should use performance.now() when "performanceNow" is equal to null', () => {
-      sinon.stub(performance, 'timeOrigin').value(11.5);
-      sinon.stub(performance, 'now').callsFake(() => 11.3);
-
-      const output = hrTime(null as any);
-      assert.deepStrictEqual(output, [0, 22800000]);
-    });
   });
 
   describe('#timeInputToHrTime', () => {
@@ -101,15 +50,6 @@ describe('time', () => {
         const output = timeInputToHrTime(input[0]);
         assert.deepStrictEqual(output, input[1], `input[${idx}]: ${input}`);
       }
-    });
-
-    it('should convert performance.now() hrTime', () => {
-      sinon.stub(performance, 'timeOrigin').value(111.5);
-
-      const timeInput = 11.9;
-      const output = timeInputToHrTime(timeInput);
-
-      assert.deepStrictEqual(output, [0, 123400000]);
     });
 
     it('should treat an epoch-ms timestamp as epoch even when it falls just below performance.timeOrigin due to clock skew', () => {

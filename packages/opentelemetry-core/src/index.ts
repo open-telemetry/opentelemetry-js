@@ -42,6 +42,8 @@ export type { ExportResult } from './ExportResult';
 export { parseKeyPairsIntoRecord } from './baggage/utils';
 export {
   SDK_INFO,
+  checkClockDrift,
+  getSleepBetween,
   getStringFromEnv,
   getBooleanFromEnv,
   getNumberFromEnv,

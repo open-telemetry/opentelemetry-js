@@ -21,8 +21,9 @@ import { diag, SpanStatusCode } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import {
   addHrTimes,
+  checkClockDrift,
+  getSleepBetween,
   millisToHrTime,
-  hrTime,
   hrTimeDuration,
   isTimeInput,
   isTimeInputHrTime,
@@ -107,6 +108,9 @@ export class SpanImpl implements Span {
 
   private readonly _performanceStartTime: number;
   private readonly _performanceOffset: number;
+  // Safari moves performance.timeOrigin forward by the time asleep, so offsets
+  // are converted with the value _performanceOffset was measured against.
+  private readonly _timeOrigin: number;
   private readonly _startTimeProvided: boolean;
 
   /**
@@ -118,12 +122,16 @@ export class SpanImpl implements Span {
    * *sampler* before span creation.
    */
   constructor(opts: SpanOptions) {
+    // Marks the span's creation as a clock check, so a later sleep is known to
+    // come after it.
+    checkClockDrift();
     const now = Date.now();
 
     this._spanContext = opts.spanContext;
     this._performanceStartTime = performance.now();
+    this._timeOrigin = performance.timeOrigin;
     this._performanceOffset =
-      now - (this._performanceStartTime + performance.timeOrigin);
+      now - (this._performanceStartTime + this._timeOrigin);
     this._startTimeProvided = opts.startTime != null;
     this._spanLimits = opts.spanLimits;
     this._spanProcessor = opts.spanProcessor;
@@ -359,8 +367,18 @@ export class SpanImpl implements Span {
   private _getTime(inp?: TimeInput): HrTime {
     if (typeof inp === 'number' && inp <= performance.now()) {
       // must be a performance timestamp
-      // apply correction and convert to hrtime
-      return hrTime(inp + this._performanceOffset);
+      // apply correction and convert to hrtime. The correction was measured at
+      // the span's creation, so any sleep between the offset and the creation
+      // is taken out of it or added to it.
+      const sleptMs =
+        inp < this._performanceStartTime
+          ? -getSleepBetween(inp, this._performanceStartTime)
+          : getSleepBetween(this._performanceStartTime, inp);
+
+      return addHrTimes(
+        millisToHrTime(this._timeOrigin),
+        millisToHrTime(inp + this._performanceOffset + sleptMs)
+      );
     }
 
     if (typeof inp === 'number') {
@@ -381,7 +399,16 @@ export class SpanImpl implements Span {
       return millisToHrTime(Date.now());
     }
 
-    const msDuration = performance.now() - this._performanceStartTime;
+    // performance.now() stops while the host sleeps, so the time slept since
+    // the span started is added. Checked first, so a sleep found here counts.
+    checkClockDrift();
+
+    const performanceNow = performance.now();
+    const msDuration =
+      performanceNow -
+      this._performanceStartTime +
+      getSleepBetween(this._performanceStartTime, performanceNow);
+
     return addHrTimes(this.startTime, millisToHrTime(msDuration));
   }
 
