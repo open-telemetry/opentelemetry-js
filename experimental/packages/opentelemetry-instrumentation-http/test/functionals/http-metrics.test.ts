@@ -21,6 +21,7 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import { HttpInstrumentation } from '../../src/http';
+import { expectModulePatching } from '../utils/modulePatching';
 import { httpRequest } from '../utils/httpRequest';
 import { TestMetricReader } from '../utils/TestMetricReader';
 import type { ContextManager } from '@opentelemetry/api';
@@ -143,42 +144,46 @@ describe('metrics', () => {
         [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
       });
 
-      metricsMemoryExporter.reset();
+      // A request that throws before a `ClientRequest` is created is only
+      // observable when the modules are patched.
+      if (expectModulePatching) {
+        metricsMemoryExporter.reset();
 
-      assert.throws(() =>
-        http.request({
-          hostname,
-          port: serverPort,
-          pathname,
-          headers: { cookie: undefined },
-        })
-      );
+        assert.throws(() =>
+          http.request({
+            hostname,
+            port: serverPort,
+            pathname,
+            headers: { cookie: undefined },
+          })
+        );
 
-      await metricReader.collectAndExport();
-      resourceMetrics = metricsMemoryExporter.getMetrics();
-      scopeMetrics = resourceMetrics[0].scopeMetrics;
-      assert.strictEqual(scopeMetrics.length, 1, 'scopeMetrics count');
-      metrics = scopeMetrics[0].metrics;
-      assert.strictEqual(metrics.length, 1, 'metrics count');
-      assert.strictEqual(metrics[0].dataPointType, DataPointType.HISTOGRAM);
-      assert.strictEqual(
-        metrics[0].descriptor.description,
-        'Duration of HTTP client requests.'
-      );
-      assert.strictEqual(
-        metrics[0].descriptor.name,
-        'http.client.request.duration'
-      );
-      assert.strictEqual(metrics[0].descriptor.unit, 's');
-      assert.strictEqual(metrics[0].dataPoints.length, 1);
-      assert.strictEqual((metrics[0].dataPoints[0].value as any).count, 1);
+        await metricReader.collectAndExport();
+        resourceMetrics = metricsMemoryExporter.getMetrics();
+        scopeMetrics = resourceMetrics[0].scopeMetrics;
+        assert.strictEqual(scopeMetrics.length, 1, 'scopeMetrics count');
+        metrics = scopeMetrics[0].metrics;
+        assert.strictEqual(metrics.length, 1, 'metrics count');
+        assert.strictEqual(metrics[0].dataPointType, DataPointType.HISTOGRAM);
+        assert.strictEqual(
+          metrics[0].descriptor.description,
+          'Duration of HTTP client requests.'
+        );
+        assert.strictEqual(
+          metrics[0].descriptor.name,
+          'http.client.request.duration'
+        );
+        assert.strictEqual(metrics[0].descriptor.unit, 's');
+        assert.strictEqual(metrics[0].dataPoints.length, 1);
+        assert.strictEqual((metrics[0].dataPoints[0].value as any).count, 1);
 
-      assert.deepStrictEqual(metrics[0].dataPoints[0].attributes, {
-        [ATTR_HTTP_REQUEST_METHOD]: 'GET',
-        [ATTR_SERVER_ADDRESS]: 'localhost',
-        [ATTR_SERVER_PORT]: 22346,
-        [ATTR_ERROR_TYPE]: 'TypeError',
-      });
+        assert.deepStrictEqual(metrics[0].dataPoints[0].attributes, {
+          [ATTR_HTTP_REQUEST_METHOD]: 'GET',
+          [ATTR_SERVER_ADDRESS]: 'localhost',
+          [ATTR_SERVER_PORT]: 22346,
+          [ATTR_ERROR_TYPE]: 'TypeError',
+        });
+      }
     });
 
     it('should set error type attribute on metrics for client/server errors', async () => {
