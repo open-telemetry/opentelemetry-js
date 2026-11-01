@@ -4,3 +4,4 @@
  */
 
 require('./transform');
+require('./trace-batches');
