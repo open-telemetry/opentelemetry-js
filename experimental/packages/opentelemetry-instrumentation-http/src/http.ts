@@ -193,20 +193,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       getConfig: () => this.getConfig(),
       startOutgoingHttpSpan: (component, optionsParsed, method) =>
         this._startOutgoingHttpSpan(component, optionsParsed, method),
-      traceClientRequest: (
-        request,
-        span,
-        startTime,
-        metricAttributes,
-        finalizeRequestAttributes
-      ) =>
-        this._traceClientRequest(
-          request,
-          span,
-          startTime,
-          metricAttributes,
-          finalizeRequestAttributes
-        ),
+      traceClientRequest: (request, span, startTime, metricAttributes) =>
+        this._traceClientRequest(request, span, startTime, metricAttributes),
       wrapServerEmit: (server, component) => {
         this._wrap(
           server,
@@ -442,14 +430,12 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
    * @param span representing the current operation
    * @param startTime representing the start time of the request to calculate duration in Metric
    * @param metricAttributes metric attributes for the request duration metric
-   * @param finalizeRequestAttributes updates attributes from the final request headers
    */
   private _traceClientRequest(
     request: http.ClientRequest,
     span: Span,
     startTime: HrTime,
-    metricAttributes: Attributes,
-    finalizeRequestAttributes?: () => void
+    metricAttributes: Attributes
   ): http.ClientRequest {
     if (this.getConfig().requestHook) {
       this._callRequestHook(span, request);
@@ -469,7 +455,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'response',
       (response: http.IncomingMessage & { aborted?: boolean }) => {
         this._diag.debug('outgoingRequest on response()');
-        finalizeRequestAttributes?.();
         if (request.listenerCount('response') <= 1) {
           response.resume();
         }
@@ -563,7 +548,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     );
     request.on('close', () => {
       this._diag.debug('outgoingRequest on request close()');
-      finalizeRequestAttributes?.();
       if (request.aborted || responseFinished) {
         return;
       }
@@ -572,7 +556,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     });
     request.on(errorMonitor, (error: Err) => {
       this._diag.debug('outgoingRequest on request error()', error);
-      finalizeRequestAttributes?.();
       if (responseFinished) {
         return;
       }
