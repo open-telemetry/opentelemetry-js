@@ -5,31 +5,7 @@
 
 import type { IProtobufWriter } from './i-protobuf-writer';
 import { estimateVarintSize } from './utils';
-
-/**
- * Calculate UTF-8 byte length without encoding
- * @param str valid UTF-16 string
- */
-function utf8ByteLength(str: string): number {
-  // No quick path for ASCII, since we need to loop though all chars anyway.
-  const len = str.length;
-  let byteLen = 0;
-  for (let i = 0; i < len; i++) {
-    const code = str.charCodeAt(i);
-    if (code < 0x80) {
-      byteLen += 1;
-    } else if (code < 0x800) {
-      byteLen += 2;
-    } else if (code < 0xd800 || code >= 0xe000) {
-      byteLen += 3;
-    } else {
-      // Surrogate pair
-      i++; // Skip the next character
-      byteLen += 4;
-    }
-  }
-  return byteLen;
-}
+import { utf8ByteLength } from '#platform';
 
 /**
  * Size estimator for protobuf messages.
