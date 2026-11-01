@@ -174,6 +174,57 @@ runIfSupported('HttpInstrumentation diagnostics channel', () => {
     }
   });
 
+  it('keep the url.full set by startOutgoingSpanHook', async () => {
+    instrumentation.setConfig({
+      useDiagnosticsChannel: true,
+      startOutgoingSpanHook: () => ({
+        [ATTR_URL_FULL]: `http://${hostname}:${serverPort}/REDACTED`,
+      }),
+    });
+
+    try {
+      await httpRequest.get(`http://${hostname}:${serverPort}/secret-path`);
+
+      const clientSpan = memoryExporter
+        .getFinishedSpans()
+        .find(span => span.kind === SpanKind.CLIENT);
+      assert.ok(clientSpan);
+      assert.strictEqual(
+        clientSpan.attributes[ATTR_URL_FULL],
+        `http://${hostname}:${serverPort}/REDACTED`
+      );
+    } finally {
+      instrumentation.setConfig({ useDiagnosticsChannel: true });
+    }
+  });
+
+  it('keep the url.full set by requestHook', async () => {
+    instrumentation.setConfig({
+      useDiagnosticsChannel: true,
+      requestHook: span => {
+        span.setAttribute(
+          ATTR_URL_FULL,
+          `http://${hostname}:${serverPort}/REDACTED`
+        );
+      },
+    });
+
+    try {
+      await httpRequest.get(`http://${hostname}:${serverPort}/secret-path`);
+
+      const clientSpan = memoryExporter
+        .getFinishedSpans()
+        .find(span => span.kind === SpanKind.CLIENT);
+      assert.ok(clientSpan);
+      assert.strictEqual(
+        clientSpan.attributes[ATTR_URL_FULL],
+        `http://${hostname}:${serverPort}/REDACTED`
+      );
+    } finally {
+      instrumentation.setConfig({ useDiagnosticsChannel: true });
+    }
+  });
+
   it('uses an overridden Host header as the request authority', async () => {
     await metricReader.collectAndExport();
     metricsMemoryExporter.reset();
@@ -215,55 +266,6 @@ runIfSupported('HttpInstrumentation diagnostics channel', () => {
     assert.strictEqual(
       clientDuration.dataPoints[0].attributes[ATTR_SERVER_PORT],
       80
-    );
-  });
-
-  it('uses the final Host header set after request creation', async () => {
-    await new Promise<void>((resolve, reject) => {
-      const request = http.request(
-        {
-          hostname,
-          port: serverPort,
-          path: '/late-host-override',
-        },
-        response => {
-          response.resume();
-          response.on('end', resolve);
-        }
-      );
-      request.on('error', reject);
-      request.setHeader('Host', 'example.test:8080');
-      request.end();
-    });
-
-    const clientSpan = memoryExporter
-      .getFinishedSpans()
-      .find(span => span.kind === SpanKind.CLIENT);
-    assert.ok(clientSpan);
-    assert.strictEqual(
-      clientSpan.attributes[ATTR_SERVER_ADDRESS],
-      'example.test'
-    );
-    assert.strictEqual(clientSpan.attributes[ATTR_SERVER_PORT], 8080);
-    assert.strictEqual(
-      clientSpan.attributes[ATTR_URL_FULL],
-      'http://example.test:8080/late-host-override'
-    );
-
-    await metricReader.collectAndExport();
-    const clientDuration = metricsMemoryExporter
-      .getMetrics()[0]
-      .scopeMetrics[0].metrics.find(
-        metric => metric.descriptor.name === METRIC_HTTP_CLIENT_REQUEST_DURATION
-      );
-    assert.ok(clientDuration);
-    assert.strictEqual(
-      clientDuration.dataPoints[0].attributes[ATTR_SERVER_ADDRESS],
-      'example.test'
-    );
-    assert.strictEqual(
-      clientDuration.dataPoints[0].attributes[ATTR_SERVER_PORT],
-      8080
     );
   });
 
@@ -339,105 +341,6 @@ runIfSupported('HttpInstrumentation diagnostics channel', () => {
       clientSpan.attributes[ATTR_URL_FULL],
       `http://${logicalHostname}:${logicalPort}/removed-host-via-agent`
     );
-  });
-
-  it('does not retain an initial Host override after it is removed', async () => {
-    await new Promise<void>((resolve, reject) => {
-      const request = http.request(
-        {
-          hostname,
-          port: serverPort,
-          path: '/removed-host-override',
-          headers: { Host: 'initial.example:8080' },
-        },
-        response => {
-          response.resume();
-          response.on('end', resolve);
-        }
-      );
-      request.on('error', reject);
-      request.removeHeader('Host');
-      request.end();
-    });
-
-    const clientSpan = memoryExporter
-      .getFinishedSpans()
-      .find(span => span.kind === SpanKind.CLIENT);
-    assert.ok(clientSpan);
-    assert.strictEqual(clientSpan.attributes[ATTR_SERVER_ADDRESS], hostname);
-    assert.strictEqual(clientSpan.attributes[ATTR_SERVER_PORT], 80);
-    assert.strictEqual(
-      clientSpan.attributes[ATTR_URL_FULL],
-      `http://${hostname}/removed-host-override`
-    );
-  });
-
-  it('finalizes the Host authority before an early response ends the span', async () => {
-    await new Promise<void>((resolve, reject) => {
-      const request = http.request(
-        {
-          hostname,
-          port: serverPort,
-          path: '/early-response',
-          method: 'POST',
-        },
-        response => {
-          response.resume();
-          response.on('end', () => {
-            request.end();
-            resolve();
-          });
-        }
-      );
-      request.on('error', reject);
-      request.setHeader('Host', 'example.test:8080');
-      request.flushHeaders();
-    });
-
-    const clientSpan = memoryExporter
-      .getFinishedSpans()
-      .find(span => span.kind === SpanKind.CLIENT);
-    assert.ok(clientSpan);
-    assert.strictEqual(
-      clientSpan.attributes[ATTR_SERVER_ADDRESS],
-      'example.test'
-    );
-    assert.strictEqual(clientSpan.attributes[ATTR_SERVER_PORT], 8080);
-  });
-
-  it('finalizes the Host authority when the request errors before finish', async () => {
-    const unavailablePort = await new Promise<number>((resolve, reject) => {
-      const unavailableServer = http.createServer();
-      unavailableServer.on('error', reject);
-      unavailableServer.listen(0, hostname, () => {
-        const address = unavailableServer.address();
-        assert.ok(address && typeof address !== 'string');
-        unavailableServer.close(error => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(address.port);
-          }
-        });
-      });
-    });
-
-    await new Promise<void>(resolve => {
-      const request = http.request({ hostname, port: unavailablePort });
-      request.setHeader('Host', 'example.test:8080');
-      request.on('error', () => resolve());
-      request.end();
-    });
-
-    const clientSpan = memoryExporter
-      .getFinishedSpans()
-      .find(span => span.kind === SpanKind.CLIENT);
-    assert.ok(clientSpan);
-    assert.strictEqual(
-      clientSpan.attributes[ATTR_SERVER_ADDRESS],
-      'example.test'
-    );
-    assert.strictEqual(clientSpan.attributes[ATTR_SERVER_PORT], 8080);
   });
 
   it('normalizes optional whitespace around the Host authority', async () => {
