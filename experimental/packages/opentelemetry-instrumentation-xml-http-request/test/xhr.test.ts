@@ -360,6 +360,24 @@ describe('xhr', () => {
         // @ts-expect-error -- property added by instrumentation.wrap(...)
         XMLHttpRequest.prototype.open.__unwrap();
       });
+
+      it('should re-enable without wrapping open/send twice', () => {
+        xhrInstrumentation = new XMLHttpRequestInstrumentation();
+        xhrInstrumentation.disable();
+        xhrInstrumentation.enable();
+        assert.strictEqual(xhrInstrumentation.isEnabled(), true);
+        const open = XMLHttpRequest.prototype.open;
+        const send = XMLHttpRequest.prototype.send;
+        assert.ok(isWrapped(open) && isWrapped(send));
+        assert.ok(
+          !isWrapped(open.__original) && !isWrapped(send.__original),
+          'open/send must not be double-wrapped'
+        );
+        // @ts-expect-error -- property added by instrumentation.wrap(...)
+        XMLHttpRequest.prototype.send.__unwrap();
+        // @ts-expect-error -- property added by instrumentation.wrap(...)
+        XMLHttpRequest.prototype.open.__unwrap();
+      });
     });
   });
 

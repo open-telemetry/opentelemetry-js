@@ -4,4 +4,4 @@
  */
 
 export { InstrumentationBase } from './instrumentation';
-export { normalize } from './noop-normalize';
+export { InstrumentationNodeModuleFile } from './instrumentationNodeModuleFile';

@@ -188,5 +188,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otlp-exporter-base-config]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-exporter-base#http-exporter-configuration
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-trace-otlp-http.svg
 [opentelemetry-spec-protocol-exporter]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options
-[semconv-resource-service-name]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service
+[semconv-resource-service-name]: https://opentelemetry.io/docs/specs/semconv/resource/#service
 [metrics-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-http

@@ -4,6 +4,8 @@
  */
 
 export { envDetector } from './EnvDetector';
+export { resourceAttributesEnvDetector } from './ResourceAttributesEnvDetector';
+export { serviceNameEnvDetector } from './ServiceNameEnvDetector';
 export {
   hostDetector,
   osDetector,

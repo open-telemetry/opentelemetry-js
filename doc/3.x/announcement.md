@@ -3,7 +3,7 @@
 > [!IMPORTANT]
 >
 > - **Feature-freeze for 2.x: September 1, 2026**
-> - **SDK 3.0 release: September 30, 2026**
+> - **SDK 3.0 release: September 30, 2026 -> Monday, Oct 19, 2026**
 
 ## Description
 
@@ -13,6 +13,7 @@ We're planning to release SDK 3.0. This release continues to clean up the SDK's 
 
 We plan to **feature-freeze 2.x on September 1, 2026**. Any feature PRs not yet merged at that point will target SDK 3.0.
 We plan to **release SDK 3.0 on September 30, 2026**.
+The release date was pushed out to **Monday, October 19, 2026**.
 
 ### Why we're releasing SDK 3.0
 
