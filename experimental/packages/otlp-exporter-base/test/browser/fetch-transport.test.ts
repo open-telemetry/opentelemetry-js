@@ -283,6 +283,33 @@ describe('FetchTransport', function () {
     });
   });
 
+  describe('request mode', function () {
+    async function sentMode(): Promise<RequestMode | undefined> {
+      const fetchStub = sinon
+        .stub(globalThis, 'fetch')
+        .resolves(new Response(null, { status: 200 }));
+      const transport = createFetchTransport({
+        ...testTransportParameters,
+        url: `${globalThis.location.origin}/v1/traces`,
+      });
+
+      await transport.send(testPayload, requestTimeout);
+
+      return fetchStub.firstCall.args[1]?.mode;
+    }
+
+    it('uses same-origin for an endpoint on the document origin', async function () {
+      assert.strictEqual(await sentMode(), 'same-origin');
+    });
+
+    it('uses cors from an opaque-origin document, whose location still reports the URL origin', async function () {
+      // A sandboxed iframe without allow-same-origin, or a data:/blob: document.
+      sinon.stub(globalThis, 'origin').value('null');
+
+      assert.strictEqual(await sentMode(), 'cors');
+    });
+  });
+
   describe('suppressTracing context', function () {
     beforeEach(function () {
       context.setGlobalContextManager(new StackContextManager().enable());

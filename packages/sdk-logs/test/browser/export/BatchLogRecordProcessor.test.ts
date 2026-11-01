@@ -5,6 +5,10 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import {
+  loggingErrorHandler,
+  setGlobalErrorHandler,
+} from '@opentelemetry/core';
 
 import type { LogRecordExporter } from '../../../src';
 import { BatchLogRecordProcessor } from '../../../src/platform/browser/export/BatchLogRecordProcessor';
@@ -25,18 +29,22 @@ describeDocument('BatchLogRecordProcessor - web main context', () => {
   let processor: BatchLogRecordProcessor;
   let forceFlushSpy: sinon.SinonStub;
   let visibilityChangeEvent: Event;
+  let globalErrorHandlerStub: sinon.SinonStub;
 
   beforeEach(() => {
     sinon.replaceGetter(document, 'visibilityState', () => visibilityState);
     visibilityState = 'visible';
     exporter = new InMemoryLogRecordExporter();
     processor = new BatchLogRecordProcessor({ exporter });
-    forceFlushSpy = sinon.stub(processor, 'forceFlush');
+    forceFlushSpy = sinon.stub(processor, 'forceFlush').resolves();
     visibilityChangeEvent = new Event('visibilitychange');
+    globalErrorHandlerStub = sinon.stub();
+    setGlobalErrorHandler(globalErrorHandlerStub);
   });
 
   afterEach(async () => {
     sinon.restore();
+    setGlobalErrorHandler(loggingErrorHandler());
   });
 
   describe('when document becomes hidden', () => {
@@ -45,6 +53,26 @@ describeDocument('BatchLogRecordProcessor - web main context', () => {
         assert.strictEqual(forceFlushSpy.callCount, 0);
         hideDocument();
         assert.strictEqual(forceFlushSpy.callCount, 1);
+      });
+
+      it('should catch any error thrown by forceFlush', done => {
+        const forceFlushError = new Error('forceFlush failed');
+        forceFlushSpy.rejects(forceFlushError);
+        hideDocument();
+        sinon.assert.calledOnce(forceFlushSpy);
+
+        // queue a microtask since hideDocument() returns before forceFlush() rejects
+        queueMicrotask(() => {
+          try {
+            sinon.assert.calledOnceWithExactly(
+              globalErrorHandlerStub,
+              forceFlushError
+            );
+            done();
+          } catch (e) {
+            done(e);
+          }
+        });
       });
 
       describe('AND shutdown has been called', () => {
@@ -62,7 +90,7 @@ describeDocument('BatchLogRecordProcessor - web main context', () => {
             exporter,
             disableAutoFlushOnDocumentHide: false,
           });
-          forceFlushSpy = sinon.stub(processor, 'forceFlush');
+          forceFlushSpy = sinon.stub(processor, 'forceFlush').resolves();
           assert.strictEqual(forceFlushSpy.callCount, 0);
           hideDocument();
           assert.strictEqual(forceFlushSpy.callCount, 1);
@@ -73,7 +101,7 @@ describeDocument('BatchLogRecordProcessor - web main context', () => {
             exporter,
             disableAutoFlushOnDocumentHide: true,
           });
-          forceFlushSpy = sinon.stub(processor, 'forceFlush');
+          forceFlushSpy = sinon.stub(processor, 'forceFlush').resolves();
           assert.strictEqual(forceFlushSpy.callCount, 0);
           hideDocument();
           assert.strictEqual(forceFlushSpy.callCount, 0);

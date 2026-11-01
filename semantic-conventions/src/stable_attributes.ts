@@ -139,7 +139,7 @@ export const ASPNETCORE_ROUTING_MATCH_STATUS_VALUE_SUCCESS = "success" as const;
 export const ATTR_ASPNETCORE_USER_IS_AUTHENTICATED = 'aspnetcore.user.is_authenticated' as const;
 
 /**
- * Client address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
+ * Client address - domain name if available without reverse DNS lookup; otherwise, IP address or UNIX domain socket name.
  *
  * @example client.example.com
  * @example 10.1.2.80
@@ -166,7 +166,7 @@ export const ATTR_CLIENT_PORT = 'client.port' as const;
 export const ATTR_CODE_COLUMN_NUMBER = 'code.column.number' as const;
 
 /**
- * The source code file name that identifies the code unit as uniquely as possible (preferably an absolute file path). This attribute **MUST NOT** be used on the Profile signal since the data is already captured in 'message Function'. This constraint is imposed to prevent redundancy and maintain data integrity.
+ * The source code filename that identifies the code unit as uniquely as possible (preferably an absolute file path). This attribute **MUST NOT** be used on the Profile signal since the data is already captured in 'message Function'. This constraint is imposed to prevent redundancy and maintain data integrity.
  *
  * @example "/usr/local/MyApplication/content_root/app/index.php"
  */
@@ -226,7 +226,7 @@ export const ATTR_CONTAINER_ID = 'container.id' as const;
 export const ATTR_CONTAINER_IMAGE_NAME = 'container.image.name' as const;
 
 /**
- * Repo digests of the container image as provided by the container runtime.
+ * Repository digests of the container image as provided by the container runtime.
  *
  * @example ["example@sha256:afcc7f1ac1b49db317a7196c902e61c6c3c4607d63599ee1a82d702d249a0ccb", "internal.registry.example.com:5000/example@sha256:b69959407d21e8a062e0416bf13405bb2b71ed7a84dde4158ebafacfa06f5578"]
  *
@@ -1393,7 +1393,7 @@ export const ATTR_K8S_STATEFULSET_NAME = 'k8s.statefulset.name' as const;
 export const ATTR_K8S_STATEFULSET_UID = 'k8s.statefulset.uid' as const;
 
 /**
- * Local address of the network connection - IP address or Unix domain socket name.
+ * Local address of the network connection - IP address or UNIX domain socket name.
  *
  * @example 10.1.2.80
  * @example /tmp/my.sock
@@ -1408,7 +1408,7 @@ export const ATTR_NETWORK_LOCAL_ADDRESS = 'network.local.address' as const;
 export const ATTR_NETWORK_LOCAL_PORT = 'network.local.port' as const;
 
 /**
- * Peer address of the network connection - IP address or Unix domain socket name.
+ * Peer address of the network connection - IP address or UNIX domain socket name.
  *
  * @example 10.1.2.80
  * @example /tmp/my.sock
@@ -1488,7 +1488,7 @@ export const NETWORK_TRANSPORT_VALUE_UDP = "udp" as const;
 /**
  * Enum value "unix" for attribute {@link ATTR_NETWORK_TRANSPORT}.
  *
- * Unix domain socket
+ * UNIX domain socket
  */
 export const NETWORK_TRANSPORT_VALUE_UNIX = "unix" as const;
 
@@ -1567,7 +1567,7 @@ export const OTEL_STATUS_CODE_VALUE_OK = "OK" as const;
 export const ATTR_OTEL_STATUS_DESCRIPTION = 'otel.status_description' as const;
 
 /**
- * Server domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
+ * Server domain name if available without reverse DNS lookup; otherwise, IP address or UNIX domain socket name.
  *
  * @example example.com
  * @example 10.1.2.80
@@ -1731,66 +1731,92 @@ export const ATTR_TELEMETRY_SDK_LANGUAGE = 'telemetry.sdk.language' as const;
 
 /**
  * Enum value "cpp" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [C++](https://opentelemetry.io/docs/languages/cpp/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_CPP = "cpp" as const;
 
 /**
  * Enum value "dotnet" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [.NET](https://opentelemetry.io/docs/languages/dotnet/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_DOTNET = "dotnet" as const;
 
 /**
  * Enum value "erlang" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [Erlang/Elixir](https://opentelemetry.io/docs/languages/erlang/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_ERLANG = "erlang" as const;
 
 /**
  * Enum value "go" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [Go](https://opentelemetry.io/docs/languages/go/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_GO = "go" as const;
 
 /**
  * Enum value "java" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [Java](https://opentelemetry.io/docs/languages/java/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_JAVA = "java" as const;
 
 /**
  * Enum value "kotlin" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [Kotlin](https://opentelemetry.io/docs/languages/kotlin/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_KOTLIN = "kotlin" as const;
 
 /**
  * Enum value "nodejs" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [Node.js](https://opentelemetry.io/docs/languages/js/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_NODEJS = "nodejs" as const;
 
 /**
  * Enum value "php" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [PHP](https://opentelemetry.io/docs/languages/php/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_PHP = "php" as const;
 
 /**
  * Enum value "python" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [Python](https://opentelemetry.io/docs/languages/python/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_PYTHON = "python" as const;
 
 /**
  * Enum value "ruby" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [Ruby](https://opentelemetry.io/docs/languages/ruby/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_RUBY = "ruby" as const;
 
 /**
  * Enum value "rust" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [Rust](https://opentelemetry.io/docs/languages/rust/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_RUST = "rust" as const;
 
 /**
  * Enum value "swift" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [Swift](https://opentelemetry.io/docs/languages/swift/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_SWIFT = "swift" as const;
 
 /**
  * Enum value "webjs" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [Browser](https://opentelemetry.io/docs/languages/js/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_WEBJS = "webjs" as const;
 

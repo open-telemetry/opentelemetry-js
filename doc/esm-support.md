@@ -32,6 +32,22 @@ If your application is written in JavaScript as ESM, or compiled to ESM from Typ
 The custom hook for ESM instrumentation is `--experimental-loader=@opentelemetry/instrumentation/hook.mjs`.
 This flag must be passed to the `node` binary, which is often done as a startup command and/or in the `NODE_OPTIONS` environment variable.
 
+### CJS Apps That Depend on ESM Packages
+
+The hook can be needed even when your application is CJS.
+Without it, instrumentations only patch modules loaded with `require()`.
+If one of your dependencies is ESM and loads an instrumented package with `import`, that package goes through the ESM loader and is not patched.
+
+For example, `@nestjs/platform-express@12` is ESM and imports `express`.
+In a CJS NestJS 12 app, `@opentelemetry/instrumentation-express` does not patch `express` unless the hook is registered, so the HTTP server spans have no `http.route`.
+
+If an instrumentation that should apply produces no spans in a CJS app, check whether the package it patches is imported from an ESM dependency.
+In that case, add the hook to the startup command:
+
+```sh
+node --experimental-loader=@opentelemetry/instrumentation/hook.mjs --require ./telemetry.js app.js
+```
+
 ### Additional Notes on Experimental Loaders
 
 Though the OpenTelemetry loader currently relies on `import-in-the-middle`, direct usage of `import-in-the-middle/hook.mjs` may cease to work in the future.

@@ -1,19 +1,8 @@
 {
   "analytics": false,
-  "tasksRunnerOptions": {
-    "default": {
-      "runner": "nx/tasks-runners/default",
-      "options": {
-        "cacheableOperations": [
-          "compile",
-          "lint",
-          "version"
-        ]
-      }
-    }
-  },
   "targetDefaults": {
     "compile": {
+      "cache": true,
       "dependsOn": [
         "version",
         "^compile"
@@ -53,12 +42,14 @@
       ]
     },
     "lint": {
+      "cache": true,
       "inputs": [
         "{projectRoot}/src/**/*.ts",
         "{projectRoot}/test/**/*.ts"
       ]
     },
     "version": {
+      "cache": true,
       "inputs": [
         "{projectRoot}/package.json"
       ],

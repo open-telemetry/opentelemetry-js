@@ -17,7 +17,7 @@ import type {
   SpanExporterConfigModel,
   TracerProviderConfigModel,
 } from '@opentelemetry/configuration';
-import { createConfigFactory } from '@opentelemetry/configuration';
+import { parseConfigFile } from '@opentelemetry/configuration';
 import type { SpanExporter, SpanLimits } from '@opentelemetry/sdk-trace';
 import {
   BatchSpanProcessor,
@@ -298,6 +298,10 @@ describe('create-from-config', () => {
       return res.attributes;
     };
 
+    afterEach(function () {
+      sinon.restore();
+    });
+
     it('empty "resource" config', async function () {
       const resource = createResourceFromConfig(undefined);
       await resource.waitForAsyncAttributes?.();
@@ -387,22 +391,30 @@ describe('create-from-config', () => {
       }
     });
 
-    it('resource detector: container (not yet supported, throws)', async function () {
-      assert.throws(() => {
-        createResourceFromConfig({
-          'detection/development': { detectors: [{ container: null }] },
-        });
+    it('resource detector: container (not yet supported, warns and skips)', async function () {
+      const warnStub = sinon.stub(diag, 'warn');
+
+      createResourceFromConfig({
+        'detection/development': { detectors: [{ container: null }] },
       });
+
+      warnStub.calledOnceWith(
+        'unknown ExperimentalResourceDetector name in configuration: "container" (skipping)'
+      );
     });
 
-    it('resource detector: unknown name throws', async function () {
-      assert.throws(() => {
-        createResourceFromConfig({
-          'detection/development': {
-            detectors: [{ some_unknown_detector: null }],
-          },
-        });
+    it('resource detector: unknown name (warns and skips)', async function () {
+      const warnStub = sinon.stub(diag, 'warn');
+
+      createResourceFromConfig({
+        'detection/development': {
+          detectors: [{ some_unknown_detector: null }],
+        },
       });
+
+      warnStub.calledOnceWith(
+        'unknown ExperimentalResourceDetector name in configuration: "some_unknown_detector" (skipping)'
+      );
     });
 
     it('schema_url', function () {
@@ -448,35 +460,28 @@ describe('create-from-config', () => {
     });
 
     it('processes fixtures/resources.yaml correctly', async function () {
-      const restoreEnv = setEnv({
-        OTEL_CONFIG_FILE: 'test/fixtures/resources.yaml',
-      });
-      try {
-        const config = createConfigFactory().getConfigModel();
-        const resource = createResourceFromConfig(config.resource);
-        await resource.waitForAsyncAttributes?.();
+      const config = parseConfigFile('test/fixtures/resources.yaml');
+      const resource = createResourceFromConfig(config.resource);
+      await resource.waitForAsyncAttributes?.();
 
-        assert.deepStrictEqual(
-          resource.schemaUrl,
-          'https://opentelemetry.io/schemas/1.16.0'
-        );
-        assert.deepStrictEqual(resource.attributes, {
-          ...defaultResAttrs,
-          'service.name': 'config-name',
-          'service.namespace': 'config-namespace',
-          'service.version': '1.0.0',
-          bool_array_key: [true, false],
-          bool_key: true,
-          double_array_key: [1.1, 2.2],
-          double_key: 1.1,
-          int_array_key: [1, 2],
-          int_key: 1,
-          string_array_key: ['value1', 'value2'],
-          string_key: 'value',
-        });
-      } finally {
-        restoreEnv();
-      }
+      assert.deepStrictEqual(
+        resource.schemaUrl,
+        'https://opentelemetry.io/schemas/1.16.0'
+      );
+      assert.deepStrictEqual(resource.attributes, {
+        ...defaultResAttrs,
+        'service.name': 'config-name',
+        'service.namespace': 'config-namespace',
+        'service.version': '1.0.0',
+        bool_array_key: [true, false],
+        bool_key: true,
+        double_array_key: [1.1, 2.2],
+        double_key: 1.1,
+        int_array_key: [1, 2],
+        int_key: 1,
+        string_array_key: ['value1', 'value2'],
+        string_key: 'value',
+      });
     });
   });
 

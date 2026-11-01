@@ -37,7 +37,8 @@ export abstract class InstrumentationBase<
   private _hooks: (Hooked | HookRequire)[] = [];
   private _requireInTheMiddleSingleton: RequireInTheMiddleSingleton =
     RequireInTheMiddleSingleton.getInstance();
-  private _enabled = false;
+  /** Set by the base enable() and disable(); subclasses only read it. */
+  protected _enabled = false;
 
   constructor(
     instrumentationName: string,
