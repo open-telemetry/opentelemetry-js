@@ -58,6 +58,7 @@ export interface FetchTransportParameters {
 class FetchTransport implements IExporterTransport {
   private _parameters: FetchTransportParameters;
   private _compression: SupportedCompression | 'none';
+  private _compressedBodyByData = new WeakMap<Uint8Array, Blob>();
 
   constructor(parameters: FetchTransportParameters) {
     this._parameters = parameters;
@@ -219,8 +220,18 @@ class FetchTransport implements IExporterTransport {
     format: CompressionFormat,
     signal: AbortSignal
   ): Promise<Blob | undefined> {
+    const cached = this._compressedBodyByData.get(data);
+    if (cached) {
+      return cached;
+    }
     try {
-      return await compressWithCompressionStream(data, format, signal);
+      const compressed = await compressWithCompressionStream(
+        data,
+        format,
+        signal
+      );
+      this._compressedBodyByData.set(data, compressed);
+      return compressed;
     } catch (error) {
       // Not warned on timeout: `fetch` rejects on the aborted signal, so nothing
       // is sent.

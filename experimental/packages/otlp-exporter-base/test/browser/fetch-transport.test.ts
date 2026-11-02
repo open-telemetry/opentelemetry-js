@@ -1420,7 +1420,7 @@ describe('FetchTransport', function () {
       sinon.assert.notCalled(warn);
     });
 
-    it('compresses the body again on retry', async function () {
+    it('reuses the compressed body on retry', async function () {
       // arrange
       const fetchStub = sinon.stub(globalThis, 'fetch');
       fetchStub
@@ -1444,6 +1444,10 @@ describe('FetchTransport', function () {
         assert.deepStrictEqual(await gunzip(requestInit.body), testPayload);
         assert.strictEqual(contentEncodingOf(requestInit), 'gzip');
       }
+      assert.strictEqual(
+        (fetchStub.secondCall.args[1] as RequestInit).body,
+        (fetchStub.firstCall.args[1] as RequestInit).body
+      );
     });
   });
 
