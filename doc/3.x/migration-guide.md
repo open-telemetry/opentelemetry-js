@@ -662,6 +662,11 @@ propagation.setGlobalPropagator(propagator);
 
 ## 💥 `@opentelemetry/sdk-node` API changes
 
+- Deprecated: `OTEL_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT` and `OTEL_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT`.
+  Use `OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT` and `OTEL_LINK_ATTRIBUTE_COUNT_LIMIT`, respectively.
+  The specification names take precedence when they have valid values; the deprecated names are still read as fallbacks.
+  See the [span-limit environment configuration](../../experimental/packages/opentelemetry-sdk-node/README.md#configure-span-limits-from-the-environment) and [#7242](https://github.com/open-telemetry/opentelemetry-js/issues/7242) for the transition.
+
 - Removed: `NodeSDKConfiguration.logRecordProcessor`.
   The singular `logRecordProcessor` option on `NodeSDKConfiguration` has been removed. Use `logRecordProcessors` (array) instead.
 
