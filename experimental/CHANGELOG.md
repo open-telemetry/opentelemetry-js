@@ -19,6 +19,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :rocket: Features
 
+* fix(sdk-node): ComponentProvider support for creating an SDK from declarative config [#7269](https://github.com/open-telemetry/opentelemetry-js/pull/7269)) @trentm
+
 ### :bug: Bug Fixes
 
 * fix(instrumentation-http): don't `require('forwarded-parse')` in ESM builds ([#7261](https://github.com/open-telemetry/opentelemetry-js/pull/7261)) @avens19
