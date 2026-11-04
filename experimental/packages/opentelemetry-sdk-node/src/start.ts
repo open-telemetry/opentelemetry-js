@@ -45,6 +45,9 @@ import {
   createResourceFromConfig,
   createTracerProviderFromConfig,
 } from './create-from-config';
+import type { ComponentProviderRegistry } from './component-provider';
+import { buildComponentProviderRegistry } from './component-provider';
+import { getBuiltinComponentProviders } from './builtin-component-providers';
 
 interface SdkComponents {
   contextManager?: ContextManager;
@@ -186,6 +189,12 @@ function startNodeSdkFromEnv(opts?: StartSdkFromEnvOptions): NodeSdk {
 }
 
 function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
+  // XXX `componentProviderRegistry` long name eventually
+  const reg = buildComponentProviderRegistry([
+    ...getBuiltinComponentProviders(),
+  ]);
+  console.log('XXX reg:'); console.dir(reg, { depth: 50 })
+
   let config: ConfigurationModel;
   try {
     config = parseConfigFile(opts.configFile);
@@ -212,7 +221,7 @@ function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
 
   let components: SdkComponents;
   try {
-    components = createFromConfig(config);
+    components = createFromConfig(config, reg);
   } catch (createErr) {
     diag.error(
       `Could not create OpenTelemetry SDK from configuration, SDK will not be setup: ${createErr.message}`
@@ -254,7 +263,10 @@ function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
 /**
  * Interpret configuration model and return SDK components.
  */
-function createFromConfig(config: ConfigurationModel): SdkComponents {
+function createFromConfig(
+  config: ConfigurationModel,
+  reg: ComponentProviderRegistry
+): SdkComponents {
   const components: SdkComponents = {};
 
   try {
@@ -284,6 +296,7 @@ function createFromConfig(config: ConfigurationModel): SdkComponents {
 
     if (config.tracer_provider) {
       components.tracerProvider = createTracerProviderFromConfig(
+        reg,
         resource,
         config.tracer_provider,
         config.attribute_limits
