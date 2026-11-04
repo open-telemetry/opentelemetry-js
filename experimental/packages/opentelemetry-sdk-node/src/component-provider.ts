@@ -3,11 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ConsoleExporterConfigModel } from '@opentelemetry/configuration';
-import {
-  ConsoleSpanExporter,
-  type SpanExporter,
-} from '@opentelemetry/sdk-trace';
+// XXX maybe move these to the `configuration` package? Not sure.
+//    Then a 3rd party ComponentProvider impl can just dep on `configuration`.
+//    It shouldn't need to dep on `sdk-node`?
+//    Though sdk-node is the only user of ComponentProvider's, so it wouldn't be evil to have that dep.
+//    Pretend this was in sdk-lib, used by sdk-node and a new mythical sdk-bun.
+//    It is whereever the "create"-step stuff for Decl Conf lives. Currently that's sdk-node.
+//    configuration feels more "right", at least for now.
 
 /**
  * Schemaless configuration properties passed to a component provider.
@@ -53,7 +55,7 @@ export function buildComponentProviderRegistry(
       reg.set(provider.componentType, new Map([[provider.name, provider]]));
     } else if (providerFromName.has(provider.name)) {
       throw new Error(
-        `a "${provider.componentType}" ComponentProvider is already registered for name="${provider.name}": ${providerFromName.get(provider.name)!.constructor.name}`
+        `a ComponentProvider of componentType="${provider.componentType}" and name="${provider.name}" is already registered: ${providerFromName.get(provider.name)!.constructor.name}`
       );
     } else {
       providerFromName.set(provider.name, provider);

@@ -235,7 +235,7 @@ class OtlpGrpcSpanExporterComponentProvider
   implements ComponentProvider<OtlpGrpcExporterConfigModel, SpanExporter>
 {
   readonly componentType = 'SpanExporter';
-  readonly name = 'otlp_http';
+  readonly name = 'otlp_grpc';
 
   createComponent(properties: OtlpGrpcExporterConfigModel): SpanExporter {
     checkConfigUse('OtlpGrpcExporter', properties!, [

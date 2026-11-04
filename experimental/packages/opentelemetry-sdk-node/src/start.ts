@@ -189,11 +189,11 @@ function startNodeSdkFromEnv(opts?: StartSdkFromEnvOptions): NodeSdk {
 }
 
 function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
-  // XXX `componentProviderRegistry` long name eventually
   const reg = buildComponentProviderRegistry([
     ...getBuiltinComponentProviders(),
   ]);
-  console.log('XXX reg:'); console.dir(reg, { depth: 50 })
+  // // eslint-disable-next-line no-console
+  // console.log('XXX reg:', reg);
 
   let config: ConfigurationModel;
   try {

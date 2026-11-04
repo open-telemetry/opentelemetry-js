@@ -1239,11 +1239,6 @@ function createSpanProcessorFromConfig(
 ): SpanProcessor {
   const [name, properties] = mustSingleEntry(processor, 'SpanProcessor');
 
-  // XXX
-  // const provider = reg.get('SpanProcessor')?.get(name);
-  // console.log('XXX provider for name %s: ', name, provider);
-  // console.log('XXX eventually should not get here, "reg" should handle all')
-
   switch (name) {
     case 'batch': {
       checkConfigUse('BatchSpanProcessor', properties!, [
