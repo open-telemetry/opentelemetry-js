@@ -24,6 +24,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 ### :books: Documentation
 
 * docs(resources): update dead semantic conventions resource specification links [#7254](https://github.com/open-telemetry/opentelemetry-js/pull/7254) @helmipradita
+* docs(migration): note that `@opentelemetry/api` v1.10.0 needs SDK 3.x [#7253](https://github.com/open-telemetry/opentelemetry-js/pull/7253) @adityareddy-dev
 
 ### :house: Internal
 
