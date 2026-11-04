@@ -154,6 +154,7 @@ export class SpanImpl implements Span {
 
     // `opts.attributes` have already been sanitized by caller.
     this.attributes = opts.attributes ?? {};
+    this._attributesCount = Object.keys(this.attributes).length;
     this._droppedAttributesCount = opts.droppedAttributesCount ?? 0;
 
     this._spanProcessor.onStart(this, opts.context);

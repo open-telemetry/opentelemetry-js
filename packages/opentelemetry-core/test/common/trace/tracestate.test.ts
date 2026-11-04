@@ -62,6 +62,17 @@ describe('TraceState', () => {
         assert.strictEqual(orgState, state);
         assert.deepStrictEqual(orgState.serialize(), tracestate);
       });
+
+      it('must not create a new TraceState if makes exceed the max number of items', () => {
+        const tracestate = new Array(32)
+          .fill(0)
+          .map((_: null, num: number) => `a${num}=${num}`)
+          .join(','); // 32 items, well below the 512 character limit
+        const orgState = new TraceState(tracestate);
+        const state = orgState.set('b', '1'); // this makes it exceed 32 items
+        assert.strictEqual(orgState, state);
+        assert.deepStrictEqual(orgState.serialize(), tracestate);
+      });
     });
 
     describe('when updating a list member', () => {

@@ -11,7 +11,7 @@ import { TracerProvider } from '../../src';
 const tracerProvider = new TracerProvider();
 const tracer = tracerProvider.getTracer('test');
 
-/** Default span limit OTEL_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT / _LINK_ (128). */
+/** Default span limit OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT / _LINK_ (128). */
 function buildManyAttributes(count: number): Attributes {
   const attrs: Attributes = {};
   for (let i = 0; i < count; i++) {

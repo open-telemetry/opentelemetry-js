@@ -27,7 +27,7 @@
       "path": "../otlp-transformer"
     },
     {
-      "path": "../sdk-logs"
+      "path": "../../../packages/sdk-logs"
     }
   ]
 }

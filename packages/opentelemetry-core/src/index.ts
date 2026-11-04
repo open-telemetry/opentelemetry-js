@@ -46,7 +46,7 @@ export {
   getBooleanFromEnv,
   getNumberFromEnv,
   getStringListFromEnv,
-} from './platform';
+} from '#platform';
 export { CompositePropagator } from './propagation/composite';
 export type { CompositePropagatorConfig } from './propagation/composite';
 export {

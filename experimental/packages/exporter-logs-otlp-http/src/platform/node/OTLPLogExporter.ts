@@ -7,7 +7,7 @@ import type {
   ReadableLogRecord,
   LogRecordExporter,
 } from '@opentelemetry/sdk-logs';
-import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base/node-http';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import {
   JsonLogsSerializer,

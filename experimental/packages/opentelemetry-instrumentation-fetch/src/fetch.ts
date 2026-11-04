@@ -28,7 +28,12 @@ import {
   ATTR_SERVER_PORT,
   ATTR_URL_FULL,
 } from '@opentelemetry/semantic-conventions';
-import type { FetchError, FetchResponse, SpanData } from './types';
+import type {
+  FetchError,
+  FetchResponse,
+  PropagateTraceHeaderCorsUrls,
+  SpanData,
+} from './types';
 import {
   getFetchBodyLength,
   normalizeHttpRequestMethod,
@@ -67,7 +72,7 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
   // is not available
   clearTimingResources?: boolean;
   // urls which should include trace headers when origin doesn't match
-  propagateTraceHeaderCorsUrls?: web.PropagateTraceHeaderCorsUrls;
+  propagateTraceHeaderCorsUrls?: PropagateTraceHeaderCorsUrls;
   /**
    * URLs that partially match any regex in ignoreUrls will not be traced.
    * In addition, URLs that are _exact matches_ of strings in ignoreUrls will
@@ -95,13 +100,8 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
   private _tasksCount = 0;
 
-  // Note: Intentionally *not* using `_enabled` as the field name to avoid
-  // any possible confusion with the `_enabled` field used on the *Node.js*
-  // InstrumentationBase class.
-  // Also not initializing the fields to `false` because the base class
-  // constructor already call `enable` modifying their values and it will
-  // set the instrumentaitons in a bas state (enabled, patched but with flags set to false)
-  declare private _isEnabled: boolean;
+  // Not initialized: the base constructor calls enable() before subclass field
+  // initializers run, so an initializer would reset the flag after patching.
   declare private _isFetchPatched: boolean;
 
   constructor(config: FetchInstrumentationConfig = {}) {
@@ -333,7 +333,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         this: typeof globalThis,
         ...args: Parameters<typeof fetch>
       ): Promise<Response> {
-        if (!plugin._isEnabled) {
+        if (!plugin._enabled) {
           return original.apply(this, args);
         }
         const self = this;
@@ -555,13 +555,23 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       return;
     }
 
-    if (this._isEnabled) {
+    if (this._enabled) {
       return;
     }
 
     if (this._isFetchPatched) {
       this._diag.debug('fetch constructor already patched');
-      this._isEnabled = true;
+      this._enabled = true;
+      return;
+    }
+
+    // `_wrap` returns undefined, without throwing, when the target is missing
+    // or not a function, and reports it through console.error rather than diag.
+    if (typeof globalThis.fetch !== 'function') {
+      this._diag.warn(
+        'globalThis.fetch is missing or not a function; instrumentation will not be enabled. ' +
+          'Register the instrumentation after any fetch polyfill, or call enable() once fetch is available.'
+      );
       return;
     }
 
@@ -570,7 +580,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       // Object.defineProperty(window, 'fetch', { writable: false, ... }).
       this._wrap(globalThis, 'fetch', this._patchConstructor());
       this._isFetchPatched = true;
-      this._isEnabled = true;
+      this._enabled = true;
     } catch (err) {
       this._diag.warn(
         'Failed to patch globalThis.fetch; instrumentation will not be enabled. ' +
@@ -587,10 +597,10 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     if (!hasBrowserPerformanceAPI) {
       return;
     }
-    if (!this._isEnabled) {
+    if (!this._enabled) {
       return;
     }
-    this._isEnabled = false;
+    this._enabled = false;
     this._usedResources = new WeakSet<PerformanceResourceTiming>();
   }
 }

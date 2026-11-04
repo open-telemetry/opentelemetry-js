@@ -2,7 +2,7 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { createOtlpHttpExportDelegate } from '../../src/otlp-http-export-delegate';
+import { createOtlpHttpExportDelegate } from '../../src/platform/node/otlp-http-export-delegate';
 import type { ISerializer } from '@opentelemetry/otlp-transformer';
 import { ExportResultCode } from '@opentelemetry/core';
 

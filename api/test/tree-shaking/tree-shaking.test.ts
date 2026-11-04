@@ -23,6 +23,10 @@ describe('tree-shaking', function () {
   const allowedAPIs = ['ContextAPI', 'DiagAPI'];
   const testAPIs = [
     {
+      name: 'LogsAPI',
+      export: 'logs',
+    },
+    {
       name: 'MetricsAPI',
       export: 'metrics',
     },
@@ -55,7 +59,7 @@ describe('tree-shaking', function () {
         this.skip();
       }
       const sourceCode = `
-          import { ${testAPI.export} } from '../../';
+          import { ${testAPI.export} } from '@opentelemetry/api';
           console.log(${testAPI.export});
         `;
       mfs.mkdirpSync(path.dirname(sourceCodePath));

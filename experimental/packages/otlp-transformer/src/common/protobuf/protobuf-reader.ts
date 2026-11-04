@@ -16,7 +16,7 @@ export class ProtobufReader {
   pos: number = 0;
   private readonly _buf: Uint8Array;
   private readonly _textDecoder: {
-    decode: (input?: Uint8Array | null) => string;
+    decode: (input?: Uint8Array) => string;
   };
 
   constructor(buf: Uint8Array) {

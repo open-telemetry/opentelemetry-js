@@ -63,6 +63,14 @@ export type {
 } from './metrics/Metric';
 export type { MetricsAPI } from './api/metrics';
 
+// Logs APIs
+export { createNoopLogger } from './logs/NoopLogger';
+export { SeverityNumber } from './logs/LogRecord';
+export type { LogRecord } from './logs/LogRecord';
+export type { Logger } from './logs/Logger';
+export type { LoggerOptions } from './logs/LoggerOptions';
+export type { LoggerProvider } from './logs/LoggerProvider';
+
 // Propagation APIs
 export {
   defaultTextMapGetter,
@@ -112,16 +120,18 @@ export { SamplingDecision, type SamplingResult } from './trace/SamplingResult';
 // tree-shaking on each api instance.
 import { context } from './context-api';
 import { diag } from './diag-api';
+import { logs } from './logs-api';
 import { metrics } from './metrics-api';
 import { propagation } from './propagation-api';
 import { trace } from './trace-api';
 
 // Named export.
-export { context, diag, metrics, propagation, trace };
+export { context, diag, logs, metrics, propagation, trace };
 // Default export.
 export default {
   context,
   diag,
+  logs,
   metrics,
   propagation,
   trace,
