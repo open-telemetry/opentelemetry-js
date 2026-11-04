@@ -22,10 +22,13 @@ import {
 import { PerformanceTimingNames as PTN } from '../src';
 
 const SECOND_TO_NANOSECONDS = 1e9;
+// Times are compared as epoch nanoseconds, which a double resolves only to
+// about 256 ns, so the helpers step in microseconds.
+const MICROSECOND_TO_NANOSECONDS = 1000;
 
 function createHrTime(startTime: HrTime, addToStart: number): HrTime {
   let seconds = startTime[0];
-  let nanos = startTime[1] + addToStart;
+  let nanos = startTime[1] + addToStart * MICROSECOND_TO_NANOSECONDS;
   if (nanos >= SECOND_TO_NANOSECONDS) {
     nanos = SECOND_TO_NANOSECONDS - nanos;
     seconds++;
@@ -38,8 +41,9 @@ function createResource(
   startTime: HrTime,
   addToStart: number
 ): PerformanceResourceTiming {
-  const fetchStart = core.hrTimeToNanoseconds(startTime) + 1;
-  const responseEnd = fetchStart + addToStart;
+  const fetchStart =
+    core.hrTimeToNanoseconds(startTime) + MICROSECOND_TO_NANOSECONDS;
+  const responseEnd = fetchStart + addToStart * MICROSECOND_TO_NANOSECONDS;
   const million = 1000 * 1000; // used to convert nano to milli
   const defaultResource = {
     connectEnd: 0,
@@ -310,16 +314,19 @@ describe('utils-resource-timings', function () {
 
   describe('getResource', function () {
     const startTime = [0, 123123123] as HrTime;
+    // Resource timings are offsets from timeOrigin, so the span times that
+    // bound them are placed on the same clock.
+    const spanTime = (addToStart: number): HrTime =>
+      core.addHrTimes(core.hrTime(0), createHrTime(startTime, addToStart));
     beforeEach(() => {
       const time = createHrTime(startTime, 500);
-      sinon.stub(performance, 'timeOrigin').value(0);
       sinon.stub(performance, 'now').callsFake(() => hrTimeToNanoseconds(time));
     });
 
     describe('when resources are empty', function () {
       it('should return undefined', function () {
-        const spanStartTime = createHrTime(startTime, 1);
-        const spanEndTime = createHrTime(startTime, 100);
+        const spanStartTime = spanTime(1);
+        const spanEndTime = spanTime(100);
         const spanUrl = 'http://foo.com/bar.json';
         const resources: PerformanceResourceTiming[] = [];
 
@@ -340,8 +347,8 @@ describe('utils-resource-timings', function () {
 
     describe('when resources has correct entry', function () {
       it('should return the closest one', function () {
-        const spanStartTime = createHrTime(startTime, 1);
-        const spanEndTime = createHrTime(startTime, 402);
+        const spanStartTime = spanTime(1);
+        const spanEndTime = spanTime(402);
         const spanUrl = 'http://foo.com/bar.json';
         const resources: PerformanceResourceTiming[] = [];
 
@@ -393,8 +400,8 @@ describe('utils-resource-timings', function () {
       });
       describe('But one resource has been already used', function () {
         it('should return the next closest', function () {
-          const spanStartTime = createHrTime(startTime, 1);
-          const spanEndTime = createHrTime(startTime, 402);
+          const spanStartTime = spanTime(1);
+          const spanEndTime = spanTime(402);
           const spanUrl = 'http://foo.com/bar.json';
           const resources: PerformanceResourceTiming[] = [];
 
@@ -463,8 +470,8 @@ describe('utils-resource-timings', function () {
 
     describe('when there are multiple resources from CorsPreflight requests', function () {
       it('should return main request and cors preflight request', function () {
-        const spanStartTime = createHrTime(startTime, 1);
-        const spanEndTime = createHrTime(startTime, 182);
+        const spanStartTime = spanTime(1);
+        const spanEndTime = spanTime(182);
         const spanUrl = 'http://foo.com/bar.json';
         const resources: PerformanceResourceTiming[] = [];
 
