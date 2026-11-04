@@ -288,13 +288,15 @@ export abstract class MetricReader implements IMetricReader {
   }
 
   async shutdown(options?: ShutdownOptions): Promise<void> {
+    let promise: Promise<void>;
     // Do not call shutdown again if it has already been called.
     if (this._shutdownOnce.isCalled) {
       api.diag.error('Cannot call shutdown twice.');
-      return this._shutdownOnce.promise;
+      promise = this._shutdownOnce.promise;
+    } else {
+      promise = this._shutdownOnce.call();
     }
 
-    const promise = this._shutdownOnce.call();
     // No timeout if timeoutMillis is undefined or null.
     if (options?.timeoutMillis == null) {
       await promise;
