@@ -23,7 +23,7 @@ import {
   assertAggregationTemporalitySelector,
 } from './utils';
 import { testResource } from '../util';
-import { ValueType } from '@opentelemetry/api';
+import { ValueType, diag } from '@opentelemetry/api';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 
 const testScopeMetrics: ScopeMetrics[] = [
@@ -251,6 +251,75 @@ describe('MetricReader', () => {
         _instrumentType => AggregationTemporality.DELTA
       );
       reader.shutdown();
+    });
+  });
+
+  describe('shutdown', () => {
+    it('should only call onShutdown once on concurrent calls', async () => {
+      let shutdownCalls = 0;
+      class SlowShutdownMetricReader extends TestMetricReader {
+        protected override async onShutdown(): Promise<void> {
+          shutdownCalls++;
+          await new Promise(resolve => setTimeout(resolve, 20));
+        }
+      }
+
+      const reader = new SlowShutdownMetricReader();
+      reader.setMetricProducer(new TestMetricProducer());
+
+      await Promise.all([reader.shutdown(), reader.shutdown()]);
+
+      assert.strictEqual(shutdownCalls, 1);
+    });
+
+    it('should mark reader as shutdown even if shutdown times out', async () => {
+      class SlowShutdownMetricReader extends TestMetricReader {
+        protected override async onShutdown(): Promise<void> {
+          await new Promise(resolve => setTimeout(resolve, 50));
+        }
+      }
+
+      const reader = new SlowShutdownMetricReader();
+      reader.setMetricProducer(new TestMetricProducer());
+
+      await assert.rejects(
+        () => reader.shutdown({ timeoutMillis: 10 }),
+        /Operation timed out/
+      );
+
+      await assert.rejects(() => reader.collect(), /MetricReader is shutdown/);
+    });
+
+    it('should warn when calling shutdown twice and return the shutdown promise', async () => {
+      const reader = new TestMetricReader();
+      reader.setMetricProducer(new TestMetricProducer());
+
+      await reader.shutdown();
+
+      const diagErrorSpy = sinon.spy(diag, 'error');
+      await reader.shutdown();
+      assert.strictEqual(diagErrorSpy.calledOnce, true);
+      assert.match(
+        diagErrorSpy.firstCall.args[0],
+        /Cannot call shutdown twice/
+      );
+      diagErrorSpy.restore();
+    });
+
+    it('should prevent forceFlush after shutdown', async () => {
+      const reader = new TestMetricReader();
+      reader.setMetricProducer(new TestMetricProducer());
+
+      await reader.shutdown();
+
+      const diagWarnSpy = sinon.spy(diag, 'warn');
+      await reader.forceFlush();
+      assert.strictEqual(diagWarnSpy.calledOnce, true);
+      assert.match(
+        diagWarnSpy.firstCall.args[0],
+        /Cannot forceFlush on already shutdown MetricReader/
+      );
+      diagWarnSpy.restore();
     });
   });
 });

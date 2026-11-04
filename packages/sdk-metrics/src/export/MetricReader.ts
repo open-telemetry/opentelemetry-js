@@ -25,7 +25,12 @@ import type { AggregationOption } from '../view/AggregationOption';
 import type { CardinalitySelector } from './CardinalitySelector';
 import { MetricReaderMetrics } from './MetricReaderMetrics';
 import { VERSION } from '../version';
-import { hrTime, hrTimeDuration, hrTimeToSeconds } from '@opentelemetry/core';
+import {
+  BindOnceFuture,
+  hrTime,
+  hrTimeDuration,
+  hrTimeToSeconds,
+} from '@opentelemetry/core';
 
 export interface MetricReaderOptions {
   /**
@@ -134,8 +139,7 @@ export interface IMetricReader {
  */
 export abstract class MetricReader implements IMetricReader {
   // Tracks the shutdown state.
-  // TODO: use BindOncePromise here once a new version of @opentelemetry/core is available.
-  private _shutdown = false;
+  private _shutdownOnce: BindOnceFuture<void>;
   // Additional MetricProducers which will be combined with the SDK's output
   private _metricProducers: MetricProducer[];
   // MetricProducer used by this instance which produces metrics from the SDK
@@ -161,6 +165,7 @@ export abstract class MetricReader implements IMetricReader {
       this._otelComponentType,
       api.createNoopMeter()
     );
+    this._shutdownOnce = new BindOnceFuture(this.onShutdown, this);
   }
 
   setMetricProducer(metricProducer: MetricProducer) {
@@ -235,7 +240,7 @@ export abstract class MetricReader implements IMetricReader {
     }
 
     // Subsequent invocations to collect are not allowed. SDKs SHOULD return some failure for these calls.
-    if (this._shutdown) {
+    if (this._shutdownOnce.isCalled) {
       throw new Error('MetricReader is shutdown');
     }
 
@@ -284,23 +289,22 @@ export abstract class MetricReader implements IMetricReader {
 
   async shutdown(options?: ShutdownOptions): Promise<void> {
     // Do not call shutdown again if it has already been called.
-    if (this._shutdown) {
+    if (this._shutdownOnce.isCalled) {
       api.diag.error('Cannot call shutdown twice.');
-      return;
+      return this._shutdownOnce.promise;
     }
 
+    const promise = this._shutdownOnce.call();
     // No timeout if timeoutMillis is undefined or null.
     if (options?.timeoutMillis == null) {
-      await this.onShutdown();
+      await promise;
     } else {
-      await callWithTimeout(this.onShutdown(), options.timeoutMillis);
+      await callWithTimeout(promise, options.timeoutMillis);
     }
-
-    this._shutdown = true;
   }
 
   async forceFlush(options?: ForceFlushOptions): Promise<void> {
-    if (this._shutdown) {
+    if (this._shutdownOnce.isCalled) {
       api.diag.warn('Cannot forceFlush on already shutdown MetricReader.');
       return;
     }
