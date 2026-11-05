@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-trace-otlp-http",
-  "version": "0.300.0",
+  "version": "0.301.0",
   "description": "OpenTelemetry Collector Trace Exporter allows user to send collected traces to the OpenTelemetry Collector",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -97,9 +97,9 @@
     "@opentelemetry/api": "^1.10.0"
   },
   "dependencies": {
-    "@opentelemetry/otlp-exporter-base": "0.300.0",
-    "@opentelemetry/otlp-transformer": "0.300.0",
-    "@opentelemetry/sdk-trace": "3.0.0"
+    "@opentelemetry/otlp-exporter-base": "0.301.0",
+    "@opentelemetry/otlp-transformer": "0.301.0",
+    "@opentelemetry/sdk-trace": "3.1.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-trace-otlp-http",
   "sideEffects": false
