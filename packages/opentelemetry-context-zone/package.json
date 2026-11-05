@@ -51,7 +51,11 @@
     "access": "public"
   },
   "devDependencies": {
+    "@opentelemetry/api": ">=1.0.0 <1.11.0",
     "typescript": "5.2.2"
+  },
+  "peerDependencies": {
+    "@opentelemetry/api": ">=1.0.0 <1.11.0"
   },
   "dependencies": {
     "@opentelemetry/context-zone-peer-dep": "3.0.0",
