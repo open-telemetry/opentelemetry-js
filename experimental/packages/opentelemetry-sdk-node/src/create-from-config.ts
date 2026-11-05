@@ -24,6 +24,7 @@ import type {
   SpanExporter,
   SpanLimits,
   SpanProcessor,
+  TracerConfig,
   TracerConfigurator,
 } from '@opentelemetry/sdk-trace';
 import {
@@ -75,6 +76,7 @@ import type {
   BatchLogRecordProcessorConfigModel,
   BatchSpanProcessorConfigModel,
   ExperimentalPrometheusMetricExporterConfigModel,
+  ExperimentalTracerConfigModel,
   ExperimentalTracerConfiguratorConfigModel,
   ExplicitBucketHistogramAggregationConfigModel,
   ExporterDefaultHistogramAggregationConfigModel,
@@ -1435,6 +1437,13 @@ function matchesWildcardPattern(
   return matches[pattern.length];
 }
 
+function createExperimentalTracerConfigFromConfig(
+  config?: ExperimentalTracerConfigModel
+): TracerConfig {
+  checkConfigUse('ExperimentalTracerConfig', config, ['enabled']);
+  return { enabled: config?.enabled ?? true };
+}
+
 function createTracerConfiguratorFromConfig(
   config?: ExperimentalTracerConfiguratorConfigModel
 ): TracerConfigurator | undefined {
@@ -1446,19 +1455,17 @@ function createTracerConfiguratorFromConfig(
     'default_config',
     'tracers',
   ]);
-  checkConfigUse('ExperimentalTracerConfig', config.default_config, [
-    'enabled',
-  ]);
-  const defaultConfig = { enabled: config.default_config?.enabled ?? true };
+  const defaultConfig = createExperimentalTracerConfigFromConfig(
+    config.default_config
+  );
   const matchers = (config.tracers ?? []).map(matcher => {
     checkConfigUse('ExperimentalTracerMatcherAndConfig', matcher, [
       'name',
       'config',
     ]);
-    checkConfigUse('ExperimentalTracerConfig', matcher.config, ['enabled']);
     return {
       pattern: Array.from(matcher.name),
-      config: { enabled: matcher.config.enabled ?? true },
+      config: createExperimentalTracerConfigFromConfig(matcher.config),
     };
   });
 

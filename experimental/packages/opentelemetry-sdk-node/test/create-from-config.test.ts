@@ -1467,6 +1467,36 @@ describe('create-from-config', () => {
           }
         });
       }
+
+      it('warns about unhandled default and matched tracer config properties', async () => {
+        const config = {
+          default_config: { enabled: false, default_option: true },
+          tracers: [
+            {
+              name: 'library',
+              config: { enabled: true, matcher_option: true },
+            },
+          ],
+        };
+        const warn = sinon.spy(diag, 'warn');
+        const provider = createTracerProviderFromConfig(resource, {
+          processors: [],
+          'tracer_configurator/development': config,
+        });
+        try {
+          assert.deepStrictEqual(warn.args, [
+            [
+              'Config warning: some specified ExperimentalTracerConfig configuration properties were not handled by SDK setup: ["default_option"]',
+            ],
+            [
+              'Config warning: some specified ExperimentalTracerConfig configuration properties were not handled by SDK setup: ["matcher_option"]',
+            ],
+          ]);
+        } finally {
+          warn.restore();
+          await provider.shutdown();
+        }
+      });
     });
 
     it('basic console exporter', function () {
