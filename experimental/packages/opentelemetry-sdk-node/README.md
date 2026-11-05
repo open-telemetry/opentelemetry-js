@@ -103,8 +103,8 @@ tracer_provider:
 ```
 
 ```js
-const { startNodeSDK } = require('@opentelemetry/sdk-node');
-const sdk = startNodeSDK();
+const { startNodeSdk } = require('@opentelemetry/sdk-node');
+const sdk = startNodeSdk();
 ```
 
 Matching is case-sensitive and uses the first matching entry. Each entry checks
