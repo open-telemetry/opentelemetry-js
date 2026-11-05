@@ -21,6 +21,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :bug: Bug Fixes
 
+* fix(instrumentation-fetch): end pending fetch spans as soon as the page is hidden, so they are not lost when navigating away before the resource timing wait finishes ([#4683](https://github.com/open-telemetry/opentelemetry-js/issues/4683)) @ShryukGrandhi
 * fix(instrumentation-http): don't `require('forwarded-parse')` in ESM builds ([#7261](https://github.com/open-telemetry/opentelemetry-js/pull/7261)) @avens19
 * fix(otlp-grpc-exporter-base): avoid an incomplete mTLS warning for root-CA-only TLS configuration ([#7235](https://github.com/open-telemetry/opentelemetry-js/issues/7235)) @LarryHu0217
 * fix(sdk-node): warn and skip, instead of erroring, on an unknown resource detector name in declarative config [#7252](https://github.com/open-telemetry/opentelemetry-js/pull/7252) @trentm

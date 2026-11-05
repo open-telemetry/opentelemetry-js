@@ -647,6 +647,49 @@ describe('fetch', () => {
         });
       });
 
+      describe('when the page is hidden before the span ends', () => {
+        afterEach(() => {
+          delete (document as { visibilityState?: unknown }).visibilityState;
+        });
+
+        it('should end the span before document visibilitychange listeners run', async () => {
+          let pendingWhenHidden: number | undefined;
+          const onVisibilityChange = () => {
+            pendingWhenHidden = pendingObservers;
+          };
+          document.addEventListener('visibilitychange', onVisibilityChange);
+
+          try {
+            await tracedFetch({
+              callback: async () => {
+                const response = await fetch('/api/status.json');
+                await response.text();
+                // let the instrumentation finish reading the response, but
+                // stay well within OBSERVER_WAIT_TIME_MS
+                await waitFor(50);
+                assert.strictEqual(pendingObservers, 1);
+
+                Object.defineProperty(document, 'visibilityState', {
+                  configurable: true,
+                  get: () => 'hidden',
+                });
+                document.dispatchEvent(
+                  new Event('visibilitychange', { bubbles: true })
+                );
+                return response;
+              },
+            });
+          } finally {
+            document.removeEventListener(
+              'visibilitychange',
+              onVisibilityChange
+            );
+          }
+
+          assert.strictEqual(pendingWhenHidden, 0);
+        });
+      });
+
       describe('404 request', () => {
         beforeEach(async () => {
           await tracedFetch({

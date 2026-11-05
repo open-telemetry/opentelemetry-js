@@ -99,6 +99,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   moduleName = this.component;
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
   private _tasksCount = 0;
+  private _pendingSpanEnds = new Set<() => void>();
 
   // Not initialized: the base constructor calls enable() before subclass field
   // initializers run, so an initializer would reset the flag after patching.
@@ -313,14 +314,45 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       span.setAttribute(ATTR_ERROR_TYPE, String(response.status));
     }
 
-    setTimeout(() => {
+    const finish = () => {
+      clearTimeout(timer);
+      this._pendingSpanEnds.delete(finish);
+      if (this._pendingSpanEnds.size === 0 && typeof document !== 'undefined') {
+        window.removeEventListener(
+          'visibilitychange',
+          this._onVisibilityChange,
+          true
+        );
+      }
       spanData.observer?.disconnect();
       this._findResourceAndAddNetworkEvents(span, spanData, performanceEndTime);
       this._tasksCount--;
       this._clearResources();
       span.end(endTime);
-    }, OBSERVER_WAIT_TIME_MS);
+    };
+    const timer = setTimeout(finish, OBSERVER_WAIT_TIME_MS);
+    this._pendingSpanEnds.add(finish);
+    if (typeof document !== 'undefined') {
+      // Capture on window so this runs before listeners on document, e.g. the
+      // BatchSpanProcessor flush, letting the span be exported when the page
+      // is navigated away from or hidden before the timeout fires.
+      window.addEventListener(
+        'visibilitychange',
+        this._onVisibilityChange,
+        true
+      );
+    }
   }
+
+  /**
+   * Ends spans waiting on resource timing right away once the page is hidden,
+   * as the page may be unloaded before their timeout fires.
+   */
+  private _onVisibilityChange = () => {
+    if (document.visibilityState === 'hidden') {
+      this._pendingSpanEnds.forEach(finish => finish());
+    }
+  };
 
   /**
    * Patches the constructor of fetch
