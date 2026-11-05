@@ -9,6 +9,18 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :boom: Breaking Changes
 
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 0.301.0
+
+### :boom: Breaking Changes
+
 * feat(sdk-node)!: The experimental `startNodeSdk()` code path for *environment-based* config (i.e. when not using a config file), has full option coverage. [#6999](https://github.com/open-telemetry/opentelemetry-js/pull/6999) @trentm
   * `startNodeSdk()` should now be a viable replacement for `new NodeSDK()`, supporting similar (but not exactly the same) options for configuring most SDK components.
   * `startNodeSDK()` has been *deprecated*, use `startNodeSdk()` (slight capitalization change).
@@ -16,8 +28,6 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 * refactor(configuration)!: The responsibility of the `configuration` package has been reduced to just the parsing, validation, and TypeScript types for declarative config files. [#6999](https://github.com/open-telemetry/opentelemetry-js/pull/6999) @trentm
   * **Breaking:** The `configuration` package no longer supports creating a synthetic `ConfigurationModel` from environment variables.
   * **Breaking:** The `configuration` package API has changed: `createConfigFactory()` has been replaced with `parseConfigFile().
-
-### :rocket: Features
 
 ### :bug: Bug Fixes
 
@@ -35,8 +45,6 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 ### :books: Documentation
 
 * docs(exporters): update dead semantic conventions resource specification links in OTLP exporters [#7254](https://github.com/open-telemetry/opentelemetry-js/pull/7254) @helmipradita
-
-### :house: Internal
 
 ## 0.300.0
 

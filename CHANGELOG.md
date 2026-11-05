@@ -15,6 +15,16 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :rocket: Features
 
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 3.1.0
+
+### :rocket: Features
+
 * feat(resources): Deprecate `envDetector` in favor of separate `resourceAttributesEnvDetector` and `serviceNameEnvDetector`. Also mark `serviceInstanceIdDetector` as stable (the `service.instance.id` semconv attribute is now stable). [#6999](https://github.com/open-telemetry/opentelemetry-js/pull/6999) @trentm
 
 ### :bug: Bug Fixes
