@@ -77,15 +77,17 @@ The default resource can be include as follows:</p>
 environment variable.</p>
 </div>
 <h3 id="resourcedetectors" class="tsd-anchor-link">resourceDetectors<a href="#resourcedetectors" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<p>Configure resource detectors. By default, the resource detectors are [envDetector, processDetector, hostDetector].
+<p>Configure resource detectors.
+If not specified, then detectors will be determined from the <code>OTEL_NODE_RESOURCE_DETECTORS</code> environment variable.
+If neither is specified, the default set of detectors is <code>[serviceInstanceIdDetector, processDetector, hostDetector, osDetector, envDetector]</code>.
 NOTE: In order to enable the detection, the parameter <code>autoDetectResources</code> has to be <code>true</code>.</p>
-<p>If <code>resourceDetectors</code> was not set, you can also use the environment variable <code>OTEL_NODE_RESOURCE_DETECTORS</code> to enable only certain detectors, or completely disable them:</p>
+<p><code>OTEL_NODE_RESOURCE_DETECTORS</code> is a comma-separated list of the following detector names:</p>
 <ul>
-<li><code>env</code></li>
 <li><code>host</code></li>
 <li><code>os</code></li>
 <li><code>process</code></li>
-<li><code>serviceinstance</code> (experimental)</li>
+<li><code>serviceinstance</code> - provides the <code>service.instance.id</code> attribute</li>
+<li><code>env</code> - reads attributes from <code>OTEL_RESOURCE_ATTRIBUTES</code> and <code>OTEL_SERVICE_NAME</code></li>
 <li><code>all</code> - enable all resource detectors above
 <ul>
 <li><strong>NOTE:</strong> future versions of <code>@opentelemetry/sdk-node</code> may include additional detectors that will be covered by this scope.</li>
@@ -93,17 +95,13 @@ NOTE: In order to enable the detection, the parameter <code>autoDetectResources<
 </li>
 <li><code>none</code> - disable resource detection</li>
 </ul>
-<p><strong>NOTE:</strong> <code>env</code> and <code>os</code> are Node.js-specific detectors with no equivalent in the <a href="https://github.com/open-telemetry/opentelemetry-configuration">OpenTelemetry declarative configuration spec</a>. They are supported when using the <code>detection/development</code> block in a declarative config file.</p>
-<p>For example, to enable only the <code>env</code>, <code>host</code> detectors:</p>
-<pre><code class="shell"><span class="hl-3">export</span><span class="hl-1"> </span><span class="hl-6">OTEL_NODE_RESOURCE_DETECTORS</span><span class="hl-1">=</span><span class="hl-2">&quot;host,env&quot;</span>
+<p>For example, to enable only the <code>process</code> and <code>env</code> detectors:</p>
+<pre><code class="shell"><span class="hl-3">export</span><span class="hl-1"> </span><span class="hl-6">OTEL_NODE_RESOURCE_DETECTORS</span><span class="hl-1">=</span><span class="hl-2">&quot;process,env&quot;</span>
 </code><button type="button">Copy</button></pre>
 
-<p>NOTE: The order set on <code>OTEL_NODE_RESOURCE_DETECTORS</code> will be respected and the detectors will be executed in order.
-For example, if you have <code>OTEL_RESOURCE_ATTRIBUTES=&quot;service.instance.id=custom-name&quot;</code>, but also <code>serviceinstance</code> and <code>env</code> on <code>OTEL_NODE_RESOURCE_DETECTORS</code>, it can have 2 scenarios:</p>
-<ul>
-<li><code>OTEL_NODE_RESOURCE_DETECTORS=&quot;serviceinstance,env&quot;</code> will have the <code>service.instance.id</code> as <code>custom-name</code></li>
-<li><code>OTEL_NODE_RESOURCE_DETECTORS=&quot;env,serviceinstance&quot;</code> will have the <code>service.instance.id</code> as a random UUID</li>
-</ul>
+<p>Detectors are processed in the order they are defined. Attributes from a later detector wins.
+You typically want the 'env' detector to be last, so that attributes explicitly set by <code>OTEL_RESOURCE_ATTRIBUTES</code> will win over the same attribute from an earlier detector.
+For example with <code>OTEL_RESOURCE_ATTRIBUTES=&quot;service.instance.id=custom-name&quot;</code> and <code>OTEL_NODE_RESOURCE_DETECTORS=env,serviceinstance</code> the &quot;custom-name&quot; value will be lost to the <code>service.instance.id</code> value from the &quot;serviceinstance&quot; detector.</p>
 <h3 id="sampler" class="tsd-anchor-link">sampler<a href="#sampler" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <p>Configure a custom sampler. By default, all traces will be sampled.</p>
 <h3 id="spanprocessor" class="tsd-anchor-link">spanProcessor<a href="#spanprocessor" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
