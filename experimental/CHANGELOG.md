@@ -9,7 +9,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :boom: Breaking Changes
 
-* fix(exporter-*-otlp-*, instrumentation-fetch, instrumentation-grpc, instrumentation-http, instrumentation-xml-http-request)!: bump minimum version of `@opentelemetry/api` peer dependency to 1.10.0. These packages load `@opentelemetry/otlp-transformer` or `@opentelemetry/instrumentation`, which use `SeverityNumber` and `logs` from API 1.10, so with API 1.9 they failed to load as ESM (and the instrumentations failed when constructed under CommonJS). npm now refuses API 1.9 for them instead ([#7258](https://github.com/open-telemetry/opentelemetry-js/issues/7258)) @volodymyrshk
+* fix!: bump minimum version of `@opentelemetry/api` peer dependency to 1.10.0 for packages that depend on `@opentelemetry/core`, `@opentelemetry/otlp-transformer` or `@opentelemetry/instrumentation`, which use API 1.10 features. With API 1.9 these packages failed to load as ESM. npm now refuses API 1.9 for them instead ([#7258](https://github.com/open-telemetry/opentelemetry-js/issues/7258)) @volodymyrshk
 * feat(sdk-node)!: The experimental `startNodeSdk()` code path for *environment-based* config (i.e. when not using a config file), has full option coverage. [#6999](https://github.com/open-telemetry/opentelemetry-js/pull/6999) @trentm
   * `startNodeSdk()` should now be a viable replacement for `new NodeSDK()`, supporting similar (but not exactly the same) options for configuring most SDK components.
   * `startNodeSDK()` has been *deprecated*, use `startNodeSdk()` (slight capitalization change).
