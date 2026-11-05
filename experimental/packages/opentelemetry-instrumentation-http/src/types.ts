@@ -36,6 +36,16 @@ export interface IgnoreOutgoingRequestFunction {
 }
 
 /**
+ * Called with each incoming request. Return `true` to skip extracting the
+ * propagation context from the incoming request's headers, e.g. to avoid
+ * honoring trace context from untrusted sources (based on the request's
+ * remote IP address, for example).
+ */
+export interface IgnoreIncomingPropagationFunction {
+  (request: IncomingMessage): boolean;
+}
+
+/**
  * Called with the active span and request before the request is handled.
  */
 export interface HttpRequestCustomAttributeFunction {
@@ -73,6 +83,14 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
   ignoreIncomingRequestHook?: IgnoreIncomingRequestFunction;
   /** Do not trace outgoing requests for which this function returns `true`. */
   ignoreOutgoingRequestHook?: IgnoreOutgoingRequestFunction;
+  /**
+   * Do not extract the propagation context from incoming requests for which
+   * this function returns `true`. The request is still traced, but the server
+   * span will not be linked to a remote parent. This can be used to ignore
+   * trace context from untrusted sources, e.g. based on the request's IP
+   * address.
+   */
+  ignoreIncomingPropagationHook?: IgnoreIncomingPropagationFunction;
   /** If set to true, incoming requests will not be instrumented at all. */
   disableIncomingRequestInstrumentation?: boolean;
   /** If set to true, outgoing requests will not be instrumented at all. */

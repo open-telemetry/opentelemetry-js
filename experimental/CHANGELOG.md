@@ -19,6 +19,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :rocket: Features
 
+* feat(instrumentation-http): add `ignoreIncomingPropagationHook` config option to skip extracting the propagation context from incoming requests, e.g. based on the request's IP address [#6901](https://github.com/open-telemetry/opentelemetry-js/pull/6901) @matthieusieben
+
 ### :bug: Bug Fixes
 
 * fix(instrumentation-http): don't `require('forwarded-parse')` in ESM builds ([#7261](https://github.com/open-telemetry/opentelemetry-js/pull/7261)) @avens19
