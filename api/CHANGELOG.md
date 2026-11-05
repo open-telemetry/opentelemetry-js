@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: Features
 
+* feat(api): export `createNoopTracer()` to create a no-op `Tracer` instance @shubhamrai9122-creator
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
