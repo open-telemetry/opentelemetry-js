@@ -28,6 +28,9 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
   * Before this change, different environment variable names (see next point), that are *not* in the OTel spec were used. They will still be supported as a fallback for the spec names for a period of approximately six months.
   * The `OTEL_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT` and `OTEL_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT` environment variables are **deprecated**. Support for them will be [removed sometime after six months](https://github.com/open-telemetry/opentelemetry-js/issues/7242), to allow transition to [the correct environment variables in the spec](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#span-limits).
 * fix(otlp-exporter-base): pick the browser fetch `mode` from the document origin, so exports from an opaque-origin document (e.g. a sandboxed iframe) no longer fail with `mode: 'same-origin'` [#7211](https://github.com/open-telemetry/opentelemetry-js/pull/7211) @MO2k4
+* fix: raise the minimum `@opentelemetry/api` peer dependency version to 1.10.0 for packages that depend on `@opentelemetry/core`, `@opentelemetry/otlp-transformer` or `@opentelemetry/instrumentation`, as these use API 1.10 features. ([#7258](https://github.com/open-telemetry/opentelemetry-js/issues/7258)) @volodymyrshk @pichlermarc
+  * Combining these packages with `@opentelemetry/api` 1.9.x never worked: they failed at runtime. The peer dependency now makes npm report this at install time instead.
+  * If you see a peer dependency error after upgrading, update `@opentelemetry/api` to 1.10.0 or later.
 
 ### :books: Documentation
 

@@ -21,6 +21,9 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 * fix(context-zone): declare the `@opentelemetry/api` peer dependency so Yarn PnP can resolve it for `context-zone-peer-dep` [#7268](https://github.com/open-telemetry/opentelemetry-js/pull/7268) @Vivek1898
 * fix(core): accept attribute values with shared (non-circular) object references [#7068](https://github.com/open-telemetry/opentelemetry-js/pull/7068) @rajanpanth
+* fix: raise the minimum `@opentelemetry/api` peer dependency version to 1.10.0 for packages that depend on `@opentelemetry/core`, `@opentelemetry/otlp-transformer` or `@opentelemetry/instrumentation`, as these use API 1.10 features. ([#7258](https://github.com/open-telemetry/opentelemetry-js/issues/7258)) @volodymyrshk @pichlermarc
+  * Combining these packages with `@opentelemetry/api` 1.9.x never worked: they failed at runtime. The peer dependency now makes npm report this at install time instead.
+  * If you see a peer dependency error after upgrading, update `@opentelemetry/api` to 1.10.0 or later.
 * fix(propagator-b3): reject trace ids that are not 16 or 32 characters long [#7262](https://github.com/open-telemetry/opentelemetry-js/pull/7262) @adityareddy-dev
 
 ### :books: Documentation
