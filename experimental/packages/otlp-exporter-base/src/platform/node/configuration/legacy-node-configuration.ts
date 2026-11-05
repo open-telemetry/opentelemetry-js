@@ -8,7 +8,6 @@ import type * as http from 'http';
 import type * as https from 'https';
 
 import type { OTLPExporterConfigBase } from '../../../configuration/legacy-base-configuration';
-import type { CompressionAlgorithm } from '../../../configuration/compression';
 import type { HttpAgentFactory } from './otlp-node-http-configuration';
 
 /**
@@ -25,12 +24,6 @@ export interface OTLPExporterNodeConfigBase extends OTLPExporterConfigBase {
    * @defaultValue true
    */
   keepAlive?: boolean;
-  /**
-   * Compression algorithm for outgoing OTLP HTTP requests.
-   *
-   * @defaultValue CompressionAlgorithm.NONE
-   */
-  compression?: CompressionAlgorithm;
   /**
    * Custom HTTP agent options or a factory function for creating agents.
    *
