@@ -75,6 +75,7 @@ import type {
   BatchLogRecordProcessorConfigModel,
   BatchSpanProcessorConfigModel,
   ExperimentalPrometheusMetricExporterConfigModel,
+  ExperimentalTracerConfiguratorConfigModel,
   ExplicitBucketHistogramAggregationConfigModel,
   ExporterDefaultHistogramAggregationConfigModel,
   ExporterTemporalityPreferenceConfigModel,
@@ -1435,7 +1436,7 @@ function matchesWildcardPattern(
 }
 
 function createTracerConfiguratorFromConfig(
-  config: TracerProviderConfigModel['tracer_configurator/development']
+  config?: ExperimentalTracerConfiguratorConfigModel
 ): TracerConfigurator | undefined {
   if (!config) {
     return undefined;

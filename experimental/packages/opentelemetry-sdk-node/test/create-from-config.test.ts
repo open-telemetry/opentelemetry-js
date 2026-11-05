@@ -9,6 +9,7 @@ import * as sinon from 'sinon';
 
 import type {
   ConfigurationModel,
+  ExperimentalTracerConfiguratorConfigModel,
   LogRecordExporterConfigModel,
   LogRecordProcessorConfigModel,
   MeterProviderConfigModel,
@@ -1306,11 +1307,9 @@ describe('create-from-config', () => {
     const resource = resourceFromAttributes({ foo: 'bar' });
 
     describe('tracer_configurator/development', () => {
-      type Config =
-        TracerProviderConfigModel['tracer_configurator/development'];
       const corpus: {
         name: string;
-        config: Config;
+        config: ExperimentalTracerConfiguratorConfigModel | undefined;
         enabled: string[];
         disabled: string[];
       }[] = [
