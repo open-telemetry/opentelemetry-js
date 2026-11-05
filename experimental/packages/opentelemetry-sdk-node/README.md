@@ -81,7 +81,7 @@ process.on("SIGTERM", () => {
 
 ## Declarative tracer configuration
 
-The experimental `startNodeSDK()` entry point supports per-tracer configuration
+The experimental `startNodeSdk()` entry point supports per-tracer configuration
 through `tracer_provider.tracer_configurator/development` in a YAML file selected
 by `OTEL_CONFIG_FILE`:
 
