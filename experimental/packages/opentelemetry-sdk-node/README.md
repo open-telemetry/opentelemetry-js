@@ -107,8 +107,9 @@ const { startNodeSDK } = require('@opentelemetry/sdk-node');
 const sdk = startNodeSDK();
 ```
 
-Matching is case-sensitive and uses the first matching entry. `*` matches any
-number of characters and `?` matches one character. Unmatched tracers use
+Matching is case-sensitive and uses the first matching entry. Each entry checks
+for an exact name match before wildcard matching. `*` matches any number of
+characters and `?` matches one character. Unmatched tracers use
 `default_config`; a missing `enabled` value defaults to `true`, including in a
 matched entry's `config`. Disabled tracers preserve parent context without
 recording spans. This feature is opt-in and experimental, and configuration is

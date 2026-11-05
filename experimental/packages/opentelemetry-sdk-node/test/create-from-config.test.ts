@@ -1307,6 +1307,7 @@ describe('create-from-config', () => {
     const resource = resourceFromAttributes({ foo: 'bar' });
 
     describe('tracer_configurator/development', () => {
+      const longName = 'library-' + 'a'.repeat(50_000);
       const corpus: {
         name: string;
         config: ExperimentalTracerConfiguratorConfigModel | undefined;
@@ -1338,6 +1339,31 @@ describe('create-from-config', () => {
           },
           enabled: ['Library', 'library-extra', 'prefix-library', 'library\n'],
           disabled: ['library'],
+        },
+        {
+          name: 'exact names containing wildcard characters',
+          config: {
+            tracers: [
+              { name: 'star-*', config: { enabled: false } },
+              { name: 'question-?', config: { enabled: false } },
+            ],
+          },
+          enabled: ['Star-*', 'Question-?', 'question-', 'question-ab'],
+          disabled: [
+            'star-*',
+            'question-?',
+            'star-',
+            'star-value',
+            'question-a',
+          ],
+        },
+        {
+          name: 'long exact names skip wildcard matching',
+          config: {
+            tracers: [{ name: longName, config: { enabled: false } }],
+          },
+          enabled: [],
+          disabled: [longName],
         },
         {
           name: 'star and question-mark wildcards',

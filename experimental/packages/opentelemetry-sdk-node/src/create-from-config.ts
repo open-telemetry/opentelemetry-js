@@ -1464,14 +1464,17 @@ function createTracerConfiguratorFromConfig(
       'config',
     ]);
     return {
+      name: matcher.name,
       pattern: Array.from(matcher.name),
       config: createExperimentalTracerConfigFromConfig(matcher.config),
     };
   });
 
   return scope =>
-    matchers.find(matcher =>
-      matchesWildcardPattern(scope.name, matcher.pattern)
+    matchers.find(
+      matcher =>
+        scope.name === matcher.name ||
+        matchesWildcardPattern(scope.name, matcher.pattern)
     )?.config ?? defaultConfig;
 }
 
