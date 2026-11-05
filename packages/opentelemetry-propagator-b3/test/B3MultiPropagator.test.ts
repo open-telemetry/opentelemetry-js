@@ -492,6 +492,26 @@ describe('B3MultiPropagator', () => {
       assert.ok(ctx3 === ROOT_CONTEXT);
     });
 
+    it('should preserve the input context for invalid trace id lengths', () => {
+      const context = trace.setSpanContext(ROOT_CONTEXT, {
+        traceId: '0af7651916cd43dd8448eb211c80319c',
+        spanId: 'b7ad6b7169203331',
+        traceFlags: TraceFlags.NONE,
+      });
+      carrier[X_B3_SPAN_ID] = 'e457b5a2e4d86bd1';
+      carrier[X_B3_SAMPLED] = '1';
+
+      for (let length = 0; length <= 33; length++) {
+        if (length === 16 || length === 32) continue;
+        carrier[X_B3_TRACE_ID] = 'f'.repeat(length);
+        assert.strictEqual(
+          b3Propagator.extract(context, carrier, defaultTextMapGetter),
+          context,
+          `trace id length ${length}`
+        );
+      }
+    });
+
     it('should left-pad 64 bit trace ids with 0', () => {
       carrier[X_B3_TRACE_ID] = '8448eb211c80319c';
       carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
