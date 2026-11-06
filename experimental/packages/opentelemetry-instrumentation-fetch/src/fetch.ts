@@ -166,7 +166,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         this.getConfig().propagateTraceHeaderCorsUrls
       )
     ) {
-      const headers: Partial<Record<string, unknown>> = {};
+      const headers: Record<string, undefined | string | string[]> = {};
       propagation.inject(context.active(), headers);
       if (Object.keys(headers).length > 0) {
         this._diag.debug('headers inject skipped due to CORS policy');
