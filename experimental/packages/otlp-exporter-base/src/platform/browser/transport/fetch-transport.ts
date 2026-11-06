@@ -85,9 +85,16 @@ class FetchTransport implements IExporterTransport {
       pendingKeepaliveCount++;
     } else {
       const reason = wouldExceedSize ? 'size limit' : 'count limit';
-      diag.debug(
-        `keepalive disabled: ${(requestSize / 1024).toFixed(1)}KB payload, ${pendingKeepaliveCount} pending (${reason})`
-      );
+      const message = `keepalive disabled: ${(requestSize / 1024).toFixed(1)}KB payload, ${pendingKeepaliveCount} pending (${reason})`;
+      if (isDocumentHidden()) {
+        // A request without keepalive can be cancelled together with the page,
+        // and nothing else reports that the batch was lost.
+        diag.warn(
+          `${message}; the page is hidden, so this export may be lost if the page is unloaded`
+        );
+      } else {
+        diag.debug(message);
+      }
     }
 
     // Captured before the first `await`, which a synchronous context manager
@@ -196,6 +203,12 @@ export function createFetchTransport(
   parameters: FetchTransportParameters
 ): IExporterTransport {
   return new FetchTransport(parameters);
+}
+
+function isDocumentHidden(): boolean {
+  return (
+    typeof document !== 'undefined' && document.visibilityState === 'hidden'
+  );
 }
 
 function isFetchNetworkErrorRetryable(error: unknown): boolean {
