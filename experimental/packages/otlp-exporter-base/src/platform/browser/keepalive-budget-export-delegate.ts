@@ -16,45 +16,24 @@ import {
 
 type Item<Internal> = Internal extends readonly (infer T)[] ? T : never;
 
-export interface TerminalAdmissionOptions<Internal> {
-  /**
-   * Ranks items when only some of them fit the keepalive budget: higher ranks
-   * are sent first and items of equal rank keep their input order. Without it
-   * the order is first in, first out.
-   */
-  priority?: (item: Item<Internal>) => number;
-}
-
 /**
- * Wraps an export delegate for the case where the page is hidden. A request
- * sent then can be cancelled together with the page unless it uses
- * `keepalive`, and the browser grants that only up to a cumulative size. When
- * the serialized batch does not fit, whole items are kept so that what is sent
- * fits, and the rest is counted as failed with a `keepalive_budget_exhausted`
- * error type instead of being lost without a trace.
- *
- * Only exports whose internal representation is a list of items (spans and
- * log records) can be partitioned, because the byte transport cannot split a
- * serialized request. Other exports pass through unchanged.
+ * Sends only the items that fit the keepalive budget while the page is hidden.
  */
-class TerminalAdmissionExportDelegate<Internal, Response>
+class KeepaliveBudgetExportDelegate<Internal, Response>
   implements IOtlpExportDelegate<Internal>
 {
   private readonly _delegate: IOtlpExportDelegate<Internal>;
   private readonly _serializer: ISerializer<Internal, Response>;
   private _metrics: ExporterMetrics<Internal>;
-  private readonly _options: TerminalAdmissionOptions<Internal>;
 
   constructor(
     delegate: IOtlpExportDelegate<Internal>,
     serializer: ISerializer<Internal, Response>,
-    metrics: ExporterMetrics<Internal>,
-    options: TerminalAdmissionOptions<Internal>
+    metrics: ExporterMetrics<Internal>
   ) {
     this._delegate = delegate;
     this._serializer = serializer;
     this._metrics = metrics;
-    this._options = options;
   }
 
   export(
@@ -74,10 +53,9 @@ class TerminalAdmissionExportDelegate<Internal, Response>
     }
 
     const kept = this._selectWithinBudget(items, budget);
-    const droppedCount = items.length - kept.length;
-    const dropped = items.filter(item => !kept.includes(item));
+    const dropped = items.slice(kept.length);
     diag.warn(
-      `page hidden and the batch exceeds the keepalive budget (${budget} bytes): sending ${kept.length} of ${items.length} items, dropping ${droppedCount}`
+      `page hidden and the batch exceeds the keepalive budget (${budget} bytes): sending ${kept.length} of ${items.length} items, dropping ${dropped.length}`
     );
     const error = new Error(
       'Items dropped because the keepalive budget was exhausted'
@@ -112,50 +90,29 @@ class TerminalAdmissionExportDelegate<Internal, Response>
     );
   }
 
-  /**
-   * Largest prefix of the priority order whose serialized size fits, returned
-   * in input order.
-   */
+  /** Longest prefix of items whose serialized size fits the budget. */
   private _selectWithinBudget(
     items: Item<Internal>[],
     budget: number
   ): Item<Internal>[] {
-    const priority = this._options.priority;
-    const order = items.map((_, index) => index);
-    if (priority) {
-      const ranks = items.map(item => priority(item));
-      order.sort((a, b) => ranks[b] - ranks[a] || a - b);
-    }
-    const take = (count: number) =>
-      order
-        .slice(0, count)
-        .sort((a, b) => a - b)
-        .map(index => items[index]);
-
     let low = 0;
     let high = items.length;
     while (low < high) {
       const mid = Math.ceil((low + high) / 2);
-      if (this._sizeOf(take(mid)) <= budget) {
+      if (this._sizeOf(items.slice(0, mid)) <= budget) {
         low = mid;
       } else {
         high = mid - 1;
       }
     }
-    return take(low);
+    return items.slice(0, low);
   }
 }
 
-export function createTerminalAdmissionExportDelegate<Internal, Response>(
+export function createKeepaliveBudgetExportDelegate<Internal, Response>(
   delegate: IOtlpExportDelegate<Internal>,
   serializer: ISerializer<Internal, Response>,
-  metrics: ExporterMetrics<Internal>,
-  options: TerminalAdmissionOptions<Internal> = {}
+  metrics: ExporterMetrics<Internal>
 ): IOtlpExportDelegate<Internal> {
-  return new TerminalAdmissionExportDelegate(
-    delegate,
-    serializer,
-    metrics,
-    options
-  );
+  return new KeepaliveBudgetExportDelegate(delegate, serializer, metrics);
 }

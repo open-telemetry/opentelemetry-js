@@ -9,12 +9,11 @@ import { ExportResultCode } from '@opentelemetry/core';
 import type { ISerializer } from '@opentelemetry/otlp-transformer';
 import type { IOtlpExportDelegate } from '../../src/otlp-export-delegate';
 import type { ExporterMetrics } from '../../src/ExporterMetrics';
-import { createTerminalAdmissionExportDelegate } from '../../src/platform/browser/terminal-admission-export-delegate';
+import { createKeepaliveBudgetExportDelegate } from '../../src/platform/browser/keepalive-budget-export-delegate';
 import { registerMockDiagLogger } from '../common/test-utils';
 
 interface Item {
   id: number;
-  error?: boolean;
 }
 
 // 60KB is the max cumulative body size for keepalive
@@ -38,7 +37,7 @@ function setVisibility(state: DocumentVisibilityState) {
   });
 }
 
-describe('TerminalAdmissionExportDelegate', function () {
+describe('KeepaliveBudgetExportDelegate', function () {
   let inner: {
     export: sinon.SinonStub;
     forceFlush: sinon.SinonStub;
@@ -48,12 +47,11 @@ describe('TerminalAdmissionExportDelegate', function () {
   let finishExport: sinon.SinonStub;
   let metrics: { startExport: sinon.SinonStub };
 
-  function create(priority?: (item: Item) => number) {
-    return createTerminalAdmissionExportDelegate(
+  function create() {
+    return createKeepaliveBudgetExportDelegate(
       inner as IOtlpExportDelegate<Item[]>,
       serializer,
-      metrics as unknown as ExporterMetrics<Item[]>,
-      { priority }
+      metrics as unknown as ExporterMetrics<Item[]>
     );
   }
 
@@ -116,38 +114,6 @@ describe('TerminalAdmissionExportDelegate', function () {
     assert.strictEqual(reason.name, 'keepalive_budget_exhausted');
   });
 
-  it('sends the highest priority items first when a selector is given', function () {
-    setVisibility('hidden');
-    const items = makeItems(FITTING_ITEMS + 20).map(item => ({
-      ...item,
-      error: item.id >= FITTING_ITEMS + 15,
-    }));
-
-    create(item => (item.error ? 1 : 0)).export(items, sinon.stub());
-
-    const sent = inner.export.firstCall.args[0] as Item[];
-    assert.strictEqual(sent.length, FITTING_ITEMS);
-    assert.deepStrictEqual(
-      sent.filter(item => item.error).map(item => item.id),
-      [
-        FITTING_ITEMS + 15,
-        FITTING_ITEMS + 16,
-        FITTING_ITEMS + 17,
-        FITTING_ITEMS + 18,
-        FITTING_ITEMS + 19,
-      ]
-    );
-    // input order is kept among the selected items
-    assert.deepStrictEqual(
-      sent.map(item => item.id),
-      [...sent.map(item => item.id)].sort((a, b) => a - b)
-    );
-    assert.strictEqual(
-      (metrics.startExport.firstCall.args[0] as Item[]).length,
-      20
-    );
-  });
-
   it('fails the export and counts every item when no budget is left', function () {
     setVisibility('hidden');
     const spy = sinon.stub();
@@ -157,7 +123,7 @@ describe('TerminalAdmissionExportDelegate', function () {
       deserializeResponse: () => undefined,
     };
 
-    createTerminalAdmissionExportDelegate(
+    createKeepaliveBudgetExportDelegate(
       inner as IOtlpExportDelegate<Item[]>,
       tiny,
       metrics as unknown as ExporterMetrics<Item[]>
@@ -182,7 +148,7 @@ describe('TerminalAdmissionExportDelegate', function () {
     setVisibility('hidden');
     const batch = { resourceMetrics: [] };
     const callback = sinon.stub();
-    const delegate = createTerminalAdmissionExportDelegate(
+    const delegate = createKeepaliveBudgetExportDelegate(
       inner as unknown as IOtlpExportDelegate<typeof batch>,
       {
         serializeRequest: () => new Uint8Array(BUDGET + 1),
