@@ -11,6 +11,7 @@ import type {
 } from '@opentelemetry/api';
 import { ValueType } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
+import type { Resource } from '@opentelemetry/resources';
 import {
   defaultResource,
   resourceFromAttributes,
@@ -33,7 +34,7 @@ export type Measurement = {
   context?: Context;
 };
 
-export const testResource = defaultResource().merge(
+export const testResource: Resource = defaultResource().merge(
   resourceFromAttributes({ resourceKey: 'my-resource' })
 );
 

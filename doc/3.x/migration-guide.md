@@ -5,6 +5,8 @@ For the most part, this document *only covers breaking changes* (sections marked
 
 The October 2026 releases also include a new *minor* version of the API package (`@opentelemetry/api` v1.10.0), with some significant changes. This document will also cover some of these changes.
 
+The SDK 2.x packages declare a peer dependency on `@opentelemetry/api` below 1.10.0, so they cannot be installed together with `@opentelemetry/api@1.10.0`. To use API v1.10.0, upgrade to SDK 3.x. A project that stays on SDK 2.x keeps `@opentelemetry/api` at 1.9.x.
+
 Refer to the changelogs for full details:
 
 - [CHANGELOG for stable SDK packages](https://github.com/open-telemetry/opentelemetry-js/blob/main/CHANGELOG.md#300)
@@ -15,7 +17,7 @@ For background on the 3.0 release, see the [3.x announcement](announcement.md).
 
 Per [OpenTelemetry guidelines](https://opentelemetry.io/docs/specs/otel/versioning-and-stability/#sdk-support), the 2.x versions of stable SDK packages will be supported for one year from the 3.0.0 release.
 
-If you have questions, reach the OTel JS community on [#otel-js](https://cloud-native.slack.com/archives/C01NL1GRPQR) in the [CNCF Slack](https://slack.cncf.io/), [open a Discussion](https://github.com/open-telemetry/opentelemetry-js/discussions), or join the weekly [OTel JS SIG call](https://docs.google.com/document/d/1tCyoQK49WVcE-x8oryZOTTToFm7sIeUhxFPm9g-qL1k/edit).
+If you have questions, reach the OTel JS community on [#otel-js](https://cloud-native.slack.com/archives/C01NL1GRPQR) in the [CNCF Slack](https://slack.cncf.io/), [open a Discussion issue](https://github.com/open-telemetry/opentelemetry-js/issues/new?template=discussion.md) on the repository, or join the weekly [OTel JS SIG call](https://docs.google.com/document/d/1tCyoQK49WVcE-x8oryZOTTToFm7sIeUhxFPm9g-qL1k/edit).
 
 ## What is OTel JS SDK 3.x?
 

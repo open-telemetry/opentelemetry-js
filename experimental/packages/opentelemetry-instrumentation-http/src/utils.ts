@@ -52,8 +52,7 @@ import {
   DEFAULT_QUERY_STRINGS_TO_REDACT,
   STR_REDACTED,
 } from './internal-types';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-import forwardedParse = require('forwarded-parse');
+import { parse as forwardedParse } from 'forwarded-parse';
 
 const defaultQueryStringsToRedact = Array.from(DEFAULT_QUERY_STRINGS_TO_REDACT);
 

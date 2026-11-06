@@ -119,6 +119,12 @@ describe('attributes', () => {
     a15_Uint8Array: new Uint8Array([104, 101, 108, 108, 111]), // 'hello' ords
     a16_Null: null,
   };
+  // `a_MultipleRefs*` refs the same obj more than once, but is *not* a cycle.
+  const a_ObjToRef = { an: 'obj' };
+  const a_ArrayToRef = ['an', 'array'];
+  attrTypesExtended.a_MultipleRefsObj = [a_ObjToRef, a_ObjToRef];
+  attrTypesExtended.a_MultipleRefsObj2 = { a: a_ObjToRef, b: a_ObjToRef };
+  attrTypesExtended.a_MultipleRefsArray = [a_ArrayToRef, a_ArrayToRef];
 
   // Some attribute values are *accepted* as AnyValue, but are changed by
   // a `cleanAttributes`.
