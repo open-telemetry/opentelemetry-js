@@ -44,6 +44,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :books: Documentation
 
+* docs(sdk-node): document span-limit environment variable replacements and deprecated fallbacks [#7260](https://github.com/open-telemetry/opentelemetry-js/pull/7260) @adityareddy-dev
 * docs(exporters): update dead semantic conventions resource specification links in OTLP exporters [#7254](https://github.com/open-telemetry/opentelemetry-js/pull/7254) @helmipradita
 
 ## 0.300.0
