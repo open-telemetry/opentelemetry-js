@@ -11,6 +11,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :rocket: Features
 
+* feat(otlp-exporter-base): add a `maxRequestSize` option (default 64 MiB, `0` disables); OTLP exporters drop larger requests instead of sending them [#7167](https://github.com/open-telemetry/opentelemetry-js/pull/7167) @DavidTraina
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation

@@ -32,6 +32,7 @@ export function convertLegacyOtlpGrpcOptions(
       compression: config.compression,
       timeoutMillis: config.timeoutMillis,
       concurrencyLimit: config.concurrencyLimit,
+      maxRequestSize: config.maxRequestSize,
       credentials:
         userProvidedCredentials != null
           ? () => userProvidedCredentials

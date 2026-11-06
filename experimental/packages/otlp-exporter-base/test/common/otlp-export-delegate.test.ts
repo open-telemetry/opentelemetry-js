@@ -245,6 +245,123 @@ describe('OTLPExportDelegate', function () {
       done();
     });
 
+    it('fails and records metrics without sending if serialized request exceeds maxRequestSize', async function () {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+      const transportStubs = {
+        send: sinon.stub(),
+        shutdown: sinon.stub(),
+      };
+      const mockTransport = <IExporterTransport>transportStubs;
+
+      const serializerStubs = {
+        serializeRequest: sinon.stub().returns(Uint8Array.from([1, 2, 3])),
+        deserializeResponse: sinon.stub(),
+      };
+      const mockSerializer = <FakeSerializer>serializerStubs;
+
+      const promiseHandlerStubs = {
+        pushPromise: sinon.stub(),
+        hasReachedLimit: sinon.stub().returns(false),
+        awaitAll: sinon.stub(),
+      };
+      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
+
+      const exporter = createOtlpExportDelegate(
+        {
+          promiseHandler: promiseHandler,
+          serializer: mockSerializer,
+          transport: mockTransport,
+          metrics: new ExporterMetrics({
+            componentType: 'test',
+            metricsHelper: { name: 'span', countItems: () => 5 },
+            url: undefined,
+            meterProvider,
+            responseAttributesFromError: () => ({}),
+          }),
+        },
+        {
+          timeout: 1000,
+          maxRequestSize: 2,
+        }
+      );
+
+      await new Promise<void>(resolve => {
+        exporter.export(internalRepresentation, result => {
+          assert.strictEqual(result.code, ExportResultCode.FAILED);
+          assert.ok(result.error);
+          assert.match(result.error.message, /maxRequestSize/);
+          resolve();
+        });
+      });
+
+      sinon.assert.notCalled(transportStubs.send);
+      sinon.assert.notCalled(promiseHandlerStubs.pushPromise);
+
+      const { resourceMetrics } = await metricReader.collect();
+      const exported = resourceMetrics.scopeMetrics[0].metrics.find(
+        metric => metric.descriptor.name === 'otel.sdk.exporter.span.exported'
+      );
+      assert.ok(exported);
+      assert.strictEqual(exported.dataPoints[0].value, 5);
+      assert.strictEqual(
+        exported.dataPoints[0].attributes['error.type'],
+        'Error'
+      );
+    });
+
+    for (const maxRequestSize of [3, 0]) {
+      it(`sends request when maxRequestSize is ${maxRequestSize}`, function (done) {
+        const exportResponse: ExportResponse = {
+          data: Uint8Array.from([]),
+          status: 'success',
+        };
+        const transportStubs = {
+          send: sinon.stub().returns(Promise.resolve(exportResponse)),
+          shutdown: sinon.stub(),
+        };
+        const mockTransport = <IExporterTransport>transportStubs;
+
+        const serializerStubs = {
+          serializeRequest: sinon.stub().returns(Uint8Array.from([1, 2, 3])),
+          deserializeResponse: sinon.stub().returns({}),
+        };
+        const mockSerializer = <FakeSerializer>serializerStubs;
+
+        const promiseHandlerStubs = {
+          pushPromise: sinon.stub(),
+          hasReachedLimit: sinon.stub().returns(false),
+          awaitAll: sinon.stub(),
+        };
+        const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
+
+        const exporter = createOtlpExportDelegate(
+          {
+            promiseHandler: promiseHandler,
+            serializer: mockSerializer,
+            transport: mockTransport,
+            metrics: noopMetrics,
+          },
+          {
+            timeout: 1000,
+            maxRequestSize,
+          }
+        );
+
+        exporter.export(internalRepresentation, result => {
+          try {
+            assert.strictEqual(result.code, ExportResultCode.SUCCESS);
+            sinon.assert.calledOnce(transportStubs.send);
+            done();
+          } catch (err) {
+            done(err);
+          }
+        });
+      });
+    }
+
     it('returns success if send promise resolves with success', function (done) {
       const exportResponse: ExportResponse = {
         data: Uint8Array.from([]),
