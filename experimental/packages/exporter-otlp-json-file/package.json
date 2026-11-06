@@ -1,0 +1,84 @@
+{
+  "name": "@opentelemetry/exporter-otlp-json-file",
+  "version": "0.300.0",
+  "description": "OpenTelemetry OTLP JSON File and Standard Output Exporter for traces, metrics, and logs",
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      },
+      "default": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      }
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "OpenTelemetry Authors",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-otlp-json-file",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-telemetry/opentelemetry-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "engines": {
+    "node": ">=22.15.0"
+  },
+  "scripts": {
+    "prepublishOnly": "npm run compile",
+    "compile": "tsdown",
+    "clean": "rimraf dist build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "tdd": "npm run test -- --watch-extensions ts --watch",
+    "test": "nyc mocha 'test/**/*.test.ts'",
+    "version": "node ../../../scripts/version-update.js",
+    "watch": "tsdown --watch --no-clean",
+    "peer-api-check": "node ../../../scripts/peer-api-check.mjs",
+    "align-api-deps": "node ../../../scripts/align-api-deps.mjs"
+  },
+  "keywords": [
+    "opentelemetry",
+    "nodejs",
+    "tracing",
+    "profiling",
+    "metrics",
+    "logs",
+    "stats"
+  ],
+  "files": [
+    "LICENSE",
+    "README.md",
+    "dist"
+  ],
+  "sideEffects": false,
+  "devDependencies": {
+    "@opentelemetry/api": "1.10.0",
+    "@opentelemetry/resources": "3.0.0",
+    "@types/mocha": "10.0.10",
+    "@types/node": "18.19.130",
+    "@types/sinon": "17.0.4",
+    "mocha": "12.0.3",
+    "nyc": "18.0.0",
+    "sinon": "18.0.1",
+    "typescript": "5.2.2"
+  },
+  "peerDependencies": {
+    "@opentelemetry/api": "^1.3.0"
+  },
+  "dependencies": {
+    "@opentelemetry/core": "3.0.0",
+    "@opentelemetry/otlp-transformer": "0.300.0",
+    "@opentelemetry/sdk-logs": "3.0.0",
+    "@opentelemetry/sdk-metrics": "3.0.0",
+    "@opentelemetry/sdk-trace": "3.0.0"
+  }
+}

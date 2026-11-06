@@ -11,6 +11,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :rocket: Features
 
+* feat(exporter-otlp-json-file): add OTLP-JSON file/stdout exporter for traces, metrics, and logs [#7221](https://github.com/open-telemetry/opentelemetry-js/issues/7221) @harshkoli1255
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation
