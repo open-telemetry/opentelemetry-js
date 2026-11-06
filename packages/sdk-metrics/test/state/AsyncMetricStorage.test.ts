@@ -623,5 +623,43 @@ describe('AsyncMetricStorage', () => {
         }
       });
     });
+
+    describe('exemplars', () => {
+      it('should not leak the attribute hash into dataPoint.exemplars', async () => {
+        // Async storage collects without an exemplar map, taking the
+        // no-exemplars path in TemporalMetricProcessor. Regression test that
+        // this path does not put the attribute hash in the exemplars slot.
+        const delegate = new ObservableCallbackDelegate();
+        const observableRegistry = new ObservableRegistry();
+        const metricStorage = new AsyncMetricStorage(
+          defaultInstrumentDescriptor,
+          new SumAggregator(true),
+          createNoopAttributesProcessor(),
+          [cumulativeCollector]
+        );
+
+        const observable = new ObservableInstrument(
+          defaultInstrumentDescriptor,
+          [metricStorage],
+          observableRegistry
+        );
+
+        observableRegistry.addCallback(delegate.getCallback(), observable);
+        delegate.setDelegate(observableResult => {
+          observableResult.observe(1, { key: '1' });
+        });
+
+        const collectionTime: HrTime = [0, 0];
+        await observableRegistry.observe(collectionTime);
+        const metric = metricStorage.collect(
+          cumulativeCollector,
+          collectionTime
+        );
+
+        assertMetricData(metric, DataPointType.SUM);
+        assert.strictEqual(metric.dataPoints.length, 1);
+        assert.strictEqual(metric.dataPoints[0].exemplars, undefined);
+      });
+    });
   });
 });

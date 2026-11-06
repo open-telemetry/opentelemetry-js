@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Context, HrTime, Attributes } from '@opentelemetry/api';
+import type { Context, Attributes } from '@opentelemetry/api';
 import { FixedSizeExemplarReservoirBase } from './ExemplarReservoir';
 
 /**
@@ -25,7 +25,7 @@ export class SimpleFixedSizeExemplarReservoir extends FixedSizeExemplarReservoir
 
   private _findBucketIndex(
     _value: number,
-    _timestamp: HrTime,
+    _timestamp: number,
     _attributes: Attributes,
     _ctx: Context
   ) {
@@ -37,7 +37,7 @@ export class SimpleFixedSizeExemplarReservoir extends FixedSizeExemplarReservoir
 
   offer(
     value: number,
-    timestamp: HrTime,
+    timestamp: number,
     attributes: Attributes,
     ctx: Context
   ): void {

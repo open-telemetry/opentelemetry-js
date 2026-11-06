@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Context, HrTime, Attributes } from '@opentelemetry/api';
+import type { Context, Attributes } from '@opentelemetry/api';
 import { isSpanContextValid, trace, TraceFlags } from '@opentelemetry/api';
 import type { ExemplarFilter } from './ExemplarFilter';
 
 export class WithTraceExemplarFilter implements ExemplarFilter {
   shouldSample(
     value: number,
-    timestamp: HrTime,
+    timestamp: number,
     attributes: Attributes,
     ctx: Context
   ): boolean {
