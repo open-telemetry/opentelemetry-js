@@ -10,19 +10,29 @@ import { createRetryingTransport } from '../../retrying-transport';
 import { createOtlpNetworkExportDelegate } from '../../otlp-network-export-delegate';
 import { createFetchTransport } from './transport/fetch-transport';
 import { type ExporterMetrics } from '../../ExporterMetrics';
+import {
+  createTerminalAdmissionExportDelegate,
+  type TerminalAdmissionOptions,
+} from './terminal-admission-export-delegate';
 
 export function createOtlpFetchExportDelegate<Internal, Response>(
   options: OtlpHttpConfiguration,
   serializer: ISerializer<Internal, Response>,
-  metrics: ExporterMetrics<Internal>
+  metrics: ExporterMetrics<Internal>,
+  terminalAdmission?: TerminalAdmissionOptions<Internal>
 ): IOtlpExportDelegate<Internal> {
-  return createOtlpNetworkExportDelegate(
-    options,
+  return createTerminalAdmissionExportDelegate(
+    createOtlpNetworkExportDelegate(
+      options,
+      serializer,
+      metrics,
+      createRetryingTransport({
+        transport: createFetchTransport(options),
+      })
+    ),
     serializer,
     metrics,
-    createRetryingTransport({
-      transport: createFetchTransport(options),
-    })
+    terminalAdmission
   );
 }
 

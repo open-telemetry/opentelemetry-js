@@ -29,6 +29,10 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
   * **Breaking:** The `configuration` package no longer supports creating a synthetic `ConfigurationModel` from environment variables.
   * **Breaking:** The `configuration` package API has changed: `createConfigFactory()` has been replaced with `parseConfigFile().
 
+### :rocket: Features
+
+* feat(otlp-exporter-base): when the page is hidden and a span or log batch exceeds the keepalive budget, the browser fetch exporter sends whole items that fit and counts the rest as failed exports with error type `keepalive_budget_exhausted` [#7230](https://github.com/open-telemetry/opentelemetry-js/issues/7230) @adityareddy-dev
+
 ### :bug: Bug Fixes
 
 * fix(instrumentation-http): don't `require('forwarded-parse')` in ESM builds ([#7261](https://github.com/open-telemetry/opentelemetry-js/pull/7261)) @avens19
