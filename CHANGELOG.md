@@ -17,6 +17,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :bug: Bug Fixes
 
+* fix(sdk-metrics): keep the exponential histogram scale when an interval records only zeros [#7281](https://github.com/open-telemetry/opentelemetry-js/pull/7281) @spokodev
+
 ### :books: Documentation
 
 ### :house: Internal

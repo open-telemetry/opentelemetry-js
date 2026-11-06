@@ -38,6 +38,12 @@ interface InternalHistogram extends ExponentialHistogram {
 // two exponential histogram accumulations
 class HighLow {
   static combine(h1: HighLow, h2: HighLow): HighLow {
+    if (h2.low > h2.high) {
+      return h1;
+    }
+    if (h1.low > h1.high) {
+      return h2;
+    }
     return new HighLow(Math.min(h1.low, h2.low), Math.max(h1.high, h2.high));
   }
 
@@ -444,7 +450,10 @@ export class ExponentialHistogramAccumulation implements Accumulation {
    * _minScale is used by diff and merge to compute an ideal combined scale
    */
   private _minScale(other: ExponentialHistogramAccumulation): number {
-    const minScale = Math.min(this.scale, other.scale);
+    const minScale =
+      other.count === other.zeroCount
+        ? this.scale
+        : Math.min(this.scale, other.scale);
 
     const highLowPos = HighLow.combine(
       this._highLowAtScale(this.positive, this.scale, minScale),
