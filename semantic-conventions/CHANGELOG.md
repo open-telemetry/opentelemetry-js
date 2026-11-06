@@ -9,6 +9,16 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: Features
 
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+## 1.45.0
+
+### :rocket: Features
+
 * feat: update semantic conventions to v1.45.0 [#NNNN]
   * Semantic Conventions v1.45.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1450) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
   * `@opentelemetry/semantic-conventions` (stable) changes: *8 added exports*
@@ -242,12 +252,6 @@ V8JS_HEAP_SPACE_NAME_VALUE_TRUSTED_SPACE                     // "trusted_space"
 ```
 
 </details>
-
-### :bug: Bug Fixes
-
-### :books: Documentation
-
-### :house: Internal
 
 ## 1.44.0
 
