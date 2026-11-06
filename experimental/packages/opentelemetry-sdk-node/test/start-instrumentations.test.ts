@@ -10,7 +10,7 @@ import type { ConfigProvider } from '@opentelemetry/api-config';
 import { config } from '@opentelemetry/api-config';
 import {
   InstrumentationBase,
-  readConfigProperties,
+  readDeclarativeConfig,
 } from '@opentelemetry/instrumentation';
 import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import { startNodeSDK } from '../src/start';
@@ -32,14 +32,17 @@ class TestInstrumentation extends InstrumentationBase<TestConfig> {
   override disable() {}
 
   setConfigProvider(configProvider: ConfigProvider): void {
-    const config = readConfigProperties({
+    const config = readDeclarativeConfig({
       configProvider,
       instrumentationName: this.instrumentationName,
-      instrumentationProps: [['server_name', 'string', 'serverName']],
-      generalProps: [
-        ['http.client.request_captured_headers', 'string[]', 'captureHeaders'],
-      ],
+      generalDomains: ['http'],
       diag: this._diag,
+      reader: (own, general): Partial<TestConfig> => ({
+        serverName: own.getString('server_name'),
+        captureHeaders: general.getStringArray(
+          'http.client.request_captured_headers'
+        ),
+      }),
     });
 
     if (Object.keys(config).length > 0) {

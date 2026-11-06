@@ -48,7 +48,7 @@ export interface Instrumentation<
    * implement this method to collect configuration.
    * Note that this is called *after* instrumentation construction,
    * and often *after* `.enable()`, so an instrumentation cannot use this
-   * config to impact one-time setup (e.g. module monkey-patching).
+   * config to impact "enable"-time setup.
    *
    * Implementations of setConfigProvider MUST NOT throw.
    * Instrumentation declarative config is often loosely typed, be defensive.
@@ -58,8 +58,8 @@ export interface Instrumentation<
    * Warning: Be aware that the "config" here differs from the "config" in
    * the `.setConfig() / .getConfig()` interface methods.
    *
-   * Use `readConfigProperties()` to do the reading; its documentation covers the
-   * mapping tuples and has an example.
+   * Use `readDeclarativeConfig()` to do the reading; its documentation covers the
+   * typed reader and has an example.
    *
    * State derived from config in the constructor goes stale, since config
    * arrives later. Rebuild it in an overridden `setConfig()`, or read through

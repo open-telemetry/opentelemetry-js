@@ -41,7 +41,7 @@ import {
   InstrumentationBase,
   InstrumentationNodeModuleDefinition,
   safeExecuteInTheMiddle,
-  readConfigProperties,
+  readDeclarativeConfig,
 } from '@opentelemetry/instrumentation';
 import { errorMonitor } from 'events';
 import {
@@ -145,63 +145,49 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
    * section of the README for the properties this instrumentation supports.
    */
   setConfigProvider(configProvider: ConfigProvider): void {
-    const config = readConfigProperties({
+    const config = readDeclarativeConfig({
       configProvider,
       instrumentationName: this.instrumentationName,
-      instrumentationProps: [
-        [
-          'disable_incoming_request_instrumentation',
-          'boolean',
-          'disableIncomingRequestInstrumentation',
-        ],
-        [
-          'disable_outgoing_request_instrumentation',
-          'boolean',
-          'disableOutgoingRequestInstrumentation',
-        ],
-        [
-          'require_parent_for_incoming_spans',
-          'boolean',
-          'requireParentforIncomingSpans',
-        ],
-        [
-          'require_parent_for_outgoing_spans',
-          'boolean',
-          'requireParentforOutgoingSpans',
-        ],
-        ['redacted_query_params', 'string[]', 'redactedQueryParams'],
-        [
-          'enable_synthetic_source_detection',
-          'boolean',
-          'enableSyntheticSourceDetection',
-        ],
-      ],
-      generalProps: [
-        [
-          'http.client.request_captured_headers',
-          'string[]',
-          'headersToSpanAttributes.client.requestHeaders',
-        ],
-        [
-          'http.client.response_captured_headers',
-          'string[]',
-          'headersToSpanAttributes.client.responseHeaders',
-        ],
-        [
-          'http.server.request_captured_headers',
-          'string[]',
-          'headersToSpanAttributes.server.requestHeaders',
-        ],
-        [
-          'http.server.response_captured_headers',
-          'string[]',
-          'headersToSpanAttributes.server.responseHeaders',
-        ],
-      ],
       // instrumentation-http owns the `general.http` domain.
       generalDomains: ['http'],
       currentConfig: this.getConfig() as Record<string, unknown>,
       diag: this._diag,
+      reader: (own, general): Partial<HttpInstrumentationConfig> => ({
+        disableIncomingRequestInstrumentation: own.getBoolean(
+          'disable_incoming_request_instrumentation'
+        ),
+        disableOutgoingRequestInstrumentation: own.getBoolean(
+          'disable_outgoing_request_instrumentation'
+        ),
+        requireParentforIncomingSpans: own.getBoolean(
+          'require_parent_for_incoming_spans'
+        ),
+        requireParentforOutgoingSpans: own.getBoolean(
+          'require_parent_for_outgoing_spans'
+        ),
+        redactedQueryParams: own.getStringArray('redacted_query_params'),
+        enableSyntheticSourceDetection: own.getBoolean(
+          'enable_synthetic_source_detection'
+        ),
+        headersToSpanAttributes: {
+          client: {
+            requestHeaders: general.getStringArray(
+              'http.client.request_captured_headers'
+            ),
+            responseHeaders: general.getStringArray(
+              'http.client.response_captured_headers'
+            ),
+          },
+          server: {
+            requestHeaders: general.getStringArray(
+              'http.server.request_captured_headers'
+            ),
+            responseHeaders: general.getStringArray(
+              'http.server.response_captured_headers'
+            ),
+          },
+        },
+      }),
     });
 
     if (Object.keys(config).length > 0) {
