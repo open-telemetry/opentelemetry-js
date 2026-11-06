@@ -1,0 +1,7 @@
+{
+  "entryPoints": [
+    "src/index.ts",
+    "src/platform/node/index.ts",
+    "src/platform/browser/index.ts"
+  ]
+}
