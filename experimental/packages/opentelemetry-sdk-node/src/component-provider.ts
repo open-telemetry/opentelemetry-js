@@ -3,18 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// XXX maybe move these to the `configuration` package? Not sure.
-//    Then a 3rd party ComponentProvider impl can just dep on `configuration`.
-//    It shouldn't need to dep on `sdk-node`?
-//    Though sdk-node is the only user of ComponentProvider's, so it wouldn't be evil to have that dep.
-//    Pretend this was in sdk-lib, used by sdk-node and a new mythical sdk-bun.
-//    It is whereever the "create"-step stuff for Decl Conf lives. Currently that's sdk-node.
-//    configuration feels more "right", at least for now.
+// XXX move this to `configuration` package
 
 /**
  * Schemaless configuration properties passed to a component provider.
  */
 export type ConfigProperties = Record<string, unknown>;
+// ^XXX this type will come from api-config, or could just be copied here if we want to avoid a dep on it
 
 // One of the "Declarative config type" values from
 // https://opentelemetry.io/docs/specs/otel/configuration/sdk/#supported-sdk-plugin-components
