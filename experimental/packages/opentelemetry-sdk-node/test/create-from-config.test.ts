@@ -298,6 +298,10 @@ describe('create-from-config', () => {
       return res.attributes;
     };
 
+    afterEach(function () {
+      sinon.restore();
+    });
+
     it('empty "resource" config', async function () {
       const resource = createResourceFromConfig(undefined);
       await resource.waitForAsyncAttributes?.();
@@ -387,22 +391,30 @@ describe('create-from-config', () => {
       }
     });
 
-    it('resource detector: container (not yet supported, throws)', async function () {
-      assert.throws(() => {
-        createResourceFromConfig({
-          'detection/development': { detectors: [{ container: null }] },
-        });
+    it('resource detector: container (not yet supported, warns and skips)', async function () {
+      const warnStub = sinon.stub(diag, 'warn');
+
+      createResourceFromConfig({
+        'detection/development': { detectors: [{ container: null }] },
       });
+
+      warnStub.calledOnceWith(
+        'unknown ExperimentalResourceDetector name in configuration: "container" (skipping)'
+      );
     });
 
-    it('resource detector: unknown name throws', async function () {
-      assert.throws(() => {
-        createResourceFromConfig({
-          'detection/development': {
-            detectors: [{ some_unknown_detector: null }],
-          },
-        });
+    it('resource detector: unknown name (warns and skips)', async function () {
+      const warnStub = sinon.stub(diag, 'warn');
+
+      createResourceFromConfig({
+        'detection/development': {
+          detectors: [{ some_unknown_detector: null }],
+        },
       });
+
+      warnStub.calledOnceWith(
+        'unknown ExperimentalResourceDetector name in configuration: "some_unknown_detector" (skipping)'
+      );
     });
 
     it('schema_url', function () {

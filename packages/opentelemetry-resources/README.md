@@ -65,4 +65,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/resources
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fresources.svg
 
-[resource-semantic_conventions]: https://github.com/open-telemetry/opentelemetry-specification/tree/master/specification/resource/semantic_conventions
+[resource-semantic_conventions]: https://opentelemetry.io/docs/specs/semconv/resource/
