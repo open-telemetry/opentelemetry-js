@@ -151,7 +151,6 @@ import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 import type {
   ComponentProviderRegistry,
   ConfigProperties,
-  SpanExporterComponentProvider,
 } from './component-provider';
 
 // ---- internal utilities

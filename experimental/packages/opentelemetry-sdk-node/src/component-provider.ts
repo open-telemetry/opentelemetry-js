@@ -11,37 +11,6 @@ import type { SpanExporter } from '@opentelemetry/sdk-trace';
 export type ConfigProperties = Record<string, unknown>;
 // ^XXX this type will come from api-config, or could just be copied here if we want to avoid a dep on it
 
-// XXX rm
-// // One of the "Declarative config type" values from
-// // https://opentelemetry.io/docs/specs/otel/configuration/sdk/#supported-sdk-plugin-components
-// export type ComponentType =
-//   | 'ExperimentalResourceDetection'
-//   | 'TextMapPropagator'
-//   | 'SpanExporter'
-//   | 'SpanProcessor'
-//   | 'Sampler'
-//   | 'IdGenerator'
-//   | 'PullMetricExporter'
-//   | 'PushMetricExporter'
-//   | 'MetricProducer'
-//   | 'LogRecordExporter'
-//   | 'LogRecordProcessor';
-
-// XXX rm
-// export interface ComponentProvider<
-//   TConfig = ConfigProperties,
-//   TComponent = unknown,
-// > {
-//   readonly componentType: ComponentType; // e.g. 'SpanExporter'
-//   readonly name: string;
-//   createComponent(properties: TConfig): TComponent;
-// }
-
-// export type ComponentProviderRegistry = Map<
-//   ComponentType,
-//   Map<string, ComponentProvider>
-// >;
-
 export interface SpanExporterComponentProvider<TConfig = ConfigProperties> {
   readonly name: string;
   createComponent(properties: TConfig): SpanExporter;
@@ -70,10 +39,6 @@ export type ComponentProvidersFromType = {
   // | 'LogRecordProcessor';
 };
 
-// export type ComponentProviderRegistry = Map<
-//   string,
-//   Map<string, ComponentProvider>
-// >;
 export type ComponentProviderRegistry = Map<
   keyof ComponentProvidersFromType,
   Map<string, SpanExporterComponentProvider>
