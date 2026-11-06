@@ -189,9 +189,7 @@ function startNodeSdkFromEnv(opts?: StartSdkFromEnvOptions): NodeSdk {
 }
 
 function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
-  const reg = buildComponentProviderRegistry([
-    ...getBuiltinComponentProviders(),
-  ]);
+  const reg = buildComponentProviderRegistry([getBuiltinComponentProviders()]);
   // // eslint-disable-next-line no-console
   // console.log('XXX reg:', reg);
 

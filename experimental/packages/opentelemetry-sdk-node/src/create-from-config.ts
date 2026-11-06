@@ -149,9 +149,9 @@ import {
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
 import type {
-  ComponentProvider,
   ComponentProviderRegistry,
   ConfigProperties,
+  SpanExporterComponentProvider,
 } from './component-provider';
 
 // ---- internal utilities
@@ -1222,10 +1222,7 @@ function createSpanExporterFromConfig(
 ): SpanExporter {
   const [name, properties] = mustSingleEntry(exporter, 'SpanExporter');
 
-  const provider = reg.get('SpanExporter')?.get(name) as ComponentProvider<
-    ConfigProperties,
-    SpanExporter
-  >;
+  const provider = reg.get('SpanExporter')?.get(name);
   if (provider) {
     return provider.createComponent(properties as ConfigProperties);
   } else {

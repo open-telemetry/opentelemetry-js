@@ -28,7 +28,10 @@ import {
   createSslCredentials,
 } from '@opentelemetry/otlp-grpc-exporter-base';
 
-import type { ComponentProvider } from './component-provider';
+import type {
+  ComponentProvidersFromType,
+  SpanExporterComponentProvider,
+} from './component-provider';
 
 /**
  * Warn if some props from a declarative config object have not been handled.
@@ -174,20 +177,17 @@ function grpcCredentialsFromConfig(tls?: GrpcTlsConfigModel) {
 }
 
 class ConsoleSpanExporterComponentProvider
-  implements ComponentProvider<ConsoleExporterConfigModel, SpanExporter>
+  implements SpanExporterComponentProvider<ConsoleExporterConfigModel>
 {
-  readonly componentType = 'SpanExporter';
   readonly name = 'console';
-
   createComponent(_properties: ConsoleExporterConfigModel): SpanExporter {
     return new ConsoleSpanExporter();
   }
 }
 
 class OtlpHttpSpanExporterComponentProvider
-  implements ComponentProvider<OtlpHttpExporterConfigModel, SpanExporter>
+  implements SpanExporterComponentProvider<OtlpHttpExporterConfigModel>
 {
-  readonly componentType = 'SpanExporter';
   readonly name = 'otlp_http';
 
   createComponent(properties: OtlpHttpExporterConfigModel): SpanExporter {
@@ -232,9 +232,8 @@ class OtlpHttpSpanExporterComponentProvider
 }
 
 class OtlpGrpcSpanExporterComponentProvider
-  implements ComponentProvider<OtlpGrpcExporterConfigModel, SpanExporter>
+  implements SpanExporterComponentProvider<OtlpGrpcExporterConfigModel>
 {
-  readonly componentType = 'SpanExporter';
   readonly name = 'otlp_grpc';
 
   createComponent(properties: OtlpGrpcExporterConfigModel): SpanExporter {
@@ -263,10 +262,12 @@ class OtlpGrpcSpanExporterComponentProvider
   }
 }
 
-export function getBuiltinComponentProviders(): ComponentProvider[] {
-  return [
-    new ConsoleSpanExporterComponentProvider(),
-    new OtlpHttpSpanExporterComponentProvider(),
-    new OtlpGrpcSpanExporterComponentProvider(),
-  ];
+export function getBuiltinComponentProviders(): ComponentProvidersFromType {
+  return {
+    SpanExporter: [
+      new ConsoleSpanExporterComponentProvider(),
+      new OtlpHttpSpanExporterComponentProvider(),
+      new OtlpGrpcSpanExporterComponentProvider(),
+    ],
+  };
 }
