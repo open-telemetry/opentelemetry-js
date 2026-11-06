@@ -39,10 +39,13 @@ class DummyLoggerProvider implements LoggerProvider {
 }
 
 class DummyConfigProvider implements ConfigProvider {
-  getInstrumentationConfig(name?: string): ConfigProperties {
+  getInstrumentationConfig(name: string): ConfigProperties {
     throw new Error('not implemented');
   }
   getGeneralInstrumentationConfig(): ConfigProperties {
+    throw new Error('not implemented');
+  }
+  getInstrumentationConfigRoot(): ConfigProperties {
     throw new Error('not implemented');
   }
 }

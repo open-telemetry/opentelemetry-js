@@ -18,20 +18,20 @@ class StubConfigProvider implements ConfigProvider {
     this._config = config;
   }
 
-  getInstrumentationConfig(name?: string): ConfigProperties {
-    if (!name) {
-      return (this._config['instrumentation/development'] ??
-        EMPTY_CONFIG_PROPERTIES) as ConfigProperties;
-    } else {
-      return (
-        (this._config['instrumentation/development'] as any)?.js?.[name] ??
-        EMPTY_CONFIG_PROPERTIES
-      );
-    }
+  getInstrumentationConfig(name: string): ConfigProperties {
+    return (
+      (this._config['instrumentation/development'] as any)?.js?.[name] ??
+      EMPTY_CONFIG_PROPERTIES
+    );
   }
 
   getGeneralInstrumentationConfig(): ConfigProperties {
     return (this._config['instrumentation/development'] as any)?.general;
+  }
+
+  getInstrumentationConfigRoot(): ConfigProperties {
+    return (this._config['instrumentation/development'] ??
+      EMPTY_CONFIG_PROPERTIES) as ConfigProperties;
   }
 }
 
@@ -43,20 +43,20 @@ describe('config (global ConfigProvider API)', function () {
   it('returns a no-op provider when none is registered', function () {
     const provider = config.getConfigProvider();
     assert.ok(provider instanceof NoopConfigProvider);
-    assert.deepStrictEqual(provider.getInstrumentationConfig(), {});
+    assert.deepStrictEqual(provider.getInstrumentationConfigRoot(), {});
     assert.deepStrictEqual(provider.getInstrumentationConfig('aName'), {});
     assert.deepStrictEqual(provider.getGeneralInstrumentationConfig(), {});
   });
 
-  it('returns the registered provider after setGlobalConfigProvider', function () {
+  it('registers the provider and returns true', function () {
     const provider = new StubConfigProvider({
       'instrumentation/development': { foo: true },
     });
     const returned = config.setGlobalConfigProvider(provider);
-    assert.strictEqual(returned, provider);
+    assert.strictEqual(returned, true);
     assert.strictEqual(config.getConfigProvider(), provider);
     assert.strictEqual(
-      (config.getConfigProvider().getInstrumentationConfig() as any).foo,
+      (config.getConfigProvider().getInstrumentationConfigRoot() as any).foo,
       true
     );
   });
@@ -64,9 +64,9 @@ describe('config (global ConfigProvider API)', function () {
   it('keeps the first registration; later calls are ignored', function () {
     const first = new StubConfigProvider({ order: 'first' } as never);
     const second = new StubConfigProvider({ order: 'second' } as never);
-    assert.strictEqual(config.setGlobalConfigProvider(first), first);
-    // Second registration returns the already-registered provider.
-    assert.strictEqual(config.setGlobalConfigProvider(second), first);
+    assert.strictEqual(config.setGlobalConfigProvider(first), true);
+    // A later registration is ignored and returns false.
+    assert.strictEqual(config.setGlobalConfigProvider(second), false);
     assert.strictEqual(config.getConfigProvider(), first);
   });
 

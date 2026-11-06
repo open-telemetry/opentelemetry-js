@@ -35,7 +35,7 @@ describe('SdkConfigProvider', () => {
   it('exposes the whole instrumentation/development node', () => {
     const provider = createConfigProvider(model);
     const node =
-      provider.getInstrumentationConfig() as ExperimentalInstrumentationConfigModel;
+      provider.getInstrumentationConfigRoot() as ExperimentalInstrumentationConfigModel;
     assert.deepStrictEqual(Object.keys(node), ['general', 'js']);
   });
 
@@ -65,7 +65,7 @@ describe('SdkConfigProvider', () => {
 
   it('returns empty ConfigProperties when the node is absent', () => {
     const provider = createConfigProvider({} as ConfigurationModel);
-    assert.deepStrictEqual(provider.getInstrumentationConfig(), {});
+    assert.deepStrictEqual(provider.getInstrumentationConfigRoot(), {});
     assert.deepStrictEqual(provider.getInstrumentationConfig('aName'), {});
     assert.deepStrictEqual(provider.getGeneralInstrumentationConfig(), {});
   });

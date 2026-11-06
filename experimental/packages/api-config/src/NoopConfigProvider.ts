@@ -13,11 +13,15 @@ export const EMPTY_CONFIG_PROPERTIES = Object.freeze({});
  * instrumentations fall back to their constructor defaults.
  */
 export class NoopConfigProvider implements ConfigProvider {
-  getInstrumentationConfig(_name?: string): ConfigProperties {
+  getInstrumentationConfig(_name: string): ConfigProperties {
     return EMPTY_CONFIG_PROPERTIES;
   }
 
   getGeneralInstrumentationConfig(): ConfigProperties {
+    return EMPTY_CONFIG_PROPERTIES;
+  }
+
+  getInstrumentationConfigRoot(): ConfigProperties {
     return EMPTY_CONFIG_PROPERTIES;
   }
 }

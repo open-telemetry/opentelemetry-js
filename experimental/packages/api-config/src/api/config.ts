@@ -26,12 +26,14 @@ export class ConfigAPI {
   }
 
   /**
-   * Set the global ConfigProvider. The first registration wins; later calls are
-   * ignored and return the already-registered provider.
+   * Set the global ConfigProvider. The first registration wins; a later call is
+   * ignored.
+   *
+   * @returns true if the provider was set, false if one was already registered.
    */
-  public setGlobalConfigProvider(provider: ConfigProvider): ConfigProvider {
+  public setGlobalConfigProvider(provider: ConfigProvider): boolean {
     if (_global[GLOBAL_CONFIG_API_KEY]) {
-      return this.getConfigProvider();
+      return false;
     }
 
     _global[GLOBAL_CONFIG_API_KEY] = makeGetter<ConfigProvider>(
@@ -40,7 +42,7 @@ export class ConfigAPI {
       NOOP_CONFIG_PROVIDER
     );
 
-    return provider;
+    return true;
   }
 
   /**

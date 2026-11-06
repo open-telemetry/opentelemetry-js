@@ -35,9 +35,9 @@ describe('readDeclarativeConfig', function () {
     general: Record<string, unknown> = {}
   ): ConfigProvider {
     return {
-      getInstrumentationConfig: (name?: string) =>
-        name === undefined ? { js: own, general } : (own[name] ?? {}),
+      getInstrumentationConfig: (name: string) => own[name] ?? {},
       getGeneralInstrumentationConfig: () => general,
+      getInstrumentationConfigRoot: () => ({ js: own, general }),
     };
   }
 

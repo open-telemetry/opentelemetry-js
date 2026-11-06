@@ -49,13 +49,7 @@ class SdkConfigProvider implements ConfigProvider {
     this._instrumentationConfig = config['instrumentation/development'];
   }
 
-  getInstrumentationConfig(name?: string): ConfigProperties {
-    if (name === undefined) {
-      return asConfigProperties(
-        this._instrumentationConfig,
-        'instrumentation/development'
-      );
-    }
+  getInstrumentationConfig(name: string): ConfigProperties {
     return asConfigProperties(
       this._instrumentationConfig?.js?.[name],
       `instrumentation/development.js.${name}`
@@ -66,6 +60,13 @@ class SdkConfigProvider implements ConfigProvider {
     return asConfigProperties(
       this._instrumentationConfig?.general,
       'instrumentation/development.general'
+    );
+  }
+
+  getInstrumentationConfigRoot(): ConfigProperties {
+    return asConfigProperties(
+      this._instrumentationConfig,
+      'instrumentation/development'
     );
   }
 }

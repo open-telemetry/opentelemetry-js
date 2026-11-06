@@ -20,11 +20,6 @@ export type ConfigProperties = Record<string, unknown>;
  */
 export interface ConfigProvider {
   /**
-   * Returns the `instrumentation/development` node, or an empty accessor when it
-   * is absent.
-   */
-  getInstrumentationConfig(): ConfigProperties;
-  /**
    * Returns the config for a single instrumentation
    * (`instrumentation/development.js.<name>`), or an empty accessor when absent.
    *
@@ -32,18 +27,16 @@ export interface ConfigProvider {
    */
   getInstrumentationConfig(name: string): ConfigProperties;
 
-  // XXX don't love ^^ the overload, could change second name later, e.g.
-  // getInstrumentationConfigFromScopeName (ugh that is wordy),
-  // `jsInstrumentationConfigFromScopeName()`, but not using that pattern here
-  // Most common usage will be the latter two methods here, so what about:
-  //    - getInstrumentationConfigRoot() - or whatever name
-  //    - getInstrumentationConfig(name)
-  //    - getGeneralInstrumentationConfig()
-  // Still not sure.
-
   /**
    * Returns the shared `instrumentation/development.general` node, or an empty
    * accessor when absent.
    */
   getGeneralInstrumentationConfig(): ConfigProperties;
+
+  /**
+   * Returns the whole `instrumentation/development` node, or an empty accessor
+   * when absent. Instrumentation code should rarely need this; prefer
+   * `getInstrumentationConfig(name)` and `getGeneralInstrumentationConfig()`.
+   */
+  getInstrumentationConfigRoot(): ConfigProperties;
 }
