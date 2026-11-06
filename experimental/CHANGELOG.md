@@ -11,7 +11,11 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :rocket: Features
 
+* feat(otlp-exporter-base): when the page is hidden and a span or log batch exceeds the keepalive budget, the browser fetch exporter sends whole items that fit and counts the rest as failed exports with error type `keepalive_budget_exhausted` [#7232](https://github.com/open-telemetry/opentelemetry-js/pull/7232) @adityareddy-dev
+
 ### :bug: Bug Fixes
+
+* fix(otlp-exporter-base): warn when the browser fetch transport sends an export without `keepalive` while the page is hidden, since that export can be lost with the page [#7231](https://github.com/open-telemetry/opentelemetry-js/pull/7231) @adityareddy-dev
 
 ### :books: Documentation
 
@@ -29,10 +33,6 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
   * **Breaking:** The `configuration` package no longer supports creating a synthetic `ConfigurationModel` from environment variables.
   * **Breaking:** The `configuration` package API has changed: `createConfigFactory()` has been replaced with `parseConfigFile().
 
-### :rocket: Features
-
-* feat(otlp-exporter-base): when the page is hidden and a span or log batch exceeds the keepalive budget, the browser fetch exporter sends whole items that fit and counts the rest as failed exports with error type `keepalive_budget_exhausted` [#7230](https://github.com/open-telemetry/opentelemetry-js/issues/7230) @adityareddy-dev
-
 ### :bug: Bug Fixes
 
 * fix(instrumentation-http): don't `require('forwarded-parse')` in ESM builds ([#7261](https://github.com/open-telemetry/opentelemetry-js/pull/7261)) @avens19
@@ -45,7 +45,6 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 * fix: raise the minimum `@opentelemetry/api` peer dependency version to 1.10.0 for packages that depend on `@opentelemetry/core`, `@opentelemetry/otlp-transformer` or `@opentelemetry/instrumentation`, as these use API 1.10 features. ([#7258](https://github.com/open-telemetry/opentelemetry-js/issues/7258)) @volodymyrshk @pichlermarc
   * Combining these packages with `@opentelemetry/api` 1.9.x never worked: they failed at runtime. The peer dependency now makes npm report this at install time instead.
   * If you see a peer dependency error after upgrading, update `@opentelemetry/api` to 1.10.0 or later.
-* fix(otlp-exporter-base): warn when the browser fetch transport sends an export without `keepalive` while the page is hidden, since that export can be lost with the page [#7230](https://github.com/open-telemetry/opentelemetry-js/issues/7230) @adityareddy-dev
 
 ### :books: Documentation
 
