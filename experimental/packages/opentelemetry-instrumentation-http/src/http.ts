@@ -68,6 +68,7 @@ import {
   isValidOptionsType,
   parseErrorType,
   parseResponseStatus,
+  requestTextMapGetter,
   setSpanWithError,
 } from './utils';
 import type { Err, Func, Http, HttpRequestArgs, Https } from './internal-types';
@@ -547,8 +548,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         });
       }
 
-      const headers = request.headers;
-
       const spanAttributes = getIncomingRequestAttributes(
         request,
         {
@@ -592,7 +591,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           spanAttributes[ATTR_NETWORK_PROTOCOL_VERSION];
       }
 
-      const ctx = propagation.extract(ROOT_CONTEXT, headers);
+      const ctx = propagation.extract(
+        ROOT_CONTEXT,
+        request,
+        requestTextMapGetter
+      );
       const span = instrumentation._startHttpSpan(method, spanOptions, ctx);
       const rpcMetadata: RPCMetadata = {
         type: RPCType.HTTP,
