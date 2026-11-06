@@ -16,7 +16,7 @@ import type {
 } from '../../src';
 import * as zlib from 'zlib';
 import type { TcpNetConnectOpts } from 'net';
-import { createConnection } from 'net';
+import { createConnection, Socket } from 'net';
 
 const sampleRequestData = new Uint8Array([1, 2, 3]);
 
@@ -262,7 +262,44 @@ describe('HttpExporterTransport', function () {
           done(error);
         });
       // pass more time than passed as timeout value
-      timer.tick(200);
+      void timer.tickAsync(200);
+    });
+
+    it('returns retryable when the connection is never established', function (done) {
+      // arrange
+      const timer = sinon.useFakeTimers();
+      const transport = createHttpExporterTransport({
+        url: 'http://localhost:8080',
+        headers: async () => ({}),
+        compression: 'none',
+        agentFactory: () => {
+          // A connect that never completes, like a SYN to a host that drops it: the socket
+          // stays `connecting` and buffers the request, and no 'connect' ever follows.
+          const agent = new http.Agent();
+          (agent as any).createConnection = () => {
+            const socket = new Socket();
+            (socket as any).connecting = true;
+            return socket;
+          };
+          return agent;
+        },
+      });
+
+      // act
+      transport
+        .send(sampleRequestData, 100)
+        .then(result => {
+          // assert
+          assert.strictEqual(result.status, 'retryable');
+          assert.ok(result.error, 'Expected error object to be present');
+          assert.strictEqual(result.error.message, 'Request timed out');
+          done();
+        })
+        .catch(error => {
+          done(error);
+        });
+      // pass more time than passed as timeout value
+      void timer.tickAsync(200);
     });
 
     it('returns retryable when socket hangs up (ECONNRESET)', async function () {
