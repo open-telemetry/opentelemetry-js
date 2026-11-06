@@ -96,7 +96,7 @@
     "mocha": "12.0.3",
     "nyc": "18.0.0",
     "protobufjs": "8.8.1",
-    "protobufjs-cli": "2.5.7",
+    "protobufjs-cli": "2.7.1",
     "ts-loader": "9.5.7",
     "typescript": "5.2.2",
     "webpack": "5.108.4"
