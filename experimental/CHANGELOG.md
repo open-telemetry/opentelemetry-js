@@ -13,6 +13,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :bug: Bug Fixes
 
+* fix(otlp-exporter-base): align exporter metric units and descriptions with semantic conventions [#7285](https://github.com/open-telemetry/opentelemetry-js/pull/7285) @henricop
+
 ### :books: Documentation
 
 ### :house: Internal
