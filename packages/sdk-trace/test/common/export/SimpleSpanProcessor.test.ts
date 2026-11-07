@@ -459,7 +459,7 @@ describe('SimpleSpanProcessor', () => {
         dataPoint => dataPoint.attributes['error.type'] === undefined
       );
       assert.ok(successPoint);
-      assert.strictEqual(successPoint.value, 1);
+      assert.strictEqual(successPoint.value, 2);
       assert.strictEqual(
         successPoint.attributes['otel.component.type'],
         'simple_span_processor'
@@ -472,17 +472,75 @@ describe('SimpleSpanProcessor', () => {
       const failedPoint = processedSpansDataPoints.find(
         dataPoint => dataPoint.attributes['error.type'] === 'SystemError'
       );
-      assert.ok(failedPoint);
-      assert.strictEqual(failedPoint.value, 1);
-      assert.strictEqual(
-        failedPoint.attributes['otel.component.type'],
-        'simple_span_processor'
+      assert.strictEqual(failedPoint, undefined);
+    });
+
+    it('should record already_shutdown for sampled spans ended after shutdown', async () => {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+      const processor = new SimpleSpanProcessor({
+        exporter,
+        selfObsMeterProvider: meterProvider,
+      });
+      await processor.shutdown();
+
+      const tracer = provider.getTracer('default') as Tracer;
+      const sampledSpan = new SpanImpl({
+        scope: tracer.instrumentationScope,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
+        spanContext: {
+          traceId: 'a3cda95b652f4a1592b449d5929fda1b',
+          spanId: '5e0c63257de34c92',
+          traceFlags: TraceFlags.SAMPLED,
+        },
+        name: 'sampled-span',
+        kind: SpanKind.CLIENT,
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
+        spanProcessor: tracer['_spanProcessor'],
+      });
+      const unsampledSpan = new SpanImpl({
+        scope: tracer.instrumentationScope,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
+        spanContext: {
+          traceId: 'a3cda95b652f4a1592b449d5929fda1b',
+          spanId: '5e0c63257de34c93',
+          traceFlags: TraceFlags.NONE,
+        },
+        name: 'unsampled-span',
+        kind: SpanKind.CLIENT,
+        spanLimits: cheatSpanLimitsFromTracer(tracer),
+        spanProcessor: tracer['_spanProcessor'],
+      });
+      processor.onEnd(sampledSpan);
+      processor.onEnd(unsampledSpan);
+
+      const { resourceMetrics } = await metricReader.collect();
+      const scopeMetrics = resourceMetrics.scopeMetrics.find(
+        sm => sm.scope.name === '@opentelemetry/sdk-trace'
       );
-      assert.ok(
-        failedPoint.attributes['otel.component.name']
-          ?.toString()
-          .startsWith('simple_span_processor/')
+      assert.ok(scopeMetrics);
+      const processedSpansMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.span.processed'
       );
+      assert.ok(processedSpansMetric);
+      const processedSpansDataPoints =
+        processedSpansMetric.dataPoints as Array<{
+          value: number;
+          attributes: Record<string, unknown>;
+        }>;
+      const shutdownPoint = processedSpansDataPoints.find(
+        dataPoint => dataPoint.attributes['error.type'] === 'already_shutdown'
+      );
+      assert.ok(shutdownPoint);
+      assert.strictEqual(shutdownPoint.value, 1);
+      const otherPoint = processedSpansDataPoints.find(
+        dataPoint => dataPoint.attributes['error.type'] !== 'already_shutdown'
+      );
+      assert.strictEqual(otherPoint, undefined);
     });
   });
 });
