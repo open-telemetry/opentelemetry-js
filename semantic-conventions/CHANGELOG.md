@@ -15,6 +15,244 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :house: Internal
 
+## 1.45.0
+
+### :rocket: Features
+
+* feat: update semantic conventions to v1.45.0 [#NNNN]
+  * Semantic Conventions v1.45.0: [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1450) | [latest docs](https://opentelemetry.io/docs/specs/semconv/)
+  * `@opentelemetry/semantic-conventions` (stable) changes: *8 added exports*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *1 exported value changed, 38 newly deprecated exports, 124 added exports*
+
+#### Stable changes in v1.45.0
+
+<details open>
+<summary>8 added exports</summary>
+
+```js
+ATTR_RPC_METHOD                 // rpc.method
+ATTR_RPC_METHOD_ORIGINAL        // rpc.method_original
+ATTR_RPC_STATUS_CODE            // rpc.status_code
+ATTR_RPC_SYSTEM_NAME            // rpc.system.name
+  RPC_SYSTEM_NAME_VALUE_DUBBO     // "dubbo"
+  RPC_SYSTEM_NAME_VALUE_GRPC      // "grpc"
+METRIC_RPC_CLIENT_CALL_DURATION // rpc.client.call.duration
+METRIC_RPC_SERVER_CALL_DURATION // rpc.server.call.duration
+```
+
+</details>
+
+#### Unstable changes in v1.45.0
+
+<details>
+<summary>1 exported value changed</summary>
+
+```js
+ATTR_FAAS_INVOCATION_ID // faas.invocation_id -> faas.invocation.id
+```
+
+</details>
+
+<details>
+<summary>38 newly deprecated exports</summary>
+
+```js
+ATTR_ENDUSER_ID                                    // enduser.id: Moved to the [OpenTelemetry Client-Side semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-client-side).
+ATTR_ENDUSER_PSEUDO_ID                             // enduser.pseudo.id: Moved to the [OpenTelemetry Client-Side semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-client-side).
+ATTR_MESSAGING_EVENTHUBS_MESSAGE_ENQUEUED_TIME     // messaging.eventhubs.message.enqueued_time: Replaced by `azure.eventhubs.message.enqueued_time`.
+ATTR_MESSAGING_GCP_PUBSUB_MESSAGE_ACK_DEADLINE     // messaging.gcp_pubsub.message.ack_deadline: Replaced by `gcp.pubsub.message.ack_deadline`.
+ATTR_MESSAGING_GCP_PUBSUB_MESSAGE_ACK_ID           // messaging.gcp_pubsub.message.ack_id: Replaced by `gcp.pubsub.message.ack_id`.
+ATTR_MESSAGING_GCP_PUBSUB_MESSAGE_DELIVERY_ATTEMPT // messaging.gcp_pubsub.message.delivery_attempt: Replaced by `gcp.pubsub.message.delivery_attempt`.
+ATTR_MESSAGING_GCP_PUBSUB_MESSAGE_ORDERING_KEY     // messaging.gcp_pubsub.message.ordering_key: Replaced by `gcp.pubsub.message.ordering_key`.
+ATTR_MESSAGING_KAFKA_CLUSTER_ID                    // messaging.kafka.cluster.id: Replaced by `kafka.cluster.id`.
+ATTR_MESSAGING_KAFKA_MESSAGE_KEY                   // messaging.kafka.message.key: Replaced by `kafka.message.key`.
+ATTR_MESSAGING_KAFKA_MESSAGE_TOMBSTONE             // messaging.kafka.message.tombstone: Replaced by `kafka.message.tombstone`.
+ATTR_MESSAGING_KAFKA_OFFSET                        // messaging.kafka.offset: Replaced by `kafka.offset`.
+ATTR_MESSAGING_RABBITMQ_DESTINATION_ROUTING_KEY    // messaging.rabbitmq.destination.routing_key: Replaced by `rabbitmq.destination.routing_key`.
+ATTR_MESSAGING_RABBITMQ_MESSAGE_DELIVERY_TAG       // messaging.rabbitmq.message.delivery_tag: Replaced by `rabbitmq.message.delivery_tag`.
+ATTR_MESSAGING_ROCKETMQ_CONSUMPTION_MODEL          // messaging.rocketmq.consumption_model: Replaced by `rocketmq.consumption_model`.
+ATTR_MESSAGING_ROCKETMQ_MESSAGE_DELAY_TIME_LEVEL   // messaging.rocketmq.message.delay_time_level: Replaced by `rocketmq.message.delay_time_level`.
+ATTR_MESSAGING_ROCKETMQ_MESSAGE_DELIVERY_TIMESTAMP // messaging.rocketmq.message.delivery_timestamp: Replaced by `rocketmq.message.delivery_timestamp`.
+ATTR_MESSAGING_ROCKETMQ_MESSAGE_GROUP              // messaging.rocketmq.message.group: Replaced by `rocketmq.message.group`.
+ATTR_MESSAGING_ROCKETMQ_MESSAGE_KEYS               // messaging.rocketmq.message.keys: Replaced by `rocketmq.message.keys`.
+ATTR_MESSAGING_ROCKETMQ_MESSAGE_TAG                // messaging.rocketmq.message.tag: Replaced by `rocketmq.message.tag`.
+ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE               // messaging.rocketmq.message.type: Replaced by `rocketmq.message.type`.
+ATTR_MESSAGING_ROCKETMQ_NAMESPACE                  // messaging.rocketmq.namespace: Replaced by `rocketmq.namespace`.
+ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS       // messaging.servicebus.disposition_status: Replaced by `azure.servicebus.disposition_status`.
+ATTR_MESSAGING_SERVICEBUS_MESSAGE_DELIVERY_COUNT   // messaging.servicebus.message.delivery_count: Replaced by `azure.servicebus.message.delivery_count`.
+ATTR_MESSAGING_SERVICEBUS_MESSAGE_ENQUEUED_TIME    // messaging.servicebus.message.enqueued_time: Replaced by `azure.servicebus.message.enqueued_time`.
+ATTR_MESSAGING_SYSTEM                              // messaging.system: Replaced by `messaging.system.name`.
+ATTR_OPENTRACING_REF_TYPE                          // opentracing.ref_type: OpenTracing compatibility requirements are [deprecated in OpenTelemetry Specification](https://opentelemetry.io/docs/specs/otel/compatibility/opentracing/)
+ATTR_RPC_REQUEST_METADATA                          // (key) => `rpc.request.metadata.${key}`: Replaced by `rpc.request.header`.
+ATTR_RPC_RESPONSE_METADATA                         // (key) => `rpc.response.metadata.${key}`: Split to `rpc.response.header` for metadata sent before the response payload and `rpc.response.trailer` for metadata sent after it.
+ATTR_RPC_RESPONSE_STATUS_CODE                      // rpc.response.status_code: Replaced by `rpc.status_code`.
+ATTR_SERVICE_PEER_NAME                             // service.peer.name: Use `server.service.name` on the client side or `client.service.name` on the server side.
+ATTR_SERVICE_PEER_NAMESPACE                        // service.peer.namespace: Use `server.service.namespace` on the client side or `client.service.namespace` on the server side.
+ATTR_SYSTEM_DEVICE                                 // system.device: Replaced by `system.device.name`.
+ATTR_ZOS_SMF_ID                                    // zos.smf.id: Moved to the [OpenTelemetry Mainframe semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-mainframe).
+ATTR_ZOS_SYSPLEX_NAME                              // zos.sysplex.name: Moved to the [OpenTelemetry Mainframe semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-mainframe).
+METRIC_DB_CLIENT_CONNECTION_MAX                    // db.client.connection.max: Replaced by `db.client.connection.limit`.
+SYSTEM_MEMORY_STATE_VALUE_BUFFERS                  // buffers: Removed, report memory usage with the `used` and `available` states instead.
+SYSTEM_MEMORY_STATE_VALUE_CACHED                   // cached: Removed, report memory usage with the `used` and `available` states instead.
+SYSTEM_MEMORY_STATE_VALUE_FREE                     // free: Removed, report memory usage with the `used` and `available` states instead.
+```
+
+</details>
+
+<details>
+<summary>124 added exports</summary>
+
+```js
+ATTR_AZURE_EVENTHUBS_MESSAGE_ENQUEUED_TIME                   // azure.eventhubs.message.enqueued_time
+ATTR_AZURE_SERVICEBUS_DISPOSITION_STATUS                     // azure.servicebus.disposition_status
+  AZURE_SERVICEBUS_DISPOSITION_STATUS_VALUE_ABANDON            // "abandon"
+  AZURE_SERVICEBUS_DISPOSITION_STATUS_VALUE_COMPLETE           // "complete"
+  AZURE_SERVICEBUS_DISPOSITION_STATUS_VALUE_DEAD_LETTER        // "dead_letter"
+  AZURE_SERVICEBUS_DISPOSITION_STATUS_VALUE_DEFER              // "defer"
+ATTR_AZURE_SERVICEBUS_MESSAGE_DELIVERY_COUNT                 // azure.servicebus.message.delivery_count
+ATTR_AZURE_SERVICEBUS_MESSAGE_ENQUEUED_TIME                  // azure.servicebus.message.enqueued_time
+
+ATTR_CLIENT_AS_NUMBER                                        // client.as.number
+ATTR_CLIENT_AS_ORGANIZATION                                  // client.as.organization
+ATTR_CLIENT_MAC_ADDRESS                                      // client.mac.address
+ATTR_CLIENT_PREFIX                                           // client.prefix
+ATTR_CLIENT_SERVICE_NAME                                     // client.service.name
+ATTR_CLIENT_SERVICE_NAMESPACE                                // client.service.namespace
+
+ATTR_DESTINATION_AS_NUMBER                                   // destination.as.number
+ATTR_DESTINATION_AS_ORGANIZATION                             // destination.as.organization
+ATTR_DESTINATION_MAC_ADDRESS                                 // destination.mac.address
+ATTR_DESTINATION_PREFIX                                      // destination.prefix
+
+ATTR_FAAS_INVOCATION_START_TIME                              // faas.invocation.start_time
+
+ATTR_GCP_PUBSUB_MESSAGE_ACK_DEADLINE                         // gcp.pubsub.message.ack_deadline
+ATTR_GCP_PUBSUB_MESSAGE_ACK_ID                               // gcp.pubsub.message.ack_id
+ATTR_GCP_PUBSUB_MESSAGE_DELIVERY_ATTEMPT                     // gcp.pubsub.message.delivery_attempt
+ATTR_GCP_PUBSUB_MESSAGE_ORDERING_KEY                         // gcp.pubsub.message.ordering_key
+
+ATTR_HTTP_REQUEST_BODY_CONTENT                               // http.request.body.content
+ATTR_HTTP_RESPONSE_BODY_CONTENT                              // http.response.body.content
+
+ATTR_JVM_EXECUTOR_NAME                                       // jvm.executor.name
+ATTR_JVM_EXECUTOR_OWNER_NAME                                 // jvm.executor.owner.name
+ATTR_JVM_EXECUTOR_THREAD_STATE                               // jvm.executor.thread.state
+  JVM_EXECUTOR_THREAD_STATE_VALUE_ACTIVE                       // "active"
+  JVM_EXECUTOR_THREAD_STATE_VALUE_IDLE                         // "idle"
+ATTR_JVM_EXECUTOR_TYPE                                       // jvm.executor.type
+
+ATTR_KAFKA_CLUSTER_ID                                        // kafka.cluster.id
+ATTR_KAFKA_MESSAGE_KEY                                       // kafka.message.key
+ATTR_KAFKA_MESSAGE_TOMBSTONE                                 // kafka.message.tombstone
+ATTR_KAFKA_OFFSET                                            // kafka.offset
+
+ATTR_MESSAGING_SYSTEM_NAME                                   // messaging.system.name
+  MESSAGING_SYSTEM_NAME_VALUE_ACTIVEMQ                         // "activemq"
+  MESSAGING_SYSTEM_NAME_VALUE_AWS_SNS                          // "aws.sns"
+  MESSAGING_SYSTEM_NAME_VALUE_AWS_SQS                          // "aws.sqs"
+  MESSAGING_SYSTEM_NAME_VALUE_AZURE_EVENTGRID                  // "azure.eventgrid"
+  MESSAGING_SYSTEM_NAME_VALUE_AZURE_EVENTHUBS                  // "azure.eventhubs"
+  MESSAGING_SYSTEM_NAME_VALUE_AZURE_SERVICEBUS                 // "azure.servicebus"
+  MESSAGING_SYSTEM_NAME_VALUE_GCP_PUBSUB                       // "gcp.pubsub"
+  MESSAGING_SYSTEM_NAME_VALUE_JMS                              // "jms"
+  MESSAGING_SYSTEM_NAME_VALUE_KAFKA                            // "kafka"
+  MESSAGING_SYSTEM_NAME_VALUE_PULSAR                           // "pulsar"
+  MESSAGING_SYSTEM_NAME_VALUE_RABBITMQ                         // "rabbitmq"
+  MESSAGING_SYSTEM_NAME_VALUE_ROCKETMQ                         // "rocketmq"
+
+ATTR_NETWORK_LOCAL_AS_NUMBER                                 // network.local.as.number
+ATTR_NETWORK_LOCAL_AS_ORGANIZATION                           // network.local.as.organization
+ATTR_NETWORK_LOCAL_MAC_ADDRESS                               // network.local.mac.address
+ATTR_NETWORK_LOCAL_PREFIX                                    // network.local.prefix
+ATTR_NETWORK_PEER_AS_NUMBER                                  // network.peer.as.number
+ATTR_NETWORK_PEER_AS_ORGANIZATION                            // network.peer.as.organization
+ATTR_NETWORK_PEER_MAC_ADDRESS                                // network.peer.mac.address
+ATTR_NETWORK_PEER_PREFIX                                     // network.peer.prefix
+
+ATTR_RABBITMQ_DESTINATION_ROUTING_KEY                        // rabbitmq.destination.routing_key
+ATTR_RABBITMQ_MESSAGE_DELIVERY_TAG                           // rabbitmq.message.delivery_tag
+
+ATTR_ROCKETMQ_CONSUMPTION_MODEL                              // rocketmq.consumption_model
+  ROCKETMQ_CONSUMPTION_MODEL_VALUE_BROADCASTING                // "broadcasting"
+  ROCKETMQ_CONSUMPTION_MODEL_VALUE_CLUSTERING                  // "clustering"
+ATTR_ROCKETMQ_MESSAGE_DELAY_TIME_LEVEL                       // rocketmq.message.delay_time_level
+ATTR_ROCKETMQ_MESSAGE_DELIVERY_TIMESTAMP                     // rocketmq.message.delivery_timestamp
+ATTR_ROCKETMQ_MESSAGE_GROUP                                  // rocketmq.message.group
+ATTR_ROCKETMQ_MESSAGE_KEYS                                   // rocketmq.message.keys
+ATTR_ROCKETMQ_MESSAGE_TAG                                    // rocketmq.message.tag
+ATTR_ROCKETMQ_MESSAGE_TYPE                                   // rocketmq.message.type
+  ROCKETMQ_MESSAGE_TYPE_VALUE_DELAY                            // "delay"
+  ROCKETMQ_MESSAGE_TYPE_VALUE_FIFO                             // "fifo"
+  ROCKETMQ_MESSAGE_TYPE_VALUE_NORMAL                           // "normal"
+  ROCKETMQ_MESSAGE_TYPE_VALUE_TRANSACTION                      // "transaction"
+ATTR_ROCKETMQ_NAMESPACE                                      // rocketmq.namespace
+
+ATTR_RPC_REQUEST_HEADER                                      // (key) => `rpc.request.header.${key}`
+ATTR_RPC_RESPONSE_HEADER                                     // (key) => `rpc.response.header.${key}`
+ATTR_RPC_RESPONSE_TRAILER                                    // (key) => `rpc.response.trailer.${key}`
+
+ATTR_SERVER_AS_NUMBER                                        // server.as.number
+ATTR_SERVER_AS_ORGANIZATION                                  // server.as.organization
+ATTR_SERVER_MAC_ADDRESS                                      // server.mac.address
+ATTR_SERVER_PREFIX                                           // server.prefix
+ATTR_SERVER_SERVICE_NAME                                     // server.service.name
+ATTR_SERVER_SERVICE_NAMESPACE                                // server.service.namespace
+
+ATTR_SERVICE_INSTANCE_COST_CENTER_ID                         // service.instance.cost_center.id
+ATTR_SERVICE_INSTANCE_COST_CENTER_NAME                       // service.instance.cost_center.name
+
+ATTR_SOURCE_AS_NUMBER                                        // source.as.number
+ATTR_SOURCE_AS_ORGANIZATION                                  // source.as.organization
+ATTR_SOURCE_MAC_ADDRESS                                      // source.mac.address
+ATTR_SOURCE_PREFIX                                           // source.prefix
+
+ATTR_SYSTEM_DEVICE_NAME                                      // system.device.name
+
+METRIC_DB_CLIENT_CONNECTION_LIMIT                            // db.client.connection.limit
+
+METRIC_JVM_EXECUTOR_QUEUE_CAPACITY                           // jvm.executor.queue.capacity
+METRIC_JVM_EXECUTOR_QUEUE_SIZE                               // jvm.executor.queue.size
+METRIC_JVM_EXECUTOR_TASK_COMPLETED                           // jvm.executor.task.completed
+METRIC_JVM_EXECUTOR_TASK_REJECTED                            // jvm.executor.task.rejected
+METRIC_JVM_EXECUTOR_THREAD_CORE                              // jvm.executor.thread.core
+METRIC_JVM_EXECUTOR_THREAD_COUNT                             // jvm.executor.thread.count
+METRIC_JVM_EXECUTOR_THREAD_LIMIT                             // jvm.executor.thread.limit
+
+METRIC_K8S_CONTAINER_MEMORY_LIMIT_UTILIZATION                // k8s.container.memory.limit.utilization
+METRIC_K8S_CONTAINER_MEMORY_REQUEST_UTILIZATION              // k8s.container.memory.request.utilization
+METRIC_K8S_NODE_PID_LIMIT                                    // k8s.node.pid.limit
+METRIC_K8S_NODE_PID_USAGE                                    // k8s.node.pid.usage
+METRIC_K8S_POD_CPU_LIMIT_CURRENT                             // k8s.pod.cpu.limit.current
+METRIC_K8S_POD_CPU_LIMIT_DESIRED                             // k8s.pod.cpu.limit.desired
+METRIC_K8S_POD_CPU_LIMIT_UTILIZATION                         // k8s.pod.cpu.limit.utilization
+METRIC_K8S_POD_CPU_REQUEST_CURRENT                           // k8s.pod.cpu.request.current
+METRIC_K8S_POD_CPU_REQUEST_DESIRED                           // k8s.pod.cpu.request.desired
+METRIC_K8S_POD_CPU_REQUEST_UTILIZATION                       // k8s.pod.cpu.request.utilization
+METRIC_K8S_POD_MEMORY_LIMIT_CURRENT                          // k8s.pod.memory.limit.current
+METRIC_K8S_POD_MEMORY_LIMIT_DESIRED                          // k8s.pod.memory.limit.desired
+METRIC_K8S_POD_MEMORY_LIMIT_UTILIZATION                      // k8s.pod.memory.limit.utilization
+METRIC_K8S_POD_MEMORY_REQUEST_CURRENT                        // k8s.pod.memory.request.current
+METRIC_K8S_POD_MEMORY_REQUEST_DESIRED                        // k8s.pod.memory.request.desired
+METRIC_K8S_POD_MEMORY_REQUEST_UTILIZATION                    // k8s.pod.memory.request.utilization
+METRIC_K8S_STATEFULSET_POD_AVAILABLE                         // k8s.statefulset.pod.available
+
+PROFILE_FRAME_TYPE_VALUE_CUDA                                // "cuda"
+
+SYSTEM_MEMORY_STATE_VALUE_AVAILABLE                          // "available"
+
+V8JS_HEAP_SPACE_NAME_VALUE_CODE_LARGE_OBJECT_SPACE           // "code_large_object_space"
+V8JS_HEAP_SPACE_NAME_VALUE_NEW_LARGE_OBJECT_SPACE            // "new_large_object_space"
+V8JS_HEAP_SPACE_NAME_VALUE_READ_ONLY_SPACE                   // "read_only_space"
+V8JS_HEAP_SPACE_NAME_VALUE_SHARED_LARGE_OBJECT_SPACE         // "shared_large_object_space"
+V8JS_HEAP_SPACE_NAME_VALUE_SHARED_SPACE                      // "shared_space"
+V8JS_HEAP_SPACE_NAME_VALUE_SHARED_TRUSTED_LARGE_OBJECT_SPACE // "shared_trusted_large_object_space"
+V8JS_HEAP_SPACE_NAME_VALUE_SHARED_TRUSTED_SPACE              // "shared_trusted_space"
+V8JS_HEAP_SPACE_NAME_VALUE_TRUSTED_LARGE_OBJECT_SPACE        // "trusted_large_object_space"
+V8JS_HEAP_SPACE_NAME_VALUE_TRUSTED_SPACE                     // "trusted_space"
+```
+
+</details>
+
 ## 1.44.0
 
 ### :rocket: Features
