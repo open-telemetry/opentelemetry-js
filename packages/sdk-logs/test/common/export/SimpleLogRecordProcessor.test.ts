@@ -250,15 +250,13 @@ describe('SimpleLogRecordProcessor', () => {
         value: number;
         attributes: Record<string, unknown>;
       }>;
-      const shutdownPoint = processedLogsDataPoints.find(
-        dataPoint => dataPoint.attributes['error.type'] === 'already_shutdown'
+      assert.deepStrictEqual(
+        processedLogsDataPoints.map(dataPoint => [
+          dataPoint.attributes['error.type'],
+          dataPoint.value,
+        ]),
+        [['already_shutdown', 1]]
       );
-      assert.ok(shutdownPoint);
-      assert.strictEqual(shutdownPoint.value, 1);
-      const otherPoint = processedLogsDataPoints.find(
-        dataPoint => dataPoint.attributes['error.type'] !== 'already_shutdown'
-      );
-      assert.strictEqual(otherPoint, undefined);
     });
   });
 });

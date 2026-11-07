@@ -532,15 +532,13 @@ describe('SimpleSpanProcessor', () => {
           value: number;
           attributes: Record<string, unknown>;
         }>;
-      const shutdownPoint = processedSpansDataPoints.find(
-        dataPoint => dataPoint.attributes['error.type'] === 'already_shutdown'
+      assert.deepStrictEqual(
+        processedSpansDataPoints.map(dataPoint => [
+          dataPoint.attributes['error.type'],
+          dataPoint.value,
+        ]),
+        [['already_shutdown', 1]]
       );
-      assert.ok(shutdownPoint);
-      assert.strictEqual(shutdownPoint.value, 1);
-      const otherPoint = processedSpansDataPoints.find(
-        dataPoint => dataPoint.attributes['error.type'] !== 'already_shutdown'
-      );
-      assert.strictEqual(otherPoint, undefined);
     });
   });
 });

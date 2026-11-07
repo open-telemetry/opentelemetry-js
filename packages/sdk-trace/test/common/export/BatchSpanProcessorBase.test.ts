@@ -856,15 +856,13 @@ describe('BatchSpanProcessorBase', () => {
           value: number;
           attributes: Record<string, unknown>;
         }>;
-      const shutdownPoint = processedSpansDataPoints.find(
-        dataPoint => dataPoint.attributes['error.type'] === 'already_shutdown'
+      assert.deepStrictEqual(
+        processedSpansDataPoints.map(dataPoint => [
+          dataPoint.attributes['error.type'],
+          dataPoint.value,
+        ]),
+        [['already_shutdown', 1]]
       );
-      assert.ok(shutdownPoint);
-      assert.strictEqual(shutdownPoint.value, 1);
-      const otherPoint = processedSpansDataPoints.find(
-        dataPoint => dataPoint.attributes['error.type'] !== 'already_shutdown'
-      );
-      assert.strictEqual(otherPoint, undefined);
     });
 
     it('should count processed spans when export times out', async () => {
@@ -902,15 +900,13 @@ describe('BatchSpanProcessorBase', () => {
           value: number;
           attributes: Record<string, unknown>;
         }>;
-      const processedPoint = processedSpansDataPoints.find(
-        dataPoint => dataPoint.attributes['error.type'] === undefined
+      assert.deepStrictEqual(
+        processedSpansDataPoints.map(dataPoint => [
+          dataPoint.attributes['error.type'],
+          dataPoint.value,
+        ]),
+        [[undefined, 1]]
       );
-      assert.ok(processedPoint);
-      assert.strictEqual(processedPoint.value, 1);
-      const failedPoint = processedSpansDataPoints.find(
-        dataPoint => dataPoint.attributes['error.type'] !== undefined
-      );
-      assert.strictEqual(failedPoint, undefined);
     });
   });
 });
