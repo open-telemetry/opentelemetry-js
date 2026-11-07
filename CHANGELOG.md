@@ -15,16 +15,33 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :rocket: Features
 
+### :bug: Bug Fixes
+
+* fix(sdk-metrics): prevent race condition and zombie state in MetricReader shutdown [#7265](https://github.com/open-telemetry/opentelemetry-js/pull/7265) @harshkoli1255
+
+### :books: Documentation
+
+### :house: Internal
+
+## 3.1.0
+
+### :rocket: Features
+
 * feat(resources): Deprecate `envDetector` in favor of separate `resourceAttributesEnvDetector` and `serviceNameEnvDetector`. Also mark `serviceInstanceIdDetector` as stable (the `service.instance.id` semconv attribute is now stable). [#6999](https://github.com/open-telemetry/opentelemetry-js/pull/6999) @trentm
 
 ### :bug: Bug Fixes
 
-* fix(sdk-metrics): prevent race condition and zombie state in MetricReader shutdown [#7265](https://github.com/open-telemetry/opentelemetry-js/pull/7265) @harshkoli1255
+* fix(context-zone): declare the `@opentelemetry/api` peer dependency so Yarn PnP can resolve it for `context-zone-peer-dep` [#7268](https://github.com/open-telemetry/opentelemetry-js/pull/7268) @Vivek1898
 * fix(core): accept attribute values with shared (non-circular) object references [#7068](https://github.com/open-telemetry/opentelemetry-js/pull/7068) @rajanpanth
+* fix: raise the minimum `@opentelemetry/api` peer dependency version to 1.10.0 for packages that depend on `@opentelemetry/core`, `@opentelemetry/otlp-transformer` or `@opentelemetry/instrumentation`, as these use API 1.10 features. ([#7258](https://github.com/open-telemetry/opentelemetry-js/issues/7258)) @volodymyrshk @pichlermarc
+  * Combining these packages with `@opentelemetry/api` 1.9.x never worked: they failed at runtime. The peer dependency now makes npm report this at install time instead.
+  * If you see a peer dependency error after upgrading, update `@opentelemetry/api` to 1.10.0 or later.
+* fix(propagator-b3): reject trace ids that are not 16 or 32 characters long [#7262](https://github.com/open-telemetry/opentelemetry-js/pull/7262) @adityareddy-dev
 
 ### :books: Documentation
 
 * docs(resources): update dead semantic conventions resource specification links [#7254](https://github.com/open-telemetry/opentelemetry-js/pull/7254) @helmipradita
+* docs(migration): note that `@opentelemetry/api` v1.10.0 needs SDK 3.x [#7253](https://github.com/open-telemetry/opentelemetry-js/pull/7253) @adityareddy-dev
 
 ### :house: Internal
 

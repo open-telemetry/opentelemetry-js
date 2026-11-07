@@ -55,31 +55,30 @@ describe('utils-resource-timings', function () {
   });
 
   describe('getElementXPath', function () {
-    let $fixture: any;
-    let child: any;
+    let root: HTMLElement;
+    const find = (selector: string): HTMLElement => {
+      const el = root.querySelector<HTMLElement>(selector);
+      assert.ok(el, `fixture element not found: ${selector}`);
+      return el;
+    };
     before(() => {
-      $fixture = $(fixture);
-      const body = document.querySelector('body');
-      if (body) {
-        body.appendChild($fixture[0]);
-        child = body.lastChild;
-      }
+      const container = document.createElement('div');
+      container.innerHTML = fixture.trim();
+      root = container.firstElementChild as HTMLElement;
+      document.body.appendChild(root);
     });
     after(() => {
-      child.parentNode.removeChild(child);
+      root.remove();
     });
 
     it('should return correct path for element with id and optimise = true', function () {
-      const element = getElementXPath($fixture.find('#btn22')[0], true);
+      const element = getElementXPath(find('#btn22'), true);
       assert.strictEqual(element, '//*[@id="btn22"]');
-      assert.strictEqual(
-        $fixture.find('#btn22')[0],
-        getElementByXpath(element)
-      );
+      assert.strictEqual(find('#btn22'), getElementByXpath(element));
     });
 
     it('should use ancestor id when optimised recursively', function () {
-      const inner = $fixture.find('#body-id div')[0];
+      const inner = find('#body-id div');
       const element = getElementXPath(inner, true);
       assert.strictEqual(element, '//*[@id="body-id"]/div');
       assert.strictEqual(inner, getElementByXpath(element));
@@ -89,12 +88,9 @@ describe('utils-resource-timings', function () {
       'should return correct path for element with id and surrounded by the' +
         ' same type',
       function () {
-        const element = getElementXPath($fixture.find('#btn22')[0]);
+        const element = getElementXPath(find('#btn22'));
         assert.strictEqual(element, '//html/body/div/div[4]/div[5]/button[3]');
-        assert.strictEqual(
-          $fixture.find('#btn22')[0],
-          getElementByXpath(element)
-        );
+        assert.strictEqual(find('#btn22'), getElementByXpath(element));
       }
     );
 
@@ -102,12 +98,9 @@ describe('utils-resource-timings', function () {
       'should return correct path for element with id and surrounded by' +
         ' text nodes mixed with cnode',
       function () {
-        const element = getElementXPath($fixture.find('#btn23')[0]);
+        const element = getElementXPath(find('#btn23'));
         assert.strictEqual(element, '//html/body/div/div[4]/div[6]/button');
-        assert.strictEqual(
-          $fixture.find('#btn23')[0],
-          getElementByXpath(element)
-        );
+        assert.strictEqual(find('#btn23'), getElementByXpath(element));
       }
     );
 
@@ -115,7 +108,7 @@ describe('utils-resource-timings', function () {
       'should return correct path for text node element surrounded by cdata' +
         ' nodes',
       function () {
-        const text = $fixture.find('#cdata')[0];
+        const text = find('#cdata');
         const textNode = document.createTextNode('foobar');
         text.appendChild(textNode);
         const element = getElementXPath(textNode);
@@ -125,7 +118,7 @@ describe('utils-resource-timings', function () {
     );
 
     it('should return correct path when element is text node', function () {
-      const text = $fixture.find('#text')[0];
+      const text = find('#text');
       const textNode = document.createTextNode('foobar');
       text.appendChild(textNode);
       const element = getElementXPath(textNode);
@@ -134,7 +127,7 @@ describe('utils-resource-timings', function () {
     });
 
     it('should return correct path when element is comment node', function () {
-      const comment = $fixture.find('#comment')[0];
+      const comment = find('#comment');
       const node = document.createComment('foobar');
       comment.appendChild(node);
       const element = getElementXPath(node);
