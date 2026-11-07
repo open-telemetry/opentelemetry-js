@@ -50,14 +50,15 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
 
   public onEmit(logRecord: ReadWriteLogRecord, _context?: Context): void {
     if (this._shutdownOnce.isCalled) {
+      this._metrics.shutdownDropLogs(1);
       return;
     }
 
-    const doExport = () =>
-      internal
+    const doExport = () => {
+      this._metrics.exportLogs(1);
+      return internal
         ._export(this._exporter, [logRecord])
         .then((result: ExportResult) => {
-          this._metrics.finishLogs(1, result.error);
           if (result.code !== ExportResultCode.SUCCESS) {
             globalErrorHandler(
               result.error ??
@@ -68,6 +69,7 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
           }
         })
         .catch(globalErrorHandler);
+    };
 
     // Avoid scheduling a promise to make the behavior more predictable and easier to test
     if (logRecord.resource.asyncAttributesPending) {

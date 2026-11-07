@@ -67,11 +67,12 @@ export class SimpleSpanProcessor implements SpanProcessor {
   onStart(_span: Span, _parentContext: Context): void {}
 
   onEnd(span: ReadableSpan): void {
-    if (this._shutdownOnce.isCalled) {
+    if ((span.spanContext().traceFlags & TraceFlags.SAMPLED) === 0) {
       return;
     }
 
-    if ((span.spanContext().traceFlags & TraceFlags.SAMPLED) === 0) {
+    if (this._shutdownOnce.isCalled) {
+      this._metrics.shutdownDropSpans(1);
       return;
     }
 
@@ -95,8 +96,8 @@ export class SimpleSpanProcessor implements SpanProcessor {
       await span.resource.waitForAsyncAttributes?.();
     }
 
+    this._metrics.exportSpans(1);
     const result = await internal._export(this._exporter, [span]);
-    this._metrics.finishSpans(1, result.error);
     if (result.code !== ExportResultCode.SUCCESS) {
       throw (
         result.error ??
