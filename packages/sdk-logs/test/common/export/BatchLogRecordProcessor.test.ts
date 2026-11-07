@@ -957,15 +957,13 @@ describe('BatchLogRecordProcessorBase', () => {
         value: number;
         attributes: Record<string, unknown>;
       }>;
-      const shutdownPoint = processedLogsDataPoints.find(
-        dataPoint => dataPoint.attributes['error.type'] === 'already_shutdown'
+      assert.deepStrictEqual(
+        processedLogsDataPoints.map(dataPoint => [
+          dataPoint.attributes['error.type'],
+          dataPoint.value,
+        ]),
+        [['already_shutdown', 1]]
       );
-      assert.ok(shutdownPoint);
-      assert.strictEqual(shutdownPoint.value, 1);
-      const otherPoint = processedLogsDataPoints.find(
-        dataPoint => dataPoint.attributes['error.type'] !== 'already_shutdown'
-      );
-      assert.strictEqual(otherPoint, undefined);
     });
 
     it('should count processed logs when export times out', async () => {
@@ -1002,15 +1000,13 @@ describe('BatchLogRecordProcessorBase', () => {
         value: number;
         attributes: Record<string, unknown>;
       }>;
-      const processedPoint = processedLogsDataPoints.find(
-        dataPoint => dataPoint.attributes['error.type'] === undefined
+      assert.deepStrictEqual(
+        processedLogsDataPoints.map(dataPoint => [
+          dataPoint.attributes['error.type'],
+          dataPoint.value,
+        ]),
+        [[undefined, 1]]
       );
-      assert.ok(processedPoint);
-      assert.strictEqual(processedPoint.value, 1);
-      const failedPoint = processedLogsDataPoints.find(
-        dataPoint => dataPoint.attributes['error.type'] !== undefined
-      );
-      assert.strictEqual(failedPoint, undefined);
     });
   });
 });
