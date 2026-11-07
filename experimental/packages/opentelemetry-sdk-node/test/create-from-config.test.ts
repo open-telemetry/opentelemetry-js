@@ -72,6 +72,10 @@ import {
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
+import { buildComponentProviderRegistry } from '../src/component-provider';
+import { getBuiltinComponentProviders } from '../src/builtin-component-providers';
+
+const reg = buildComponentProviderRegistry([getBuiltinComponentProviders()]);
 
 describe('create-from-config', () => {
   describe('headers_list exporter wiring', function () {
@@ -82,7 +86,7 @@ describe('create-from-config', () => {
     function createTraceExporter(
       exporter: SpanExporterConfigModel
     ): SpanExporter {
-      const provider = createTracerProviderFromConfig(resource, {
+      const provider = createTracerProviderFromConfig(reg, resource, {
         processors: [{ simple: { exporter } }],
       });
       return (provider as any)._activeSpanProcessor._spanProcessors[0]
@@ -1310,6 +1314,7 @@ describe('create-from-config', () => {
         processors: [{ simple: { exporter: { console: null } } }],
       };
       const provider = createTracerProviderFromConfig(
+        reg,
         resource,
         tracer_provider
       );
@@ -1350,6 +1355,7 @@ describe('create-from-config', () => {
         id_generator: { random: null },
       };
       const provider = createTracerProviderFromConfig(
+        reg,
         resource,
         tracer_provider
       );
@@ -1458,7 +1464,7 @@ describe('create-from-config', () => {
       for (const item of corpus) {
         it(item.testName, function () {
           assert.throws(() => {
-            createTracerProviderFromConfig(resource, item.tracer_provider);
+            createTracerProviderFromConfig(reg, resource, item.tracer_provider);
           }, item.assertThrowsError);
         });
       }

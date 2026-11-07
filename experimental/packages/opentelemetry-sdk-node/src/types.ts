@@ -19,6 +19,7 @@ import type {
   SpanProcessor,
   IdGenerator,
 } from '@opentelemetry/sdk-trace';
+import type { ComponentProvidersFromType } from './component-provider';
 
 export interface NodeSDKConfiguration {
   autoDetectResources: boolean;
@@ -88,6 +89,8 @@ export interface NodeSDKConfiguration {
 
 export interface StartSdkFromConfigOptions {
   configFile: string;
+  // XXX test `componentProviderCollections`
+  componentProviderCollections?: ComponentProvidersFromType[];
   instrumentations?: (Instrumentation | Instrumentation[])[];
 }
 
