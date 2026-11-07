@@ -33,6 +33,7 @@ export class SpanProcessorMetrics {
 
   private readonly standardAttrs: Attributes;
   private readonly droppedAttrs: Attributes;
+  private readonly alreadyShutdownAttrs: Attributes;
 
   constructor(componentType: string, meter: Meter, queueConfig?: QueueConfig) {
     const counter = componentCounter.get(componentType) ?? 0;
@@ -46,6 +47,11 @@ export class SpanProcessorMetrics {
     this.droppedAttrs = {
       ...this.standardAttrs,
       [ATTR_ERROR_TYPE]: 'queue_full',
+    };
+
+    this.alreadyShutdownAttrs = {
+      ...this.standardAttrs,
+      [ATTR_ERROR_TYPE]: 'already_shutdown',
     };
 
     this.processedSpans = meter.createCounter(
@@ -87,17 +93,12 @@ export class SpanProcessorMetrics {
     this.processedSpans.add(count, this.droppedAttrs);
   }
 
-  finishSpans(count: number, error: Error | undefined) {
-    if (!error) {
-      this.processedSpans.add(count, this.standardAttrs);
-      return;
-    }
+  exportSpans(count: number) {
+    this.processedSpans.add(count, this.standardAttrs);
+  }
 
-    const attrs = {
-      ...this.standardAttrs,
-      [ATTR_ERROR_TYPE]: error.name,
-    };
-    this.processedSpans.add(count, attrs);
+  shutdownDropSpans(count: number) {
+    this.processedSpans.add(count, this.alreadyShutdownAttrs);
   }
 
   shutdown() {

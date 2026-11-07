@@ -683,19 +683,23 @@ describe('BatchSpanProcessorBase', () => {
         m => m.descriptor.name === 'otel.sdk.processor.span.processed'
       );
       assert.ok(processedSpansMetric);
-      assert.strictEqual(processedSpansMetric.dataPoints[0].value, 1);
+      let processedSpansDataPoints = processedSpansMetric.dataPoints as Array<{
+        value: number;
+        attributes: Record<string, unknown>;
+      }>;
+      let queueFullPoint = processedSpansDataPoints.find(
+        dataPoint => dataPoint.attributes['error.type'] === 'queue_full'
+      );
+      assert.ok(queueFullPoint);
+      assert.strictEqual(queueFullPoint.value, 1);
       assert.strictEqual(
-        processedSpansMetric.dataPoints[0].attributes['otel.component.type'],
+        queueFullPoint.attributes['otel.component.type'],
         'batching_span_processor'
       );
       assert.ok(
-        processedSpansMetric.dataPoints[0].attributes['otel.component.name']
+        queueFullPoint.attributes['otel.component.name']
           ?.toString()
           .startsWith('batching_span_processor/')
-      );
-      assert.strictEqual(
-        processedSpansMetric.dataPoints[0].attributes['error.type'],
-        'queue_full'
       );
       let spanCapacityMetric = scopeMetrics.metrics.find(
         m => m.descriptor.name === 'otel.sdk.processor.span.queue.capacity'
@@ -752,12 +756,11 @@ describe('BatchSpanProcessorBase', () => {
         m => m.descriptor.name === 'otel.sdk.processor.span.processed'
       );
       assert.ok(processedSpansMetric);
-      const processedSpansDataPoints =
-        processedSpansMetric.dataPoints as Array<{
-          value: number;
-          attributes: Record<string, unknown>;
-        }>;
-      const queueFullPoint = processedSpansDataPoints.find(
+      processedSpansDataPoints = processedSpansMetric.dataPoints as Array<{
+        value: number;
+        attributes: Record<string, unknown>;
+      }>;
+      queueFullPoint = processedSpansDataPoints.find(
         dataPoint => dataPoint.attributes['error.type'] === 'queue_full'
       );
       assert.ok(queueFullPoint);
@@ -775,7 +778,7 @@ describe('BatchSpanProcessorBase', () => {
         dataPoint => dataPoint.attributes['error.type'] === undefined
       );
       assert.ok(successPoint);
-      assert.strictEqual(successPoint.value, 1);
+      assert.strictEqual(successPoint.value, 2);
       assert.strictEqual(
         successPoint.attributes['otel.component.type'],
         'batching_span_processor'
@@ -788,17 +791,7 @@ describe('BatchSpanProcessorBase', () => {
       const failedPoint = processedSpansDataPoints.find(
         dataPoint => dataPoint.attributes['error.type'] === 'BackendError'
       );
-      assert.ok(failedPoint);
-      assert.strictEqual(failedPoint.value, 1);
-      assert.strictEqual(
-        failedPoint.attributes['otel.component.type'],
-        'batching_span_processor'
-      );
-      assert.ok(
-        failedPoint.attributes['otel.component.name']
-          ?.toString()
-          .startsWith('batching_span_processor/')
-      );
+      assert.strictEqual(failedPoint, undefined);
 
       spanCapacityMetric = scopeMetrics.metrics.find(
         m => m.descriptor.name === 'otel.sdk.processor.span.queue.capacity'
@@ -830,6 +823,94 @@ describe('BatchSpanProcessorBase', () => {
           ?.toString()
           .startsWith('batching_span_processor/')
       );
+    });
+
+    it('should record already_shutdown for sampled spans ended after shutdown', async () => {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+      const processor = new BatchSpanProcessor({
+        exporter,
+        maxQueueSize: 5,
+        maxExportBatchSize: 1,
+        scheduledDelayMillis: 1_000_000_000,
+        selfObsMeterProvider: meterProvider,
+      });
+      await processor.shutdown();
+
+      processor.onEnd(createSampledSpan('sampled'));
+      processor.onEnd(createUnsampledSpan('unsampled'));
+
+      const { resourceMetrics } = await metricReader.collect();
+      const scopeMetrics = resourceMetrics.scopeMetrics.find(
+        sm => sm.scope.name === '@opentelemetry/sdk-trace'
+      );
+      assert.ok(scopeMetrics);
+      const processedSpansMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.span.processed'
+      );
+      assert.ok(processedSpansMetric);
+      const processedSpansDataPoints =
+        processedSpansMetric.dataPoints as Array<{
+          value: number;
+          attributes: Record<string, unknown>;
+        }>;
+      const shutdownPoint = processedSpansDataPoints.find(
+        dataPoint => dataPoint.attributes['error.type'] === 'already_shutdown'
+      );
+      assert.ok(shutdownPoint);
+      assert.strictEqual(shutdownPoint.value, 1);
+      const otherPoint = processedSpansDataPoints.find(
+        dataPoint => dataPoint.attributes['error.type'] !== 'already_shutdown'
+      );
+      assert.strictEqual(otherPoint, undefined);
+    });
+
+    it('should count processed spans when export times out', async () => {
+      const clock = sinon.useFakeTimers();
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+      const exportTimeoutMillis = 1000;
+      sinon.stub(exporter, 'export').callsFake(() => {
+        // never call the callback to simulate a hung export
+      });
+      const processor = new BatchSpanProcessor({
+        exporter,
+        maxExportBatchSize: 1,
+        scheduledDelayMillis: 2500,
+        exportTimeoutMillis,
+        selfObsMeterProvider: meterProvider,
+      });
+
+      processor.onEnd(createSampledSpan('span1'));
+      await clock.tickAsync(exportTimeoutMillis + 100);
+
+      const { resourceMetrics } = await metricReader.collect();
+      const scopeMetrics = resourceMetrics.scopeMetrics.find(
+        sm => sm.scope.name === '@opentelemetry/sdk-trace'
+      );
+      assert.ok(scopeMetrics);
+      const processedSpansMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.span.processed'
+      );
+      assert.ok(processedSpansMetric);
+      const processedSpansDataPoints =
+        processedSpansMetric.dataPoints as Array<{
+          value: number;
+          attributes: Record<string, unknown>;
+        }>;
+      const processedPoint = processedSpansDataPoints.find(
+        dataPoint => dataPoint.attributes['error.type'] === undefined
+      );
+      assert.ok(processedPoint);
+      assert.strictEqual(processedPoint.value, 1);
+      const failedPoint = processedSpansDataPoints.find(
+        dataPoint => dataPoint.attributes['error.type'] !== undefined
+      );
+      assert.strictEqual(failedPoint, undefined);
     });
   });
 });
