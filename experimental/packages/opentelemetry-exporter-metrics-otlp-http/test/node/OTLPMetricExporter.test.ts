@@ -219,6 +219,15 @@ describe('OTLPMetricExporter', () => {
             sm => sm.scope.name === '@opentelemetry/otlp-exporter'
           );
           assert.ok(scopeMetrics);
+          const componentTypes = scopeMetrics.metrics.flatMap(metric =>
+            metric.dataPoints.map(
+              dataPoint => dataPoint.attributes['otel.component.type']
+            )
+          );
+          assert.ok(componentTypes.length > 0);
+          for (const componentType of componentTypes) {
+            assert.strictEqual(componentType, 'otlp_http_json_metric_exporter');
+          }
           meterProvider.shutdown();
 
           done();
