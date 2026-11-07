@@ -1381,6 +1381,53 @@ describe('PrometheusSerializer', () => {
 
       assert.strictEqual(result, 'test_total{account_id="123456"} 1\n');
     });
+
+    it('should join values of attribute names that collide after sanitizing', async () => {
+      const serializer = new PrometheusSerializer();
+
+      const result = await testSerializer(serializer, 'test_total', counter => {
+        counter.add(1, { http_route: '/b', 'http.route': '/a', other: 'x' });
+      });
+
+      // values are ordered by the original keys: 'http.route' < 'http_route'
+      assert.strictEqual(
+        result,
+        'test_total{http_route="/a;/b",other="x"} 1\n'
+      );
+    });
+
+    it('should prefix attribute names starting with a digit', async () => {
+      const serializer = new PrometheusSerializer();
+
+      const result = await testSerializer(serializer, 'test_total', counter => {
+        counter.add(1, { '1st': 'x' });
+      });
+
+      assert.strictEqual(result, 'test_total{_1st="x"} 1\n');
+    });
+
+    it('should join attribute values that collide with scope labels', async () => {
+      const serializer = new PrometheusSerializer(
+        undefined,
+        undefined,
+        undefined,
+        true
+      );
+      const reader = new TestMetricReader();
+      const meterProvider = new MeterProvider({ readers: [reader] });
+      meterProvider
+        .getMeter('test')
+        .createCounter('test')
+        .add(1, { 'otel.scope.name': 'mine' });
+
+      const { resourceMetrics } = await reader.collect();
+      const result = serializer.serialize(resourceMetrics);
+
+      assert.ok(
+        result.includes('test_total{otel_scope_name="mine;test"} 1\n'),
+        result
+      );
+    });
   });
 
   describe('_serializeResource', () => {

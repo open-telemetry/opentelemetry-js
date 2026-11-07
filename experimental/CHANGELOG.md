@@ -13,6 +13,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :bug: Bug Fixes
 
+* fix(exporter-prometheus): join values of attribute keys that collide after sanitizing into one label, and prefix label names that start with a digit [#7288](https://github.com/open-telemetry/opentelemetry-js/issues/7288) @kshitizj03
+
 ### :books: Documentation
 
 ### :house: Internal
