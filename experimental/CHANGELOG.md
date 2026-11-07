@@ -13,6 +13,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :bug: Bug Fixes
 
+* fix(otlp-exporter-base): align exporter metric units and descriptions with semantic conventions @henricop
+
 ### :books: Documentation
 
 ### :house: Internal
