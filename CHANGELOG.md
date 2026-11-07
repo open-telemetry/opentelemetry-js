@@ -17,7 +17,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :bug: Bug Fixes
 
-* fix(sdk-trace, sdk-logs): record `otel.sdk.processor.{span,log}.processed` when export is invoked and record `already_shutdown` drops [#7277](https://github.com/open-telemetry/opentelemetry-js/issues/7277) @shehjaddev
+* fix(sdk-trace, sdk-logs): record `otel.sdk.processor.{span,log}.processed` when export is invoked and record `already_shutdown` drops [#7287](https://github.com/open-telemetry/opentelemetry-js/pull/7287) @shehjaddev
 
 ### :books: Documentation
 
