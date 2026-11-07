@@ -12,7 +12,7 @@ import {
 } from '@opentelemetry/otlp-transformer';
 import { createLegacyOtlpBrowserExportDelegate } from '@opentelemetry/otlp-exporter-base/browser-http';
 
-import { OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_SPAN_EXPORTER } from '../../semconv';
+import { OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_JSON_SPAN_EXPORTER } from '../../semconv';
 
 /**
  * Collector Trace Exporter for Web
@@ -26,7 +26,7 @@ export class OTLPTraceExporter
       createLegacyOtlpBrowserExportDelegate(
         config,
         JsonTraceSerializer,
-        OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_SPAN_EXPORTER,
+        OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_JSON_SPAN_EXPORTER,
         TraceExporterMetricsHelper,
         config.selfObsMeterProvider,
         'v1/traces',
