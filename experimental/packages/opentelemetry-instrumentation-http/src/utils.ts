@@ -847,11 +847,12 @@ export const getIncomingRequestAttributes = (
 export const getIncomingRequestAttributesOnResponse = (
   response: ServerResponse
 ): Attributes => {
-  const { statusCode } = response;
+  const { statusCode, headersSent } = response;
 
-  const attributes: Attributes = {
-    [ATTR_HTTP_RESPONSE_STATUS_CODE]: statusCode,
-  };
+  const attributes: Attributes = {};
+  if (headersSent) {
+    attributes[ATTR_HTTP_RESPONSE_STATUS_CODE] = statusCode;
+  }
 
   const rpcMetadata = getRPCMetadata(context.active());
   if (rpcMetadata?.type === RPCType.HTTP && rpcMetadata.route !== undefined) {

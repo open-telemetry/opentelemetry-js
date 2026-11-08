@@ -24,6 +24,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 ### :bug: Bug Fixes
 
 * fix(exporter-trace-otlp-http, exporter-logs-otlp-http, exporter-metrics-otlp-http): use the `otlp_http_json_*_exporter` `otel.component.type` values for JSON exporters ([#7286](https://github.com/open-telemetry/opentelemetry-js/pull/7286)) @shehjaddev
+* fix(instrumentation-http): do not record status code 200 for aborted server requests ([#7290](https://github.com/open-telemetry/opentelemetry-js/issues/7290)) @abdul-karim-mia
 
 ### :books: Documentation
 
