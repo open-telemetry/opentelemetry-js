@@ -22,6 +22,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :house: Internal
 
+* ci: update the W3C harness for Python 3.14 [#7236](https://github.com/open-telemetry/opentelemetry-js/pull/7236) @adityareddy-dev
+
 ## 2.12.0
 
 ### :house: Internal
