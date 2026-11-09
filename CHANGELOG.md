@@ -16,12 +16,15 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
-* fix(resources): specify full path for ioreg command on Darwin, and kenv command on BSD for `host.id` @trentm
-
 ### :books: Documentation
 
 ### :house: Internal
 
+## 2.12.1
+
+### :bug: Bug Fixes
+
+* fix(resources): specify full path for ioreg command on Darwin, and kenv command on BSD for `host.id` @trentm
 * ci: update the W3C harness for Python 3.14 [#7236](https://github.com/open-telemetry/opentelemetry-js/pull/7236) @adityareddy-dev
 
 ## 2.12.0
