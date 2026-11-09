@@ -34,7 +34,7 @@ describe('getMachineId on BSD', () => {
       .stub(fs, 'readFile')
       .returns(Promise.reject(new Error('not found')));
 
-    const execStub = sinon.stub(util, 'execAsync').returns(
+    const execStub = sinon.stub(util, 'execFileAsync').returns(
       Promise.resolve({
         stdout: fileContents,
         stderr: '',
@@ -44,6 +44,10 @@ describe('getMachineId on BSD', () => {
     const machineId = await getMachineId();
 
     assert.equal(machineId, expectedMachineId);
+    assert.deepStrictEqual(execStub.firstCall.args.slice(0, 2), [
+      '/bin/kenv',
+      ['-q', 'smbios.system.uuid'],
+    ]);
     assert.equal(fsStub.callCount, 1);
     assert.equal(execStub.callCount, 1);
   });
@@ -53,7 +57,7 @@ describe('getMachineId on BSD', () => {
       .stub(fs, 'readFile')
       .returns(Promise.reject(new Error('not found')));
 
-    const execStub = sinon.stub(util, 'execAsync').returns(
+    const execStub = sinon.stub(util, 'execFileAsync').returns(
       Promise.reject(new Error('not found')) as PromiseWithChild<{
         stdout: string;
         stderr: string;
