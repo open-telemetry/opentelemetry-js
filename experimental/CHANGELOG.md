@@ -18,6 +18,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ## 0.223.1
 
+* chore: Update local dependencies to 2.12.1 for the release of stable packages.
+
 ## 0.223.0
 
 ### :boom: Breaking Changes
