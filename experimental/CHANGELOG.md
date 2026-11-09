@@ -17,6 +17,12 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :house: Internal
 
+## 0.301.1
+
+### :house: Internal
+
+* chore: Update local dependencies to 3.1.1 for the release of stable packages.
+
 ## 0.301.0
 
 ### :boom: Breaking Changes
