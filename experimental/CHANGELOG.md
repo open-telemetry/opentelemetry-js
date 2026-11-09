@@ -17,6 +17,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :house: Internal
 
+## 0.301.1
+
 ## 0.301.0
 
 ### :boom: Breaking Changes
