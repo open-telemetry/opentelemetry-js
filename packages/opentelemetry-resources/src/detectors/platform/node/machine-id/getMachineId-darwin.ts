@@ -3,12 +3,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { execAsync } from './execAsync';
+import { execFileAsync } from './execAsync';
 import { diag } from '@opentelemetry/api';
+
+const EXEC_TIMEOUT_MS = 5000;
 
 export async function getMachineId(): Promise<string | undefined> {
   try {
-    const result = await execAsync('ioreg -rd1 -c "IOPlatformExpertDevice"');
+    const result = await execFileAsync(
+      '/usr/sbin/ioreg',
+      ['-rd1', '-c', 'IOPlatformExpertDevice'],
+      { timeout: EXEC_TIMEOUT_MS }
+    );
 
     const idLine = result.stdout
       .split('\n')
