@@ -28,10 +28,7 @@ import {
   createSslCredentials,
 } from '@opentelemetry/otlp-grpc-exporter-base';
 
-import type {
-  ComponentProvidersFromType,
-  SpanExporterComponentProvider,
-} from './component-provider';
+import type { ComponentProviderRegistry } from './component-provider';
 
 /**
  * Warn if some props from a declarative config object have not been handled.
@@ -176,98 +173,83 @@ function grpcCredentialsFromConfig(tls?: GrpcTlsConfigModel) {
   return undefined;
 }
 
-class ConsoleSpanExporterComponentProvider
-  implements SpanExporterComponentProvider<ConsoleExporterConfigModel>
-{
-  readonly name = 'console';
-  createComponent(_properties: ConsoleExporterConfigModel): SpanExporter {
-    return new ConsoleSpanExporter();
+function createConsoleSpanExporterFromConfig(
+  _props: ConsoleExporterConfigModel
+): SpanExporter {
+  return new ConsoleSpanExporter();
+}
+
+function createHttpSpanExporterFromConfig(
+  props: OtlpHttpExporterConfigModel
+): SpanExporter {
+  checkConfigUse('OtlpHttpExporter', props!, [
+    'compression',
+    'endpoint',
+    'headers',
+    'headers_list',
+    'timeout',
+    'tls',
+    'encoding',
+  ]);
+
+  const commonOpts = {
+    compression:
+      props?.compression === 'gzip'
+        ? CompressionAlgorithm.GZIP
+        : CompressionAlgorithm.NONE,
+    url: props?.endpoint ?? undefined,
+    headers: mergeHeadersConfig(props?.headers, props?.headers_list),
+    timeoutMillis: validateExportTimeoutConfig(
+      props?.timeout,
+      'OtlpHttpExporter.timeout'
+    ),
+    httpAgentOptions: httpTlsOptionsFromConfig(props?.tls),
+  };
+  const encoding = props?.encoding ?? 'protobuf';
+  switch (encoding) {
+    case 'json':
+      return new OTLPHttpTraceExporter(commonOpts);
+    case 'protobuf':
+      return new OTLPProtoTraceExporter(commonOpts);
+    default:
+      throw new Error(
+        `unknown OtlpHttpExporter encoding in configuration: "${encoding}"`
+      );
   }
 }
 
-class OtlpHttpSpanExporterComponentProvider
-  implements SpanExporterComponentProvider<OtlpHttpExporterConfigModel>
-{
-  readonly name = 'otlp_http';
-
-  createComponent(properties: OtlpHttpExporterConfigModel): SpanExporter {
-    checkConfigUse('OtlpHttpExporter', properties!, [
-      'compression',
-      'endpoint',
-      'headers',
-      'headers_list',
-      'timeout',
-      'tls',
-      'encoding',
-    ]);
-
-    const commonOpts = {
-      compression:
-        properties?.compression === 'gzip'
-          ? CompressionAlgorithm.GZIP
-          : CompressionAlgorithm.NONE,
-      url: properties?.endpoint ?? undefined,
-      headers: mergeHeadersConfig(
-        properties?.headers,
-        properties?.headers_list
-      ),
-      timeoutMillis: validateExportTimeoutConfig(
-        properties?.timeout,
-        'OtlpHttpExporter.timeout'
-      ),
-      httpAgentOptions: httpTlsOptionsFromConfig(properties?.tls),
-    };
-    const encoding = properties?.encoding ?? 'protobuf';
-    switch (encoding) {
-      case 'json':
-        return new OTLPHttpTraceExporter(commonOpts);
-      case 'protobuf':
-        return new OTLPProtoTraceExporter(commonOpts);
-      default:
-        throw new Error(
-          `unknown OtlpHttpExporter encoding in configuration: "${encoding}"`
-        );
-    }
-  }
+function createOtlpGrpcSpanExporterFromConfig(
+  props: OtlpGrpcExporterConfigModel
+): SpanExporter {
+  checkConfigUse('OtlpGrpcExporter', props!, [
+    'compression',
+    'endpoint',
+    'timeout',
+    'tls',
+    'headers',
+    'headers_list',
+  ]);
+  return new OTLPGrpcTraceExporter({
+    compression:
+      props?.compression === 'gzip'
+        ? CompressionAlgorithm.GZIP
+        : CompressionAlgorithm.NONE,
+    url: props?.endpoint ?? undefined,
+    timeoutMillis: validateExportTimeoutConfig(
+      props?.timeout,
+      'OtlpGrpcExporter.timeout'
+    ),
+    credentials: grpcCredentialsFromConfig(props?.tls),
+    metadata: getGrpcMetadataFromHeaders(props?.headers, props?.headers_list),
+  });
 }
 
-class OtlpGrpcSpanExporterComponentProvider
-  implements SpanExporterComponentProvider<OtlpGrpcExporterConfigModel>
-{
-  readonly name = 'otlp_grpc';
-
-  createComponent(properties: OtlpGrpcExporterConfigModel): SpanExporter {
-    checkConfigUse('OtlpGrpcExporter', properties!, [
-      'compression',
-      'endpoint',
-      'timeout',
-      'tls',
-      'headers',
-      'headers_list',
-    ]);
-    const props = properties as OtlpGrpcExporterConfigModel;
-    return new OTLPGrpcTraceExporter({
-      compression:
-        props?.compression === 'gzip'
-          ? CompressionAlgorithm.GZIP
-          : CompressionAlgorithm.NONE,
-      url: props?.endpoint ?? undefined,
-      timeoutMillis: validateExportTimeoutConfig(
-        props?.timeout,
-        'OtlpGrpcExporter.timeout'
-      ),
-      credentials: grpcCredentialsFromConfig(props?.tls),
-      metadata: getGrpcMetadataFromHeaders(props?.headers, props?.headers_list),
-    });
-  }
-}
-
-export function getBuiltinComponentProviders(): ComponentProvidersFromType {
+export function getBuiltinComponentProviders(): ComponentProviderRegistry {
   return {
-    SpanExporter: [
-      new ConsoleSpanExporterComponentProvider(),
-      new OtlpHttpSpanExporterComponentProvider(),
-      new OtlpGrpcSpanExporterComponentProvider(),
-    ],
+    SpanExporter: {
+      console: createConsoleSpanExporterFromConfig,
+      otlp_http: createHttpSpanExporterFromConfig,
+      otlp_grpc: createOtlpGrpcSpanExporterFromConfig,
+    },
   };
 }

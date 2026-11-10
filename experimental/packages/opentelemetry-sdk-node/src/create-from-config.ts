@@ -1221,9 +1221,9 @@ function createSpanExporterFromConfig(
 ): SpanExporter {
   const [name, properties] = mustSingleEntry(exporter, 'SpanExporter');
 
-  const provider = reg.get('SpanExporter')?.get(name);
+  const provider = reg['SpanExporter']?.[name];
   if (provider) {
-    return provider.createComponent(properties as ConfigProperties);
+    return provider(properties as ConfigProperties);
   } else {
     throw new Error(`unknown SpanExporter name in configuration: "${name}"`);
   }

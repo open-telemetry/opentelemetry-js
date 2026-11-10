@@ -99,54 +99,88 @@ export interface LogRecordProcessorComponentProvider<
 }
 
 /**
- * A data structure to hold a number of ComponentProviders (separated by
- * component type). One or more of these are used to build a
- * ComponentProviderRegistry (that is used for `createFromConfig()`).
+ * The built component provider registry maps component *name* (the string name
+ * in a declarative config .yaml file) to a provider implementation.
+ * For example:
+ *    {
+ *      SpanExporter: {
+ *        otlp_http => OtlpHttpSpanExporterComponentProvider,
+ *        otlp_grpc => OtlpGrpcSpanExporterComponentProvider,
+ *        console => ConsoleSpanExporterComponentProvider,
+ *      }
+ *      // ... and similarly for other component types.
+ *    }
  */
-export type ComponentProvidersFromType = {
-  // Keys are one of the "Declarative config type" values from
-  // https://opentelemetry.io/docs/specs/otel/configuration/sdk/#supported-sdk-plugin-components
-  ExperimentalResourceDetection?: ExperimentalResourceDetectionComponentProvider[];
-  TextMapPropagator?: TextMapPropagatorComponentProvider[];
-  SpanExporter?: SpanExporterComponentProvider[];
-  SpanProcessor?: SpanProcessorComponentProvider[];
-  Sampler?: SamplerComponentProvider[];
-  IdGenerator?: IdGeneratorComponentProvider[];
-  // XXX see above
-  // PullMetricExporter?: PullMetricExporterComponentProvider[];
-  PushMetricExporter?: PushMetricExporterComponentProvider[];
-  MetricProducer?: MetricProducerComponentProvider[];
-  LogRecordExporter?: LogRecordExporterComponentProvider[];
-  LogRecordProcessor?: LogRecordProcessorComponentProvider[];
+export type ComponentProviderRegistry = {
+  ExperimentalResourceDetection?: Record<
+    string,
+    (props: ConfigProperties) => ResourceDetector
+  >;
+  TextMapPropagator?: Record<
+    string,
+    (props: ConfigProperties) => TextMapPropagator
+  >;
+  SpanExporter?: Record<string, (props: ConfigProperties) => SpanExporter>;
+  SpanProcessor?: Record<string, (props: ConfigProperties) => SpanProcessor>;
+  Sampler?: Record<string, (props: ConfigProperties) => Sampler>;
+  IdGenerator?: Record<string, (props: ConfigProperties) => IdGenerator>;
+  // PullMetricExporter?: Record<string, (props: ConfigProperties) => PullMetricExporter>; // XXX see above
+  PushMetricExporter?: Record<
+    string,
+    (props: ConfigProperties) => PushMetricExporter
+  >;
+  MetricProducer?: Record<string, (props: ConfigProperties) => MetricProducer>;
+  LogRecordExporter?: Record<
+    string,
+    (props: ConfigProperties) => LogRecordExporter
+  >;
+  LogRecordProcessor?: Record<
+    string,
+    (props: ConfigProperties) => LogRecordProcessor
+  >;
 };
 
-export type ComponentProviderRegistry = Map<
-  keyof ComponentProvidersFromType,
-  Map<string, SpanExporterComponentProvider>
->;
-
+/**
+ * Merge multiple `ComponentProviderRegistry`'s into one
+ *
+ * @throws {Error} if two attempt to provide for the same component type and
+ *  name.
+ */
 export function buildComponentProviderRegistry(
-  collections: ComponentProvidersFromType[]
+  regs: ComponentProviderRegistry[]
 ): ComponentProviderRegistry {
-  const reg: ComponentProviderRegistry = new Map();
-  for (const collection of collections) {
-    for (const [k, providers] of Object.entries(collection)) {
-      const componentType = k as keyof ComponentProvidersFromType;
-      let providerFromName = reg.get(componentType);
-      if (!providerFromName) {
-        providerFromName = new Map();
-        reg.set(componentType, providerFromName);
-      }
-      for (const provider of providers) {
-        if (providerFromName.has(provider.name)) {
-          throw new Error(
-            `a ComponentProvider of type "${componentType}" and name="${provider.name}" is already registered: ${providerFromName.get(provider.name)!.constructor.name}`
-          );
-        } else {
-          providerFromName.set(provider.name, provider);
+  const mergedReg: ComponentProviderRegistry = {};
+  for (const reg of regs) {
+    const componentTypes: (keyof ComponentProviderRegistry)[] = [
+      'ExperimentalResourceDetection',
+      'TextMapPropagator',
+      'SpanExporter',
+      'SpanProcessor',
+      'Sampler',
+      'IdGenerator',
+      // 'PullMetricExporter', // XXX see above
+      'PushMetricExporter',
+      'MetricProducer',
+      'LogRecordExporter',
+      'LogRecordProcessor',
+    ];
+    for (const componentType of componentTypes) {
+      const providerFromName = reg[componentType];
+      if (providerFromName !== undefined) {
+        for (const name of Object.keys(providerFromName)) {
+          if (mergedReg[componentType]?.[name]) {
+            throw new Error(
+              `a ComponentProvider of type "${componentType}" and name="${name}" is already registered: ${mergedReg[componentType]?.[name]}`
+            );
+          } else {
+            mergedReg[componentType] ??= {};
+            // The `!` is used because tsc doesn't infer existence from `??= {}` above.
+            mergedReg[componentType]![name] = providerFromName[name];
+          }
         }
       }
     }
   }
-  return reg;
+
+  return mergedReg;
 }
