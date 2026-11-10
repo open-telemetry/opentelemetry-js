@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+// NOTE: do not change this to be an actual import, doing so will break `@opentelemetry/instrumentation-grpc`
 import type { ServiceClientConstructor } from '@grpc/grpc-js';
 
 /**
