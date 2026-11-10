@@ -401,14 +401,13 @@ export function createPropagatorFromConfig(
   const propagators: TextMapPropagator[] = [];
   for (const [name, value] of kvs) {
     const provider = reg['TextMapPropagator']?.[name];
-    if (provider) {
-      const propagator = provider(reg, value ?? EMPTY_CONFIG_PROPERTIES);
-      propagators.push(propagator);
-    } else {
+    if (!provider) {
       throw new Error(
         `unknown TextMapPropagator name in configuration: "${name}"`
       );
     }
+    const propagator = provider(reg, value ?? EMPTY_CONFIG_PROPERTIES);
+    propagators.push(propagator);
   }
 
   if (propagators.length === 0) {
