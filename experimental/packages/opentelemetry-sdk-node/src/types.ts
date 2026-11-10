@@ -19,7 +19,7 @@ import type {
   SpanProcessor,
   IdGenerator,
 } from '@opentelemetry/sdk-trace';
-import type { ComponentProviderRegistry, ComponentProvidersFromType } from './component-provider';
+import type { ComponentProviderRegistry } from './component-provider';
 
 export interface NodeSDKConfiguration {
   autoDetectResources: boolean;
