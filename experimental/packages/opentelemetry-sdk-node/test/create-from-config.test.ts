@@ -201,7 +201,7 @@ describe('create-from-config', () => {
 
   describe('createPropagatorFromConfig', function () {
     it('single propagator still uses CompositePropagator', function () {
-      const propagator = createPropagatorFromConfig({
+      const propagator = createPropagatorFromConfig(reg, {
         composite: [{ tracecontext: null }],
       });
       assert.ok(propagator instanceof CompositePropagator);
@@ -209,7 +209,7 @@ describe('create-from-config', () => {
     });
 
     it('multiple', function () {
-      const propagator = createPropagatorFromConfig({
+      const propagator = createPropagatorFromConfig(reg, {
         composite: [
           { tracecontext: null },
           { baggage: null },
@@ -232,14 +232,14 @@ describe('create-from-config', () => {
 
     it('should throw on unknown/unsupported propagators', function () {
       assert.throws(() => {
-        createPropagatorFromConfig({
+        createPropagatorFromConfig(reg, {
           composite: [{ tracecontext: null }, { my_propagator: null }],
         });
       });
     });
 
     it('no propagator if "none"', function () {
-      const propagator = createPropagatorFromConfig({
+      const propagator = createPropagatorFromConfig(reg, {
         composite: [{ tracecontext: null }, { none: null }],
       });
       assert.equal(propagator, undefined);
@@ -247,14 +247,14 @@ describe('create-from-config', () => {
 
     it('should throw on invalid composite entry with two keys', function () {
       assert.throws(() => {
-        createPropagatorFromConfig({
+        createPropagatorFromConfig(reg, {
           composite: [{ tracecontext: null, tracestate: null }],
         });
       });
     });
 
     it('composite_list usage', function () {
-      const propagator = createPropagatorFromConfig({
+      const propagator = createPropagatorFromConfig(reg, {
         composite: [{ tracecontext: null }],
         composite_list: 'tracecontext, \tbaggage',
       });
