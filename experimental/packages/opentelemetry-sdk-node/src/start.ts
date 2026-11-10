@@ -38,12 +38,13 @@ import {
   createResourceFromOptsAndEnv,
   createTracerProviderFromOptsAndEnv,
 } from './create-from-env';
-import getBuiltinComponentProviderRegistry, {
+import {
   createLoggerProviderFromConfig,
   createMeterProviderFromConfig,
   createPropagatorFromConfig,
   createResourceFromConfig,
   createTracerProviderFromConfig,
+  getBuiltinComponentProviderRegistry,
 } from './create-from-config';
 import type { ComponentProviderRegistry } from './component-provider';
 import { mergeComponentProviderRegistries } from './component-provider';

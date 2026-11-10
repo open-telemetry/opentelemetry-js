@@ -190,7 +190,6 @@ function checkConfigUse(
   handledProps: string[]
 ) {
   if (!props) return;
-  // Dev note: I'd use Set#difference, but that requires Node.js v22.
   const unhandledProps = Object.keys(props).filter(
     k => !handledProps.includes(k)
   );

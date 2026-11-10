@@ -49,7 +49,7 @@ import {
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 
-import getBuiltinComponentProviderRegistry, {
+import {
   createLoggerProviderFromConfig,
   createLogRecordExporterFromConfig,
   createLogRecordLimitsFromConfig,
@@ -61,6 +61,7 @@ import getBuiltinComponentProviderRegistry, {
   createSamplerFromConfig,
   createSpanLimitsFromConfig,
   createTracerProviderFromConfig,
+  getBuiltinComponentProviderRegistry,
 } from '../src/create-from-config';
 import { CompositePropagator, SDK_INFO } from '@opentelemetry/core';
 import {
