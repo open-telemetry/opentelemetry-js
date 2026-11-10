@@ -12,10 +12,10 @@ import type { ServiceClientConstructor } from '@grpc/grpc-js';
  * @param path service path
  * @param name service name
  */
-export function createServiceClientConstructor(
+export async function createServiceClientConstructor(
   path: string,
   name: string
-): ServiceClientConstructor {
+): Promise<ServiceClientConstructor> {
   const serviceDefinition = {
     export: {
       path: path,
@@ -36,9 +36,7 @@ export function createServiceClientConstructor(
     },
   };
 
-  const { makeGenericClientConstructor } =
-    // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/consistent-type-imports
-    require('@grpc/grpc-js') as typeof import('@grpc/grpc-js');
+  const { makeGenericClientConstructor } = await import('@grpc/grpc-js');
 
   return makeGenericClientConstructor(serviceDefinition, name);
 }
