@@ -26,74 +26,83 @@ import type {
 export type ConfigProperties = Record<string, unknown>;
 // ^XXX this type will come from api-config, or could just be copied here if we want to avoid a dep on it
 
-// XXX Is it easier to read `ComponentProviderRegistry` if we pull these out.
+// These `*ComponentProvider` aliases are defined to make
+// `type ComponentProviderRegistry` more readable;
+export type ExperimentalResourceDetectorComponentProvider = (
+  reg: ComponentProviderRegistry,
+  props: ConfigProperties
+) => ResourceDetector;
+export type TextMapPropagatorComponentProvider = (
+  reg: ComponentProviderRegistry,
+  props: ConfigProperties
+) => TextMapPropagator;
 export type SpanExporterComponentProvider = (
   reg: ComponentProviderRegistry,
   props: ConfigProperties
 ) => SpanExporter;
+export type SpanProcessorComponentProvider = (
+  reg: ComponentProviderRegistry,
+  props: ConfigProperties
+) => SpanProcessor;
+export type SamplerComponentProvider = (
+  reg: ComponentProviderRegistry,
+  props: ConfigProperties
+) => Sampler;
+export type IdGeneratorComponentProvider = (
+  reg: ComponentProviderRegistry,
+  props: ConfigProperties
+) => IdGenerator;
+export type PushMetricExporterComponentProvider = (
+  reg: ComponentProviderRegistry,
+  props: ConfigProperties
+) => PushMetricExporter;
+export type MetricProducerComponentProvider = (
+  reg: ComponentProviderRegistry,
+  props: ConfigProperties
+) => MetricProducer;
+export type LogRecordExporterComponentProvider = (
+  reg: ComponentProviderRegistry,
+  props: ConfigProperties
+) => LogRecordExporter;
+export type LogRecordProcessorComponentProvider = (
+  reg: ComponentProviderRegistry,
+  props: ConfigProperties
+) => LogRecordProcessor;
 
 /**
  * The built component provider registry maps component *name* (the string name
  * in a declarative config .yaml file) to a provider implementation.
+ *
+ * Supported component types (the keys) are the config types in this table:
+ * https://opentelemetry.io/docs/specs/otel/configuration/sdk/#supported-sdk-plugin-components
+ * (with the exception of ResourceDetection).
  */
 export type ComponentProviderRegistry = {
-  ExperimentalResourceDetection?: Record<
+  // XXX builtin 'host' detector is implemented with *multiple* `ResourceDetector`s
+  //     It would be handy (but weird) for this to return *an array of* ResourceDetectors.
+  // XXX Q: Is the Java impl *really* using a `ExperimentalResourceDetection` node for component provider? Or at the named ResourceDetector level?
+  /**
+   * @experimental The resource detector component provider interface is not stable.
+   */
+  ExperimentalResourceDetector?: Record<
     string,
-    (
-      reg: ComponentProviderRegistry,
-      props: ConfigProperties
-    ) => ResourceDetector
+    ExperimentalResourceDetectorComponentProvider
   >;
-  TextMapPropagator?: Record<
-    string,
-    (
-      reg: ComponentProviderRegistry,
-      props: ConfigProperties
-    ) => TextMapPropagator
-  >;
+
+  TextMapPropagator?: Record<string, TextMapPropagatorComponentProvider>;
   SpanExporter?: Record<string, SpanExporterComponentProvider>;
-  SpanProcessor?: Record<
-    string,
-    (reg: ComponentProviderRegistry, props: ConfigProperties) => SpanProcessor
-  >;
-  Sampler?: Record<
-    string,
-    (reg: ComponentProviderRegistry, props: ConfigProperties) => Sampler
-  >;
-  IdGenerator?: Record<
-    string,
-    (reg: ComponentProviderRegistry, props: ConfigProperties) => IdGenerator
-  >;
+  SpanProcessor?: Record<string, SpanProcessorComponentProvider>;
+  Sampler?: Record<string, SamplerComponentProvider>;
+  IdGenerator?: Record<string, IdGeneratorComponentProvider>;
   // XXX I get lost in `MetricReader`, `PeriodicMetricReader`, `PullMetricReader`
   //     and `PullMetricExporter`.
   //     See comment on `createPullMetricReaderFromConfig()`.
   //     I need help.
   // PullMetricExporter?: Record<string, (reg: ComponentProviderRegistry, props: ConfigProperties) => PullMetricExporter>;
-  PushMetricExporter?: Record<
-    string,
-    (
-      reg: ComponentProviderRegistry,
-      props: ConfigProperties
-    ) => PushMetricExporter
-  >;
-  MetricProducer?: Record<
-    string,
-    (reg: ComponentProviderRegistry, props: ConfigProperties) => MetricProducer
-  >;
-  LogRecordExporter?: Record<
-    string,
-    (
-      reg: ComponentProviderRegistry,
-      props: ConfigProperties
-    ) => LogRecordExporter
-  >;
-  LogRecordProcessor?: Record<
-    string,
-    (
-      reg: ComponentProviderRegistry,
-      props: ConfigProperties
-    ) => LogRecordProcessor
-  >;
+  PushMetricExporter?: Record<string, PushMetricExporterComponentProvider>;
+  MetricProducer?: Record<string, MetricProducerComponentProvider>;
+  LogRecordExporter?: Record<string, LogRecordExporterComponentProvider>;
+  LogRecordProcessor?: Record<string, LogRecordProcessorComponentProvider>;
 };
 
 /**
@@ -108,7 +117,7 @@ export function mergeComponentProviderRegistries(
   const mergedReg: ComponentProviderRegistry = {};
   for (const reg of regs) {
     const componentTypes: (keyof ComponentProviderRegistry)[] = [
-      'ExperimentalResourceDetection',
+      'ExperimentalResourceDetector',
       'TextMapPropagator',
       'SpanExporter',
       'SpanProcessor',
