@@ -1348,6 +1348,49 @@ function createSpanProcessorFromConfig(
   }
 }
 
+function createTraceIdRatioBasedSamplerFromConfig(
+  _reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): Sampler {
+  checkConfigUse('TraceIdRatioBasedSampler', properties!, ['ratio']);
+  const DEFAULT_RATIO = 1.0;
+  const props = properties as TraceIdRatioBasedSamplerConfigModel;
+  return new TraceIdRatioBasedSampler(props?.ratio ?? DEFAULT_RATIO);
+}
+
+function createParentBasedSamplerFromConfig(
+  reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): Sampler {
+  checkConfigUse('ParentBasedSampler', properties!, [
+    'root',
+    'remote_parent_sampled',
+    'remote_parent_not_sampled',
+    'local_parent_sampled',
+    'local_parent_not_sampled',
+  ]);
+  const props = properties as ParentBasedSamplerConfigModel;
+  return new ParentBasedSampler({
+    root: createSamplerFromConfig(reg, props?.root) ?? new AlwaysOnSampler(),
+    remoteParentSampled: createSamplerFromConfig(
+      reg,
+      props?.remote_parent_sampled
+    ),
+    remoteParentNotSampled: createSamplerFromConfig(
+      reg,
+      props?.remote_parent_not_sampled
+    ),
+    localParentSampled: createSamplerFromConfig(
+      reg,
+      props?.local_parent_sampled
+    ),
+    localParentNotSampled: createSamplerFromConfig(
+      reg,
+      props?.local_parent_not_sampled
+    ),
+  });
+}
+
 /**
  * Returns a Sampler for the `tracer_provider.sampler` in configuration,
  * or `undefined` if not set.
@@ -1355,54 +1398,18 @@ function createSpanProcessorFromConfig(
  * Exported for testing.
  */
 export function createSamplerFromConfig(
+  reg: ComponentProviderRegistry,
   samplerConfig?: SamplerConfigModel
 ): Sampler | undefined {
   if (!samplerConfig) {
     return undefined;
   }
-
   const [name, properties] = mustSingleEntry(samplerConfig, 'Sampler');
-
-  switch (name) {
-    case 'always_off':
-      return new AlwaysOffSampler();
-    case 'always_on':
-      return new AlwaysOnSampler();
-    case 'trace_id_ratio_based': {
-      const DEFAULT_RATIO = 1.0;
-      const props = properties as TraceIdRatioBasedSamplerConfigModel;
-      return new TraceIdRatioBasedSampler(props?.ratio ?? DEFAULT_RATIO);
-    }
-    case 'parent_based': {
-      const props = properties as ParentBasedSamplerConfigModel;
-      return new ParentBasedSampler({
-        root: createSamplerFromConfig(props?.root) ?? new AlwaysOnSampler(),
-        remoteParentSampled: createSamplerFromConfig(
-          props?.remote_parent_sampled
-        ),
-        remoteParentNotSampled: createSamplerFromConfig(
-          props?.remote_parent_not_sampled
-        ),
-        localParentSampled: createSamplerFromConfig(
-          props?.local_parent_sampled
-        ),
-        localParentNotSampled: createSamplerFromConfig(
-          props?.local_parent_not_sampled
-        ),
-      });
-    }
-
-    // TODO: always_record, once there is a release of opentelemetry-configuration with https://github.com/open-telemetry/opentelemetry-configuration/pull/698
-    // case 'always_record': {
-    //   const props = properties as AlwaysRecordConfigModel;
-    //   return createAlwaysRecordSampler(createSamplerFromConfig(props.root));
-    // }
-    // TODO(6961): composite/development
-    // TODO(6541): probability/development (via composite support for?)
-    // TODO(later): Consider supporting jaeger_remote/development if requested by a user. Only consider `sampler-jaeger-remote` package after axios dep is dropped in #6963.
-
-    default:
-      throw new Error(`unknown Sampler name: "${name}"`);
+  const provider = reg['Sampler']?.[name];
+  if (provider) {
+    return provider(reg, properties as ConfigProperties);
+  } else {
+    throw new Error(`unknown Sampler name in configuration: "${name}"`);
   }
 }
 
@@ -1435,7 +1442,7 @@ export function createTracerProviderFromConfig(
     tracer_provider.limits,
     attribute_limits
   );
-  const sampler = createSamplerFromConfig(tracer_provider.sampler);
+  const sampler = createSamplerFromConfig(reg, tracer_provider.sampler);
   const idGenerator = createIdGeneratorFromConfig(tracer_provider.id_generator);
 
   checkConfigUse('TracerProvider', tracer_provider, [
@@ -1473,6 +1480,20 @@ export function getBuiltinComponentProviderRegistry(): ComponentProviderRegistry
     SpanProcessor: {
       batch: createBatchSpanProcessorFromConfig,
       simple: createSimpleSpanProcessorFromConfig,
+    },
+    Sampler: {
+      always_off: () => new AlwaysOffSampler(),
+      always_on: () => new AlwaysOnSampler(),
+      trace_id_ratio_based: createTraceIdRatioBasedSamplerFromConfig,
+      parent_based: createParentBasedSamplerFromConfig,
+      // TODO: always_record, once there is a release of opentelemetry-configuration with https://github.com/open-telemetry/opentelemetry-configuration/pull/698
+      // case 'always_record': {
+      //   const props = properties as AlwaysRecordConfigModel;
+      //   return createAlwaysRecordSampler(createSamplerFromConfig(reg, props.root));
+      // }
+      // TODO(6961): composite/development
+      // TODO(6541): probability/development (via composite support for?)
+      // TODO(later): Consider supporting jaeger_remote/development if requested by a user. Only consider `sampler-jaeger-remote` package after axios dep is dropped in #6963.
     },
   };
 }

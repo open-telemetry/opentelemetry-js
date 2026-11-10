@@ -1450,7 +1450,8 @@ describe('create-from-config', () => {
             processors: [{ simple: { exporter: { console: null } } }],
             sampler: { some_unknown_sampler: null },
           },
-          assertThrowsError: /unknown Sampler name: "some_unknown_sampler"/,
+          assertThrowsError:
+            /unknown Sampler name in configuration: "some_unknown_sampler"/,
         },
         {
           testName: 'unknown IdGenerator',
@@ -1532,7 +1533,7 @@ describe('create-from-config', () => {
 
     for (const item of corpus) {
       it(String(JSON.stringify(item.sampler)), function () {
-        const sampler = createSamplerFromConfig(item.sampler);
+        const sampler = createSamplerFromConfig(reg, item.sampler);
         assert.equal(item.repr, String(sampler));
       });
     }
