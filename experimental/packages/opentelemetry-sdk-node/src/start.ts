@@ -38,7 +38,7 @@ import {
   createResourceFromOptsAndEnv,
   createTracerProviderFromOptsAndEnv,
 } from './create-from-env';
-import {
+import getBuiltinComponentProviderRegistry, {
   createLoggerProviderFromConfig,
   createMeterProviderFromConfig,
   createPropagatorFromConfig,
@@ -46,8 +46,7 @@ import {
   createTracerProviderFromConfig,
 } from './create-from-config';
 import type { ComponentProviderRegistry } from './component-provider';
-import { buildComponentProviderRegistry } from './component-provider';
-import { getBuiltinComponentProviders } from './builtin-component-providers';
+import { mergeComponentProviderRegistries } from './component-provider';
 
 interface SdkComponents {
   contextManager?: ContextManager;
@@ -189,7 +188,9 @@ function startNodeSdkFromEnv(opts?: StartSdkFromEnvOptions): NodeSdk {
 }
 
 function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
-  const reg = buildComponentProviderRegistry([getBuiltinComponentProviders()]);
+  const reg = mergeComponentProviderRegistries([
+    getBuiltinComponentProviderRegistry(),
+  ]);
   // // eslint-disable-next-line no-console
   // console.log('XXX reg:', reg);
 

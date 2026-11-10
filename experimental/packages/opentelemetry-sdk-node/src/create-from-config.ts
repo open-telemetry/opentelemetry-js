@@ -29,6 +29,7 @@ import {
   AlwaysOffSampler,
   AlwaysOnSampler,
   BatchSpanProcessor,
+  ConsoleSpanExporter,
   ParentBasedSampler,
   RandomIdGenerator,
   SimpleSpanProcessor,
@@ -56,6 +57,9 @@ import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter
 import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
 import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
+import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
+import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
 import {
   createEmptyMetadata,
@@ -1215,18 +1219,128 @@ export function createMeterProviderFromConfig(
   });
 }
 
+function createConsoleSpanExporterFromConfig(
+  _reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): SpanExporter {
+  checkConfigUse('ConsoleSpanExporter', properties!, []);
+  return new ConsoleSpanExporter();
+}
+
+function createHttpSpanExporterFromConfig(
+  _reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): SpanExporter {
+  checkConfigUse('OtlpHttpExporter', properties!, [
+    'compression',
+    'endpoint',
+    'headers',
+    'headers_list',
+    'timeout',
+    'tls',
+    'encoding',
+  ]);
+  const props = properties as unknown as OtlpHttpExporterConfigModel;
+  const commonOpts = {
+    compression:
+      props?.compression === 'gzip'
+        ? CompressionAlgorithm.GZIP
+        : CompressionAlgorithm.NONE,
+    url: props?.endpoint ?? undefined,
+    headers: mergeHeadersConfig(props?.headers, props?.headers_list),
+    timeoutMillis: validateExportTimeoutConfig(
+      props?.timeout,
+      'OtlpHttpExporter.timeout'
+    ),
+    httpAgentOptions: httpTlsOptionsFromConfig(props?.tls),
+  };
+  const encoding = props?.encoding ?? 'protobuf';
+  switch (encoding) {
+    case 'json':
+      return new OTLPHttpTraceExporter(commonOpts);
+    case 'protobuf':
+      return new OTLPProtoTraceExporter(commonOpts);
+    default:
+      throw new Error(
+        `unknown OtlpHttpExporter encoding in configuration: "${encoding}"`
+      );
+  }
+}
+
+function createOtlpGrpcSpanExporterFromConfig(
+  _reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): SpanExporter {
+  checkConfigUse('OtlpGrpcExporter', properties!, [
+    'compression',
+    'endpoint',
+    'timeout',
+    'tls',
+    'headers',
+    'headers_list',
+  ]);
+  const props = properties as unknown as OtlpGrpcExporterConfigModel;
+  return new OTLPGrpcTraceExporter({
+    compression:
+      props?.compression === 'gzip'
+        ? CompressionAlgorithm.GZIP
+        : CompressionAlgorithm.NONE,
+    url: props?.endpoint ?? undefined,
+    timeoutMillis: validateExportTimeoutConfig(
+      props?.timeout,
+      'OtlpGrpcExporter.timeout'
+    ),
+    credentials: grpcCredentialsFromConfig(props?.tls),
+    metadata: getGrpcMetadataFromHeaders(props?.headers, props?.headers_list),
+  });
+}
+
 function createSpanExporterFromConfig(
   reg: ComponentProviderRegistry,
   exporter: SpanExporterConfigModel
 ): SpanExporter {
   const [name, properties] = mustSingleEntry(exporter, 'SpanExporter');
-
   const provider = reg['SpanExporter']?.[name];
   if (provider) {
-    return provider(properties as ConfigProperties);
+    return provider(reg, properties as ConfigProperties);
   } else {
     throw new Error(`unknown SpanExporter name in configuration: "${name}"`);
   }
+}
+
+function createBatchSpanProcessorFromConfig(
+  reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): SpanProcessor {
+  checkConfigUse('BatchSpanProcessor', properties!, [
+    'exporter',
+    'max_queue_size',
+    'max_export_batch_size',
+    'schedule_delay',
+    'export_timeout',
+  ]);
+  const props = properties as unknown as BatchSpanProcessorConfigModel;
+  const exporter = createSpanExporterFromConfig(reg, props.exporter);
+  return new BatchSpanProcessor({
+    exporter,
+    maxQueueSize: props.max_queue_size ?? undefined,
+    maxExportBatchSize: props.max_export_batch_size ?? undefined,
+    scheduledDelayMillis: props.schedule_delay ?? undefined,
+    exportTimeoutMillis: validateExportTimeoutConfig(
+      props.export_timeout,
+      'BatchSpanProcessor.export_timeout'
+    ),
+  });
+}
+
+function createSimpleSpanProcessorFromConfig(
+  reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): SpanProcessor {
+  checkConfigUse('SimpleSpanProcessor', properties!, ['exporter']);
+  const props = properties as unknown as SimpleSpanProcessorConfigModel;
+  const exporter = createSpanExporterFromConfig(reg, props.exporter);
+  return new SimpleSpanProcessor({ exporter });
 }
 
 function createSpanProcessorFromConfig(
@@ -1234,38 +1348,11 @@ function createSpanProcessorFromConfig(
   processor: SpanProcessorConfigModel
 ): SpanProcessor {
   const [name, properties] = mustSingleEntry(processor, 'SpanProcessor');
-
-  switch (name) {
-    case 'batch': {
-      checkConfigUse('BatchSpanProcessor', properties!, [
-        'exporter',
-        'max_queue_size',
-        'max_export_batch_size',
-        'schedule_delay',
-        'export_timeout',
-      ]);
-      const props = properties as BatchSpanProcessorConfigModel;
-      const exporter = createSpanExporterFromConfig(reg, props.exporter);
-      return new BatchSpanProcessor({
-        exporter,
-        maxQueueSize: props.max_queue_size ?? undefined,
-        maxExportBatchSize: props.max_export_batch_size ?? undefined,
-        scheduledDelayMillis: props.schedule_delay ?? undefined,
-        exportTimeoutMillis: validateExportTimeoutConfig(
-          props.export_timeout,
-          'BatchSpanProcessor.export_timeout'
-        ),
-      });
-    }
-
-    case 'simple': {
-      const props = properties as SimpleSpanProcessorConfigModel;
-      const exporter = createSpanExporterFromConfig(reg, props.exporter);
-      return new SimpleSpanProcessor({ exporter });
-    }
-
-    default:
-      throw new Error(`unknown SpanProcessor name: "${name}"`);
+  const provider = reg['SpanProcessor']?.[name];
+  if (provider) {
+    return provider(reg, properties as ConfigProperties);
+  } else {
+    throw new Error(`unknown SpanProcessor name in configuration: "${name}"`);
   }
 }
 
@@ -1375,4 +1462,18 @@ export function createTracerProviderFromConfig(
     sampler,
     idGenerator,
   });
+}
+
+export function getBuiltinComponentProviderRegistry(): ComponentProviderRegistry {
+  return {
+    SpanExporter: {
+      console: createConsoleSpanExporterFromConfig,
+      otlp_http: createHttpSpanExporterFromConfig,
+      otlp_grpc: createOtlpGrpcSpanExporterFromConfig,
+    },
+    SpanProcessor: {
+      batch: createBatchSpanProcessorFromConfig,
+      simple: createSimpleSpanProcessorFromConfig,
+    },
+  };
 }

@@ -49,7 +49,7 @@ import {
   serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 
-import {
+import getBuiltinComponentProviderRegistry, {
   createLoggerProviderFromConfig,
   createLogRecordExporterFromConfig,
   createLogRecordLimitsFromConfig,
@@ -72,10 +72,11 @@ import {
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
-import { buildComponentProviderRegistry } from '../src/component-provider';
-import { getBuiltinComponentProviders } from '../src/builtin-component-providers';
+import { mergeComponentProviderRegistries } from '../src/component-provider';
 
-const reg = buildComponentProviderRegistry([getBuiltinComponentProviders()]);
+const reg = mergeComponentProviderRegistries([
+  getBuiltinComponentProviderRegistry(),
+]);
 
 describe('create-from-config', () => {
   describe('headers_list exporter wiring', function () {
@@ -1440,7 +1441,7 @@ describe('create-from-config', () => {
             processors: [{ some_unknown_processor: null }],
           },
           assertThrowsError:
-            /unknown SpanProcessor name: "some_unknown_processor"/,
+            /unknown SpanProcessor name in configuration: "some_unknown_processor"/,
         },
         {
           testName: 'unknown Sampler',
