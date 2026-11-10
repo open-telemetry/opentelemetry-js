@@ -342,6 +342,7 @@ function validateExportTimeoutConfig(
 // ---- create<SDKThing>FromConfig functions
 
 export function createPropagatorFromConfig(
+  reg: ComponentProviderRegistry,
   propagatorConfig: PropagatorConfigModel
 ): TextMapPropagator | undefined {
   const configComposite = mergePropagatorCompositeConfig(
@@ -362,7 +363,7 @@ export function createPropagatorFromConfig(
   //    does not.
   const kvFromItem = (
     item: TextMapPropagatorConfigModel
-  ): [string, object | null] => {
+  ): [string, ConfigProperties | null] => {
     const keys = [];
     let value = undefined;
     for (const key of Object.keys(item)) {
@@ -377,7 +378,7 @@ export function createPropagatorFromConfig(
         `invalid "propagator" entry in configuration, there must be exactly one key (with a non-undefined value): ${inspect(item)}`
       );
     }
-    return [keys[0], value as object | null];
+    return [keys[0], value as ConfigProperties | null];
   };
 
   // First pass: handle 'none', remove dupes.
@@ -396,25 +397,18 @@ export function createPropagatorFromConfig(
     }
   }
 
-  // Implementation note: this only contains specification required propagators that are actually hosted in this repo.
-  // Any other propagators (like aws, aws-lambda, should go into `@opentelemetry/auto-configuration-propagators` instead).
-  const propagatorsFactory = new Map<string, () => TextMapPropagator>([
-    ['tracecontext', () => new W3CTraceContextPropagator()],
-    ['baggage', () => new W3CBaggagePropagator()],
-    ['b3', () => new B3Propagator()],
-    [
-      'b3multi',
-      () => new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
-    ],
-  ]);
-
+  const EMPTY_CONFIG_PROPERTIES = Object.freeze({}) as ConfigProperties;
   const propagators: TextMapPropagator[] = [];
-  for (const [name] of kvs) {
-    const propagator = propagatorsFactory.get(name)?.();
-    if (!propagator) {
-      throw new Error(`unknown TextMapPropagator in configuration: "${name}"`);
+  for (const [name, value] of kvs) {
+    const provider = reg['TextMapPropagator']?.[name];
+    if (provider) {
+      const propagator = provider(reg, value ?? EMPTY_CONFIG_PROPERTIES);
+      propagators.push(propagator);
+    } else {
+      throw new Error(
+        `unknown TextMapPropagator name in configuration: "${name}"`
+      );
     }
-    propagators.push(propagator);
   }
 
   if (propagators.length === 0) {
@@ -1465,6 +1459,13 @@ export function createTracerProviderFromConfig(
 
 export function getBuiltinComponentProviderRegistry(): ComponentProviderRegistry {
   return {
+    TextMapPropagator: {
+      tracecontext: () => new W3CTraceContextPropagator(),
+      baggage: () => new W3CBaggagePropagator(),
+      b3: () => new B3Propagator(),
+      b3multi: () =>
+        new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
+    },
     SpanExporter: {
       console: createConsoleSpanExporterFromConfig,
       otlp_http: createHttpSpanExporterFromConfig,

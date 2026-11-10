@@ -192,8 +192,6 @@ function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
   const reg = mergeComponentProviderRegistries([
     getBuiltinComponentProviderRegistry(),
   ]);
-  // // eslint-disable-next-line no-console
-  // console.log('XXX reg:', reg);
 
   let config: ConfigurationModel;
   try {
@@ -221,7 +219,7 @@ function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
 
   let components: SdkComponents;
   try {
-    components = createFromConfig(config, reg);
+    components = createFromConfig(reg, config);
   } catch (createErr) {
     diag.error(
       `Could not create OpenTelemetry SDK from configuration, SDK will not be setup: ${createErr.message}`
@@ -264,8 +262,8 @@ function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
  * Interpret configuration model and return SDK components.
  */
 function createFromConfig(
-  config: ConfigurationModel,
-  reg: ComponentProviderRegistry
+  reg: ComponentProviderRegistry,
+  config: ConfigurationModel
 ): SdkComponents {
   const components: SdkComponents = {};
 
@@ -276,7 +274,10 @@ function createFromConfig(
     const resource = createResourceFromConfig(config.resource);
 
     if (config.propagator) {
-      components.propagator = createPropagatorFromConfig(config.propagator);
+      components.propagator = createPropagatorFromConfig(
+        reg,
+        config.propagator
+      );
     }
 
     if (config.logger_provider) {
