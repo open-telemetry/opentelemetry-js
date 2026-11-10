@@ -44,7 +44,6 @@ export type {
   ExporterTemporalityPreference as ExporterTemporalityPreferenceConfigModel,
   ExporterDefaultHistogramAggregation as ExporterDefaultHistogramAggregationConfigModel,
   ConsoleMetricExporter as ConsoleMetricExporterConfigModel,
-  ConsoleExporter as ConsoleExporterConfigModel,
   PullMetricReader as PullMetricReaderConfigModel,
   PullMetricExporter as PullMetricExporterConfigModel,
   ExperimentalPrometheusMetricExporter as ExperimentalPrometheusMetricExporterConfigModel,
