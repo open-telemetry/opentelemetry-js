@@ -5,6 +5,7 @@
 
 import * as sinon from 'sinon';
 import * as assert from 'assert';
+import { diag, DiagLogLevel } from '@opentelemetry/api';
 import type { IExporterTransport } from '../../src';
 import { ExportResultCode } from '@opentelemetry/core';
 import { type Histogram, MeterProvider } from '@opentelemetry/sdk-metrics';
@@ -743,6 +744,82 @@ describe('OTLPExportDelegate', function () {
           done(err);
         }
       });
+    });
+
+    it('exports items that the diag logger cannot serialize', function (done) {
+      // a logger that serializes its arguments, e.g. one that writes JSON
+      const stringifyArgs = (...args: unknown[]) => {
+        JSON.stringify(args);
+      };
+      diag.setLogger(
+        {
+          verbose: stringifyArgs,
+          debug: stringifyArgs,
+          info: stringifyArgs,
+          warn: stringifyArgs,
+          error: stringifyArgs,
+        },
+        DiagLogLevel.ALL
+      );
+
+      // SDK spans are circular, as they reference their span processor
+      const circularRepresentation: FakeInternalRepresentation & {
+        self?: unknown;
+      } = { foo: 'internal' };
+      circularRepresentation.self = circularRepresentation;
+
+      const exportResponse: ExportResponse = {
+        data: Uint8Array.from([]),
+        status: 'success',
+      };
+      const transportStubs = {
+        send: sinon.stub().returns(Promise.resolve(exportResponse)),
+        shutdown: sinon.stub(),
+      };
+      const mockTransport = <IExporterTransport>transportStubs;
+
+      const serializerStubs = {
+        serializeRequest: sinon.stub().returns(Uint8Array.from([1])),
+        deserializeResponse: sinon.stub().returns({}),
+      };
+      const mockSerializer = <FakeSerializer>serializerStubs;
+
+      // mock a queue that has not yet reached capacity
+      const promiseHandlerStubs = {
+        pushPromise: sinon.stub(),
+        hasReachedLimit: sinon.stub().returns(false),
+        awaitAll: sinon.stub(),
+      };
+      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
+
+      const exporter = createOtlpExportDelegate(
+        {
+          promiseHandler: promiseHandler,
+          serializer: mockSerializer,
+          transport: mockTransport,
+          metrics: noopMetrics,
+        },
+        {
+          timeout: 1000,
+        }
+      );
+
+      try {
+        exporter.export(circularRepresentation, result => {
+          try {
+            assert.strictEqual(result.code, ExportResultCode.SUCCESS);
+            assert.strictEqual(result.error, undefined);
+            sinon.assert.calledOnce(transportStubs.send);
+            done();
+          } catch (err) {
+            // ensures we throw if there are more calls to result;
+            done(err);
+          }
+        });
+      } finally {
+        // do not leak the serializing logger into other tests
+        diag.disable();
+      }
     });
   });
 
