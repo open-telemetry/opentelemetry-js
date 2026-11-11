@@ -13,11 +13,18 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :bug: Bug Fixes
 
+* fix(otlp-grpc-exporter-base): load `@grpc/grpc-js` lazily in `createServiceClientConstructor` so that importing an OTLP gRPC exporter no longer loads it before instrumentations can wrap `net` and `dns` ([#7297](https://github.com/open-telemetry/opentelemetry-js/pull/7297)) @AyeshaWaseemAhmad
 * fix(exporter-trace-otlp-http, exporter-logs-otlp-http, exporter-metrics-otlp-http): use the `otlp_http_json_*_exporter` `otel.component.type` values for JSON exporters ([#7286](https://github.com/open-telemetry/opentelemetry-js/pull/7286)) @shehjaddev
 
 ### :books: Documentation
 
 ### :house: Internal
+
+## 0.301.1
+
+### :house: Internal
+
+* chore: Update local dependencies to 3.1.1 for the release of stable packages.
 
 ## 0.301.0
 

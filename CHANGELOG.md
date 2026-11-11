@@ -21,6 +21,12 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :house: Internal
 
+## 3.1.1
+
+### :bug: Bug Fixes
+
+* fix(resources): specify full path for ioreg command on Darwin, and kenv command on BSD for `host.id` @trentm
+
 ## 3.1.0
 
 ### :rocket: Features

@@ -46,7 +46,7 @@ describe('getMachineId on Darwin', () => {
   });
 
   it('reads machine-id', async () => {
-    const stub = sinon.stub(util, 'execAsync').returns(
+    const stub = sinon.stub(util, 'execFileAsync').returns(
       Promise.resolve({ stdout: cmdOutput, stderr: '' }) as PromiseWithChild<{
         stdout: string;
         stderr: string;
@@ -56,11 +56,15 @@ describe('getMachineId on Darwin', () => {
     const machineId = await getMachineId();
 
     assert.equal(machineId, expectedMachineId);
+    assert.deepStrictEqual(stub.firstCall.args.slice(0, 2), [
+      '/usr/sbin/ioreg',
+      ['-rd1', '-c', 'IOPlatformExpertDevice'],
+    ]);
     assert.equal(stub.callCount, 1);
   });
 
   it('handles failure', async () => {
-    const stub = sinon.stub(util, 'execAsync').returns(
+    const stub = sinon.stub(util, 'execFileAsync').returns(
       Promise.reject(new Error('not found')) as PromiseWithChild<{
         stdout: string;
         stderr: string;
