@@ -201,13 +201,16 @@ function checkConfigUse(
   }
 }
 
+const EMPTY_CONFIG_PROPERTIES = Object.freeze({}) as ConfigProperties;
+
 /**
  * Return the single non-undefined entry in the given config object, or throw.
+ * As well, if the entry value is `null`, then return an empty ConfigProperties.
  *
  * It is common for Declarative Configuration to have config objects with
  * a single entry, e.g.
  *
- *    "LogRecordProcessor": {
+ *    "SpanExporter": {
  *      "type": "object",
  *      "additionalProperties": {
  *        "type": [
@@ -218,13 +221,20 @@ function checkConfigUse(
  *      "minProperties": 1,
  *      "maxProperties": 1,
  *
- * The TypeScript types cannot express the minProperties/maxProperties from the
- * JSON schema. We guard against that here.
+ * - The JSON schema `"null"` allows YAML like this:
+ *      exporter:
+ *        console:
+ *   where the parsed config object is `exporter: { console: null }`.
+ *   As a convenience for ComponentProvider functions that accept a
+ *   `ConfigProperties`, an empty ConfigProperties is returned in place of
+ *   `null`.
+ * - The TypeScript types cannot express the minProperties/maxProperties from
+ *   the JSON schema. We guard against that here.
  */
 function mustSingleEntry(
   configObj: object,
   configTypeName: string
-): [string, unknown] {
+): [string, ConfigProperties] {
   const entries = Object.entries(configObj).filter(
     ([_name, properties]) => properties !== undefined
   );
@@ -236,7 +246,7 @@ function mustSingleEntry(
     );
   }
 
-  return entries[0];
+  return [entries[0][0], entries[0][1] ?? EMPTY_CONFIG_PROPERTIES];
 }
 
 function loadTlsConfigFile(absPath: string, propName: string) {
@@ -397,7 +407,6 @@ export function createPropagatorFromConfig(
     }
   }
 
-  const EMPTY_CONFIG_PROPERTIES = Object.freeze({}) as ConfigProperties;
   const propagators: TextMapPropagator[] = [];
   for (const [name, value] of kvs) {
     const provider = reg['TextMapPropagator']?.[name];
@@ -536,7 +545,7 @@ export function createLogRecordExporterFromConfig(
 
   switch (name) {
     case 'otlp_http': {
-      checkConfigUse('OtlpHttpExporter', properties!, [
+      checkConfigUse('OtlpHttpExporter', properties, [
         'compression',
         'endpoint',
         'headers',
@@ -617,14 +626,14 @@ export function createLogRecordProcessorFromConfig(
 
   switch (name) {
     case 'batch': {
-      checkConfigUse('BatchLogRecordProcessor', properties!, [
+      checkConfigUse('BatchLogRecordProcessor', properties, [
         'exporter',
         'max_queue_size',
         'max_export_batch_size',
         'schedule_delay',
         'export_timeout',
       ]);
-      const props = properties as BatchLogRecordProcessorConfigModel;
+      const props = properties as unknown as BatchLogRecordProcessorConfigModel;
       const exporter = createLogRecordExporterFromConfig(props.exporter);
       return new BatchLogRecordProcessor({
         exporter,
@@ -767,7 +776,7 @@ export function createPushMetricExporterFromConfig(
 
   switch (name) {
     case 'otlp_http': {
-      checkConfigUse('PushMetricExporter', properties!, [
+      checkConfigUse('PushMetricExporter', properties, [
         'compression',
         'endpoint',
         'headers',
@@ -944,7 +953,7 @@ function createPullMetricReaderFromConfig(
       // TODO(6605): 'resource_constant_labels' map to `withResourceConstantLabels` regex
       checkConfigUse(
         'ExperimentalPrometheusMetricExporterConfigModel',
-        properties!,
+        properties,
         [
           'host',
           'port',
@@ -994,11 +1003,11 @@ function createMetricReaderFromConfig(
   switch (name) {
     case 'periodic':
       return createPeriodicMetricReaderFromConfig(
-        properties as PeriodicMetricReaderConfigModel
+        properties as unknown as PeriodicMetricReaderConfigModel
       );
     case 'pull':
       return createPullMetricReaderFromConfig(
-        properties as PullMetricReaderConfigModel
+        properties as unknown as PullMetricReaderConfigModel
       );
     default:
       throw new Error(
@@ -1045,7 +1054,7 @@ function createAggregationOptionFromConfig(
         type: AggregationType.DROP,
       };
     case 'explicit_bucket_histogram': {
-      checkConfigUse('ExplicitBucketHistogramAggregation', properties!, [
+      checkConfigUse('ExplicitBucketHistogramAggregation', properties, [
         'record_min_max',
         'boundaries',
       ]);
@@ -1063,11 +1072,10 @@ function createAggregationOptionFromConfig(
     }
     case 'base2_exponential_bucket_histogram': {
       // TODO(3841): max_scale property
-      checkConfigUse(
-        'Base2ExponentialBucketHistogramAggregation',
-        properties!,
-        ['record_min_max', 'max_size']
-      );
+      checkConfigUse('Base2ExponentialBucketHistogramAggregation', properties, [
+        'record_min_max',
+        'max_size',
+      ]);
       const props =
         properties as Base2ExponentialBucketHistogramAggregationConfigModel;
       return {
@@ -1294,7 +1302,7 @@ function createSpanExporterFromConfig(
   const [name, properties] = mustSingleEntry(exporter, 'SpanExporter');
   const provider = reg['SpanExporter']?.[name];
   if (provider) {
-    return provider(reg, properties as ConfigProperties);
+    return provider(reg, properties);
   } else {
     throw new Error(`unknown SpanExporter name in configuration: "${name}"`);
   }
@@ -1342,7 +1350,7 @@ function createSpanProcessorFromConfig(
   const [name, properties] = mustSingleEntry(processor, 'SpanProcessor');
   const provider = reg['SpanProcessor']?.[name];
   if (provider) {
-    return provider(reg, properties as ConfigProperties);
+    return provider(reg, properties);
   } else {
     throw new Error(`unknown SpanProcessor name in configuration: "${name}"`);
   }
@@ -1407,7 +1415,7 @@ export function createSamplerFromConfig(
   const [name, properties] = mustSingleEntry(samplerConfig, 'Sampler');
   const provider = reg['Sampler']?.[name];
   if (provider) {
-    return provider(reg, properties as ConfigProperties);
+    return provider(reg, properties);
   } else {
     throw new Error(`unknown Sampler name in configuration: "${name}"`);
   }
