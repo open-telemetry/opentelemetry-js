@@ -271,7 +271,7 @@ function createFromConfig(
     components.contextManager = new AsyncLocalStorageContextManager();
     components.contextManager.enable();
 
-    const resource = createResourceFromConfig(config.resource);
+    const resource = createResourceFromConfig(reg, config.resource);
 
     if (config.propagator) {
       components.propagator = createPropagatorFromConfig(

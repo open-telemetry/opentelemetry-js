@@ -40,6 +40,7 @@ import type {
   Resource,
   DetectedResourceAttributes,
   ResourceDetector,
+  DetectedResource,
 } from '@opentelemetry/resources';
 import {
   defaultResource,
@@ -429,7 +430,32 @@ export function createPropagatorFromConfig(
   }
 }
 
+/**
+ * Combines multiple resource detectors into a single one.
+ *
+ * An `ExperimentalResourceDetector` component provider returns a *single*
+ * `ResourceDetector`. However, some declarative config resource detector
+ * names are implemented with *multiple* separate ResourceDetectors.
+ * E.g. "host" is a combo of `hostDetector` and `osDetector`.
+ *
+ * Limitation: Behavior is undefined if the multiple detectors return
+ * conflicting attributes.
+ */
+class CompositeResourceDetector implements ResourceDetector {
+  private readonly _detectors: ResourceDetector[];
+  constructor(detectors: ResourceDetector[]) {
+    this._detectors = detectors;
+  }
+  detect(): DetectedResource {
+    const attrsArr = this._detectors.map(d => d.detect().attributes);
+    return {
+      attributes: Object.assign({}, ...attrsArr),
+    };
+  }
+}
+
 export function createResourceFromConfig(
+  reg: ComponentProviderRegistry,
   resourceConfig?: ResourceConfigModel
 ): Resource {
   // Limitation: Resource#merge() is the only exported mechanism from the
@@ -462,31 +488,20 @@ export function createResourceFromConfig(
     if (resourceConfig['detection/development'].detectors) {
       const detectors: ResourceDetector[] = [];
       for (const d of resourceConfig['detection/development'].detectors) {
-        const [name] = mustSingleEntry(d, 'ExperimentalResourceDetector');
-        // https://opentelemetry.io/docs/specs/otel-config/types/#type-experimentalresourcedetector
-        switch (name) {
-          // Note: The 'container' detector defined in the schema cannot yet
-          // be supported because a container resource detector lives in the
-          // separate opentelemetry-js-contrib.git repo. Supporting 'container'
-          // will come as part of supporting PluginComponentProvider.
-          case 'host':
-            detectors.push(hostDetector);
-            detectors.push(osDetector);
-            break;
-          case 'process':
-            detectors.push(processDetector);
-            break;
-          case 'service':
-            detectors.push(serviceNameEnvDetector);
-            detectors.push(serviceInstanceIdDetector);
-            break;
-          default:
-            // An unknown resource detector should "warn and skip".
-            // https://opentelemetry.io/docs/specs/otel/configuration/sdk/#supported-sdk-plugin-components
-            diag.warn(
-              `unknown ExperimentalResourceDetector name in configuration: "${name}" (skipping)`
-            );
-            break;
+        const [name, properties] = mustSingleEntry(
+          d,
+          'ExperimentalResourceDetector'
+        );
+        const provider = reg['ExperimentalResourceDetector']?.[name];
+        if (provider) {
+          const detector = provider(reg, properties);
+          detectors.push(detector);
+        } else {
+          // An unknown resource detector should "warn and skip".
+          // https://opentelemetry.io/docs/specs/otel/configuration/sdk/#supported-sdk-plugin-components
+          diag.warn(
+            `unknown ExperimentalResourceDetector name in configuration: "${name}" (skipping)`
+          );
         }
       }
 
@@ -1477,6 +1492,17 @@ export function createTracerProviderFromConfig(
 
 export function getBuiltinComponentProviderRegistry(): ComponentProviderRegistry {
   return {
+    ExperimentalResourceDetector: {
+      // https://opentelemetry.io/docs/specs/otel-config/types/#type-experimentalresourcedetector
+      // The 'container' detector lives in opentelemetry-js-contrib.git.
+      host: () => new CompositeResourceDetector([hostDetector, osDetector]),
+      process: () => processDetector,
+      service: () =>
+        new CompositeResourceDetector([
+          serviceNameEnvDetector,
+          serviceInstanceIdDetector,
+        ]),
+    },
     TextMapPropagator: {
       tracecontext: () => new W3CTraceContextPropagator(),
       baggage: () => new W3CBaggagePropagator(),
@@ -1507,11 +1533,9 @@ export function getBuiltinComponentProviderRegistry(): ComponentProviderRegistry
       // TODO(6541): probability/development (via composite support for?)
       // TODO(later): Consider supporting jaeger_remote/development if requested by a user. Only consider `sampler-jaeger-remote` package after axios dep is dropped in #6963.
     },
-    // XXX IdGenerator
     IdGenerator: {
       random: () => new RandomIdGenerator(),
     },
-    // XXX ExperimentalResourceDetector
     // XXX PullMetricExporter
     // XXX PushMetricExporter
     // XXX MetricProducer

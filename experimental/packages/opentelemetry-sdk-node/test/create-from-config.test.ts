@@ -309,13 +309,13 @@ describe('create-from-config', () => {
     });
 
     it('empty "resource" config', async function () {
-      const resource = createResourceFromConfig(undefined);
+      const resource = createResourceFromConfig(reg, undefined);
       await resource.waitForAsyncAttributes?.();
       assert.deepEqual(resource.attributes, defaultResAttrs);
     });
 
     it('resource.attributes', async function () {
-      const resource = createResourceFromConfig({
+      const resource = createResourceFromConfig(reg, {
         attributes: [{ name: 'foo', value: 'bar' }],
       });
       await resource.waitForAsyncAttributes?.();
@@ -326,7 +326,7 @@ describe('create-from-config', () => {
     });
 
     it('resource.attributes_list', async function () {
-      const resource = createResourceFromConfig({
+      const resource = createResourceFromConfig(reg, {
         attributes_list: 'foo=baz, spam=eggs \t',
       });
       await resource.waitForAsyncAttributes?.();
@@ -338,7 +338,7 @@ describe('create-from-config', () => {
     });
 
     it('resource.attributes beats resource.attributes_list', async function () {
-      const resource = createResourceFromConfig({
+      const resource = createResourceFromConfig(reg, {
         attributes: [{ name: 'foo', value: 'bar' }],
         attributes_list: 'foo=baz, spam=eggs \t',
       });
@@ -354,7 +354,7 @@ describe('create-from-config', () => {
     // https://opentelemetry.io/docs/specs/otel-config/types/#type-experimentalresourcedetector
 
     it('resource detector: host', async function () {
-      const resource = createResourceFromConfig({
+      const resource = createResourceFromConfig(reg, {
         'detection/development': { detectors: [{ host: null }] },
       });
       await resource.waitForAsyncAttributes?.();
@@ -366,7 +366,7 @@ describe('create-from-config', () => {
     });
 
     it('resource detector: process', async function () {
-      const resource = createResourceFromConfig({
+      const resource = createResourceFromConfig(reg, {
         'detection/development': { detectors: [{ process: null }] },
       });
       await resource.waitForAsyncAttributes?.();
@@ -382,7 +382,7 @@ describe('create-from-config', () => {
         OTEL_RESOURCE_ATTRIBUTES: 'foo=bar,spam=eggs',
       });
       try {
-        const resource = createResourceFromConfig({
+        const resource = createResourceFromConfig(reg, {
           'detection/development': { detectors: [{ service: null }] },
         });
         await resource.waitForAsyncAttributes?.();
@@ -400,7 +400,7 @@ describe('create-from-config', () => {
     it('resource detector: container (not yet supported, warns and skips)', async function () {
       const warnStub = sinon.stub(diag, 'warn');
 
-      createResourceFromConfig({
+      createResourceFromConfig(reg, {
         'detection/development': { detectors: [{ container: null }] },
       });
 
@@ -412,7 +412,7 @@ describe('create-from-config', () => {
     it('resource detector: unknown name (warns and skips)', async function () {
       const warnStub = sinon.stub(diag, 'warn');
 
-      createResourceFromConfig({
+      createResourceFromConfig(reg, {
         'detection/development': {
           detectors: [{ some_unknown_detector: null }],
         },
@@ -425,7 +425,7 @@ describe('create-from-config', () => {
 
     it('schema_url', function () {
       const schema_url = 'https://example.com/a-scheme';
-      const resource = createResourceFromConfig({ schema_url });
+      const resource = createResourceFromConfig(reg, { schema_url });
       assert.deepEqual(resource.attributes, defaultResAttrs);
       assert.deepEqual(resource.schemaUrl, schema_url);
     });
@@ -436,7 +436,7 @@ describe('create-from-config', () => {
       });
       try {
         const schema_url = 'https://example.com/a-scheme';
-        const resource = createResourceFromConfig({
+        const resource = createResourceFromConfig(reg, {
           attributes: [
             { name: 'service.name', value: 'service-name-from-attributes' },
             { name: 'os.type', value: 'my-os-type' }, // override from osDetector
@@ -467,7 +467,7 @@ describe('create-from-config', () => {
 
     it('processes fixtures/resources.yaml correctly', async function () {
       const config = parseConfigFile('test/fixtures/resources.yaml');
-      const resource = createResourceFromConfig(config.resource);
+      const resource = createResourceFromConfig(reg, config.resource);
       await resource.waitForAsyncAttributes?.();
 
       assert.deepStrictEqual(
