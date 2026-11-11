@@ -4,8 +4,10 @@
  */
 
 import { promises as fs } from 'fs';
-import { execAsync } from './execAsync';
+import { execFileAsync } from './execAsync';
 import { diag } from '@opentelemetry/api';
+
+const EXEC_TIMEOUT_MS = 5000;
 
 export async function getMachineId(): Promise<string | undefined> {
   try {
@@ -16,7 +18,11 @@ export async function getMachineId(): Promise<string | undefined> {
   }
 
   try {
-    const result = await execAsync('kenv -q smbios.system.uuid');
+    const result = await execFileAsync(
+      '/bin/kenv',
+      ['-q', 'smbios.system.uuid'],
+      { timeout: EXEC_TIMEOUT_MS }
+    );
     return result.stdout.trim();
   } catch (e) {
     diag.debug(`error reading machine id: ${e}`);
