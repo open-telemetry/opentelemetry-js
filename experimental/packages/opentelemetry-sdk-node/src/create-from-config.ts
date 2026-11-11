@@ -648,7 +648,8 @@ export function createLogRecordProcessorFromConfig(
     }
 
     case 'simple': {
-      const props = properties as SimpleLogRecordProcessorConfigModel;
+      const props =
+        properties as unknown as SimpleLogRecordProcessorConfigModel;
       const exporter = createLogRecordExporterFromConfig(props.exporter);
       return new SimpleLogRecordProcessor({ exporter });
     }
