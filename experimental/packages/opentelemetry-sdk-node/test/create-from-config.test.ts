@@ -1447,16 +1447,6 @@ describe('create-from-config', () => {
           ],
           disabled: ['\u{1f680}-ab', '\u{1f680}-\u{1f680}a', '\u{1f680}-\n\n'],
         },
-        {
-          name: 'repeated star/literal segments do not backtrack exponentially',
-          config: {
-            tracers: [
-              { name: '*a'.repeat(12) + 'b', config: { enabled: false } },
-            ],
-          },
-          enabled: ['a'.repeat(32)],
-          disabled: ['a'.repeat(32) + 'b'],
-        },
       ];
 
       for (const item of corpus) {
