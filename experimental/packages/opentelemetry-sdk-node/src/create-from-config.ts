@@ -1423,18 +1423,18 @@ export function createSamplerFromConfig(
 }
 
 export function createIdGeneratorFromConfig(
+  reg: ComponentProviderRegistry,
   id_generator?: IdGeneratorConfigModel
 ): IdGenerator | undefined {
   if (!id_generator) {
     return undefined;
   }
-
-  const [name] = mustSingleEntry(id_generator, 'IdGenerator');
-  switch (name) {
-    case 'random':
-      return new RandomIdGenerator();
-    default:
-      throw new Error(`unknown IdGenerator name: "${name}"`);
+  const [name, properties] = mustSingleEntry(id_generator, 'IdGenerator');
+  const provider = reg['IdGenerator']?.[name];
+  if (provider) {
+    return provider(reg, properties);
+  } else {
+    throw new Error(`unknown IdGenerator name in configuration: "${name}"`);
   }
 }
 
@@ -1452,7 +1452,10 @@ export function createTracerProviderFromConfig(
     attribute_limits
   );
   const sampler = createSamplerFromConfig(reg, tracer_provider.sampler);
-  const idGenerator = createIdGeneratorFromConfig(tracer_provider.id_generator);
+  const idGenerator = createIdGeneratorFromConfig(
+    reg,
+    tracer_provider.id_generator
+  );
 
   checkConfigUse('TracerProvider', tracer_provider, [
     'processors',
@@ -1504,5 +1507,15 @@ export function getBuiltinComponentProviderRegistry(): ComponentProviderRegistry
       // TODO(6541): probability/development (via composite support for?)
       // TODO(later): Consider supporting jaeger_remote/development if requested by a user. Only consider `sampler-jaeger-remote` package after axios dep is dropped in #6963.
     },
+    // XXX IdGenerator
+    IdGenerator: {
+      random: () => new RandomIdGenerator(),
+    },
+    // XXX ExperimentalResourceDetector
+    // XXX PullMetricExporter
+    // XXX PushMetricExporter
+    // XXX MetricProducer
+    // XXX LogRecordExporter
+    // XXX LogRecordProcessor
   };
 }

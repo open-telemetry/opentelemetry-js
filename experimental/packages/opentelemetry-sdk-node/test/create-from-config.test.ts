@@ -1460,7 +1460,7 @@ describe('create-from-config', () => {
             id_generator: { some_unknown_id_generator: null },
           },
           assertThrowsError:
-            /unknown IdGenerator name: "some_unknown_id_generator"/,
+            /unknown IdGenerator name in configuration: "some_unknown_id_generator"/,
         },
       ];
 
