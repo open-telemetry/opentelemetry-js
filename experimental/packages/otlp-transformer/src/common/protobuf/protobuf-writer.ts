@@ -5,6 +5,7 @@
 import { diag } from '@opentelemetry/api';
 import type { IProtobufWriter } from './i-protobuf-writer';
 import { estimateVarintSize } from './utils';
+import { utf8ByteLength } from '#platform';
 
 export const GROWING_BUFFER_DEBUG_MESSAGE =
   'ProtobufWriter: estimated size was too small, growing buffer.';
@@ -22,7 +23,9 @@ const RESERVED_LENGTH_BYTES = 1;
 export class ProtobufWriter implements IProtobufWriter {
   private _buffer: Uint8Array;
   // Avoid using TextEncoder type. While the global is there on all supported runtimes, types may differ.
-  private readonly _textEncoder: { encode: (str: string) => Uint8Array };
+  private readonly _textEncoder: {
+    encodeInto: (str: string, destination: Uint8Array) => { written: number };
+  };
   private _dataView: DataView;
 
   public pos: number = 0;
@@ -275,28 +278,29 @@ export class ProtobufWriter implements IProtobufWriter {
    * Write a string as UTF-8 bytes (length-delimited)
    */
   writeString(str: string): void {
-    // Fast path for ASCII strings (most common case)
-    let isAscii = true;
     const len = str.length;
-    for (let i = 0; i < len; i++) {
-      if (str.charCodeAt(i) > 127) {
-        isAscii = false;
-        break;
+    // Limit ASCII detection to short strings to avoid scanning long values.
+    if (len < 128) {
+      let i = 0;
+      while (i < len && str.charCodeAt(i) < 128) {
+        i++;
+      }
+      if (i === len) {
+        this.writeVarint(len);
+        this._ensureCapacity(len);
+        for (i = 0; i < len; i++) {
+          this._buffer[this.pos++] = str.charCodeAt(i);
+        }
+        return;
       }
     }
 
-    if (isAscii) {
-      // Write length varint
-      this.writeVarint(len);
-      this._ensureCapacity(len);
-      // Write ASCII bytes directly
-      for (let i = 0; i < len; i++) {
-        this._buffer[this.pos++] = str.charCodeAt(i);
-      }
-    } else {
-      // Use TextEncoder for non-ASCII strings
-      const bytes = this._textEncoder.encode(str);
-      this.writeBytes(bytes);
-    }
+    const byteLength = utf8ByteLength(str);
+    this.writeVarint(byteLength);
+    this._ensureCapacity(byteLength);
+    this.pos += this._textEncoder.encodeInto(
+      str,
+      this._buffer.subarray(this.pos)
+    ).written;
   }
 }
