@@ -19,24 +19,22 @@ export class MultiSpanProcessor implements SpanProcessor {
     this._spanProcessors = spanProcessors;
   }
 
-  forceFlush(): Promise<void> {
+  async forceFlush(): Promise<void> {
     const promises: Promise<void>[] = [];
 
     for (const spanProcessor of this._spanProcessors) {
       promises.push(spanProcessor.forceFlush());
     }
-    return new Promise(resolve => {
-      Promise.all(promises)
-        .then(() => {
-          resolve();
-        })
-        .catch(error => {
-          globalErrorHandler(
-            error || new Error('MultiSpanProcessor: forceFlush failed')
-          );
-          resolve();
-        });
-    });
+
+    const results = await Promise.allSettled(promises);
+    const rejected = results.find(
+      (result): result is PromiseRejectedResult => result.status === 'rejected'
+    );
+    if (rejected) {
+      globalErrorHandler(
+        rejected.reason || new Error('MultiSpanProcessor: forceFlush failed')
+      );
+    }
   }
 
   onStart(span: Span, context: Context): void {
@@ -59,16 +57,19 @@ export class MultiSpanProcessor implements SpanProcessor {
     }
   }
 
-  shutdown(): Promise<void> {
+  async shutdown(): Promise<void> {
     const promises: Promise<void>[] = [];
 
     for (const spanProcessor of this._spanProcessors) {
       promises.push(spanProcessor.shutdown());
     }
-    return new Promise((resolve, reject) => {
-      Promise.all(promises).then(() => {
-        resolve();
-      }, reject);
-    });
+
+    const results = await Promise.allSettled(promises);
+    const rejected = results.find(
+      (result): result is PromiseRejectedResult => result.status === 'rejected'
+    );
+    if (rejected) {
+      throw rejected.reason;
+    }
   }
 }
