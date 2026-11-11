@@ -16,7 +16,6 @@ import {
   writeHrTimeAsFixed64,
 } from '../../common/protobuf/common-serializer';
 import type { IProtobufWriter } from '../../common/protobuf/i-protobuf-writer';
-import { ProtobufSizeEstimator } from '../../common/protobuf/protobuf-size-estimator';
 
 /**
  * Serialize a single LogRecord directly from ReadableLogRecord
@@ -198,15 +197,7 @@ export function serializeLogsExportRequest(
 ): Uint8Array {
   const resourceMap = createResourceMap(logRecords);
 
-  // First pass: estimate size
-  const estimator = new ProtobufSizeEstimator();
-  for (const [resource, scopeMap] of resourceMap) {
-    estimator.writeTag(1, 2);
-    serializeResourceLogs(estimator, resource, scopeMap);
-  }
-
-  // Second pass: write with estimated size
-  const writer = new ProtobufWriter(estimator.pos);
+  const writer = new ProtobufWriter();
   for (const [resource, scopeMap] of resourceMap) {
     writer.writeTag(1, 2);
     serializeResourceLogs(writer, resource, scopeMap);

@@ -2,13 +2,9 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { diag } from '@opentelemetry/api';
 import type { IProtobufWriter } from './i-protobuf-writer';
 import { estimateVarintSize } from './utils';
 import { utf8ByteLength } from '#platform';
-
-export const GROWING_BUFFER_DEBUG_MESSAGE =
-  'ProtobufWriter: estimated size was too small, growing buffer.';
 
 /**
  * bytes reserved for length in length-delimited fields
@@ -45,10 +41,10 @@ export class ProtobufWriter implements IProtobufWriter {
       return;
     }
 
-    // It is safe to grow the buffer, but we assume that estimation is correct.
-    // Getting to this point indicates incorrect estimation or over-reservation
-    // of space in this writer and can lead to poor memory performance.
-    diag.debug(GROWING_BUFFER_DEBUG_MESSAGE);
+    // TODO: Re-measure growing a resizable ArrayBuffer in place. On Node.js 24
+    // and 26 its views made every write slower than this copy saves. Browsers
+    // would also need a path other than encodeInto for it, because WebIDL
+    // rejects views on resizable buffers there.
 
     // Double buffer size until we have enough space
     let newSize = this._buffer.length * 2;

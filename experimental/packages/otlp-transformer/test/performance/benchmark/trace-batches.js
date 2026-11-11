@@ -94,5 +94,30 @@ for (const size of [10, 100, 512]) {
   }
 }
 
+// Multi-megabyte export requests, from spans carrying a large attribute such
+// as a request body. These grow the writer's buffer well past its initial size.
+for (const payloadSize of [4096, 16384, 65536]) {
+  const payload = 'x'.repeat(payloadSize);
+  const spans = Array.from({ length: 512 }, (_, i) => {
+    const span = tracers[i % tracers.length].startSpan('POST /checkout');
+    span.setAttributes({
+      'http.request.method': 'POST',
+      'url.full': `https://shop.example/checkout?order=${i}`,
+      'http.response.status_code': 200,
+      'http.request.body': payload,
+    });
+    span.end();
+    return span;
+  });
+  const bytes = ProtobufTraceSerializer.serializeRequest(spans).length;
+  suite.add(
+    `protobuf: 512 spans, ${payloadSize}-byte attribute, ${bytes} bytes`,
+    () => {
+      ProtobufTraceSerializer.serializeRequest(spans);
+    },
+    { maxTime: 1, minSamples: 10 }
+  );
+}
+
 suite.on('cycle', event => console.log(String(event.target)));
 suite.run();

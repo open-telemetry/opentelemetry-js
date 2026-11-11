@@ -3,14 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import * as signals from '../test/generated/signals';
-import { diag, SpanKind, SpanStatusCode, TraceFlags } from '@opentelemetry/api';
+import { SpanKind, SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import { TraceState } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import type { ReadableSpan } from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
-import * as sinon from 'sinon';
 import { toBase64 } from './utils';
 import type { OtlpEncodingOptions } from '../src/common/internal-types';
 import { ESpanKind, EStatusCode } from '../src/trace/internal-types';
@@ -20,10 +19,7 @@ import { JsonTraceSerializer } from '../src/trace/json';
 import { hexToBinary } from '../src/common/hex-to-binary';
 import type { ISpan } from '../src/trace/internal-types';
 import { JSON_ENCODER, PROTOBUF_ENCODER } from '../src/common/utils';
-import {
-  GROWING_BUFFER_DEBUG_MESSAGE,
-  ProtobufWriter,
-} from '../src/common/protobuf/protobuf-writer';
+import { ProtobufWriter } from '../src/common/protobuf/protobuf-writer';
 
 function createExpectedSpanJson(options: OtlpEncodingOptions) {
   const useHex = options.useHex ?? false;
@@ -660,16 +656,6 @@ describe('Trace', () => {
   });
 
   describe('ProtobufTracesSerializer', function () {
-    let diagStub: sinon.SinonStub;
-
-    beforeEach(function () {
-      diagStub = sinon.stub(diag, 'debug');
-    });
-
-    afterEach(function () {
-      sinon.restore();
-    });
-
     it('serializes an export request', () => {
       const serialized = ProtobufTraceSerializer.serializeRequest([
         span_1_1,
@@ -696,7 +682,6 @@ describe('Trace', () => {
           }
         );
       assert.deepStrictEqual(decodedObj, expected);
-      sinon.assert.neverCalledWith(diagStub, GROWING_BUFFER_DEBUG_MESSAGE);
     });
 
     it('deserializes a response', () => {
@@ -729,7 +714,6 @@ describe('Trace', () => {
       assert.doesNotThrow(() =>
         ProtobufTraceSerializer.deserializeResponse(new Uint8Array([]))
       );
-      sinon.assert.neverCalledWith(diagStub, GROWING_BUFFER_DEBUG_MESSAGE);
     });
 
     it('does not throw when encountering unexpected wiretypes during deserialization', function () {

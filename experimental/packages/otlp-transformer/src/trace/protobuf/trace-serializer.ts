@@ -15,7 +15,6 @@ import {
   writeHrTimeAsFixed64,
 } from '../../common/protobuf/common-serializer';
 import type { IProtobufWriter } from '../../common/protobuf/i-protobuf-writer';
-import { ProtobufSizeEstimator } from '../../common/protobuf/protobuf-size-estimator';
 
 // Span flags constants matching the OTLP specification
 const SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK = 0x100;
@@ -355,15 +354,7 @@ function createResourceMap(
 export function serializeTraceExportRequest(spans: ReadableSpan[]): Uint8Array {
   const resourceMap = createResourceMap(spans);
 
-  // First pass: estimate size
-  const estimator = new ProtobufSizeEstimator();
-  for (const [resource, scopeMap] of resourceMap) {
-    estimator.writeTag(1, 2);
-    serializeResourceSpans(estimator, resource, scopeMap);
-  }
-
-  // Second pass: write with estimated size
-  const writer = new ProtobufWriter(estimator.pos);
+  const writer = new ProtobufWriter();
   for (const [resource, scopeMap] of resourceMap) {
     writer.writeTag(1, 2);
     serializeResourceSpans(writer, resource, scopeMap);
