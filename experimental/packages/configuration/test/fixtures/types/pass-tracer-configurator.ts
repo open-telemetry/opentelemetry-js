@@ -5,13 +5,13 @@
 
 import type {
   ConfigurationModel,
-  ExperimentalTracerConfigModel,
+  ExperimentalTracerConfigConfigModel,
   ExperimentalTracerConfiguratorConfigModel,
-  ExperimentalTracerMatcherAndConfigModel,
+  ExperimentalTracerMatcherAndConfigConfigModel,
 } from '@opentelemetry/configuration';
 
-const disabledConfig: ExperimentalTracerConfigModel = { enabled: false };
-const matcher: ExperimentalTracerMatcherAndConfigModel = {
+const disabledConfig: ExperimentalTracerConfigConfigModel = { enabled: false };
+const matcher: ExperimentalTracerMatcherAndConfigConfigModel = {
   name: 'library-*',
   config: disabledConfig,
 };

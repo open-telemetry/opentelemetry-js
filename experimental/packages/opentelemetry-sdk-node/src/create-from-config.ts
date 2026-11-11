@@ -76,7 +76,7 @@ import type {
   BatchLogRecordProcessorConfigModel,
   BatchSpanProcessorConfigModel,
   ExperimentalPrometheusMetricExporterConfigModel,
-  ExperimentalTracerConfigModel,
+  ExperimentalTracerConfigConfigModel,
   ExperimentalTracerConfiguratorConfigModel,
   ExplicitBucketHistogramAggregationConfigModel,
   ExporterDefaultHistogramAggregationConfigModel,
@@ -1438,7 +1438,7 @@ function matchesWildcardPattern(
 }
 
 function createExperimentalTracerConfigFromConfig(
-  config?: ExperimentalTracerConfigModel
+  config?: ExperimentalTracerConfigConfigModel
 ): TracerConfig {
   checkConfigUse('ExperimentalTracerConfig', config, ['enabled']);
   return { enabled: config?.enabled ?? true };
