@@ -4,7 +4,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.223.1",
+  "version": "0.223.2",
   "description": "Composite samplers for OpenTelemetry tracing",
   "module": "build/esm/index.js",
   "esnext": "build/esnext/index.js",
