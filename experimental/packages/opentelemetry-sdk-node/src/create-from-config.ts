@@ -908,31 +908,26 @@ export function createPushMetricExporterFromConfig(
 }
 
 function createMetricProducerFromConfig(
+  reg: ComponentProviderRegistry,
   producer: MetricProducerConfigModel
 ): MetricProducer {
-  const [name] = mustSingleEntry(producer, 'MetricProducer');
-
-  switch (name) {
-    case 'opencensus': {
-      // Note: The "opencensus" MetricProducer is intentionally not supported.
-      // It is deprecated in OpenTelemetry Configuration v1.2.0.
-      throw new Error(
-        'the "opencensus" MetricProducer is deprecated and not supported'
-      );
-    }
-
-    default:
-      throw new Error(`unknown MetricProducer name: "${name}"`);
+  const [name, properties] = mustSingleEntry(producer, 'MetricProducer');
+  const provider = reg['MetricProducer']?.[name];
+  if (provider) {
+    return provider(reg, properties);
+  } else {
+    throw new Error(`unknown MetricProducer name in configuration: "${name}"`);
   }
 }
 
 function createPeriodicMetricReaderFromConfig(
+  reg: ComponentProviderRegistry,
   periodic: PeriodicMetricReaderConfigModel
 ): MetricReader {
   const exporter = createPushMetricExporterFromConfig(periodic.exporter);
 
-  const metricProducers = periodic.producers?.map(
-    createMetricProducerFromConfig
+  const metricProducers = periodic.producers?.map(producer =>
+    createMetricProducerFromConfig(reg, producer)
   );
 
   checkConfigUse('PeriodicMetricReader', periodic, [
@@ -959,12 +954,15 @@ function createPeriodicMetricReaderFromConfig(
 }
 
 function createPullMetricReaderFromConfig(
+  reg: ComponentProviderRegistry,
   pull: PullMetricReaderConfigModel
 ): MetricReader {
   // TODO(6425): add cardinality_limits
   checkConfigUse('PullMetricReader', pull, ['exporter', 'producers']);
 
-  const metricProducers = pull.producers?.map(createMetricProducerFromConfig);
+  const metricProducers = pull.producers?.map(producer =>
+    createMetricProducerFromConfig(reg, producer)
+  );
 
   // The declarative config models a `pull` MetricReader as an object that takes
   // an exporter, e.g.:
@@ -1033,6 +1031,7 @@ function createPullMetricReaderFromConfig(
 }
 
 function createMetricReaderFromConfig(
+  reg: ComponentProviderRegistry,
   reader: MetricReaderConfigModel
 ): MetricReader {
   const [name, properties] = mustSingleEntry(reader, 'MetricReader');
@@ -1040,10 +1039,12 @@ function createMetricReaderFromConfig(
   switch (name) {
     case 'periodic':
       return createPeriodicMetricReaderFromConfig(
+        reg,
         properties as unknown as PeriodicMetricReaderConfigModel
       );
     case 'pull':
       return createPullMetricReaderFromConfig(
+        reg,
         properties as unknown as PullMetricReaderConfigModel
       );
     default:
@@ -1238,10 +1239,13 @@ function createViewOptionsFromConfig(view: ViewConfigModel): ViewOptions {
 }
 
 export function createMeterProviderFromConfig(
+  reg: ComponentProviderRegistry,
   resource: Resource,
   meter_provider: MeterProviderConfigModel
 ): MeterProvider {
-  const readers = meter_provider.readers.map(createMetricReaderFromConfig);
+  const readers = meter_provider.readers.map(reader =>
+    createMetricReaderFromConfig(reg, reader)
+  );
   const views = meter_provider.views?.map(createViewOptionsFromConfig);
 
   // TODO(5147): exemplar_filter when sdk-metrics package supports it
@@ -1524,6 +1528,7 @@ export function getBuiltinComponentProviderRegistry(): ComponentProviderRegistry
           serviceInstanceIdDetector,
         ]),
     },
+
     TextMapPropagator: {
       tracecontext: () => new W3CTraceContextPropagator(),
       baggage: () => new W3CBaggagePropagator(),
@@ -1557,9 +1562,14 @@ export function getBuiltinComponentProviderRegistry(): ComponentProviderRegistry
     IdGenerator: {
       random: () => new RandomIdGenerator(),
     },
+
     // XXX PullMetricExporter
     // XXX PushMetricExporter
-    // XXX MetricProducer
+
+    // Note: The "opencensus" MetricProducer is intentionally not supported.
+    // It is deprecated in OpenTelemetry Configuration v1.2.0.
+    // MetricProducer: {},
+
     LogRecordExporter: {
       console: createConsoleLogRecordExporterFromConfig,
       otlp_http: createHttpLogRecordExporterFromConfig,

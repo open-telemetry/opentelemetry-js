@@ -897,7 +897,11 @@ describe('create-from-config', () => {
       const meter_provider: MeterProviderConfigModel = {
         readers: [{ periodic: { exporter: { console: null } } }],
       };
-      const provider = createMeterProviderFromConfig(resource, meter_provider);
+      const provider = createMeterProviderFromConfig(
+        reg,
+        resource,
+        meter_provider
+      );
       assert.ok(provider instanceof MeterProvider);
     });
 
@@ -934,7 +938,11 @@ describe('create-from-config', () => {
           },
         ],
       };
-      const provider = createMeterProviderFromConfig(resource, meter_provider);
+      const provider = createMeterProviderFromConfig(
+        reg,
+        resource,
+        meter_provider
+      );
       assert.ok(provider instanceof MeterProvider);
       // Cheat look at internal structure to confirm the two expected readers.
       const collectors = (provider as any)._sharedState.metricCollectors;
@@ -1011,7 +1019,11 @@ describe('create-from-config', () => {
           },
         ],
       };
-      const provider = createMeterProviderFromConfig(resource, meter_provider);
+      const provider = createMeterProviderFromConfig(
+        reg,
+        resource,
+        meter_provider
+      );
 
       assert.ok(provider instanceof MeterProvider);
 
@@ -1101,7 +1113,7 @@ describe('create-from-config', () => {
             ],
           },
           assertThrowsError:
-            /the "opencensus" MetricProducer is deprecated and not supported/,
+            /unknown MetricProducer name in configuration: "opencensus"/,
         },
         {
           testName: 'a 0 timeout on exporters it not currently supported',
@@ -1185,14 +1197,14 @@ describe('create-from-config', () => {
             ],
           },
           assertThrowsError:
-            /unknown MetricProducer name: "some_unknown_producer"/,
+            /unknown MetricProducer name in configuration: "some_unknown_producer"/,
         },
       ];
 
       for (const item of corpus) {
         it(item.testName, function () {
           assert.throws(() => {
-            createMeterProviderFromConfig(resource, item.meter_provider);
+            createMeterProviderFromConfig(reg, resource, item.meter_provider);
           }, item.assertThrowsError);
         });
       }

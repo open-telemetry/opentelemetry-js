@@ -291,6 +291,7 @@ function createFromConfig(
 
     if (config.meter_provider) {
       components.meterProvider = createMeterProviderFromConfig(
+        reg,
         resource,
         config.meter_provider
       );
