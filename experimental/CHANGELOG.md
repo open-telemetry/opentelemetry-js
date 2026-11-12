@@ -11,7 +11,11 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :rocket: Features
 
+* feat(otlp-exporter-base): when the page is hidden and a span or log batch exceeds the keepalive budget, the browser fetch exporter sends whole items that fit and counts the rest as failed exports with error type `keepalive_budget_exhausted` [#7232](https://github.com/open-telemetry/opentelemetry-js/pull/7232) @adityareddy-dev
+
 ### :bug: Bug Fixes
+
+* fix(otlp-exporter-base): warn when the browser fetch transport sends an export without `keepalive` while the page is hidden, since that export can be lost with the page [#7231](https://github.com/open-telemetry/opentelemetry-js/pull/7231) @adityareddy-dev
 
 ### :books: Documentation
 
