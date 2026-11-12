@@ -52,6 +52,7 @@ export type IdGeneratorComponentProvider = (
   reg: ComponentProviderRegistry,
   props: ConfigProperties
 ) => IdGenerator;
+// TODO(7309): Support `PullMetricExporter` component providers.
 export type PushMetricExporterComponentProvider = (
   reg: ComponentProviderRegistry,
   props: ConfigProperties
@@ -94,13 +95,12 @@ export type ComponentProviderRegistry = {
   SpanProcessor?: Record<string, SpanProcessorComponentProvider>;
   Sampler?: Record<string, SamplerComponentProvider>;
   IdGenerator?: Record<string, IdGeneratorComponentProvider>;
-  // XXX I get lost in `MetricReader`, `PeriodicMetricReader`, `PullMetricReader`
-  //     and `PullMetricExporter`.
-  //     See comment on `createPullMetricReaderFromConfig()`.
-  //     I need help.
-  // PullMetricExporter?: Record<string, (reg: ComponentProviderRegistry, props: ConfigProperties) => PullMetricExporter>;
+
+  // TODO(7309): Support `PullMetricExporter` component providers.
+  // PullMetricExporter?: Record<string, PullMetricExporterComponentProvider>;
   PushMetricExporter?: Record<string, PushMetricExporterComponentProvider>;
   MetricProducer?: Record<string, MetricProducerComponentProvider>;
+
   LogRecordExporter?: Record<string, LogRecordExporterComponentProvider>;
   LogRecordProcessor?: Record<string, LogRecordProcessorComponentProvider>;
 };

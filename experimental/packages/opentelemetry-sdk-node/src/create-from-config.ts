@@ -981,6 +981,7 @@ function createPullMetricReaderFromConfig(
   // but the exporter (or at least the only current one, PrometheusExporter)
   // *is* a MetricReader, and takes configuration from (A) and (B).
   //    export class PrometheusExporter extends MetricReader { ... }
+  // TODO(7309): Support `PullMetricExporter` component providers.
   const [name, properties] = mustSingleEntry(
     pull.exporter,
     'PullMetricExporter'
@@ -1567,7 +1568,7 @@ export function getBuiltinComponentProviderRegistry(): ComponentProviderRegistry
       random: () => new RandomIdGenerator(),
     },
 
-    // XXX PullMetricExporter
+    // TODO(7309): Support `PullMetricExporter` component providers.
     PushMetricExporter: {
       console: createConsoleMetricExporterFromConfig,
       otlp_http: createHttpMetricExporterFromConfig,
