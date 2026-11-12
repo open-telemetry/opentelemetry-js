@@ -12,6 +12,8 @@ For notes on migrating to 2.x / 0.200.x see [the upgrade guide](doc/upgrade-to-2
 
 ### :bug: Bug Fixes
 
+* fix(instrumentation-fetch, instrumentation-xml-http-request): redact credentials and sensitive query parameters in `url.full` @adityareddy-dev
+
 ### :books: Documentation
 
 ### :house: Internal

@@ -32,6 +32,7 @@ import type { FetchError, FetchResponse, SpanData } from './types';
 import {
   getFetchBodyLength,
   normalizeHttpRequestMethod,
+  redactUrl,
   serverPortFromUrl,
 } from './utils';
 import { VERSION } from './version';
@@ -227,7 +228,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     if (normMethod !== origMethod) {
       attributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = origMethod;
     }
-    attributes[ATTR_URL_FULL] = url;
+    attributes[ATTR_URL_FULL] = redactUrl(url);
 
     return this.tracer.startSpan(name, {
       kind: SpanKind.CLIENT,
