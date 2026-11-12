@@ -7,7 +7,6 @@ import type {
   HrTime,
   Span,
   SpanOptions,
-  SpanStatus,
   Histogram,
   Attributes,
 } from '@opentelemetry/api';
@@ -400,6 +399,13 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           metricAttributes,
           getOutgoingStableRequestMetricAttributesOnResponse(responseAttributes)
         );
+        span.setStatus({
+          code: parseResponseStatus(SpanKind.CLIENT, response.statusCode),
+        });
+        const errorType = parseErrorType(SpanKind.CLIENT, response.statusCode);
+        if (errorType !== undefined) {
+          span.setAttribute(ATTR_ERROR_TYPE, errorType);
+        }
 
         if (this.getConfig().responseHook) {
           this._callResponseHook(span, response);
@@ -424,25 +430,10 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             return;
           }
           responseFinished = true;
-          let status: SpanStatus;
 
           if (response.aborted && !response.complete) {
-            status = { code: SpanStatusCode.ERROR };
-          } else {
-            // behaves same for new and old semconv
-            status = {
-              code: parseResponseStatus(SpanKind.CLIENT, response.statusCode),
-            };
-            const errorType = parseErrorType(
-              SpanKind.CLIENT,
-              response.statusCode
-            );
-            if (errorType !== undefined) {
-              span.setAttribute(ATTR_ERROR_TYPE, errorType);
-            }
+            span.setStatus({ code: SpanStatusCode.ERROR });
           }
-
-          span.setStatus(status);
 
           if (this.getConfig().applyCustomAttributesOnSpan) {
             safeExecuteInTheMiddle(
