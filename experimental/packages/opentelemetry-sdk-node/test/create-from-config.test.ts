@@ -104,7 +104,7 @@ describe('create-from-config', () => {
         testName: 'log OTLP HTTP/protobuf',
         protocol: 'http',
         createExporter: () =>
-          createLogRecordExporterFromConfig({
+          createLogRecordExporterFromConfig(reg, {
             otlp_http: { headers, headers_list },
           }),
       },
@@ -112,7 +112,7 @@ describe('create-from-config', () => {
         testName: 'log OTLP HTTP/JSON',
         protocol: 'http',
         createExporter: () =>
-          createLogRecordExporterFromConfig({
+          createLogRecordExporterFromConfig(reg, {
             otlp_http: { headers, headers_list, encoding: 'json' },
           }),
       },
@@ -120,7 +120,7 @@ describe('create-from-config', () => {
         testName: 'log OTLP gRPC',
         protocol: 'grpc',
         createExporter: () =>
-          createLogRecordExporterFromConfig({
+          createLogRecordExporterFromConfig(reg, {
             otlp_grpc: { headers, headers_list },
           }),
       },
@@ -585,10 +585,11 @@ describe('create-from-config', () => {
       (item.only ? it.only : it)(item.testName, function () {
         if (item.throws) {
           assert.throws(() => {
-            createLogRecordExporterFromConfig(item.exporterConfig);
+            createLogRecordExporterFromConfig(reg, item.exporterConfig);
           });
         } else {
           const exporter = createLogRecordExporterFromConfig(
+            reg,
             item.exporterConfig
           );
           assert.ok(
@@ -726,10 +727,11 @@ describe('create-from-config', () => {
       (item.only ? it.only : it)(item.testName, function () {
         if (item.throws) {
           assert.throws(() => {
-            createLogRecordProcessorFromConfig(item.processorConfig);
+            createLogRecordProcessorFromConfig(reg, item.processorConfig);
           });
         } else {
           const processor = createLogRecordProcessorFromConfig(
+            reg,
             item.processorConfig
           );
           assert.ok(
@@ -776,6 +778,7 @@ describe('create-from-config', () => {
         if (item.throws) {
           assert.throws(() => {
             createLoggerProviderFromConfig(
+              reg,
               item.resource,
               item.config.logger_provider!,
               item.config.attribute_limits
@@ -783,6 +786,7 @@ describe('create-from-config', () => {
           });
         } else {
           const provider = createLoggerProviderFromConfig(
+            reg,
             item.resource,
             item.config.logger_provider!,
             item.config.attribute_limits

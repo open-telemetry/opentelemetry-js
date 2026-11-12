@@ -553,88 +553,99 @@ export function createLogRecordLimitsFromConfig(
   };
 }
 
-export function createLogRecordExporterFromConfig(
-  exporter: LogRecordExporterConfigModel
+function createConsoleLogRecordExporterFromConfig(
+  _reg: ComponentProviderRegistry,
+  properties: ConfigProperties
 ): LogRecordExporter {
-  const [name, properties] = mustSingleEntry(exporter, 'LogRecordExporter');
+  checkConfigUse('ConsoleLogRecordExporter', properties!, []);
+  return new ConsoleLogRecordExporter();
+}
 
-  switch (name) {
-    case 'otlp_http': {
-      checkConfigUse('OtlpHttpExporter', properties, [
-        'compression',
-        'endpoint',
-        'headers',
-        'headers_list',
-        'timeout',
-        'tls',
-        'encoding',
-      ]);
-      const props = properties as OtlpHttpExporterConfigModel;
-      const commonOpts = {
-        compression:
-          props?.compression === 'gzip'
-            ? CompressionAlgorithm.GZIP
-            : CompressionAlgorithm.NONE,
-        url: props?.endpoint ?? undefined,
-        headers: mergeHeadersConfig(props?.headers, props?.headers_list),
-        timeoutMillis: validateExportTimeoutConfig(
-          props?.timeout,
-          'OtlpHttpExporter.timeout'
-        ),
-        httpAgentOptions: httpTlsOptionsFromConfig(props?.tls),
-      };
-      const encoding = props?.encoding ?? 'protobuf';
-      switch (encoding) {
-        case 'json':
-          return new OTLPHttpLogExporter(commonOpts);
-        case 'protobuf':
-          return new OTLPProtoLogExporter(commonOpts);
-        default:
-          throw new Error(
-            `unknown OtlpHttpExporter encoding in configuration: "${encoding}"`
-          );
-      }
-    }
-
-    case 'otlp_grpc': {
-      checkConfigUse('OtlpGrpcExporter', properties!, [
-        'compression',
-        'endpoint',
-        'timeout',
-        'tls',
-        'headers',
-        'headers_list',
-      ]);
-      const props = properties as OtlpGrpcExporterConfigModel;
-      return new OTLPGrpcLogExporter({
-        compression:
-          props?.compression === 'gzip'
-            ? CompressionAlgorithm.GZIP
-            : CompressionAlgorithm.NONE,
-        url: props?.endpoint ?? undefined,
-        timeoutMillis: validateExportTimeoutConfig(
-          props?.timeout,
-          'OtlpGrpcExporter.timeout'
-        ),
-        credentials: grpcCredentialsFromConfig(props?.tls),
-        metadata: getGrpcMetadataFromHeaders(
-          props?.headers,
-          props?.headers_list
-        ),
-      });
-    }
-
-    case 'console':
-      return new ConsoleLogRecordExporter();
-
+function createHttpLogRecordExporterFromConfig(
+  _reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): LogRecordExporter {
+  checkConfigUse('OtlpHttpExporter', properties, [
+    'compression',
+    'endpoint',
+    'headers',
+    'headers_list',
+    'timeout',
+    'tls',
+    'encoding',
+  ]);
+  const props = properties as OtlpHttpExporterConfigModel;
+  const commonOpts = {
+    compression:
+      props?.compression === 'gzip'
+        ? CompressionAlgorithm.GZIP
+        : CompressionAlgorithm.NONE,
+    url: props?.endpoint ?? undefined,
+    headers: mergeHeadersConfig(props?.headers, props?.headers_list),
+    timeoutMillis: validateExportTimeoutConfig(
+      props?.timeout,
+      'OtlpHttpExporter.timeout'
+    ),
+    httpAgentOptions: httpTlsOptionsFromConfig(props?.tls),
+  };
+  const encoding = props?.encoding ?? 'protobuf';
+  switch (encoding) {
+    case 'json':
+      return new OTLPHttpLogExporter(commonOpts);
+    case 'protobuf':
+      return new OTLPProtoLogExporter(commonOpts);
     default:
       throw new Error(
-        `unknown LogRecordExporter name in configuration: "${name}"`
+        `unknown OtlpHttpExporter encoding in configuration: "${encoding}"`
       );
   }
 }
 
+function createOtlpGrpcLogRecordExporterFromConfig(
+  _reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): LogRecordExporter {
+  checkConfigUse('OtlpGrpcExporter', properties!, [
+    'compression',
+    'endpoint',
+    'timeout',
+    'tls',
+    'headers',
+    'headers_list',
+  ]);
+  const props = properties as OtlpGrpcExporterConfigModel;
+  return new OTLPGrpcLogExporter({
+    compression:
+      props?.compression === 'gzip'
+        ? CompressionAlgorithm.GZIP
+        : CompressionAlgorithm.NONE,
+    url: props?.endpoint ?? undefined,
+    timeoutMillis: validateExportTimeoutConfig(
+      props?.timeout,
+      'OtlpGrpcExporter.timeout'
+    ),
+    credentials: grpcCredentialsFromConfig(props?.tls),
+    metadata: getGrpcMetadataFromHeaders(props?.headers, props?.headers_list),
+  });
+}
+
+export function createLogRecordExporterFromConfig(
+  reg: ComponentProviderRegistry,
+  exporter: LogRecordExporterConfigModel
+): LogRecordExporter {
+  const [name, properties] = mustSingleEntry(exporter, 'LogRecordExporter');
+  const provider = reg['LogRecordExporter']?.[name];
+  if (provider) {
+    return provider(reg, properties);
+  } else {
+    throw new Error(
+      `unknown LogRecordExporter name in configuration: "${name}"`
+    );
+  }
+}
+
 export function createLogRecordProcessorFromConfig(
+  reg: ComponentProviderRegistry,
   processor: LogRecordProcessorConfigModel
 ): LogRecordProcessor {
   const [name, properties] = mustSingleEntry(processor, 'LogRecordProcessor');
@@ -649,7 +660,7 @@ export function createLogRecordProcessorFromConfig(
         'export_timeout',
       ]);
       const props = properties as unknown as BatchLogRecordProcessorConfigModel;
-      const exporter = createLogRecordExporterFromConfig(props.exporter);
+      const exporter = createLogRecordExporterFromConfig(reg, props.exporter);
       return new BatchLogRecordProcessor({
         exporter,
         maxQueueSize: props.max_queue_size ?? undefined,
@@ -665,7 +676,7 @@ export function createLogRecordProcessorFromConfig(
     case 'simple': {
       const props =
         properties as unknown as SimpleLogRecordProcessorConfigModel;
-      const exporter = createLogRecordExporterFromConfig(props.exporter);
+      const exporter = createLogRecordExporterFromConfig(reg, props.exporter);
       return new SimpleLogRecordProcessor({ exporter });
     }
 
@@ -675,12 +686,13 @@ export function createLogRecordProcessorFromConfig(
 }
 
 export function createLoggerProviderFromConfig(
+  reg: ComponentProviderRegistry,
   resource: Resource,
   logger_provider: LoggerProviderConfigModel,
   attribute_limits?: AttributeLimitsConfigModel
 ): LoggerProvider {
   const processors = logger_provider.processors.map(p =>
-    createLogRecordProcessorFromConfig(p)
+    createLogRecordProcessorFromConfig(reg, p)
   );
   const logRecordLimits = createLogRecordLimitsFromConfig(
     logger_provider.limits,
@@ -1539,7 +1551,11 @@ export function getBuiltinComponentProviderRegistry(): ComponentProviderRegistry
     // XXX PullMetricExporter
     // XXX PushMetricExporter
     // XXX MetricProducer
-    // XXX LogRecordExporter
+    LogRecordExporter: {
+      console: createConsoleLogRecordExporterFromConfig,
+      otlp_http: createHttpLogRecordExporterFromConfig,
+      otlp_grpc: createOtlpGrpcLogRecordExporterFromConfig,
+    },
     // XXX LogRecordProcessor
   };
 }

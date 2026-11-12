@@ -282,6 +282,7 @@ function createFromConfig(
 
     if (config.logger_provider) {
       components.loggerProvider = createLoggerProviderFromConfig(
+        reg,
         resource,
         config.logger_provider,
         config.attribute_limits
