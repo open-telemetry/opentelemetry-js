@@ -62,8 +62,6 @@ class OTLPExportDelegate<Internal, Response>
     internalRepresentation: Internal,
     resultCallback: (result: ExportResult) => void
   ): void {
-    this._diagLogger.debug('items to be sent', internalRepresentation);
-
     // don't do any work if too many exports are in progress.
     if (this._promiseQueue.hasReachedLimit()) {
       resultCallback({
