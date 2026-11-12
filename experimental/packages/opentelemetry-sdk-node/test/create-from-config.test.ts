@@ -9,6 +9,7 @@ import * as sinon from 'sinon';
 
 import type {
   ConfigurationModel,
+  ExperimentalTracerConfiguratorConfigModel,
   LogRecordExporterConfigModel,
   LogRecordProcessorConfigModel,
   MeterProviderConfigModel,
@@ -1304,6 +1305,206 @@ describe('create-from-config', () => {
 
   describe('createTracerProviderFromConfig', () => {
     const resource = resourceFromAttributes({ foo: 'bar' });
+
+    describe('tracer_configurator/development', () => {
+      const corpus: {
+        name: string;
+        config: ExperimentalTracerConfiguratorConfigModel | undefined;
+        enabled: string[];
+        disabled: string[];
+      }[] = [
+        {
+          name: 'omitted configuration',
+          config: undefined,
+          enabled: ['library'],
+          disabled: [],
+        },
+        {
+          name: 'empty configuration',
+          config: {},
+          enabled: ['library'],
+          disabled: [],
+        },
+        {
+          name: 'disabled default',
+          config: { default_config: { enabled: false } },
+          enabled: [],
+          disabled: ['library'],
+        },
+        {
+          name: 'exact, case-sensitive, whole-name matching',
+          config: {
+            tracers: [{ name: 'library', config: { enabled: false } }],
+          },
+          enabled: ['Library', 'library-extra', 'prefix-library', 'library\n'],
+          disabled: ['library'],
+        },
+        {
+          name: 'exact names containing wildcard characters',
+          config: {
+            tracers: [
+              { name: 'star-*', config: { enabled: false } },
+              { name: 'question-?', config: { enabled: false } },
+            ],
+          },
+          enabled: ['Star-*', 'Question-?', 'question-', 'question-ab'],
+          disabled: [
+            'star-*',
+            'question-?',
+            'star-',
+            'star-value',
+            'question-a',
+          ],
+        },
+        {
+          name: 'star and question-mark wildcards',
+          config: {
+            tracers: [
+              { name: 'library-*', config: { enabled: false } },
+              { name: 'worker-?', config: { enabled: false } },
+            ],
+          },
+          enabled: ['worker-', 'worker-ab', 'Library-test'],
+          disabled: [
+            'library-',
+            'library-test',
+            'library-\n',
+            'worker-a',
+            'worker-\n',
+            'worker-\u{1f680}',
+          ],
+        },
+        {
+          name: 'literal regular-expression metacharacters',
+          config: {
+            tracers: [
+              { name: 'lib.[a](b){c}+^$|\\', config: { enabled: false } },
+            ],
+          },
+          enabled: ['libXabc', 'libXa(b){c}+^$|\\'],
+          disabled: ['lib.[a](b){c}+^$|\\'],
+        },
+        {
+          name: 'first matching entry wins',
+          config: {
+            default_config: { enabled: false },
+            tracers: [
+              { name: 'library-*', config: { enabled: true } },
+              { name: 'library-specific', config: { enabled: false } },
+            ],
+          },
+          enabled: ['library-specific', 'library-other'],
+          disabled: ['unmatched'],
+        },
+        {
+          name: 'matched empty config uses spec defaults, not default_config',
+          config: {
+            default_config: { enabled: false },
+            tracers: [{ name: 'library', config: {} }],
+          },
+          enabled: ['library'],
+          disabled: ['unmatched'],
+        },
+        {
+          name: 'empty default config enables unmatched tracers',
+          config: {
+            default_config: {},
+            tracers: [{ name: 'disabled', config: { enabled: false } }],
+          },
+          enabled: ['library'],
+          disabled: ['disabled'],
+        },
+        {
+          name: 'wildcard-only pattern matches every scope',
+          config: { tracers: [{ name: '*', config: { enabled: false } }] },
+          enabled: [],
+          disabled: ['', 'library', 'another-library', '\n'],
+        },
+        {
+          name: 'empty pattern only matches the empty name',
+          config: { tracers: [{ name: '', config: { enabled: false } }] },
+          enabled: ['library', '\n'],
+          disabled: [''],
+        },
+        {
+          name: 'consecutive stars still require a character for question mark',
+          config: {
+            tracers: [{ name: 'lib-**?**', config: { enabled: false } }],
+          },
+          enabled: ['', 'lib-', 'Lib-a'],
+          disabled: ['lib-a', 'lib-ab', 'lib-\n', 'lib-\u{1f680}'],
+        },
+        {
+          name: 'matches Unicode literals and counts question marks by code point',
+          config: {
+            tracers: [{ name: '\u{1f680}-??', config: { enabled: false } }],
+          },
+          enabled: [
+            '\u{1f680}-',
+            '\u{1f680}-a',
+            '\u{1f680}-\u{1f680}',
+            '\u{1f680}-abc',
+          ],
+          disabled: ['\u{1f680}-ab', '\u{1f680}-\u{1f680}a', '\u{1f680}-\n\n'],
+        },
+      ];
+
+      for (const item of corpus) {
+        it(item.name, async () => {
+          const warn = sinon.spy(diag, 'warn');
+          const provider = createTracerProviderFromConfig(resource, {
+            processors: [],
+            'tracer_configurator/development': item.config,
+          });
+          try {
+            for (const name of item.enabled) {
+              const span = provider.getTracer(name).startSpan('test');
+              assert.strictEqual(span.isRecording(), true, name);
+              span.end();
+            }
+            for (const name of item.disabled) {
+              const span = provider.getTracer(name).startSpan('test');
+              assert.strictEqual(span.isRecording(), false, name);
+              span.end();
+            }
+            sinon.assert.notCalled(warn);
+          } finally {
+            warn.restore();
+            await provider.shutdown();
+          }
+        });
+      }
+
+      it('warns about unhandled default and matched tracer config properties', async () => {
+        const config = {
+          default_config: { enabled: false, default_option: true },
+          tracers: [
+            {
+              name: 'library',
+              config: { enabled: true, matcher_option: true },
+            },
+          ],
+        };
+        const warn = sinon.spy(diag, 'warn');
+        const provider = createTracerProviderFromConfig(resource, {
+          processors: [],
+          'tracer_configurator/development': config,
+        });
+        try {
+          assert.deepStrictEqual(warn.args, [
+            [
+              'Config warning: some specified ExperimentalTracerConfig configuration properties were not handled by SDK setup: ["default_option"]',
+            ],
+            [
+              'Config warning: some specified ExperimentalTracerConfig configuration properties were not handled by SDK setup: ["matcher_option"]',
+            ],
+          ]);
+        } finally {
+          warn.restore();
+          await provider.shutdown();
+        }
+      });
+    });
 
     it('basic console exporter', function () {
       const tracer_provider: TracerProviderConfigModel = {

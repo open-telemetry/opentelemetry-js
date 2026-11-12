@@ -11,6 +11,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :rocket: Features
 
+* feat(sdk-node, configuration): support `tracer_configurator/development` in declarative configuration and export its config model types [#6960](https://github.com/open-telemetry/opentelemetry-js/issues/6960)
+
 ### :bug: Bug Fixes
 
 * fix(otlp-grpc-exporter-base): load `@grpc/grpc-js` lazily in `createServiceClientConstructor` so that importing an OTLP gRPC exporter no longer loads it before instrumentations can wrap `net` and `dns` ([#7297](https://github.com/open-telemetry/opentelemetry-js/pull/7297)) @AyeshaWaseemAhmad
