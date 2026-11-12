@@ -4,3 +4,4 @@
  */
 
 export { encodeBase64 } from './base64';
+export { utf8ByteLength } from './utf8';
