@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation-fetch",
-  "version": "0.223.1",
+  "version": "0.223.2",
   "description": "OpenTelemetry instrumentation for fetch http client in web browsers",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -85,9 +85,9 @@
   },
   "dependencies": {
     "@opentelemetry/core": "2.12.1",
-    "@opentelemetry/instrumentation": "0.223.1",
+    "@opentelemetry/instrumentation": "0.223.2",
     "@opentelemetry/semantic-conventions": "^1.29.0",
-    "@opentelemetry/web-common": "0.223.1"
+    "@opentelemetry/web-common": "0.223.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-fetch",
   "sideEffects": false,
