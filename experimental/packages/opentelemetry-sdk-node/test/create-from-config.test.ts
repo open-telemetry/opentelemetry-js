@@ -128,7 +128,7 @@ describe('create-from-config', () => {
         testName: 'metric OTLP HTTP/protobuf',
         protocol: 'http',
         createExporter: () =>
-          createPushMetricExporterFromConfig({
+          createPushMetricExporterFromConfig(reg, {
             otlp_http: { headers, headers_list },
           }),
       },
@@ -136,7 +136,7 @@ describe('create-from-config', () => {
         testName: 'metric OTLP HTTP/JSON',
         protocol: 'http',
         createExporter: () =>
-          createPushMetricExporterFromConfig({
+          createPushMetricExporterFromConfig(reg, {
             otlp_http: { headers, headers_list, encoding: 'json' },
           }),
       },
@@ -144,7 +144,7 @@ describe('create-from-config', () => {
         testName: 'metric OTLP gRPC',
         protocol: 'grpc',
         createExporter: () =>
-          createPushMetricExporterFromConfig({
+          createPushMetricExporterFromConfig(reg, {
             otlp_grpc: { headers, headers_list },
           }),
       },
@@ -1213,43 +1213,51 @@ describe('create-from-config', () => {
 
   describe('createPushMetricExporterFromConfig', () => {
     it('http/protobuf by default', function () {
-      const exporter = createPushMetricExporterFromConfig({ otlp_http: null });
+      const exporter = createPushMetricExporterFromConfig(reg, {
+        otlp_http: null,
+      });
       assert.ok(exporter instanceof OTLPProtoMetricExporter);
     });
 
     it('http/json', function () {
-      const exporter = createPushMetricExporterFromConfig({
+      const exporter = createPushMetricExporterFromConfig(reg, {
         otlp_http: { encoding: 'json' },
       });
       assert.ok(exporter instanceof OTLPHttpMetricExporter);
     });
 
     it('grpc', function () {
-      const exporter = createPushMetricExporterFromConfig({ otlp_grpc: null });
+      const exporter = createPushMetricExporterFromConfig(reg, {
+        otlp_grpc: null,
+      });
       assert.ok(exporter instanceof OTLPGrpcMetricExporter);
     });
 
     it('console', function () {
-      const exporter = createPushMetricExporterFromConfig({ console: null });
+      const exporter = createPushMetricExporterFromConfig(reg, {
+        console: null,
+      });
       assert.ok(exporter instanceof ConsoleMetricExporter);
     });
 
     it('throws for unsupported exporter name', function () {
       assert.throws(() => {
-        createPushMetricExporterFromConfig({ some_unknown_exporter: null });
+        createPushMetricExporterFromConfig(reg, {
+          some_unknown_exporter: null,
+        });
       }, /unknown PushMetricExporter name in configuration: "some_unknown_exporter"/);
     });
 
     it('throws for invalid otlp_http encoding', function () {
       assert.throws(() => {
-        createPushMetricExporterFromConfig({
+        createPushMetricExporterFromConfig(reg, {
           otlp_http: { encoding: 'invalid_encoding' },
         } as unknown as PushMetricExporterConfigModel);
       }, /unknown OtlpHttpMetricExporter encoding in configuration: "invalid_encoding"/);
     });
 
     it('maps temporality_preference onto the OTLP http exporter', function () {
-      const exporter = createPushMetricExporterFromConfig({
+      const exporter = createPushMetricExporterFromConfig(reg, {
         otlp_http: { temporality_preference: 'delta' },
       }) as OTLPProtoMetricExporter;
       // delta uses DELTA temporality for counters
@@ -1265,7 +1273,7 @@ describe('create-from-config', () => {
     });
 
     it('maps the cumulative temporality_preference', function () {
-      const exporter = createPushMetricExporterFromConfig({
+      const exporter = createPushMetricExporterFromConfig(reg, {
         otlp_http: { temporality_preference: 'cumulative' },
       }) as OTLPProtoMetricExporter;
       assert.strictEqual(
@@ -1279,7 +1287,7 @@ describe('create-from-config', () => {
     });
 
     it('maps temporality_preference onto the OTLP gRPC exporter', function () {
-      const exporter = createPushMetricExporterFromConfig({
+      const exporter = createPushMetricExporterFromConfig(reg, {
         otlp_grpc: { temporality_preference: 'low_memory' },
       }) as OTLPGrpcMetricExporter;
       // low_memory uses DELTA for counters and histograms
@@ -1294,7 +1302,7 @@ describe('create-from-config', () => {
     });
 
     it('maps default_histogram_aggregation to exponential for histograms only', function () {
-      const exporter = createPushMetricExporterFromConfig({
+      const exporter = createPushMetricExporterFromConfig(reg, {
         otlp_http: {
           default_histogram_aggregation: 'base2_exponential_bucket_histogram',
         },
@@ -1312,7 +1320,7 @@ describe('create-from-config', () => {
     });
 
     it('maps default_histogram_aggregation explicit_bucket_histogram', function () {
-      const exporter = createPushMetricExporterFromConfig({
+      const exporter = createPushMetricExporterFromConfig(reg, {
         otlp_grpc: {
           default_histogram_aggregation: 'explicit_bucket_histogram',
         },

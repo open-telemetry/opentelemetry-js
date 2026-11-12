@@ -803,107 +803,111 @@ function aggregationSelectorFromConfig(
       : { type: AggregationType.DEFAULT };
 }
 
+function createConsoleMetricExporterFromConfig(
+  _reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): PushMetricExporter {
+  checkConfigUse('ConsoleMetricExporter', properties!, []);
+  return new ConsoleMetricExporter();
+}
+
+function createHttpMetricExporterFromConfig(
+  _reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): PushMetricExporter {
+  checkConfigUse('PushMetricExporter', properties, [
+    'compression',
+    'endpoint',
+    'headers',
+    'headers_list',
+    'timeout',
+    'tls',
+    'temporality_preference',
+    'default_histogram_aggregation',
+    'encoding',
+  ]);
+  const props = properties as OtlpHttpMetricExporterConfigModel;
+  const commonOpts = {
+    compression:
+      props?.compression === 'gzip'
+        ? CompressionAlgorithm.GZIP
+        : CompressionAlgorithm.NONE,
+    url: props?.endpoint ?? undefined,
+    headers: mergeHeadersConfig(props?.headers, props?.headers_list),
+    timeoutMillis: validateExportTimeoutConfig(
+      props?.timeout,
+      'PushMetricExporter.timeout'
+    ),
+    httpAgentOptions: httpTlsOptionsFromConfig(props?.tls),
+    temporalityPreference: aggregationTemporalityPreferenceFromConfig(
+      props?.temporality_preference
+    ),
+    aggregationPreference: aggregationSelectorFromConfig(
+      props?.default_histogram_aggregation
+    ),
+  };
+  const encoding = props?.encoding ?? 'protobuf';
+  switch (encoding) {
+    case 'json':
+      return new OTLPHttpMetricExporter(commonOpts);
+    case 'protobuf':
+      return new OTLPProtoMetricExporter(commonOpts);
+    default:
+      throw new Error(
+        `unknown OtlpHttpMetricExporter encoding in configuration: "${encoding}"`
+      );
+  }
+}
+
+function createOtlpGrpcMetricExporterFromConfig(
+  _reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): PushMetricExporter {
+  checkConfigUse('PushMetricExporter', properties!, [
+    'compression',
+    'endpoint',
+    'timeout',
+    'tls',
+    'headers',
+    'headers_list',
+    'temporality_preference',
+    'default_histogram_aggregation',
+  ]);
+  const props = properties as OtlpGrpcMetricExporterConfigModel;
+  return new OTLPGrpcMetricExporter({
+    compression:
+      props?.compression === 'gzip'
+        ? CompressionAlgorithm.GZIP
+        : CompressionAlgorithm.NONE,
+    url: props?.endpoint ?? undefined,
+    timeoutMillis: validateExportTimeoutConfig(
+      props?.timeout,
+      'PushMetricExporter.timeout'
+    ),
+    credentials: grpcCredentialsFromConfig(props?.tls),
+    metadata: getGrpcMetadataFromHeaders(props?.headers, props?.headers_list),
+    temporalityPreference: aggregationTemporalityPreferenceFromConfig(
+      props?.temporality_preference
+    ),
+    aggregationPreference: aggregationSelectorFromConfig(
+      props?.default_histogram_aggregation
+    ),
+  });
+}
+
 /** exported for testing */
 export function createPushMetricExporterFromConfig(
+  reg: ComponentProviderRegistry,
   exporter: PushMetricExporterConfigModel
 ): PushMetricExporter {
   const [name, properties] = mustSingleEntry(exporter, 'PushMetricExporter');
-
-  // TODO(6959): use non-envvar reading mechanism to create OTLP exporters, so an `undefined` option does NOT fallback to an envvar
-
-  switch (name) {
-    case 'otlp_http': {
-      checkConfigUse('PushMetricExporter', properties, [
-        'compression',
-        'endpoint',
-        'headers',
-        'headers_list',
-        'timeout',
-        'tls',
-        'temporality_preference',
-        'default_histogram_aggregation',
-        'encoding',
-      ]);
-      const props = properties as OtlpHttpMetricExporterConfigModel;
-      const commonOpts = {
-        compression:
-          props?.compression === 'gzip'
-            ? CompressionAlgorithm.GZIP
-            : CompressionAlgorithm.NONE,
-        url: props?.endpoint ?? undefined,
-        headers: mergeHeadersConfig(props?.headers, props?.headers_list),
-        timeoutMillis: validateExportTimeoutConfig(
-          props?.timeout,
-          'PushMetricExporter.timeout'
-        ),
-        httpAgentOptions: httpTlsOptionsFromConfig(props?.tls),
-        temporalityPreference: aggregationTemporalityPreferenceFromConfig(
-          props?.temporality_preference
-        ),
-        aggregationPreference: aggregationSelectorFromConfig(
-          props?.default_histogram_aggregation
-        ),
-      };
-      const encoding = props?.encoding ?? 'protobuf';
-      switch (encoding) {
-        case 'json':
-          return new OTLPHttpMetricExporter(commonOpts);
-        case 'protobuf':
-          return new OTLPProtoMetricExporter(commonOpts);
-        default:
-          throw new Error(
-            `unknown OtlpHttpMetricExporter encoding in configuration: "${encoding}"`
-          );
-      }
-    }
-
-    case 'otlp_grpc': {
-      checkConfigUse('PushMetricExporter', properties!, [
-        'compression',
-        'endpoint',
-        'timeout',
-        'tls',
-        'headers',
-        'headers_list',
-        'temporality_preference',
-        'default_histogram_aggregation',
-      ]);
-      const props = properties as OtlpGrpcMetricExporterConfigModel;
-      return new OTLPGrpcMetricExporter({
-        compression:
-          props?.compression === 'gzip'
-            ? CompressionAlgorithm.GZIP
-            : CompressionAlgorithm.NONE,
-        url: props?.endpoint ?? undefined,
-        timeoutMillis: validateExportTimeoutConfig(
-          props?.timeout,
-          'PushMetricExporter.timeout'
-        ),
-        credentials: grpcCredentialsFromConfig(props?.tls),
-        metadata: getGrpcMetadataFromHeaders(
-          props?.headers,
-          props?.headers_list
-        ),
-        temporalityPreference: aggregationTemporalityPreferenceFromConfig(
-          props?.temporality_preference
-        ),
-        aggregationPreference: aggregationSelectorFromConfig(
-          props?.default_histogram_aggregation
-        ),
-      });
-    }
-
-    case 'console': {
-      // TODO(6957): temporality_preference
-      // TODO(6957): default_histogram_aggregation
-      checkConfigUse('PushMetricExporter', properties!, []);
-      return new ConsoleMetricExporter();
-    }
-
-    default:
-      throw new Error(
-        `unknown PushMetricExporter name in configuration: "${name}"`
-      );
+  const provider = reg['PushMetricExporter']?.[name];
+  if (provider) {
+    return provider(reg, properties);
+  } else {
+    throw new Error(
+      `unknown PushMetricExporter name in configuration: "${name}"`
+    );
   }
 }
 
@@ -924,7 +928,7 @@ function createPeriodicMetricReaderFromConfig(
   reg: ComponentProviderRegistry,
   periodic: PeriodicMetricReaderConfigModel
 ): MetricReader {
-  const exporter = createPushMetricExporterFromConfig(periodic.exporter);
+  const exporter = createPushMetricExporterFromConfig(reg, periodic.exporter);
 
   const metricProducers = periodic.producers?.map(producer =>
     createMetricProducerFromConfig(reg, producer)
@@ -1564,8 +1568,11 @@ export function getBuiltinComponentProviderRegistry(): ComponentProviderRegistry
     },
 
     // XXX PullMetricExporter
-    // XXX PushMetricExporter
-
+    PushMetricExporter: {
+      console: createConsoleMetricExporterFromConfig,
+      otlp_http: createHttpMetricExporterFromConfig,
+      otlp_grpc: createOtlpGrpcMetricExporterFromConfig,
+    },
     // Note: The "opencensus" MetricProducer is intentionally not supported.
     // It is deprecated in OpenTelemetry Configuration v1.2.0.
     // MetricProducer: {},
