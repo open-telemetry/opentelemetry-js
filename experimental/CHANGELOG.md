@@ -13,12 +13,22 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :bug: Bug Fixes
 
-* fix(otlp-grpc-exporter-base): load `@grpc/grpc-js` lazily in `createServiceClientConstructor` so that importing an OTLP gRPC exporter no longer loads it before instrumentations can wrap `net` and `dns` ([#7297](https://github.com/open-telemetry/opentelemetry-js/pull/7297)) @AyeshaWaseemAhmad
 * fix(instrumentation-http): do not record status code 200 for aborted server requests ([#7290](https://github.com/open-telemetry/opentelemetry-js/issues/7290)) @abdul-karim-mia
 
 ### :books: Documentation
 
 ### :house: Internal
+
+## 0.301.2
+
+### :bug: Bug Fixes
+
+* fix(otlp-grpc-exporter-base): load `@grpc/grpc-js` lazily in `createServiceClientConstructor` so that importing an OTLP gRPC exporter no longer loads it before instrumentations can wrap `net` and `dns` ([#7297](https://github.com/open-telemetry/opentelemetry-js/pull/7297)) @AyeshaWaseemAhmad
+* fix(instrumentation-fetch, instrumentation-xml-http-request): redact credentials and sensitive query parameters in `url.full` @adityareddy-dev
+
+### :house: Internal
+
+* perf(otlp-transformer): use node native utf8ByteLength [#7257](https://github.com/open-telemetry/opentelemetry-js/pull/7257) @legendecas
 
 ## 0.301.1
 

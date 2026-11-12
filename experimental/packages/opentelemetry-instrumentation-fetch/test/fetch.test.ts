@@ -647,6 +647,106 @@ describe('fetch', () => {
         });
       });
 
+      describe('request to a signed URL', () => {
+        const SIGNED_QUERY =
+          'X-Amz-Credential=AKIAEXAMPLE&X-Amz-Security-Token=aws-token-value' +
+          '&X-Amz-Signature=aws-v4-signature-value&AWSAccessKeyId=AKIAOLDEXAMPLE' +
+          '&Signature=aws-v2-signature-value&sig=azure-sas-signature-value' +
+          '&X-Goog-Signature=gcs-signature-value&keep=1';
+
+        const signedFetch = (config: FetchInstrumentationConfig = {}) =>
+          tracedFetch({
+            handlers: [
+              msw.http.get('/api/signed-file.json', () => {
+                return msw.HttpResponse.json({ ok: true });
+              }),
+            ],
+            callback: () => fetch(`/api/signed-file.json?${SIGNED_QUERY}`),
+            config,
+          });
+
+        it('should redact the default sensitive query values in url.full', async () => {
+          await signedFetch();
+
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          assert.strictEqual(
+            span.attributes[ATTR_URL_FULL],
+            `${ORIGIN}/api/signed-file.json?X-Amz-Credential=REDACTED` +
+              '&X-Amz-Security-Token=REDACTED&X-Amz-Signature=REDACTED' +
+              '&AWSAccessKeyId=REDACTED&Signature=REDACTED&sig=REDACTED' +
+              '&X-Goog-Signature=REDACTED&keep=1'
+          );
+        });
+      });
+
+      describe('request to a URL with credentials', () => {
+        it('should redact the credentials in url.full', async () => {
+          // fetch() rejects a URL that includes credentials, but the span is
+          // created before that and still gets exported.
+          await trace(async () => {
+            await fetch(
+              `${ORIGIN_URL.protocol}//user:pass@${ORIGIN_URL.host}/api/status.json`
+            ).catch(() => {});
+          });
+
+          assert.strictEqual(exportedSpans.length, 1);
+          assert.strictEqual(
+            exportedSpans[0].attributes[ATTR_URL_FULL],
+            `${ORIGIN_URL.protocol}//REDACTED:REDACTED@${ORIGIN_URL.host}/api/status.json`
+          );
+        });
+      });
+
+      describe('request to a signed URL', () => {
+        const SIGNED_QUERY =
+          'X-Amz-Credential=AKIAEXAMPLE&X-Amz-Security-Token=aws-token-value' +
+          '&X-Amz-Signature=aws-v4-signature-value&AWSAccessKeyId=AKIAOLDEXAMPLE' +
+          '&Signature=aws-v2-signature-value&sig=azure-sas-signature-value' +
+          '&X-Goog-Signature=gcs-signature-value&keep=1';
+
+        const signedFetch = (config: FetchInstrumentationConfig = {}) =>
+          tracedFetch({
+            handlers: [
+              msw.http.get('/api/signed-file.json', () => {
+                return msw.HttpResponse.json({ ok: true });
+              }),
+            ],
+            callback: () => fetch(`/api/signed-file.json?${SIGNED_QUERY}`),
+            config,
+          });
+
+        it('should redact the default sensitive query values in url.full', async () => {
+          await signedFetch();
+
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          assert.strictEqual(
+            span.attributes[ATTR_URL_FULL],
+            `${ORIGIN}/api/signed-file.json?X-Amz-Credential=REDACTED` +
+              '&X-Amz-Security-Token=REDACTED&X-Amz-Signature=REDACTED' +
+              '&AWSAccessKeyId=REDACTED&Signature=REDACTED&sig=REDACTED' +
+              '&X-Goog-Signature=REDACTED&keep=1'
+          );
+        });
+      });
+
+      describe('request to a URL with credentials', () => {
+        it('should redact the credentials in url.full', async () => {
+          // fetch() rejects a URL that includes credentials, but the span is
+          // created before that and still gets exported.
+          await trace(async () => {
+            await fetch(
+              `${ORIGIN_URL.protocol}//user:pass@${ORIGIN_URL.host}/api/status.json`
+            ).catch(() => {});
+          });
+
+          assert.strictEqual(exportedSpans.length, 1);
+          assert.strictEqual(
+            exportedSpans[0].attributes[ATTR_URL_FULL],
+            `${ORIGIN_URL.protocol}//REDACTED:REDACTED@${ORIGIN_URL.host}/api/status.json`
+          );
+        });
+      });
+
       describe('404 request', () => {
         beforeEach(async () => {
           await tracedFetch({
