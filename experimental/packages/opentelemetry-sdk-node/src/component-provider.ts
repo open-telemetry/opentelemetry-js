@@ -79,9 +79,6 @@ export type LogRecordProcessorComponentProvider = (
  * (with the exception of ResourceDetection).
  */
 export type ComponentProviderRegistry = {
-  // XXX builtin 'host' detector is implemented with *multiple* `ResourceDetector`s
-  //     It would be handy (but weird) for this to return *an array of* ResourceDetectors.
-  // XXX Q: Is the Java impl *really* using a `ExperimentalResourceDetection` node for component provider? Or at the named ResourceDetector level?
   /**
    * @experimental The resource detector component provider interface is not stable.
    */
@@ -123,7 +120,7 @@ export function mergeComponentProviderRegistries(
       'SpanProcessor',
       'Sampler',
       'IdGenerator',
-      // 'PullMetricExporter', // XXX see above
+      // TODO(7309): 'PullMetricExporter',
       'PushMetricExporter',
       'MetricProducer',
       'LogRecordExporter',
