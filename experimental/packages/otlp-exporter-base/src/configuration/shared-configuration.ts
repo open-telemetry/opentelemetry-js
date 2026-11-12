@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { diag } from '@opentelemetry/api';
 import type { HeadersFactory } from './otlp-http-configuration';
 
 /**
@@ -17,6 +18,7 @@ export interface OtlpSharedConfiguration {
   timeoutMillis: number;
   concurrencyLimit: number;
   compression: 'gzip' | 'none';
+  maxRequestSize?: number;
 }
 
 export function validateTimeoutMillis(timeoutMillis: number) {
@@ -26,6 +28,22 @@ export function validateTimeoutMillis(timeoutMillis: number) {
   throw new Error(
     `Configuration: timeoutMillis is invalid, expected number greater than 0 (actual: '${timeoutMillis}')`
   );
+}
+
+function validateMaxRequestSize(
+  maxRequestSize: number | undefined,
+  defaultMaxRequestSize: number | undefined
+): number | undefined {
+  if (
+    maxRequestSize == null ||
+    (Number.isFinite(maxRequestSize) && maxRequestSize >= 0)
+  ) {
+    return maxRequestSize;
+  }
+  diag.warn(
+    `Configuration: maxRequestSize is invalid, expected number greater than or equal to 0 (actual: ${maxRequestSize})`
+  );
+  return defaultMaxRequestSize;
 }
 
 export function wrapStaticHeadersInFunction(
@@ -62,6 +80,12 @@ export function mergeOtlpSharedConfigurationWithDefaults(
       userProvidedConfiguration.compression ??
       fallbackConfiguration.compression ??
       defaultConfiguration.compression,
+    maxRequestSize: validateMaxRequestSize(
+      userProvidedConfiguration.maxRequestSize ??
+        fallbackConfiguration.maxRequestSize ??
+        defaultConfiguration.maxRequestSize,
+      defaultConfiguration.maxRequestSize
+    ),
   };
 }
 
@@ -70,5 +94,6 @@ export function getSharedConfigurationDefaults(): OtlpSharedConfiguration {
     timeoutMillis: 10000,
     concurrencyLimit: 30,
     compression: 'none',
+    maxRequestSize: 64 * 1024 * 1024,
   };
 }

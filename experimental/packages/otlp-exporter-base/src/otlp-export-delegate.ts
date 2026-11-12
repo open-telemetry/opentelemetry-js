@@ -38,6 +38,7 @@ class OTLPExportDelegate<Internal, Response>
   private _responseHandler: IOtlpResponseHandler<Response>;
   private _promiseQueue: IExportPromiseHandler;
   private _timeout: number;
+  private _maxRequestSize: number;
 
   constructor(
     transport: IExporterTransport,
@@ -45,13 +46,15 @@ class OTLPExportDelegate<Internal, Response>
     responseHandler: IOtlpResponseHandler<Response>,
     promiseQueue: IExportPromiseHandler,
     metrics: ExporterMetrics<Internal>,
-    timeout: number
+    timeout: number,
+    maxRequestSize: number
   ) {
     this._transport = transport;
     this._serializer = serializer;
     this._responseHandler = responseHandler;
     this._promiseQueue = promiseQueue;
     this._timeout = timeout;
+    this._maxRequestSize = maxRequestSize;
     this._diagLogger = diag.createComponentLogger({
       namespace: 'OTLPExportDelegate',
     });
@@ -86,6 +89,18 @@ class OTLPExportDelegate<Internal, Response>
     }
 
     const finishExport = this._metrics.startExport(internalRepresentation);
+    if (
+      this._maxRequestSize > 0 &&
+      serializedRequest.byteLength > this._maxRequestSize
+    ) {
+      const error = new Error(
+        `Export request of ${serializedRequest.byteLength} bytes exceeds maxRequestSize of ${this._maxRequestSize} bytes`
+      );
+      finishExport(error);
+      resultCallback({ code: ExportResultCode.FAILED, error });
+      return;
+    }
+
     this._promiseQueue.pushPromise(
       this._transport.send(serializedRequest, this._timeout).then(
         response => {
@@ -169,7 +184,7 @@ export function createOtlpExportDelegate<Internal, Response>(
     promiseHandler: IExportPromiseHandler;
     metrics: ExporterMetrics<Internal>;
   },
-  settings: { timeout: number }
+  settings: { timeout: number; maxRequestSize?: number }
 ): IOtlpExportDelegate<Internal> {
   return new OTLPExportDelegate(
     components.transport,
@@ -177,6 +192,7 @@ export function createOtlpExportDelegate<Internal, Response>(
     createLoggingPartialSuccessResponseHandler(),
     components.promiseHandler,
     components.metrics,
-    settings.timeout
+    settings.timeout,
+    settings.maxRequestSize ?? 0
   );
 }
