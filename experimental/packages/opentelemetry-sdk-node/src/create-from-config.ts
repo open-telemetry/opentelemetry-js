@@ -644,44 +644,53 @@ export function createLogRecordExporterFromConfig(
   }
 }
 
+function createBatchLogRecordProcessorFromConfig(
+  reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): LogRecordProcessor {
+  checkConfigUse('BatchLogRecordProcessor', properties, [
+    'exporter',
+    'max_queue_size',
+    'max_export_batch_size',
+    'schedule_delay',
+    'export_timeout',
+  ]);
+  const props = properties as unknown as BatchLogRecordProcessorConfigModel;
+  const exporter = createLogRecordExporterFromConfig(reg, props.exporter);
+  return new BatchLogRecordProcessor({
+    exporter,
+    maxQueueSize: props.max_queue_size ?? undefined,
+    maxExportBatchSize: props.max_export_batch_size ?? undefined,
+    scheduledDelayMillis: props.schedule_delay ?? undefined,
+    exportTimeoutMillis: validateExportTimeoutConfig(
+      props.export_timeout,
+      'BatchLogRecordProcessor.export_timeout'
+    ),
+  });
+}
+
+function createSimpleLogRecordProcessorFromConfig(
+  reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): LogRecordProcessor {
+  checkConfigUse('SimpleLogRecordProcessor', properties!, ['exporter']);
+  const props = properties as unknown as SimpleLogRecordProcessorConfigModel;
+  const exporter = createLogRecordExporterFromConfig(reg, props.exporter);
+  return new SimpleLogRecordProcessor({ exporter });
+}
+
 export function createLogRecordProcessorFromConfig(
   reg: ComponentProviderRegistry,
   processor: LogRecordProcessorConfigModel
 ): LogRecordProcessor {
   const [name, properties] = mustSingleEntry(processor, 'LogRecordProcessor');
-
-  switch (name) {
-    case 'batch': {
-      checkConfigUse('BatchLogRecordProcessor', properties, [
-        'exporter',
-        'max_queue_size',
-        'max_export_batch_size',
-        'schedule_delay',
-        'export_timeout',
-      ]);
-      const props = properties as unknown as BatchLogRecordProcessorConfigModel;
-      const exporter = createLogRecordExporterFromConfig(reg, props.exporter);
-      return new BatchLogRecordProcessor({
-        exporter,
-        maxQueueSize: props.max_queue_size ?? undefined,
-        maxExportBatchSize: props.max_export_batch_size ?? undefined,
-        scheduledDelayMillis: props.schedule_delay ?? undefined,
-        exportTimeoutMillis: validateExportTimeoutConfig(
-          props.export_timeout,
-          'BatchLogRecordProcessor.export_timeout'
-        ),
-      });
-    }
-
-    case 'simple': {
-      const props =
-        properties as unknown as SimpleLogRecordProcessorConfigModel;
-      const exporter = createLogRecordExporterFromConfig(reg, props.exporter);
-      return new SimpleLogRecordProcessor({ exporter });
-    }
-
-    default:
-      throw new Error(`unknown LogRecordProcessor name: "${name}"`);
+  const provider = reg['LogRecordProcessor']?.[name];
+  if (provider) {
+    return provider(reg, properties);
+  } else {
+    throw new Error(
+      `unknown LogRecordProcessor name in configuration: "${name}"`
+    );
   }
 }
 
@@ -1556,6 +1565,9 @@ export function getBuiltinComponentProviderRegistry(): ComponentProviderRegistry
       otlp_http: createHttpLogRecordExporterFromConfig,
       otlp_grpc: createOtlpGrpcLogRecordExporterFromConfig,
     },
-    // XXX LogRecordProcessor
+    LogRecordProcessor: {
+      batch: createBatchLogRecordProcessorFromConfig,
+      simple: createSimpleLogRecordProcessorFromConfig,
+    },
   };
 }
