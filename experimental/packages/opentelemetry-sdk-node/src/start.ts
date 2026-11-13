@@ -4,7 +4,12 @@
  */
 
 import type { ConfigurationModel } from '@opentelemetry/configuration';
-import { parseConfigFile } from '@opentelemetry/configuration';
+import {
+  parseConfigFile,
+  createConfigProvider,
+} from '@opentelemetry/configuration';
+import type { ConfigProvider } from '@opentelemetry/api-config';
+import { config as configApi } from '@opentelemetry/api-config';
 import type { ContextManager, TextMapPropagator } from '@opentelemetry/api';
 import {
   context,
@@ -47,6 +52,7 @@ import {
 } from './create-from-config';
 
 interface SdkComponents {
+  configProvider?: ConfigProvider;
   contextManager?: ContextManager;
   loggerProvider?: LoggerProvider;
   meterProvider?: MeterProvider;
@@ -206,10 +212,6 @@ function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
   const logLevel = diagLogLevelFromSeverityNumberConfig(config.log_level);
   diag.setLogger(new DiagConsoleLogger(), { logLevel });
 
-  registerInstrumentations({
-    instrumentations: opts.instrumentations?.flat() ?? [],
-  });
-
   let components: SdkComponents;
   try {
     components = createFromConfig(config);
@@ -221,6 +223,9 @@ function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
   }
   if (components.contextManager) {
     context.setGlobalContextManager(components.contextManager);
+  }
+  if (components.configProvider) {
+    configApi.setGlobalConfigProvider(components.configProvider);
   }
   if (components.loggerProvider) {
     logs.setGlobalLoggerProvider(components.loggerProvider);
@@ -234,6 +239,12 @@ function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
   if (components.propagator) {
     propagation.setGlobalPropagator(components.propagator);
   }
+
+  // Register instrumentations after the global ConfigProvider is set, so each
+  // instrumentation can read its declarative config from it.
+  registerInstrumentations({
+    instrumentations: opts.instrumentations?.flat() ?? [],
+  });
 
   const shutdownFn = async () => {
     const promises: Promise<unknown>[] = [];
@@ -266,6 +277,8 @@ function createFromConfig(config: ConfigurationModel): SdkComponents {
     if (config.propagator) {
       components.propagator = createPropagatorFromConfig(config.propagator);
     }
+
+    components.configProvider = createConfigProvider(config);
 
     if (config.logger_provider) {
       components.loggerProvider = createLoggerProviderFromConfig(

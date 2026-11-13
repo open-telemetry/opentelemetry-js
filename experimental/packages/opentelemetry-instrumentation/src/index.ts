@@ -20,4 +20,9 @@ export {
   safeExecuteInTheMiddle,
   safeExecuteInTheMiddleAsync,
 } from './utils';
+export {
+  readDeclarativeConfig,
+  type ConfigPropertiesReader,
+  type DeclarativeConfigReader,
+} from './readDeclarativeConfig';
 export { SemconvStability, semconvStabilityFromStr } from './semconvStability';
