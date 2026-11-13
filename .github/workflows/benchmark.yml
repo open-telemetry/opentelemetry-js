@@ -18,7 +18,7 @@ jobs:
           - ^26.3.0
     runs-on: oracle-bare-metal-64cpu-1024gb-x86-64-ubuntu-24
     container:
-      image: ubuntu:26.04@sha256:3131b4cc82a783df6c9df078f86e01819a13594b865c2cad47bd1bca2b7063bb
+      image: ubuntu:26.04@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c
     timeout-minutes: 10
     steps:
       # Apt packages:
