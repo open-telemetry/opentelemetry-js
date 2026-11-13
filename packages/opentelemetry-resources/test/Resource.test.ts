@@ -87,6 +87,9 @@ describe('Resource', () => {
   };
 
   beforeEach(() => _clearDefaultServiceNameCache());
+  afterEach(() => {
+    sinon.restore();
+  });
 
   it('should return merged resource', () => {
     const expectedResource = resourceFromAttributes({
@@ -172,6 +175,18 @@ describe('Resource', () => {
     );
   });
 
+  it('should not warn when dropping undefined values', () => {
+    const warnStub = sinon.spy(diag, 'warn');
+
+    const resource = resourceFromAttributes({
+      foo: 'bar',
+      aUndefined: undefined,
+    });
+
+    assert.deepStrictEqual(resource.attributes, { foo: 'bar' });
+    sinon.assert.notCalled(warnStub);
+  });
+
   it('should log when accessing attributes before async attributes promise has settled', () => {
     const debugStub = sinon.spy(diag, 'error');
     const resource = resourceFromAttributes({
@@ -190,10 +205,6 @@ describe('Resource', () => {
   });
 
   describe('asynchronous attributes', () => {
-    afterEach(() => {
-      sinon.restore();
-    });
-
     it('should return false for asyncAttributesPending if no promise provided', () => {
       assert.ok(!resourceFromAttributes({ foo: 'bar' }).asyncAttributesPending);
       assert.ok(!emptyResource().asyncAttributesPending);
@@ -535,8 +546,6 @@ describe('Resource', () => {
       assert.strictEqual(mergedResource.schemaUrl, undefined);
 
       assert.ok(warnStub.calledWithMatch('Schema URL merge conflict'));
-
-      warnStub.restore();
     });
 
     it('should accept valid schema URL formats', () => {
@@ -592,8 +601,6 @@ describe('Resource', () => {
       assert.ok(
         warnStub.alwaysCalledWithMatch('Schema URL must be string or undefined')
       );
-
-      warnStub.restore();
     });
   });
 

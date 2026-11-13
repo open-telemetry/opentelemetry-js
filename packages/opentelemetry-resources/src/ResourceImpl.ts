@@ -100,6 +100,8 @@ class ResourceImpl implements Resource {
       }
       if (Object.hasOwn(attrs, k)) {
         // Pass. First res attribute wins.
+      } else if (v == null) {
+        // Pass. Detectors return undefined values to indicate there was nothing to detect.
       } else if (k.length === 0) {
         diag.warn('dropping invalid resource attribute key: <empty string>');
       } else if (!isSimpleAttributeValue(v)) {

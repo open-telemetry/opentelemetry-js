@@ -17,6 +17,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :bug: Bug Fixes
 
+* fix(resources): don't warn on undefined resource attributes [#7308](https://github.com/open-telemetry/opentelemetry-js/pull/7308) @raphael-theriault-swi
+
 ### :books: Documentation
 
 ### :house: Internal
