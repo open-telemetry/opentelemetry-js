@@ -23,6 +23,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :house: Internal
 
+* refactor(sdk-node): internally use a ComponentProvider implementation for creating SDK components from a declarative config [#7269](https://github.com/open-telemetry/opentelemetry-js/pull/7269) @trentm
+
 ## 0.301.2
 
 ### :bug: Bug Fixes

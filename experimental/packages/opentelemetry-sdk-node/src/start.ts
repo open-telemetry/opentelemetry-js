@@ -49,7 +49,10 @@ import {
   createPropagatorFromConfig,
   createResourceFromConfig,
   createTracerProviderFromConfig,
+  getBuiltinComponentProviderRegistry,
 } from './create-from-config';
+import type { ComponentProviderRegistry } from './component-provider';
+import { mergeComponentProviderRegistries } from './component-provider';
 
 interface SdkComponents {
   configProvider?: ConfigProvider;
@@ -192,6 +195,10 @@ function startNodeSdkFromEnv(opts?: StartSdkFromEnvOptions): NodeSdk {
 }
 
 function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
+  const reg = mergeComponentProviderRegistries([
+    getBuiltinComponentProviderRegistry(),
+  ]);
+
   let config: ConfigurationModel;
   try {
     config = parseConfigFile(opts.configFile);
@@ -214,7 +221,7 @@ function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
 
   let components: SdkComponents;
   try {
-    components = createFromConfig(config);
+    components = createFromConfig(reg, config);
   } catch (createErr) {
     diag.error(
       `Could not create OpenTelemetry SDK from configuration, SDK will not be setup: ${createErr.message}`
@@ -265,23 +272,30 @@ function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
 /**
  * Interpret configuration model and return SDK components.
  */
-function createFromConfig(config: ConfigurationModel): SdkComponents {
+function createFromConfig(
+  reg: ComponentProviderRegistry,
+  config: ConfigurationModel
+): SdkComponents {
   const components: SdkComponents = {};
 
   try {
     components.contextManager = new AsyncLocalStorageContextManager();
     components.contextManager.enable();
 
-    const resource = createResourceFromConfig(config.resource);
+    const resource = createResourceFromConfig(reg, config.resource);
 
     if (config.propagator) {
-      components.propagator = createPropagatorFromConfig(config.propagator);
+      components.propagator = createPropagatorFromConfig(
+        reg,
+        config.propagator
+      );
     }
 
     components.configProvider = createConfigProvider(config);
 
     if (config.logger_provider) {
       components.loggerProvider = createLoggerProviderFromConfig(
+        reg,
         resource,
         config.logger_provider,
         config.attribute_limits
@@ -290,6 +304,7 @@ function createFromConfig(config: ConfigurationModel): SdkComponents {
 
     if (config.meter_provider) {
       components.meterProvider = createMeterProviderFromConfig(
+        reg,
         resource,
         config.meter_provider
       );
@@ -297,6 +312,7 @@ function createFromConfig(config: ConfigurationModel): SdkComponents {
 
     if (config.tracer_provider) {
       components.tracerProvider = createTracerProviderFromConfig(
+        reg,
         resource,
         config.tracer_provider,
         config.attribute_limits
