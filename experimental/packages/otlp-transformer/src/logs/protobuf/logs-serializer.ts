@@ -4,7 +4,6 @@
  */
 import type { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { ProtobufWriter } from '../../common/protobuf/protobuf-writer';
-import { hexToBinary } from '../../common/hex-to-binary';
 import type { Resource } from '@opentelemetry/resources';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import { SeverityNumber } from '@opentelemetry/api';
@@ -75,13 +74,13 @@ function serializeLogRecord(
   // trace_id (field 9, bytes) - skip if empty
   if (logRecord.spanContext?.traceId) {
     writer.writeTag(9, 2);
-    writer.writeBytes(hexToBinary(logRecord.spanContext.traceId));
+    writer.writeHexBytes(logRecord.spanContext.traceId);
   }
 
   // span_id (field 10, bytes) - skip if empty
   if (logRecord.spanContext?.spanId) {
     writer.writeTag(10, 2);
-    writer.writeBytes(hexToBinary(logRecord.spanContext.spanId));
+    writer.writeHexBytes(logRecord.spanContext.spanId);
   }
 
   // observed_time_unix_nano (field 11, fixed64)

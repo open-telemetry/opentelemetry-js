@@ -4,6 +4,7 @@
  */
 import type { IProtobufWriter } from './i-protobuf-writer';
 import { estimateVarintSize } from './utils';
+import { writeHexToBinary } from '../hex-to-binary';
 import { utf8ByteLength } from '#platform';
 
 /**
@@ -255,6 +256,19 @@ export class ProtobufWriter implements IProtobufWriter {
     this._ensureCapacity(bytes.length);
     this._buffer.set(bytes, this.pos);
     this.pos += bytes.length;
+  }
+
+  /**
+   * Write a hex string as length-delimited bytes, such as a trace or span ID.
+   * The hex is decoded straight into the buffer, without an intermediate
+   * Uint8Array.
+   */
+  writeHexBytes(hex: string): void {
+    const byteLength = hex.length >>> 1;
+    this.writeVarint(byteLength);
+    this._ensureCapacity(byteLength);
+    writeHexToBinary(hex, byteLength, this._buffer, this.pos);
+    this.pos += byteLength;
   }
 
   /**
