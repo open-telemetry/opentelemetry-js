@@ -12,7 +12,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 ### :rocket: Features
 
 * feat(sdk-config): add support for parsing `file_format: "1.2"` declarative config files
-  * See the OTel Configuration v1.2.0 release notes: https://github.com/open-telemetry/opentelemetry-configuration/releases/tag/v1.2.0
+  * See the OTel Configuration v1.2.0 release notes: <https://github.com/open-telemetry/opentelemetry-configuration/releases/tag/v1.2.0>
 * feat(api-config): add `@opentelemetry/api-config`, an experimental package with the declarative-config `ConfigProvider` and `ConfigProperties` types and a global `config` accessor [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
 * feat(configuration): add `createConfigProvider()` to build a `ConfigProvider` over the parsed configuration model [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
 * feat(instrumentation): support the `instrumentation/development` section of declarative config. `Instrumentation#setConfigProvider()` is an optional method that `registerInstrumentations()` calls on each instrumentation, alongside `setTracerProvider()` and friends. The `readDeclarativeConfig()` util reads an instrumentation's own block (`instrumentation/development.js.<name>`) and the shared `general` block through a typed reader, mapping snake_case config properties onto config fields. Unrecognized properties and type mismatches warn [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
