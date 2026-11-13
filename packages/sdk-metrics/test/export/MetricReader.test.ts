@@ -23,7 +23,7 @@ import {
   assertAggregationTemporalitySelector,
 } from './utils';
 import { testResource } from '../util';
-import { ValueType } from '@opentelemetry/api';
+import { ValueType, diag } from '@opentelemetry/api';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 
 const testScopeMetrics: ScopeMetrics[] = [
@@ -251,6 +251,242 @@ describe('MetricReader', () => {
         _instrumentType => AggregationTemporality.DELTA
       );
       reader.shutdown();
+    });
+  });
+
+  describe('shutdown', () => {
+    class Deferred<T = void> {
+      promise: Promise<T>;
+      resolve!: (val: T) => void;
+      reject!: (err: unknown) => void;
+      constructor() {
+        this.promise = new Promise((resolve, reject) => {
+          this.resolve = resolve;
+          this.reject = reject;
+        });
+      }
+    }
+
+    it('should only call onShutdown once on concurrent calls', async () => {
+      let shutdownCalls = 0;
+      const shutdownDeferred = new Deferred<void>();
+      class SlowShutdownMetricReader extends TestMetricReader {
+        protected override async onShutdown(): Promise<void> {
+          shutdownCalls++;
+          await shutdownDeferred.promise;
+        }
+      }
+
+      const reader = new SlowShutdownMetricReader();
+      reader.setMetricProducer(new TestMetricProducer());
+
+      const p1 = reader.shutdown();
+      const p2 = reader.shutdown();
+
+      assert.strictEqual(shutdownCalls, 1);
+      shutdownDeferred.resolve();
+      await Promise.all([p1, p2]);
+    });
+
+    it('should independently respect deadlines when concurrent callers have different timeouts', async () => {
+      const shutdownDeferred = new Deferred<void>();
+      let shutdownCalls = 0;
+      class ControlledShutdownMetricReader extends TestMetricReader {
+        protected override async onShutdown(): Promise<void> {
+          shutdownCalls++;
+          await shutdownDeferred.promise;
+        }
+      }
+
+      const reader = new ControlledShutdownMetricReader();
+      reader.setMetricProducer(new TestMetricProducer());
+
+      // Caller 1 has no timeout, Caller 2 has a short timeout
+      const p1 = reader.shutdown();
+      const p2 = reader.shutdown({ timeoutMillis: 20 });
+
+      // Caller 2 specified a 20ms timeout and must timeout independently
+      await assert.rejects(p2, /Operation timed out/);
+
+      // onShutdown was only called once and continues running
+      assert.strictEqual(shutdownCalls, 1);
+
+      // Caller 1 should still be able to complete successfully once the underlying operation finishes
+      shutdownDeferred.resolve();
+      await p1;
+
+      // The reader is marked as shutdown
+      await assert.rejects(() => reader.collect(), /MetricReader is shutdown/);
+    });
+
+    it('should allow a longer-timeout caller to succeed even when an earlier caller timed out', async () => {
+      const shutdownDeferred = new Deferred<void>();
+      let shutdownCalls = 0;
+      class ControlledShutdownMetricReader extends TestMetricReader {
+        protected override async onShutdown(): Promise<void> {
+          shutdownCalls++;
+          await shutdownDeferred.promise;
+        }
+      }
+
+      const reader = new ControlledShutdownMetricReader();
+      reader.setMetricProducer(new TestMetricProducer());
+
+      // Caller 1 has a short timeout, Caller 2 has a long timeout
+      const p1 = reader.shutdown({ timeoutMillis: 20 });
+      const p2 = reader.shutdown({ timeoutMillis: 500 });
+
+      // Caller 1 times out
+      await assert.rejects(p1, /Operation timed out/);
+
+      // Caller 2 is still waiting
+      assert.strictEqual(shutdownCalls, 1);
+
+      // Completing the shutdown allows Caller 2 to finish
+      shutdownDeferred.resolve();
+      await p2;
+
+      await assert.rejects(() => reader.collect(), /MetricReader is shutdown/);
+    });
+
+    it('should mark reader as shutdown even if shutdown times out', async () => {
+      class SlowShutdownMetricReader extends TestMetricReader {
+        protected override async onShutdown(): Promise<void> {
+          await new Promise(resolve => setTimeout(resolve, 50));
+        }
+      }
+
+      const reader = new SlowShutdownMetricReader();
+      reader.setMetricProducer(new TestMetricProducer());
+
+      await assert.rejects(
+        () => reader.shutdown({ timeoutMillis: 10 }),
+        /Operation timed out/
+      );
+
+      await assert.rejects(() => reader.collect(), /MetricReader is shutdown/);
+    });
+
+    it('should allow subsequent shutdown calls to await the shared promise', async () => {
+      const shutdownDeferred = new Deferred<void>();
+      let shutdownCalls = 0;
+      class ControlledShutdownMetricReader extends TestMetricReader {
+        protected override async onShutdown(): Promise<void> {
+          shutdownCalls++;
+          await shutdownDeferred.promise;
+        }
+      }
+
+      const reader = new ControlledShutdownMetricReader();
+      reader.setMetricProducer(new TestMetricProducer());
+
+      let p1Resolved = false;
+      let p2Resolved = false;
+
+      const p1 = reader.shutdown().then(() => {
+        p1Resolved = true;
+      });
+      const p2 = reader.shutdown().then(() => {
+        p2Resolved = true;
+      });
+
+      await new Promise(resolve => setTimeout(resolve, 10));
+      assert.strictEqual(p1Resolved, false);
+      assert.strictEqual(p2Resolved, false);
+      assert.strictEqual(shutdownCalls, 1);
+
+      shutdownDeferred.resolve();
+      await Promise.all([p1, p2]);
+
+      assert.strictEqual(p1Resolved, true);
+      assert.strictEqual(p2Resolved, true);
+    });
+
+    it('should propagate shutdown rejection to all concurrent callers', async () => {
+      const shutdownDeferred = new Deferred<void>();
+      const expectedError = new Error('shutdown failure');
+      class FailingShutdownMetricReader extends TestMetricReader {
+        protected override async onShutdown(): Promise<void> {
+          await shutdownDeferred.promise;
+          throw expectedError;
+        }
+      }
+
+      const reader = new FailingShutdownMetricReader();
+      reader.setMetricProducer(new TestMetricProducer());
+
+      const p1 = reader.shutdown();
+      const p2 = reader.shutdown();
+
+      shutdownDeferred.reject(expectedError);
+
+      await assert.rejects(p1, /shutdown failure/);
+      await assert.rejects(p2, /shutdown failure/);
+
+      // Reader is still marked as shutdown
+      await assert.rejects(() => reader.collect(), /MetricReader is shutdown/);
+    });
+
+    it('should make collect() and forceFlush() unavailable immediately after shutdown begins', async () => {
+      const shutdownDeferred = new Deferred<void>();
+      class ControlledShutdownMetricReader extends TestMetricReader {
+        protected override async onShutdown(): Promise<void> {
+          await shutdownDeferred.promise;
+        }
+      }
+
+      const reader = new ControlledShutdownMetricReader();
+      reader.setMetricProducer(new TestMetricProducer());
+
+      const shutdownPromise = reader.shutdown();
+
+      // collect() must throw immediately even while onShutdown is still pending
+      await assert.rejects(() => reader.collect(), /MetricReader is shutdown/);
+
+      // forceFlush() must log a warning and return immediately
+      const diagWarnSpy = sinon.spy(diag, 'warn');
+      await reader.forceFlush();
+      assert.strictEqual(diagWarnSpy.calledOnce, true);
+      assert.match(
+        diagWarnSpy.firstCall.args[0],
+        /Cannot forceFlush on already shutdown MetricReader/
+      );
+      diagWarnSpy.restore();
+
+      shutdownDeferred.resolve();
+      await shutdownPromise;
+    });
+
+    it('should warn when calling shutdown twice and return the shutdown promise', async () => {
+      const reader = new TestMetricReader();
+      reader.setMetricProducer(new TestMetricProducer());
+
+      await reader.shutdown();
+
+      const diagErrorSpy = sinon.spy(diag, 'error');
+      await reader.shutdown();
+      assert.strictEqual(diagErrorSpy.calledOnce, true);
+      assert.match(
+        diagErrorSpy.firstCall.args[0],
+        /Cannot call shutdown twice/
+      );
+      diagErrorSpy.restore();
+    });
+
+    it('should prevent forceFlush after shutdown', async () => {
+      const reader = new TestMetricReader();
+      reader.setMetricProducer(new TestMetricProducer());
+
+      await reader.shutdown();
+
+      const diagWarnSpy = sinon.spy(diag, 'warn');
+      await reader.forceFlush();
+      assert.strictEqual(diagWarnSpy.calledOnce, true);
+      assert.match(
+        diagWarnSpy.firstCall.args[0],
+        /Cannot forceFlush on already shutdown MetricReader/
+      );
+      diagWarnSpy.restore();
     });
   });
 });
