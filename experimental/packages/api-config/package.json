@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/api-config",
-  "version": "0.301.1",
+  "version": "0.301.2",
   "description": "Public declarative configuration API for OpenTelemetry",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",

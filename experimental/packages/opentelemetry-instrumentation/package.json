@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation",
-  "version": "0.301.1",
+  "version": "0.301.2",
   "description": "Base class for node which OpenTelemetry instrumentation modules extend",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -81,7 +81,7 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/api-config": "0.301.1",
+    "@opentelemetry/api-config": "0.301.2",
     "import-in-the-middle": "^3.0.0",
     "require-in-the-middle": "^8.0.0"
   },

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-prometheus",
-  "version": "0.301.1",
+  "version": "0.301.2",
   "description": "OpenTelemetry Exporter Prometheus provides a metrics endpoint for Prometheus",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
