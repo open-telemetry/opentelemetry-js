@@ -112,7 +112,6 @@ export function mergeComponentProviderRegistries(
   regs: ComponentProviderRegistry[]
 ): ComponentProviderRegistry {
   const mergedReg: ComponentProviderRegistry = {};
-  for (const reg of regs) {
     const componentTypes: (keyof ComponentProviderRegistry)[] = [
       'ExperimentalResourceDetector',
       'TextMapPropagator',
@@ -126,6 +125,7 @@ export function mergeComponentProviderRegistries(
       'LogRecordExporter',
       'LogRecordProcessor',
     ];
+  for (const reg of regs) {
     for (const componentType of componentTypes) {
       const providerFromName = reg[componentType];
       if (providerFromName !== undefined) {
