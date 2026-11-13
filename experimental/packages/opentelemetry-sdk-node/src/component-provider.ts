@@ -4,6 +4,7 @@
  */
 
 import type { TextMapPropagator } from '@opentelemetry/api';
+import type { ConfigProperties } from '@opentelemetry/api-config';
 import type { ResourceDetector } from '@opentelemetry/resources';
 import type {
   LogRecordExporter,
@@ -19,12 +20,6 @@ import type {
   SpanExporter,
   SpanProcessor,
 } from '@opentelemetry/sdk-trace';
-
-/**
- * Schemaless configuration properties passed to a component provider.
- */
-export type ConfigProperties = Record<string, unknown>;
-// ^XXX this type will come from api-config, or could just be copied here if we want to avoid a dep on it
 
 // These `*ComponentProvider` aliases are defined to make
 // `type ComponentProviderRegistry` more readable;

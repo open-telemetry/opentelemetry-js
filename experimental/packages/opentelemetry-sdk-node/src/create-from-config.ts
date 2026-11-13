@@ -17,6 +17,7 @@ import { readFileSync } from 'fs';
 import * as path from 'path';
 
 import type { TextMapPropagator } from '@opentelemetry/api';
+import type { ConfigProperties } from '@opentelemetry/api-config';
 import { diag } from '@opentelemetry/api';
 import type {
   IdGenerator,
@@ -153,10 +154,7 @@ import {
 } from '@opentelemetry/sdk-metrics';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
-import type {
-  ComponentProviderRegistry,
-  ConfigProperties,
-} from './component-provider';
+import type { ComponentProviderRegistry } from './component-provider';
 
 // ---- internal utilities
 
