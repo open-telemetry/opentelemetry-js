@@ -4,7 +4,7 @@
  */
 //
 // AUTO-GENERATED — do not edit
-// Generated from opentelemetry-configuration.git v1.1.0
+// Generated from opentelemetry-configuration.git v1.2.0
 // Run `npm run generate:config` to regenerate
 //
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-object-type */
@@ -99,6 +99,18 @@ export type OtlpHttpExporter = {
    */
   compression?: string | null;
   /**
+   * Configure the maximum size of each export request body in bytes, before compression.
+   * Value must be non-negative. A value of 0 indicates no limit (infinity) and is not recommended.
+   * If omitted or null, 67108864 (64 MiB) is used.
+   */
+  max_request_size?: number | null;
+  /**
+   * Configure the maximum size of each export response in bytes, after decompression.
+   * Value must be positive.
+   * If omitted or null, 4194304 (4 MiB) is used.
+   */
+  max_response_size?: number | null;
+  /**
    * Configure max time (in milliseconds) to wait for each export.
    * Value must be non-negative. A value of 0 indicates no limit (infinity).
    * If omitted or null, 10000 is used.
@@ -173,6 +185,18 @@ export type OtlpGrpcExporter = {
    * If omitted or null, none is used.
    */
   compression?: string | null;
+  /**
+   * Configure the maximum size of each export request message in bytes, before compression.
+   * Value must be non-negative. A value of 0 indicates no limit (infinity) and is not recommended.
+   * If omitted or null, 67108864 (64 MiB) is used.
+   */
+  max_request_size?: number | null;
+  /**
+   * Configure the maximum size of each export response in bytes, after decompression.
+   * Value must be positive.
+   * If omitted or null, 4194304 (4 MiB) is used.
+   */
+  max_response_size?: number | null;
   /**
    * Configure max time (in milliseconds) to wait for each export.
    * Value must be non-negative. A value of 0 indicates no limit (infinity).
@@ -269,6 +293,18 @@ export type OtlpHttpMetricExporter = {
    */
   compression?: string | null;
   /**
+   * Configure the maximum size of each export request body in bytes, before compression.
+   * Value must be non-negative. A value of 0 indicates no limit (infinity) and is not recommended.
+   * If omitted or null, 67108864 (64 MiB) is used.
+   */
+  max_request_size?: number | null;
+  /**
+   * Configure the maximum size of each export response in bytes, after decompression.
+   * Value must be positive.
+   * If omitted or null, 4194304 (4 MiB) is used.
+   */
+  max_response_size?: number | null;
+  /**
    * Configure max time (in milliseconds) to wait for each export.
    * Value must be non-negative. A value of 0 indicates no limit (infinity).
    * If omitted or null, 10000 is used.
@@ -334,6 +370,18 @@ export type OtlpGrpcMetricExporter = {
    */
   compression?: string | null;
   /**
+   * Configure the maximum size of each export request message in bytes, before compression.
+   * Value must be non-negative. A value of 0 indicates no limit (infinity) and is not recommended.
+   * If omitted or null, 67108864 (64 MiB) is used.
+   */
+  max_request_size?: number | null;
+  /**
+   * Configure the maximum size of each export response in bytes, after decompression.
+   * Value must be positive.
+   * If omitted or null, 4194304 (4 MiB) is used.
+   */
+  max_response_size?: number | null;
+  /**
    * Configure max time (in milliseconds) to wait for each export.
    * Value must be non-negative. A value of 0 indicates no limit (infinity).
    * If omitted or null, 10000 is used.
@@ -369,6 +417,12 @@ export type ConsoleMetricExporter = {
 
 /**
  * Configure metric producer to be opencensus.
+ *
+ * **Deprecated** as of v1.2.0, may be removed in v2.0.0. The OpenCensus
+ * compatibility specification it relies on was deprecated in
+ * https://github.com/open-telemetry/opentelemetry-specification/pull/5138.
+ * SDKs MAY continue to support this entry for backwards compatibility;
+ * new configurations SHOULD NOT use it.
  * If omitted, ignore.
  */
 export type OpenCensusMetricProducer = {} | null;
@@ -519,6 +573,17 @@ export type SumAggregation = {} | null;
  */
 export type ExemplarFilter =
   | ('always_on' | 'always_off' | 'trace_based')
+  | null;
+
+/**
+ * Controls how multiple matching Views are applied to an Instrument.
+ * Values include:
+ * * composable: Combines (merges) matching Views into unified metric streams unless distinct stream names are configured.
+ * * independent: Creates separate metric streams independently for each matching View.
+ * If omitted, independent is used.
+ */
+export type ExperimentalViewMatchingMode =
+  | ('independent' | 'composable')
   | null;
 
 /**
@@ -752,6 +817,14 @@ export interface AttributeLimits {
    */
   attribute_value_length_limit?: number | null;
   /**
+   * Configure the maximum attribute value depth for nested array and map values.
+   * Depth starts at 1 for the top-level attribute value and increments when descending into array elements or map values.
+   * Array or map values deeper than the limit are replaced with an empty value.
+   * Value must be positive.
+   * If omitted or null, 64 is used.
+   */
+  attribute_value_depth_limit?: number | null;
+  /**
    * Configure max attribute count.
    * Value must be non-negative.
    * If omitted or null, 128 is used.
@@ -857,6 +930,14 @@ export interface LogRecordLimits {
    */
   attribute_value_length_limit?: number | null;
   /**
+   * Configure the maximum attribute value depth for nested array and map values. Overrides .attribute_limits.attribute_value_depth_limit.
+   * Depth starts at 1 for the top-level attribute value and increments when descending into array elements or map values.
+   * Array or map values deeper than the limit are replaced with an empty value.
+   * Value must be positive.
+   * If omitted or null, 64 is used.
+   */
+  attribute_value_depth_limit?: number | null;
+  /**
    * Configure max attribute count. Overrides .attribute_limits.attribute_count_limit.
    * Value must be non-negative.
    * If omitted or null, 128 is used.
@@ -932,6 +1013,7 @@ export interface MeterProvider {
   views?: View[];
   exemplar_filter?: ExemplarFilter;
   'meter_configurator/development'?: ExperimentalMeterConfigurator;
+  'view_matching_mode/development'?: ExperimentalViewMatchingMode;
 }
 
 export interface MetricReader {
@@ -1320,6 +1402,14 @@ export interface SpanLimits {
    */
   attribute_value_length_limit?: number | null;
   /**
+   * Configure the maximum attribute value depth for nested array and map values. Overrides .attribute_limits.attribute_value_depth_limit.
+   * Depth starts at 1 for the top-level attribute value and increments when descending into array elements or map values.
+   * Array or map values deeper than the limit are replaced with an empty value.
+   * Value must be positive.
+   * If omitted or null, 64 is used.
+   */
+  attribute_value_depth_limit?: number | null;
+  /**
    * Configure max attribute count. Overrides .attribute_limits.attribute_count_limit.
    * Value must be non-negative.
    * If omitted or null, 128 is used.
@@ -1358,12 +1448,21 @@ export interface SpanLimits {
 export interface Sampler {
   always_off?: AlwaysOffSampler;
   always_on?: AlwaysOnSampler;
+  always_record?: AlwaysRecordSampler;
   'composite/development'?: ExperimentalComposableSampler;
   'jaeger_remote/development'?: ExperimentalJaegerRemoteSampler;
   parent_based?: ParentBasedSampler;
   'probability/development'?: ExperimentalProbabilitySampler;
   trace_id_ratio_based?: TraceIdRatioBasedSampler;
   [k: string]: object | null | undefined;
+}
+
+/**
+ * Configure sampler to be always_record.
+ * If omitted, ignore.
+ */
+export interface AlwaysRecordSampler {
+  root: Sampler;
 }
 
 /**
@@ -1610,7 +1709,7 @@ export interface ExperimentalInstrumentation {
 
 /**
  * Configure general SemConv options that may apply to multiple languages and instrumentations.
- * Instrumenation may merge general config options with the language specific configuration at .instrumentation.<language>.
+ * Instrumentation may merge general config options with the language specific configuration at .instrumentation.<language>.
  * If omitted, default values as described in ExperimentalGeneralInstrumentation are used.
  */
 export interface ExperimentalGeneralInstrumentation {
