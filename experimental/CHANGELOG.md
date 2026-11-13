@@ -19,6 +19,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :bug: Bug Fixes
 
+* fix(instrumentation-http): set client span status and error.type on response ([#7303](https://github.com/open-telemetry/opentelemetry-js/pull/7303)) @helmipradita
+
 ### :books: Documentation
 
 ### :house: Internal

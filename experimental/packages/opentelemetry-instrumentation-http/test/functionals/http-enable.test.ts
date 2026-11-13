@@ -457,6 +457,45 @@ describe('HttpInstrumentation', () => {
         assert.strictEqual(outgoingSpan.attributes[ATTR_ERROR_TYPE], '404');
       });
 
+      it('should set error status and error.type for 4xx client span when response body is not consumed', async () => {
+        await new Promise<void>((resolve, reject) => {
+          const req = http.get(
+            `${protocol}://${hostname}:${serverPort}/status/410`,
+            { headers: { connection: 'close' } },
+            _res => {}
+          );
+          req.on('error', reject);
+          req.on('close', () => resolve());
+        });
+
+        const spans = memoryExporter.getFinishedSpans();
+        const outgoingSpan = spans.find(s => s.kind === SpanKind.CLIENT);
+        assert.ok(outgoingSpan);
+        assert.strictEqual(outgoingSpan.status.code, SpanStatusCode.ERROR);
+        assert.strictEqual(outgoingSpan.attributes[ATTR_ERROR_TYPE], '410');
+      });
+
+      it('should set error status on client span if response ends marked aborted and incomplete', async () => {
+        await new Promise<void>((resolve, reject) => {
+          const req = http.get(
+            `${protocol}://${hostname}:${serverPort}/status/200`,
+            { headers: { connection: 'close' } },
+            res => {
+              Object.defineProperty(res, 'aborted', { value: true });
+              Object.defineProperty(res, 'complete', { value: false });
+              res.emit('end');
+            }
+          );
+          req.on('error', reject);
+          req.on('close', () => resolve());
+        });
+
+        const spans = memoryExporter.getFinishedSpans();
+        const outgoingSpan = spans.find(s => s.kind === SpanKind.CLIENT);
+        assert.ok(outgoingSpan);
+        assert.strictEqual(outgoingSpan.status.code, SpanStatusCode.ERROR);
+      });
+
       const httpErrorCodes = [
         400, 401, 403, 404, 429, 501, 503, 504, 500, 505, 597,
       ];
