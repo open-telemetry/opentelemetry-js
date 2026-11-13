@@ -35,6 +35,27 @@ describe('PatternPredicate', () => {
     });
   });
 
+  describe('question-mark match', () => {
+    it('should match exactly one character', () => {
+      const predicate = new PatternPredicate('fo?');
+      assert.ok(predicate.match('foo'));
+      assert.ok(predicate.match('fob'));
+
+      assert.ok(!predicate.match('fo'));
+      assert.ok(!predicate.match('fooo'));
+      assert.ok(!predicate.match(''));
+    });
+
+    it('should combine with asterisk', () => {
+      const predicate = new PatternPredicate('fo?*');
+      assert.ok(predicate.match('foo'));
+      assert.ok(predicate.match('foobar'));
+
+      assert.ok(!predicate.match('fo'));
+      assert.ok(!predicate.match(''));
+    });
+  });
+
   describe('exact match', () => {
     it('should match exactly', () => {
       const predicate = new PatternPredicate('foobar');
@@ -49,13 +70,15 @@ describe('PatternPredicate', () => {
   describe('escapePattern', () => {
     it('should escape regexp elements', () => {
       assert.strictEqual(
-        PatternPredicate.escapePattern('^$\\.+?()[]{}|'),
-        '^\\^\\$\\\\\\.\\+\\?\\(\\)\\[\\]\\{\\}\\|$'
+        PatternPredicate.escapePattern('^$\\.+()[]{}|'),
+        '^\\^\\$\\\\\\.\\+\\(\\)\\[\\]\\{\\}\\|$'
       );
       assert.strictEqual(PatternPredicate.escapePattern('*'), '^.*$');
       assert.strictEqual(PatternPredicate.escapePattern('foobar'), '^foobar$');
       assert.strictEqual(PatternPredicate.escapePattern('foo*'), '^foo.*$');
       assert.strictEqual(PatternPredicate.escapePattern('*bar'), '^.*bar$');
+      assert.strictEqual(PatternPredicate.escapePattern('fo?'), '^fo.$');
+      assert.strictEqual(PatternPredicate.escapePattern('?bar'), '^.bar$');
     });
   });
 });
