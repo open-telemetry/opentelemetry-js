@@ -154,7 +154,45 @@ describe('API', function () {
       assert.deepStrictEqual(span, dummySpan);
     });
 
+    it('should return the registered tracer provider directly', function () {
+      const provider = new TestTracerProvider();
+      assert.strictEqual(api.trace.setGlobalTracerProvider(provider), true);
+      assert.strictEqual(api.trace.getTracerProvider(), provider);
+    });
+
+    it('should update tracers and providers obtained before registration', function () {
+      const earlyProvider = api.trace.getTracerProvider();
+      const earlyTracer = earlyProvider.getTracer('early');
+      assert.notStrictEqual(earlyTracer.startSpan('before'), dummySpan);
+
+      const provider = new TestTracerProvider();
+      assert.strictEqual(api.trace.setGlobalTracerProvider(provider), true);
+      assert.strictEqual(earlyTracer.startSpan('after'), dummySpan);
+      assert.strictEqual(
+        earlyProvider.getTracer('after').startSpan('after'),
+        dummySpan
+      );
+    });
+
+    it('should use a fresh proxy after disabling the global provider', function () {
+      const provider = new TestTracerProvider();
+      assert.strictEqual(api.trace.setGlobalTracerProvider(provider), true);
+      const oldTracer = api.trace.getTracer('old');
+      assert.strictEqual(oldTracer.startSpan('before'), dummySpan);
+
+      api.trace.disable();
+      const newTracer = api.trace.getTracer('new');
+      assert.notStrictEqual(newTracer.startSpan('before'), dummySpan);
+      assert.strictEqual(
+        api.trace.setGlobalTracerProvider(new NoopTracerProvider()),
+        true
+      );
+      assert.notStrictEqual(newTracer.startSpan('after'), dummySpan);
+      assert.strictEqual(oldTracer.startSpan('after'), dummySpan);
+    });
+
     it('should set delegate only on success', function () {
+      const earlyTracer = api.trace.getTracer('early');
       assert.strictEqual(
         api.trace.setGlobalTracerProvider(new TestTracerProvider()),
         true
@@ -164,6 +202,7 @@ describe('API', function () {
         false
       );
       assert.ok(api.trace.getTracer('name') instanceof TestTracer);
+      assert.strictEqual(earlyTracer.startSpan('after duplicate'), dummySpan);
     });
 
     class TestTracer extends NoopTracer {
