@@ -382,7 +382,12 @@ export function createPropagatorFromConfig(
       if (value === undefined) {
         continue;
       }
+      const v = item[key];
+      if (v === undefined) {
+        continue;
+      }
       keys.push(key);
+      value = v;
     }
     if (keys.length !== 1) {
       throw new Error(
