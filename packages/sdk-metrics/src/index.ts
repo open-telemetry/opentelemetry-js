@@ -63,3 +63,10 @@ export {
 } from './view/AttributesProcessor';
 
 export { TimeoutError } from './utils';
+export type { MeterConfig } from './MeterConfig';
+export { DEFAULT_METER_CONFIG } from './MeterConfig';
+export type {
+  MeterConfigurator,
+  MeterConfiguratorCondition,
+} from './MeterConfigurator';
+export { createMeterConfigurator } from './MeterConfigurator';
