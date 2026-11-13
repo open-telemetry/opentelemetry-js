@@ -17,6 +17,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :house: Internal
 
+* test: use erasable syntax on type assertions [#7311](https://github.com/open-telemetry/opentelemetry-js/pull/7311) @legendecas
+
 ## 0.301.2
 
 ### :bug: Bug Fixes

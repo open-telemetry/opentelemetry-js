@@ -138,6 +138,10 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-function-type': 'warn',
       '@typescript-eslint/no-shadow': 'warn',
       '@typescript-eslint/parameter-properties': 'error',
+      '@typescript-eslint/consistent-type-assertions': [
+        'error',
+        { assertionStyle: 'as' },
+      ],
       'no-restricted-syntax': ['error', 'ExportAllDeclaration'],
       'prefer-rest-params': 'off',
     },
