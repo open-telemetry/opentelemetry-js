@@ -235,6 +235,19 @@ This flag must be passed to the `node` binary, which is often done as a startup 
 
 For more details on ECMAScript Modules vs CommonJS, refer to [esm-support](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-support.md).
 
+## Redacting URLs
+
+`redactUrl(url)` replaces URL userinfo with `REDACTED:REDACTED` and replaces the values of sensitive query parameters with `REDACTED` before a URL is recorded as a span attribute such as `url.full`.
+
+The default sensitive keys are the [URL semantic convention list](https://opentelemetry.io/docs/specs/semconv/registry/attributes/url/) exported as `REDACTED_QUERY_PARAMS`: `sig`, `Signature`, `AWSAccessKeyId`, `X-Goog-Signature`, `X-Amz-Signature`, `X-Amz-Credential`, and `X-Amz-Security-Token`. Keys are matched case-sensitively after percent-decoding. A URL that `new URL` cannot parse, including a relative URL, is returned unchanged. A URL with nothing to redact is returned unchanged.
+
+```typescript
+import { redactUrl } from '@opentelemetry/instrumentation';
+
+redactUrl('https://user:pass@example.com/p?sig=secret&color=blue');
+// https://REDACTED:REDACTED@example.com/p?sig=REDACTED&color=blue
+```
+
 ## Limitations
 
 Instrumentations for external modules (e.g. express, mongodb,...) hooks the `require` call or `import` statement. Therefore following conditions need to be met that this mechanism can work:
