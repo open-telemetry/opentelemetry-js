@@ -45,7 +45,7 @@
  */
 
 import { DiagLogLevel } from '@opentelemetry/api';
-import type { SeverityNumberConfigModel } from '@opentelemetry/configuration';
+import type { SeverityNumberConfigModel } from '@opentelemetry/sdk-config';
 
 /* istanbul ignore next */
 /**

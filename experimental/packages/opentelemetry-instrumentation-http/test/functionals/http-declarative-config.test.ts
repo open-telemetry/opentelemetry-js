@@ -7,7 +7,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag, DiagLogLevel } from '@opentelemetry/api';
 import { config } from '@opentelemetry/api-config';
-import { createConfigProvider } from '@opentelemetry/configuration';
+import { createConfigProvider } from '@opentelemetry/sdk-config';
 import type { ConfigProvider } from '@opentelemetry/api-config';
 import { HttpInstrumentation } from '../../src/http';
 

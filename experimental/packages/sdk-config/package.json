@@ -1,5 +1,5 @@
 {
-  "name": "@opentelemetry/configuration",
+  "name": "@opentelemetry/sdk-config",
   "version": "0.301.2",
   "description": "OpenTelemetry Configuration",
   "main": "./dist/index.cjs",
@@ -68,6 +68,6 @@
     "ts-loader": "9.5.7",
     "typescript": "5.2.2"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/configuration",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/sdk-config",
   "sideEffects": false
 }
