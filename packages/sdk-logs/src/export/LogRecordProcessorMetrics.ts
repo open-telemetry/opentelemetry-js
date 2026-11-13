@@ -33,6 +33,7 @@ export class LogRecordProcessorMetrics {
 
   private readonly standardAttrs: Attributes;
   private readonly droppedAttrs: Attributes;
+  private readonly alreadyShutdownAttrs: Attributes;
 
   constructor(componentType: string, meter: Meter, queueConfig?: QueueConfig) {
     const counter = componentCounter.get(componentType) ?? 0;
@@ -46,6 +47,11 @@ export class LogRecordProcessorMetrics {
     this.droppedAttrs = {
       ...this.standardAttrs,
       [ATTR_ERROR_TYPE]: 'queue_full',
+    };
+
+    this.alreadyShutdownAttrs = {
+      ...this.standardAttrs,
+      [ATTR_ERROR_TYPE]: 'already_shutdown',
     };
 
     this.processedLogs = meter.createCounter(
@@ -87,17 +93,12 @@ export class LogRecordProcessorMetrics {
     this.processedLogs.add(count, this.droppedAttrs);
   }
 
-  finishLogs(count: number, error: Error | undefined) {
-    if (!error) {
-      this.processedLogs.add(count, this.standardAttrs);
-      return;
-    }
+  exportLogs(count: number) {
+    this.processedLogs.add(count, this.standardAttrs);
+  }
 
-    const attrs = {
-      ...this.standardAttrs,
-      [ATTR_ERROR_TYPE]: error.name,
-    };
-    this.processedLogs.add(count, attrs);
+  shutdownDropLogs(count: number) {
+    this.processedLogs.add(count, this.alreadyShutdownAttrs);
   }
 
   shutdown() {

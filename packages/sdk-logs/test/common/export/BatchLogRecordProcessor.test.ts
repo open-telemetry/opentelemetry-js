@@ -789,19 +789,23 @@ describe('BatchLogRecordProcessorBase', () => {
         m => m.descriptor.name === 'otel.sdk.processor.log.processed'
       );
       assert.ok(processedLogsMetric);
-      assert.strictEqual(processedLogsMetric.dataPoints[0].value, 1);
+      let processedLogsDataPoints = processedLogsMetric.dataPoints as Array<{
+        value: number;
+        attributes: Record<string, unknown>;
+      }>;
+      let queueFullPoint = processedLogsDataPoints.find(
+        dataPoint => dataPoint.attributes['error.type'] === 'queue_full'
+      );
+      assert.ok(queueFullPoint);
+      assert.strictEqual(queueFullPoint.value, 1);
       assert.strictEqual(
-        processedLogsMetric.dataPoints[0].attributes['otel.component.type'],
+        queueFullPoint.attributes['otel.component.type'],
         'batching_log_processor'
       );
       assert.ok(
-        processedLogsMetric.dataPoints[0].attributes['otel.component.name']
+        queueFullPoint.attributes['otel.component.name']
           ?.toString()
           .startsWith('batching_log_processor/')
-      );
-      assert.strictEqual(
-        processedLogsMetric.dataPoints[0].attributes['error.type'],
-        'queue_full'
       );
       let logCapacityMetric = scopeMetrics.metrics.find(
         m => m.descriptor.name === 'otel.sdk.processor.log.queue.capacity'
@@ -855,11 +859,11 @@ describe('BatchLogRecordProcessorBase', () => {
         m => m.descriptor.name === 'otel.sdk.processor.log.processed'
       );
       assert.ok(processedLogsMetric);
-      const processedLogsDataPoints = processedLogsMetric.dataPoints as Array<{
+      processedLogsDataPoints = processedLogsMetric.dataPoints as Array<{
         value: number;
         attributes: Record<string, unknown>;
       }>;
-      const queueFullPoint = processedLogsDataPoints.find(
+      queueFullPoint = processedLogsDataPoints.find(
         dataPoint => dataPoint.attributes['error.type'] === 'queue_full'
       );
       assert.ok(queueFullPoint);
@@ -877,7 +881,7 @@ describe('BatchLogRecordProcessorBase', () => {
         dataPoint => dataPoint.attributes['error.type'] === undefined
       );
       assert.ok(successPoint);
-      assert.strictEqual(successPoint.value, 1);
+      assert.strictEqual(successPoint.value, 2);
       assert.strictEqual(
         successPoint.attributes['otel.component.type'],
         'batching_log_processor'
@@ -890,17 +894,7 @@ describe('BatchLogRecordProcessorBase', () => {
       const failedPoint = processedLogsDataPoints.find(
         dataPoint => dataPoint.attributes['error.type'] === 'BackendError'
       );
-      assert.ok(failedPoint);
-      assert.strictEqual(failedPoint.value, 1);
-      assert.strictEqual(
-        failedPoint.attributes['otel.component.type'],
-        'batching_log_processor'
-      );
-      assert.ok(
-        failedPoint.attributes['otel.component.name']
-          ?.toString()
-          .startsWith('batching_log_processor/')
-      );
+      assert.strictEqual(failedPoint, undefined);
 
       logCapacityMetric = scopeMetrics.metrics.find(
         m => m.descriptor.name === 'otel.sdk.processor.log.queue.capacity'
@@ -931,6 +925,87 @@ describe('BatchLogRecordProcessorBase', () => {
         logQueueSizeMetric.dataPoints[0].attributes['otel.component.name']
           ?.toString()
           .startsWith('batching_log_processor/')
+      );
+    });
+
+    it('should record already_shutdown for logs emitted after shutdown', async () => {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+      const processor = new BatchLogRecordProcessor({
+        exporter,
+        maxQueueSize: 5,
+        maxExportBatchSize: 1,
+        scheduledDelayMillis: 1_000_000_000,
+        selfObsMeterProvider: meterProvider,
+      });
+      await processor.shutdown();
+
+      processor.onEmit(createLogRecord());
+
+      const { resourceMetrics } = await metricReader.collect();
+      const scopeMetrics = resourceMetrics.scopeMetrics.find(
+        sm => sm.scope.name === '@opentelemetry/sdk-logs'
+      );
+      assert.ok(scopeMetrics);
+      const processedLogsMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.log.processed'
+      );
+      assert.ok(processedLogsMetric);
+      const processedLogsDataPoints = processedLogsMetric.dataPoints as Array<{
+        value: number;
+        attributes: Record<string, unknown>;
+      }>;
+      assert.deepStrictEqual(
+        processedLogsDataPoints.map(dataPoint => [
+          dataPoint.attributes['error.type'],
+          dataPoint.value,
+        ]),
+        [['already_shutdown', 1]]
+      );
+    });
+
+    it('should count processed logs when export times out', async () => {
+      const clock = sinon.useFakeTimers();
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+      const exportTimeoutMillis = 1000;
+      sinon.stub(exporter, 'export').callsFake(() => {
+        // never call the callback to simulate a hung export
+      });
+      const processor = new BatchLogRecordProcessor({
+        exporter,
+        maxExportBatchSize: 1,
+        scheduledDelayMillis: 2500,
+        exportTimeoutMillis,
+        selfObsMeterProvider: meterProvider,
+      });
+
+      processor.onEmit(createLogRecord());
+      await clock.tickAsync(exportTimeoutMillis + 100);
+
+      const { resourceMetrics } = await metricReader.collect();
+      const scopeMetrics = resourceMetrics.scopeMetrics.find(
+        sm => sm.scope.name === '@opentelemetry/sdk-logs'
+      );
+      assert.ok(scopeMetrics);
+      const processedLogsMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.log.processed'
+      );
+      assert.ok(processedLogsMetric);
+      const processedLogsDataPoints = processedLogsMetric.dataPoints as Array<{
+        value: number;
+        attributes: Record<string, unknown>;
+      }>;
+      assert.deepStrictEqual(
+        processedLogsDataPoints.map(dataPoint => [
+          dataPoint.attributes['error.type'],
+          dataPoint.value,
+        ]),
+        [[undefined, 1]]
       );
     });
   });
