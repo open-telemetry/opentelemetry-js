@@ -308,6 +308,40 @@ describe('ExponentialHistogramAccumulation', () => {
       assertHistogramsEqual(acc0, acc2);
     });
 
+    it('keeps the scale when one side has no buckets', () => {
+      const values = new ExponentialHistogramAccumulation([0, 0], 4);
+      const zeros = new ExponentialHistogramAccumulation([0, 0], 4);
+      values.record(1024);
+      zeros.record(0);
+
+      const merged = values.clone();
+      merged.merge(zeros);
+      assert.strictEqual(merged.scale, 20);
+      assert.strictEqual(merged.zeroCount, 1);
+      assert.deepStrictEqual(getCounts(merged.positive), [1]);
+
+      const reversed = zeros.clone();
+      reversed.merge(values);
+      assertHistogramsEqual(reversed, merged);
+    });
+
+    it('keeps the scale when one side has no buckets: negative values', () => {
+      const values = new ExponentialHistogramAccumulation([0, 0], 4);
+      const zeros = new ExponentialHistogramAccumulation([0, 0], 4);
+      values.record(-1024);
+      zeros.record(0);
+
+      const merged = values.clone();
+      merged.merge(zeros);
+      assert.strictEqual(merged.scale, 20);
+      assert.strictEqual(merged.zeroCount, 1);
+      assert.deepStrictEqual(getCounts(merged.negative), [1]);
+
+      const reversed = zeros.clone();
+      reversed.merge(values);
+      assertHistogramsEqual(reversed, merged);
+    });
+
     it('handles exhaustive test case', () => {
       const testMergeExhaustive = (
         a: number[],
@@ -458,6 +492,19 @@ describe('ExponentialHistogramAccumulation', () => {
 
       acc2.diff(acc1);
       assertHistogramsEqual(acc0, acc2);
+    });
+
+    it('keeps the scale when the other side has no buckets', () => {
+      const acc0 = new ExponentialHistogramAccumulation([0, 0], 4);
+      const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
+      acc0.record(1024);
+      acc0.record(0);
+      acc1.record(0);
+
+      acc0.diff(acc1);
+      assert.strictEqual(acc0.scale, 20);
+      assert.strictEqual(acc0.zeroCount, 0);
+      assert.deepStrictEqual(getCounts(acc0.positive), [1]);
     });
 
     it('handles all zero bucket case', () => {
