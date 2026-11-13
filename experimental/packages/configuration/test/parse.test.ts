@@ -786,9 +786,15 @@ describe('FileConfigFactory', function () {
     });
   });
 
-  it('should accept file_format 1.1', function () {
+  it('should accept file_format 1.1 for backward compatibility', function () {
     assert.doesNotThrow(() => {
-      parseConfigFile('test/fixtures/short-config.yml');
+      parseConfigFile('test/fixtures/file-format-1.1.yaml');
+    });
+  });
+
+  it('should accept file_format 1.2', function () {
+    assert.doesNotThrow(() => {
+      parseConfigFile('test/fixtures/file-format-1.2.yaml');
     });
   });
 
