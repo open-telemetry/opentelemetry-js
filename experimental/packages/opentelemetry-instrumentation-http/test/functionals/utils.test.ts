@@ -6,6 +6,7 @@ import type { Span } from '@opentelemetry/api';
 import { SpanStatusCode, SpanKind, context, diag } from '@opentelemetry/api';
 import {
   ATTR_ERROR_TYPE,
+  ATTR_HTTP_RESPONSE_STATUS_CODE,
   ATTR_HTTP_ROUTE,
   ATTR_URL_PATH,
   ATTR_URL_QUERY,
@@ -586,6 +587,22 @@ describe('Utility', () => {
         socket: {},
       } as ServerResponse & { socket: Socket });
       assert.deepEqual(attributes[ATTR_HTTP_ROUTE], undefined);
+    });
+
+    it('should set http.response.status_code when headersSent is true', () => {
+      const attributes = utils.getIncomingRequestAttributesOnResponse({
+        statusCode: 200,
+        headersSent: true,
+      } as ServerResponse);
+      assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], 200);
+    });
+
+    it('should not set http.response.status_code when headersSent is false', () => {
+      const attributes = utils.getIncomingRequestAttributesOnResponse({
+        statusCode: 200,
+        headersSent: false,
+      } as ServerResponse);
+      assert.strictEqual(attributes[ATTR_HTTP_RESPONSE_STATUS_CODE], undefined);
     });
   });
 

@@ -59,6 +59,7 @@ instrumentation.enable();
 instrumentation.disable();
 
 import * as http from 'http';
+import * as net from 'net';
 import { getRemoteClientAddress } from '../../src/utils';
 
 const applyCustomAttributesOnSpanErrorMessage =
@@ -308,6 +309,10 @@ describe('HttpInstrumentation', () => {
         server = http.createServer((request, response) => {
           if (request.url?.includes('/premature-close')) {
             response.destroy();
+            return;
+          }
+          if (request.url?.includes('/aborted-before-response')) {
+            request.resume();
             return;
           }
           if (request.url?.includes('/hang')) {
@@ -986,6 +991,43 @@ describe('HttpInstrumentation', () => {
         assert.ok(Object.keys(clientSpan.attributes).length >= 6);
       });
 
+      it('should record error and omit status_code when client disconnects before response headers are sent', async () => {
+        const promise = new Promise<void>(resolve => {
+          function waitForSpans() {
+            const numSpans = memoryExporter.getFinishedSpans().length;
+            if (numSpans < 1) {
+              setTimeout(waitForSpans, 10);
+            } else {
+              resolve();
+            }
+          }
+
+          const socket = net.connect(serverPort, hostname);
+          socket.write(
+            'POST /aborted-before-response HTTP/1.1\r\nHost: localhost\r\nContent-Length: 10\r\n\r\nhello'
+          );
+          socket.on('connect', () => {
+            setTimeout(() => {
+              socket.destroy();
+              waitForSpans();
+            }, 50);
+          });
+        });
+
+        await promise;
+
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 1);
+        const [serverSpan] = spans;
+        assert.strictEqual(serverSpan.kind, SpanKind.SERVER);
+        assert.strictEqual(serverSpan.status.code, SpanStatusCode.ERROR);
+        assert.strictEqual(
+          serverSpan.attributes[ATTR_HTTP_RESPONSE_STATUS_CODE],
+          undefined
+        );
+        assert.ok(serverSpan.attributes[ATTR_ERROR_TYPE] !== undefined);
+      });
+
       it('should have 2 ended span when server prematurely close', async () => {
         const promise = new Promise<void>(resolve => {
           const req = http.get(
@@ -1086,6 +1128,10 @@ describe('HttpInstrumentation', () => {
         server = http.createServer((request, response) => {
           if (request.url?.includes('/premature-close')) {
             response.destroy();
+            return;
+          }
+          if (request.url?.includes('/aborted-before-response')) {
+            request.resume();
             return;
           }
           if (request.url?.includes('/hang')) {

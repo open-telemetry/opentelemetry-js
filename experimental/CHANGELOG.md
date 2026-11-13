@@ -19,6 +19,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :bug: Bug Fixes
 
+* fix(instrumentation-http): do not record status code 200 for aborted server requests ([#7290](https://github.com/open-telemetry/opentelemetry-js/issues/7290)) @abdul-karim-mia
+
 ### :books: Documentation
 
 ### :house: Internal

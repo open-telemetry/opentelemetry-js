@@ -880,13 +880,37 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       )
     );
 
-    span.setAttributes(attributes).setStatus({
-      code: parseResponseStatus(SpanKind.SERVER, response.statusCode),
-    });
+    span.setAttributes(attributes);
 
-    const errorType = parseErrorType(SpanKind.SERVER, response.statusCode);
-    if (errorType !== undefined) {
-      span.setAttribute(ATTR_ERROR_TYPE, errorType);
+    if (response.headersSent) {
+      span.setStatus({
+        code: parseResponseStatus(SpanKind.SERVER, response.statusCode),
+      });
+
+      const errorType = parseErrorType(SpanKind.SERVER, response.statusCode);
+      if (errorType !== undefined) {
+        span.setAttribute(ATTR_ERROR_TYPE, errorType);
+      }
+    } else {
+      const incomingReq = request as http.IncomingMessage & {
+        errored?: Err;
+        aborted?: boolean;
+      };
+      const serverRes = response as http.ServerResponse & {
+        errored?: Err;
+      };
+      const error = incomingReq.errored ?? serverRes.errored;
+      if (error) {
+        setSpanWithError(span, error);
+        metricAttributes[ATTR_ERROR_TYPE] = error.name;
+      } else {
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+        });
+        const errorType = incomingReq.aborted ? 'aborted' : 'Error';
+        span.setAttribute(ATTR_ERROR_TYPE, errorType);
+        metricAttributes[ATTR_ERROR_TYPE] = errorType;
+      }
     }
 
     const route = attributes[ATTR_HTTP_ROUTE];
