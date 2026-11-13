@@ -5,6 +5,7 @@
 
 import type { Context, HrTime, Attributes } from '@opentelemetry/api';
 import { isSpanContextValid, trace } from '@opentelemetry/api';
+import { millisToHrTime } from '@opentelemetry/core';
 import type { Exemplar } from './Exemplar';
 
 /**
@@ -14,7 +15,7 @@ export interface ExemplarReservoir {
   /** Offers a measurement to be sampled. */
   offer(
     value: number,
-    timestamp: HrTime,
+    timestamp: number,
     attributes: Attributes,
     ctx: Context
   ): void;
@@ -40,35 +41,37 @@ class ExemplarBucket {
 
   offer(
     value: number,
-    timestamp: HrTime,
+    timestamp: number,
     attributes: Attributes,
     ctx: Context
   ) {
     this.value = value;
-    this.timestamp = timestamp;
+    // Convert to HrTime only here, on the sampled path, rather than on every record.
+    this.timestamp = millisToHrTime(timestamp);
     this.attributes = attributes;
     const spanContext = trace.getSpanContext(ctx);
     if (spanContext && isSpanContextValid(spanContext)) {
       this.spanId = spanContext.spanId;
       this.traceId = spanContext.traceId;
+    } else {
+      // Clear IDs from a prior offer so this measurement is not reported with a stale span.
+      this.spanId = undefined;
+      this.traceId = undefined;
     }
     this._offered = true;
   }
 
   collect(pointAttributes: Attributes): Exemplar | null {
     if (!this._offered) return null;
-    const currentAttributes = this.attributes;
-    // filter attributes
-    for (const key in pointAttributes) {
-      if (
-        Object.prototype.hasOwnProperty.call(pointAttributes, key) &&
-        pointAttributes[key] === currentAttributes[key]
-      ) {
-        delete currentAttributes[key];
+    // Build filtered attributes as a new object to avoid mutating the original
+    const filteredAttributes: Attributes = {};
+    Object.keys(this.attributes).forEach(key => {
+      if (this.attributes[key] !== pointAttributes[key]) {
+        filteredAttributes[key] = this.attributes[key];
       }
-    }
+    });
     const retVal: Exemplar = {
-      filteredAttributes: currentAttributes,
+      filteredAttributes,
       value: this.value,
       timestamp: this.timestamp,
       spanId: this.spanId,
@@ -100,7 +103,7 @@ export abstract class FixedSizeExemplarReservoirBase
 
   abstract offer(
     value: number,
-    timestamp: HrTime,
+    timestamp: number,
     attributes: Attributes,
     ctx: Context
   ): void;

@@ -5,6 +5,7 @@
 import { ValueType } from '@opentelemetry/api';
 import type {
   DataPoint,
+  Exemplar,
   ExponentialHistogram,
   ExponentialHistogramMetricData,
   GaugeMetricData,
@@ -19,6 +20,7 @@ import {
   AggregationTemporality,
   DataPointType,
 } from '@opentelemetry/sdk-metrics';
+import { hexToBinary } from '../../common/hex-to-binary';
 import {
   writeInstrumentationScope,
   writeResource,
@@ -28,6 +30,63 @@ import {
 import type { IProtobufWriter } from '../../common/protobuf/i-protobuf-writer';
 import { ProtobufSizeEstimator } from '../../common/protobuf/protobuf-size-estimator';
 import { ProtobufWriter } from '../../common/protobuf/protobuf-writer';
+
+/**
+ * Serialize an Exemplar (caller writes the field tag)
+ *
+ * Proto fields (Exemplar):
+ *   7  filtered_attributes  repeated KeyValue  (wire type 2)
+ *   2  time_unix_nano       fixed64            (wire type 1)
+ *   3  as_double            double             (wire type 1)
+ *   4  span_id              bytes              (wire type 2)
+ *   5  trace_id             bytes              (wire type 2)
+ */
+function serializeExemplar(writer: IProtobufWriter, exemplar: Exemplar): void {
+  const start = writer.startLengthDelimited();
+  const startPos = writer.pos;
+
+  // time_unix_nano (field 2, fixed64)
+  writer.writeTag(2, 1);
+  writeHrTimeAsFixed64(writer, exemplar.timestamp);
+
+  // value oneof: as_double (field 3) — matches the JSON transform, which
+  // always emits asDouble for SDK exemplar values
+  writer.writeTag(3, 1);
+  writer.writeDouble(exemplar.value);
+
+  // span_id (field 4, bytes) — SDK carries hex strings, wire wants bytes
+  if (exemplar.spanId) {
+    writer.writeTag(4, 2);
+    writer.writeBytes(hexToBinary(exemplar.spanId));
+  }
+
+  // trace_id (field 5, bytes)
+  if (exemplar.traceId) {
+    writer.writeTag(5, 2);
+    writer.writeBytes(hexToBinary(exemplar.traceId));
+  }
+
+  // filtered_attributes (field 7, repeated KeyValue)
+  if (exemplar.filteredAttributes) {
+    writeAttributes(writer, exemplar.filteredAttributes, 7);
+  }
+
+  writer.finishLengthDelimited(start, writer.pos - startPos);
+}
+
+function serializeExemplars(
+  writer: IProtobufWriter,
+  exemplars: Exemplar[] | undefined,
+  fieldNumber: number
+): void {
+  if (!exemplars) {
+    return;
+  }
+  for (const exemplar of exemplars) {
+    writer.writeTag(fieldNumber, 2);
+    serializeExemplar(writer, exemplar);
+  }
+}
 
 /**
  * Serialize a NumberDataPoint directly from SDK DataPoint<number>
@@ -70,6 +129,9 @@ function serializeNumberDataPoint(
   if (dataPoint.attributes) {
     writeAttributes(writer, dataPoint.attributes, 7);
   }
+
+  // exemplars (field 5, repeated Exemplar)
+  serializeExemplars(writer, dataPoint.exemplars, 5);
 
   writer.finishLengthDelimited(start, writer.pos - startPos);
 }
@@ -145,6 +207,9 @@ function serializeHistogramDataPoint(
   if (dataPoint.attributes) {
     writeAttributes(writer, dataPoint.attributes, 9);
   }
+
+  // exemplars (field 8, repeated Exemplar)
+  serializeExemplars(writer, dataPoint.exemplars, 8);
 
   // min (field 11, optional double)
   if (histogram.min !== undefined) {
@@ -276,6 +341,9 @@ function serializeExponentialHistogramDataPoint(
     histogram.negative.offset,
     histogram.negative.bucketCounts
   );
+
+  // exemplars (field 11, repeated Exemplar)
+  serializeExemplars(writer, dataPoint.exemplars, 11);
 
   // min (field 12, optional double)
   if (histogram.min !== undefined) {
