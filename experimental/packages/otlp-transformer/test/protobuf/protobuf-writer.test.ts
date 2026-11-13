@@ -262,6 +262,33 @@ describe('ProtobufWriter', function () {
       const buffer = writer.finish();
       assert.strictEqual(buffer.length, 101);
     });
+
+    it('should grow from an empty buffer', function () {
+      const writer = new ProtobufWriter(0);
+      writer.writeVarint(1);
+      writer.writeString('abc');
+
+      assert.deepStrictEqual(
+        writer.finish(),
+        new Uint8Array([1, 3, 0x61, 0x62, 0x63])
+      );
+    });
+  });
+
+  describe('initialBufferSize', function () {
+    const defaultSize = ProtobufWriter.initialBufferSize;
+
+    afterEach(function () {
+      ProtobufWriter.initialBufferSize = defaultSize;
+    });
+
+    it('sets the buffer size of writers constructed without a size', function () {
+      ProtobufWriter.initialBufferSize = 16;
+      const writer = new ProtobufWriter();
+      writer.writeVarint(1);
+
+      assert.strictEqual(writer.finish().buffer.byteLength, 16);
+    });
   });
 
   describe('large sub-messages', function () {

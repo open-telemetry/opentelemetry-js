@@ -17,6 +17,12 @@ const RESERVED_LENGTH_BYTES = 1;
  * Grows buffer dynamically if initial size is exceeded.
  */
 export class ProtobufWriter implements IProtobufWriter {
+  /**
+   * Initial buffer size in bytes for writers constructed without a size.
+   * Size in bytes.
+   */
+  static initialBufferSize = 1024;
+
   private _buffer: Uint8Array;
   // Avoid using TextEncoder type. While the global is there on all supported runtimes, types may differ.
   private readonly _textEncoder: {
@@ -26,7 +32,7 @@ export class ProtobufWriter implements IProtobufWriter {
 
   public pos: number = 0;
 
-  constructor(estimatedSize = 65536) {
+  constructor(estimatedSize = ProtobufWriter.initialBufferSize) {
     this._buffer = new Uint8Array(estimatedSize);
     this._textEncoder = new TextEncoder();
     this._dataView = new DataView(this._buffer.buffer, this._buffer.byteOffset);
@@ -47,10 +53,7 @@ export class ProtobufWriter implements IProtobufWriter {
     // rejects views on resizable buffers there.
 
     // Double buffer size until we have enough space
-    let newSize = this._buffer.length * 2;
-    while (newSize < needed) {
-      newSize *= 2;
-    }
+    const newSize = Math.max(this._buffer.length * 2, needed);
 
     const newBuffer = new Uint8Array(newSize);
     newBuffer.set(this._buffer);
