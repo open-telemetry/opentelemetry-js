@@ -17,6 +17,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :bug: Bug Fixes
 
+* fix(sdk-trace): wait for all span processors to settle during shutdown and forceFlush [#7300](https://github.com/open-telemetry/opentelemetry-js/pull/7300) @abdul-karim-mia
+
 ### :books: Documentation
 
 ### :house: Internal
