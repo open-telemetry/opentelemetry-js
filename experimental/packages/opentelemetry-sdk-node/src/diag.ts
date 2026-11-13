@@ -41,11 +41,11 @@
  *
  * See also:
  * - `diagLogLevelFromString()` from `@opentelemetry/core`.
- * - `severityNumberConfigFromLogLevelString()` in `@opentelemetry/configuration`.
+ * - `severityNumberConfigFromLogLevelString()` in `@opentelemetry/sdk-config`.
  */
 
 import { DiagLogLevel } from '@opentelemetry/api';
-import type { SeverityNumberConfigModel } from '@opentelemetry/configuration';
+import type { SeverityNumberConfigModel } from '@opentelemetry/sdk-config';
 
 /* istanbul ignore next */
 /**

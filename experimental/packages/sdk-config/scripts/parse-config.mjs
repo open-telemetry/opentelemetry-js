@@ -15,7 +15,7 @@
  * via the `OTEL_CONFIG_FILE` environment variable.
  */
 
-import { parseConfigFile } from '@opentelemetry/configuration';
+import { parseConfigFile } from '@opentelemetry/sdk-config';
 import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api';
 
 diag.setLogger(new DiagConsoleLogger(), { logLevel: DiagLogLevel.INFO });

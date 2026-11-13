@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ConfigurationModel } from '@opentelemetry/configuration';
+import type { ConfigurationModel } from '@opentelemetry/sdk-config';
 const config: ConfigurationModel = {
   tracer_provider: {
-    processors: [{ my_custom_processor: 42 }],
+    processors: [{ my_custom_processor: {} }],
   },
 };

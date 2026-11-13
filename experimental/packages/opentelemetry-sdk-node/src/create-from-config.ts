@@ -111,12 +111,12 @@ import type {
   TraceIdRatioBasedSamplerConfigModel,
   TracerProviderConfigModel,
   ViewConfigModel,
-} from '@opentelemetry/configuration';
+} from '@opentelemetry/sdk-config';
 import {
   mergeHeadersConfig,
   mergePropagatorCompositeConfig,
   mergeResourceAttributesConfig,
-} from '@opentelemetry/configuration';
+} from '@opentelemetry/sdk-config';
 import type {
   LogRecordExporter,
   LogRecordProcessor,

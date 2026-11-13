@@ -36,7 +36,7 @@ import {
 } from '@opentelemetry/sdk-trace';
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
-import type { ConfigurationModel } from '@opentelemetry/configuration';
+import type { ConfigurationModel } from '@opentelemetry/sdk-config';
 import type {
   IMetricReader,
   PushMetricExporter,

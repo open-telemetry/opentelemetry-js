@@ -13,7 +13,7 @@ the sampler.
   YAML.
 - A `parent_based` sampler config.
 
-See [`../../packages/configuration/README.md`](../../packages/configuration/README.md)
+See [`../../packages/sdk-config/README.md`](../../packages/sdk-config/README.md)
 for the full list of supported fields and current limitations.
 
 ## Run it

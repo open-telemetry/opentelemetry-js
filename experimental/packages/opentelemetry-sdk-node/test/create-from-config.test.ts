@@ -16,8 +16,8 @@ import type {
   SamplerConfigModel,
   SpanExporterConfigModel,
   TracerProviderConfigModel,
-} from '@opentelemetry/configuration';
-import { parseConfigFile } from '@opentelemetry/configuration';
+} from '@opentelemetry/sdk-config';
+import { parseConfigFile } from '@opentelemetry/sdk-config';
 import type { SpanExporter, SpanLimits } from '@opentelemetry/sdk-trace';
 import {
   BatchSpanProcessor,
