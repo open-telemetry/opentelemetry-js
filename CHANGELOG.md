@@ -41,6 +41,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
   * Combining these packages with `@opentelemetry/api` 1.9.x never worked: they failed at runtime. The peer dependency now makes npm report this at install time instead.
   * If you see a peer dependency error after upgrading, update `@opentelemetry/api` to 1.10.0 or later.
 * fix(propagator-b3): reject trace ids that are not 16 or 32 characters long [#7262](https://github.com/open-telemetry/opentelemetry-js/pull/7262) @adityareddy-dev
+* fix(sdk-logs): wait for overlapping flushes and recover after exporter flush failures [#7210](https://github.com/open-telemetry/opentelemetry-js/pull/7210) @adityareddy-dev
 
 ### :books: Documentation
 
