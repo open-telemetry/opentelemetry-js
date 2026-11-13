@@ -5,7 +5,7 @@
 
 import * as assert from 'assert';
 
-import { getXHRBodyLength, getFetchBodyLength, redactUrl } from '../src/utils';
+import { getXHRBodyLength, getFetchBodyLength } from '../src/utils';
 
 const ENCODER = new TextEncoder();
 function textToReadableStream(msg: string) {
@@ -257,61 +257,5 @@ describe('getFetchBodyLength', () => {
     // AND the body is still readable and correct
     const requestBody = await req.text();
     assert.strictEqual(requestBody, 'hello=world');
-  });
-});
-
-describe('redactUrl', () => {
-  it('should return a URL without sensitive parts unchanged', () => {
-    const url = 'https://example.com/a%20b/?q=a+b&x=%7B1%7D&empty#frag';
-    assert.strictEqual(redactUrl(url), url);
-  });
-
-  it('should redact the values of the default sensitive query keys', () => {
-    assert.strictEqual(
-      redactUrl(
-        'https://bucket.s3.amazonaws.com/file?X-Amz-Credential=c' +
-          '&X-Amz-Security-Token=t&X-Amz-Signature=s&AWSAccessKeyId=k' +
-          '&Signature=v2&sig=sas&X-Goog-Signature=g'
-      ),
-      'https://bucket.s3.amazonaws.com/file?X-Amz-Credential=REDACTED' +
-        '&X-Amz-Security-Token=REDACTED&X-Amz-Signature=REDACTED' +
-        '&AWSAccessKeyId=REDACTED&Signature=REDACTED&sig=REDACTED' +
-        '&X-Goog-Signature=REDACTED'
-    );
-  });
-
-  it('should keep other query values, their encoding and the fragment', () => {
-    assert.strictEqual(
-      redactUrl('https://example.com/p?q=a+b&sig=secret&x=%7B1%7D&q=2#frag'),
-      'https://example.com/p?q=a+b&sig=REDACTED&x=%7B1%7D&q=2#frag'
-    );
-  });
-
-  it('should match keys case-sensitively', () => {
-    const url = 'https://example.com/p?SIG=a&signature=b';
-    assert.strictEqual(redactUrl(url), url);
-  });
-
-  it('should redact a percent-encoded key and every repeat of a key', () => {
-    assert.strictEqual(
-      redactUrl('https://example.com/p?X%2DAmz%2DSignature=a&sig=b&sig=c&sig'),
-      'https://example.com/p?X%2DAmz%2DSignature=REDACTED&sig=REDACTED' +
-        '&sig=REDACTED&sig=REDACTED'
-    );
-  });
-
-  it('should redact credentials', () => {
-    assert.strictEqual(
-      redactUrl('https://user:pass@example.com/p?a=1'),
-      'https://REDACTED:REDACTED@example.com/p?a=1'
-    );
-    assert.strictEqual(
-      redactUrl('https://user@example.com/'),
-      'https://REDACTED:REDACTED@example.com/'
-    );
-  });
-
-  it('should return a string that is not a URL unchanged', () => {
-    assert.strictEqual(redactUrl('not a url?sig=b'), 'not a url?sig=b');
   });
 });

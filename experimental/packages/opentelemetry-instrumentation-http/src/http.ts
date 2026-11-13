@@ -40,6 +40,7 @@ import { VERSION } from './version';
 import {
   InstrumentationBase,
   InstrumentationNodeModuleDefinition,
+  REDACTED_QUERY_PARAMS,
   safeExecuteInTheMiddle,
   readDeclarativeConfig,
 } from '@opentelemetry/instrumentation';
@@ -73,7 +74,6 @@ import {
   setSpanWithError,
 } from './utils';
 import type { Err, Func, Http, HttpRequestArgs, Https } from './internal-types';
-import { DEFAULT_QUERY_STRINGS_TO_REDACT } from './internal-types';
 
 /**
  * `node:http` and `node:https` instrumentation for OpenTelemetry
@@ -620,7 +620,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             instrumentation.getConfig().enableSyntheticSourceDetection || false,
           redactedQueryParams:
             instrumentation.getConfig().redactedQueryParamsServer ??
-            Array.from(DEFAULT_QUERY_STRINGS_TO_REDACT),
+            Array.from(REDACTED_QUERY_PARAMS),
         },
         instrumentation._diag
       );
