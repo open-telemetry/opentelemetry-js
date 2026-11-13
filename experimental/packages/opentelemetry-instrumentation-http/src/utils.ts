@@ -49,12 +49,12 @@ import type {
 } from './internal-types';
 import { SYNTHETIC_BOT_NAMES, SYNTHETIC_TEST_NAMES } from './internal-types';
 import {
-  DEFAULT_QUERY_STRINGS_TO_REDACT,
+  REDACTED_QUERY_PARAMS,
   STR_REDACTED,
-} from './internal-types';
+} from '@opentelemetry/instrumentation';
 import { parse as forwardedParse } from 'forwarded-parse';
 
-const defaultQueryStringsToRedact = Array.from(DEFAULT_QUERY_STRINGS_TO_REDACT);
+const defaultQueryStringsToRedact = Array.from(REDACTED_QUERY_PARAMS);
 
 /**
  * Redacts sensitive query parameters from a query string (without leading '?').
@@ -80,7 +80,7 @@ export const getAbsoluteUrl = (
   requestUrl: ParsedRequestOptions | null,
   headers: IncomingHttpHeaders | OutgoingHttpHeaders,
   fallbackProtocol = 'http:',
-  redactedQueryParams: string[] = Array.from(DEFAULT_QUERY_STRINGS_TO_REDACT)
+  redactedQueryParams: string[] = Array.from(REDACTED_QUERY_PARAMS)
 ): string => {
   const reqUrlObject = requestUrl || {};
   const protocol = reqUrlObject.protocol || fallbackProtocol;

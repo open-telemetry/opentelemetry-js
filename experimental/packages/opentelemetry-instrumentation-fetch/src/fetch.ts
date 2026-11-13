@@ -14,6 +14,7 @@ import type { Attributes, HrTime, Span } from '@opentelemetry/api';
 import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import {
   InstrumentationBase,
+  redactUrl,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import * as core from '@opentelemetry/core';
@@ -37,7 +38,6 @@ import type {
 import {
   getFetchBodyLength,
   normalizeHttpRequestMethod,
-  redactUrl,
   serverPortFromUrl,
 } from './utils';
 import { VERSION } from './version';

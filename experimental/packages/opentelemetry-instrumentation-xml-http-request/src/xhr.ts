@@ -7,6 +7,7 @@ import * as api from '@opentelemetry/api';
 import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import {
   InstrumentationBase,
+  redactUrl,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import { hrTime, isUrlIgnored } from '@opentelemetry/core';
@@ -36,7 +37,6 @@ import type {
 } from './types';
 import {
   normalizeHttpRequestMethod,
-  redactUrl,
   serverPortFromUrl,
   getXHRBodyLength,
 } from './utils';

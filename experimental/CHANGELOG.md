@@ -11,6 +11,10 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :rocket: Features
 
+* feat(instrumentation): add shared `redactUrl` for credential and sensitive query redaction ([#7307](https://github.com/open-telemetry/opentelemetry-js/issues/7307)) @shehjaddev
+  * `instrumentation-fetch` and `instrumentation-xml-http-request` record `url.full` through this helper.
+  * `instrumentation-http` uses the same `REDACTED` token and default sensitive query keys.
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation

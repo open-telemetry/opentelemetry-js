@@ -20,4 +20,5 @@ export {
   safeExecuteInTheMiddle,
   safeExecuteInTheMiddleAsync,
 } from './utils';
+export { REDACTED_QUERY_PARAMS, STR_REDACTED, redactUrl } from './redact-url';
 export { SemconvStability, semconvStabilityFromStr } from './semconvStability';
