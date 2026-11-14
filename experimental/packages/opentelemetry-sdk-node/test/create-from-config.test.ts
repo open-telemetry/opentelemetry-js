@@ -1330,6 +1330,80 @@ describe('create-from-config', () => {
         { type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM }
       );
     });
+
+    it('console defaults to cumulative temporality and default aggregation', function () {
+      const exporter = createPushMetricExporterFromConfig(reg, {
+        console: null,
+      }) as ConsoleMetricExporter;
+      assert.strictEqual(
+        exporter.selectAggregationTemporality(InstrumentType.COUNTER),
+        AggregationTemporality.CUMULATIVE
+      );
+      assert.deepStrictEqual(
+        exporter.selectAggregation(InstrumentType.HISTOGRAM),
+        {
+          type: AggregationType.DEFAULT,
+        }
+      );
+    });
+
+    it('maps temporality_preference onto the console exporter', function () {
+      const exporter = createPushMetricExporterFromConfig(reg, {
+        console: { temporality_preference: 'delta' },
+      }) as ConsoleMetricExporter;
+      // delta uses DELTA temporality for counters
+      assert.strictEqual(
+        exporter.selectAggregationTemporality(InstrumentType.COUNTER),
+        AggregationTemporality.DELTA
+      );
+      // ...but cumulative for up-down counters
+      assert.strictEqual(
+        exporter.selectAggregationTemporality(InstrumentType.UP_DOWN_COUNTER),
+        AggregationTemporality.CUMULATIVE
+      );
+    });
+
+    it('maps the low_memory temporality_preference onto the console exporter', function () {
+      const exporter = createPushMetricExporterFromConfig(reg, {
+        console: { temporality_preference: 'low_memory' },
+      }) as ConsoleMetricExporter;
+      // low_memory uses DELTA for counters and histograms
+      assert.strictEqual(
+        exporter.selectAggregationTemporality(InstrumentType.HISTOGRAM),
+        AggregationTemporality.DELTA
+      );
+      assert.strictEqual(
+        exporter.selectAggregationTemporality(InstrumentType.OBSERVABLE_GAUGE),
+        AggregationTemporality.CUMULATIVE
+      );
+    });
+
+    it('maps default_histogram_aggregation onto the console exporter', function () {
+      const exporter = createPushMetricExporterFromConfig(reg, {
+        console: {
+          default_histogram_aggregation: 'base2_exponential_bucket_histogram',
+        },
+      }) as ConsoleMetricExporter;
+      assert.deepStrictEqual(
+        exporter.selectAggregation(InstrumentType.HISTOGRAM),
+        { type: AggregationType.EXPONENTIAL_HISTOGRAM }
+      );
+      // ...and leaves other instrument types at their default
+      assert.deepStrictEqual(
+        exporter.selectAggregation(InstrumentType.COUNTER),
+        {
+          type: AggregationType.DEFAULT,
+        }
+      );
+    });
+
+    it('throws for invalid console temporality_preference', function () {
+      assert.throws(() => {
+        createPushMetricExporterFromConfig(reg, {
+          console: { temporality_preference: 'invalid' },
+        } as unknown as PushMetricExporterConfigModel);
+      }, /unknown temporality_preference value in configuration: invalid/);
+    });
   });
 
   describe('createTracerProviderFromConfig', () => {

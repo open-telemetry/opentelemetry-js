@@ -15,6 +15,11 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :rocket: Features
 
+* feat(sdk-metrics): add `AggregationTemporalityPreference`, the shared temporality selectors, and options to configure `ConsoleMetricExporter` [#6957](https://github.com/open-telemetry/opentelemetry-js/issues/6957) @neoLsH
+  * `AggregationTemporalityPreference`, `CumulativeTemporalitySelector`, `DeltaTemporalitySelector` and `LowMemoryTemporalitySelector` now live here instead of in `@opentelemetry/exporter-metrics-otlp-http`, so that exporters which do not depend on OTLP can share them. The OTLP package re-exports all of them unchanged.
+  * Added `aggregationTemporalitySelectorFromPreference()`, which resolves an `AggregationTemporalityPreference` (or a bare `AggregationTemporality`) to the selector it denotes.
+  * `ConsoleMetricExporterOptions` gained `temporalityPreference` and `aggregationPreference`, and `ConsoleMetricExporter` now implements the optional `selectAggregation()`. Existing behaviour is unchanged when neither is given.
+
 ### :bug: Bug Fixes
 
 ### :books: Documentation

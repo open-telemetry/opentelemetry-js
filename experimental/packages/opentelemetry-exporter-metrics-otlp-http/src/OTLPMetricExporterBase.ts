@@ -5,56 +5,34 @@
 
 import { getStringFromEnv } from '@opentelemetry/core';
 import type {
+  AggregationOption,
+  AggregationSelector,
+  AggregationTemporality,
+  AggregationTemporalityPreference,
   AggregationTemporalitySelector,
+  InstrumentType,
   PushMetricExporter,
   ResourceMetrics,
-  AggregationSelector,
-  AggregationOption,
 } from '@opentelemetry/sdk-metrics';
 import {
-  AggregationTemporality,
-  InstrumentType,
   AggregationType,
+  CumulativeTemporalitySelector,
+  DeltaTemporalitySelector,
+  LowMemoryTemporalitySelector,
+  aggregationTemporalitySelectorFromPreference,
 } from '@opentelemetry/sdk-metrics';
 import type { OTLPMetricExporterOptions } from './OTLPMetricExporterOptions';
-import { AggregationTemporalityPreference } from './OTLPMetricExporterOptions';
 import type { IOtlpExportDelegate } from '@opentelemetry/otlp-exporter-base';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import { diag } from '@opentelemetry/api';
 
-export const CumulativeTemporalitySelector: AggregationTemporalitySelector =
-  () => AggregationTemporality.CUMULATIVE;
-
-export const DeltaTemporalitySelector: AggregationTemporalitySelector = (
-  instrumentType: InstrumentType
-) => {
-  switch (instrumentType) {
-    case InstrumentType.COUNTER:
-    case InstrumentType.OBSERVABLE_COUNTER:
-    case InstrumentType.GAUGE:
-    case InstrumentType.HISTOGRAM:
-    case InstrumentType.OBSERVABLE_GAUGE:
-      return AggregationTemporality.DELTA;
-    case InstrumentType.UP_DOWN_COUNTER:
-    case InstrumentType.OBSERVABLE_UP_DOWN_COUNTER:
-      return AggregationTemporality.CUMULATIVE;
-  }
-};
-
-export const LowMemoryTemporalitySelector: AggregationTemporalitySelector = (
-  instrumentType: InstrumentType
-) => {
-  switch (instrumentType) {
-    case InstrumentType.COUNTER:
-    case InstrumentType.HISTOGRAM:
-      return AggregationTemporality.DELTA;
-    case InstrumentType.GAUGE:
-    case InstrumentType.UP_DOWN_COUNTER:
-    case InstrumentType.OBSERVABLE_UP_DOWN_COUNTER:
-    case InstrumentType.OBSERVABLE_COUNTER:
-    case InstrumentType.OBSERVABLE_GAUGE:
-      return AggregationTemporality.CUMULATIVE;
-  }
+// Re-exported for backward compatibility. These now live in `@opentelemetry/sdk-metrics`
+// so that exporters which do not depend on OTLP can use them too.
+// See https://github.com/open-telemetry/opentelemetry-js/issues/6957
+export {
+  CumulativeTemporalitySelector,
+  DeltaTemporalitySelector,
+  LowMemoryTemporalitySelector,
 };
 
 function chooseTemporalitySelectorFromEnvironment() {
@@ -86,14 +64,7 @@ function chooseTemporalitySelector(
 ): AggregationTemporalitySelector {
   // Directly passed preference has priority.
   if (temporalityPreference != null) {
-    if (temporalityPreference === AggregationTemporalityPreference.DELTA) {
-      return DeltaTemporalitySelector;
-    } else if (
-      temporalityPreference === AggregationTemporalityPreference.LOWMEMORY
-    ) {
-      return LowMemoryTemporalitySelector;
-    }
-    return CumulativeTemporalitySelector;
+    return aggregationTemporalitySelectorFromPreference(temporalityPreference);
   }
 
   return chooseTemporalitySelectorFromEnvironment();

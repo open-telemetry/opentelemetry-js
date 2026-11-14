@@ -4,14 +4,42 @@
  */
 import type { ExportResult } from '@opentelemetry/core';
 import { ExportResultCode } from '@opentelemetry/core';
-import type { AggregationTemporality } from './AggregationTemporality';
+import type {
+  AggregationTemporality,
+  AggregationTemporalityPreference,
+} from './AggregationTemporality';
 import type { ResourceMetrics, InstrumentType } from './MetricData';
 import type { PushMetricExporter } from './MetricExporter';
 import type { AggregationTemporalitySelector } from './AggregationSelector';
-import { DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR } from './AggregationSelector';
+import type { AggregationSelector } from './AggregationSelector';
+import type { AggregationOption } from '../view/AggregationOption';
+import {
+  DEFAULT_AGGREGATION_SELECTOR,
+  DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
+  aggregationTemporalitySelectorFromPreference,
+} from './AggregationSelector';
 
-interface ConsoleMetricExporterOptions {
+export interface ConsoleMetricExporterOptions {
+  /**
+   * Explicit temporality selector. When both this and
+   * {@link ConsoleMetricExporterOptions.temporalityPreference} are given, this
+   * one wins: it is the more specific of the two.
+   */
   temporalitySelector?: AggregationTemporalitySelector;
+  /**
+   * Temporality preference, as used by declarative configuration's
+   * `temporality_preference`. Resolved per instrument type; an unspecified
+   * preference means cumulative.
+   */
+  temporalityPreference?:
+    | AggregationTemporalityPreference
+    | AggregationTemporality;
+  /**
+   * Aggregation selector, as used by declarative configuration's
+   * `default_histogram_aggregation`. An unspecified preference leaves every
+   * instrument type at its default aggregation.
+   */
+  aggregationPreference?: AggregationSelector;
 }
 
 /**
@@ -25,10 +53,18 @@ interface ConsoleMetricExporterOptions {
 export class ConsoleMetricExporter implements PushMetricExporter {
   protected _shutdown = false;
   protected _temporalitySelector: AggregationTemporalitySelector;
+  protected _aggregationSelector: AggregationSelector;
 
   constructor(options?: ConsoleMetricExporterOptions) {
     this._temporalitySelector =
-      options?.temporalitySelector ?? DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR;
+      options?.temporalitySelector ??
+      (options?.temporalityPreference != null
+        ? aggregationTemporalitySelectorFromPreference(
+            options.temporalityPreference
+          )
+        : DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR);
+    this._aggregationSelector =
+      options?.aggregationPreference ?? DEFAULT_AGGREGATION_SELECTOR;
   }
 
   export(
@@ -46,6 +82,10 @@ export class ConsoleMetricExporter implements PushMetricExporter {
 
   forceFlush(): Promise<void> {
     return Promise.resolve();
+  }
+
+  selectAggregation(instrumentType: InstrumentType): AggregationOption {
+    return this._aggregationSelector(instrumentType);
   }
 
   selectAggregationTemporality(

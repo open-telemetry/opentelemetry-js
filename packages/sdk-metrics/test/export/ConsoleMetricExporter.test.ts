@@ -11,9 +11,23 @@ import { MeterProvider } from '../../src/MeterProvider';
 import { testResource } from '../util';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { assertAggregationTemporalitySelector } from './utils';
-import { DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR } from '../../src/export/AggregationSelector';
-import { AggregationTemporality, InstrumentType } from '../../src';
+import {
+  assertAggregationSelector,
+  assertAggregationTemporalitySelector,
+} from './utils';
+import {
+  CumulativeTemporalitySelector,
+  DEFAULT_AGGREGATION_SELECTOR,
+  DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
+  DeltaTemporalitySelector,
+  LowMemoryTemporalitySelector,
+} from '../../src/export/AggregationSelector';
+import {
+  AggregationTemporality,
+  AggregationTemporalityPreference,
+  AggregationType,
+  InstrumentType,
+} from '../../src';
 
 async function waitForNumberOfExports(
   exporter: sinon.SinonSpy<
@@ -162,6 +176,67 @@ describe('ConsoleMetricExporter', () => {
         temporalitySelector: selector,
       });
       assertAggregationTemporalitySelector(exporter, selector);
+    });
+
+    it('with no arguments should select the default aggregation', () => {
+      const exporter = new ConsoleMetricExporter();
+      assertAggregationSelector(exporter, DEFAULT_AGGREGATION_SELECTOR);
+    });
+
+    it('with delta temporality preference should select the delta selector', () => {
+      const exporter = new ConsoleMetricExporter({
+        temporalityPreference: AggregationTemporalityPreference.DELTA,
+      });
+      assertAggregationTemporalitySelector(exporter, DeltaTemporalitySelector);
+    });
+
+    it('with cumulative temporality preference should select the cumulative selector', () => {
+      const exporter = new ConsoleMetricExporter({
+        temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
+      });
+      assertAggregationTemporalitySelector(
+        exporter,
+        CumulativeTemporalitySelector
+      );
+    });
+
+    it('with low memory temporality preference should select the low memory selector', () => {
+      const exporter = new ConsoleMetricExporter({
+        temporalityPreference: AggregationTemporalityPreference.LOWMEMORY,
+      });
+      assertAggregationTemporalitySelector(
+        exporter,
+        LowMemoryTemporalitySelector
+      );
+    });
+
+    it('accepts a bare AggregationTemporality as temporality preference', () => {
+      // `AggregationTemporality` and `AggregationTemporalityPreference` are
+      // numerically aligned for DELTA/CUMULATIVE, so either may be passed.
+      const exporter = new ConsoleMetricExporter({
+        temporalityPreference: AggregationTemporality.DELTA,
+      });
+      assertAggregationTemporalitySelector(exporter, DeltaTemporalitySelector);
+    });
+
+    it('prefers an explicit temporalitySelector over temporalityPreference', () => {
+      const selector = () => AggregationTemporality.CUMULATIVE;
+      const exporter = new ConsoleMetricExporter({
+        temporalitySelector: selector,
+        temporalityPreference: AggregationTemporalityPreference.DELTA,
+      });
+      assertAggregationTemporalitySelector(exporter, selector);
+    });
+
+    it('with an aggregation preference should select that aggregation', () => {
+      const exponentialOnlyForHistograms = (instrumentType: InstrumentType) =>
+        instrumentType === InstrumentType.HISTOGRAM
+          ? { type: AggregationType.EXPONENTIAL_HISTOGRAM }
+          : { type: AggregationType.DEFAULT };
+      const exporter = new ConsoleMetricExporter({
+        aggregationPreference: exponentialOnlyForHistograms,
+      });
+      assertAggregationSelector(exporter, exponentialOnlyForHistograms);
     });
   });
 });

@@ -15,7 +15,17 @@ export type {
   AggregationTemporalitySelector,
 } from './export/AggregationSelector';
 
-export { AggregationTemporality } from './export/AggregationTemporality';
+export {
+  CumulativeTemporalitySelector,
+  DeltaTemporalitySelector,
+  LowMemoryTemporalitySelector,
+  aggregationTemporalitySelectorFromPreference,
+} from './export/AggregationSelector';
+
+export {
+  AggregationTemporality,
+  AggregationTemporalityPreference,
+} from './export/AggregationTemporality';
 
 export { DataPointType, InstrumentType } from './export/MetricData';
 export type {
@@ -42,6 +52,7 @@ export type { PeriodicExportingMetricReaderOptions } from './export/PeriodicExpo
 export { InMemoryMetricExporter } from './export/InMemoryMetricExporter';
 
 export { ConsoleMetricExporter } from './export/ConsoleMetricExporter';
+export type { ConsoleMetricExporterOptions } from './export/ConsoleMetricExporter';
 
 export type {
   MetricCollectOptions,
