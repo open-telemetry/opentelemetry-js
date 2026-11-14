@@ -4,7 +4,12 @@
  */
 
 import type { ConfigurationModel } from '@opentelemetry/configuration';
-import { parseConfigFile } from '@opentelemetry/configuration';
+import {
+  parseConfigFile,
+  createConfigProvider,
+} from '@opentelemetry/configuration';
+import type { ConfigProvider } from '@opentelemetry/api-config';
+import { config as configApi } from '@opentelemetry/api-config';
 import type { ContextManager, TextMapPropagator } from '@opentelemetry/api';
 import {
   context,
@@ -44,9 +49,13 @@ import {
   createPropagatorFromConfig,
   createResourceFromConfig,
   createTracerProviderFromConfig,
+  getBuiltinComponentProviderRegistry,
 } from './create-from-config';
+import type { ComponentProviderRegistry } from './component-provider';
+import { mergeComponentProviderRegistries } from './component-provider';
 
 interface SdkComponents {
+  configProvider?: ConfigProvider;
   contextManager?: ContextManager;
   loggerProvider?: LoggerProvider;
   meterProvider?: MeterProvider;
@@ -186,6 +195,10 @@ function startNodeSdkFromEnv(opts?: StartSdkFromEnvOptions): NodeSdk {
 }
 
 function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
+  const reg = mergeComponentProviderRegistries([
+    getBuiltinComponentProviderRegistry(),
+  ]);
+
   let config: ConfigurationModel;
   try {
     config = parseConfigFile(opts.configFile);
@@ -206,13 +219,9 @@ function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
   const logLevel = diagLogLevelFromSeverityNumberConfig(config.log_level);
   diag.setLogger(new DiagConsoleLogger(), { logLevel });
 
-  registerInstrumentations({
-    instrumentations: opts.instrumentations?.flat() ?? [],
-  });
-
   let components: SdkComponents;
   try {
-    components = createFromConfig(config);
+    components = createFromConfig(reg, config);
   } catch (createErr) {
     diag.error(
       `Could not create OpenTelemetry SDK from configuration, SDK will not be setup: ${createErr.message}`
@@ -221,6 +230,9 @@ function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
   }
   if (components.contextManager) {
     context.setGlobalContextManager(components.contextManager);
+  }
+  if (components.configProvider) {
+    configApi.setGlobalConfigProvider(components.configProvider);
   }
   if (components.loggerProvider) {
     logs.setGlobalLoggerProvider(components.loggerProvider);
@@ -234,6 +246,12 @@ function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
   if (components.propagator) {
     propagation.setGlobalPropagator(components.propagator);
   }
+
+  // Register instrumentations after the global ConfigProvider is set, so each
+  // instrumentation can read its declarative config from it.
+  registerInstrumentations({
+    instrumentations: opts.instrumentations?.flat() ?? [],
+  });
 
   const shutdownFn = async () => {
     const promises: Promise<unknown>[] = [];
@@ -254,21 +272,30 @@ function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
 /**
  * Interpret configuration model and return SDK components.
  */
-function createFromConfig(config: ConfigurationModel): SdkComponents {
+function createFromConfig(
+  reg: ComponentProviderRegistry,
+  config: ConfigurationModel
+): SdkComponents {
   const components: SdkComponents = {};
 
   try {
     components.contextManager = new AsyncLocalStorageContextManager();
     components.contextManager.enable();
 
-    const resource = createResourceFromConfig(config.resource);
+    const resource = createResourceFromConfig(reg, config.resource);
 
     if (config.propagator) {
-      components.propagator = createPropagatorFromConfig(config.propagator);
+      components.propagator = createPropagatorFromConfig(
+        reg,
+        config.propagator
+      );
     }
+
+    components.configProvider = createConfigProvider(config);
 
     if (config.logger_provider) {
       components.loggerProvider = createLoggerProviderFromConfig(
+        reg,
         resource,
         config.logger_provider,
         config.attribute_limits
@@ -277,6 +304,7 @@ function createFromConfig(config: ConfigurationModel): SdkComponents {
 
     if (config.meter_provider) {
       components.meterProvider = createMeterProviderFromConfig(
+        reg,
         resource,
         config.meter_provider
       );
@@ -284,6 +312,7 @@ function createFromConfig(config: ConfigurationModel): SdkComponents {
 
     if (config.tracer_provider) {
       components.tracerProvider = createTracerProviderFromConfig(
+        reg,
         resource,
         config.tracer_provider,
         config.attribute_limits
