@@ -259,9 +259,8 @@ export function writeResource(
     writeAttributes(writer, resource.attributes, 1);
   }
 
-  // dropped_attributes_count (field 2, uint32) - set to 0 as we don't track this
-  writer.writeTag(2, 0);
-  writer.writeVarint(0);
+  // dropped_attributes_count (field 2, uint32) - skipped, we don't track this
+  // and 0 is the default
 
   writer.finishLengthDelimited(resourceStart, writer.pos - resourceStartPos);
 }
