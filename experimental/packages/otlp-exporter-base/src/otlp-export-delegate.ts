@@ -11,7 +11,7 @@ import type { ISerializer } from '@opentelemetry/otlp-transformer';
 import { OTLPExporterError } from './types';
 import type { IOtlpResponseHandler } from './response-handler';
 import { createLoggingPartialSuccessResponseHandler } from './logging-response-handler';
-import type { DiagLogger } from '@opentelemetry/api';
+import type { DiagLogger, MeterProvider } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
 import { type ExporterMetrics } from './ExporterMetrics';
 
@@ -26,6 +26,7 @@ export interface IOtlpExportDelegate<Internal> {
   forceFlush(): Promise<void>;
   shutdown(): Promise<void>;
   setMetrics(metrics: ExporterMetrics<Internal>): void;
+  setMeterProvider?(meterProvider: MeterProvider): void;
 }
 
 class OTLPExportDelegate<Internal, Response>
@@ -149,6 +150,10 @@ class OTLPExportDelegate<Internal, Response>
 
   setMetrics(metrics: ExporterMetrics<Internal>) {
     this._metrics = metrics;
+  }
+
+  setMeterProvider(meterProvider: MeterProvider): void {
+    this._metrics.setMeterProvider(meterProvider);
   }
 
   async shutdown(): Promise<void> {

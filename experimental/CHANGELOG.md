@@ -19,6 +19,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :bug: Bug Fixes
 
+* fix(sdk-node, otlp-exporter-base, exporter-metrics-otlp-http): wire `selfObsMeterProvider` into auto-created OTLP exporters when `OTEL_NODE_EXPERIMENTAL_SDK_METRICS` is enabled without overwriting an exporter's configured provider or endpoint attributes [#7280](https://github.com/open-telemetry/opentelemetry-js/issues/7280) @eisen0419
+
 ### :books: Documentation
 
 ### :house: Internal

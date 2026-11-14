@@ -104,21 +104,24 @@ export function getOtlpProtocolFromEnv(): string {
   );
 }
 
-function getOtlpExporterFromEnv(): SpanExporter {
+function getOtlpExporterFromEnv(
+  selfObsMeterProvider: MeterProvider | undefined
+): SpanExporter {
   const protocol = getOtlpProtocolFromEnv();
+  const config = { selfObsMeterProvider };
 
   switch (protocol) {
     case 'grpc':
-      return new OTLPGrpcTraceExporter();
+      return new OTLPGrpcTraceExporter(config);
     case 'http/json':
-      return new OTLPHttpTraceExporter();
+      return new OTLPHttpTraceExporter(config);
     case 'http/protobuf':
-      return new OTLPProtoTraceExporter();
+      return new OTLPProtoTraceExporter(config);
     default:
       diag.warn(
         `Unsupported OTLP traces protocol: ${protocol}. Using http/protobuf.`
       );
-      return new OTLPProtoTraceExporter();
+      return new OTLPProtoTraceExporter(config);
   }
 }
 
@@ -126,7 +129,7 @@ export function getSpanProcessorsFromEnv(
   selfObsMeterProvider: MeterProvider | undefined
 ): SpanProcessor[] {
   const exportersMap = new Map<string, () => SpanExporter>([
-    ['otlp', () => getOtlpExporterFromEnv()],
+    ['otlp', () => getOtlpExporterFromEnv(selfObsMeterProvider)],
     ['zipkin', () => new ZipkinExporter()],
     ['console', () => new ConsoleSpanExporter()],
   ]);
@@ -365,6 +368,8 @@ export function getPeriodicExportingMetricReaderFromEnv(
 }
 
 export function getOtlpMetricExporterFromEnv(): PushMetricExporter {
+  // The MeterProvider does not exist yet. PeriodicExportingMetricReader
+  // late-binds it via setSelfObsMeterProviderIfAbsent when SDK metrics are enabled.
   const protocol =
     (
       getStringFromEnv('OTEL_EXPORTER_OTLP_METRICS_PROTOCOL') ??

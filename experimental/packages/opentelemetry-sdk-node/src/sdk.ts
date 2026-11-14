@@ -347,21 +347,22 @@ export class NodeSDK {
             getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL')
           )?.trim() || 'http/protobuf'; // Using || to also fall back on empty string
 
+        const config = { selfObsMeterProvider: meterProvider };
         switch (protocol) {
           case 'grpc':
-            exporters.push(new OTLPGrpcLogExporter());
+            exporters.push(new OTLPGrpcLogExporter(config));
             break;
           case 'http/json':
-            exporters.push(new OTLPHttpLogExporter());
+            exporters.push(new OTLPHttpLogExporter(config));
             break;
           case 'http/protobuf':
-            exporters.push(new OTLPProtoLogExporter());
+            exporters.push(new OTLPProtoLogExporter(config));
             break;
           default:
             diag.warn(
               `Unsupported OTLP logs protocol: "${protocol}". Using http/protobuf.`
             );
-            exporters.push(new OTLPProtoLogExporter());
+            exporters.push(new OTLPProtoLogExporter(config));
         }
       } else if (exporter === 'console') {
         exporters.push(new ConsoleLogRecordExporter());

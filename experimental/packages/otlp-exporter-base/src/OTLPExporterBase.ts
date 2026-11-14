@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { MeterProvider } from '@opentelemetry/api';
 import type { ExportResult } from '@opentelemetry/core';
 import type { IOtlpExportDelegate } from './otlp-export-delegate';
 import { type ExporterMetrics } from './ExporterMetrics';
@@ -35,5 +36,9 @@ export class OTLPExporterBase<Internal> {
 
   protected setMetrics(metrics: ExporterMetrics<Internal>) {
     this._delegate.setMetrics(metrics);
+  }
+
+  protected bindSelfObsMeterProvider(meterProvider: MeterProvider): void {
+    this._delegate.setMeterProvider?.(meterProvider);
   }
 }
