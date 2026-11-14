@@ -246,5 +246,89 @@ describe('OTLPMetricExporter', () => {
       // act
       meterProvider.forceFlush();
     });
+
+    it('setSelfObsMeterProviderIfAbsent late-binds once without losing env endpoint attributes and preserves an existing provider', async () => {
+      const previousEndpoint = process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT;
+      process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT =
+        'http://metrics.example.com:4318/v1/metrics';
+      try {
+        const unconfigured = new OTLPMetricExporter();
+        const delegateMetrics = (
+          unconfigured as unknown as {
+            _delegate: {
+              _metrics: {
+                standardAttrs: Record<string, unknown>;
+              };
+            };
+          }
+        )._delegate._metrics;
+        const initialComponentName =
+          delegateMetrics.standardAttrs['otel.component.name'];
+        assert.strictEqual(
+          delegateMetrics.standardAttrs['server.address'],
+          'metrics.example.com'
+        );
+        assert.strictEqual(delegateMetrics.standardAttrs['server.port'], 4318);
+
+        const lateProvider = new MeterProvider();
+        const lateGetMeterSpy = sinon.spy(lateProvider, 'getMeter');
+        const secondLateProvider = new MeterProvider();
+        const secondGetMeterSpy = sinon.spy(secondLateProvider, 'getMeter');
+        const explicitOverrideProvider = new MeterProvider();
+        const overrideGetMeterSpy = sinon.spy(
+          explicitOverrideProvider,
+          'getMeter'
+        );
+
+        unconfigured.setSelfObsMeterProviderIfAbsent(lateProvider);
+        unconfigured.setSelfObsMeterProviderIfAbsent(secondLateProvider);
+
+        assert.strictEqual(
+          delegateMetrics.standardAttrs['otel.component.name'],
+          initialComponentName
+        );
+        assert.strictEqual(
+          delegateMetrics.standardAttrs['server.address'],
+          'metrics.example.com'
+        );
+        assert.strictEqual(delegateMetrics.standardAttrs['server.port'], 4318);
+        assert.strictEqual(lateGetMeterSpy.callCount, 1);
+        assert.strictEqual(
+          lateGetMeterSpy.firstCall.args[0],
+          '@opentelemetry/otlp-exporter'
+        );
+        assert.strictEqual(secondGetMeterSpy.callCount, 0);
+
+        // Explicit setSelfObsMeterProvider still overrides after late-binding.
+        unconfigured.setSelfObsMeterProvider(explicitOverrideProvider);
+        assert.strictEqual(overrideGetMeterSpy.callCount, 1);
+        assert.strictEqual(
+          overrideGetMeterSpy.firstCall.args[0],
+          '@opentelemetry/otlp-exporter'
+        );
+
+        const customProvider = new MeterProvider();
+        const customGetMeterSpy = sinon.spy(customProvider, 'getMeter');
+        const fromConstructor = new OTLPMetricExporter({
+          selfObsMeterProvider: customProvider,
+        });
+        assert.strictEqual(customGetMeterSpy.callCount, 1);
+        fromConstructor.setSelfObsMeterProviderIfAbsent(secondLateProvider);
+        assert.strictEqual(secondGetMeterSpy.callCount, 0);
+
+        await Promise.all([
+          lateProvider.shutdown(),
+          secondLateProvider.shutdown(),
+          explicitOverrideProvider.shutdown(),
+          customProvider.shutdown(),
+        ]);
+      } finally {
+        if (previousEndpoint === undefined) {
+          delete process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT;
+        } else {
+          process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = previousEndpoint;
+        }
+      }
+    });
   });
 });

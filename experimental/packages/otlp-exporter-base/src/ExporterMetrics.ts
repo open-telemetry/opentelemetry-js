@@ -43,9 +43,9 @@ export interface ExporterMetricsOptions<Internal> {
  * https://opentelemetry.io/docs/specs/semconv/otel/sdk-metrics
  */
 export class ExporterMetrics<Internal> {
-  private readonly inflight: UpDownCounter;
-  private readonly exported: Counter;
-  private readonly duration: Histogram;
+  private inflight!: UpDownCounter;
+  private exported!: Counter;
+  private duration!: Histogram;
   private readonly standardAttrs: Attributes;
   private readonly responseAttributesFromError: (
     error: Error | string | undefined
@@ -62,9 +62,6 @@ export class ExporterMetrics<Internal> {
       responseAttributesFromError,
     } = options;
     this.responseAttributesFromError = responseAttributesFromError;
-    const meter = meterProvider
-      ? meterProvider.getMeter('@opentelemetry/otlp-exporter', VERSION)
-      : createNoopMeter();
 
     const counter = componentCounter.get(componentType) ?? 0;
     componentCounter.set(componentType, counter + 1);
@@ -103,7 +100,31 @@ export class ExporterMetrics<Internal> {
     }
 
     this.helper = metricsHelper;
+    if (meterProvider) {
+      this.setMeterProvider(meterProvider);
+    } else {
+      this._bindNoopInstruments();
+    }
+  }
 
+  /**
+   * Rebinds exporter self-observability instruments onto the given
+   * {@link MeterProvider} while keeping the resolved `standardAttrs`
+   * (`otel.component.name`, `server.address`, `server.port`).
+   */
+  setMeterProvider(meterProvider: MeterProvider): void {
+    const meter = meterProvider.getMeter(
+      '@opentelemetry/otlp-exporter',
+      VERSION
+    );
+    this._bindInstruments(meter);
+  }
+
+  private _bindNoopInstruments(): void {
+    this._bindInstruments(createNoopMeter());
+  }
+
+  private _bindInstruments(meter: ReturnType<MeterProvider['getMeter']>): void {
     this.inflight = meter.createUpDownCounter(
       `otel.sdk.exporter.${this.helper.name}.inflight`,
       {

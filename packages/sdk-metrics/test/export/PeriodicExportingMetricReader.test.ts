@@ -33,6 +33,7 @@ import {
   DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
 } from '../../src/export/AggregationSelector';
 import { ValueType, diag } from '@opentelemetry/api';
+import type { MeterProvider as ApiMeterProvider } from '@opentelemetry/api';
 import { testResource } from '../util';
 
 const MAX_32_BIT_INT = 2 ** 31 - 1;
@@ -1686,5 +1687,116 @@ describe('PeriodicExportingMetricReader', () => {
 
       await meterProvider.shutdown();
     });
+
+    it('forwards the meter provider to the exporter once and does not re-enter export', async () => {
+      const exporter = new SelfObsMetricExporter();
+      const reader = new PeriodicExportingMetricReader({
+        exporter,
+        exportIntervalMillis: 60_000,
+        exportTimeoutMillis: 30_000,
+      });
+      const meterProvider = new MeterProvider({
+        readers: [reader],
+        sdkMetricsEnabled: true,
+      });
+
+      assert.strictEqual(exporter.setCalls, 1);
+      assert.strictEqual(exporter.seen, meterProvider);
+      assert.strictEqual(exporter.exportCalls, 0);
+
+      meterProvider.getMeter('user').createCounter('user_counter').add(1);
+      await meterProvider.forceFlush();
+      assert.strictEqual(exporter.exportCalls, 1);
+      assert.strictEqual(exporter.setCalls, 1);
+
+      await meterProvider.forceFlush();
+      assert.strictEqual(exporter.exportCalls, 2);
+      assert.strictEqual(exporter.setCalls, 1);
+
+      await meterProvider.shutdown();
+    });
+
+    it('does not overwrite a meter provider already configured on the exporter', async () => {
+      const customMeterProvider = new MeterProvider();
+      const exporter = new SelfObsMetricExporter(customMeterProvider);
+      const reader = new PeriodicExportingMetricReader({
+        exporter,
+        exportIntervalMillis: 60_000,
+        exportTimeoutMillis: 30_000,
+      });
+      const meterProvider = new MeterProvider({
+        readers: [reader],
+        sdkMetricsEnabled: true,
+      });
+
+      assert.strictEqual(exporter.setCalls, 0);
+      assert.strictEqual(exporter.seen, customMeterProvider);
+
+      await meterProvider.shutdown();
+      await customMeterProvider.shutdown();
+    });
+
+    it('does not forward the meter provider when sdk metrics are disabled', async () => {
+      const exporter = new SelfObsMetricExporter();
+      const reader = new PeriodicExportingMetricReader({
+        exporter,
+        exportIntervalMillis: 60_000,
+        exportTimeoutMillis: 30_000,
+      });
+      const meterProvider = new MeterProvider({
+        readers: [reader],
+      });
+
+      assert.strictEqual(exporter.setCalls, 0);
+      assert.strictEqual(exporter.exportCalls, 0);
+
+      await meterProvider.shutdown();
+    });
   });
 });
+
+class SelfObsMetricExporter implements PushMetricExporter {
+  setCalls = 0;
+  exportCalls = 0;
+  seen?: ApiMeterProvider;
+  private _inExport = false;
+
+  constructor(initialMeterProvider?: ApiMeterProvider) {
+    this.seen = initialMeterProvider;
+  }
+
+  setSelfObsMeterProvider(meterProvider: ApiMeterProvider): void {
+    this.setCalls += 1;
+    this.seen = meterProvider;
+  }
+
+  setSelfObsMeterProviderIfAbsent(meterProvider: ApiMeterProvider): void {
+    if (this.seen != null) {
+      return;
+    }
+    this.setSelfObsMeterProvider(meterProvider);
+  }
+
+  export(
+    _metrics: ResourceMetrics,
+    resultCallback: (result: ExportResult) => void
+  ): void {
+    assert.strictEqual(this._inExport, false, 'export re-entered');
+    this._inExport = true;
+    try {
+      this.exportCalls += 1;
+      this.seen?.getMeter('exporter-self-obs').createCounter('exported').add(1);
+      resultCallback({ code: ExportResultCode.SUCCESS });
+    } finally {
+      this._inExport = false;
+    }
+  }
+
+  forceFlush(): Promise<void> {
+    return Promise.resolve();
+  }
+
+  shutdown(): Promise<void> {
+    return Promise.resolve();
+  }
+}
