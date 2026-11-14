@@ -24,6 +24,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 ### :house: Internal
 
 * refactor(sdk-node): internally use a ComponentProvider implementation for creating SDK components from a declarative config [#7269](https://github.com/open-telemetry/opentelemetry-js/pull/7269) @trentm
+* test: use erasable syntax on type assertions [#7311](https://github.com/open-telemetry/opentelemetry-js/pull/7311) @legendecas
 
 ## 0.301.2
 

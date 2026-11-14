@@ -498,7 +498,7 @@ describe('GrpcExporterTransport', function () {
           // simulate that it returns a full success (empty response)
           deserializeResponse: sinon.stub().returns({}),
         };
-        const mockSerializer = <FakeSerializer>serializerStubs;
+        const mockSerializer = serializerStubs as FakeSerializer;
 
         const delegate = createOtlpGrpcExportDelegate(
           {
@@ -565,7 +565,7 @@ describe('GrpcExporterTransport', function () {
           // simulate that it returns a full success (empty response)
           deserializeResponse: sinon.stub().returns({}),
         };
-        const mockSerializer = <FakeSerializer>serializerStubs;
+        const mockSerializer = serializerStubs as FakeSerializer;
 
         const delegate = createOtlpGrpcExportDelegate(
           {
