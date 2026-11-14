@@ -18,9 +18,12 @@ import {
 } from '@opentelemetry/sdk-metrics';
 import type { OTLPMetricExporterOptions } from './OTLPMetricExporterOptions';
 import { AggregationTemporalityPreference } from './OTLPMetricExporterOptions';
-import type { IOtlpExportDelegate } from '@opentelemetry/otlp-exporter-base';
+import type {
+  ExporterMetrics,
+  IOtlpExportDelegate,
+} from '@opentelemetry/otlp-exporter-base';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
-import { diag } from '@opentelemetry/api';
+import { diag, type MeterProvider } from '@opentelemetry/api';
 
 export const CumulativeTemporalitySelector: AggregationTemporalitySelector =
   () => AggregationTemporality.CUMULATIVE;
@@ -115,16 +118,40 @@ export class OTLPMetricExporterBase
 {
   private readonly _aggregationTemporalitySelector: AggregationTemporalitySelector;
   private readonly _aggregationSelector: AggregationSelector;
+  private _hasSelfObsMeterProvider: boolean;
 
   constructor(
     delegate: IOtlpExportDelegate<ResourceMetrics>,
     config?: OTLPMetricExporterOptions
   ) {
     super(delegate);
+    this._hasSelfObsMeterProvider = config?.selfObsMeterProvider != null;
     this._aggregationSelector = chooseAggregationSelector(config);
     this._aggregationTemporalitySelector = chooseTemporalitySelector(
       config?.temporalityPreference
     );
+  }
+
+  protected override setMetrics(
+    metrics: ExporterMetrics<ResourceMetrics>
+  ): void {
+    this._hasSelfObsMeterProvider = true;
+    super.setMetrics(metrics);
+  }
+
+  /**
+   * Sets the meter provider to use to collect metrics for the exporter itself
+   * if one has not already been configured via constructor options or
+   * {@link OTLPMetricExporter.setSelfObsMeterProvider}.
+   *
+   * @experimental This method is experimental and is subject to breaking changes in minor releases.
+   */
+  setSelfObsMeterProviderIfAbsent(meterProvider: MeterProvider): void {
+    if (this._hasSelfObsMeterProvider) {
+      return;
+    }
+    this._hasSelfObsMeterProvider = true;
+    this.bindSelfObsMeterProvider(meterProvider);
   }
 
   selectAggregation(instrumentType: InstrumentType): AggregationOption {
