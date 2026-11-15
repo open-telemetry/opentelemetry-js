@@ -147,6 +147,36 @@ function summarizeChanges({prev, curr, prevSrc, currSrc}) {
     added: null,
   };
 
+  // Sort the changes *almost* by key name for presentation.
+  // tsdown-generated JS files do *not* preserve the file order in the .ts file,
+  // so we cannot rely on file order.
+  // This sorts alphabetically, except that enum values sort next to their enum.
+  const cmp = (a, b) => {
+    if (a > b) return 1;
+    else if (a < b) return -1;
+    return 0;
+  };
+  const changesKeys = new Set(changes.map(c => c.k));
+  const sortKey = (k) => {
+    // If this is an enum value **and its enum field is in the array**, then
+    // have it compare to the same index as its enum field name. Given stable
+    // sorting, that should put it just after the enum field.
+    const idx = k.indexOf('_VALUE_')
+    if (idx === -1) {
+      return k
+    } else {
+      const enumFieldName = `ATTR_${k.slice(0, idx)}`;
+      if (changesKeys.has(enumFieldName)) {
+        return enumFieldName;
+      } else {
+        return k;
+      }
+    }
+  };
+  changes.sort((a, b) => {
+    return cmp(sortKey(a.k), sortKey(b.k));
+  });
+
   const removed = changes.filter(ch => ch.type === 'removed');
   let summary = summaryFromChangeType.removed;
   if (removed.length) {

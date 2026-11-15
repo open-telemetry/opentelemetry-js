@@ -36,6 +36,7 @@ import type {
 } from './types';
 import {
   normalizeHttpRequestMethod,
+  redactUrl,
   serverPortFromUrl,
   getXHRBodyLength,
 } from './utils';
@@ -83,6 +84,7 @@ export interface XMLHttpRequestInstrumentationConfig
 
 /**
  * This class represents a XMLHttpRequest plugin for auto instrumentation
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/instrumentation#xhr-xmlhttprequest
  */
 export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRequestInstrumentationConfig> {
   readonly component: string = 'xml-http-request';
@@ -93,13 +95,8 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   private _xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
 
-  // Note: Intentionally *not* using `_enabled` as the field name to avoid
-  // any possible confusion with the `_enabled` field used on the *Node.js*
-  // InstrumentationBase class.
-  // Also not initializing the fields to `false` because the base class
-  // constructor already calls `enable` modifying their values and it will
-  // set the instrumentations in a bad state (enabled, patched but with flags set to false)
-  declare private _isEnabled: boolean;
+  // Not initialized: the base constructor calls enable() before subclass field
+  // initializers run, so an initializer would reset the flag after patching.
   declare private _isXhrPatched: boolean;
 
   constructor(config: XMLHttpRequestInstrumentationConfig = {}) {
@@ -342,7 +339,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     if (normMethod !== origMethod) {
       attributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = origMethod;
     }
-    attributes[ATTR_URL_FULL] = parsedUrl.toString();
+    attributes[ATTR_URL_FULL] = redactUrl(parsedUrl.toString());
     attributes[ATTR_SERVER_ADDRESS] = parsedUrl.hostname;
     const serverPort = serverPortFromUrl(parsedUrl);
     if (serverPort) {
@@ -385,7 +382,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     return (original: OpenFunction): OpenFunction => {
       const plugin = this;
       return function patchOpen(this: XMLHttpRequest, ...args): void {
-        if (!plugin._isEnabled) {
+        if (!plugin._enabled) {
           return original.apply(this, args);
         }
         const method: string = args[0];
@@ -510,7 +507,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
 
     return (original: SendFunction): SendFunction => {
       return function patchSend(this: XMLHttpRequest, ...args): void {
-        if (!plugin._isEnabled) {
+        if (!plugin._enabled) {
           return original.apply(this, args);
         }
         const xhrMem = plugin._xhrMem.get(this);
@@ -561,7 +558,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * implements enable function
    */
   override enable() {
-    if (this._isEnabled) {
+    if (this._enabled) {
       return;
     }
     if (this._isXhrPatched) {
@@ -570,16 +567,28 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         this.moduleName,
         this.version
       );
-      this._isEnabled = true;
+      this._enabled = true;
       return;
     }
 
     try {
       this._diag.debug('applying patch to', this.moduleName, this.version);
-      this._wrap(XMLHttpRequest.prototype, 'open', this._patchOpen());
-      this._wrap(XMLHttpRequest.prototype, 'send', this._patchSend());
+      const proto = XMLHttpRequest.prototype;
+      // `_wrap` returns undefined, without throwing, on a missing or non-function
+      // target, so a lone wrapped `open` would escape the catch and re-wrap on retry.
+      for (const name of ['open', 'send'] as const) {
+        if (typeof proto[name] !== 'function') {
+          this._diag.warn(
+            `XMLHttpRequest.prototype.${name} is missing or not a function; instrumentation will not be enabled. ` +
+              'Register the instrumentation after any XMLHttpRequest polyfill, or call enable() once it is available.'
+          );
+          return;
+        }
+      }
+      this._wrap(proto, 'open', this._patchOpen());
+      this._wrap(proto, 'send', this._patchSend());
       this._isXhrPatched = true;
-      this._isEnabled = true;
+      this._enabled = true;
     } catch (err) {
       // make sure there is no wrapped functions
       this._unwrap(XMLHttpRequest.prototype, 'open');
@@ -596,10 +605,10 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * implements disable function
    */
   override disable() {
-    if (!this._isEnabled) {
+    if (!this._enabled) {
       return;
     }
-    this._isEnabled = false;
+    this._enabled = false;
     this._tasksCount = 0;
     this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
     this._usedResources = new WeakSet<PerformanceResourceTiming>();

@@ -3,4 +3,4 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 export { InstrumentationBase } from './instrumentation';
-export { normalize } from './normalize';
+export { InstrumentationNodeModuleFile } from './instrumentationNodeModuleFile';

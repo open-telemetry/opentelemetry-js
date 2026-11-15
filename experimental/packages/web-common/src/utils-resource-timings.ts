@@ -385,7 +385,8 @@ export function normalizeUrl(url: string): string {
  * Get element XPath
  * @param target - target element
  * @param optimised - when id attribute of element is present the xpath can be
- * simplified to contain id
+ *    simplified to contain id
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getElementXPath(target: any, optimised?: boolean): string {

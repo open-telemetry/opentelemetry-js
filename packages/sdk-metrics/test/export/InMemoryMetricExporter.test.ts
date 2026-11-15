@@ -130,7 +130,7 @@ describe('InMemoryMetricExporter', () => {
     assert.ok(counterMetric.dataPoints.length > 0);
     const counterDataPoint = counterMetric.dataPoints.shift();
     assert.ok(counterDataPoint);
-    assert.strictEqual(counterDataPoint.attributes, counterAttribute);
+    assert.deepStrictEqual(counterDataPoint.attributes, counterAttribute);
 
     assert.ok(histogramMetric.descriptor.name, 'histogram');
     assert.ok(histogramMetric.dataPoints.length > 0);

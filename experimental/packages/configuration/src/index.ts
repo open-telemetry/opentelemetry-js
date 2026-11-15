@@ -10,7 +10,6 @@
 // names from `./generated/types`; the renaming happens at export time here.
 // Follow this convention when adding new exports.
 
-export type { ConfigFactory } from './IConfigFactory';
 export type {
   ConfigurationModel,
   LogRecordExporter as LogRecordExporterConfigModel,
@@ -57,10 +56,21 @@ export type {
   TraceIdRatioBasedSampler as TraceIdRatioBasedSamplerConfigModel,
   ParentBasedSampler as ParentBasedSamplerConfigModel,
   Resource as ResourceConfigModel,
+  ExperimentalInstrumentation as ExperimentalInstrumentationConfigModel,
+  ExperimentalLanguageSpecificInstrumentation as ExperimentalLanguageSpecificInstrumentationConfigModel,
+  ExperimentalGeneralInstrumentation as ExperimentalGeneralInstrumentationConfigModel,
+  ExperimentalHttpInstrumentation as ExperimentalHttpInstrumentationConfigModel,
+  ExperimentalCodeInstrumentation as ExperimentalCodeInstrumentationConfigModel,
+  ExperimentalDbInstrumentation as ExperimentalDbInstrumentationConfigModel,
+  ExperimentalGenAiInstrumentation as ExperimentalGenAiInstrumentationConfigModel,
+  ExperimentalMessagingInstrumentation as ExperimentalMessagingInstrumentationConfigModel,
+  ExperimentalRpcInstrumentation as ExperimentalRpcInstrumentationConfigModel,
+  ExperimentalSanitization as ExperimentalSanitizationConfigModel,
 } from './generated/types';
-export { createConfigFactory } from './ConfigFactory';
+export { parseConfigFile } from './parse';
+export { createConfigProvider } from './SdkConfigProvider';
 export {
   mergeHeadersConfig,
   mergeResourceAttributesConfig,
   mergePropagatorCompositeConfig,
-} from './FileConfigFactory';
+} from './parse';

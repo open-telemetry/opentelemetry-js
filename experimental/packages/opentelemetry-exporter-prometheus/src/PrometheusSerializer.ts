@@ -3,11 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Attributes, AttributeValue } from '@opentelemetry/api';
+import type { AnyValue, Attributes } from '@opentelemetry/api';
 import { diag } from '@opentelemetry/api';
 import type {
   ResourceMetrics,
-  ScopeMetrics,
   MetricData,
   DataPoint,
   Histogram,
@@ -31,19 +30,52 @@ type PrometheusDataTypeLiteral =
   | 'summary'
   | 'untyped';
 
+interface PrometheusMetadata {
+  help: string;
+  unit: string;
+  type: PrometheusDataTypeLiteral;
+}
+
+interface PrometheusMetricFamily {
+  metadata: PrometheusMetadata | undefined;
+  metrics: { metric: MetricData; scope: InstrumentationScope }[];
+}
+
+function createPrometheusMetadata(
+  help: string,
+  unit: string,
+  type: PrometheusDataTypeLiteral
+): PrometheusMetadata {
+  return {
+    help,
+    unit,
+    type,
+  };
+}
+
 function escapeString(str: string) {
   return str.replace(/\\/g, '\\\\').replace(/\n/g, '\\n');
+}
+
+function quoteDiagnosticValue(value: string): string {
+  return JSON.stringify(value);
 }
 
 /**
  * String Attribute values are converted directly to Prometheus attribute values.
  * Non-string values are represented as JSON-encoded strings.
  *
- * `undefined` is converted to an empty string.
+ * Note: This does *not* currently guard against unserializable attribute
+ * values, e.g. BigInt or circular references. This is relying, as is
+ * the sdk-metrics package, that users follow the requirement to only use
+ * simple attributes. (See OTEP 4485.)
  */
-function escapeAttributeValue(str: AttributeValue = '') {
-  if (typeof str !== 'string') {
-    str = JSON.stringify(str);
+function escapeAttributeValue(val: AnyValue = '') {
+  let str: string;
+  if (typeof val !== 'string') {
+    str = JSON.stringify(val);
+  } else {
+    str = val;
   }
   return escapeString(str).replace(/"/g, '\\"');
 }
@@ -173,6 +205,7 @@ export class PrometheusSerializer {
   private _withResourceConstantLabels: RegExp | undefined;
   private _withoutScopeInfo: boolean | undefined;
   private _withoutTargetInfo: boolean | undefined;
+  private _previousMetadataConflicts = new Set<string>();
 
   constructor(
     prefix?: string,
@@ -192,21 +225,51 @@ export class PrometheusSerializer {
 
   serialize(resourceMetrics: ResourceMetrics): string {
     let str = '';
+    let resource = '';
+    const metricFamilies = this._collectMetricFamilies(resourceMetrics);
 
     this._additionalAttributes = this._filterResourceConstantLabels(
       resourceMetrics.resource.attributes,
       this._withResourceConstantLabels
     );
 
-    for (const scopeMetrics of resourceMetrics.scopeMetrics) {
-      str += this._serializeScopeMetrics(scopeMetrics);
+    // Preserve first-seen family order, with target_info first, and keep each
+    // family's samples together even when they originate from different scopes.
+    for (const [name, family] of metricFamilies) {
+      if (family.metadata === undefined) {
+        continue;
+      }
+
+      let writeMetadata = true;
+      if (name === 'target_info' && !this._withoutTargetInfo) {
+        resource = this._serializeResource(
+          resourceMetrics.resource,
+          family.metadata,
+          writeMetadata
+        );
+        writeMetadata = false;
+      }
+
+      for (const { metric, scope } of family.metrics) {
+        const metricStr = this._serializeMetricData(
+          metric,
+          scope,
+          name,
+          family.metadata,
+          writeMetadata
+        );
+        if (metricStr) {
+          str += metricStr + '\n';
+          writeMetadata = false;
+        }
+      }
     }
 
     if (str === '') {
       str += NO_REGISTERED_METRICS;
     }
 
-    return this._serializeResource(resourceMetrics.resource) + str;
+    return resource + str;
   }
 
   private _filterResourceConstantLabels(
@@ -225,54 +288,170 @@ export class PrometheusSerializer {
     return;
   }
 
-  private _serializeScopeMetrics(scopeMetrics: ScopeMetrics) {
-    let str = '';
-    for (const metric of scopeMetrics.metrics) {
-      const metricStr = this._serializeMetricData(metric, scopeMetrics.scope);
+  private _warnMetadataConflict(
+    currentMetadataConflicts: Set<string>,
+    kind: 'HELP' | 'UNIT' | 'TYPE',
+    name: string,
+    firstValue: string,
+    secondValue: string,
+    selected: string | undefined
+  ) {
+    const key = `${kind}:${name}:${selected ?? ''}`;
+    if (currentMetadataConflicts.has(key)) {
+      return;
+    }
+    currentMetadataConflicts.add(key);
+    if (this._previousMetadataConflicts.has(key)) {
+      return;
+    }
 
-      if (metricStr) {
-        str += metricStr + '\n';
+    const formattedValues = `${quoteDiagnosticValue(
+      firstValue
+    )}, ${quoteDiagnosticValue(secondValue)}`;
+    if (selected === undefined) {
+      diag.warn(
+        `Conflicting ${kind} comments for metric "${name}": ${formattedValues}; dropping the metric.`
+      );
+    } else {
+      diag.warn(
+        `Conflicting ${kind} comments for metric "${name}": ${formattedValues}; exporting ${quoteDiagnosticValue(
+          selected
+        )}.`
+      );
+    }
+  }
+
+  private _collectMetricFamilies(resourceMetrics: ResourceMetrics) {
+    // A TYPE conflict requires dropping the entire family, so all metadata must
+    // be resolved before any samples are serialized.
+    const metricFamilies = new Map<string, PrometheusMetricFamily>();
+    const currentMetadataConflicts = new Set<string>();
+
+    if (!this._withoutTargetInfo) {
+      metricFamilies.set('target_info', {
+        metadata: createPrometheusMetadata('Target metadata', '', 'gauge'),
+        metrics: [],
+      });
+    }
+
+    for (const scopeMetrics of resourceMetrics.scopeMetrics) {
+      for (const metric of scopeMetrics.metrics) {
+        const name = this._getPrometheusMetricName(metric);
+        if (name === undefined) {
+          continue;
+        }
+
+        const type = toPrometheusType(metric);
+        const family = metricFamilies.get(name);
+
+        if (family === undefined) {
+          metricFamilies.set(name, {
+            metadata: createPrometheusMetadata(
+              metric.descriptor.description,
+              metric.descriptor.unit,
+              type
+            ),
+            metrics: [{ metric, scope: scopeMetrics.scope }],
+          });
+          continue;
+        }
+
+        const metadata = family.metadata;
+        if (metadata === undefined) {
+          continue;
+        }
+
+        if (metadata.type !== type) {
+          this._warnMetadataConflict(
+            currentMetadataConflicts,
+            'TYPE',
+            name,
+            metadata.type,
+            type,
+            undefined
+          );
+          family.metadata = undefined;
+          family.metrics = [];
+          continue;
+        }
+
+        family.metrics.push({ metric, scope: scopeMetrics.scope });
       }
     }
-    return str;
+
+    for (const [name, family] of metricFamilies) {
+      const metadata = family.metadata;
+      if (metadata === undefined) {
+        continue;
+      }
+
+      for (const { metric } of family.metrics) {
+        const { description: help, unit } = metric.descriptor;
+        if (help) {
+          if (!metadata.help) {
+            metadata.help = help;
+          } else if (metadata.help !== help) {
+            this._warnMetadataConflict(
+              currentMetadataConflicts,
+              'HELP',
+              name,
+              metadata.help,
+              help,
+              metadata.help
+            );
+          }
+        }
+        if (unit) {
+          if (!metadata.unit) {
+            metadata.unit = unit;
+          } else if (metadata.unit !== unit) {
+            this._warnMetadataConflict(
+              currentMetadataConflicts,
+              'UNIT',
+              name,
+              metadata.unit,
+              unit,
+              metadata.unit
+            );
+          }
+        }
+      }
+    }
+
+    // Remember only this scrape's conflicts: persistent conflicts stay quiet,
+    // while resolved conflicts can warn again if they recur later.
+    this._previousMetadataConflicts = currentMetadataConflicts;
+    return metricFamilies;
   }
 
   private _serializeMetricData(
     metricData: MetricData,
-    scope: InstrumentationScope
+    scope: InstrumentationScope,
+    normalizedName?: string,
+    metadata?: PrometheusMetadata,
+    writeMetadata = true
   ) {
-    let name = sanitizePrometheusMetricName(
-      escapeString(metricData.descriptor.name)
-    );
-    if (this._prefix) {
-      name = `${this._prefix}${name}`;
+    const name = normalizedName ?? this._getPrometheusMetricName(metricData);
+    if (name === undefined) {
+      return '';
     }
 
-    if (name === '') {
-      diag.error(
-        `Normalization for metric "${metricData.descriptor.name}" resulted in empty name`
+    const currentMetadata =
+      metadata ??
+      createPrometheusMetadata(
+        metricData.descriptor.description,
+        metricData.descriptor.unit,
+        toPrometheusType(metricData)
       );
-      return '';
-    } else if (name === '_') {
-      diag.error(
-        `Normalization for metric "${metricData.descriptor.name}" resulted in an invalid name: "_"`
-      );
-      return '';
-    } else if (name[0] >= '0' && name[0] <= '9') {
-      name = `_${name}`;
-    }
-
-    const dataPointType = metricData.dataPointType;
-
-    name = enforcePrometheusNamingConvention(name, metricData);
 
     const help = `# HELP ${name} ${escapeString(
-      metricData.descriptor.description || 'description missing'
+      currentMetadata.help || 'description missing'
     )}`;
-    const unit = metricData.descriptor.unit
-      ? `\n# UNIT ${name} ${escapeString(metricData.descriptor.unit)}`
+    const unit = currentMetadata.unit
+      ? `\n# UNIT ${name} ${escapeString(currentMetadata.unit)}`
       : '';
-    const type = `# TYPE ${name} ${toPrometheusType(metricData)}`;
+    const type = `# TYPE ${name} ${currentMetadata.type}`;
+    const dataPointType = metricData.dataPointType;
     let additionalAttributes: Attributes | undefined;
 
     if (this._withoutScopeInfo) {
@@ -330,7 +509,32 @@ export class PrometheusSerializer {
       }
     }
 
-    return `${help}${unit}\n${type}\n${results}`.trim();
+    return `${writeMetadata ? `${help}${unit}\n${type}\n` : ''}${results}`.trim();
+  }
+
+  private _getPrometheusMetricName(metricData: MetricData) {
+    let name = sanitizePrometheusMetricName(
+      escapeString(metricData.descriptor.name)
+    );
+    if (this._prefix) {
+      name = `${this._prefix}${name}`;
+    }
+
+    if (name === '') {
+      diag.error(
+        `Normalization for metric "${metricData.descriptor.name}" resulted in empty name`
+      );
+      return undefined;
+    } else if (name === '_') {
+      diag.error(
+        `Normalization for metric "${metricData.descriptor.name}" resulted in an invalid name: "_"`
+      );
+      return undefined;
+    } else if (name[0] >= '0' && name[0] <= '9') {
+      name = `_${name}`;
+    }
+
+    return enforcePrometheusNamingConvention(name, metricData);
   }
 
   private _serializeSingularDataPoint(
@@ -412,16 +616,23 @@ export class PrometheusSerializer {
     return results;
   }
 
-  protected _serializeResource(resource: Resource): string {
+  protected _serializeResource(
+    resource: Resource,
+    metadata = createPrometheusMetadata('Target metadata', '', 'gauge'),
+    writeMetadata = true
+  ): string {
     if (this._withoutTargetInfo === true) {
       return '';
     }
 
     const name = 'target_info';
-    const help = `# HELP ${name} Target metadata`;
-    const type = `# TYPE ${name} gauge`;
+    const help = `# HELP ${name} ${escapeString(metadata.help)}`;
+    const unit = metadata.unit
+      ? `\n# UNIT ${name} ${escapeString(metadata.unit)}`
+      : '';
+    const type = `# TYPE ${name} ${metadata.type}`;
 
     const results = stringify(name, resource.attributes, 1).trim();
-    return `${help}\n${type}\n${results}\n`;
+    return `${writeMetadata ? `${help}${unit}\n${type}\n` : ''}${results}\n`;
   }
 }

@@ -16,8 +16,8 @@ const provider = new TracerProvider({
   // to your exporter. Using the SimpleSpanProcessor here as it sends the spans immediately to the
   // exporter without delay
   spanProcessors: [
-    new SimpleSpanProcessor(new ConsoleSpanExporter()),
-    new SimpleSpanProcessor(new OTLPTraceExporter()),
+    new SimpleSpanProcessor({ exporter: new ConsoleSpanExporter() }),
+    new SimpleSpanProcessor({ exporter: new OTLPTraceExporter() }),
   ]
 });
 

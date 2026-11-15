@@ -8,7 +8,7 @@ import * as assert from 'assert';
 import { context } from '@opentelemetry/api';
 import { isTracingSuppressed } from '@opentelemetry/core';
 import { StackContextManager } from '@opentelemetry/sdk-trace';
-import { createFetchTransport } from '../../src/transport/fetch-transport';
+import { createFetchTransport } from '../../src/platform/browser/transport/fetch-transport';
 import { createRetryingTransport } from '../../src/retrying-transport';
 import { registerMockDiagLogger, withResolvers } from '../common/test-utils';
 import type {
@@ -280,6 +280,33 @@ describe('FetchTransport', function () {
         (result as ExportResponseFailure).error.message,
         'Fetch request errored'
       );
+    });
+  });
+
+  describe('request mode', function () {
+    async function sentMode(): Promise<RequestMode | undefined> {
+      const fetchStub = sinon
+        .stub(globalThis, 'fetch')
+        .resolves(new Response(null, { status: 200 }));
+      const transport = createFetchTransport({
+        ...testTransportParameters,
+        url: `${globalThis.location.origin}/v1/traces`,
+      });
+
+      await transport.send(testPayload, requestTimeout);
+
+      return fetchStub.firstCall.args[1]?.mode;
+    }
+
+    it('uses same-origin for an endpoint on the document origin', async function () {
+      assert.strictEqual(await sentMode(), 'same-origin');
+    });
+
+    it('uses cors from an opaque-origin document, whose location still reports the URL origin', async function () {
+      // A sandboxed iframe without allow-same-origin, or a data:/blob: document.
+      sinon.stub(globalThis, 'origin').value('null');
+
+      assert.strictEqual(await sentMode(), 'cors');
     });
   });
 

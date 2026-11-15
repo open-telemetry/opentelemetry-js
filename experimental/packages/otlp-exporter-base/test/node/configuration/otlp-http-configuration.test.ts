@@ -8,8 +8,8 @@ import * as https from 'https';
 import {
   httpAgentFactoryFromOptions,
   mergeOtlpNodeHttpConfigurationWithDefaults,
-} from '../../../src/configuration/otlp-node-http-configuration';
-import type { OtlpNodeHttpConfiguration } from '../../../src/configuration/otlp-node-http-configuration';
+} from '../../../src/platform/node/configuration/otlp-node-http-configuration';
+import type { OtlpNodeHttpConfiguration } from '../../../src/platform/node/configuration/otlp-node-http-configuration';
 import { VERSION } from '../../../src/version';
 
 const TEST_ENV_VARIABLES = [
@@ -129,7 +129,7 @@ describe('httpAgentFactoryFromOptions', function () {
 
     let proxyRequestReceived = false;
     const proxyServer = http.createServer((request, response) => {
-      proxyRequestReceived = true;
+      proxyRequestReceived = request.url === 'http://127.0.0.1:1/probe';
       response.statusCode = 204;
       response.end();
     });
@@ -150,7 +150,7 @@ describe('httpAgentFactoryFromOptions', function () {
       try {
         const statusCode = await new Promise<number>((resolve, reject) => {
           const request = http.get(
-            'http://proxy-test.invalid/probe',
+            'http://127.0.0.1:1/probe',
             { agent },
             response => {
               response.resume();

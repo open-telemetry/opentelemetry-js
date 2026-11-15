@@ -16,6 +16,10 @@ export abstract class InstrumentationBase<
   extends InstrumentationAbstract<ConfigType>
   implements types.Instrumentation<ConfigType>
 {
+  /** Subclasses set this to true when their enable() succeeds and to false in
+   * their disable(); isEnabled() returns it. */
+  protected _enabled = false;
+
   constructor(
     instrumentationName: string,
     instrumentationVersion: string,
@@ -26,5 +30,10 @@ export abstract class InstrumentationBase<
     if (this._config.enabled) {
       this.enable();
     }
+  }
+
+  /** Returns `_enabled`, which stays false unless the subclass's enable() sets it. */
+  public isEnabled(): boolean {
+    return this._enabled;
   }
 }

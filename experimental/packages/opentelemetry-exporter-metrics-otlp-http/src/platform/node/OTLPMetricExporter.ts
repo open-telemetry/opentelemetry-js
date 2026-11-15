@@ -6,7 +6,7 @@
 import { type MeterProvider } from '@opentelemetry/api';
 import type { OTLPMetricExporterOptions } from '../../OTLPMetricExporterOptions';
 import { OTLPMetricExporterBase } from '../../OTLPMetricExporterBase';
-import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base/node-http';
 import {
   JsonMetricsSerializer,
   MetricsExporterMetricsHelper,

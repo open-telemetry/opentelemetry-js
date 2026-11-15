@@ -50,6 +50,9 @@ export class ObservableResultImpl implements ObservableResult {
         return;
       }
     }
+    // Intentionally *not* guarding the given attributes with `cleanAttributes`
+    // or similar, because of the performance impact. Users are strongly
+    // encouraged to use only simple attribute types with metrics.
     this._buffer.set(attributes, value);
   }
 }

@@ -4,11 +4,9 @@
  */
 
 import * as assert from 'assert';
-import {
-  _clearDefaultServiceNameCache,
-  defaultServiceName,
-} from '../src/default-service-name';
-import { describeNode } from './util';
+import { defaultServiceName } from '../src';
+import { _clearDefaultServiceNameCache } from '../src/detectors/platform/node/default-service-name';
+import { describeBrowser, describeNode } from './util';
 
 describe('defaultServiceName', () => {
   const originalProcess = globalThis.process;
@@ -47,6 +45,19 @@ describe('defaultServiceName', () => {
       globalThis.process = {};
       const serviceName = defaultServiceName();
       assert.strictEqual(serviceName, 'unknown_service');
+    });
+
+    it('returns plain unknown_service when process.argv0 is empty', () => {
+      // @ts-expect-error redefining process for testing
+      globalThis.process = { argv0: '' };
+      const serviceName = defaultServiceName();
+      assert.strictEqual(serviceName, 'unknown_service');
+    });
+  });
+
+  describeBrowser('defaultServiceName', () => {
+    it('returns plain unknown_service', () => {
+      assert.strictEqual(defaultServiceName(), 'unknown_service');
     });
   });
 });

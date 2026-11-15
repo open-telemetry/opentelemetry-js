@@ -249,11 +249,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
       // this._runOnce never rejects. Using void operator to suppress @typescript-eslint/no-floating-promises.
       void this._runOnce();
     }, this._exportInterval);
-
-    // depending on runtime, this may be a 'number' or NodeJS.Timeout
-    if (typeof this._interval !== 'number') {
-      this._interval.unref();
-    }
+    unrefTimer(this._interval);
   }
 
   protected async onForceFlush(): Promise<void> {
@@ -296,4 +292,10 @@ export class PeriodicExportingMetricReader extends MetricReader {
     await this.onForceFlush();
     await this._exporter.shutdown();
   }
+}
+
+// Node.js timers keep the process alive unless unref'd; browsers return a number.
+function unrefTimer(timer: ReturnType<typeof setInterval>): void {
+  const handle = timer as number | { unref?: () => void };
+  if (typeof handle !== 'number') handle.unref?.();
 }

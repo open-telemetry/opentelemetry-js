@@ -5,7 +5,6 @@
 
 import * as yaml from 'yaml';
 import { getStringFromEnv } from '@opentelemetry/core';
-import type { ConfigurationModel, GrpcTls, HttpTls } from './generated/types';
 
 /**
  * Handle (Environment) variable substitution per
@@ -104,101 +103,4 @@ function yamlScalarCoerce(value: string): string | null | number | boolean {
   } else {
     return value;
   }
-}
-
-export function getGrpcTlsConfig(
-  certificateFile?: string,
-  clientKeyFile?: string,
-  clientCertificateFile?: string,
-  insecure?: boolean
-): GrpcTls | undefined {
-  if (certificateFile || clientKeyFile || clientCertificateFile) {
-    const tls: GrpcTls = {};
-    if (certificateFile) {
-      tls.ca_file = certificateFile;
-    }
-    if (clientKeyFile) {
-      tls.key_file = clientKeyFile;
-    }
-    if (clientCertificateFile) {
-      tls.cert_file = clientCertificateFile;
-    }
-    if (insecure !== undefined) {
-      tls.insecure = insecure;
-    }
-    return tls;
-  }
-  return undefined;
-}
-
-export function initializeDefaultConfiguration(): ConfigurationModel {
-  return {
-    disabled: false,
-    log_level: 'info',
-    resource: {},
-    attribute_limits: {
-      attribute_count_limit: 128,
-    },
-  };
-}
-
-export function initializeDefaultTracerProviderConfiguration(): NonNullable<
-  ConfigurationModel['tracer_provider']
-> {
-  return {
-    processors: [],
-    limits: {
-      attribute_count_limit: 128,
-      event_count_limit: 128,
-      link_count_limit: 128,
-      event_attribute_count_limit: 128,
-      link_attribute_count_limit: 128,
-    },
-    sampler: {
-      parent_based: {
-        root: { always_on: null },
-      },
-    },
-  };
-}
-
-export function initializeDefaultMeterProviderConfiguration(): NonNullable<
-  ConfigurationModel['meter_provider']
-> {
-  return {
-    readers: [],
-    views: [],
-    exemplar_filter: 'trace_based',
-  };
-}
-
-export function initializeDefaultLoggerProviderConfiguration(): NonNullable<
-  ConfigurationModel['logger_provider']
-> {
-  return {
-    processors: [],
-    limits: { attribute_count_limit: 128 },
-    'logger_configurator/development': {},
-  };
-}
-
-export function getHttpTlsConfig(
-  certificateFile?: string,
-  clientKeyFile?: string,
-  clientCertificateFile?: string
-): HttpTls | undefined {
-  if (certificateFile || clientKeyFile || clientCertificateFile) {
-    const tls: HttpTls = {};
-    if (certificateFile) {
-      tls.ca_file = certificateFile;
-    }
-    if (clientKeyFile) {
-      tls.key_file = clientKeyFile;
-    }
-    if (clientCertificateFile) {
-      tls.cert_file = clientCertificateFile;
-    }
-    return tls;
-  }
-  return undefined;
 }
