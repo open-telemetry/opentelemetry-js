@@ -9,7 +9,7 @@
  * using json-schema-to-typescript.
  *
  * Usage:
- *    cd experimental/packages/configuration
+ *    cd experimental/packages/sdk-config
  *    npm run generate:config
  */
 

@@ -54,7 +54,7 @@
   },
   "dependencies": {
     "@opentelemetry/api-config": "0.301.2",
-    "@opentelemetry/configuration": "0.301.2",
+    "@opentelemetry/sdk-config": "0.301.2",
     "@opentelemetry/context-async-hooks": "3.1.1",
     "@opentelemetry/core": "3.1.1",
     "@opentelemetry/exporter-logs-otlp-grpc": "0.301.2",

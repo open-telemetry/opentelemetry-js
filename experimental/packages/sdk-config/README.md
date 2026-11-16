@@ -14,13 +14,13 @@ This package implements a part of the [OpenTelemetry declarative configuration](
 ## Installation
 
 ```sh
-npm install @opentelemetry/configuration
+npm install @opentelemetry/sdk-config
 ```
 
 ## Usage
 
 ```js
-import { parseConfigFile } from '@opentelemetry/configuration';
+import { parseConfigFile } from '@opentelemetry/sdk-config';
 const config = parseConfigFile('./otel-sdk-config.yaml');
 ```
 
@@ -98,7 +98,7 @@ The generation script (`scripts/generate-config.js`) handles several post-proces
 
 Apache 2.0 - See [LICENSE][license-url] for more information.
 
-[npm-url]: https://www.npmjs.com/package/@opentelemetry/configuration
+[npm-url]: https://www.npmjs.com/package/@opentelemetry/sdk-config
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fconfiguration.svg
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat

@@ -40,7 +40,7 @@ export default tseslint.config(
       '**/.tmp/**',
       'docs/**',
       // tsd-style negative type-check fixtures, intentionally outside tsconfig.
-      'experimental/packages/configuration/test/fixtures/types/**',
+      'experimental/packages/sdk-config/test/fixtures/types/**',
       'experimental/packages/otlp-transformer/src/generated/**',
       // protobufjs-generated test fixtures (npm run protos output, gitignored).
       'experimental/packages/otlp-transformer/test/generated/**',

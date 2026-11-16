@@ -11,7 +11,7 @@
     "entryPoints": [
       "api",
       "experimental/packages/api-config",
-      "experimental/packages/configuration",
+      "experimental/packages/sdk-config",
       "experimental/packages/exporter-logs-otlp-grpc",
       "experimental/packages/exporter-logs-otlp-http",
       "experimental/packages/exporter-logs-otlp-proto",
@@ -64,9 +64,6 @@
     },
     {
       "path": "experimental/packages/api-config"
-    },
-    {
-      "path": "experimental/packages/configuration"
     },
     {
       "path": "experimental/packages/exporter-logs-otlp-grpc"
@@ -136,6 +133,9 @@
     },
     {
       "path": "experimental/packages/sampler-jaeger-remote"
+    },
+    {
+      "path": "experimental/packages/sdk-config"
     },
     {
       "path": "experimental/packages/web-common"
