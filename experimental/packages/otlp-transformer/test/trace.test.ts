@@ -63,7 +63,6 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
               value: { stringValue: 'resource attribute value' },
             },
           ],
-          droppedAttributesCount: 0,
         },
         schemaUrl: undefined,
         scopeSpans: [
@@ -82,7 +81,7 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
                 kind: ESpanKind.SPAN_KIND_CLIENT,
                 links: [
                   {
-                    droppedAttributesCount: 0,
+                    droppedAttributesCount: undefined,
                     spanId: linkSpanId,
                     traceId: linkTraceId,
                     traceState: 'link=foo',
@@ -101,7 +100,7 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
                 endTimeUnixNano: endTime,
                 events: [
                   {
-                    droppedAttributesCount: 0,
+                    droppedAttributesCount: undefined,
                     attributes: [
                       {
                         key: 'event-attribute',
@@ -120,9 +119,9 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
                     value: { stringValue: 'some attribute value' },
                   },
                 ],
-                droppedAttributesCount: 0,
-                droppedEventsCount: 0,
-                droppedLinksCount: 0,
+                droppedAttributesCount: undefined,
+                droppedEventsCount: undefined,
+                droppedLinksCount: undefined,
                 status: {
                   code: EStatusCode.STATUS_CODE_OK,
                   message: undefined,
@@ -175,7 +174,7 @@ function createExpectedSpanData(options: OtlpEncodingOptions) {
     kind: ESpanKind.SPAN_KIND_CLIENT,
     links: [
       {
-        droppedAttributesCount: 0,
+        droppedAttributesCount: undefined,
         spanId: linkSpanId,
         traceId: linkTraceId,
         traceState: 'link=foo',
@@ -192,7 +191,7 @@ function createExpectedSpanData(options: OtlpEncodingOptions) {
     endTimeUnixNano: endTime,
     events: [
       {
-        droppedAttributesCount: 0,
+        droppedAttributesCount: undefined,
         attributes: [
           {
             key: 'event-attribute',
@@ -209,9 +208,9 @@ function createExpectedSpanData(options: OtlpEncodingOptions) {
         value: { stringValue: 'some attribute value' },
       },
     ],
-    droppedAttributesCount: 0,
-    droppedEventsCount: 0,
-    droppedLinksCount: 0,
+    droppedAttributesCount: undefined,
+    droppedEventsCount: undefined,
+    droppedLinksCount: undefined,
     status: {
       code: EStatusCode.STATUS_CODE_OK,
       message: undefined,
@@ -233,7 +232,6 @@ function createExpectedMultiResourceSpanJson(options: OtlpEncodingOptions) {
               value: { stringValue: 'resource attribute value' },
             },
           ],
-          droppedAttributesCount: 0,
         },
         schemaUrl: undefined,
         scopeSpans: [
@@ -257,7 +255,6 @@ function createExpectedMultiResourceSpanJson(options: OtlpEncodingOptions) {
               value: { stringValue: 'another resource value' },
             },
           ],
-          droppedAttributesCount: 0,
         },
         schemaUrl: undefined,
         scopeSpans: [
@@ -569,7 +566,7 @@ describe('Trace', () => {
         assert.ok(exportRequest);
         assert.strictEqual(
           exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].status.code,
-          EStatusCode.STATUS_CODE_UNSET
+          undefined
         );
       });
     });
@@ -697,6 +694,19 @@ describe('Trace', () => {
         );
       assert.deepStrictEqual(decodedObj, expected);
       sinon.assert.neverCalledWith(diagStub, GROWING_BUFFER_DEBUG_MESSAGE);
+    });
+
+    it('omits fields that hold their default value', () => {
+      span_1_1.status.code = SpanStatusCode.UNSET;
+      const serialized = ProtobufTraceSerializer.serializeRequest([span_1_1])!;
+      // The reference encoder omits default values and writes fields in field
+      // number order, so a re-encoded request has the same bytes.
+      const { ExportTraceServiceRequest } =
+        signals.opentelemetry.proto.collector.trace.v1;
+      const reencoded = ExportTraceServiceRequest.encode(
+        ExportTraceServiceRequest.decode(serialized)
+      ).finish();
+      assert.deepStrictEqual(Array.from(serialized), Array.from(reencoded));
     });
 
     it('deserializes a response', () => {

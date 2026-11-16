@@ -45,7 +45,7 @@ function getHeaderValue(carrier: unknown, getter: TextMapGetter, key: string) {
 function getTraceId(carrier: unknown, getter: TextMapGetter): string {
   const traceId = getHeaderValue(carrier, getter, X_B3_TRACE_ID);
   if (typeof traceId === 'string') {
-    return traceId.padStart(32, '0');
+    return traceId.length === 16 ? traceId.padStart(32, '0') : traceId;
   }
   return '';
 }

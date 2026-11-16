@@ -59,8 +59,7 @@ import {
   parseHttpRequestTarget,
   redactQueryString,
 } from './http-url';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-import forwardedParse = require('forwarded-parse');
+import { parse as forwardedParse } from 'forwarded-parse';
 
 const defaultQueryStringsToRedact = Array.from(DEFAULT_QUERY_STRINGS_TO_REDACT);
 

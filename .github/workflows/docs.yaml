@@ -3,6 +3,7 @@ name: Deploy API Documentation
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -16,6 +17,10 @@ jobs:
   # `_github:draft_release:*` scripts pass `--target $(git rev-parse HEAD)`), so "does this
   # release belong to `main`" is a plain reachability check. It holds for all four tag
   # families - `vX.Y.Z`, `api/vX.Y.Z`, `experimental/vX.Y.Z` and `semconv/vX.Y.Z`.
+  #
+  # The same check guards manual runs (`workflow_dispatch`): `github.sha` is then the head of
+  # the ref the run was started from, so dispatching from `main` deploys, while dispatching
+  # from any other branch is skipped rather than overwriting the published docs.
   check-released-commit:
     runs-on: ubuntu-latest
     outputs:

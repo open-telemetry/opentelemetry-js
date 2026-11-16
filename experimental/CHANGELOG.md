@@ -9,6 +9,44 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :boom: Breaking Changes
 
+### :rocket: Features
+
+* feat(api-config): add `@opentelemetry/api-config`, an experimental package with the declarative-config `ConfigProvider` and `ConfigProperties` types and a global `config` accessor [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
+* feat(configuration): add `createConfigProvider()` to build a `ConfigProvider` over the parsed configuration model [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
+* feat(instrumentation): support the `instrumentation/development` section of declarative config. `Instrumentation#setConfigProvider()` is an optional method that `registerInstrumentations()` calls on each instrumentation, alongside `setTracerProvider()` and friends. The `readDeclarativeConfig()` util reads an instrumentation's own block (`instrumentation/development.js.<name>`) and the shared `general` block through a typed reader, mapping snake_case config properties onto config fields. Unrecognized properties and type mismatches warn [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
+* feat(instrumentation-http): read declarative config via `setConfigProvider()`, mapping the `instrumentation/development.js.@opentelemetry/instrumentation-http` properties it supports and the `general.http.{client,server}.*_captured_headers` properties onto `headersToSpanAttributes` [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
+* feat(sdk-node): register a global `ConfigProvider` from the config file, so instrumentations registered with `registerInstrumentations()` receive it [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
+
+### :bug: Bug Fixes
+
+### :books: Documentation
+
+### :house: Internal
+
+* refactor(sdk-node): internally use a ComponentProvider implementation for creating SDK components from a declarative config [#7269](https://github.com/open-telemetry/opentelemetry-js/pull/7269) @trentm
+* fix(otlp-transformer): omit proto3 defalt value fields [#7316](https://github.com/open-telemetry/opentelemetry-js/pull/7316) @legendecas
+
+## 0.301.2
+
+### :bug: Bug Fixes
+
+* fix(otlp-grpc-exporter-base): load `@grpc/grpc-js` lazily in `createServiceClientConstructor` so that importing an OTLP gRPC exporter no longer loads it before instrumentations can wrap `net` and `dns` ([#7297](https://github.com/open-telemetry/opentelemetry-js/pull/7297)) @AyeshaWaseemAhmad
+* fix(instrumentation-fetch, instrumentation-xml-http-request): redact credentials and sensitive query parameters in `url.full` @adityareddy-dev
+
+### :house: Internal
+
+* perf(otlp-transformer): use node native utf8ByteLength [#7257](https://github.com/open-telemetry/opentelemetry-js/pull/7257) @legendecas
+
+## 0.301.1
+
+### :house: Internal
+
+* chore: Update local dependencies to 3.1.1 for the release of stable packages.
+
+## 0.301.0
+
+### :boom: Breaking Changes
+
 * feat(sdk-node)!: The experimental `startNodeSdk()` code path for *environment-based* config (i.e. when not using a config file), has full option coverage. [#6999](https://github.com/open-telemetry/opentelemetry-js/pull/6999) @trentm
   * `startNodeSdk()` should now be a viable replacement for `new NodeSDK()`, supporting similar (but not exactly the same) options for configuring most SDK components.
   * `startNodeSDK()` has been *deprecated*, use `startNodeSdk()` (slight capitalization change).
@@ -17,22 +55,22 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
   * **Breaking:** The `configuration` package no longer supports creating a synthetic `ConfigurationModel` from environment variables.
   * **Breaking:** The `configuration` package API has changed: `createConfigFactory()` has been replaced with `parseConfigFile().
 
-### :rocket: Features
-
 ### :bug: Bug Fixes
 
+* fix(instrumentation-http): don't `require('forwarded-parse')` in ESM builds ([#7261](https://github.com/open-telemetry/opentelemetry-js/pull/7261)) @avens19
 * fix(otlp-grpc-exporter-base): avoid an incomplete mTLS warning for root-CA-only TLS configuration ([#7235](https://github.com/open-telemetry/opentelemetry-js/issues/7235)) @LarryHu0217
 * fix(sdk-node): warn and skip, instead of erroring, on an unknown resource detector name in declarative config [#7252](https://github.com/open-telemetry/opentelemetry-js/pull/7252) @trentm
 * fix(sdk-node): use `OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT` and `OTEL_LINK_ATTRIBUTE_COUNT_LIMIT` environment variables for span limits [#6999](https://github.com/open-telemetry/opentelemetry-js/pull/6999) @trentm
   * Before this change, different environment variable names (see next point), that are *not* in the OTel spec were used. They will still be supported as a fallback for the spec names for a period of approximately six months.
   * The `OTEL_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT` and `OTEL_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT` environment variables are **deprecated**. Support for them will be [removed sometime after six months](https://github.com/open-telemetry/opentelemetry-js/issues/7242), to allow transition to [the correct environment variables in the spec](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#span-limits).
 * fix(otlp-exporter-base): pick the browser fetch `mode` from the document origin, so exports from an opaque-origin document (e.g. a sandboxed iframe) no longer fail with `mode: 'same-origin'` [#7211](https://github.com/open-telemetry/opentelemetry-js/pull/7211) @MO2k4
+* fix: raise the minimum `@opentelemetry/api` peer dependency version to 1.10.0 for packages that depend on `@opentelemetry/core`, `@opentelemetry/otlp-transformer` or `@opentelemetry/instrumentation`, as these use API 1.10 features. ([#7258](https://github.com/open-telemetry/opentelemetry-js/issues/7258)) @volodymyrshk @pichlermarc
+  * Combining these packages with `@opentelemetry/api` 1.9.x never worked: they failed at runtime. The peer dependency now makes npm report this at install time instead.
+  * If you see a peer dependency error after upgrading, update `@opentelemetry/api` to 1.10.0 or later.
 
 ### :books: Documentation
 
 * docs(exporters): update dead semantic conventions resource specification links in OTLP exporters [#7254](https://github.com/open-telemetry/opentelemetry-js/pull/7254) @helmipradita
-
-### :house: Internal
 
 ## 0.300.0
 
