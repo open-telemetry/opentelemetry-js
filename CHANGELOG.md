@@ -17,6 +17,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :bug: Bug Fixes
 
+* fix(sdk-metrics): prevent race condition and zombie state in MetricReader shutdown [#7265](https://github.com/open-telemetry/opentelemetry-js/pull/7265) @harshkoli1255
+
 ### :books: Documentation
 
 ### :house: Internal
