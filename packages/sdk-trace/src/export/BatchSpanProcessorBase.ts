@@ -80,11 +80,12 @@ export abstract class BatchSpanProcessorBase<
   onStart(_span: Span, _parentContext: Context): void {}
 
   onEnd(span: ReadableSpan): void {
-    if (this._shutdownOnce.isCalled) {
+    if ((span.spanContext().traceFlags & TraceFlags.SAMPLED) === 0) {
       return;
     }
 
-    if ((span.spanContext().traceFlags & TraceFlags.SAMPLED) === 0) {
+    if (this._shutdownOnce.isCalled) {
+      this._metrics.shutdownDropSpans(1);
       return;
     }
 
@@ -181,10 +182,10 @@ export abstract class BatchSpanProcessorBase<
           spans = this._finishedSpans.splice(0, this._maxExportBatchSize);
         }
 
-        const doExport = () =>
+        const doExport = () => {
+          this._metrics.exportSpans(spans.length);
           this._exporter.export(spans, result => {
             clearTimeout(timer);
-            this._metrics.finishSpans(spans.length, result.error);
             if (result.code === ExportResultCode.SUCCESS) {
               resolve();
             } else {
@@ -194,6 +195,7 @@ export abstract class BatchSpanProcessorBase<
               );
             }
           });
+        };
 
         // Spans from the same TracerProvider usually share one Resource
         // instance, so wait on each distinct pending resource only once.

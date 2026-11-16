@@ -116,8 +116,8 @@ class ExportOperation {
       }, exportTimeoutMillis);
 
       // Call exporter.export() and immediately resolve exportScheduled
+      this._metrics.exportLogs(logRecords.length);
       exporter.export(logRecords, result => {
-        this._metrics.finishLogs(logRecords.length, result.error);
         clearTimeout(timer);
         if (result.code === ExportResultCode.SUCCESS) {
           resolve();
@@ -184,6 +184,7 @@ export abstract class BatchLogRecordProcessorBase<
 
   public onEmit(logRecord: ReadWriteLogRecord): void {
     if (this._shutdownOnce.isCalled) {
+      this._metrics.shutdownDropLogs(1);
       return;
     }
     this._addToBuffer(logRecord);

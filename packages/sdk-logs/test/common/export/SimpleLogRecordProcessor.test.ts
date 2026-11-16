@@ -206,7 +206,7 @@ describe('SimpleLogRecordProcessor', () => {
         dataPoint => dataPoint.attributes['error.type'] === undefined
       );
       assert.ok(successPoint);
-      assert.strictEqual(successPoint.value, 1);
+      assert.strictEqual(successPoint.value, 2);
       assert.strictEqual(
         successPoint.attributes['otel.component.type'],
         'simple_log_processor'
@@ -219,16 +219,43 @@ describe('SimpleLogRecordProcessor', () => {
       const failedPoint = processedLogsDataPoints.find(
         dataPoint => dataPoint.attributes['error.type'] === 'SystemError'
       );
-      assert.ok(failedPoint);
-      assert.strictEqual(failedPoint.value, 1);
-      assert.strictEqual(
-        failedPoint.attributes['otel.component.type'],
-        'simple_log_processor'
+      assert.strictEqual(failedPoint, undefined);
+    });
+
+    it('should record already_shutdown for logs emitted after shutdown', async () => {
+      const metricReader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        readers: [metricReader],
+      });
+      const exporter = new InMemoryLogRecordExporter();
+      const { logRecord } = setup(exporter);
+      const processor = new SimpleLogRecordProcessor({
+        exporter,
+        selfObsMeterProvider: meterProvider,
+      });
+      await processor.shutdown();
+
+      processor.onEmit(logRecord);
+
+      const { resourceMetrics } = await metricReader.collect();
+      const scopeMetrics = resourceMetrics.scopeMetrics.find(
+        sm => sm.scope.name === '@opentelemetry/sdk-logs'
       );
-      assert.ok(
-        failedPoint.attributes['otel.component.name']
-          ?.toString()
-          .startsWith('simple_log_processor/')
+      assert.ok(scopeMetrics);
+      const processedLogsMetric = scopeMetrics.metrics.find(
+        m => m.descriptor.name === 'otel.sdk.processor.log.processed'
+      );
+      assert.ok(processedLogsMetric);
+      const processedLogsDataPoints = processedLogsMetric.dataPoints as Array<{
+        value: number;
+        attributes: Record<string, unknown>;
+      }>;
+      assert.deepStrictEqual(
+        processedLogsDataPoints.map(dataPoint => [
+          dataPoint.attributes['error.type'],
+          dataPoint.value,
+        ]),
+        [['already_shutdown', 1]]
       );
     });
   });
