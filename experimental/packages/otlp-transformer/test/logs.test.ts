@@ -51,7 +51,6 @@ function createExpectedLogJson(encoder: Encoder): IExportLogsServiceRequest {
               value: { stringValue: 'some attribute value' },
             },
           ],
-          droppedAttributesCount: 0,
         },
         schemaUrl: undefined,
         scopeLogs: [
@@ -98,7 +97,7 @@ function createExpectedLogJson(encoder: Encoder): IExportLogsServiceRequest {
                     value: { doubleValue: 1.23 },
                   },
                 ],
-                droppedAttributesCount: 0,
+                droppedAttributesCount: undefined,
                 flags: 1,
                 traceId: traceId,
                 spanId: spanId,
@@ -501,6 +500,18 @@ describe('Logs', () => {
 
       assert.deepStrictEqual(decodedObj, expected);
       sinon.assert.neverCalledWith(diagStub, GROWING_BUFFER_DEBUG_MESSAGE);
+    });
+
+    it('omits fields that hold their default value', function () {
+      const serialized = ProtobufLogsSerializer.serializeRequest([log_1_1_1])!;
+      // The reference encoder omits default values and writes fields in field
+      // number order, so a re-encoded request has the same bytes.
+      const { ExportLogsServiceRequest } =
+        signals.opentelemetry.proto.collector.logs.v1;
+      const reencoded = ExportLogsServiceRequest.encode(
+        ExportLogsServiceRequest.decode(serialized)
+      ).finish();
+      assert.deepStrictEqual(Array.from(serialized), Array.from(reencoded));
     });
 
     it('deserializes a response', () => {

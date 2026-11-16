@@ -72,7 +72,7 @@
     "karma-spec-reporter": "0.0.37",
     "karma-webpack": "5.0.1",
     "knip": "6.43.0",
-    "lerna": "10.0.1",
+    "lerna": "10.1.1",
     "linkinator": "7.6.1",
     "markdownlint-cli2": "0.23.2",
     "mocha": "12.0.3",
