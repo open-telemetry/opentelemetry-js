@@ -37,7 +37,10 @@
       "path": "../../../semantic-conventions"
     },
     {
-      "path": "../configuration"
+      "path": "../api-config"
+    },
+    {
+      "path": "../sdk-config"
     },
     {
       "path": "../exporter-logs-otlp-grpc"
