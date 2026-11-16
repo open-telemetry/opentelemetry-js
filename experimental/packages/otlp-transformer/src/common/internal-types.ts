@@ -9,7 +9,7 @@ export interface Resource {
   attributes: IKeyValue[];
 
   /** Resource droppedAttributesCount */
-  droppedAttributesCount: number;
+  droppedAttributesCount?: number;
 
   /** Resource schemaUrl */
   schemaUrl?: string;

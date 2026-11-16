@@ -55,16 +55,22 @@ export function sdkSpanToOtlpSpan(span: ReadableSpan, encoder: Encoder): ISpan {
     startTimeUnixNano: encoder.encodeHrTime(span.startTime),
     endTimeUnixNano: encoder.encodeHrTime(span.endTime),
     attributes: toAttributes(span.attributes, encoder),
-    droppedAttributesCount: span.droppedAttributesCount,
-    events: span.events.map(event => toOtlpSpanEvent(event, encoder)),
-    droppedEventsCount: span.droppedEventsCount,
+    droppedAttributesCount: span.droppedAttributesCount || undefined,
+    events:
+      span.events.length > 0
+        ? span.events.map(event => toOtlpSpanEvent(event, encoder))
+        : undefined,
+    droppedEventsCount: span.droppedEventsCount || undefined,
     status: {
       // API and proto enums share the same values
-      code: status.code as unknown as EStatusCode,
+      code: (status.code as unknown as EStatusCode) || undefined,
       message: status.message,
     },
-    links: span.links.map(link => toOtlpLink(link, encoder)),
-    droppedLinksCount: span.droppedLinksCount,
+    links:
+      span.links.length > 0
+        ? span.links.map(link => toOtlpLink(link, encoder))
+        : undefined,
+    droppedLinksCount: span.droppedLinksCount || undefined,
     flags: buildSpanFlagsFrom(ctx.traceFlags, span.parentSpanContext?.isRemote),
   };
 }
@@ -75,7 +81,7 @@ export function toOtlpLink(link: Link, encoder: Encoder): ILink {
     spanId: encoder.encodeSpanContext(link.context.spanId),
     traceId: encoder.encodeSpanContext(link.context.traceId),
     traceState: link.context.traceState?.serialize(),
-    droppedAttributesCount: link.droppedAttributesCount || 0,
+    droppedAttributesCount: link.droppedAttributesCount || undefined,
     flags: buildSpanFlagsFrom(link.context.traceFlags, link.context.isRemote),
   };
 }
@@ -90,7 +96,7 @@ export function toOtlpSpanEvent(
       : [],
     name: timedEvent.name,
     timeUnixNano: encoder.encodeHrTime(timedEvent.time),
-    droppedAttributesCount: timedEvent.droppedAttributesCount || 0,
+    droppedAttributesCount: timedEvent.droppedAttributesCount || undefined,
   };
 }
 
