@@ -109,6 +109,17 @@ function sanitizePrometheusMetricName(name: string): string {
 }
 
 /**
+ * Label names must match `[a-zA-Z_][a-zA-Z0-9_]*`, so a leading digit is
+ * prefixed with '_'.
+ */
+function sanitizePrometheusLabelName(name: string): string {
+  const sanitized = sanitizePrometheusMetricName(name);
+  return sanitized[0] >= '0' && sanitized[0] <= '9'
+    ? `_${sanitized}`
+    : sanitized;
+}
+
+/**
  * @private
  *
  * Helper method which assists in enforcing the naming conventions for metric
@@ -167,27 +178,32 @@ function stringify(
   timestamp?: number,
   additionalAttributes?: Attributes
 ) {
-  let hasAttribute = false;
-  let attributesStr = '';
-
-  for (const [key, val] of Object.entries(attributes)) {
-    const sanitizedAttributeName = sanitizePrometheusMetricName(key);
-    hasAttribute = true;
-    attributesStr += `${
-      attributesStr.length > 0 ? ',' : ''
-    }${sanitizedAttributeName}="${escapeAttributeValue(val)}"`;
-  }
+  // Different keys can map to the same label name after sanitizing. Per the
+  // spec, their values are joined with ';' in lexicographical order of the
+  // original keys.
+  const labels = new Map<string, [key: string, value: string][]>();
+  const entries = Object.entries(attributes);
   if (additionalAttributes) {
-    for (const [key, val] of Object.entries(additionalAttributes)) {
-      const sanitizedAttributeName = sanitizePrometheusMetricName(key);
-      hasAttribute = true;
-      attributesStr += `${
-        attributesStr.length > 0 ? ',' : ''
-      }${sanitizedAttributeName}="${escapeAttributeValue(val)}"`;
+    entries.push(...Object.entries(additionalAttributes));
+  }
+  for (const [key, val] of entries) {
+    const labelName = sanitizePrometheusLabelName(key);
+    let values = labels.get(labelName);
+    if (values === undefined) {
+      values = [];
+      labels.set(labelName, values);
     }
+    values.push([key, escapeAttributeValue(val)]);
   }
 
-  if (hasAttribute) {
+  if (labels.size > 0) {
+    const attributesStr = Array.from(labels, ([labelName, values]) => {
+      const joined = values
+        .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+        .map(([, v]) => v)
+        .join(';');
+      return `${labelName}="${joined}"`;
+    }).join(',');
     metricName += `{${attributesStr}}`;
   }
 
