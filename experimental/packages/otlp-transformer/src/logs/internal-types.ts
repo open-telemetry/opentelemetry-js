@@ -62,7 +62,7 @@ export interface ILogRecord {
   attributes: IKeyValue[];
 
   /** LogRecord droppedAttributesCount */
-  droppedAttributesCount: number;
+  droppedAttributesCount?: number;
 
   /** LogRecord flags */
   flags?: number;

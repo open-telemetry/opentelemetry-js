@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-logs-otlp-http",
-  "version": "0.301.1",
+  "version": "0.301.2",
   "description": "OpenTelemetry Collector Logs Exporter allows user to send collected logs to the OpenTelemetry Collector",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -106,8 +106,8 @@
     "@opentelemetry/api": "^1.10.0"
   },
   "dependencies": {
-    "@opentelemetry/otlp-exporter-base": "0.301.1",
-    "@opentelemetry/otlp-transformer": "0.301.1",
+    "@opentelemetry/otlp-exporter-base": "0.301.2",
+    "@opentelemetry/otlp-transformer": "0.301.2",
     "@opentelemetry/sdk-logs": "3.1.1"
   }
 }

@@ -61,6 +61,7 @@ import {
   createSamplerFromConfig,
   createSpanLimitsFromConfig,
   createTracerProviderFromConfig,
+  getBuiltinComponentProviderRegistry,
 } from '../src/create-from-config';
 import { CompositePropagator, SDK_INFO } from '@opentelemetry/core';
 import {
@@ -72,6 +73,11 @@ import {
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
+import { mergeComponentProviderRegistries } from '../src/component-provider';
+
+const reg = mergeComponentProviderRegistries([
+  getBuiltinComponentProviderRegistry(),
+]);
 
 describe('create-from-config', () => {
   describe('headers_list exporter wiring', function () {
@@ -82,7 +88,7 @@ describe('create-from-config', () => {
     function createTraceExporter(
       exporter: SpanExporterConfigModel
     ): SpanExporter {
-      const provider = createTracerProviderFromConfig(resource, {
+      const provider = createTracerProviderFromConfig(reg, resource, {
         processors: [{ simple: { exporter } }],
       });
       return (provider as any)._activeSpanProcessor._spanProcessors[0]
@@ -98,7 +104,7 @@ describe('create-from-config', () => {
         testName: 'log OTLP HTTP/protobuf',
         protocol: 'http',
         createExporter: () =>
-          createLogRecordExporterFromConfig({
+          createLogRecordExporterFromConfig(reg, {
             otlp_http: { headers, headers_list },
           }),
       },
@@ -106,7 +112,7 @@ describe('create-from-config', () => {
         testName: 'log OTLP HTTP/JSON',
         protocol: 'http',
         createExporter: () =>
-          createLogRecordExporterFromConfig({
+          createLogRecordExporterFromConfig(reg, {
             otlp_http: { headers, headers_list, encoding: 'json' },
           }),
       },
@@ -114,7 +120,7 @@ describe('create-from-config', () => {
         testName: 'log OTLP gRPC',
         protocol: 'grpc',
         createExporter: () =>
-          createLogRecordExporterFromConfig({
+          createLogRecordExporterFromConfig(reg, {
             otlp_grpc: { headers, headers_list },
           }),
       },
@@ -122,7 +128,7 @@ describe('create-from-config', () => {
         testName: 'metric OTLP HTTP/protobuf',
         protocol: 'http',
         createExporter: () =>
-          createPushMetricExporterFromConfig({
+          createPushMetricExporterFromConfig(reg, {
             otlp_http: { headers, headers_list },
           }),
       },
@@ -130,7 +136,7 @@ describe('create-from-config', () => {
         testName: 'metric OTLP HTTP/JSON',
         protocol: 'http',
         createExporter: () =>
-          createPushMetricExporterFromConfig({
+          createPushMetricExporterFromConfig(reg, {
             otlp_http: { headers, headers_list, encoding: 'json' },
           }),
       },
@@ -138,7 +144,7 @@ describe('create-from-config', () => {
         testName: 'metric OTLP gRPC',
         protocol: 'grpc',
         createExporter: () =>
-          createPushMetricExporterFromConfig({
+          createPushMetricExporterFromConfig(reg, {
             otlp_grpc: { headers, headers_list },
           }),
       },
@@ -195,7 +201,7 @@ describe('create-from-config', () => {
 
   describe('createPropagatorFromConfig', function () {
     it('single propagator still uses CompositePropagator', function () {
-      const propagator = createPropagatorFromConfig({
+      const propagator = createPropagatorFromConfig(reg, {
         composite: [{ tracecontext: null }],
       });
       assert.ok(propagator instanceof CompositePropagator);
@@ -203,7 +209,7 @@ describe('create-from-config', () => {
     });
 
     it('multiple', function () {
-      const propagator = createPropagatorFromConfig({
+      const propagator = createPropagatorFromConfig(reg, {
         composite: [
           { tracecontext: null },
           { baggage: null },
@@ -226,14 +232,14 @@ describe('create-from-config', () => {
 
     it('should throw on unknown/unsupported propagators', function () {
       assert.throws(() => {
-        createPropagatorFromConfig({
+        createPropagatorFromConfig(reg, {
           composite: [{ tracecontext: null }, { my_propagator: null }],
         });
       });
     });
 
     it('no propagator if "none"', function () {
-      const propagator = createPropagatorFromConfig({
+      const propagator = createPropagatorFromConfig(reg, {
         composite: [{ tracecontext: null }, { none: null }],
       });
       assert.equal(propagator, undefined);
@@ -241,14 +247,14 @@ describe('create-from-config', () => {
 
     it('should throw on invalid composite entry with two keys', function () {
       assert.throws(() => {
-        createPropagatorFromConfig({
+        createPropagatorFromConfig(reg, {
           composite: [{ tracecontext: null, tracestate: null }],
         });
       });
     });
 
     it('composite_list usage', function () {
-      const propagator = createPropagatorFromConfig({
+      const propagator = createPropagatorFromConfig(reg, {
         composite: [{ tracecontext: null }],
         composite_list: 'tracecontext, \tbaggage',
       });
@@ -303,13 +309,13 @@ describe('create-from-config', () => {
     });
 
     it('empty "resource" config', async function () {
-      const resource = createResourceFromConfig(undefined);
+      const resource = createResourceFromConfig(reg, undefined);
       await resource.waitForAsyncAttributes?.();
       assert.deepEqual(resource.attributes, defaultResAttrs);
     });
 
     it('resource.attributes', async function () {
-      const resource = createResourceFromConfig({
+      const resource = createResourceFromConfig(reg, {
         attributes: [{ name: 'foo', value: 'bar' }],
       });
       await resource.waitForAsyncAttributes?.();
@@ -320,7 +326,7 @@ describe('create-from-config', () => {
     });
 
     it('resource.attributes_list', async function () {
-      const resource = createResourceFromConfig({
+      const resource = createResourceFromConfig(reg, {
         attributes_list: 'foo=baz, spam=eggs \t',
       });
       await resource.waitForAsyncAttributes?.();
@@ -332,7 +338,7 @@ describe('create-from-config', () => {
     });
 
     it('resource.attributes beats resource.attributes_list', async function () {
-      const resource = createResourceFromConfig({
+      const resource = createResourceFromConfig(reg, {
         attributes: [{ name: 'foo', value: 'bar' }],
         attributes_list: 'foo=baz, spam=eggs \t',
       });
@@ -348,7 +354,7 @@ describe('create-from-config', () => {
     // https://opentelemetry.io/docs/specs/otel-config/types/#type-experimentalresourcedetector
 
     it('resource detector: host', async function () {
-      const resource = createResourceFromConfig({
+      const resource = createResourceFromConfig(reg, {
         'detection/development': { detectors: [{ host: null }] },
       });
       await resource.waitForAsyncAttributes?.();
@@ -360,7 +366,7 @@ describe('create-from-config', () => {
     });
 
     it('resource detector: process', async function () {
-      const resource = createResourceFromConfig({
+      const resource = createResourceFromConfig(reg, {
         'detection/development': { detectors: [{ process: null }] },
       });
       await resource.waitForAsyncAttributes?.();
@@ -376,7 +382,7 @@ describe('create-from-config', () => {
         OTEL_RESOURCE_ATTRIBUTES: 'foo=bar,spam=eggs',
       });
       try {
-        const resource = createResourceFromConfig({
+        const resource = createResourceFromConfig(reg, {
           'detection/development': { detectors: [{ service: null }] },
         });
         await resource.waitForAsyncAttributes?.();
@@ -394,7 +400,7 @@ describe('create-from-config', () => {
     it('resource detector: container (not yet supported, warns and skips)', async function () {
       const warnStub = sinon.stub(diag, 'warn');
 
-      createResourceFromConfig({
+      createResourceFromConfig(reg, {
         'detection/development': { detectors: [{ container: null }] },
       });
 
@@ -406,7 +412,7 @@ describe('create-from-config', () => {
     it('resource detector: unknown name (warns and skips)', async function () {
       const warnStub = sinon.stub(diag, 'warn');
 
-      createResourceFromConfig({
+      createResourceFromConfig(reg, {
         'detection/development': {
           detectors: [{ some_unknown_detector: null }],
         },
@@ -419,7 +425,7 @@ describe('create-from-config', () => {
 
     it('schema_url', function () {
       const schema_url = 'https://example.com/a-scheme';
-      const resource = createResourceFromConfig({ schema_url });
+      const resource = createResourceFromConfig(reg, { schema_url });
       assert.deepEqual(resource.attributes, defaultResAttrs);
       assert.deepEqual(resource.schemaUrl, schema_url);
     });
@@ -430,7 +436,7 @@ describe('create-from-config', () => {
       });
       try {
         const schema_url = 'https://example.com/a-scheme';
-        const resource = createResourceFromConfig({
+        const resource = createResourceFromConfig(reg, {
           attributes: [
             { name: 'service.name', value: 'service-name-from-attributes' },
             { name: 'os.type', value: 'my-os-type' }, // override from osDetector
@@ -461,7 +467,7 @@ describe('create-from-config', () => {
 
     it('processes fixtures/resources.yaml correctly', async function () {
       const config = parseConfigFile('test/fixtures/resources.yaml');
-      const resource = createResourceFromConfig(config.resource);
+      const resource = createResourceFromConfig(reg, config.resource);
       await resource.waitForAsyncAttributes?.();
 
       assert.deepStrictEqual(
@@ -579,10 +585,11 @@ describe('create-from-config', () => {
       (item.only ? it.only : it)(item.testName, function () {
         if (item.throws) {
           assert.throws(() => {
-            createLogRecordExporterFromConfig(item.exporterConfig);
+            createLogRecordExporterFromConfig(reg, item.exporterConfig);
           });
         } else {
           const exporter = createLogRecordExporterFromConfig(
+            reg,
             item.exporterConfig
           );
           assert.ok(
@@ -720,10 +727,11 @@ describe('create-from-config', () => {
       (item.only ? it.only : it)(item.testName, function () {
         if (item.throws) {
           assert.throws(() => {
-            createLogRecordProcessorFromConfig(item.processorConfig);
+            createLogRecordProcessorFromConfig(reg, item.processorConfig);
           });
         } else {
           const processor = createLogRecordProcessorFromConfig(
+            reg,
             item.processorConfig
           );
           assert.ok(
@@ -770,6 +778,7 @@ describe('create-from-config', () => {
         if (item.throws) {
           assert.throws(() => {
             createLoggerProviderFromConfig(
+              reg,
               item.resource,
               item.config.logger_provider!,
               item.config.attribute_limits
@@ -777,6 +786,7 @@ describe('create-from-config', () => {
           });
         } else {
           const provider = createLoggerProviderFromConfig(
+            reg,
             item.resource,
             item.config.logger_provider!,
             item.config.attribute_limits
@@ -887,7 +897,11 @@ describe('create-from-config', () => {
       const meter_provider: MeterProviderConfigModel = {
         readers: [{ periodic: { exporter: { console: null } } }],
       };
-      const provider = createMeterProviderFromConfig(resource, meter_provider);
+      const provider = createMeterProviderFromConfig(
+        reg,
+        resource,
+        meter_provider
+      );
       assert.ok(provider instanceof MeterProvider);
     });
 
@@ -924,7 +938,11 @@ describe('create-from-config', () => {
           },
         ],
       };
-      const provider = createMeterProviderFromConfig(resource, meter_provider);
+      const provider = createMeterProviderFromConfig(
+        reg,
+        resource,
+        meter_provider
+      );
       assert.ok(provider instanceof MeterProvider);
       // Cheat look at internal structure to confirm the two expected readers.
       const collectors = (provider as any)._sharedState.metricCollectors;
@@ -1001,7 +1019,11 @@ describe('create-from-config', () => {
           },
         ],
       };
-      const provider = createMeterProviderFromConfig(resource, meter_provider);
+      const provider = createMeterProviderFromConfig(
+        reg,
+        resource,
+        meter_provider
+      );
 
       assert.ok(provider instanceof MeterProvider);
 
@@ -1091,7 +1113,7 @@ describe('create-from-config', () => {
             ],
           },
           assertThrowsError:
-            /the "opencensus" MetricProducer is deprecated and not supported/,
+            /unknown MetricProducer name in configuration: "opencensus"/,
         },
         {
           testName: 'a 0 timeout on exporters it not currently supported',
@@ -1175,14 +1197,14 @@ describe('create-from-config', () => {
             ],
           },
           assertThrowsError:
-            /unknown MetricProducer name: "some_unknown_producer"/,
+            /unknown MetricProducer name in configuration: "some_unknown_producer"/,
         },
       ];
 
       for (const item of corpus) {
         it(item.testName, function () {
           assert.throws(() => {
-            createMeterProviderFromConfig(resource, item.meter_provider);
+            createMeterProviderFromConfig(reg, resource, item.meter_provider);
           }, item.assertThrowsError);
         });
       }
@@ -1191,43 +1213,51 @@ describe('create-from-config', () => {
 
   describe('createPushMetricExporterFromConfig', () => {
     it('http/protobuf by default', function () {
-      const exporter = createPushMetricExporterFromConfig({ otlp_http: null });
+      const exporter = createPushMetricExporterFromConfig(reg, {
+        otlp_http: null,
+      });
       assert.ok(exporter instanceof OTLPProtoMetricExporter);
     });
 
     it('http/json', function () {
-      const exporter = createPushMetricExporterFromConfig({
+      const exporter = createPushMetricExporterFromConfig(reg, {
         otlp_http: { encoding: 'json' },
       });
       assert.ok(exporter instanceof OTLPHttpMetricExporter);
     });
 
     it('grpc', function () {
-      const exporter = createPushMetricExporterFromConfig({ otlp_grpc: null });
+      const exporter = createPushMetricExporterFromConfig(reg, {
+        otlp_grpc: null,
+      });
       assert.ok(exporter instanceof OTLPGrpcMetricExporter);
     });
 
     it('console', function () {
-      const exporter = createPushMetricExporterFromConfig({ console: null });
+      const exporter = createPushMetricExporterFromConfig(reg, {
+        console: null,
+      });
       assert.ok(exporter instanceof ConsoleMetricExporter);
     });
 
     it('throws for unsupported exporter name', function () {
       assert.throws(() => {
-        createPushMetricExporterFromConfig({ some_unknown_exporter: null });
+        createPushMetricExporterFromConfig(reg, {
+          some_unknown_exporter: null,
+        });
       }, /unknown PushMetricExporter name in configuration: "some_unknown_exporter"/);
     });
 
     it('throws for invalid otlp_http encoding', function () {
       assert.throws(() => {
-        createPushMetricExporterFromConfig({
+        createPushMetricExporterFromConfig(reg, {
           otlp_http: { encoding: 'invalid_encoding' },
         } as unknown as PushMetricExporterConfigModel);
       }, /unknown OtlpHttpMetricExporter encoding in configuration: "invalid_encoding"/);
     });
 
     it('maps temporality_preference onto the OTLP http exporter', function () {
-      const exporter = createPushMetricExporterFromConfig({
+      const exporter = createPushMetricExporterFromConfig(reg, {
         otlp_http: { temporality_preference: 'delta' },
       }) as OTLPProtoMetricExporter;
       // delta uses DELTA temporality for counters
@@ -1243,7 +1273,7 @@ describe('create-from-config', () => {
     });
 
     it('maps the cumulative temporality_preference', function () {
-      const exporter = createPushMetricExporterFromConfig({
+      const exporter = createPushMetricExporterFromConfig(reg, {
         otlp_http: { temporality_preference: 'cumulative' },
       }) as OTLPProtoMetricExporter;
       assert.strictEqual(
@@ -1257,7 +1287,7 @@ describe('create-from-config', () => {
     });
 
     it('maps temporality_preference onto the OTLP gRPC exporter', function () {
-      const exporter = createPushMetricExporterFromConfig({
+      const exporter = createPushMetricExporterFromConfig(reg, {
         otlp_grpc: { temporality_preference: 'low_memory' },
       }) as OTLPGrpcMetricExporter;
       // low_memory uses DELTA for counters and histograms
@@ -1272,7 +1302,7 @@ describe('create-from-config', () => {
     });
 
     it('maps default_histogram_aggregation to exponential for histograms only', function () {
-      const exporter = createPushMetricExporterFromConfig({
+      const exporter = createPushMetricExporterFromConfig(reg, {
         otlp_http: {
           default_histogram_aggregation: 'base2_exponential_bucket_histogram',
         },
@@ -1290,7 +1320,7 @@ describe('create-from-config', () => {
     });
 
     it('maps default_histogram_aggregation explicit_bucket_histogram', function () {
-      const exporter = createPushMetricExporterFromConfig({
+      const exporter = createPushMetricExporterFromConfig(reg, {
         otlp_grpc: {
           default_histogram_aggregation: 'explicit_bucket_histogram',
         },
@@ -1310,6 +1340,7 @@ describe('create-from-config', () => {
         processors: [{ simple: { exporter: { console: null } } }],
       };
       const provider = createTracerProviderFromConfig(
+        reg,
         resource,
         tracer_provider
       );
@@ -1350,6 +1381,7 @@ describe('create-from-config', () => {
         id_generator: { random: null },
       };
       const provider = createTracerProviderFromConfig(
+        reg,
         resource,
         tracer_provider
       );
@@ -1434,7 +1466,7 @@ describe('create-from-config', () => {
             processors: [{ some_unknown_processor: null }],
           },
           assertThrowsError:
-            /unknown SpanProcessor name: "some_unknown_processor"/,
+            /unknown SpanProcessor name in configuration: "some_unknown_processor"/,
         },
         {
           testName: 'unknown Sampler',
@@ -1442,7 +1474,8 @@ describe('create-from-config', () => {
             processors: [{ simple: { exporter: { console: null } } }],
             sampler: { some_unknown_sampler: null },
           },
-          assertThrowsError: /unknown Sampler name: "some_unknown_sampler"/,
+          assertThrowsError:
+            /unknown Sampler name in configuration: "some_unknown_sampler"/,
         },
         {
           testName: 'unknown IdGenerator',
@@ -1451,14 +1484,14 @@ describe('create-from-config', () => {
             id_generator: { some_unknown_id_generator: null },
           },
           assertThrowsError:
-            /unknown IdGenerator name: "some_unknown_id_generator"/,
+            /unknown IdGenerator name in configuration: "some_unknown_id_generator"/,
         },
       ];
 
       for (const item of corpus) {
         it(item.testName, function () {
           assert.throws(() => {
-            createTracerProviderFromConfig(resource, item.tracer_provider);
+            createTracerProviderFromConfig(reg, resource, item.tracer_provider);
           }, item.assertThrowsError);
         });
       }
@@ -1524,7 +1557,7 @@ describe('create-from-config', () => {
 
     for (const item of corpus) {
       it(String(JSON.stringify(item.sampler)), function () {
-        const sampler = createSamplerFromConfig(item.sampler);
+        const sampler = createSamplerFromConfig(reg, item.sampler);
         assert.equal(item.repr, String(sampler));
       });
     }

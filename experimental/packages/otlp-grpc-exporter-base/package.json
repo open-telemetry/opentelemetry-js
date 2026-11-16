@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/otlp-grpc-exporter-base",
-  "version": "0.301.1",
+  "version": "0.301.2",
   "description": "OpenTelemetry OTLP-gRPC Exporter base (for internal use only)",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -70,8 +70,8 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.14.5",
     "@opentelemetry/core": "3.1.1",
-    "@opentelemetry/otlp-exporter-base": "0.301.1",
-    "@opentelemetry/otlp-transformer": "0.301.1"
+    "@opentelemetry/otlp-exporter-base": "0.301.2",
+    "@opentelemetry/otlp-transformer": "0.301.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-grpc-exporter-base",
   "sideEffects": false

@@ -11,14 +11,33 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :rocket: Features
 
+* feat(api-config): add `@opentelemetry/api-config`, an experimental package with the declarative-config `ConfigProvider` and `ConfigProperties` types and a global `config` accessor [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
+* feat(configuration): add `createConfigProvider()` to build a `ConfigProvider` over the parsed configuration model [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
+* feat(instrumentation): support the `instrumentation/development` section of declarative config. `Instrumentation#setConfigProvider()` is an optional method that `registerInstrumentations()` calls on each instrumentation, alongside `setTracerProvider()` and friends. The `readDeclarativeConfig()` util reads an instrumentation's own block (`instrumentation/development.js.<name>`) and the shared `general` block through a typed reader, mapping snake_case config properties onto config fields. Unrecognized properties and type mismatches warn [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
+* feat(instrumentation-http): read declarative config via `setConfigProvider()`, mapping the `instrumentation/development.js.@opentelemetry/instrumentation-http` properties it supports and the `general.http.{client,server}.*_captured_headers` properties onto `headersToSpanAttributes` [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
+* feat(sdk-node): register a global `ConfigProvider` from the config file, so instrumentations registered with `registerInstrumentations()` receive it [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
+
 ### :bug: Bug Fixes
 
-* fix(otlp-grpc-exporter-base): load `@grpc/grpc-js` lazily in `createServiceClientConstructor` so that importing an OTLP gRPC exporter no longer loads it before instrumentations can wrap `net` and `dns` ([#7297](https://github.com/open-telemetry/opentelemetry-js/pull/7297)) @AyeshaWaseemAhmad
 * fix(exporter-trace-otlp-http, exporter-logs-otlp-http, exporter-metrics-otlp-http): use the `otlp_http_json_*_exporter` `otel.component.type` values for JSON exporters ([#7286](https://github.com/open-telemetry/opentelemetry-js/pull/7286)) @shehjaddev
 
 ### :books: Documentation
 
 ### :house: Internal
+
+* refactor(sdk-node): internally use a ComponentProvider implementation for creating SDK components from a declarative config [#7269](https://github.com/open-telemetry/opentelemetry-js/pull/7269) @trentm
+* fix(otlp-transformer): omit proto3 defalt value fields [#7316](https://github.com/open-telemetry/opentelemetry-js/pull/7316) @legendecas
+
+## 0.301.2
+
+### :bug: Bug Fixes
+
+* fix(otlp-grpc-exporter-base): load `@grpc/grpc-js` lazily in `createServiceClientConstructor` so that importing an OTLP gRPC exporter no longer loads it before instrumentations can wrap `net` and `dns` ([#7297](https://github.com/open-telemetry/opentelemetry-js/pull/7297)) @AyeshaWaseemAhmad
+* fix(instrumentation-fetch, instrumentation-xml-http-request): redact credentials and sensitive query parameters in `url.full` @adityareddy-dev
+
+### :house: Internal
+
+* perf(otlp-transformer): use node native utf8ByteLength [#7257](https://github.com/open-telemetry/opentelemetry-js/pull/7257) @legendecas
 
 ## 0.301.1
 
