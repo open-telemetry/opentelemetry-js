@@ -43,7 +43,6 @@ describe('Metrics', () => {
         },
       },
     ],
-    droppedAttributesCount: 0,
   };
 
   const expectedScope = {

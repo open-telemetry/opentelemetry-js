@@ -27,7 +27,7 @@ const config = parseConfigFile('./otel-sdk-config.yaml');
 An extremely limit example configuration file:
 
 ```yaml
-file_format: "1.1"
+file_format: "1.2"
 tracer_provider:
   processors:
     - batch:

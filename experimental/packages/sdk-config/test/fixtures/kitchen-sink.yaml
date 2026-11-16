@@ -7,7 +7,7 @@
 #
 # For schema documentation, including required properties, semantics, default behavior, etc,
 # see: https://github.com/open-telemetry/opentelemetry-configuration/blob/main/schema-docs.md
-file_format: "1.1"
+file_format: "1.2"
 disabled: false
 log_level: info
 attribute_limits:
@@ -350,7 +350,7 @@ tracer_provider:
         composite/development:
           # Configure sampler to be rule_based.
           rule_based:
-            # The rules for the sampler, matched in order. Each rule can have multiple match conditions - the sampler will be applied if all match. 
+            # The rules for the sampler, matched in order. Each rule can have multiple match conditions - the sampler will be applied if all match.
             # If no conditions are specified, the rule matches all spans that reach it. If no rules match, the span is not sampled.
             rules:
               - attribute_values:
