@@ -31,6 +31,7 @@ import {
   AlwaysOnSampler,
   BatchSpanProcessor,
   ConsoleSpanExporter,
+  createAlwaysRecordSampler,
   ParentBasedSampler,
   RandomIdGenerator,
   SimpleSpanProcessor,
@@ -71,6 +72,7 @@ import {
 import { AggregationTemporalityPreference } from '@opentelemetry/exporter-metrics-otlp-http';
 import type {
   AggregationConfigModel,
+  AlwaysRecordSamplerConfigModel,
   AttributeLimitsConfigModel,
   Base2ExponentialBucketHistogramAggregationConfigModel,
   BatchLogRecordProcessorConfigModel,
@@ -1405,6 +1407,17 @@ function createSpanProcessorFromConfig(
   }
 }
 
+function createAlwaysRecordSamplerFromConfig(
+  reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): Sampler {
+  checkConfigUse('AlwaysRecordSampler', properties!, ['root']);
+  const props = properties as unknown as AlwaysRecordSamplerConfigModel;
+  return createAlwaysRecordSampler(
+    mustCreateSamplerFromConfig(reg, props.root)
+  );
+}
+
 function createTraceIdRatioBasedSamplerFromConfig(
   _reg: ComponentProviderRegistry,
   properties: ConfigProperties
@@ -1461,6 +1474,13 @@ export function createSamplerFromConfig(
   if (!samplerConfig) {
     return undefined;
   }
+  return mustCreateSamplerFromConfig(reg, samplerConfig);
+}
+
+function mustCreateSamplerFromConfig(
+  reg: ComponentProviderRegistry,
+  samplerConfig: SamplerConfigModel
+): Sampler {
   const [name, properties] = mustSingleEntry(samplerConfig, 'Sampler');
   const provider = reg['Sampler']?.[name];
   if (provider) {
@@ -1556,13 +1576,9 @@ export function getBuiltinComponentProviderRegistry(): ComponentProviderRegistry
     Sampler: {
       always_off: () => new AlwaysOffSampler(),
       always_on: () => new AlwaysOnSampler(),
+      always_record: createAlwaysRecordSamplerFromConfig,
       trace_id_ratio_based: createTraceIdRatioBasedSamplerFromConfig,
       parent_based: createParentBasedSamplerFromConfig,
-      // TODO: always_record, once there is a release of opentelemetry-configuration with https://github.com/open-telemetry/opentelemetry-configuration/pull/698
-      // case 'always_record': {
-      //   const props = properties as AlwaysRecordConfigModel;
-      //   return createAlwaysRecordSampler(createSamplerFromConfig(reg, props.root));
-      // }
       // TODO(6961): composite/development
       // TODO(6541): probability/development (via composite support for?)
       // TODO(later): Consider supporting jaeger_remote/development if requested by a user. Only consider `sampler-jaeger-remote` package after axios dep is dropped in #6963.
