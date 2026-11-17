@@ -1,0 +1,157 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="../"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>ATTR_HOST_ID | OpenTelemetry SDK</title><meta name="description" content="Documentation for OpenTelemetry SDK"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/icons.js" id="tsd-icons-script"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script><script async src="../assets/hierarchy.js" id="tsd-hierarchy-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar">
+<div class="tsd-toolbar-contents container"><a href="../index.html" class="title">OpenTelemetry SDK</a>
+<div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/>
+<ul role="listbox" id="tsd-search-results"></ul>
+<div id="tsd-search-status" aria-live="polite" aria-atomic="true">
+<div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-menu"></use></svg></a></div></header>
+<div class="container container-main">
+<div class="col-content">
+<div class="tsd-page-title">
+<ul class="tsd-breadcrumb" aria-label="Breadcrumb">
+<li><a href="../modules/_opentelemetry_semantic-conventions.html">@opentelemetry/semantic-conventions</a></li>
+<li><a href="../modules/_opentelemetry_semantic-conventions.index-incubating.html">index-incubating</a></li>
+<li><a href="" aria-current="page">ATTR_HOST_ID</a></li></ul>
+<h1>Variable ATTR_HOST_ID<code class="tsd-tag">Const</code> <code class="tsd-tag">Experimental</code></h1></div>
+<div class="tsd-signature"><span class="tsd-kind-variable">ATTR_HOST_ID</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;host.id&quot;</span><span class="tsd-signature-symbol"> = ...</span></div>
+<div class="tsd-comment tsd-typography"><p>Unique host ID, determined by the first matching source in the priority order.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-example">
+<h4 class="tsd-anchor-link" id="example">Example<a href="#example" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-6">fdbf79e8af94cb7f9e8df36789187052</span>
+</code><button type="button">Copy</button></pre>
+
+</div>
+<div class="tsd-tag-note">
+<h4 class="tsd-anchor-link" id="note">Note<a href="#note" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p><strong>SHOULD</strong> be determined using the first available source from the following priority tiers:</p>
+<ol>
+<li>Known cloud vendors - cloud instance ID</li>
+<li>Known VM vendors - provider VM ID</li>
+<li>OS-dependent machine ID</li>
+<li>User-provided value</li>
+</ol>
+<p>The value <strong>SHOULD</strong> conform to the following properties:</p>
+<ul>
+<li><strong>Unique</strong> within a given context;</li>
+<li><strong><a href="https://opentelemetry.io/docs/specs/otel/entities/data-model/#repeatable-identity">Repeatable</a></strong> - multiple observers on the same host come up with the same value;</li>
+<li><strong>Persistent</strong> - survives host restarts and software updates.</li>
+</ul>
+<p><strong>Collecting <code>host.id</code> From Known Environments:</strong> When <code>host.id</code> is derived from a
+cloud vendor instance ID, the resource <strong>SHOULD</strong> also carry the corresponding
+<code>cloud.provider</code> and <code>cloud.platform</code> attributes so that the source of the <code>host.id</code>
+value can be unambiguously determined.</p>
+<p>The following cloud environments are currently recognized:</p>
+<table>
+<thead>
+<tr>
+<th>Environment</th>
+<th><code>host.id</code> source</th>
+<th><code>cloud.provider</code></th>
+<th><code>cloud.platform</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AWS EC2</td>
+<td>EC2 instance ID</td>
+<td><code>aws</code></td>
+<td><code>aws_ec2</code></td>
+</tr>
+<tr>
+<td>AWS EKS (node)</td>
+<td>EC2 instance ID</td>
+<td><code>aws</code></td>
+<td><code>aws_eks</code></td>
+</tr>
+<tr>
+<td>Azure VM</td>
+<td><code>vmId</code></td>
+<td><code>azure</code></td>
+<td><code>azure.vm</code></td>
+</tr>
+<tr>
+<td>GCP Compute Engine</td>
+<td>GCE instance ID</td>
+<td><code>gcp</code></td>
+<td><code>gcp_compute_engine</code></td>
+</tr>
+<tr>
+<td>GCP GKE (node)</td>
+<td>GCE instance ID</td>
+<td><code>gcp</code></td>
+<td><code>gcp_kubernetes_engine</code></td>
+</tr>
+</tbody>
+</table>
+<p>The listed <code>cloud.provider</code>/<code>cloud.platform</code> values are for example only. Refer to the
+<a href="/docs/registry/attributes/cloud.md"><code>cloud</code></a> attribute definitions for the relevant set of values.</p>
+<p><strong>Non-privileged Machine ID Lookup:</strong> When collecting <code>host.id</code> for non-containerized
+systems, non-privileged lookups of the machine ID are preferred. SDK detector
+implementations <strong>MUST</strong> use the sources listed below to obtain the machine ID.</p>
+<table>
+<thead>
+<tr>
+<th>OS</th>
+<th>Primary</th>
+<th>Fallback</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Linux</td>
+<td>contents of <code>/etc/machine-id</code></td>
+<td>contents of <code>/var/lib/dbus/machine-id</code></td>
+</tr>
+<tr>
+<td>BSD</td>
+<td>contents of <code>/etc/hostid</code></td>
+<td>output of <code>/bin/kenv -q smbios.system.uuid</code></td>
+</tr>
+<tr>
+<td>macOS</td>
+<td><code>IOPlatformUUID</code> line from the output of <code>/usr/sbin/ioreg -rd1 -c &quot;IOPlatformExpertDevice&quot;</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td><code>MachineGuid</code> from registry <code>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Cryptography</code></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Privileged Machine ID Lookup:</strong> The <code>host.id</code> can be looked up using privileged
+sources. For example, Linux systems can use the output of <code>dmidecode -t system</code>,
+<code>dmidecode -t baseboard</code>,
+<code>dmidecode -t chassis</code>, or read the corresponding data from the filesystem
+(e.g. <code>cat /sys/devices/virtual/dmi/id/product_id</code>,
+<code>cat /sys/devices/virtual/dmi/id/product_uuid</code>, etc), however, SDK resource
+detector implementations <strong>MUST NOT</strong> collect <code>host.id</code> from privileged sources. If
+privileged lookup of <code>host.id</code> is required, the value <strong>SHOULD</strong> be injected via the
+<code>OTEL_RESOURCE_ATTRIBUTES</code> environment variable.</p>
+<p><strong>Collecting <code>host.id</code> From User Configuration:</strong> If none of the above sources yields
+a non-empty value, the implementation <strong>MAY</strong> be unable to determine <code>host.id</code>
+automatically and <strong>SHOULD</strong> omit the attribute.
+In that case, the <code>host.id</code> can only be provided through user configuration
+or other available manual options. Users <strong>SHOULD</strong> ensure that the <code>host.id</code> value
+conforms to the properties stated above.</p>
+<p>This attribute is experimental and is subject to breaking changes in minor releases of <code>@opentelemetry/semantic-conventions</code>.</p>
+</div></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/497a5abfd3d852241f6f0512074c9909bd95261e/semantic-conventions/src/experimental_attributes.ts#L9045">experimental_attributes.ts:9045</a></li></ul></aside></div>
+<div class="col-sidebar">
+<div class="page-menu">
+<div class="tsd-navigation settings">
+<details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h3>Settings</h3></summary>
+<div class="tsd-accordion-details">
+<div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span>
+<ul id="tsd-filter-options">
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></div>
+<div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div></div>
+<div class="site-menu">
+<nav class="tsd-navigation"><a href="../index.html">OpenTelemetry SDK</a>
+<ul class="tsd-small-nested-navigation" id="tsd-nav-container">
+<li>Loading...</li></ul></nav></div></div></div><footer>
+<p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer>
+<div class="overlay"></div></body></html>
