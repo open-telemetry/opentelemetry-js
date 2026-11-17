@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-logs-otlp-proto",
-  "version": "0.301.0",
+  "version": "0.301.2",
   "description": "An OTLP exporter to send logs using protobuf over HTTP",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -70,12 +70,12 @@
     "access": "public"
   },
   "devDependencies": {
-    "@babel/core": "7.29.7",
-    "@babel/preset-env": "7.29.7",
+    "@babel/core": "7.29.13",
+    "@babel/preset-env": "7.29.14",
     "@opentelemetry/api": "1.10.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
-    "@types/sinon": "17.0.4",
+    "@types/sinon": "22.0.2",
     "babel-plugin-istanbul": "8.0.0",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.2.0",
@@ -85,7 +85,7 @@
     "karma-webpack": "5.0.1",
     "mocha": "12.0.3",
     "nyc": "18.0.0",
-    "sinon": "18.0.1",
+    "sinon": "22.1.0",
     "ts-loader": "9.5.7",
     "typescript": "5.2.2",
     "webpack": "5.108.4",
@@ -95,9 +95,9 @@
     "@opentelemetry/api": "^1.10.0"
   },
   "dependencies": {
-    "@opentelemetry/otlp-exporter-base": "0.301.0",
-    "@opentelemetry/otlp-transformer": "0.301.0",
-    "@opentelemetry/sdk-logs": "3.1.0"
+    "@opentelemetry/otlp-exporter-base": "0.301.2",
+    "@opentelemetry/otlp-transformer": "0.301.2",
+    "@opentelemetry/sdk-logs": "3.1.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-logs-otlp-proto",
   "sideEffects": false

@@ -1,0 +1,11 @@
+file_format: "1.1"
+disabled: false
+tracer_provider:
+  processors:
+    - batch:
+        exporter:
+          otlp_http:
+            endpoint: "http://localhost:4318/v1/traces"
+  # `id_generator` was added in v1.1.0.
+  id_generator:
+    random:

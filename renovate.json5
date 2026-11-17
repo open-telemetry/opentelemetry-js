@@ -27,12 +27,12 @@
     },
     {
       "matchUpdateTypes": ["minor"],
-      "matchManagers": ["js"],
+      "matchManagers": ["npm"],
       "dependencyDashboardApproval": true
     },
     {
       "matchUpdateTypes": ["minor"],
-      "matchManagers": ["!js"],
+      "matchManagers": ["!npm"],
       "schedule": ["before 3am on Monday"]
     },
     {

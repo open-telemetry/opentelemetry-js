@@ -217,7 +217,7 @@ describe('startNodeSdk', function () {
     assert.strictEqual(diagError.callCount, 1);
     assert.strictEqual(
       diagError.args[0][0],
-      'Could not create OpenTelemetry SDK from configuration, SDK will not be setup: unknown LogRecordProcessor name: "my_custom_processor"'
+      'Could not create OpenTelemetry SDK from configuration, SDK will not be setup: unknown LogRecordProcessor name in configuration: "my_custom_processor"'
     );
 
     await sdk.shutdown();

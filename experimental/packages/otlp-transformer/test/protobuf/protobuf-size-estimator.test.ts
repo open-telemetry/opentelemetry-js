@@ -177,6 +177,21 @@ describe('ProtobufSizeEstimator', function () {
       }
     });
 
+    for (const length of [0, 1, 127, 128, 129, 4096]) {
+      for (const suffix of ['', 'é世界', '🚀', '\ud800', '\udc00', '\ud800x']) {
+        const value = 'a'.repeat(length) + suffix;
+        it(`should size writeString as TextEncoder bytes for ${length} ASCII characters and ${JSON.stringify(suffix)}`, function () {
+          const writer = new ProtobufWriter(8);
+          const estimator = new ProtobufSizeEstimator();
+
+          writer.writeBytes(new TextEncoder().encode(value));
+          estimator.writeString(value);
+
+          assert.strictEqual(estimator.pos, writer.pos);
+        });
+      }
+    }
+
     it('should match ProtobufWriter size for writeTag', function () {
       const testValues = [
         { fieldNumber: 1, wireType: 0 },
