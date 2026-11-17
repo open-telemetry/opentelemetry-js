@@ -352,7 +352,13 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         if (args[0] instanceof Request) {
           options = args[1] != null ? new Request(args[0], args[1]) : args[0];
         } else {
-          options = args[1] || {};
+          // Copy a plain init object, so that header injection does not change
+          // the caller's object, which it may reuse for other requests.
+          const init = args[1];
+          options =
+            init && Object.getPrototypeOf(init) === Object.prototype
+              ? { ...init }
+              : init || {};
         }
         const createdSpan = plugin._createSpan(url, options);
         if (!createdSpan) {
@@ -361,7 +367,10 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         const spanData = plugin._prepareSpanData(url);
 
         if (plugin.getConfig().measureRequestSize) {
-          getFetchBodyLength(...args)
+          getFetchBodyLength(
+            args[0],
+            options instanceof Request ? args[1] : options
+          )
             .then(bodyLength => {
               if (!bodyLength) return;
               createdSpan.setAttribute(ATTR_HTTP_REQUEST_BODY_SIZE, bodyLength);
