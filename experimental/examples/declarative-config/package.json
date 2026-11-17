@@ -12,7 +12,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@opentelemetry/api": "^1.7.0",
-    "@opentelemetry/configuration": "0.301.2",
+    "@opentelemetry/sdk-config": "0.301.2",
     "@opentelemetry/sdk-node": "0.301.2"
   },
   "devDependencies": {

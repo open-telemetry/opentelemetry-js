@@ -53,13 +53,13 @@ describe('OTLPExportDelegate', function () {
         send: sinon.stub(),
         shutdown: sinon.stub(),
       };
-      const mockTransport = <IExporterTransport>transportStubs;
+      const mockTransport = transportStubs as IExporterTransport;
 
       const serializerStubs = {
         serializeRequest: sinon.stub(),
         deserializeResponse: sinon.stub(),
       };
-      const mockSerializer = <FakeSerializer>serializerStubs;
+      const mockSerializer = serializerStubs as FakeSerializer;
 
       // promise queue has not reached capacity yet
       const promiseQueueStubs = {
@@ -67,7 +67,7 @@ describe('OTLPExportDelegate', function () {
         hasReachedLimit: sinon.stub(),
         awaitAll: sinon.stub().returns(Promise.resolve()),
       };
-      const promiseQueue = <IExportPromiseHandler>promiseQueueStubs;
+      const promiseQueue = promiseQueueStubs as IExportPromiseHandler;
 
       const exporter = createOtlpExportDelegate(
         {
@@ -97,13 +97,13 @@ describe('OTLPExportDelegate', function () {
         send: sinon.stub(),
         shutdown: sinon.stub(),
       };
-      const mockTransport = <IExporterTransport>transportStubs;
+      const mockTransport = transportStubs as IExporterTransport;
 
       const serializerStubs = {
         serializeRequest: sinon.stub(),
         deserializeResponse: sinon.stub(),
       };
-      const mockSerializer = <FakeSerializer>serializerStubs;
+      const mockSerializer = serializerStubs as FakeSerializer;
 
       // promise queue has not reached capacity yet
       const promiseQueueStubs = {
@@ -111,7 +111,7 @@ describe('OTLPExportDelegate', function () {
         hasReachedLimit: sinon.stub(),
         awaitAll: sinon.stub().returns(Promise.resolve()),
       };
-      const promiseQueue = <IExportPromiseHandler>promiseQueueStubs;
+      const promiseQueue = promiseQueueStubs as IExportPromiseHandler;
 
       const exporter = createOtlpExportDelegate(
         {
@@ -141,13 +141,13 @@ describe('OTLPExportDelegate', function () {
         send: sinon.stub(),
         shutdown: sinon.stub(),
       };
-      const mockTransport = <IExporterTransport>transportStubs;
+      const mockTransport = transportStubs as IExporterTransport;
 
       const serializerStubs = {
         serializeRequest: sinon.stub().returns(undefined),
         deserializeResponse: sinon.stub(),
       };
-      const mockSerializer = <FakeSerializer>serializerStubs;
+      const mockSerializer = serializerStubs as FakeSerializer;
 
       // promise queue has not reached capacity yet
       const promiseHandlerStubs = {
@@ -155,7 +155,7 @@ describe('OTLPExportDelegate', function () {
         hasReachedLimit: sinon.stub().returns(false),
         awaitAll: sinon.stub(),
       };
-      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
+      const promiseHandler = promiseHandlerStubs as IExportPromiseHandler;
 
       const exporter = createOtlpExportDelegate(
         {
@@ -197,14 +197,14 @@ describe('OTLPExportDelegate', function () {
         send: sinon.stub(),
         shutdown: sinon.stub(),
       };
-      const mockTransport = <IExporterTransport>transportStubs;
+      const mockTransport = transportStubs as IExporterTransport;
 
       // serializer should be never used when the queue is full, so it does not need to do anything.
       const serializerStubs = {
         serializeRequest: sinon.stub(),
         deserializeResponse: sinon.stub(),
       };
-      const mockSerializer = <FakeSerializer>serializerStubs;
+      const mockSerializer = serializerStubs as FakeSerializer;
 
       // make queue signal that it is full.
       const promiseHandlerStubs = {
@@ -212,7 +212,7 @@ describe('OTLPExportDelegate', function () {
         hasReachedLimit: sinon.stub().returns(true),
         awaitAll: sinon.stub(),
       };
-      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
+      const promiseHandler = promiseHandlerStubs as IExportPromiseHandler;
 
       const exporter = createOtlpExportDelegate(
         {
@@ -255,7 +255,7 @@ describe('OTLPExportDelegate', function () {
         send: sinon.stub().returns(Promise.resolve(exportResponse)),
         shutdown: sinon.stub(),
       };
-      const mockTransport = <IExporterTransport>transportStubs;
+      const mockTransport = transportStubs as IExporterTransport;
 
       const serializerStubs = {
         // simulate that the serializer returns something to send
@@ -263,7 +263,7 @@ describe('OTLPExportDelegate', function () {
         // simulate that it returns a full success (empty response)
         deserializeResponse: sinon.stub().returns({}),
       };
-      const mockSerializer = <FakeSerializer>serializerStubs;
+      const mockSerializer = serializerStubs as FakeSerializer;
 
       // mock a queue that has not yet reached capacity
       const promiseHandlerStubs = {
@@ -271,7 +271,7 @@ describe('OTLPExportDelegate', function () {
         hasReachedLimit: sinon.stub().returns(false),
         awaitAll: sinon.stub(),
       };
-      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
+      const promiseHandler = promiseHandlerStubs as IExportPromiseHandler;
 
       const exporter = createOtlpExportDelegate(
         {
@@ -314,7 +314,7 @@ describe('OTLPExportDelegate', function () {
         send: sinon.stub().returns(Promise.resolve(exportResponse)),
         shutdown: sinon.stub,
       };
-      const mockTransport = <IExporterTransport>transportStubs;
+      const mockTransport = transportStubs as IExporterTransport;
 
       const serializerStubs = {
         // simulate that the serializer returns something to send
@@ -322,7 +322,7 @@ describe('OTLPExportDelegate', function () {
         // simulate that it returns a full success (empty response)
         deserializeResponse: sinon.stub().returns({}),
       };
-      const mockSerializer = <FakeSerializer>serializerStubs;
+      const mockSerializer = serializerStubs as FakeSerializer;
 
       // mock a queue that has not yet reached capacity
       const promiseHandlerStubs = {
@@ -330,7 +330,7 @@ describe('OTLPExportDelegate', function () {
         hasReachedLimit: sinon.stub().returns(false),
         awaitAll: sinon.stub(),
       };
-      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
+      const promiseHandler = promiseHandlerStubs as IExportPromiseHandler;
 
       const exporter = createOtlpExportDelegate(
         {
@@ -373,7 +373,7 @@ describe('OTLPExportDelegate', function () {
         send: sinon.stub().returns(Promise.resolve(exportResponse)),
         shutdown: sinon.stub,
       };
-      const mockTransport = <IExporterTransport>transportStubs;
+      const mockTransport = transportStubs as IExporterTransport;
 
       const serializerStubs = {
         // simulate that the serializer returns something to send
@@ -381,7 +381,7 @@ describe('OTLPExportDelegate', function () {
         // simulate that it returns a full success (empty response)
         deserializeResponse: sinon.stub().returns({}),
       };
-      const mockSerializer = <FakeSerializer>serializerStubs;
+      const mockSerializer = serializerStubs as FakeSerializer;
 
       // mock a queue that has not yet reached capacity
       const promiseHandlerStubs = {
@@ -389,7 +389,7 @@ describe('OTLPExportDelegate', function () {
         hasReachedLimit: sinon.stub().returns(false),
         awaitAll: sinon.stub(),
       };
-      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
+      const promiseHandler = promiseHandlerStubs as IExportPromiseHandler;
 
       const exporter = createOtlpExportDelegate(
         {
@@ -434,7 +434,7 @@ describe('OTLPExportDelegate', function () {
         send: sinon.stub().returns(Promise.resolve(exportResponse)),
         shutdown: sinon.stub(),
       };
-      const mockTransport = <IExporterTransport>transportStubs;
+      const mockTransport = transportStubs as IExporterTransport;
 
       const serializerStubs = {
         // simulate that the serializer returns something to send
@@ -442,7 +442,7 @@ describe('OTLPExportDelegate', function () {
         // simulate that it returns a full success (empty response)
         deserializeResponse: sinon.stub().returns({}),
       };
-      const mockSerializer = <FakeSerializer>serializerStubs;
+      const mockSerializer = serializerStubs as FakeSerializer;
 
       // mock a queue that has not yet reached capacity
       const promiseHandlerStubs = {
@@ -450,7 +450,7 @@ describe('OTLPExportDelegate', function () {
         hasReachedLimit: sinon.stub().returns(false),
         awaitAll: sinon.stub(),
       };
-      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
+      const promiseHandler = promiseHandlerStubs as IExportPromiseHandler;
 
       const exporter = createOtlpExportDelegate(
         {
@@ -498,7 +498,7 @@ describe('OTLPExportDelegate', function () {
         send: sinon.stub().returns(Promise.resolve(exportResponse)),
         shutdown: sinon.stub(),
       };
-      const mockTransport = <IExporterTransport>transportStubs;
+      const mockTransport = transportStubs as IExporterTransport;
 
       const response: FakeSignalResponse = {};
 
@@ -508,7 +508,7 @@ describe('OTLPExportDelegate', function () {
         // simulate that it returns a partial success (response with contents)
         deserializeResponse: sinon.stub().returns(response),
       };
-      const mockSerializer = <FakeSerializer>serializerStubs;
+      const mockSerializer = serializerStubs as FakeSerializer;
 
       // mock a queue that has not yet reached capacity
       const promiseHandlerStubs = {
@@ -516,7 +516,7 @@ describe('OTLPExportDelegate', function () {
         hasReachedLimit: sinon.stub().returns(false),
         awaitAll: sinon.stub(),
       };
-      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
+      const promiseHandler = promiseHandlerStubs as IExportPromiseHandler;
 
       const exporter = createOtlpExportDelegate(
         {
@@ -562,7 +562,7 @@ describe('OTLPExportDelegate', function () {
         send: sinon.stub().returns(Promise.resolve(exportResponse)),
         shutdown: sinon.stub(),
       };
-      const mockTransport = <IExporterTransport>transportStubs;
+      const mockTransport = transportStubs as IExporterTransport;
 
       const serializerStubs = {
         // simulate that the serializer returns something to send
@@ -570,7 +570,7 @@ describe('OTLPExportDelegate', function () {
         // simulate that it returns a partial success (response with contents)
         deserializeResponse: sinon.stub().throws(new Error()),
       };
-      const mockSerializer = <FakeSerializer>serializerStubs;
+      const mockSerializer = serializerStubs as FakeSerializer;
 
       // mock a queue that has not yet reached capacity
       const promiseHandlerStubs = {
@@ -578,7 +578,7 @@ describe('OTLPExportDelegate', function () {
         hasReachedLimit: sinon.stub().returns(false),
         awaitAll: sinon.stub(),
       };
-      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
+      const promiseHandler = promiseHandlerStubs as IExportPromiseHandler;
 
       const exporter = createOtlpExportDelegate(
         {
@@ -631,7 +631,7 @@ describe('OTLPExportDelegate', function () {
         send: sinon.stub().returns(Promise.resolve(exportResponse)),
         shutdown: sinon.stub(),
       };
-      const mockTransport = <IExporterTransport>transportStubs;
+      const mockTransport = transportStubs as IExporterTransport;
 
       const partialSuccessResponse: FakeSignalResponse = {
         partialSuccess: { foo: 'bar' },
@@ -643,7 +643,7 @@ describe('OTLPExportDelegate', function () {
         // simulate that it returns a partial success (response with contents)
         deserializeResponse: sinon.stub().returns(partialSuccessResponse),
       };
-      const mockSerializer = <FakeSerializer>serializerStubs;
+      const mockSerializer = serializerStubs as FakeSerializer;
 
       // mock a queue that has not yet reached capacity
       const promiseHandlerStubs = {
@@ -651,7 +651,7 @@ describe('OTLPExportDelegate', function () {
         hasReachedLimit: sinon.stub().returns(false),
         awaitAll: sinon.stub(),
       };
-      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
+      const promiseHandler = promiseHandlerStubs as IExportPromiseHandler;
 
       const exporter = createOtlpExportDelegate(
         {
@@ -695,7 +695,7 @@ describe('OTLPExportDelegate', function () {
         send: sinon.stub().returns(Promise.reject(new Error())),
         shutdown: sinon.stub(),
       };
-      const mockTransport = <IExporterTransport>transportStubs;
+      const mockTransport = transportStubs as IExporterTransport;
 
       const serializerStubs = {
         // simulate that the serializer returns something to send
@@ -703,7 +703,7 @@ describe('OTLPExportDelegate', function () {
         // does not need to do anything, should never be called.
         deserializeResponse: sinon.stub(),
       };
-      const mockSerializer = <FakeSerializer>serializerStubs;
+      const mockSerializer = serializerStubs as FakeSerializer;
 
       // mock a queue that has not yet reached capacity
       const promiseHandlerStubs = {
@@ -711,7 +711,7 @@ describe('OTLPExportDelegate', function () {
         hasReachedLimit: sinon.stub().returns(false),
         awaitAll: sinon.stub(),
       };
-      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
+      const promiseHandler = promiseHandlerStubs as IExportPromiseHandler;
 
       const exporter = createOtlpExportDelegate(
         {
@@ -764,7 +764,7 @@ describe('OTLPExportDelegate', function () {
         send: sinon.stub().returns(sendPromise),
         shutdown: sinon.stub(),
       };
-      const mockTransport = <IExporterTransport>transportStubs;
+      const mockTransport = transportStubs as IExporterTransport;
 
       const serializerStubs = {
         // simulate that the serializer returns something to send
@@ -772,7 +772,7 @@ describe('OTLPExportDelegate', function () {
         // simulate that it returns a full success (empty response)
         deserializeResponse: sinon.stub().returns({}),
       };
-      const mockSerializer = <FakeSerializer>serializerStubs;
+      const mockSerializer = serializerStubs as FakeSerializer;
 
       // mock a queue that has not yet reached capacity
       const promiseHandlerStubs = {
@@ -780,7 +780,7 @@ describe('OTLPExportDelegate', function () {
         hasReachedLimit: sinon.stub().returns(false),
         awaitAll: sinon.stub(),
       };
-      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
+      const promiseHandler = promiseHandlerStubs as IExportPromiseHandler;
 
       const exporter = createOtlpExportDelegate(
         {
@@ -881,7 +881,7 @@ describe('OTLPExportDelegate', function () {
         send: sinon.stub().returns(Promise.resolve(exportResponse)),
         shutdown: sinon.stub(),
       };
-      const mockTransport = <IExporterTransport>transportStubs;
+      const mockTransport = transportStubs as IExporterTransport;
 
       const serializerStubs = {
         // simulate that the serializer returns something to send
@@ -889,7 +889,7 @@ describe('OTLPExportDelegate', function () {
         // simulate that it returns a full success (empty response)
         deserializeResponse: sinon.stub().returns({}),
       };
-      const mockSerializer = <FakeSerializer>serializerStubs;
+      const mockSerializer = serializerStubs as FakeSerializer;
 
       // mock a queue that has not yet reached capacity
       const promiseHandlerStubs = {
@@ -897,7 +897,7 @@ describe('OTLPExportDelegate', function () {
         hasReachedLimit: sinon.stub().returns(false),
         awaitAll: sinon.stub(),
       };
-      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
+      const promiseHandler = promiseHandlerStubs as IExportPromiseHandler;
 
       const exporter = createOtlpExportDelegate(
         {

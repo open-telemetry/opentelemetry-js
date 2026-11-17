@@ -9,7 +9,7 @@
  * using json-schema-to-typescript.
  *
  * Usage:
- *    cd experimental/packages/configuration
+ *    cd experimental/packages/sdk-config
  *    npm run generate:config
  */
 
@@ -26,7 +26,7 @@ const typescript = require('typescript');
 // Get latest version by running:
 //    git tag -l --sort=version:refname | grep -v -- - | tail -1
 // in git@github.com:open-telemetry/opentelemetry-configuration.git
-const CONFIG_VERSION = 'v1.1.0';
+const CONFIG_VERSION = 'v1.2.0';
 
 const TOP = path.resolve(__dirname, '..');
 const SCHEMA_PATH = path.join(

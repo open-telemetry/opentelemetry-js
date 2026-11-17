@@ -40,7 +40,7 @@
       "path": "../api-config"
     },
     {
-      "path": "../configuration"
+      "path": "../sdk-config"
     },
     {
       "path": "../exporter-logs-otlp-grpc"

@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ConfigurationModel } from '@opentelemetry/configuration';
+import type { ConfigurationModel } from '@opentelemetry/sdk-config';
 import {
   parseConfigFile,
   createConfigProvider,
-} from '@opentelemetry/configuration';
+} from '@opentelemetry/sdk-config';
 import type { ConfigProvider } from '@opentelemetry/api-config';
 import { config as configApi } from '@opentelemetry/api-config';
 import type { ContextManager, TextMapPropagator } from '@opentelemetry/api';

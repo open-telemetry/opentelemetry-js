@@ -9,21 +9,28 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :boom: Breaking Changes
 
+* chore(configuration, sdk-config)!: rename the `@opentelemetry/configuration` package to `@opentelemetry/sdk-config` [#7284](https://github.com/open-telemetry/opentelemetry-js/issues/7284) @trentm
+
 ### :rocket: Features
 
+* feat(sdk-config): add support for parsing `file_format: "1.2"` declarative config files
+  * See the OTel Configuration v1.2.0 release notes: <https://github.com/open-telemetry/opentelemetry-configuration/releases/tag/v1.2.0>
 * feat(api-config): add `@opentelemetry/api-config`, an experimental package with the declarative-config `ConfigProvider` and `ConfigProperties` types and a global `config` accessor [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
-* feat(configuration): add `createConfigProvider()` to build a `ConfigProvider` over the parsed configuration model [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
+* feat(sdk-config): add `createConfigProvider()` to build a `ConfigProvider` over the parsed configuration model [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
 * feat(instrumentation): support the `instrumentation/development` section of declarative config. `Instrumentation#setConfigProvider()` is an optional method that `registerInstrumentations()` calls on each instrumentation, alongside `setTracerProvider()` and friends. The `readDeclarativeConfig()` util reads an instrumentation's own block (`instrumentation/development.js.<name>`) and the shared `general` block through a typed reader, mapping snake_case config properties onto config fields. Unrecognized properties and type mismatches warn [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
 * feat(instrumentation-http): read declarative config via `setConfigProvider()`, mapping the `instrumentation/development.js.@opentelemetry/instrumentation-http` properties it supports and the `general.http.{client,server}.*_captured_headers` properties onto `headersToSpanAttributes` [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
 * feat(sdk-node): register a global `ConfigProvider` from the config file, so instrumentations registered with `registerInstrumentations()` receive it [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
 
 ### :bug: Bug Fixes
 
+* fix(exporter-trace-otlp-http, exporter-logs-otlp-http, exporter-metrics-otlp-http): use the `otlp_http_json_*_exporter` `otel.component.type` values for JSON exporters ([#7286](https://github.com/open-telemetry/opentelemetry-js/pull/7286)) @shehjaddev
+
 ### :books: Documentation
 
 ### :house: Internal
 
 * refactor(sdk-node): internally use a ComponentProvider implementation for creating SDK components from a declarative config [#7269](https://github.com/open-telemetry/opentelemetry-js/pull/7269) @trentm
+* test: use erasable syntax on type assertions [#7311](https://github.com/open-telemetry/opentelemetry-js/pull/7311) @legendecas
 * fix(otlp-transformer): omit proto3 defalt value fields [#7316](https://github.com/open-telemetry/opentelemetry-js/pull/7316) @legendecas
 
 ## 0.301.2
@@ -135,6 +142,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :bug: Bug Fixes
 
+* fix(otlp-exporter-base): honor standard proxy environment variables in Node.js HTTP exporters while preserving explicit proxy configuration. Native environment proxying requires Node.js 22.21.0+ or 24.5.0+; earlier supported runtimes require an explicit agent implementation. [#6932](https://github.com/open-telemetry/opentelemetry-js/pull/6932) @LarryHu0217
 * fix(otlp-exporter-base): suppress tracing around the browser fetch transport's own request so a `fetch` instrumentation cannot create an export → span → export loop [#6948](https://github.com/open-telemetry/opentelemetry-js/pull/6948) @YangJonghun
 * fix(instrumentation-http): set `error.type` on spans whose status code makes them an error [#7061](https://github.com/open-telemetry/opentelemetry-js/pull/7061) @mwear
 * fix(exporter-prometheus): prevent duplicate metric metadata and keep metric families grouped across instrumentation scopes in Prometheus scrapes [#7047](https://github.com/open-telemetry/opentelemetry-js/pull/7047) @freben
