@@ -89,8 +89,8 @@
     "@opentelemetry/otlp-transformer": "0.301.2"
   },
   "devDependencies": {
-    "@babel/core": "7.29.13",
-    "@babel/preset-env": "7.29.14",
+    "@babel/core": "8.1.2",
+    "@babel/preset-env": "8.0.7",
     "@opentelemetry/api": "1.10.0",
     "@opentelemetry/sdk-trace": "3.1.1",
     "@types/mocha": "10.0.10",

@@ -32,8 +32,8 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "devDependencies": {
-    "@babel/core": "^7.23.6",
-    "@babel/preset-env": "^7.22.20",
+    "@babel/core": "^8.0.0",
+    "@babel/preset-env": "^8.0.0",
     "babel-loader": "^10.0.0",
     "ts-loader": "^9.2.6",
     "typescript": "5.2.2",
