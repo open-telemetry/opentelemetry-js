@@ -9,13 +9,6 @@
       "matchManagers": ["github-actions"],
       "pinDigests": true
     },
-    {
-      // Pin devDependencies only (config:best-practices). Runtime ranges stay
-      // unpinned so consumers keep flexibility.
-      "matchDepTypes": ["dependencies", "peerDependencies", "optionalDependencies"],
-      "matchUpdateTypes": ["pin"],
-      "enabled": false
-    },
     // Stable (>=1.0) minor and patch updates are low risk and clustered by
     // category. 0.x versions are excluded as they are treated like majors.
     {
