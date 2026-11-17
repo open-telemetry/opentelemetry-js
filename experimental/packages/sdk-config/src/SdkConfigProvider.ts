@@ -42,8 +42,7 @@ function asConfigProperties(node: unknown, path: string): ConfigProperties {
  */
 class SdkConfigProvider implements ConfigProvider {
   private readonly _instrumentationConfig:
-    | ExperimentalInstrumentation
-    | undefined;
+    ExperimentalInstrumentation | undefined;
 
   constructor(config: ConfigurationModel) {
     this._instrumentationConfig = config['instrumentation/development'];

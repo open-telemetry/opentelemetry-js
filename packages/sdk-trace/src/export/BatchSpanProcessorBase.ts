@@ -25,8 +25,7 @@ import { OTEL_COMPONENT_TYPE_VALUE_BATCHING_SPAN_PROCESSOR } from '../semconv';
  */
 export abstract class BatchSpanProcessorBase<
   T extends BatchSpanProcessorOptions,
-> implements SpanProcessor
-{
+> implements SpanProcessor {
   private readonly _maxExportBatchSize: number;
   private readonly _maxQueueSize: number;
   private readonly _scheduledDelayMillis: number;

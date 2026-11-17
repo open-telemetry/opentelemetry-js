@@ -56,8 +56,7 @@ export type XHRCustomAttributeFunction = (
 /**
  * XMLHttpRequest config
  */
-export interface XMLHttpRequestInstrumentationConfig
-  extends InstrumentationConfig {
+export interface XMLHttpRequestInstrumentationConfig extends InstrumentationConfig {
   /**
    * The number of timing resources is limited, after the limit
    * (chrome 250, safari 150) the information is not collected anymore.

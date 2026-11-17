@@ -22,8 +22,7 @@ type PropagateTraceHeaderCorsUrl = string | RegExp;
  * @deprecated See https://github.com/open-telemetry/opentelemetry-js/issues/3174
  */
 export type PropagateTraceHeaderCorsUrls =
-  | PropagateTraceHeaderCorsUrl
-  | PropagateTraceHeaderCorsUrl[];
+  PropagateTraceHeaderCorsUrl | PropagateTraceHeaderCorsUrl[];
 
 // Used to normalize relative URLs
 let urlNormalizingAnchor: HTMLAnchorElement | undefined;
