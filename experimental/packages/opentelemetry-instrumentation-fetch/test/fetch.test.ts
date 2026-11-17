@@ -977,6 +977,19 @@ describe('fetch', () => {
             assert.strictEqual(headers['foo'], 'bar');
             assert.strictEqual(headers['content-type'], 'application/json');
           });
+
+          it('should not change an init object that the caller reuses', async () => {
+            const init: RequestInit = { headers: { foo: 'bar' } };
+
+            const { response } = await tracedFetch({
+              callback: () => fetch('/api/echo-headers.json', init),
+            });
+
+            const headers = await assertPropagationHeaders(response);
+
+            assert.strictEqual(headers['foo'], 'bar');
+            assert.deepStrictEqual(init, { headers: { foo: 'bar' } });
+          });
         });
 
         describe('without global propagator', () => {
