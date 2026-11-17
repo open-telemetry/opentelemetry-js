@@ -352,6 +352,22 @@ export const METRIC_KESTREL_TLS_HANDSHAKE_DURATION = 'kestrel.tls_handshake.dura
 export const METRIC_KESTREL_UPGRADED_CONNECTIONS = 'kestrel.upgraded_connections' as const;
 
 /**
+ * Measures the duration of an outgoing Remote Procedure Call (RPC).
+ *
+ * @note When this metric is reported alongside an RPC client span, the metric value
+ * **SHOULD** be the same as the RPC client span duration.
+ */
+export const METRIC_RPC_CLIENT_CALL_DURATION = 'rpc.client.call.duration' as const;
+
+/**
+ * Measures the duration of an incoming Remote Procedure Call (RPC).
+ *
+ * @note When this metric is reported alongside an RPC server span, the metric value
+ * **SHOULD** be the same as the RPC server span duration.
+ */
+export const METRIC_RPC_SERVER_CALL_DURATION = 'rpc.server.call.duration' as const;
+
+/**
  * Number of connections that are currently active on the server.
  *
  * @note Meter name: `Microsoft.AspNetCore.Http.Connections`; Added in: ASP.NET Core 8.0

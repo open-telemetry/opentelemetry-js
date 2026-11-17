@@ -61,9 +61,11 @@ function serializeLogRecord(
     writeAttributes(writer, logRecord.attributes, 6);
   }
 
-  // dropped_attributes_count (field 7, uint32)
-  writer.writeTag(7, 0);
-  writer.writeVarint(logRecord.droppedAttributesCount);
+  // dropped_attributes_count (field 7, uint32) - skip if 0
+  if (logRecord.droppedAttributesCount) {
+    writer.writeTag(7, 0);
+    writer.writeVarint(logRecord.droppedAttributesCount);
+  }
 
   // flags (field 8, fixed32) - skip if 0 or undefined
   if (logRecord.spanContext?.traceFlags) {

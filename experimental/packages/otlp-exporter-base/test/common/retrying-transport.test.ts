@@ -25,7 +25,7 @@ describe('RetryingTransport', function () {
         send: sinon.stub().returns(Promise.resolve(expectedResponse)),
         shutdown: sinon.stub(),
       };
-      const mockTransport = <IExporterTransport>transportStubs;
+      const mockTransport = transportStubs as IExporterTransport;
       const transport = createRetryingTransport({ transport: mockTransport });
 
       // act
@@ -53,7 +53,7 @@ describe('RetryingTransport', function () {
         send: sinon.stub().returns(Promise.resolve(expectedResponse)),
         shutdown: sinon.stub(),
       };
-      const mockTransport = <IExporterTransport>transportStubs;
+      const mockTransport = transportStubs as IExporterTransport;
       const transport = createRetryingTransport({ transport: mockTransport });
 
       // act
@@ -78,7 +78,7 @@ describe('RetryingTransport', function () {
         send: sinon.stub().rejects(expectedError),
         shutdown: sinon.stub(),
       };
-      const mockTransport = <IExporterTransport>transportStubs;
+      const mockTransport = transportStubs as IExporterTransport;
       const transport = createRetryingTransport({ transport: mockTransport });
 
       // act
@@ -111,7 +111,7 @@ describe('RetryingTransport', function () {
           .returns(Promise.resolve(successResponse)),
         shutdown: sinon.stub(),
       };
-      const mockTransport = <IExporterTransport>transportStubs;
+      const mockTransport = transportStubs as IExporterTransport;
       const transport = createRetryingTransport({ transport: mockTransport });
 
       // act
@@ -149,7 +149,7 @@ describe('RetryingTransport', function () {
           .rejects(expectedError),
         shutdown: sinon.stub(),
       };
-      const mockTransport = <IExporterTransport>transportStubs;
+      const mockTransport = transportStubs as IExporterTransport;
       const transport = createRetryingTransport({ transport: mockTransport });
 
       // act
@@ -183,7 +183,7 @@ describe('RetryingTransport', function () {
         send: sinon.stub().resolves(retryResponse),
         shutdown: sinon.stub(),
       };
-      const mockTransport = <IExporterTransport>transportStubs;
+      const mockTransport = transportStubs as IExporterTransport;
       const transport = createRetryingTransport({ transport: mockTransport });
 
       // act
@@ -216,7 +216,7 @@ describe('RetryingTransport', function () {
         send: sinon.stub().resolves(retryResponse),
         shutdown: sinon.stub(),
       };
-      const mockTransport = <IExporterTransport>transportStubs;
+      const mockTransport = transportStubs as IExporterTransport;
       const transport = createRetryingTransport({ transport: mockTransport });
 
       // act

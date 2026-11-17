@@ -70,19 +70,19 @@ export interface ISpan {
   attributes: IKeyValue[];
 
   /** Span droppedAttributesCount */
-  droppedAttributesCount: number;
+  droppedAttributesCount?: number;
 
   /** Span events */
-  events: IEvent[];
+  events?: IEvent[];
 
   /** Span droppedEventsCount */
-  droppedEventsCount: number;
+  droppedEventsCount?: number;
 
   /** Span links */
-  links: ILink[];
+  links?: ILink[];
 
   /** Span droppedLinksCount */
-  droppedLinksCount: number;
+  droppedLinksCount?: number;
 
   /** Span status */
   status: IStatus;
@@ -133,7 +133,7 @@ export interface IStatus {
   message?: string;
 
   /** Status code */
-  code: EStatusCode;
+  code?: EStatusCode;
 }
 
 /** StatusCode enum. */
@@ -158,7 +158,7 @@ export interface IEvent {
   attributes: IKeyValue[];
 
   /** Event droppedAttributesCount */
-  droppedAttributesCount: number;
+  droppedAttributesCount?: number;
 }
 
 /** Properties of a Link. */
@@ -176,7 +176,7 @@ export interface ILink {
   attributes: IKeyValue[];
 
   /** Link droppedAttributesCount */
-  droppedAttributesCount: number;
+  droppedAttributesCount?: number;
 
   /** Link flags */
   flags?: number;

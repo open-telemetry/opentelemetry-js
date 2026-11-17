@@ -288,10 +288,8 @@ export const METRIC_CONTAINER_DISK_IO = 'container.disk.io' as const;
 /**
  * Container filesystem available bytes.
  *
- * @note In K8s, this metric is derived from the
- * [FsStats.AvailableBytes](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats) field
- * of the [ContainerStats.Rootfs](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#ContainerStats)
- * of the Kubelet's stats API.
+ * @note Available filesystem space for the container's `rootfs`.
+ * In K8s, this metric is derived from the [FsStats.AvailableBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats) field of the [ContainerStats.Rootfs](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#ContainerStats) of the Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -300,10 +298,9 @@ export const METRIC_CONTAINER_FILESYSTEM_AVAILABLE = 'container.filesystem.avail
 /**
  * Container filesystem capacity.
  *
- * @note In K8s, this metric is derived from the
- * [FsStats.CapacityBytes](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats) field
- * of the [ContainerStats.Rootfs](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#ContainerStats)
- * of the Kubelet's stats API.
+ * @note Total filesystem capacity for the container's `rootfs`.
+ * In general, this metric can be derived from [cadvisor](https://github.com/google/cadvisor/blob/v0.53.0/docs/storage/prometheus.md#prometheus-container-metrics) and specifically the `container_fs_limit_bytes` metric for the container's `rootfs` device.
+ * In K8s, this metric is derived from the [FsStats.CapacityBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats) field of the [ContainerStats.Rootfs](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#ContainerStats) of the Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -312,12 +309,10 @@ export const METRIC_CONTAINER_FILESYSTEM_CAPACITY = 'container.filesystem.capaci
 /**
  * Container filesystem usage.
  *
- * @note This may not equal capacity - available.
- *
- * In K8s, this metric is derived from the
- * [FsStats.UsedBytes](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats) field
- * of the [ContainerStats.Rootfs](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#ContainerStats)
- * of the Kubelet's stats API.
+ * @note Filesystem space used by the container's `rootfs`.
+ * In general, this metric can be derived from [cadvisor](https://github.com/google/cadvisor/blob/v0.53.0/docs/storage/prometheus.md#prometheus-container-metrics) and specifically the `container_fs_usage_bytes` metric for the container's `rootfs` device.
+ * In K8s, this metric is derived from the [FsStats.UsedBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats) field of the [ContainerStats.Rootfs](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#ContainerStats) of the Kubelet's stats API.
+ * Capacity and available are reported for the backing filesystem, which may be shared with other workloads; therefore, usage may not equal `capacity - available`.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -370,7 +365,7 @@ export const METRIC_CONTAINER_MEMORY_USAGE = 'container.memory.usage' as const;
 /**
  * Container memory working set.
  *
- * @note In general, this metric can be derived from [cadvisor](https://github.com/google/cadvisor/blob/v0.53.0/docs/storage/prometheus.md#prometheus-container-metrics) and specifically the `container_memory_working_set_bytes` metric.
+ * @note In general, this metric can be derived from [cadvisor](https://github.com/google/cadvisor/blob/v0.53.0/docs/storage/prometheus.md#prometheus-container-metrics) and specifically the `container_memory_working_set_bytes` metric. When derived from cAdvisor on Linux, the working set is calculated by excluding inactive file-backed memory from memory usage (`inactive_file` on cgroup v2, `total_inactive_file` on cgroup v1), so active file-backed memory remains included.
  * In K8s, this metric is derived from the [MemoryStats.WorkingSetBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field of the [ContainerStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#ContainerStats) of the Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -389,8 +384,8 @@ export const METRIC_CONTAINER_NETWORK_IO = 'container.network.io' as const;
 /**
  * Container memory paging faults.
  *
- * @note In general, this metric can be derived from [cadvisor](https://github.com/google/cadvisor/blob/v0.53.0/docs/storage/prometheus.md#prometheus-container-metrics) and specifically the `container_memory_failures_total{failure_type=pgfault, scope=container}` and `container_memory_failures_total{failure_type=pgmajfault, scope=container}`metric.
- * In K8s, this metric is derived from the [MemoryStats.PageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) and [MemoryStats.MajorPageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field of the [ContainerStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#ContainerStats) of the Kubelet's stats API.
+ * @note In general, this metric can be derived from [cadvisor](https://github.com/google/cadvisor/blob/v0.53.0/docs/storage/prometheus.md#prometheus-container-metrics). The `container_memory_failures_total{failure_type=pgfault, scope=container}` counter reports the total page faults (minor + major), while `container_memory_failures_total{failure_type=pgmajfault, scope=container}` reports only major faults. The minor page faults **MUST** be derived as the difference between the two.
+ * In K8s, this metric is derived from the [MemoryStats.PageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) and [MemoryStats.MajorPageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) fields of the [ContainerStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#ContainerStats) of the Kubelet's stats API. `MemoryStats.PageFaults` reports the total number of page faults (equivalent to `pgfault` in the cgroup `memory.stat`), with minor and major combined. The minor page faults **MUST** therefore be derived as `MemoryStats.PageFaults - MemoryStats.MajorPageFaults`, so that summing the metric over `system.paging.fault.type` yields the total number of page faults.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -399,8 +394,8 @@ export const METRIC_CONTAINER_PAGING_FAULTS = 'container.paging.faults' as const
 /**
  * The time the container has been running.
  *
- * @note Instrumentations **SHOULD** use a gauge with type `double` and measure uptime in seconds as a floating point number with the highest precision available.
- * The actual accuracy would depend on the instrumentation and operating system.
+ * @note Instrumentations **SHOULD** use a gauge with type `double` and measure uptime in seconds as a floating point number with the highest precision available. The actual accuracy would depend on the instrumentation and operating system.
+ * In K8s environments, this metric can be derived from Kubelet's stats API and specifically from the [ContainerStats.StartTime](https://github.com/kubernetes/kubelet/blob/v0.35.2/pkg/apis/stats/v1alpha1/types.go#L161) field, where `StartTime` represents the container creation time as [noted in the Kubelet source](https://github.com/kubernetes/kubernetes/blob/v1.36.3/pkg/kubelet/stats/cri_stats_provider.go#L776). This value resets on every container restart and aligns with [ContainerStateRunning.startedAt](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#ContainerStateRunning) from the K8s API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -493,6 +488,15 @@ export const METRIC_DB_CLIENT_CONNECTION_IDLE_MIN = 'db.client.connection.idle.m
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
+export const METRIC_DB_CLIENT_CONNECTION_LIMIT = 'db.client.connection.limit' as const;
+
+/**
+ * Deprecated, use `db.client.connection.limit` instead.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated Replaced by `db.client.connection.limit`.
+ */
 export const METRIC_DB_CLIENT_CONNECTION_MAX = 'db.client.connection.max' as const;
 
 /**
@@ -551,11 +555,11 @@ export const METRIC_DB_CLIENT_CONNECTIONS_IDLE_MAX = 'db.client.connections.idle
 export const METRIC_DB_CLIENT_CONNECTIONS_IDLE_MIN = 'db.client.connections.idle.min' as const;
 
 /**
- * Deprecated, use `db.client.connection.max` instead.
+ * Deprecated, use `db.client.connection.limit` instead.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated Replaced by `db.client.connection.max`.
+ * @deprecated Replaced by `db.client.connection.limit`.
  */
 export const METRIC_DB_CLIENT_CONNECTIONS_MAX = 'db.client.connections.max' as const;
 
@@ -1271,6 +1275,63 @@ export const METRIC_JVM_BUFFER_MEMORY_USAGE = 'jvm.buffer.memory.usage' as const
 export const METRIC_JVM_BUFFER_MEMORY_USED = 'jvm.buffer.memory.used' as const;
 
 /**
+ * The maximum number of tasks the executor queue can hold.
+ *
+ * @note Instrumentations **SHOULD** emit this metric only when the queue has a finite capacity that represents a meaningful operational limit. This metric **SHOULD NOT** be emitted for unbounded or effectively unbounded queues.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_JVM_EXECUTOR_QUEUE_CAPACITY = 'jvm.executor.queue.capacity' as const;
+
+/**
+ * The number of tasks currently queued for execution.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_JVM_EXECUTOR_QUEUE_SIZE = 'jvm.executor.queue.size' as const;
+
+/**
+ * The number of tasks completed by the executor.
+ *
+ * @note A task **SHOULD** be counted as completed when the executor has finished processing it, regardless of whether it returns normally, terminates with an exception, or is canceled. Cancellation during processing does not complete the task until processing ends. A task that never begins processing on the executor **SHOULD NOT** be counted. A task initially rejected but subsequently resubmitted to and processed by the executor **SHOULD** be counted when processing ends.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_JVM_EXECUTOR_TASK_COMPLETED = 'jvm.executor.task.completed' as const;
+
+/**
+ * The number of task submissions rejected by the executor.
+ *
+ * @note A task submission **SHOULD** be counted as rejected when the executor invokes its rejection handler, regardless of whether the handler subsequently executes the task in the caller (for example, `CallerRunsPolicy`) or discards or replaces a queued task (for example, `DiscardOldestPolicy`). This metric counts rejected submissions, not tasks ultimately discarded from the queue.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_JVM_EXECUTOR_TASK_REJECTED = 'jvm.executor.task.rejected' as const;
+
+/**
+ * The number of core threads configured for the executor.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_JVM_EXECUTOR_THREAD_CORE = 'jvm.executor.thread.core' as const;
+
+/**
+ * The number of executor threads that are currently in the state described by the `jvm.executor.thread.state` attribute.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_JVM_EXECUTOR_THREAD_COUNT = 'jvm.executor.thread.count' as const;
+
+/**
+ * The maximum number of threads allowed for the executor.
+ *
+ * @note Instrumentations **SHOULD** emit this metric only when the maximum thread count is finite and represents a meaningful operational limit. This metric **SHOULD NOT** be emitted for unbounded or effectively unbounded executors. For example, an executor with a maximum thread count of `Integer.MAX_VALUE` is effectively unbounded.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_JVM_EXECUTOR_THREAD_LIMIT = 'jvm.executor.thread.limit' as const;
+
+/**
  * Number of open file descriptors as reported by the JVM.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -1396,8 +1457,9 @@ export const METRIC_K8S_CONTAINER_CPU_REQUEST_DESIRED = 'k8s.container.cpu.reque
  *
  * @note The current CPU request reflects the request applied to the running container, as reported by
  * [ContainerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#containerstatus-v1-core).
- * The value range is [0.0,1.0]. A value of 1.0 means the container is using 100% of its actual CPU request.
- * If the CPU request is not set, this metric **SHOULD NOT** be emitted for that container.
+ * A value of 1.0 means the container is using exactly its CPU request. Since a CPU request is a scheduling
+ * reservation and not a hard cap, values above 1.0 are possible and indicate the container is using more CPU
+ * than requested. If the CPU request is not set, this metric **SHOULD NOT** be emitted for that container.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1406,7 +1468,7 @@ export const METRIC_K8S_CONTAINER_CPU_REQUEST_UTILIZATION = 'k8s.container.cpu.r
 /**
  * Maximum ephemeral storage resource limit set for the container.
  *
- * @note See https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core for details.
+ * @note See the [Kubernetes ResourceRequirements API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core) for details.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1415,7 +1477,7 @@ export const METRIC_K8S_CONTAINER_EPHEMERAL_STORAGE_LIMIT = 'k8s.container.ephem
 /**
  * Ephemeral storage resource requested for the container.
  *
- * @note See https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core for details.
+ * @note See the [Kubernetes ResourceRequirements API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core) for details.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1466,6 +1528,19 @@ export const METRIC_K8S_CONTAINER_MEMORY_LIMIT_CURRENT = 'k8s.container.memory.l
 export const METRIC_K8S_CONTAINER_MEMORY_LIMIT_DESIRED = 'k8s.container.memory.limit.desired' as const;
 
 /**
+ * The ratio of container memory working set to its current memory limit.
+ *
+ * @note The numerator is the container memory working set, as reported by `container.memory.working_set`. The current memory limit
+ * reflects the actual resources applied to the container, as reported by
+ * [ContainerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#containerstatus-v1-core).
+ * A value of 1.0 means the container is using 100% of its actual memory limit. Values above 1.0 can occur transiently, since memory usage can briefly exceed the limit.
+ * If the memory limit is not set, this metric **SHOULD NOT** be emitted for that container.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_CONTAINER_MEMORY_LIMIT_UTILIZATION = 'k8s.container.memory.limit.utilization' as const;
+
+/**
  * Deprecated, use `k8s.container.memory.request.desired` and `k8s.container.memory.request.current` instead.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -1499,6 +1574,21 @@ export const METRIC_K8S_CONTAINER_MEMORY_REQUEST_CURRENT = 'k8s.container.memory
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_K8S_CONTAINER_MEMORY_REQUEST_DESIRED = 'k8s.container.memory.request.desired' as const;
+
+/**
+ * The ratio of container memory working set to its current memory request.
+ *
+ * @note The numerator is the container memory working set, as reported by `container.memory.working_set`. The current memory request
+ * reflects the request applied to the running container, as reported by
+ * [ContainerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#containerstatus-v1-core).
+ * A value of 1.0 means the container is using exactly its memory request. Since a memory request is a
+ * scheduling reservation and not a hard cap, values above 1.0 are possible and indicate the container is
+ * using more memory than requested. If the memory request is not set, this metric **SHOULD NOT** be emitted for
+ * that container.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_CONTAINER_MEMORY_REQUEST_UTILIZATION = 'k8s.container.memory.request.utilization' as const;
 
 /**
  * Indicates whether the container is currently marked as ready to accept traffic, based on its readiness probe (1 = ready, 0 = not ready).
@@ -1546,7 +1636,7 @@ export const METRIC_K8S_CONTAINER_STATUS_STATE = 'k8s.container.status.state' as
 /**
  * Maximum storage resource limit set for the container.
  *
- * @note See https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core for details.
+ * @note See the [Kubernetes ResourceRequirements API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core) for details.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1555,7 +1645,7 @@ export const METRIC_K8S_CONTAINER_STORAGE_LIMIT = 'k8s.container.storage.limit' 
 /**
  * Storage resource requested for the container.
  *
- * @note See https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core for details.
+ * @note See the [Kubernetes ResourceRequirements API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core) for details.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2037,8 +2127,8 @@ export const METRIC_K8S_NODE_EPHEMERAL_STORAGE_ALLOCATABLE = 'k8s.node.ephemeral
  * Node filesystem available bytes.
  *
  * @note This metric is derived from the
- * [FsStats.AvailableBytes](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats) field
- * of the [NodeStats.Fs](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#NodeStats)
+ * [FsStats.AvailableBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats) field
+ * of the [NodeStats.Fs](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#NodeStats)
  * of the Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -2049,8 +2139,8 @@ export const METRIC_K8S_NODE_FILESYSTEM_AVAILABLE = 'k8s.node.filesystem.availab
  * Node filesystem capacity.
  *
  * @note This metric is derived from the
- * [FsStats.CapacityBytes](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats) field
- * of the [NodeStats.Fs](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#NodeStats)
+ * [FsStats.CapacityBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats) field
+ * of the [NodeStats.Fs](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#NodeStats)
  * of the Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -2061,8 +2151,8 @@ export const METRIC_K8S_NODE_FILESYSTEM_CAPACITY = 'k8s.node.filesystem.capacity
  * The total inodes in the node's root filesystem.
  *
  * @note This metric is derived from the
- * [FsStats.Inodes](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats) field
- * of the [NodeStats.Fs](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#NodeStats)
+ * [FsStats.Inodes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats) field
+ * of the [NodeStats.Fs](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#NodeStats)
  * of the Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -2073,8 +2163,8 @@ export const METRIC_K8S_NODE_FILESYSTEM_INODE_COUNT = 'k8s.node.filesystem.inode
  * The free inodes in the node's root filesystem.
  *
  * @note This metric is derived from the
- * [FsStats.InodesFree](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats) field
- * of the [NodeStats.Fs](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#NodeStats)
+ * [FsStats.InodesFree](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats) field
+ * of the [NodeStats.Fs](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#NodeStats)
  * of the Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -2084,12 +2174,14 @@ export const METRIC_K8S_NODE_FILESYSTEM_INODE_FREE = 'k8s.node.filesystem.inode.
 /**
  * Node filesystem usage.
  *
- * @note This may not equal capacity - available.
- *
- * This metric is derived from the
- * [FsStats.UsedBytes](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats) field
- * of the [NodeStats.Fs](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#NodeStats)
+ * @note This metric is derived from the
+ * [FsStats.UsedBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats) field
+ * of the [NodeStats.Fs](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#NodeStats)
  * of the Kubelet's stats API.
+ *
+ * Capacity and available are reported for the backing filesystem,
+ * which may be shared with other workloads; therefore,
+ * usage may not equal `capacity - available`.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2147,7 +2239,7 @@ export const METRIC_K8S_NODE_MEMORY_USAGE = 'k8s.node.memory.usage' as const;
 /**
  * Node memory working set.
  *
- * @note The amount of working set memory. This includes recently accessed memory, dirty memory, and kernel memory. WorkingSetBytes is <= UsageBytes.
+ * @note The amount of working set memory. This includes recently accessed memory, dirty memory, and kernel memory. On Linux, the working set is calculated by excluding inactive file-backed memory from memory usage (`inactive_file` on cgroup v2, `total_inactive_file` on cgroup v1), so active file-backed memory remains included. On Linux, the kubelet uses the node working set when determining memory availability for the `memory.available` eviction signal. `WorkingSetBytes` is less than or equal to `UsageBytes`.
  * This metric is derived from the [MemoryStats.WorkingSetBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field of the [NodeStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#NodeStats) of the Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -2171,12 +2263,37 @@ export const METRIC_K8S_NODE_NETWORK_IO = 'k8s.node.network.io' as const;
 /**
  * Node memory paging faults.
  *
- * @note Cumulative number of major/minor page faults.
- * This metric is derived from the [MemoryStats.PageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) and [MemoryStats.MajorPageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) fields of the [NodeStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#NodeStats) of the Kubelet's stats API.
+ * @note Cumulative number of major and minor page faults.
+ * The [MemoryStats.MajorPageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field of the [NodeStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#NodeStats) of the Kubelet's stats API maps directly to `system.paging.fault.type=major`.
+ * The [MemoryStats.PageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field reports the total number of page faults (equivalent to `pgfault` in the cgroup `memory.stat`), with minor and major combined. The minor page faults **MUST** therefore be derived as `MemoryStats.PageFaults - MemoryStats.MajorPageFaults`, so that summing the metric over `system.paging.fault.type` yields the total number of page faults.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_K8S_NODE_PAGING_FAULTS = 'k8s.node.paging.faults' as const;
+
+/**
+ * Total number of processes/threads allowed by the operating system on the node.
+ *
+ * @note Derived from the Kubelet Summary API
+ * ([RlimitStats.MaxPID](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#RlimitStats))
+ * field of the [NodeStats.Rlimit](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#NodeStats),
+ * representing the system-wide task limit (the lower of `kernel.pid_max` and `kernel.threads-max`).
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_NODE_PID_LIMIT = 'k8s.node.pid.limit' as const;
+
+/**
+ * Total number of existing processes and threads on the node.
+ *
+ * @note Derived from the Kubelet Summary API
+ * ([RlimitStats.NumOfRunningProcesses](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#RlimitStats))
+ * field of the [NodeStats.Rlimit](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#NodeStats),
+ * which reads the total count of scheduling entities (threads/processes across all states) from `/proc/loadavg`.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_NODE_PID_USAGE = 'k8s.node.pid.usage' as const;
 
 /**
  * Amount of pods allocatable on the node.
@@ -2224,8 +2341,8 @@ export const METRIC_K8S_NODE_SYSTEM_CONTAINER_MEMORY_WORKING_SET = 'k8s.node.sys
 /**
  * The time the Node has been running.
  *
- * @note Instrumentations **SHOULD** use a gauge with type `double` and measure uptime in seconds as a floating point number with the highest precision available.
- * The actual accuracy would depend on the instrumentation and operating system.
+ * @note Instrumentations **SHOULD** use a gauge with type `double` and measure uptime in seconds as a floating point number with the highest precision available. The actual accuracy would depend on the instrumentation and operating system.
+ * This metric is derived from the [NodeStats.StartTime](https://github.com/kubernetes/kubelet/blob/v0.35.2/pkg/apis/stats/v1alpha1/types.go#L42) field of Kubelet's stats API, which is set to the [system boot time](https://github.com/kubernetes/kubernetes/blob/v1.36.3/pkg/kubelet/server/stats/summary.go#L113). This value resets when the node reboots.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2283,6 +2400,89 @@ export const METRIC_K8S_PERSISTENTVOLUMECLAIM_STORAGE_CAPACITY = 'k8s.persistent
 export const METRIC_K8S_PERSISTENTVOLUMECLAIM_STORAGE_REQUEST = 'k8s.persistentvolumeclaim.storage.request' as const;
 
 /**
+ * Maximum CPU resource limit currently configured for a running Pod.
+ *
+ * @note This metric aligns with the limit in the
+ * [`resources`](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#resourcerequirements-v1-core) field of
+ * [K8s PodStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podstatus-v1-core)
+ * (status.resources). Also see `Actual Resources` in
+ * [https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/](https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/) for more details.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_POD_CPU_LIMIT_CURRENT = 'k8s.pod.cpu.limit.current' as const;
+
+/**
+ * Maximum CPU resource limit as defined by the Pod spec.
+ *
+ * @note This metric aligns with the limit in the
+ * [`resources`](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#resourcerequirements-v1-core) field of
+ * [K8s PodSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podspec-v1-core)
+ * (spec.resources). See
+ * [https://kubernetes.io/docs/tasks/configure-pod-container/assign-pod-level-resources/](https://kubernetes.io/docs/tasks/configure-pod-container/assign-pod-level-resources/)
+ * for more details on Pod level resources. Note that Kubernetes can default unset Pod level limits
+ * based on the aggregated limits of the Pod's containers. Also see `Desired Resources` in
+ * [https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/](https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/).
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_POD_CPU_LIMIT_DESIRED = 'k8s.pod.cpu.limit.desired' as const;
+
+/**
+ * The ratio of Pod CPU usage to its current CPU limit.
+ *
+ * @note The current CPU limit reflects the actual resources applied at the Pod level, as reported by
+ * [PodStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podstatus-v1-core).
+ * The value range is [0.0,1.0]. A value of 1.0 means the Pod is using 100% of its actual CPU limit.
+ * If the CPU limit is not set, this metric **SHOULD NOT** be emitted for that Pod.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_POD_CPU_LIMIT_UTILIZATION = 'k8s.pod.cpu.limit.utilization' as const;
+
+/**
+ * CPU resource requested currently configured for a running Pod.
+ *
+ * @note This metric aligns with the request in the
+ * [`resources`](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#resourcerequirements-v1-core) field of
+ * [K8s PodStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podstatus-v1-core)
+ * (status.resources). Also see `Actual Resources` in
+ * [https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/](https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/) for more details.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_POD_CPU_REQUEST_CURRENT = 'k8s.pod.cpu.request.current' as const;
+
+/**
+ * CPU resource requested as defined by the Pod spec.
+ *
+ * @note This metric aligns with the request in the
+ * [`resources`](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#resourcerequirements-v1-core) field of
+ * [K8s PodSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podspec-v1-core)
+ * (spec.resources). See
+ * [https://kubernetes.io/docs/tasks/configure-pod-container/assign-pod-level-resources/](https://kubernetes.io/docs/tasks/configure-pod-container/assign-pod-level-resources/)
+ * for more details on Pod level resources. Note that Kubernetes can default unset Pod level requests
+ * based on the aggregated requests of the Pod's containers. Also see `Desired Resources` in
+ * [https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/](https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/).
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_POD_CPU_REQUEST_DESIRED = 'k8s.pod.cpu.request.desired' as const;
+
+/**
+ * The ratio of Pod CPU usage to its current CPU request.
+ *
+ * @note The current CPU request reflects the request applied at the Pod level, as reported by
+ * [PodStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podstatus-v1-core).
+ * A value of 1.0 means the Pod is using exactly its CPU request. Since a CPU request is a scheduling
+ * reservation and not a hard cap, values above 1.0 are possible and indicate the Pod is using more CPU
+ * than requested. If the CPU request is not set, this metric **SHOULD NOT** be emitted for that Pod.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_POD_CPU_REQUEST_UTILIZATION = 'k8s.pod.cpu.request.utilization' as const;
+
+/**
  * Total CPU time consumed.
  *
  * @note Total CPU time consumed by the specific Pod on all available CPU cores
@@ -2304,8 +2504,8 @@ export const METRIC_K8S_POD_CPU_USAGE = 'k8s.pod.cpu.usage' as const;
  * Pod filesystem available bytes.
  *
  * @note This metric is derived from the
- * [FsStats.AvailableBytes](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats) field
- * of the [PodStats.EphemeralStorage](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats)
+ * [FsStats.AvailableBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats) field
+ * of the [PodStats.EphemeralStorage](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats)
  * of the Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -2316,8 +2516,8 @@ export const METRIC_K8S_POD_FILESYSTEM_AVAILABLE = 'k8s.pod.filesystem.available
  * Pod filesystem capacity.
  *
  * @note This metric is derived from the
- * [FsStats.CapacityBytes](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats) field
- * of the [PodStats.EphemeralStorage](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats)
+ * [FsStats.CapacityBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats) field
+ * of the [PodStats.EphemeralStorage](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats)
  * of the Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -2327,12 +2527,13 @@ export const METRIC_K8S_POD_FILESYSTEM_CAPACITY = 'k8s.pod.filesystem.capacity' 
 /**
  * Pod filesystem usage.
  *
- * @note This may not equal capacity - available.
- *
- * This metric is derived from the
- * [FsStats.UsedBytes](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats) field
- * of the [PodStats.EphemeralStorage](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats)
+ * @note This metric is derived from the
+ * [FsStats.UsedBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#FsStats) field
+ * of the [PodStats.EphemeralStorage](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats)
  * of the Kubelet's stats API.
+ *
+ * Capacity and available are reported for the backing filesystem, which may be shared
+ * with other workloads; therefore, usage may not equal `capacity - available`.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2349,6 +2550,48 @@ export const METRIC_K8S_POD_FILESYSTEM_USAGE = 'k8s.pod.filesystem.usage' as con
 export const METRIC_K8S_POD_MEMORY_AVAILABLE = 'k8s.pod.memory.available' as const;
 
 /**
+ * Maximum memory resource limit currently configured for a running Pod.
+ *
+ * @note This metric aligns with the limit in the
+ * [`resources`](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#resourcerequirements-v1-core) field of
+ * [K8s PodStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podstatus-v1-core)
+ * (status.resources). Also see `Actual Resources` in
+ * [https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/](https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/) for more details.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_POD_MEMORY_LIMIT_CURRENT = 'k8s.pod.memory.limit.current' as const;
+
+/**
+ * Maximum memory resource limit as defined by the Pod spec.
+ *
+ * @note This metric aligns with the limit in the
+ * [`resources`](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#resourcerequirements-v1-core) field of
+ * [K8s PodSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podspec-v1-core)
+ * (spec.resources). See
+ * [https://kubernetes.io/docs/tasks/configure-pod-container/assign-pod-level-resources/](https://kubernetes.io/docs/tasks/configure-pod-container/assign-pod-level-resources/)
+ * for more details on Pod level resources. Note that Kubernetes can default unset Pod level limits
+ * based on the aggregated limits of the Pod's containers. Also see `Desired Resources` in
+ * [https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/](https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/).
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_POD_MEMORY_LIMIT_DESIRED = 'k8s.pod.memory.limit.desired' as const;
+
+/**
+ * The ratio of Pod memory working set to its current memory limit.
+ *
+ * @note The numerator is the Pod memory working set, as reported by `k8s.pod.memory.working_set`. The current memory limit
+ * reflects the actual resources applied at the Pod level, as reported by
+ * [PodStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podstatus-v1-core).
+ * A value of 1.0 means the Pod is using 100% of its actual memory limit. Values above 1.0 can occur transiently, since memory usage can briefly exceed the limit.
+ * If the memory limit is not set, this metric **SHOULD NOT** be emitted for that Pod.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_POD_MEMORY_LIMIT_UTILIZATION = 'k8s.pod.memory.limit.utilization' as const;
+
+/**
  * Deprecated, use `k8s.pod.paging.faults` instead.
  *
  * @note Cumulative number of major/minor page faults.
@@ -2359,6 +2602,49 @@ export const METRIC_K8S_POD_MEMORY_AVAILABLE = 'k8s.pod.memory.available' as con
  * @deprecated Replaced by `k8s.pod.paging.faults`.
  */
 export const METRIC_K8S_POD_MEMORY_PAGING_FAULTS = 'k8s.pod.memory.paging.faults' as const;
+
+/**
+ * Memory resource request currently configured for a running Pod.
+ *
+ * @note This metric aligns with the request in the
+ * [`resources`](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#resourcerequirements-v1-core) field of
+ * [K8s PodStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podstatus-v1-core)
+ * (status.resources). Also see `Actual Resources` in
+ * [https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/](https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/) for more details.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_POD_MEMORY_REQUEST_CURRENT = 'k8s.pod.memory.request.current' as const;
+
+/**
+ * Memory resource requested as defined by the Pod spec.
+ *
+ * @note This metric aligns with the request in the
+ * [`resources`](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#resourcerequirements-v1-core) field of
+ * [K8s PodSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podspec-v1-core)
+ * (spec.resources). See
+ * [https://kubernetes.io/docs/tasks/configure-pod-container/assign-pod-level-resources/](https://kubernetes.io/docs/tasks/configure-pod-container/assign-pod-level-resources/)
+ * for more details on Pod level resources. Note that Kubernetes can default unset Pod level requests
+ * based on the aggregated requests of the Pod's containers. Also see `Desired Resources` in
+ * [https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/](https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/).
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_POD_MEMORY_REQUEST_DESIRED = 'k8s.pod.memory.request.desired' as const;
+
+/**
+ * The ratio of Pod memory working set to its current memory request.
+ *
+ * @note The numerator is the Pod memory working set, as reported by `k8s.pod.memory.working_set`. The current memory request
+ * reflects the request applied at the Pod level, as reported by
+ * [PodStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#podstatus-v1-core).
+ * A value of 1.0 means the Pod is using exactly its memory request. Since a memory request is a
+ * scheduling reservation and not a hard cap, values above 1.0 are possible and indicate the Pod is using
+ * more memory than requested. If the memory request is not set, this metric **SHOULD NOT** be emitted for that Pod.
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_POD_MEMORY_REQUEST_UTILIZATION = 'k8s.pod.memory.request.utilization' as const;
 
 /**
  * Pod memory RSS.
@@ -2383,7 +2669,7 @@ export const METRIC_K8S_POD_MEMORY_USAGE = 'k8s.pod.memory.usage' as const;
 /**
  * Pod memory working set.
  *
- * @note The amount of working set memory. This includes recently accessed memory, dirty memory, and kernel memory. WorkingSetBytes is <= UsageBytes.
+ * @note The amount of working set memory. This includes recently accessed memory, dirty memory, and kernel memory. On Linux, the working set is calculated by excluding inactive file-backed memory from memory usage (`inactive_file` on cgroup v2, `total_inactive_file` on cgroup v1), so active file-backed memory remains included. The kubelet uses the Pod working set when ranking Pods for eviction under memory pressure. `WorkingSetBytes` is less than or equal to `UsageBytes`.
  * This metric is derived from the [MemoryStats.WorkingSetBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field of the [PodStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats) of the Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -2407,8 +2693,9 @@ export const METRIC_K8S_POD_NETWORK_IO = 'k8s.pod.network.io' as const;
 /**
  * Pod memory paging faults.
  *
- * @note Cumulative number of major/minor page faults.
- * This metric is derived from the [MemoryStats.PageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) and [MemoryStats.MajorPageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field of the [PodStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats) of the Kubelet's stats API.
+ * @note Cumulative number of major and minor page faults.
+ * The [MemoryStats.MajorPageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field of the [PodStats.Memory](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats) of the Kubelet's stats API maps directly to `system.paging.fault.type=major`.
+ * The [MemoryStats.PageFaults](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#MemoryStats) field reports the total number of page faults (equivalent to `pgfault` in the cgroup `memory.stat`), with minor and major combined. The minor page faults **MUST** therefore be derived as `MemoryStats.PageFaults - MemoryStats.MajorPageFaults`, so that summing the metric over `system.paging.fault.type` yields the total number of page faults.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2437,8 +2724,8 @@ export const METRIC_K8S_POD_STATUS_REASON = 'k8s.pod.status.reason' as const;
 /**
  * The time the Pod has been running.
  *
- * @note Instrumentations **SHOULD** use a gauge with type `double` and measure uptime in seconds as a floating point number with the highest precision available.
- * The actual accuracy would depend on the instrumentation and operating system.
+ * @note Instrumentations **SHOULD** use a gauge with type `double` and measure uptime in seconds as a floating point number with the highest precision available. The actual accuracy would depend on the instrumentation and operating system.
+ * This metric is derived from the [PodStats.StartTime](https://github.com/kubernetes/kubelet/blob/v0.35.2/pkg/apis/stats/v1alpha1/types.go#L122) field of Kubelet's stats API, where `StartTime` represents the pod sandbox creation time as [noted in the Kubelet source](https://github.com/kubernetes/kubernetes/blob/v1.36.3/pkg/kubelet/stats/cri_stats_provider.go#L299). This value resets when the node restarts, as the pod sandbox is recreated.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2448,8 +2735,8 @@ export const METRIC_K8S_POD_UPTIME = 'k8s.pod.uptime' as const;
  * Pod volume storage space available.
  *
  * @note This metric is derived from the
- * [VolumeStats.AvailableBytes](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#VolumeStats) field
- * of the [PodStats](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats) of the
+ * [VolumeStats.AvailableBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#VolumeStats) field
+ * of the [PodStats](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats) of the
  * Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -2460,8 +2747,8 @@ export const METRIC_K8S_POD_VOLUME_AVAILABLE = 'k8s.pod.volume.available' as con
  * Pod volume total capacity.
  *
  * @note This metric is derived from the
- * [VolumeStats.CapacityBytes](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#VolumeStats) field
- * of the [PodStats](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats) of the
+ * [VolumeStats.CapacityBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#VolumeStats) field
+ * of the [PodStats](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats) of the
  * Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -2472,8 +2759,8 @@ export const METRIC_K8S_POD_VOLUME_CAPACITY = 'k8s.pod.volume.capacity' as const
  * The total inodes in the filesystem of the Pod's volume.
  *
  * @note This metric is derived from the
- * [VolumeStats.Inodes](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#VolumeStats) field
- * of the [PodStats](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats) of the
+ * [VolumeStats.Inodes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#VolumeStats) field
+ * of the [PodStats](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats) of the
  * Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -2484,8 +2771,8 @@ export const METRIC_K8S_POD_VOLUME_INODE_COUNT = 'k8s.pod.volume.inode.count' as
  * The free inodes in the filesystem of the Pod's volume.
  *
  * @note This metric is derived from the
- * [VolumeStats.InodesFree](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#VolumeStats) field
- * of the [PodStats](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats) of the
+ * [VolumeStats.InodesFree](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#VolumeStats) field
+ * of the [PodStats](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats) of the
  * Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -2496,8 +2783,8 @@ export const METRIC_K8S_POD_VOLUME_INODE_FREE = 'k8s.pod.volume.inode.free' as c
  * The inodes used by the filesystem of the Pod's volume.
  *
  * @note This metric is derived from the
- * [VolumeStats.InodesUsed](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#VolumeStats) field
- * of the [PodStats](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats) of the
+ * [VolumeStats.InodesUsed](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#VolumeStats) field
+ * of the [PodStats](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats) of the
  * Kubelet's stats API.
  *
  * This may not be equal to `inodes - free` because filesystem may share inodes with other filesystems.
@@ -2512,8 +2799,8 @@ export const METRIC_K8S_POD_VOLUME_INODE_USED = 'k8s.pod.volume.inode.used' as c
  * @note This may not equal capacity - available.
  *
  * This metric is derived from the
- * [VolumeStats.UsedBytes](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#VolumeStats) field
- * of the [PodStats](https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats) of the
+ * [VolumeStats.UsedBytes](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#VolumeStats) field
+ * of the [PodStats](https://pkg.go.dev/k8s.io/kubelet@v0.34.0/pkg/apis/stats/v1alpha1#PodStats) of the
  * Kubelet's stats API.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -2922,6 +3209,16 @@ export const METRIC_K8S_STATEFULSET_CURRENT_PODS = 'k8s.statefulset.current_pods
  * @deprecated Replaced by `k8s.statefulset.pod.desired`.
  */
 export const METRIC_K8S_STATEFULSET_DESIRED_PODS = 'k8s.statefulset.desired_pods' as const;
+
+/**
+ * Total number of available replica pods (ready for at least minReadySeconds) targeted by this statefulset.
+ *
+ * @note This metric aligns with the `availableReplicas` field of the
+ * [K8s StatefulSetStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#statefulsetstatus-v1-apps).
+ *
+ * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_K8S_STATEFULSET_POD_AVAILABLE = 'k8s.statefulset.pod.available' as const;
 
 /**
  * The number of replica pods created by the statefulset controller from the statefulset version indicated by currentRevision.
@@ -3687,7 +3984,13 @@ export const METRIC_OTEL_SDK_EXPORTER_SPAN_INFLIGHT = 'otel.sdk.exporter.span.in
 export const METRIC_OTEL_SDK_EXPORTER_SPAN_INFLIGHT_COUNT = 'otel.sdk.exporter.span.inflight.count' as const;
 
 /**
- * The number of logs submitted to enabled SDK Loggers.
+ * The number of log records submitted to an enabled `Logger`.
+ *
+ * @note In OpenTelemetry SDKs a `Logger` is enabled by default, and can be disabled via configuration i.e. `LoggerConfig.enabled` = `false` when supported;
+ * a disabled `Logger` is a No-op: emitting to it has no effect, so its records are not counted.
+ * Every log record submitted to an enabled `Logger` is counted, even if it is later filtered or dropped within the SDK
+ * (e.g. by minimum severity or trace-based rules, or by a processor or the export pipeline), making this metric the top of the log delivery funnel.
+ * Records not submitted to the SDK are not counted (e.g. a caller that skips calling `Emit()` based on an `Enabled()` check, or an upstream logging library that filters first).
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -3947,16 +4250,6 @@ export const METRIC_PROCESS_UPTIME = 'process.uptime' as const;
 export const METRIC_PROCESS_WINDOWS_HANDLE_COUNT = 'process.windows.handle.count' as const;
 
 /**
- * Measures the duration of an outgoing Remote Procedure Call (RPC).
- *
- * @note When this metric is reported alongside an RPC client span, the metric value
- * **SHOULD** be the same as the RPC client span duration.
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_RPC_CLIENT_CALL_DURATION = 'rpc.client.call.duration' as const;
-
-/**
  * Deprecated, use `rpc.client.call.duration` instead. Note: the unit also changed from `ms` to `s`.
  *
  * @note While streaming RPCs may record this metric as start-of-batch
@@ -4017,16 +4310,6 @@ export const METRIC_RPC_CLIENT_RESPONSE_SIZE = 'rpc.client.response.size' as con
  * @deprecated Removed, no replacement at this time.
  */
 export const METRIC_RPC_CLIENT_RESPONSES_PER_RPC = 'rpc.client.responses_per_rpc' as const;
-
-/**
- * Measures the duration of an incoming Remote Procedure Call (RPC).
- *
- * @note When this metric is reported alongside an RPC server span, the metric value
- * **SHOULD** be the same as the RPC server span duration.
- *
- * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_RPC_SERVER_CALL_DURATION = 'rpc.server.call.duration' as const;
 
 /**
  * Deprecated, use `rpc.server.call.duration` instead. Note: the unit also changed from `ms` to `s`.
@@ -4240,7 +4523,7 @@ export const METRIC_SYSTEM_MEMORY_LIMIT = 'system.memory.limit' as const;
 /**
  * An estimate of how much memory is available for starting new applications, without causing swapping.
  *
- * @note This is an alternative to `system.memory.usage` metric with `state=free`.
+ * @note This is equivalent to the `system.memory.usage` metric with `state=available`.
  * Linux starting from 3.14 exports "available" memory. It takes "free" memory as a baseline, and then factors in kernel-specific values.
  * This is supposed to be more accurate than just "free" memory.
  * For reference, see the calculations [here](https://superuser.com/a/980821).
@@ -4331,14 +4614,18 @@ export const METRIC_SYSTEM_MEMORY_LINUX_SLAB_USAGE = 'system.memory.linux.slab.u
 export const METRIC_SYSTEM_MEMORY_SHARED = 'system.memory.shared' as const;
 
 /**
- * Reports memory in use by state.
+ * Reports memory by state.
+ *
+ * @note The sum of the `used` and `available` state values **SHOULD** be equal to `system.memory.limit`.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_SYSTEM_MEMORY_USAGE = 'system.memory.usage' as const;
 
 /**
- * Percentage of memory bytes in use.
+ * Fraction of memory bytes by state.
+ *
+ * @note The sum of the `used` and `available` state values **SHOULD** be equal to 1.
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */

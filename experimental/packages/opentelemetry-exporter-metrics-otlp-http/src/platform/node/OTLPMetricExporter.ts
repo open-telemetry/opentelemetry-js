@@ -17,7 +17,7 @@ import {
   createOtlpHttpExporterMetrics,
 } from '@opentelemetry/otlp-exporter-base/node-http';
 
-import { OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER } from '../../semconv';
+import { OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_JSON_METRIC_EXPORTER } from '../../semconv';
 
 /**
  * OTLP Metric Exporter for Node.js
@@ -31,7 +31,7 @@ export class OTLPMetricExporter extends OTLPMetricExporterBase {
           'Content-Type': 'application/json',
         }),
         JsonMetricsSerializer,
-        OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER,
+        OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_JSON_METRIC_EXPORTER,
         MetricsExporterMetricsHelper,
         config?.selfObsMeterProvider
       ),
@@ -47,7 +47,7 @@ export class OTLPMetricExporter extends OTLPMetricExporterBase {
   setSelfObsMeterProvider(meterProvider: MeterProvider) {
     this.setMetrics(
       createOtlpHttpExporterMetrics(
-        OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER,
+        OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_JSON_METRIC_EXPORTER,
         MetricsExporterMetricsHelper,
         this._url,
         meterProvider

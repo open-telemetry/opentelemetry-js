@@ -365,6 +365,26 @@ describe('GrpcExporterTransport', function () {
         );
       });
 
+      it('creates a single client for concurrent first sends', async function () {
+        const credentials = sinon.spy(createInsecureCredentials);
+        const transport = createOtlpGrpcExporterTransport({
+          ...simpleClientConfig,
+          credentials,
+        });
+
+        const results = await Promise.all([
+          transport.send(Buffer.from([1]), timeoutMillis),
+          transport.send(Buffer.from([2]), timeoutMillis),
+        ]);
+
+        assert.deepStrictEqual(
+          results.map(result => result.status),
+          ['success', 'success']
+        );
+        sinon.assert.calledOnce(credentials);
+        assert.strictEqual(serverTestContext.requests.length, 2);
+      });
+
       it('forwards response', async function () {
         const expectedResponseData = Buffer.from([1, 2, 3]);
         serverTestContext.serverResponseProvider = () => {
@@ -478,7 +498,7 @@ describe('GrpcExporterTransport', function () {
           // simulate that it returns a full success (empty response)
           deserializeResponse: sinon.stub().returns({}),
         };
-        const mockSerializer = <FakeSerializer>serializerStubs;
+        const mockSerializer = serializerStubs as FakeSerializer;
 
         const delegate = createOtlpGrpcExportDelegate(
           {
@@ -545,7 +565,7 @@ describe('GrpcExporterTransport', function () {
           // simulate that it returns a full success (empty response)
           deserializeResponse: sinon.stub().returns({}),
         };
-        const mockSerializer = <FakeSerializer>serializerStubs;
+        const mockSerializer = serializerStubs as FakeSerializer;
 
         const delegate = createOtlpGrpcExportDelegate(
           {

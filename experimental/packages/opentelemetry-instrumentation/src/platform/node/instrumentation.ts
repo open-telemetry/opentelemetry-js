@@ -305,7 +305,7 @@ export abstract class InstrumentationBase<
       const esmHook = new HookImport(
         [module.name],
         { internals: true },
-        <HookFn>hookFn
+        hookFn as HookFn
       );
       this._hooks.push(esmHook);
     }

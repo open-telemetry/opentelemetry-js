@@ -36,6 +36,7 @@ import type {
 } from './types';
 import {
   normalizeHttpRequestMethod,
+  redactUrl,
   serverPortFromUrl,
   getXHRBodyLength,
 } from './utils';
@@ -338,7 +339,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     if (normMethod !== origMethod) {
       attributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = origMethod;
     }
-    attributes[ATTR_URL_FULL] = parsedUrl.toString();
+    attributes[ATTR_URL_FULL] = redactUrl(parsedUrl.toString());
     attributes[ATTR_SERVER_ADDRESS] = parsedUrl.hostname;
     const serverPort = serverPortFromUrl(parsedUrl);
     if (serverPort) {
