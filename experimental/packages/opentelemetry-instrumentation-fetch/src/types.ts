@@ -36,5 +36,4 @@ export interface SpanData {
 export type PropagateTraceHeaderCorsUrl = string | RegExp;
 
 export type PropagateTraceHeaderCorsUrls =
-  | PropagateTraceHeaderCorsUrl
-  | PropagateTraceHeaderCorsUrl[];
+  PropagateTraceHeaderCorsUrl | PropagateTraceHeaderCorsUrl[];

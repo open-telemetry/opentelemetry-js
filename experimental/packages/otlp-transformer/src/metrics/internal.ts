@@ -100,9 +100,7 @@ export function toMetric(metricData: MetricData, encoder: Encoder): IMetric {
 
 function toSingularDataPoint(
   dataPoint:
-    | DataPoint<number>
-    | DataPoint<Histogram>
-    | DataPoint<ExponentialHistogram>,
+    DataPoint<number> | DataPoint<Histogram> | DataPoint<ExponentialHistogram>,
   valueType: ValueType,
   encoder: Encoder
 ) {
