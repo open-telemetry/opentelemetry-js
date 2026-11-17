@@ -57,7 +57,7 @@ app.post("/verify-tracecontext", (req, res) => {
             method: "POST",
             headers: { ...headers, "content-type": "application/json" },
             body: JSON.stringify([...action.arguments]),
-            signal: AbortSignal.timeout(10),
+            signal: AbortSignal.timeout(5000),
           })
             .then((response) => {
               // match previous axios behavior: non-2xx rejects
