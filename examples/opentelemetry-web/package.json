@@ -39,7 +39,7 @@
     "typescript": "5.2.2",
     "webpack": "^5.89.0",
     "webpack-cli": "^7.2.1",
-    "webpack-dev-server": "^5.2.0",
+    "webpack-dev-server": "^6.0.0",
     "webpack-merge": "^6.0.0"
   },
   "dependencies": {
