@@ -232,7 +232,11 @@ describe('HttpExporterTransport', function () {
 
     it('returns retryable when request times out', function (done) {
       // arrange
-      const timer = sinon.useFakeTimers();
+      // do not fake process.nextTick (faked by default since sinon 19), it
+      // would stall the http client's internal stream handling
+      const timer = sinon.useFakeTimers({
+        toFake: ['setTimeout', 'clearTimeout'],
+      });
       server = http.createServer((_, res) => {
         setTimeout(() => {
           res.statusCode = 200;

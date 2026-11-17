@@ -11,6 +11,7 @@ import {
 import type { ReadableSpan } from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import { fakeServer } from 'nise';
 import { ZipkinExporter } from '../../src';
 import type * as zipkinTypes from '../../src/types';
 import {
@@ -79,7 +80,7 @@ describe('Zipkin Exporter - web', () => {
       beforeEach(() => {
         (window.navigator as any).sendBeacon = false;
         zipkinExporter = new ZipkinExporter(zipkinConfig);
-        server = sinon.fakeServer.create();
+        server = fakeServer.create();
       });
       afterEach(() => {
         server.restore();
@@ -131,7 +132,7 @@ describe('Zipkin Exporter - web', () => {
         // Browser getStringFromEnv() always returns undefined, so env-based
         // URL override does not work. Use config.url instead.
         zipkinExporter = new ZipkinExporter({ url: endpointUrl });
-        server = sinon.fakeServer.create();
+        server = fakeServer.create();
       });
       afterEach(() => {
         server.restore();
@@ -155,7 +156,7 @@ describe('Zipkin Exporter - web', () => {
   describe('when getExportRequestHeaders is defined', () => {
     let server: any;
     beforeEach(() => {
-      server = sinon.fakeServer.create();
+      server = fakeServer.create();
       spySend.restore();
     });
 
@@ -198,7 +199,7 @@ describe('Zipkin Exporter - web', () => {
       zipkinConfig = {
         headers: customHeaders,
       };
-      server = sinon.fakeServer.create();
+      server = fakeServer.create();
     });
 
     afterEach(() => {
