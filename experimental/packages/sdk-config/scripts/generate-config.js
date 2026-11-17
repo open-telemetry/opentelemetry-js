@@ -36,6 +36,7 @@ const SCHEMA_PATH = path.join(
 const TYPES_PATH = path.join(TOP, 'src/generated/types.ts');
 const VALIDATOR_JS_PATH = path.join(TOP, 'src/generated/validator.js');
 const VALIDATOR_DTS_PATH = path.join(TOP, 'src/generated/validator.d.ts');
+const INDEX_PATH = path.join(TOP, 'src/index.ts');
 
 const licenseHeader = `/*
  * Copyright The OpenTelemetry Authors
@@ -142,7 +143,7 @@ const validatorJsWithHeader = [
 fs.writeFileSync(VALIDATOR_JS_PATH, validatorJsWithHeader);
 console.log(`Written pre-compiled validator to ${VALIDATOR_JS_PATH}`);
 
-// TypeScript declaration file so FileConfigFactory.ts can import the .js module.
+// TypeScript declaration file so parse.ts can import the .js module.
 // Uses `export =` to match the CJS module.exports = fn pattern emitted by standalone.
 // Uses a local ValidatorError type (not imported from ajv) so consumers don't need
 // ajv as a transitive dependency just for the .d.ts file.
@@ -291,6 +292,34 @@ compile(schema, 'OpenTelemetryConfiguration', {
       encoding: 'utf8',
     });
     console.log(`Written ${ts.split('\n').length} lines to ${TYPES_PATH}`);
+
+    // Update the section of src/index.ts that re-exports all generated types
+    // and interfaces.
+    const exportMatcher = /^(export (type|interface) (\w+) (=|{))/gm;
+    const exportedNames = ts.matchAll(exportMatcher).map(hit => hit[3]);
+    const markerStart = '// AUTO-GENERATED SECTION - do not edit';
+    const markerEnd = '// END AUTO-GENERATED SECTION';
+    const tsReexportBlock = [
+      markerStart,
+      'export type {',
+      ...exportedNames
+        .map(n => n === 'ConfigurationModel' ? n : `${n} as ${n}ConfigModel`)
+        .map(line => '  ' + line + ','),
+      "} from './generated/types';",
+      "",
+    ].join('\n');
+    let indexTs = fs.readFileSync(INDEX_PATH, 'utf8');
+    const startIdx = indexTs.indexOf(markerStart + '\n')
+    if (startIdx === -1) {
+      throw new Error(`could not find marker in "${INDEX_PATH}": "${markerStart}"`);
+    }
+    const endIdx = indexTs.indexOf(markerEnd + '\n', startIdx);
+    if (endIdx === -1) {
+      throw new Error(`could not find marker in "${INDEX_PATH}": "${markerEnd}"`);
+    }
+    indexTs = indexTs.slice(0, startIdx) + tsReexportBlock + indexTs.slice(endIdx);
+    fs.writeFileSync(INDEX_PATH, indexTs);
+    console.log(`Updated re-exports in "${TYPES_PATH}"`);
   })
   .catch(err => {
     console.error('Generation failed:', err);
