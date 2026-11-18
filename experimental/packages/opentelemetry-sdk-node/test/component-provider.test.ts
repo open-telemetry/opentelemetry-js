@@ -227,9 +227,6 @@ describe('componentProviderRegistries option to startNodeSdk', function () {
     });
   });
 
-  // TODO: I'm not actually sure here if this should instead diag.error + return NOOP_SDK.
-  //    The spec says "Register MUST return an error if" this case.
-  //    https://opentelemetry.io/docs/specs/otel/configuration/sdk/#register-plugincomponentprovider
   it('should throw if there is a collision in given registries', async () => {
     const logRecords: ReadWriteLogRecord[] = [];
     class MyProcessor implements LogRecordProcessor {
