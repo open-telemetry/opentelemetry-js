@@ -26,6 +26,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 * perf(sdk-trace): use named imports from `@opentelemetry/api` in `Tracer`, avoiding the CommonJS interop getters on the span creation path [#7355](https://github.com/open-telemetry/opentelemetry-js/pull/7355) @daniellockyer
 * perf(core): add a fast path for primitive values in `isAnyValue` and `maybeAddAttribute` [#7356](https://github.com/open-telemetry/opentelemetry-js/pull/7356) @daniellockyer
 * perf(core): iterate with `Object.keys` instead of `Object.entries` in `cleanAttributes` [#7353](https://github.com/open-telemetry/opentelemetry-js/pull/7353) @daniellockyer
+* perf(core): add a fast path for primitive values in `cleanAttributes` [#7361](https://github.com/open-telemetry/opentelemetry-js/pull/7361) @daniellockyer
 
 ## 3.1.1
 
