@@ -7,7 +7,7 @@ import { INVALID_THRESHOLD } from './util';
 
 const intent: SamplingIntent = Object.freeze({
   threshold: INVALID_THRESHOLD,
-  thresholdReliable: false,
+  adjustedCountReliable: false,
 });
 
 class ComposableAlwaysOffSampler implements ComposableSampler {

@@ -20,7 +20,6 @@ class ComposableParentThresholdSampler implements ComposableSampler {
 
   getSamplingIntent(
     context: Context,
-    traceId: string,
     spanName: string,
     spanKind: SpanKind,
     attributes: Attributes,
@@ -30,7 +29,6 @@ class ComposableParentThresholdSampler implements ComposableSampler {
     if (!parentSpanContext || !isSpanContextValid(parentSpanContext)) {
       return this.rootSampler.getSamplingIntent(
         context,
-        traceId,
         spanName,
         spanKind,
         attributes,
@@ -43,7 +41,7 @@ class ComposableParentThresholdSampler implements ComposableSampler {
     if (isValidThreshold(otTraceState.threshold)) {
       return {
         threshold: otTraceState.threshold,
-        thresholdReliable: true,
+        adjustedCountReliable: true,
       };
     }
 
@@ -53,7 +51,7 @@ class ComposableParentThresholdSampler implements ComposableSampler {
         : INVALID_THRESHOLD;
     return {
       threshold,
-      thresholdReliable: false,
+      adjustedCountReliable: false,
     };
   }
 

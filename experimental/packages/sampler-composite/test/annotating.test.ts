@@ -26,7 +26,6 @@ describe('ComposableAnnotatingSampler', () => {
   it('should add attributes to SamplingIntent', () => {
     const delegateIntent = alwaysOnSampler.getSamplingIntent(
       context.active(),
-      'unused',
       'span-name',
       SpanKind.SERVER,
       {},
@@ -37,7 +36,6 @@ describe('ComposableAnnotatingSampler', () => {
     });
     const intent = sampler.getSamplingIntent(
       context.active(),
-      'unused',
       'span-name',
       SpanKind.SERVER,
       {},
@@ -45,8 +43,8 @@ describe('ComposableAnnotatingSampler', () => {
     );
     assert.strictEqual(intent.threshold, delegateIntent.threshold);
     assert.strictEqual(
-      intent.thresholdReliable,
-      delegateIntent.thresholdReliable
+      intent.adjustedCountReliable,
+      delegateIntent.adjustedCountReliable
     );
     assert.deepStrictEqual(intent.attributes, { foo: 'bar' });
   });
@@ -61,7 +59,6 @@ describe('ComposableAnnotatingSampler', () => {
     );
     const intent = sampler.getSamplingIntent(
       context.active(),
-      'unused',
       'span-name',
       SpanKind.SERVER,
       {},

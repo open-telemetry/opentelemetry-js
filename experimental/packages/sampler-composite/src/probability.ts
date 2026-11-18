@@ -23,7 +23,7 @@ class ComposableProbabilitySampler implements ComposableSampler {
     if (threshold !== MAX_THRESHOLD) {
       this.intent = Object.freeze({
         threshold: threshold,
-        thresholdReliable: true,
+        adjustedCountReliable: true,
       });
     } else {
       // Same as AlwaysOff, notably the threshold is not considered reliable. The spec mentions
@@ -31,7 +31,7 @@ class ComposableProbabilitySampler implements ComposableSampler {
       // if the description of the sampler matches the user's request.
       this.intent = Object.freeze({
         threshold: INVALID_THRESHOLD,
-        thresholdReliable: false,
+        adjustedCountReliable: false,
       });
     }
     this.description = `ComposableProbabilitySampler(threshold=${thresholdStr}, ratio=${ratio})`;

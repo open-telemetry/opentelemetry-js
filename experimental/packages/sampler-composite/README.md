@@ -34,14 +34,15 @@ const sampler = createCompositeSampler(createComposableAlwaysOffSampler());
 const sampler = createCompositeSampler(createComposableAlwaysOnSampler());
 // follow the parent, or otherwise sample with a probability if root
 const sampler = createCompositeSampler(
-    createComposableParentThresholdSampler(createComposableProbabilitySampler(0.3)));
+  createComposableParentThresholdSampler(
+    createComposableProbabilitySampler(0.3)));
 
 // An example of a rule-based sampler implementing the example at
 // https://opentelemetry.io/docs/specs/otel/trace/sdk/#composablerulebased
-const isHealthCheck = (_ctx, _traceId, _name, _kind, attrs, _links) => {
+const isHealthCheck = (_ctx, _name, _kind, attrs, _links) => {
   return attrs['http.route'] === '/healthcheck';
 };
-const isCheckout = (_ctx, _traceId, _name, _kind, attrs, _links) => {
+const isCheckout = (_ctx, _name, _kind, attrs, _links) => {
   return attrs['http.route'] === '/checkout';
 };
 const sampler = createCompositeSampler(
