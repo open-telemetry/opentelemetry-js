@@ -780,8 +780,7 @@ function aggregationTemporalityPreferenceFromConfig(
  */
 function aggregationSelectorFromConfig(
   default_histogram_aggregation:
-    | ExporterDefaultHistogramAggregationConfigModel
-    | undefined
+    ExporterDefaultHistogramAggregationConfigModel | undefined
 ): AggregationSelector | undefined {
   if (default_histogram_aggregation == null) {
     return undefined;

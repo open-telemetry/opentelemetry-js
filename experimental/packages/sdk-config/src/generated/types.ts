@@ -324,8 +324,7 @@ export type OtlpHttpMetricExporter = {
  * If omitted, cumulative is used.
  */
 export type ExporterTemporalityPreference =
-  | ('cumulative' | 'delta' | 'low_memory')
-  | null;
+  ('cumulative' | 'delta' | 'low_memory') | null;
 
 /**
  * Configure default histogram aggregation.
@@ -335,8 +334,7 @@ export type ExporterTemporalityPreference =
  * If omitted, explicit_bucket_histogram is used.
  */
 export type ExporterDefaultHistogramAggregation =
-  | ('explicit_bucket_histogram' | 'base2_exponential_bucket_histogram')
-  | null;
+  ('explicit_bucket_histogram' | 'base2_exponential_bucket_histogram') | null;
 
 /**
  * Configure exporter to be OTLP with gRPC transport.
@@ -572,8 +570,7 @@ export type SumAggregation = {} | null;
  * If omitted, trace_based is used.
  */
 export type ExemplarFilter =
-  | ('always_on' | 'always_off' | 'trace_based')
-  | null;
+  ('always_on' | 'always_off' | 'trace_based') | null;
 
 /**
  * Controls how multiple matching Views are applied to an Instrument.
@@ -583,8 +580,7 @@ export type ExemplarFilter =
  * If omitted, independent is used.
  */
 export type ExperimentalViewMatchingMode =
-  | ('independent' | 'composable')
-  | null;
+  ('independent' | 'composable') | null;
 
 /**
  * Include the w3c trace context propagator.
@@ -664,8 +660,7 @@ export type ExperimentalComposableRuleBasedSampler = {
 } | null;
 
 export type SpanKind =
-  | ('internal' | 'server' | 'client' | 'producer' | 'consumer')
-  | null;
+  ('internal' | 'server' | 'client' | 'producer' | 'consumer') | null;
 
 export type ExperimentalSpanParent = ('none' | 'remote' | 'local') | null;
 

@@ -82,6 +82,8 @@
     "@opentelemetry/api": ">=1.10.0 <1.11.0"
   },
   "devDependencies": {
+    "@babel/core": "8.1.2",
+    "@babel/preset-env": "8.0.7",
     "@opentelemetry/api": "1.10.0",
     "@types/mocha": "10.0.10",
     "@types/sinon": "^22.0.2",
@@ -96,7 +98,7 @@
     "mocha": "12.0.3",
     "nyc": "18.0.0",
     "protobufjs": "8.8.1",
-    "protobufjs-cli": "2.5.7",
+    "protobufjs-cli": "2.7.1",
     "ts-loader": "9.5.7",
     "typescript": "5.2.2",
     "webpack": "5.108.4"

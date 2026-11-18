@@ -160,12 +160,15 @@ export interface InstrumentationModuleDefinition {
   includePrerelease?: boolean;
 
   /** Method to patch the instrumentation  */
-  patch?: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ((moduleExports: any, moduleVersion?: string | undefined) => any) | undefined;
+  patch?:
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    | ((moduleExports: any, moduleVersion?: string | undefined) => any)
+    | undefined;
 
   /** Method to unpatch the instrumentation  */
-  unpatch?: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  | ((moduleExports: any, moduleVersion?: string | undefined) => void)
+  unpatch?:
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    | ((moduleExports: any, moduleVersion?: string | undefined) => void)
     | undefined;
 }
 

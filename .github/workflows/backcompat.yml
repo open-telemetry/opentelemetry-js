@@ -44,7 +44,7 @@ jobs:
 
       # Use a modern Node.js to install dependencies and compile TypeScript.
       - name: Setup Node.js (compile)
-        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ^26.3.0
           cache: 'npm'
@@ -59,7 +59,7 @@ jobs:
       # Switch to the target old Node.js and run the standalone plain-JS smoke
       # test. Package is already compiled and dependencies are already installed.
       - name: Setup Node.js ${{ env.NODE_VERSION }} (test)
-        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ env.NODE_VERSION }}
 

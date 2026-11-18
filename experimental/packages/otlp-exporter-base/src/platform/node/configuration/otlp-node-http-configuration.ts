@@ -37,8 +37,7 @@ export interface OtlpNodeHttpConfiguration extends OtlpHttpConfiguration {
 }
 
 function getEnvProxyAgentOptions():
-  | { proxyEnv: NodeJS.ProcessEnv }
-  | undefined {
+  { proxyEnv: NodeJS.ProcessEnv } | undefined {
   if (
     !process.env.HTTP_PROXY &&
     !process.env.http_proxy &&

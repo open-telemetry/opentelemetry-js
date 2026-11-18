@@ -28,8 +28,8 @@ import { isWrapped } from '../../utils';
  * Base abstract class for instrumenting node plugins
  */
 export abstract class InstrumentationBase<
-    ConfigType extends InstrumentationConfig = InstrumentationConfig,
-  >
+  ConfigType extends InstrumentationConfig = InstrumentationConfig,
+>
   extends InstrumentationAbstract<ConfigType>
   implements types.Instrumentation<ConfigType>
 {

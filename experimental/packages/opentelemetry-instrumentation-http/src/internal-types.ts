@@ -22,8 +22,7 @@ export type RequestSignature = [http.RequestOptions, HttpCallbackOptional] &
 export type HttpRequestArgs = Array<HttpCallbackOptional | RequestSignature>;
 
 export type ParsedRequestOptions =
-  | (http.RequestOptions & Partial<url.UrlWithParsedQuery>)
-  | http.RequestOptions;
+  (http.RequestOptions & Partial<url.UrlWithParsedQuery>) | http.RequestOptions;
 export type Http = typeof http;
 export type Https = typeof https;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

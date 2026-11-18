@@ -145,7 +145,7 @@ export class Buckets {
     let inpos = 0;
     let outpos = 0;
 
-    for (let pos = this.indexStart; pos <= this.indexEnd; ) {
+    for (let pos = this.indexStart; pos <= this.indexEnd;) {
       let mod = pos % each;
       if (mod < 0) {
         mod += each;

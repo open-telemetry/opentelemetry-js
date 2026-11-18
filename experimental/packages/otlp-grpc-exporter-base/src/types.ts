@@ -12,8 +12,10 @@ import type {
 /**
  * OTLP Exporter Config for Node
  */
-export interface OTLPGRPCExporterConfigNode
-  extends Omit<OTLPExporterConfigBase, 'headers'> {
+export interface OTLPGRPCExporterConfigNode extends Omit<
+  OTLPExporterConfigBase,
+  'headers'
+> {
   credentials?: ChannelCredentials;
   metadata?: Metadata;
   compression?: CompressionAlgorithm;

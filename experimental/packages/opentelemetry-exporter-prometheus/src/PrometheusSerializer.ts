@@ -24,11 +24,7 @@ import {
 const ATTR_OTEL_SCOPE_SCHEMA_URL = 'otel.scope.schema_url';
 
 type PrometheusDataTypeLiteral =
-  | 'counter'
-  | 'gauge'
-  | 'histogram'
-  | 'summary'
-  | 'untyped';
+  'counter' | 'gauge' | 'histogram' | 'summary' | 'untyped';
 
 interface PrometheusMetadata {
   help: string;

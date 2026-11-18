@@ -130,12 +130,26 @@ function maybeAddAttributeInternal(
     return AddAttributeDecision.DROP_LIMIT_REACHED;
   }
 
-  if (!isValidValue(opts.value)) {
+  const value = opts.value;
+  let attributeValueLengthLimit = opts.limits.attributeValueLengthLimit;
+  if (
+    attributeValueLengthLimit > 0 &&
+    (typeof value === 'number' ||
+      typeof value === 'boolean' ||
+      (typeof value === 'string' && value.length <= attributeValueLengthLimit))
+  ) {
+    // Fast path for primitives that need no validation, copy, or truncation.
+    opts.attributes[opts.key] = value;
+    return isNewKey
+      ? AddAttributeDecision.ADD_NEW
+      : AddAttributeDecision.ADD_OVERWRITE_EXISTING;
+  }
+
+  if (!isValidValue(value)) {
     diag.warn(`Invalid attribute value set for key: ${opts.key}`);
     return AddAttributeDecision.DROP_INVALID;
   }
 
-  let attributeValueLengthLimit = opts.limits.attributeValueLengthLimit;
   if (attributeValueLengthLimit <= 0) {
     diag.warn(
       `Invalid attributeValueLengthLimit: must be positive, got ${attributeValueLengthLimit} (ignoring)`
@@ -217,7 +231,11 @@ function cleanAttributesInternal(
   }
 
   let count = 0;
-  for (const [key, val] of Object.entries(inAttributes)) {
+  const obj = inAttributes as Record<string, unknown>;
+  const keys = Object.keys(obj);
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    const val = obj[key];
     if (val === undefined) {
       // Silently drop undefined values.
       continue;
@@ -261,7 +279,16 @@ function cleanAttributesInternal(
  * @returns true if the value is a valid AnyValue, false otherwise
  */
 export function isAnyValue(val: unknown): boolean {
-  return isAnyValueInternal(val, new WeakSet());
+  switch (typeof val) {
+    case 'string':
+    case 'number':
+    case 'boolean':
+      return true;
+    case 'object':
+      return isAnyValueInternal(val, new WeakSet());
+    default:
+      return false;
+  }
 }
 
 function isAnyValueInternal(
