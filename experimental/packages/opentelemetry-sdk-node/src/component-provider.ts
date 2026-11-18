@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { TextMapPropagator } from '@opentelemetry/api';
+import { diag, type TextMapPropagator } from '@opentelemetry/api';
 import type { ConfigProperties } from '@opentelemetry/api-config';
 import type { ResourceDetector } from '@opentelemetry/resources';
 import type {
@@ -100,11 +100,19 @@ export type ComponentProviderRegistry = {
 /**
  * Merge multiple `ComponentProviderRegistry`'s into one.
  *
- * @throws {Error} if two attempt to provide for the same component type and
- *  name.
+ * Generally a collision (two registries providing for the same component type
+ * and name) is an *error*. However, the built-in registry is special: its
+ * providers cannot be overriden, but attempting to do so will only
+ * `diag.warn()`. This is to support forward compatibility, so new component
+ * types and names can be added to the built-in set without possibly crashing
+ * existing usage.
+ *
+ * @throws {Error} if multiple registries provided in `regs` attempt to provide
+ *   for the same component type and name.
  */
 export function mergeComponentProviderRegistries(
-  regs: ComponentProviderRegistry[]
+  builtinReg: ComponentProviderRegistry,
+  regs?: ComponentProviderRegistry[]
 ): ComponentProviderRegistry {
   const mergedReg: ComponentProviderRegistry = {};
   const componentTypes: (keyof ComponentProviderRegistry)[] = [
@@ -120,15 +128,21 @@ export function mergeComponentProviderRegistries(
     'LogRecordExporter',
     'LogRecordProcessor',
   ];
-  for (const reg of regs) {
+  for (const reg of [builtinReg, ...(regs ?? [])]) {
     for (const componentType of componentTypes) {
       const providerFromName = reg[componentType];
       if (providerFromName !== undefined) {
         for (const name of Object.keys(providerFromName)) {
           if (mergedReg[componentType]?.[name]) {
-            throw new Error(
-              `a ComponentProvider of type "${componentType}" and name="${name}" is already registered: ${mergedReg[componentType]?.[name]}`
-            );
+            if (builtinReg[componentType]?.[name]) {
+              diag.warn(
+                `cannot override built-in ComponentProvider of type "${componentType}" and name="${name}"`
+              );
+            } else {
+              throw new Error(
+                `a ComponentProvider of type "${componentType}" and name="${name}" is already registered: ${mergedReg[componentType]?.[name]}`
+              );
+            }
           } else {
             mergedReg[componentType] ??= {};
             // The `!` is used because tsc doesn't infer existence from `??= {}` above.

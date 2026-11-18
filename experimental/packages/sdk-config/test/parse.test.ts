@@ -781,21 +781,27 @@ describe('FileConfigFactory', function () {
   });
 
   it('should accept file_format 1.0 for backward compatibility', function () {
+    const warnStub = Sinon.stub(diag, 'warn');
     assert.doesNotThrow(() => {
       parseConfigFile('test/fixtures/file-format-1.0.yaml');
     });
+    Sinon.assert.notCalled(warnStub);
   });
 
   it('should accept file_format 1.1 for backward compatibility', function () {
+    const warnStub = Sinon.stub(diag, 'warn');
     assert.doesNotThrow(() => {
       parseConfigFile('test/fixtures/file-format-1.1.yaml');
     });
+    Sinon.assert.notCalled(warnStub);
   });
 
   it('should accept file_format 1.2', function () {
+    const warnStub = Sinon.stub(diag, 'warn');
     assert.doesNotThrow(() => {
       parseConfigFile('test/fixtures/file-format-1.2.yaml');
     });
+    Sinon.assert.notCalled(warnStub);
   });
 
   it('should accept a newer minor file_format with a warning', function () {

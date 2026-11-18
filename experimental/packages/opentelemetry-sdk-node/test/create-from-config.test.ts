@@ -75,9 +75,9 @@ import {
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 import { mergeComponentProviderRegistries } from '../src/component-provider';
 
-const reg = mergeComponentProviderRegistries([
-  getBuiltinComponentProviderRegistry(),
-]);
+const reg = mergeComponentProviderRegistries(
+  getBuiltinComponentProviderRegistry()
+);
 
 describe('create-from-config', () => {
   describe('headers_list exporter wiring', function () {
