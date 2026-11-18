@@ -352,12 +352,18 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         if (args[0] instanceof Request) {
           options = args[1] != null ? new Request(args[0], args[1]) : args[0];
         } else {
-          // Copy a plain init object, so that header injection does not change
-          // the caller's object, which it may reuse for other requests.
+          // We copy the init so that adding headers doesn't change the caller's
+          // object. A spread would drop non-enumerable properties, which fetch
+          // still reads.
           const init = args[1];
           options =
             init && Object.getPrototypeOf(init) === Object.prototype
-              ? { ...init }
+              ? Object.fromEntries(
+                  Reflect.ownKeys(init).map(key => [
+                    key,
+                    Reflect.get(init, key),
+                  ])
+                )
               : init || {};
         }
         const createdSpan = plugin._createSpan(url, options);

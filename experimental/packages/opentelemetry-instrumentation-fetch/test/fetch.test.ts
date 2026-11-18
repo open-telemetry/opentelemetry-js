@@ -990,6 +990,71 @@ describe('fetch', () => {
             assert.strictEqual(headers['foo'], 'bar');
             assert.deepStrictEqual(init, { headers: { foo: 'bar' } });
           });
+
+          it('should keep non-enumerable properties of a frozen init object', async () => {
+            const init: RequestInit = Object.freeze(
+              Object.defineProperty({ headers: {} }, 'method', {
+                value: 'QUERY',
+              })
+            );
+
+            await tracedFetch({
+              callback: () => fetch('/api/status.json', init),
+            });
+
+            assert.strictEqual(
+              exportedSpans[0].attributes[ATTR_HTTP_REQUEST_METHOD],
+              'QUERY'
+            );
+          });
+
+          it('should inject headers when the init object has a getter-only headers property', async () => {
+            const init: RequestInit = {
+              get headers() {
+                return { foo: 'bar' };
+              },
+            };
+
+            const { response } = await tracedFetch({
+              callback: () => fetch('/api/echo-headers.json', init),
+            });
+
+            const headers = await assertPropagationHeaders(response);
+
+            assert.strictEqual(headers['foo'], 'bar');
+          });
+
+          it('should not change the prototype of the copy when the init object has an own __proto__ key', async () => {
+            const init: RequestInit = JSON.parse(
+              '{ "__proto__": { "method": "QUERY" } }'
+            );
+
+            await tracedFetch({
+              callback: () => fetch('/api/status.json', init),
+            });
+
+            assert.strictEqual(
+              exportedSpans[0].attributes[ATTR_HTTP_REQUEST_METHOD],
+              'GET'
+            );
+          });
+
+          it('should keep properties that a class instance init object inherits', async () => {
+            class Init {
+              get method() {
+                return 'QUERY';
+              }
+            }
+
+            await tracedFetch({
+              callback: () => fetch('/api/status.json', new Init()),
+            });
+
+            assert.strictEqual(
+              exportedSpans[0].attributes[ATTR_HTTP_REQUEST_METHOD],
+              'QUERY'
+            );
+          });
         });
 
         describe('without global propagator', () => {
