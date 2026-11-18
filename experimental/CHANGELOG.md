@@ -25,6 +25,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :bug: Bug Fixes
 
+* fix(exporter-prometheus): support IPv6 addresses such as `::` as `host`; requests no longer fail with `400 Bad Request` [#7368](https://github.com/open-telemetry/opentelemetry-js/pull/7368) @barnes-c
 * fix(exporter-trace-otlp-http, exporter-logs-otlp-http, exporter-metrics-otlp-http): use the `otlp_http_json_*_exporter` `otel.component.type` values for JSON exporters ([#7286](https://github.com/open-telemetry/opentelemetry-js/pull/7286)) @shehjaddev
 
 ### :books: Documentation
