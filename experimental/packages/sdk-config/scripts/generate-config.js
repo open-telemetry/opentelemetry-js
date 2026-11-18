@@ -291,7 +291,7 @@ compile(schema, 'OpenTelemetryConfiguration', {
       cwd: TOP,
       encoding: 'utf8',
     });
-    console.log(`Written ${ts.split('\n').length} lines to ${TYPES_PATH}`);
+    console.log(`Wrote ${ts.split('\n').length} lines to ${TYPES_PATH}`);
 
     // Update the section of src/index.ts that re-exports all generated types
     // and interfaces.
@@ -319,7 +319,7 @@ compile(schema, 'OpenTelemetryConfiguration', {
     }
     indexTs = indexTs.slice(0, startIdx) + tsReexportBlock + indexTs.slice(endIdx);
     fs.writeFileSync(INDEX_PATH, indexTs);
-    console.log(`Updated re-exports in "${TYPES_PATH}"`);
+    console.log(`Updated re-exports in "${INDEX_PATH}"`);
   })
   .catch(err => {
     console.error('Generation failed:', err);
