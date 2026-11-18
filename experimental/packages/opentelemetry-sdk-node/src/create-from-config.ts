@@ -18,7 +18,7 @@ import * as path from 'path';
 
 import type { TextMapPropagator } from '@opentelemetry/api';
 import type { ConfigProperties } from '@opentelemetry/api-config';
-import { diag } from '@opentelemetry/api';
+import { diag, SpanKind, trace } from '@opentelemetry/api';
 import type {
   IdGenerator,
   Sampler,
@@ -38,6 +38,19 @@ import {
   TraceIdRatioBasedSampler,
   TracerProvider,
 } from '@opentelemetry/sdk-trace';
+import type {
+  ComposableSampler,
+  SamplingPredicate,
+  SamplingRule,
+} from '@opentelemetry/sampler-composite';
+import {
+  createComposableAlwaysOffSampler,
+  createComposableAlwaysOnSampler,
+  createComposableParentThresholdSampler,
+  createComposableProbabilitySampler,
+  createComposableRuleBasedSampler,
+  createCompositeSampler,
+} from '@opentelemetry/sampler-composite';
 import type {
   Resource,
   DetectedResourceAttributes,
@@ -77,6 +90,10 @@ import type {
   Base2ExponentialBucketHistogramAggregationConfigModel,
   BatchLogRecordProcessorConfigModel,
   BatchSpanProcessorConfigModel,
+  ExperimentalComposableParentThresholdSamplerConfigModel,
+  ExperimentalComposableProbabilitySamplerConfigModel,
+  ExperimentalComposableRuleBasedSamplerConfigModel,
+  ExperimentalComposableRuleBasedSamplerRuleConfigModel,
   ExperimentalPrometheusMetricExporterConfigModel,
   ExplicitBucketHistogramAggregationConfigModel,
   ExporterDefaultHistogramAggregationConfigModel,
@@ -107,6 +124,7 @@ import type {
   SimpleLogRecordProcessorConfigModel,
   SimpleSpanProcessorConfigModel,
   SpanExporterConfigModel,
+  SpanKindConfigModel,
   SpanLimitsConfigModel,
   SpanProcessorConfigModel,
   TextMapPropagatorConfigModel,
@@ -1460,6 +1478,250 @@ function createParentBasedSamplerFromConfig(
   });
 }
 
+function createComposableSamplerFromConfig(
+  reg: ComponentProviderRegistry,
+  compositeSamplerConfig: ConfigProperties
+): ComposableSampler {
+  const [name, properties] = mustSingleEntry(
+    compositeSamplerConfig,
+    'ExperimentalComposableSampler'
+  );
+
+  // Note: Currently there is no `ExperimentalComposableSampler` component
+  // provider type, though there *could* be. The spec doesn't (yet) define one.
+
+  switch (name) {
+    case 'always_off':
+      return createComposableAlwaysOffSampler();
+    case 'always_on':
+      return createComposableAlwaysOnSampler();
+    case 'parent_threshold': {
+      checkConfigUse(
+        'ExperimentalComposableParentThresholdSampler',
+        properties,
+        ['root']
+      );
+      const props =
+        properties as unknown as ExperimentalComposableParentThresholdSamplerConfigModel;
+      return createComposableParentThresholdSampler(
+        createComposableSamplerFromConfig(reg, props.root)
+      );
+    }
+    case 'probability': {
+      checkConfigUse('ExperimentalComposableProbabilitySampler', properties, [
+        'ratio',
+      ]);
+      const props =
+        properties as unknown as ExperimentalComposableProbabilitySamplerConfigModel;
+      return createComposableProbabilitySampler(props?.ratio ?? 1.0);
+    }
+    case 'rule_based': {
+      checkConfigUse('ExperimentalComposableRuleBasedSampler', properties, [
+        'rules',
+      ]);
+      const props =
+        properties as unknown as ExperimentalComposableRuleBasedSamplerConfigModel;
+      const rules = (props?.rules ?? []).map(ruleConfig =>
+        createComposableRuleBasedSamplingRuleFromConfig(reg, ruleConfig)
+      );
+      return createComposableRuleBasedSampler(rules);
+    }
+    default:
+      throw new Error(
+        `unknown ComposableSampler name in configuration: "${name}"`
+      );
+  }
+}
+
+// 'matchesWildcardPattern' is based on Jackson's from https://github.com/open-telemetry/opentelemetry-js/pull/7106
+// TODO: Share some wildcard matching impl in the core package.
+function matchesWildcardPattern(
+  name: string,
+  pattern: readonly string[]
+): boolean {
+  // Dynamic programming bounds matching to O(name.length * pattern.length)
+  // time and O(pattern.length) space, without regex backtracking.
+  const matches: boolean[] = new Array(pattern.length + 1).fill(false);
+  matches[0] = true;
+  for (let i = 0; i < pattern.length; i++) {
+    matches[i + 1] = matches[i] && pattern[i] === '*';
+  }
+
+  for (const character of name) {
+    let previous = matches[0];
+    matches[0] = false;
+    for (let i = 0; i < pattern.length; i++) {
+      const previousMatch = matches[i + 1];
+      matches[i + 1] =
+        pattern[i] === '*'
+          ? matches[i] || previousMatch
+          : previous && (pattern[i] === '?' || pattern[i] === character);
+      previous = previousMatch;
+    }
+  }
+  return matches[pattern.length];
+}
+
+// XXX This should live in sampler-composite package, where it can be better tested.
+
+// SpanParentType tracks `ExperimentalSpanParent` from sdk-config, but doesn't
+// directly depend on it.
+type SpanParentType = 'local' | 'none' | 'remote';
+type SamplingPredicateOptions = {
+  attributeValues?: { key: string; values: string[] };
+  attributePatterns?: { key: string; included?: string[]; excluded?: string[] };
+  spanKinds?: SpanKind[];
+  parent?: SpanParentType[];
+};
+
+function createSamplingPredicate(
+  opts: SamplingPredicateOptions
+): SamplingPredicate {
+  // Pre-prepared data structures for use by matchesWildcardPattern.
+  const patCache: Record<string, string[]> = {};
+  if (opts.attributePatterns?.included) {
+    for (const included of opts.attributePatterns.included) {
+      patCache[included] = Array.from(included);
+    }
+  }
+  if (opts.attributePatterns?.excluded) {
+    for (const excluded of opts.attributePatterns.excluded) {
+      patCache[excluded] = Array.from(excluded);
+    }
+  }
+
+  const predicate: SamplingPredicate = (
+    context,
+    // XXX traceId will be gone with https://github.com/open-telemetry/opentelemetry-js/pull/7365
+    _traceId,
+    _spanName,
+    spanKind,
+    attributes,
+    _links
+  ) => {
+    if (opts.attributeValues) {
+      const val = attributes[opts.attributeValues.key];
+      if (typeof val !== 'string') {
+        return false;
+      }
+      if (!opts.attributeValues.values.includes(val)) {
+        return false;
+      }
+    }
+
+    if (opts.attributePatterns) {
+      const val = attributes[opts.attributePatterns.key];
+      if (typeof val !== 'string') {
+        return false;
+      }
+      // TODO(perf): Can we optimize matching by preparing the `matches` array for each pattern once, and then re-using it?
+      if (opts.attributePatterns?.included) {
+        let isIncluded = false;
+        for (const included of opts.attributePatterns.included) {
+          if (
+            included === val ||
+            matchesWildcardPattern(val, patCache[included])
+          ) {
+            isIncluded = true;
+            break;
+          }
+        }
+        if (!isIncluded) {
+          return false;
+        }
+      }
+      if (opts.attributePatterns?.excluded) {
+        for (const excluded of opts.attributePatterns.excluded) {
+          if (
+            excluded === val ||
+            matchesWildcardPattern(val, patCache[excluded])
+          ) {
+            return false;
+          }
+        }
+      }
+    }
+
+    if (opts.spanKinds) {
+      if (!opts.spanKinds.includes(spanKind)) {
+        return false;
+      }
+    }
+
+    if (opts.parent) {
+      const parentSpanContext = trace.getSpanContext(context);
+      let parentType: SpanParentType;
+      if (!parentSpanContext) {
+        parentType = 'none';
+      } else if (parentSpanContext.isRemote) {
+        parentType = 'remote';
+      } else {
+        parentType = 'local';
+      }
+      if (!opts.parent.includes(parentType)) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+  return predicate;
+}
+
+const SPAN_KIND_FROM_CONFIG_MODEL: Record<
+  Exclude<SpanKindConfigModel, null>,
+  SpanKind
+> = {
+  internal: SpanKind.INTERNAL,
+  server: SpanKind.SERVER,
+  client: SpanKind.CLIENT,
+  producer: SpanKind.PRODUCER,
+  consumer: SpanKind.CONSUMER,
+};
+
+function createComposableRuleBasedSamplingRuleFromConfig(
+  reg: ComponentProviderRegistry,
+  props: ExperimentalComposableRuleBasedSamplerRuleConfigModel
+): SamplingRule {
+  checkConfigUse('ExperimentalComposableRuleBasedSamplerRule', props, [
+    'sampler',
+    'attribute_values',
+    'attribute_patterns',
+    'span_kinds',
+    'parent',
+  ]);
+  const predicate = createSamplingPredicate({
+    attributeValues: props.attribute_values ?? undefined,
+    attributePatterns: props.attribute_patterns ?? undefined,
+    // XXX test a `span_kinds: [ ... ]` with empty (i.e. null) entries
+    spanKinds: !props.span_kinds
+      ? undefined
+      : props.span_kinds
+          .filter(val => val !== null)
+          // @ts-expect-error TS2538: Type 'null' cannot be used as an index type. Fixed in more recent TypeScript.
+          .map(val => SPAN_KIND_FROM_CONFIG_MODEL[val]),
+    parent: !props.parent
+      ? undefined
+      : (props.parent.filter(val => val !== null) as SpanParentType[]),
+  });
+  const composableSampler = createComposableSamplerFromConfig(
+    reg,
+    props.sampler
+  );
+  return [predicate, composableSampler];
+}
+
+function createCompositeSamplerFromConfig(
+  reg: ComponentProviderRegistry,
+  composableSamplerConfig: ConfigProperties
+): Sampler {
+  const composableSampler = createComposableSamplerFromConfig(
+    reg,
+    composableSamplerConfig
+  );
+  return createCompositeSampler(composableSampler);
+}
+
 /**
  * Returns a Sampler for the `tracer_provider.sampler` in configuration,
  * or `undefined` if not set.
@@ -1578,7 +1840,7 @@ export function getBuiltinComponentProviderRegistry(): ComponentProviderRegistry
       always_record: createAlwaysRecordSamplerFromConfig,
       trace_id_ratio_based: createTraceIdRatioBasedSamplerFromConfig,
       parent_based: createParentBasedSamplerFromConfig,
-      // TODO(6961): composite/development
+      'composite/development': createCompositeSamplerFromConfig,
       // TODO(6541): probability/development (via composite support for?)
       // TODO(later): Consider supporting jaeger_remote/development if requested by a user. Only consider `sampler-jaeger-remote` package after axios dep is dropped in #6963.
     },
