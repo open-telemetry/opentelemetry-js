@@ -23,6 +23,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :house: Internal
 
+* perf(sdk-trace): use named imports from `@opentelemetry/api` in `Tracer`, avoiding the CommonJS interop getters on the span creation path [#7355](https://github.com/open-telemetry/opentelemetry-js/pull/7355) @daniellockyer
+
 ## 3.1.1
 
 ### :bug: Bug Fixes
