@@ -14,7 +14,7 @@ export class RandomIdGenerator implements IdGenerator {
    * characters corresponding to 128 bits.
    */
   generateTraceId(): string {
-    return generateId(TRACE_ID_BYTES);
+    return generateId(TRACE_ID_VIEW);
   }
 
   /**
@@ -22,26 +22,40 @@ export class RandomIdGenerator implements IdGenerator {
    * characters corresponding to 64 bits.
    */
   generateSpanId(): string {
-    return generateId(SPAN_ID_BYTES);
+    return generateId(SPAN_ID_VIEW);
   }
 }
 
-const SHARED_BUFFER = Buffer.allocUnsafe(TRACE_ID_BYTES);
-function generateId(bytes: number): string {
+// Writing through a Uint32Array view avoids the bounds and range checks of
+// Buffer#writeUInt32BE. Byte order does not matter for random bytes.
+const SHARED_WORDS = new Uint32Array(TRACE_ID_BYTES / 4);
+const SHARED_BUFFER = Buffer.from(SHARED_WORDS.buffer);
+
+// `Uint8Array.prototype.toHex` is only available from Node.js 25.
+type HexEncodable = Uint8Array & { toHex?: () => string };
+const TRACE_ID_VIEW: HexEncodable = new Uint8Array(
+  SHARED_WORDS.buffer,
+  0,
+  TRACE_ID_BYTES
+);
+const SPAN_ID_VIEW: HexEncodable = new Uint8Array(
+  SHARED_WORDS.buffer,
+  0,
+  SPAN_ID_BYTES
+);
+const HAS_TO_HEX = typeof TRACE_ID_VIEW.toHex === 'function';
+
+function generateId(view: HexEncodable): string {
+  const bytes = view.length;
+  let anyNonZero = 0;
   for (let i = 0; i < bytes / 4; i++) {
-    // unsigned right shift drops decimal part of the number
-    // it is required because if a number between 2**32 and 2**32 - 1 is generated, an out of range error is thrown by writeUInt32BE
-    SHARED_BUFFER.writeUInt32BE((Math.random() * 2 ** 32) >>> 0, i * 4);
+    anyNonZero |= SHARED_WORDS[i] = (Math.random() * 2 ** 32) >>> 0;
   }
 
   // If buffer is all 0, set the last byte to 1 to guarantee a valid w3c id is generated
-  for (let i = 0; i < bytes; i++) {
-    if (SHARED_BUFFER[i] > 0) {
-      break;
-    } else if (i === bytes - 1) {
-      SHARED_BUFFER[bytes - 1] = 1;
-    }
+  if (anyNonZero === 0) {
+    view[bytes - 1] = 1;
   }
 
-  return SHARED_BUFFER.toString('hex', 0, bytes);
+  return HAS_TO_HEX ? view.toHex!() : SHARED_BUFFER.toString('hex', 0, bytes);
 }
