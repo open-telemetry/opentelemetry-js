@@ -12,6 +12,7 @@ import {
   logs,
   metrics,
   DiagConsoleLogger,
+  createNoopMeter,
 } from '@opentelemetry/api';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
@@ -65,9 +66,14 @@ import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/expo
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 
-import { NOOP_COUNTER_METRIC } from '../../../../api/src/metrics/NoopMeter';
 import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from '../src/semconv';
-import { NOOP_HISTOGRAM_METRIC } from '../../../../api/src/metrics/NoopMeter';
+
+// The noop meter hands out shared singleton instruments, so these can be used
+// to check whether a self-observability metric is a noop without reaching into
+// the API's internals.
+const noopMeter = createNoopMeter();
+const NOOP_COUNTER_METRIC = noopMeter.createCounter('noop');
+const NOOP_HISTOGRAM_METRIC = noopMeter.createHistogram('noop');
 
 function assertDefaultContextManagerRegistered() {
   assert.ok(

@@ -8,9 +8,7 @@ import type {
   InstrumentationModuleFile,
 } from './types';
 
-export class InstrumentationNodeModuleDefinition
-  implements InstrumentationModuleDefinition
-{
+export class InstrumentationNodeModuleDefinition implements InstrumentationModuleDefinition {
   files: InstrumentationModuleFile[];
   public name: string;
   public supportedVersions: string[];

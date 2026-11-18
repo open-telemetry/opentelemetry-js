@@ -269,13 +269,12 @@ function stringUrlToHttpOptions(
  */
 export const isURLLike = (value: unknown): value is url.URL => {
   const candidate = value as
-    | (url.URL & { auth?: unknown; path?: unknown })
-    | undefined;
+    (url.URL & { auth?: unknown; path?: unknown }) | undefined;
   return Boolean(
     candidate?.href &&
-      candidate.protocol &&
-      candidate.auth === undefined &&
-      candidate.path === undefined
+    candidate.protocol &&
+    candidate.auth === undefined &&
+    candidate.path === undefined
   );
 };
 

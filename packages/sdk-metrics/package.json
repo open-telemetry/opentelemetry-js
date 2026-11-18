@@ -56,12 +56,12 @@
     "access": "public"
   },
   "devDependencies": {
-    "@babel/core": "7.29.7",
-    "@babel/preset-env": "7.29.7",
+    "@babel/core": "8.1.2",
+    "@babel/preset-env": "8.0.7",
     "@opentelemetry/api": ">=1.10.0 <1.11.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
-    "@types/sinon": "17.0.4",
+    "@types/sinon": "22.0.2",
     "babel-plugin-istanbul": "8.0.0",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.2.0",
@@ -71,11 +71,11 @@
     "karma-webpack": "5.0.1",
     "mocha": "12.0.3",
     "nyc": "18.0.0",
-    "sinon": "18.0.1",
-    "ts-loader": "9.5.7",
+    "sinon": "22.1.0",
+    "ts-loader": "9.6.2",
     "typescript": "5.2.2",
-    "webpack": "5.108.4",
-    "webpack-cli": "7.2.3"
+    "webpack": "5.112.2",
+    "webpack-cli": "7.3.1"
   },
   "peerDependencies": {
     "@opentelemetry/api": ">=1.10.0 <1.11.0"

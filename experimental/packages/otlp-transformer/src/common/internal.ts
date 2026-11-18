@@ -20,7 +20,8 @@ export function createResource(
 ): Resource {
   const result: Resource = {
     attributes: toAttributes(resource.attributes, encoder),
-    droppedAttributesCount: 0,
+    // droppedAttributesCount - skipped, we don't track this and 0 is the
+    // default
   };
 
   const schemaUrl = resource.schemaUrl;
@@ -43,7 +44,7 @@ export function createInstrumentationScope(
 
   if (scope.attributes && Object.keys(scope.attributes).length > 0) {
     result.attributes = toAttributes(scope.attributes, encoder);
-    result.droppedAttributesCount = scope.droppedAttributesCount ?? 0;
+    result.droppedAttributesCount = scope.droppedAttributesCount || undefined;
   }
 
   return result;

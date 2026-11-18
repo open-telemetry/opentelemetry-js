@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation",
-  "version": "0.301.1",
+  "version": "0.301.2",
   "description": "Base class for node which OpenTelemetry instrumentation modules extend",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -81,6 +81,7 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
+    "@opentelemetry/api-config": "0.301.2",
     "import-in-the-middle": "^3.0.0",
     "require-in-the-middle": "^8.0.0"
   },
@@ -88,13 +89,13 @@
     "@opentelemetry/api": ">=1.10.0 <1.11.0"
   },
   "devDependencies": {
-    "@babel/core": "7.29.7",
-    "@babel/preset-env": "7.29.7",
+    "@babel/core": "8.1.2",
+    "@babel/preset-env": "8.0.7",
     "@opentelemetry/api": "1.10.0",
     "@opentelemetry/sdk-metrics": "3.1.1",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
-    "@types/sinon": "17.0.4",
+    "@types/sinon": "22.0.2",
     "@types/webpack-env": "1.18.8",
     "babel-loader": "10.1.1",
     "babel-plugin-istanbul": "8.0.0",
@@ -106,11 +107,11 @@
     "karma-webpack": "5.0.1",
     "mocha": "12.0.3",
     "nyc": "18.0.0",
-    "sinon": "18.0.1",
-    "ts-loader": "9.5.7",
+    "sinon": "22.1.0",
+    "ts-loader": "9.6.2",
     "typescript": "5.2.2",
-    "webpack": "5.108.4",
-    "webpack-cli": "7.2.3"
+    "webpack": "5.112.2",
+    "webpack-cli": "7.3.1"
   },
   "engines": {
     "node": ">=22.15.0"

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sampler-composite",
-  "version": "0.301.1",
+  "version": "0.301.2",
   "description": "Composite samplers for OpenTelemetry tracing",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
