@@ -1,0 +1,5 @@
+file_format: "1.2"
+logger_provider:
+  processors:
+    - my_processor_a:
+    - my_processor_b:

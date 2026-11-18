@@ -195,9 +195,10 @@ function startNodeSdkFromEnv(opts?: StartSdkFromEnvOptions): NodeSdk {
 }
 
 function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
-  const reg = mergeComponentProviderRegistries([
+  const reg = mergeComponentProviderRegistries(
     getBuiltinComponentProviderRegistry(),
-  ]);
+    opts.componentProviderRegistries,
+  );
 
   let config: ConfigurationModel;
   try {

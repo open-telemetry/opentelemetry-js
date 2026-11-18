@@ -1,0 +1,64 @@
+# Use a custom component of each type. Pass `foo: bar` property so the test
+# can verify that properties from the config file are passed through.
+
+file_format: "1.2"
+
+resource:
+  detection/development:
+    detectors:
+      # ExperimentalResourceDetector
+      - my_detector:
+          foo: bar
+
+propagator:
+  composite:
+    # TextMapPropagator
+    - my_propagator:
+        foo: bar
+  composite_list: tracecontext
+
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          # SpanExporter
+          my_exporter:
+            foo: bar
+    # SpanProcessor
+    - my_processor:
+        foo: bar
+
+  # Sampler
+  sampler:
+    my_sampler:
+      foo: bar
+
+id_generator:
+  # IdGenerator
+  my_generator:
+    foo: bar
+
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          # PushMetricExporter
+          my_exporter:
+            foo: bar
+        producers:
+          # MetricProducer
+          - my_producer:
+              foo: bar
+
+# TODO(7309): PullMetricExporter
+
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          # LogRecordExporter
+          my_exporter:
+            foo: bar
+    # LogRecordProcessor
+    - my_processor:
+        foo: bar
