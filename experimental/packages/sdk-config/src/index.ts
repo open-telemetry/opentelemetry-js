@@ -66,6 +66,7 @@ export type {
   ExperimentalMessagingInstrumentation as ExperimentalMessagingInstrumentationConfigModel,
   ExperimentalRpcInstrumentation as ExperimentalRpcInstrumentationConfigModel,
   ExperimentalSanitization as ExperimentalSanitizationConfigModel,
+  AlwaysRecordSampler as AlwaysRecordSamplerConfigModel,
 } from './generated/types';
 export { parseConfigFile } from './parse';
 export { createConfigProvider } from './SdkConfigProvider';
