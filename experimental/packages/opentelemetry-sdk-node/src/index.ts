@@ -11,4 +11,5 @@
 export { NodeSDK } from './sdk';
 export type { LoggerProviderConfig, MeterProviderConfig } from './sdk';
 export type { NodeSDKConfiguration } from './types';
+export type { ComponentProviderRegistry } from './component-provider';
 export { startNodeSdk, startNodeSDK } from './start';
