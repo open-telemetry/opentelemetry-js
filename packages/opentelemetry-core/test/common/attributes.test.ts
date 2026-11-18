@@ -322,6 +322,32 @@ describe('attributes', () => {
       });
       assert.equal(droppedAttributesCount, 0);
     });
+
+    it('applies attributeValueLengthLimit at the boundary', () => {
+      const { attributes, droppedAttributesCount } = cleanAttributes(
+        { short: 'ab', exact: 'abc', long: 'abcd', num: 123456, bool: true },
+        { attributeCountLimit: Infinity, attributeValueLengthLimit: 3 }
+      );
+
+      assert.deepStrictEqual(attributes, {
+        short: 'ab',
+        exact: 'abc',
+        long: 'abc',
+        num: 123456,
+        bool: true,
+      });
+      assert.equal(droppedAttributesCount, 0);
+    });
+
+    it('ignores a non-positive attributeValueLengthLimit', () => {
+      const { attributes, droppedAttributesCount } = cleanAttributes(
+        { str: 'abcdef' },
+        { attributeCountLimit: Infinity, attributeValueLengthLimit: 0 }
+      );
+
+      assert.deepStrictEqual(attributes, { str: 'abcdef' });
+      assert.equal(droppedAttributesCount, 0);
+    });
   });
 
   describe('cleanSimpleAttributes', () => {

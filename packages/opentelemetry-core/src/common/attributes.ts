@@ -249,6 +249,16 @@ function cleanAttributesInternal(
       droppedAttributesCount++;
       continue;
     }
+    if (
+      typeof val === 'number' ||
+      typeof val === 'boolean' ||
+      (typeof val === 'string' && val.length <= attributeValueLengthLimit)
+    ) {
+      // Fast path for primitives that need no validation, copy, or truncation.
+      attributes[key] = val;
+      count++;
+      continue;
+    }
     if (!isValidValue(val)) {
       diag.warn(`Invalid attribute value set for key: ${key}`);
       droppedAttributesCount++;
