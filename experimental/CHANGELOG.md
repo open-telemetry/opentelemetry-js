@@ -13,6 +13,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :rocket: Features
 
+* feat(sdk-node): support 'composite/development' samplers in declarative config files [#7366](https://github.com/open-telemetry/opentelemetry-js/pull/7366) @trentm
+* feat(sampler-composite): new 'createSamplerPredicate' utility for creating rule-based samplers [#7366](https://github.com/open-telemetry/opentelemetry-js/pull/7366) @trentm
 * feat(sdk-config): export all generated schema types [#7351](https://github.com/open-telemetry/opentelemetry-js/pull/7351) @trentm
 * feat(sdk-node): wire up `always_record` in declarative config to create an AlwaysRecord sampler [#7322](https://github.com/open-telemetry/opentelemetry-js/pull/7322) @trentm
 * feat(sdk-config): add support for parsing `file_format: "1.2"` declarative config files
