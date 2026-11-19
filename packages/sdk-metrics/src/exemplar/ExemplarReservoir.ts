@@ -84,9 +84,7 @@ class ExemplarBucket {
   }
 }
 
-export abstract class FixedSizeExemplarReservoirBase
-  implements ExemplarReservoir
-{
+export abstract class FixedSizeExemplarReservoirBase implements ExemplarReservoir {
   protected _reservoirStorage: ExemplarBucket[];
   protected _size: number;
 

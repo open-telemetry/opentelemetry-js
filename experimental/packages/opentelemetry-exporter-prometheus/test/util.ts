@@ -15,7 +15,12 @@ import {
 export const mockedHrTimeMs = 1586347902211;
 
 export function mockHrTime() {
-  sinon.useFakeTimers(mockedHrTimeMs);
+  // process.nextTick and queueMicrotask are faked by default since sinon 19,
+  // which stalls the http server used in tests, so only fake the time.
+  sinon.useFakeTimers({
+    now: mockedHrTimeMs,
+    toFake: ['Date', 'performance', 'hrtime'],
+  });
 }
 
 export const serviceName = defaultResource()

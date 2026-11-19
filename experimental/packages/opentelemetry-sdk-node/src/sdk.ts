@@ -3,8 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { metrics, trace, diag, DiagConsoleLogger } from '@opentelemetry/api';
-import { logs } from '@opentelemetry/api-logs';
+import {
+  metrics,
+  trace,
+  diag,
+  DiagConsoleLogger,
+  logs,
+} from '@opentelemetry/api';
 import type { Instrumentation } from '@opentelemetry/instrumentation';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import type {
@@ -17,8 +22,10 @@ import {
   detectResources,
   envDetector,
   hostDetector,
+  osDetector,
   processDetector,
   resourceFromAttributes,
+  serviceInstanceIdDetector,
 } from '@opentelemetry/resources';
 import type {
   LogRecordProcessor,
@@ -32,13 +39,8 @@ import {
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
-import { PrometheusExporter as PrometheusMetricExporter } from '@opentelemetry/exporter-prometheus';
 import type { IMetricReader, ViewOptions } from '@opentelemetry/sdk-metrics';
-import {
-  MeterProvider,
-  ConsoleMetricExporter,
-  PeriodicExportingMetricReader,
-} from '@opentelemetry/sdk-metrics';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import type { SpanProcessor } from '@opentelemetry/sdk-trace';
 import { TracerProvider } from '@opentelemetry/sdk-trace';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
@@ -55,10 +57,9 @@ import {
   getPropagatorFromEnv,
   setupPropagator,
   setupContextManager,
-  getPeriodicExportingMetricReaderFromEnv,
-  getOtlpMetricExporterFromEnv,
   getBatchLogRecordProcessorFromEnv,
   getLoggerProviderConfigFromEnv,
+  getMetricReadersFromEnv,
 } from './utils';
 import {
   createBatchSpanProcessorFromEnv,
@@ -83,51 +84,6 @@ export type LoggerProviderConfig = {
    */
   logRecordProcessors: LogRecordProcessor[];
 };
-
-/**
- *
- * @returns MetricReader[] if appropriate environment variables are configured
- */
-function getMetricReadersFromEnv(): IMetricReader[] {
-  const metricReaders: IMetricReader[] = [];
-  const enabledExporters = Array.from(
-    new Set(getStringListFromEnv('OTEL_METRICS_EXPORTER') ?? [])
-  );
-
-  if (enabledExporters.length === 0) {
-    diag.debug('OTEL_METRICS_EXPORTER is empty. Using default otlp exporter.');
-    enabledExporters.push('otlp');
-  }
-
-  if (enabledExporters.includes('none')) {
-    diag.info(
-      'OTEL_METRICS_EXPORTER contains "none". Metric provider will not be initialized.'
-    );
-    return metricReaders;
-  }
-
-  enabledExporters.forEach(exporter => {
-    if (exporter === 'otlp') {
-      metricReaders.push(
-        getPeriodicExportingMetricReaderFromEnv(getOtlpMetricExporterFromEnv())
-      );
-    } else if (exporter === 'console') {
-      metricReaders.push(
-        new PeriodicExportingMetricReader({
-          exporter: new ConsoleMetricExporter(),
-        })
-      );
-    } else if (exporter === 'prometheus') {
-      metricReaders.push(new PrometheusMetricExporter());
-    } else {
-      diag.warn(
-        `Unsupported OTEL_METRICS_EXPORTER value: "${exporter}". Supported values are: otlp, console, prometheus, none.`
-      );
-    }
-  });
-
-  return metricReaders;
-}
 
 /**
  * A setup helper for the OpenTelemetry SDKs (logs, metrics, traces).
@@ -193,28 +149,21 @@ export class NodeSDK {
     } else if (getStringFromEnv('OTEL_NODE_RESOURCE_DETECTORS')) {
       this._resourceDetectors = getResourceDetectorsFromEnv();
     } else {
-      this._resourceDetectors = [envDetector, processDetector, hostDetector];
+      this._resourceDetectors = [
+        serviceInstanceIdDetector,
+        processDetector,
+        hostDetector,
+        osDetector,
+        envDetector,
+      ];
     }
 
     this._serviceName = configuration.serviceName;
-
-    if (configuration.spanProcessor) {
-      diag.warn(
-        "The 'spanProcessor' option is deprecated. Please use 'spanProcessors' instead."
-      );
-    }
 
     if (configuration.logRecordProcessors) {
       this._loggerProviderConfig = {
         logRecordProcessors: configuration.logRecordProcessors,
       };
-    } else if (configuration.logRecordProcessor) {
-      this._loggerProviderConfig = {
-        logRecordProcessors: [configuration.logRecordProcessor],
-      };
-      diag.warn(
-        "The 'logRecordProcessor' option is deprecated. Please use 'logRecordProcessors' instead."
-      );
     }
 
     if (configuration.metricReaders) {
@@ -222,14 +171,6 @@ export class NodeSDK {
         readers: configuration.metricReaders,
         views: configuration.views,
       };
-    } else if (configuration.metricReader) {
-      this._meterProviderConfig = {
-        readers: [configuration.metricReader],
-        views: configuration.views,
-      };
-      diag.warn(
-        "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
-      );
     } else {
       this._meterProviderConfig = {
         readers: getMetricReadersFromEnv(),
@@ -305,12 +246,10 @@ export class NodeSDK {
       }
     }
 
-    // Determine `spanProcessors` from multiple possible options.
+    // Determine `spanProcessors` from configuration options.
     let spanProcessors: SpanProcessor[];
     if (this._configuration?.spanProcessors) {
       spanProcessors = this._configuration.spanProcessors;
-    } else if (this._configuration?.spanProcessor) {
-      spanProcessors = [this._configuration.spanProcessor];
     } else if (this._configuration?.traceExporter) {
       spanProcessors = [
         createBatchSpanProcessorFromEnv(

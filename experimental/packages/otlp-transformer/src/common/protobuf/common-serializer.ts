@@ -2,8 +2,7 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import type { Attributes, HrTime } from '@opentelemetry/api';
-import type { AnyValue, LogAttributes } from '@opentelemetry/api-logs';
+import type { AnyValue, Attributes, HrTime } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import type { IProtobufWriter } from './i-protobuf-writer';
@@ -81,7 +80,7 @@ export function writeHrTimeAsFixed64(
  */
 export function writeAttributes(
   writer: IProtobufWriter,
-  attributes: Attributes | LogAttributes,
+  attributes: Attributes,
   fieldNumber: number
 ): void {
   for (const key in attributes) {
@@ -206,7 +205,7 @@ export function writeInstrumentationScope(
      * we should remove these extensions.
      */
     {
-      attributes?: LogAttributes;
+      attributes?: Attributes;
       droppedAttributesCount?: number;
     },
   fieldNumber: number
@@ -260,9 +259,8 @@ export function writeResource(
     writeAttributes(writer, resource.attributes, 1);
   }
 
-  // dropped_attributes_count (field 2, uint32) - set to 0 as we don't track this
-  writer.writeTag(2, 0);
-  writer.writeVarint(0);
+  // dropped_attributes_count (field 2, uint32) - skipped, we don't track this
+  // and 0 is the default
 
   writer.finishLengthDelimited(resourceStart, writer.pos - resourceStartPos);
 }

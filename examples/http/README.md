@@ -1,6 +1,6 @@
 # Overview
 
-OpenTelemetry HTTP Instrumentation allows the user to automatically collect trace data and export them to the backend of choice (we can use Zipkin or Jaeger for this example), to give observability to distributed systems.
+OpenTelemetry HTTP Instrumentation allows the user to automatically collect trace data and export them to the backend of choice (we can use Zipkin for this example), to give observability to distributed systems.
 
 This is a simple example that demonstrates tracing HTTP request from client to server. The example
 shows key aspects of tracing such as
@@ -15,66 +15,43 @@ shows key aspects of tracing such as
 ## Installation
 
 ```sh
-# from this directory
+git clone https://github.com/open-telemetry/opentelemetry-js.git
+cd examples/http
 npm install
 ```
 
-Setup [Zipkin Tracing](https://zipkin.io/pages/quickstart.html)
-or
-Setup [Jaeger Tracing](https://www.jaegertracing.io/docs/latest/getting-started/#all-in-one)
+Setup [Zipkin Tracing](https://zipkin.io/pages/quickstart.html), for example:
+
+```sh
+docker run -d -p 9411:9411 openzipkin/zipkin
+```
 
 ## Run the Application
 
-### Zipkin
+Run the server:
 
-- Run the server
+```sh
+npm run server
+```
 
-   ```sh
-   # from this directory
-   npm run zipkin:server
-   ```
+Run the client
 
-- Run the client
+```sh
+npm run client
+```
 
-   ```sh
-   # from this directory
-   npm run zipkin:client
-   ```
+## Zipkin UI
 
-#### Zipkin UI
-
-`zipkin:server` script should output the `traceid` in the terminal (e.g `traceid: 4815c3d576d930189725f1f1d1bdfcc6`).
-Go to Zipkin with your browser <http://localhost:9411/zipkin/traces/(your-trace-id)> (e.g <http://localhost:9411/zipkin/traces/4815c3d576d930189725f1f1d1bdfcc6>)
+- `npm run server` should output the trace ID in the terminal (e.g `traceId: 4815c3d576d930189725f1f1d1bdfcc6`).
+- Go to Zipkin at <http://localhost:9411/zipkin>.
+- Enter the trace ID in the "Search by trace ID" form (top right).
 
 <p align="center"><img alt="Zipkin UI showing a trace" src="./images/zipkin-ui.png?raw=true"/></p>
-
-### Jaeger
-
-- Run the server
-
-   ```sh
-   # from this directory
-   npm run jaeger:server
-   ```
-
-- Run the client
-
-   ```sh
-   # from this directory
-   npm run jaeger:client
-   ```
-
-#### Jaeger UI
-
-`jaeger:server` script should output the `traceid` in the terminal (e.g `traceid: 4815c3d576d930189725f1f1d1bdfcc6`).
-Go to Jaeger with your browser <http://localhost:16686/trace/(your-trace-id)> (e.g <http://localhost:16686/trace/4815c3d576d930189725f1f1d1bdfcc6>)
-
-<p align="center"><img alt="Jaeger UI showing a trace"  src="images/jaeger-ui.png?raw=true"/></p>
 
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For more information on OpenTelemetry for Node.js, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node>
+- For more information on OpenTelemetry for Node.js, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-sdk-node>
 
 ## LICENSE
 

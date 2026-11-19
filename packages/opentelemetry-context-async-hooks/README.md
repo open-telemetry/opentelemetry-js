@@ -3,16 +3,57 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-This package provides two [`ContextManager`](https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api.ContextManager.html) implementations built on APIs from Node.js's [`async_hooks`][async-hooks-doc] module. If you're looking for a `ContextManager` to use in browser environments, consider [opentelemetry-context-zone](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone) or [opentelemetry-context-zone-peer-dep](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone-peer-dep).
+This package provides a [`ContextManager`](https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api.ContextManager.html) implementation built on APIs from Node.js's [`async_hooks`][async-hooks-doc] module. If you're looking for a `ContextManager` to use in browser environments, consider [opentelemetry-context-zone](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone) or [opentelemetry-context-zone-peer-dep](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone-peer-dep).
 
 See [the definition of the `ContextManager` interface][def-context-manager] and the problem it solves.
 
 ## API
 
-Two `ContextManager` implementations are exported:
+A `ContextManager` implementations is exported:
 
 - `AsyncLocalStorageContextManager`, based on [`AsyncLocalStorage`](https://nodejs.org/api/async_context.html#class-asynclocalstorage)
-- `AsyncHooksContextManager`, based on [`AsyncHook`](https://nodejs.org/api/async_hooks.html#async_hooks_class_asynchook). This is **deprecated** and will be removed in v3 (planned for mid-2025. `AsyncLocalStorage` is simpler, faster, available in Node.js v14.8.0 and later, and avoids [this possible DoS vulnerability](https://nodejs.org/en/blog/vulnerability/january-2026-dos-mitigation-async-hooks).
+
+### Using attach()
+
+`AsyncLocalStorageContextManager` supports the optional `attach()` method for imperative context management. It sets a context as active and returns a disposable `Token`. Disposing the token restores the previously active context.
+
+**What is an "execution unit"?** In Node.js, this refers to the current asynchronous execution chain - the currently running code plus all async operations that will be spawned from it (Promises, callbacks, async/await, timers, etc.). When you `attach()` a context, it becomes active for this entire chain until the token is disposed.
+
+```javascript
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
+import { ROOT_CONTEXT } from '@opentelemetry/api';
+
+const contextManager = new AsyncLocalStorageContextManager();
+contextManager.enable();
+
+const myContext = ROOT_CONTEXT.setValue('key', 'value');
+
+// Attach a context - it becomes active for the current async execution chain
+const token = contextManager.attach(myContext);
+console.log(contextManager.active()); // myContext
+
+// Context propagates to async operations automatically
+await someAsyncOperation();
+console.log(contextManager.active()); // still myContext
+
+// Restore the previous context by disposing the token
+token.dispose();
+console.log(contextManager.active()); // ROOT_CONTEXT
+```
+
+**Important:** You should ensure that every `attach()` call has a corresponding `token.dispose()` call to avoid context leaks. Use a try/finally block for safety:
+
+```javascript
+const token = contextManager.attach(myContext);
+try {
+  await doWork();
+} finally {
+  token.dispose(); // Always restore
+}
+```
+
+For most use cases, prefer using `with()` as it automatically handles context restoration.
+Not restoring context properly can lead to catastrophic effects on your telemetry, even outside the bounds of your instrumentation library.
 
 ## Prior art
 

@@ -4,9 +4,8 @@
  */
 
 export { registerInstrumentations } from './autoLoader';
-export { InstrumentationBase } from './platform/index';
+export { InstrumentationBase, InstrumentationNodeModuleFile } from '#platform';
 export { InstrumentationNodeModuleDefinition } from './instrumentationNodeModuleDefinition';
-export { InstrumentationNodeModuleFile } from './instrumentationNodeModuleFile';
 export type {
   Instrumentation,
   InstrumentationConfig,
@@ -21,4 +20,9 @@ export {
   safeExecuteInTheMiddle,
   safeExecuteInTheMiddleAsync,
 } from './utils';
+export {
+  readDeclarativeConfig,
+  type ConfigPropertiesReader,
+  type DeclarativeConfigReader,
+} from './readDeclarativeConfig';
 export { SemconvStability, semconvStabilityFromStr } from './semconvStability';

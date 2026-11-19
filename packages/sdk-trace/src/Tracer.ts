@@ -3,9 +3,23 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as api from '@opentelemetry/api';
+import type {
+  Context,
+  Span as APISpan,
+  SpanOptions,
+  Tracer as APITracer,
+} from '@opentelemetry/api';
+import {
+  context as contextApi,
+  diag,
+  INVALID_SPAN_CONTEXT,
+  SamplingDecision,
+  SpanKind,
+  trace,
+  TraceFlags,
+} from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
-import { sanitizeAttributes, isTracingSuppressed } from '@opentelemetry/core';
+import { isTracingSuppressed, cleanAttributes } from '@opentelemetry/core';
 import { SpanImpl } from './Span';
 import type { SpanLimits, TracerOptions } from './types';
 import type { SpanProcessor } from './SpanProcessor';
@@ -21,12 +35,17 @@ import {
   settledResourceAttributes,
 } from './inspect';
 
+const NO_ATTR_LIMITS = {
+  attributeCountLimit: Infinity,
+  attributeValueLengthLimit: Infinity,
+};
+
 /**
  * This class represents a basic tracer.
  */
-export class Tracer implements api.Tracer {
+export class Tracer implements APITracer {
   private readonly _sampler: Sampler;
-  private readonly _spanLimits: SpanLimits;
+  private readonly _spanLimits: Required<SpanLimits>;
   private readonly _idGenerator: IdGenerator;
   readonly instrumentationScope: InstrumentationScope;
 
@@ -61,20 +80,18 @@ export class Tracer implements api.Tracer {
    */
   startSpan(
     name: string,
-    options: api.SpanOptions = {},
-    context = api.context.active()
-  ): api.Span {
+    options: SpanOptions = {},
+    context = contextApi.active()
+  ): APISpan {
     // remove span from context in case a root span is requested via options
     if (options.root) {
-      context = api.trace.deleteSpan(context);
+      context = trace.deleteSpan(context);
     }
-    const parentSpan = api.trace.getSpan(context);
+    const parentSpan = trace.getSpan(context);
 
     if (isTracingSuppressed(context)) {
-      api.diag.debug('Instrumentation suppressed, returning Noop Span');
-      const nonRecordingSpan = api.trace.wrapSpanContext(
-        api.INVALID_SPAN_CONTEXT
-      );
+      diag.debug('Instrumentation suppressed, returning Noop Span');
+      const nonRecordingSpan = trace.wrapSpanContext(INVALID_SPAN_CONTEXT);
       return nonRecordingSpan;
     }
 
@@ -83,10 +100,7 @@ export class Tracer implements api.Tracer {
     let validParentSpanContext;
     let traceId;
     let traceState;
-    if (
-      !parentSpanContext ||
-      !api.trace.isSpanContextValid(parentSpanContext)
-    ) {
+    if (!parentSpanContext || !trace.isSpanContextValid(parentSpanContext)) {
       // New root span.
       traceId = this._idGenerator.generateTraceId();
     } else {
@@ -96,15 +110,23 @@ export class Tracer implements api.Tracer {
       validParentSpanContext = parentSpanContext;
     }
 
-    const spanKind = options.kind ?? api.SpanKind.INTERNAL;
+    const spanKind = options.kind ?? SpanKind.INTERNAL;
     const links = (options.links ?? []).map(link => {
       return {
         context: link.context,
-        attributes: sanitizeAttributes(link.attributes),
+        ...cleanAttributes(link.attributes, {
+          attributeCountLimit: this._spanLimits.attributePerLinkCountLimit,
+          attributeValueLengthLimit: this._spanLimits.attributeValueLengthLimit,
+        }),
       };
     });
-    const attributes = sanitizeAttributes(options.attributes);
-    // make sampling decision
+
+    // `NO_ATTR_LIMITS` to avoid applying limits until after `shouldSample`.
+    // The second `cleanAttributes` below will apply user limits.
+    const attrsData1 = cleanAttributes(options.attributes, NO_ATTR_LIMITS);
+    const attributes = attrsData1.attributes ?? {};
+
+    // Make sampling decision.
     const samplingResult = this._sampler.shouldSample(
       context,
       traceId,
@@ -113,31 +135,29 @@ export class Tracer implements api.Tracer {
       attributes,
       links
     );
-
     const recordEndMetrics = this._tracerMetrics.startSpan(
       parentSpanContext,
       samplingResult.decision
     );
-
     traceState = samplingResult.traceState ?? traceState;
-
     const traceFlags =
-      samplingResult.decision === api.SamplingDecision.RECORD_AND_SAMPLED
-        ? api.TraceFlags.SAMPLED
-        : api.TraceFlags.NONE;
+      samplingResult.decision === SamplingDecision.RECORD_AND_SAMPLED
+        ? TraceFlags.SAMPLED
+        : TraceFlags.NONE;
     const spanContext = { traceId, spanId, traceFlags, traceState };
-    if (samplingResult.decision === api.SamplingDecision.NOT_RECORD) {
-      api.diag.debug(
+    if (samplingResult.decision === SamplingDecision.NOT_RECORD) {
+      diag.debug(
         'Recording is off, propagating context in a non-recording span'
       );
-      const nonRecordingSpan = api.trace.wrapSpanContext(spanContext);
+      const nonRecordingSpan = trace.wrapSpanContext(spanContext);
       return nonRecordingSpan;
     }
 
     // Set initial span attributes. The attributes object may have been mutated
     // by the sampler, so we sanitize the merged attributes before setting them.
-    const initAttributes = sanitizeAttributes(
-      Object.assign(attributes, samplingResult.attributes)
+    const attrsData2 = cleanAttributes(
+      Object.assign(attributes, samplingResult.attributes),
+      this._spanLimits
     );
 
     const span = new SpanImpl({
@@ -149,7 +169,10 @@ export class Tracer implements api.Tracer {
       kind: spanKind,
       links,
       parentSpanContext: validParentSpanContext,
-      attributes: initAttributes,
+      attributes: attrsData2.attributes,
+      droppedAttributesCount:
+        (attrsData1.droppedAttributesCount ?? 0) +
+        (attrsData2.droppedAttributesCount ?? 0),
       startTime: options.startTime,
       spanProcessor: this._spanProcessor,
       spanLimits: this._spanLimits,
@@ -206,29 +229,29 @@ export class Tracer implements api.Tracer {
    *   do some more work
    *   span.end();
    */
-  startActiveSpan<F extends (span: api.Span) => ReturnType<F>>(
+  startActiveSpan<F extends (span: APISpan) => ReturnType<F>>(
     name: string,
     fn: F
   ): ReturnType<F>;
-  startActiveSpan<F extends (span: api.Span) => ReturnType<F>>(
+  startActiveSpan<F extends (span: APISpan) => ReturnType<F>>(
     name: string,
-    opts: api.SpanOptions,
+    opts: SpanOptions,
     fn: F
   ): ReturnType<F>;
-  startActiveSpan<F extends (span: api.Span) => ReturnType<F>>(
+  startActiveSpan<F extends (span: APISpan) => ReturnType<F>>(
     name: string,
-    opts: api.SpanOptions,
-    ctx: api.Context,
+    opts: SpanOptions,
+    ctx: Context,
     fn: F
   ): ReturnType<F>;
-  startActiveSpan<F extends (span: api.Span) => ReturnType<F>>(
+  startActiveSpan<F extends (span: APISpan) => ReturnType<F>>(
     name: string,
-    arg2?: F | api.SpanOptions,
-    arg3?: F | api.Context,
+    arg2?: F | SpanOptions,
+    arg3?: F | Context,
     arg4?: F
   ): ReturnType<F> | undefined {
-    let opts: api.SpanOptions | undefined;
-    let ctx: api.Context | undefined;
+    let opts: SpanOptions | undefined;
+    let ctx: Context | undefined;
     let fn: F;
 
     if (arguments.length < 2) {
@@ -236,19 +259,19 @@ export class Tracer implements api.Tracer {
     } else if (arguments.length === 2) {
       fn = arg2 as F;
     } else if (arguments.length === 3) {
-      opts = arg2 as api.SpanOptions | undefined;
+      opts = arg2 as SpanOptions | undefined;
       fn = arg3 as F;
     } else {
-      opts = arg2 as api.SpanOptions | undefined;
-      ctx = arg3 as api.Context | undefined;
+      opts = arg2 as SpanOptions | undefined;
+      ctx = arg3 as Context | undefined;
       fn = arg4 as F;
     }
 
-    const parentContext = ctx ?? api.context.active();
+    const parentContext = ctx ?? contextApi.active();
     const span = this.startSpan(name, opts, parentContext);
-    const contextWithSpanSet = api.trace.setSpan(parentContext, span);
+    const contextWithSpanSet = trace.setSpan(parentContext, span);
 
-    return api.context.with(contextWithSpanSet, fn, undefined, span);
+    return contextApi.with(contextWithSpanSet, fn, undefined, span);
   }
 
   [inspectCustom](

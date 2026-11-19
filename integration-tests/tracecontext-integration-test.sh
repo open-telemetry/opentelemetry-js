@@ -2,7 +2,7 @@
 #!/bin/sh
 set -e
 # hard-coding the git tag to ensure stable builds.
-TRACECONTEXT_GIT_TAG="98f210efd89c63593dce90e2bae0a1bdcb986f51"
+TRACECONTEXT_GIT_TAG="9e4d52f3c87cbc8bd54afe15addc08914609eaa5"
 # clone w3c tracecontext tests
 mkdir -p target
 rm -rf ./target/trace-context

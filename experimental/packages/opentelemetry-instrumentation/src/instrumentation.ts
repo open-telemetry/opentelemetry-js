@@ -12,8 +12,8 @@ import type {
   Span,
 } from '@opentelemetry/api';
 import { diag, metrics, trace } from '@opentelemetry/api';
-import type { Logger, LoggerProvider } from '@opentelemetry/api-logs';
-import { logs } from '@opentelemetry/api-logs';
+import type { Logger, LoggerProvider } from '@opentelemetry/api';
+import { logs } from '@opentelemetry/api';
 import * as shimmer from './shimmer';
 import type {
   InstrumentationModuleDefinition,
@@ -27,8 +27,7 @@ import type {
  */
 export abstract class InstrumentationAbstract<
   ConfigType extends InstrumentationConfig = InstrumentationConfig,
-> implements Instrumentation<ConfigType>
-{
+> implements Instrumentation<ConfigType> {
   protected _config: ConfigType = {} as ConfigType;
 
   private _tracer: Tracer;
@@ -170,9 +169,7 @@ export abstract class InstrumentationAbstract<
    * methods.
    */
   protected abstract init():
-    | InstrumentationModuleDefinition
-    | InstrumentationModuleDefinition[]
-    | void;
+    InstrumentationModuleDefinition | InstrumentationModuleDefinition[] | void;
 
   /**
    * Execute span customization hook, if configured, and log any errors.

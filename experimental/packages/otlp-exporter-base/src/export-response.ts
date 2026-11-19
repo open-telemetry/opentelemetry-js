@@ -20,6 +20,4 @@ export interface ExportResponseRetryable {
 }
 
 export type ExportResponse =
-  | ExportResponseSuccess
-  | ExportResponseFailure
-  | ExportResponseRetryable;
+  ExportResponseSuccess | ExportResponseFailure | ExportResponseRetryable;

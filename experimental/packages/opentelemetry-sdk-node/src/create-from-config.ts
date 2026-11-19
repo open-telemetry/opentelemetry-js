@@ -13,30 +13,112 @@
  */
 
 import { inspect } from 'util';
+import { readFileSync } from 'fs';
+import * as path from 'path';
 
 import type { TextMapPropagator } from '@opentelemetry/api';
+import type { ConfigProperties } from '@opentelemetry/api-config';
 import { diag } from '@opentelemetry/api';
-import type { SpanLimits } from '@opentelemetry/sdk-trace';
-import type { Resource } from '@opentelemetry/resources';
+import type {
+  IdGenerator,
+  Sampler,
+  SpanExporter,
+  SpanLimits,
+  SpanProcessor,
+} from '@opentelemetry/sdk-trace';
+import {
+  AlwaysOffSampler,
+  AlwaysOnSampler,
+  BatchSpanProcessor,
+  ConsoleSpanExporter,
+  createAlwaysRecordSampler,
+  ParentBasedSampler,
+  RandomIdGenerator,
+  SimpleSpanProcessor,
+  TraceIdRatioBasedSampler,
+  TracerProvider,
+} from '@opentelemetry/sdk-trace';
+import type {
+  Resource,
+  DetectedResourceAttributes,
+  ResourceDetector,
+  DetectedResource,
+} from '@opentelemetry/resources';
+import {
+  defaultResource,
+  detectResources,
+  hostDetector,
+  osDetector,
+  processDetector,
+  resourceFromAttributes,
+  serviceInstanceIdDetector,
+  serviceNameEnvDetector,
+} from '@opentelemetry/resources';
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
+import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
+import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
+import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
+import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
+import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
+import {
+  createEmptyMetadata,
+  createInsecureCredentials,
+  createSslCredentials,
+} from '@opentelemetry/otlp-grpc-exporter-base';
+import { AggregationTemporalityPreference } from '@opentelemetry/exporter-metrics-otlp-http';
 import type {
+  AggregationConfigModel,
+  AlwaysRecordSamplerConfigModel,
   AttributeLimitsConfigModel,
+  Base2ExponentialBucketHistogramAggregationConfigModel,
   BatchLogRecordProcessorConfigModel,
+  BatchSpanProcessorConfigModel,
+  ExperimentalPrometheusMetricExporterConfigModel,
+  ExplicitBucketHistogramAggregationConfigModel,
+  ExporterDefaultHistogramAggregationConfigModel,
+  ExporterTemporalityPreferenceConfigModel,
+  GrpcTlsConfigModel,
+  HttpTlsConfigModel,
+  IdGeneratorConfigModel,
+  InstrumentTypeConfigModel,
   LoggerProviderConfigModel,
   LogRecordExporterConfigModel,
   LogRecordLimitsConfigModel,
   LogRecordProcessorConfigModel,
+  MeterProviderConfigModel,
+  MetricProducerConfigModel,
+  MetricReaderConfigModel,
+  NameStringValuePairConfigModel,
   OtlpGrpcExporterConfigModel,
+  OtlpGrpcMetricExporterConfigModel,
   OtlpHttpExporterConfigModel,
+  OtlpHttpMetricExporterConfigModel,
+  ParentBasedSamplerConfigModel,
+  PeriodicMetricReaderConfigModel,
   PropagatorConfigModel,
+  PullMetricReaderConfigModel,
+  PushMetricExporterConfigModel,
+  ResourceConfigModel,
+  SamplerConfigModel,
   SimpleLogRecordProcessorConfigModel,
+  SimpleSpanProcessorConfigModel,
+  SpanExporterConfigModel,
   SpanLimitsConfigModel,
+  SpanProcessorConfigModel,
   TextMapPropagatorConfigModel,
-} from '@opentelemetry/configuration';
-import { mergePropagatorCompositeConfig } from '@opentelemetry/configuration';
+  TraceIdRatioBasedSamplerConfigModel,
+  TracerProviderConfigModel,
+  ViewConfigModel,
+} from '@opentelemetry/sdk-config';
+import {
+  mergeHeadersConfig,
+  mergePropagatorCompositeConfig,
+  mergeResourceAttributesConfig,
+} from '@opentelemetry/sdk-config';
 import type {
   LogRecordExporter,
   LogRecordProcessor,
@@ -48,23 +130,50 @@ import {
   SimpleLogRecordProcessor,
   LoggerProvider,
 } from '@opentelemetry/sdk-logs';
-import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import {
   CompositePropagator,
   W3CBaggagePropagator,
   W3CTraceContextPropagator,
 } from '@opentelemetry/core';
-
+import type {
+  AggregationOption,
+  AggregationSelector,
+  IAttributesProcessor,
+  MetricProducer,
+  MetricReader,
+  PushMetricExporter,
+  ViewOptions,
+} from '@opentelemetry/sdk-metrics';
 import {
-  getGrpcCredentialsFromTls,
-  getGrpcMetadataFromHeaders,
-  getHeadersFromConfiguration,
-  getHttpAgentOptionsFromTls,
-  validateExporterTimeout,
-} from './utils';
+  AggregationType,
+  ConsoleMetricExporter,
+  createAllowListAttributesProcessor,
+  createDenyListAttributesProcessor,
+  InstrumentType,
+  MeterProvider,
+  PeriodicExportingMetricReader,
+} from '@opentelemetry/sdk-metrics';
+import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
+
+import type { ComponentProviderRegistry } from './component-provider';
 
 // ---- internal utilities
+
+function getGrpcMetadataFromHeaders(
+  headers: NameStringValuePairConfigModel[] | undefined,
+  headersList?: string | null
+) {
+  const headerValues = mergeHeadersConfig(headers, headersList);
+  if (!headerValues || Object.keys(headerValues).length === 0) {
+    return undefined;
+  }
+  const metadata = createEmptyMetadata();
+  for (const [name, value] of Object.entries(headerValues)) {
+    metadata.set(name, value);
+  }
+  return metadata;
+}
 
 /**
  * Warn if some props from a declarative config object have not been handled.
@@ -82,7 +191,6 @@ function checkConfigUse(
   handledProps: string[]
 ) {
   if (!props) return;
-  // Dev note: I'd use Set#difference, but that requires Node.js v22.
   const unhandledProps = Object.keys(props).filter(
     k => !handledProps.includes(k)
   );
@@ -94,13 +202,16 @@ function checkConfigUse(
   }
 }
 
+const EMPTY_CONFIG_PROPERTIES = Object.freeze({}) as ConfigProperties;
+
 /**
  * Return the single non-undefined entry in the given config object, or throw.
+ * As well, if the entry value is `null`, then return an empty ConfigProperties.
  *
  * It is common for Declarative Configuration to have config objects with
  * a single entry, e.g.
  *
- *    "LogRecordProcessor": {
+ *    "SpanExporter": {
  *      "type": "object",
  *      "additionalProperties": {
  *        "type": [
@@ -111,30 +222,138 @@ function checkConfigUse(
  *      "minProperties": 1,
  *      "maxProperties": 1,
  *
- * The TypeScript types cannot express the minProperties/maxProperties from the
- * JSON schema. We guard against that here.
+ * - The JSON schema `"null"` allows YAML like this:
+ *      exporter:
+ *        console:
+ *   where the parsed config object is `exporter: { console: null }`.
+ *   As a convenience for ComponentProvider functions that accept a
+ *   `ConfigProperties`, an empty ConfigProperties is returned in place of
+ *   `null`.
+ * - The TypeScript types cannot express the minProperties/maxProperties from
+ *   the JSON schema. We guard against that here.
  */
 function mustSingleEntry(
-  configObj: Record<string, unknown>,
+  configObj: object,
   configTypeName: string
-): [string, unknown] {
+): [string, ConfigProperties] {
   const entries = Object.entries(configObj).filter(
     ([_name, properties]) => properties !== undefined
   );
 
   if (entries.length !== 1) {
     const entryNames = entries.map(e => e[0]);
-    throw Error(
+    throw new Error(
       `invalid ${configTypeName} in configuration: must have exactly one entry: entries=${JSON.stringify(entryNames)}`
     );
   }
 
-  return entries[0];
+  return [entries[0][0], entries[0][1] ?? EMPTY_CONFIG_PROPERTIES];
+}
+
+function loadTlsConfigFile(absPath: string, propName: string) {
+  try {
+    if (!path.isAbsolute(absPath)) {
+      throw new Error(`TLS config file "${absPath}" must be an absolute path`);
+    }
+    return readFileSync(absPath);
+  } catch (err) {
+    throw new Error(
+      `could not load "tls.${propName}" from config: ${err.message}`,
+      { cause: err }
+    );
+  }
+}
+
+/**
+ * Get TLS-related HTTP client options from declarative configuration.
+ * https://opentelemetry.io/docs/specs/otel-config/types/#type-httptls
+ * https://nodejs.org/api/tls.html#tlscreatesecurecontextoptions
+ */
+function httpTlsOptionsFromConfig(
+  tls?: HttpTlsConfigModel
+): { ca?: Buffer; cert?: Buffer; key?: Buffer } | undefined {
+  if (!tls) {
+    return undefined;
+  }
+
+  checkConfigUse('HttpTls', tls, ['ca_file', 'cert_file', 'key_file']);
+  const httpTlsOptions: { ca?: Buffer; cert?: Buffer; key?: Buffer } = {};
+  if (tls.ca_file) {
+    httpTlsOptions.ca = loadTlsConfigFile(tls.ca_file, 'ca_file');
+  }
+  if (tls.cert_file) {
+    httpTlsOptions.cert = loadTlsConfigFile(tls.cert_file, 'cert_file');
+  }
+  if (tls.key_file) {
+    httpTlsOptions.key = loadTlsConfigFile(tls.key_file, 'key_file');
+  }
+  return httpTlsOptions;
+}
+
+function grpcCredentialsFromConfig(tls?: GrpcTlsConfigModel) {
+  if (!tls) {
+    return undefined;
+  }
+
+  checkConfigUse('GrpcTls', tls, [
+    'insecure',
+    'ca_file',
+    'cert_file',
+    'key_file',
+  ]);
+
+  if (tls?.insecure) {
+    return createInsecureCredentials();
+  }
+
+  const rootCert = tls.ca_file
+    ? loadTlsConfigFile(tls.ca_file, 'ca_file')
+    : undefined;
+  const privateKey = tls.key_file
+    ? loadTlsConfigFile(tls.key_file, 'key_file')
+    : undefined;
+  const certChain = tls.cert_file
+    ? loadTlsConfigFile(tls.cert_file, 'cert_file')
+    : undefined;
+  if (rootCert || privateKey || certChain) {
+    return createSslCredentials(rootCert, privateKey, certChain);
+  }
+
+  return undefined;
+}
+
+/**
+ * Validate an export(er) timeout value.
+ * "timeout" properties in the declarative config schema are typically
+ * described with:
+ *
+ * 1. Value must be non-negative.
+ * 2. A value of 0 indicates no limit (infinity).
+ *
+ * Search "timeout" at https://opentelemetry.io/docs/specs/otel-config/types/
+ *
+ * This function enforces (1), and guards against (2) because current OTel
+ * JS SDK components do *not* handle a `0` timeout value.
+ * See https://github.com/open-telemetry/opentelemetry-js/issues/6617
+ */
+function validateExportTimeoutConfig(
+  timeout: number | null | undefined,
+  errLabel: string
+): number | undefined {
+  if (timeout == null) {
+    return undefined;
+  } else if (timeout < 0) {
+    throw new Error(`${errLabel} value must be non-negative: ${timeout}`);
+  } else if (timeout === 0) {
+    throw new Error(`${errLabel} of 0 (infinite) is not supported`);
+  }
+  return timeout;
 }
 
 // ---- create<SDKThing>FromConfig functions
 
 export function createPropagatorFromConfig(
+  reg: ComponentProviderRegistry,
   propagatorConfig: PropagatorConfigModel
 ): TextMapPropagator | undefined {
   const configComposite = mergePropagatorCompositeConfig(
@@ -155,7 +374,7 @@ export function createPropagatorFromConfig(
   //    does not.
   const kvFromItem = (
     item: TextMapPropagatorConfigModel
-  ): [string, object | null] => {
+  ): [string, ConfigProperties | null] => {
     const keys = [];
     let value = undefined;
     for (const key of Object.keys(item)) {
@@ -163,14 +382,19 @@ export function createPropagatorFromConfig(
       if (value === undefined) {
         continue;
       }
+      const v = item[key];
+      if (v === undefined) {
+        continue;
+      }
       keys.push(key);
+      value = v;
     }
     if (keys.length !== 1) {
       throw new Error(
         `invalid "propagator" entry in configuration, there must be exactly one key (with a non-undefined value): ${inspect(item)}`
       );
     }
-    return [keys[0], value as object | null];
+    return [keys[0], value as ConfigProperties | null];
   };
 
   // First pass: handle 'none', remove dupes.
@@ -189,33 +413,15 @@ export function createPropagatorFromConfig(
     }
   }
 
-  // Implementation note: this only contains specification required propagators that are actually hosted in this repo.
-  // Any other propagators (like aws, aws-lambda, should go into `@opentelemetry/auto-configuration-propagators` instead).
-  const propagatorsFactory = new Map<string, () => TextMapPropagator>([
-    ['tracecontext', () => new W3CTraceContextPropagator()],
-    ['baggage', () => new W3CBaggagePropagator()],
-    ['b3', () => new B3Propagator()],
-    [
-      'b3multi',
-      () => new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
-    ],
-    [
-      'jaeger',
-      () => {
-        diag.warn(
-          'The Jaeger propagator is deprecated and will be removed in a future release. Use the W3C TraceContext propagator ("tracecontext") instead.'
-        );
-        return new JaegerPropagator();
-      },
-    ],
-  ]);
-
   const propagators: TextMapPropagator[] = [];
-  for (const [name] of kvs) {
-    const propagator = propagatorsFactory.get(name)?.();
-    if (!propagator) {
-      throw new Error(`unknown TextMapPropagator in configuration: "${name}"`);
+  for (const [name, value] of kvs) {
+    const provider = reg['TextMapPropagator']?.[name];
+    if (!provider) {
+      throw new Error(
+        `unknown TextMapPropagator name in configuration: "${name}"`
+      );
     }
+    const propagator = provider(reg, value ?? EMPTY_CONFIG_PROPERTIES);
     propagators.push(propagator);
   }
 
@@ -227,6 +433,110 @@ export function createPropagatorFromConfig(
     // says "Configure the propagators in the composite text map propagator".
     return new CompositePropagator({ propagators });
   }
+}
+
+/**
+ * Combines multiple resource detectors into a single one.
+ *
+ * An `ExperimentalResourceDetector` component provider returns a *single*
+ * `ResourceDetector`. However, some declarative config resource detector
+ * names are implemented with *multiple* separate ResourceDetectors.
+ * E.g. "host" is a combo of `hostDetector` and `osDetector`.
+ *
+ * Limitation: Behavior is undefined if the multiple detectors return
+ * conflicting attributes.
+ */
+class CompositeResourceDetector implements ResourceDetector {
+  private readonly _detectors: ResourceDetector[];
+  constructor(detectors: ResourceDetector[]) {
+    this._detectors = detectors;
+  }
+  detect(): DetectedResource {
+    const attrsArr = this._detectors.map(d => d.detect().attributes);
+    return {
+      attributes: Object.assign({}, ...attrsArr),
+    };
+  }
+}
+
+export function createResourceFromConfig(
+  reg: ComponentProviderRegistry,
+  resourceConfig?: ResourceConfigModel
+): Resource {
+  // Limitation: Resource#merge() is the only exported mechanism from the
+  // resources package that supports *async* attributes, so we must use it.
+  // However, if `schemaUrl` is being used by detectors and in the config, then
+  // `.merge()` will potentially warn and drop the schema URL if there is a
+  // conflict.  (See `mergeSchemaUrl` behaviour.) This is likely not the
+  // intended behavior when a user specifies a `schema_url` in the declarative
+  // config file.
+
+  checkConfigUse('Resource', resourceConfig, [
+    'attributes',
+    'attributes_list',
+    'schema_url',
+    'detection/development',
+  ]);
+  let resource = defaultResource();
+
+  if (!resourceConfig) {
+    return resource;
+  }
+
+  if (resourceConfig['detection/development']) {
+    // TODO(6986): support attributes.{include,exclude}; `resources` package doesn't currently support this
+    checkConfigUse(
+      'ExperimentalResourceDetection',
+      resourceConfig['detection/development'],
+      ['detectors']
+    );
+    if (resourceConfig['detection/development'].detectors) {
+      const detectors: ResourceDetector[] = [];
+      for (const d of resourceConfig['detection/development'].detectors) {
+        const [name, properties] = mustSingleEntry(
+          d,
+          'ExperimentalResourceDetector'
+        );
+        const provider = reg['ExperimentalResourceDetector']?.[name];
+        if (provider) {
+          const detector = provider(reg, properties);
+          detectors.push(detector);
+        } else {
+          // An unknown resource detector should "warn and skip".
+          // https://opentelemetry.io/docs/specs/otel/configuration/sdk/#supported-sdk-plugin-components
+          diag.warn(
+            `unknown ExperimentalResourceDetector name in configuration: "${name}" (skipping)`
+          );
+        }
+      }
+
+      if (detectors.length > 0) {
+        resource = resource.merge(detectResources({ detectors }));
+      }
+    }
+  }
+
+  const configAttrs = mergeResourceAttributesConfig(
+    resourceConfig.attributes,
+    resourceConfig.attributes_list
+  );
+  if (configAttrs && configAttrs.length > 0) {
+    const attrs: DetectedResourceAttributes = {};
+    for (const a of configAttrs) {
+      if (a.value !== null) {
+        attrs[a.name] = a.value;
+      }
+    }
+    resource = resource.merge(resourceFromAttributes(attrs));
+  }
+
+  if (resourceConfig.schema_url) {
+    resource = resource.merge(
+      resourceFromAttributes({}, { schemaUrl: resourceConfig.schema_url })
+    );
+  }
+
+  return resource;
 }
 
 export function createLogRecordLimitsFromConfig(
@@ -248,119 +558,155 @@ export function createLogRecordLimitsFromConfig(
   };
 }
 
-export function createLogRecordExporterFromConfig(
-  exporter: LogRecordExporterConfigModel
+function createConsoleLogRecordExporterFromConfig(
+  _reg: ComponentProviderRegistry,
+  properties: ConfigProperties
 ): LogRecordExporter {
-  const [name, properties] = mustSingleEntry(exporter, 'LogRecordExporter');
+  checkConfigUse('ConsoleLogRecordExporter', properties!, []);
+  return new ConsoleLogRecordExporter();
+}
 
-  switch (name) {
-    case 'otlp_http': {
-      checkConfigUse('LogRecordExporter', properties!, [
-        'compression',
-        'endpoint',
-        'headers',
-        'timeout',
-        'tls',
-        'encoding',
-      ]);
-      const props = properties as OtlpHttpExporterConfigModel;
-      const commonOpts = {
-        compression:
-          props?.compression === 'gzip'
-            ? CompressionAlgorithm.GZIP
-            : CompressionAlgorithm.NONE,
-        url: props?.endpoint ?? undefined,
-        headers: getHeadersFromConfiguration(props?.headers),
-        timeoutMillis: validateExporterTimeout(props?.timeout),
-        httpAgentOptions: getHttpAgentOptionsFromTls(props?.tls),
-      };
-      const encoding = props?.encoding ?? 'protobuf';
-      switch (encoding) {
-        case 'json':
-          return new OTLPHttpLogExporter(commonOpts);
-        case 'protobuf':
-          return new OTLPProtoLogExporter(commonOpts);
-        default:
-          throw new Error(
-            `unknown OtlpHttpExporter encoding in configuration: "${encoding}"`
-          );
-      }
-    }
-
-    case 'otlp_grpc': {
-      checkConfigUse('LogRecordExporter', properties!, [
-        'compression',
-        'endpoint',
-        'timeout',
-        'tls',
-        'headers',
-      ]);
-      const props = properties as OtlpGrpcExporterConfigModel;
-      return new OTLPGrpcLogExporter({
-        compression:
-          props?.compression === 'gzip'
-            ? CompressionAlgorithm.GZIP
-            : CompressionAlgorithm.NONE,
-        url: props?.endpoint ?? undefined,
-        timeoutMillis: validateExporterTimeout(props?.timeout),
-        credentials: getGrpcCredentialsFromTls(props?.tls),
-        metadata: getGrpcMetadataFromHeaders(props?.headers),
-      });
-    }
-
-    case 'console':
-      return new ConsoleLogRecordExporter();
-
+function createHttpLogRecordExporterFromConfig(
+  _reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): LogRecordExporter {
+  checkConfigUse('OtlpHttpExporter', properties, [
+    'compression',
+    'endpoint',
+    'headers',
+    'headers_list',
+    'timeout',
+    'tls',
+    'encoding',
+  ]);
+  const props = properties as OtlpHttpExporterConfigModel;
+  const commonOpts = {
+    compression:
+      props?.compression === 'gzip'
+        ? CompressionAlgorithm.GZIP
+        : CompressionAlgorithm.NONE,
+    url: props?.endpoint ?? undefined,
+    headers: mergeHeadersConfig(props?.headers, props?.headers_list),
+    timeoutMillis: validateExportTimeoutConfig(
+      props?.timeout,
+      'OtlpHttpExporter.timeout'
+    ),
+    httpAgentOptions: httpTlsOptionsFromConfig(props?.tls),
+  };
+  const encoding = props?.encoding ?? 'protobuf';
+  switch (encoding) {
+    case 'json':
+      return new OTLPHttpLogExporter(commonOpts);
+    case 'protobuf':
+      return new OTLPProtoLogExporter(commonOpts);
     default:
       throw new Error(
-        `unknown LogRecordExporter name in configuration: "${name}"`
+        `unknown OtlpHttpExporter encoding in configuration: "${encoding}"`
       );
   }
 }
 
+function createOtlpGrpcLogRecordExporterFromConfig(
+  _reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): LogRecordExporter {
+  checkConfigUse('OtlpGrpcExporter', properties!, [
+    'compression',
+    'endpoint',
+    'timeout',
+    'tls',
+    'headers',
+    'headers_list',
+  ]);
+  const props = properties as OtlpGrpcExporterConfigModel;
+  return new OTLPGrpcLogExporter({
+    compression:
+      props?.compression === 'gzip'
+        ? CompressionAlgorithm.GZIP
+        : CompressionAlgorithm.NONE,
+    url: props?.endpoint ?? undefined,
+    timeoutMillis: validateExportTimeoutConfig(
+      props?.timeout,
+      'OtlpGrpcExporter.timeout'
+    ),
+    credentials: grpcCredentialsFromConfig(props?.tls),
+    metadata: getGrpcMetadataFromHeaders(props?.headers, props?.headers_list),
+  });
+}
+
+export function createLogRecordExporterFromConfig(
+  reg: ComponentProviderRegistry,
+  exporter: LogRecordExporterConfigModel
+): LogRecordExporter {
+  const [name, properties] = mustSingleEntry(exporter, 'LogRecordExporter');
+  const provider = reg['LogRecordExporter']?.[name];
+  if (provider) {
+    return provider(reg, properties);
+  } else {
+    throw new Error(
+      `unknown LogRecordExporter name in configuration: "${name}"`
+    );
+  }
+}
+
+function createBatchLogRecordProcessorFromConfig(
+  reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): LogRecordProcessor {
+  checkConfigUse('BatchLogRecordProcessor', properties, [
+    'exporter',
+    'max_queue_size',
+    'max_export_batch_size',
+    'schedule_delay',
+    'export_timeout',
+  ]);
+  const props = properties as unknown as BatchLogRecordProcessorConfigModel;
+  const exporter = createLogRecordExporterFromConfig(reg, props.exporter);
+  return new BatchLogRecordProcessor({
+    exporter,
+    maxQueueSize: props.max_queue_size ?? undefined,
+    maxExportBatchSize: props.max_export_batch_size ?? undefined,
+    scheduledDelayMillis: props.schedule_delay ?? undefined,
+    exportTimeoutMillis: validateExportTimeoutConfig(
+      props.export_timeout,
+      'BatchLogRecordProcessor.export_timeout'
+    ),
+  });
+}
+
+function createSimpleLogRecordProcessorFromConfig(
+  reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): LogRecordProcessor {
+  checkConfigUse('SimpleLogRecordProcessor', properties!, ['exporter']);
+  const props = properties as unknown as SimpleLogRecordProcessorConfigModel;
+  const exporter = createLogRecordExporterFromConfig(reg, props.exporter);
+  return new SimpleLogRecordProcessor({ exporter });
+}
+
 export function createLogRecordProcessorFromConfig(
+  reg: ComponentProviderRegistry,
   processor: LogRecordProcessorConfigModel
 ): LogRecordProcessor {
   const [name, properties] = mustSingleEntry(processor, 'LogRecordProcessor');
-
-  switch (name) {
-    case 'batch': {
-      checkConfigUse('BatchLogRecordProcessor', properties!, [
-        'exporter',
-        'max_queue_size',
-        'max_export_batch_size',
-        'schedule_delay',
-        'export_timeout',
-      ]);
-      const props = properties as BatchLogRecordProcessorConfigModel;
-      const exporter = createLogRecordExporterFromConfig(props.exporter);
-      return new BatchLogRecordProcessor({
-        exporter,
-        maxQueueSize: props.max_queue_size ?? undefined,
-        maxExportBatchSize: props.max_export_batch_size ?? undefined,
-        scheduledDelayMillis: props.schedule_delay ?? undefined,
-        exportTimeoutMillis: props.export_timeout ?? undefined,
-      });
-    }
-
-    case 'simple': {
-      const props = properties as SimpleLogRecordProcessorConfigModel;
-      const exporter = createLogRecordExporterFromConfig(props.exporter);
-      return new SimpleLogRecordProcessor({ exporter });
-    }
-
-    default:
-      throw new Error(`unknown LogRecordProcessor name: "${name}"`);
+  const provider = reg['LogRecordProcessor']?.[name];
+  if (provider) {
+    return provider(reg, properties);
+  } else {
+    throw new Error(
+      `unknown LogRecordProcessor name in configuration: "${name}"`
+    );
   }
 }
 
 export function createLoggerProviderFromConfig(
+  reg: ComponentProviderRegistry,
   resource: Resource,
   logger_provider: LoggerProviderConfigModel,
   attribute_limits?: AttributeLimitsConfigModel
 ): LoggerProvider {
   const processors = logger_provider.processors.map(p =>
-    createLogRecordProcessorFromConfig(p)
+    createLogRecordProcessorFromConfig(reg, p)
   );
   const logRecordLimits = createLogRecordLimitsFromConfig(
     logger_provider.limits,
@@ -378,6 +724,7 @@ export function createLoggerProviderFromConfig(
   });
 }
 
+// Exported for testing.
 export function createSpanLimitsFromConfig(
   limits?: SpanLimitsConfigModel,
   attribute_limits?: AttributeLimitsConfigModel
@@ -399,5 +746,864 @@ export function createSpanLimitsFromConfig(
     attributePerEventCountLimit:
       limits?.event_attribute_count_limit ?? undefined,
     attributePerLinkCountLimit: limits?.link_attribute_count_limit ?? undefined,
+  };
+}
+
+/**
+ * Map a declarative-config `temporality_preference` value to the enum the OTLP
+ * metric exporters expect. Returns undefined for an unspecified preference so
+ * the exporter falls back to its own default (cumulative).
+ */
+function aggregationTemporalityPreferenceFromConfig(
+  temporality_preference: ExporterTemporalityPreferenceConfigModel | undefined
+): AggregationTemporalityPreference | undefined {
+  if (temporality_preference == null) {
+    return undefined;
+  }
+  switch (temporality_preference) {
+    case 'delta':
+      return AggregationTemporalityPreference.DELTA;
+    case 'low_memory':
+      return AggregationTemporalityPreference.LOWMEMORY;
+    case 'cumulative':
+      return AggregationTemporalityPreference.CUMULATIVE;
+    default:
+      throw new Error(
+        `unknown temporality_preference value in configuration: ${temporality_preference}`
+      );
+  }
+}
+
+/**
+ * Map a declarative-config `default_histogram_aggregation` value to an
+ * AggregationSelector that applies the requested aggregation to histogram
+ * instruments and leaves all other instrument types at their default. Returns
+ * undefined for an unspecified value so the exporter uses its own default.
+ */
+function aggregationSelectorFromConfig(
+  default_histogram_aggregation:
+    ExporterDefaultHistogramAggregationConfigModel | undefined
+): AggregationSelector | undefined {
+  if (default_histogram_aggregation == null) {
+    return undefined;
+  }
+
+  let histoAggOpt: AggregationOption;
+  switch (default_histogram_aggregation) {
+    case 'base2_exponential_bucket_histogram':
+      histoAggOpt = { type: AggregationType.EXPONENTIAL_HISTOGRAM };
+      break;
+    case 'explicit_bucket_histogram':
+      histoAggOpt = { type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM };
+      break;
+    default:
+      throw new Error(
+        `unknown default_histogram_aggregation value in configuration: ${default_histogram_aggregation}`
+      );
+  }
+  return (instrumentType: InstrumentType): AggregationOption =>
+    instrumentType === InstrumentType.HISTOGRAM
+      ? histoAggOpt
+      : { type: AggregationType.DEFAULT };
+}
+
+function createConsoleMetricExporterFromConfig(
+  _reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): PushMetricExporter {
+  checkConfigUse('ConsoleMetricExporter', properties!, []);
+  return new ConsoleMetricExporter();
+}
+
+function createHttpMetricExporterFromConfig(
+  _reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): PushMetricExporter {
+  checkConfigUse('PushMetricExporter', properties, [
+    'compression',
+    'endpoint',
+    'headers',
+    'headers_list',
+    'timeout',
+    'tls',
+    'temporality_preference',
+    'default_histogram_aggregation',
+    'encoding',
+  ]);
+  const props = properties as OtlpHttpMetricExporterConfigModel;
+  const commonOpts = {
+    compression:
+      props?.compression === 'gzip'
+        ? CompressionAlgorithm.GZIP
+        : CompressionAlgorithm.NONE,
+    url: props?.endpoint ?? undefined,
+    headers: mergeHeadersConfig(props?.headers, props?.headers_list),
+    timeoutMillis: validateExportTimeoutConfig(
+      props?.timeout,
+      'PushMetricExporter.timeout'
+    ),
+    httpAgentOptions: httpTlsOptionsFromConfig(props?.tls),
+    temporalityPreference: aggregationTemporalityPreferenceFromConfig(
+      props?.temporality_preference
+    ),
+    aggregationPreference: aggregationSelectorFromConfig(
+      props?.default_histogram_aggregation
+    ),
+  };
+  const encoding = props?.encoding ?? 'protobuf';
+  switch (encoding) {
+    case 'json':
+      return new OTLPHttpMetricExporter(commonOpts);
+    case 'protobuf':
+      return new OTLPProtoMetricExporter(commonOpts);
+    default:
+      throw new Error(
+        `unknown OtlpHttpMetricExporter encoding in configuration: "${encoding}"`
+      );
+  }
+}
+
+function createOtlpGrpcMetricExporterFromConfig(
+  _reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): PushMetricExporter {
+  checkConfigUse('PushMetricExporter', properties!, [
+    'compression',
+    'endpoint',
+    'timeout',
+    'tls',
+    'headers',
+    'headers_list',
+    'temporality_preference',
+    'default_histogram_aggregation',
+  ]);
+  const props = properties as OtlpGrpcMetricExporterConfigModel;
+  return new OTLPGrpcMetricExporter({
+    compression:
+      props?.compression === 'gzip'
+        ? CompressionAlgorithm.GZIP
+        : CompressionAlgorithm.NONE,
+    url: props?.endpoint ?? undefined,
+    timeoutMillis: validateExportTimeoutConfig(
+      props?.timeout,
+      'PushMetricExporter.timeout'
+    ),
+    credentials: grpcCredentialsFromConfig(props?.tls),
+    metadata: getGrpcMetadataFromHeaders(props?.headers, props?.headers_list),
+    temporalityPreference: aggregationTemporalityPreferenceFromConfig(
+      props?.temporality_preference
+    ),
+    aggregationPreference: aggregationSelectorFromConfig(
+      props?.default_histogram_aggregation
+    ),
+  });
+}
+
+/** exported for testing */
+export function createPushMetricExporterFromConfig(
+  reg: ComponentProviderRegistry,
+  exporter: PushMetricExporterConfigModel
+): PushMetricExporter {
+  const [name, properties] = mustSingleEntry(exporter, 'PushMetricExporter');
+  const provider = reg['PushMetricExporter']?.[name];
+  if (provider) {
+    return provider(reg, properties);
+  } else {
+    throw new Error(
+      `unknown PushMetricExporter name in configuration: "${name}"`
+    );
+  }
+}
+
+function createMetricProducerFromConfig(
+  reg: ComponentProviderRegistry,
+  producer: MetricProducerConfigModel
+): MetricProducer {
+  const [name, properties] = mustSingleEntry(producer, 'MetricProducer');
+  const provider = reg['MetricProducer']?.[name];
+  if (provider) {
+    return provider(reg, properties);
+  } else {
+    throw new Error(`unknown MetricProducer name in configuration: "${name}"`);
+  }
+}
+
+function createPeriodicMetricReaderFromConfig(
+  reg: ComponentProviderRegistry,
+  periodic: PeriodicMetricReaderConfigModel
+): MetricReader {
+  const exporter = createPushMetricExporterFromConfig(reg, periodic.exporter);
+
+  const metricProducers = periodic.producers?.map(producer =>
+    createMetricProducerFromConfig(reg, producer)
+  );
+
+  checkConfigUse('PeriodicMetricReader', periodic, [
+    'exporter',
+    'producers',
+    'interval',
+    'timeout',
+    'max_export_batch_size/development',
+  ]);
+
+  // TODO(6425): add cardinality_limits
+  return new PeriodicExportingMetricReader({
+    exportIntervalMillis: periodic.interval ?? 60_000,
+    exportTimeoutMillis:
+      validateExportTimeoutConfig(
+        periodic?.timeout,
+        'PeriodicExportingMetricReader.timeout'
+      ) ?? 30_000,
+    exporter,
+    metricProducers,
+    maxExportBatchSize:
+      periodic['max_export_batch_size/development'] ?? undefined,
+  });
+}
+
+function createPullMetricReaderFromConfig(
+  reg: ComponentProviderRegistry,
+  pull: PullMetricReaderConfigModel
+): MetricReader {
+  // TODO(6425): add cardinality_limits
+  checkConfigUse('PullMetricReader', pull, ['exporter', 'producers']);
+
+  const metricProducers = pull.producers?.map(producer =>
+    createMetricProducerFromConfig(reg, producer)
+  );
+
+  // The declarative config models a `pull` MetricReader as an object that takes
+  // an exporter, e.g.:
+  //    meter_provider:
+  //      readers:
+  //        - pull:
+  //            exporter:
+  //              prometheus/development: ... # (A)
+  //            # (B)
+  //            producers: ...
+  //            cardinality_limits: ...
+  // but the exporter (or at least the only current one, PrometheusExporter)
+  // *is* a MetricReader, and takes configuration from (A) and (B).
+  //    export class PrometheusExporter extends MetricReader { ... }
+  // TODO(7309): Support `PullMetricExporter` component providers.
+  const [name, properties] = mustSingleEntry(
+    pull.exporter,
+    'PullMetricExporter'
+  );
+
+  switch (name) {
+    case 'prometheus/development': {
+      // TODO(6653): 'translation_strategy' with #6653 or separately
+      // TODO(6605): 'resource_constant_labels' map to `withResourceConstantLabels` regex
+      checkConfigUse(
+        'ExperimentalPrometheusMetricExporterConfigModel',
+        properties,
+        [
+          'host',
+          'port',
+          'scope_info_enabled',
+          'target_info_enabled/development',
+        ]
+      );
+
+      const props =
+        properties as ExperimentalPrometheusMetricExporterConfigModel;
+      return new PrometheusExporter({
+        // TODO(6605): default host to `undefined` when PrometheusExporter defaults to 'localhost'
+        host: props?.host ?? 'localhost',
+        // TODO(6958): default port and host to `undefined` when PrometheusExporter constructor no longer reads envvars for config
+        port: props?.port ?? 9464,
+        withoutScopeInfo:
+          props?.scope_info_enabled != null
+            ? !props.scope_info_enabled
+            : undefined,
+        withoutTargetInfo:
+          props?.['target_info_enabled/development'] != null
+            ? !props['target_info_enabled/development']
+            : undefined,
+        metricProducers,
+        // Note: The following are not configurable via declarative config.
+        // This isn't necessarily an issue.
+        // - prefix
+        // - appendTimestamp
+        // - endpoint
+        // - preventServerStart
+        // - callback (second arg)
+      });
+    }
+
+    default:
+      throw new Error(
+        `unknown PullMetricReader name in configuration: "${name}"`
+      );
+  }
+}
+
+function createMetricReaderFromConfig(
+  reg: ComponentProviderRegistry,
+  reader: MetricReaderConfigModel
+): MetricReader {
+  const [name, properties] = mustSingleEntry(reader, 'MetricReader');
+
+  switch (name) {
+    case 'periodic':
+      return createPeriodicMetricReaderFromConfig(
+        reg,
+        properties as unknown as PeriodicMetricReaderConfigModel
+      );
+    case 'pull':
+      return createPullMetricReaderFromConfig(
+        reg,
+        properties as unknown as PullMetricReaderConfigModel
+      );
+    default:
+      throw new Error(
+        `unknown MetricReader type in configuration: "${Object.keys(reader)[0]}"`
+      );
+  }
+}
+
+function instrumentTypeFromConfig(
+  instrument_type: InstrumentTypeConfigModel
+): InstrumentType | undefined {
+  switch (instrument_type) {
+    case 'counter':
+      return InstrumentType.COUNTER;
+    case 'gauge':
+      return InstrumentType.GAUGE;
+    case 'histogram':
+      return InstrumentType.HISTOGRAM;
+    case 'observable_counter':
+      return InstrumentType.OBSERVABLE_COUNTER;
+    case 'observable_gauge':
+      return InstrumentType.OBSERVABLE_GAUGE;
+    case 'observable_up_down_counter':
+      return InstrumentType.OBSERVABLE_UP_DOWN_COUNTER;
+    case 'up_down_counter':
+      return InstrumentType.UP_DOWN_COUNTER;
+    default:
+      throw new Error(`unknown InstrumentType: ${instrument_type}`);
+  }
+}
+
+function createAggregationOptionFromConfig(
+  aggregation: AggregationConfigModel
+): AggregationOption | undefined {
+  const [name, properties] = mustSingleEntry(aggregation, 'Aggregation');
+
+  switch (name) {
+    case 'default':
+      return {
+        type: AggregationType.DEFAULT,
+      };
+    case 'drop':
+      return {
+        type: AggregationType.DROP,
+      };
+    case 'explicit_bucket_histogram': {
+      checkConfigUse('ExplicitBucketHistogramAggregation', properties, [
+        'record_min_max',
+        'boundaries',
+      ]);
+      const props = properties as ExplicitBucketHistogramAggregationConfigModel;
+      return {
+        type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+        options: {
+          recordMinMax: props?.record_min_max ?? true,
+          boundaries: props?.boundaries ?? [
+            0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500,
+            10000,
+          ],
+        },
+      };
+    }
+    case 'base2_exponential_bucket_histogram': {
+      // TODO(3841): max_scale property
+      checkConfigUse('Base2ExponentialBucketHistogramAggregation', properties, [
+        'record_min_max',
+        'max_size',
+      ]);
+      const props =
+        properties as Base2ExponentialBucketHistogramAggregationConfigModel;
+      return {
+        type: AggregationType.EXPONENTIAL_HISTOGRAM,
+        options: {
+          recordMinMax: props?.record_min_max ?? undefined,
+          maxSize: props?.max_size ?? undefined,
+        },
+      };
+    }
+    case 'last_value':
+      return {
+        type: AggregationType.LAST_VALUE,
+      };
+    case 'sum':
+      return {
+        type: AggregationType.SUM,
+      };
+    default:
+      throw new Error(`unknown Aggregation name in configuration: "${name}"`);
+  }
+}
+
+function createViewOptionsFromConfig(view: ViewConfigModel): ViewOptions {
+  const viewOptions: ViewOptions = {};
+  checkConfigUse('View', view, ['selector', 'stream']);
+
+  checkConfigUse('ViewSelector', view.selector, [
+    'instrument_name',
+    'instrument_type',
+    'unit',
+    'meter_name',
+    'meter_version',
+    'meter_schema_url',
+  ]);
+  if (view.selector.instrument_name) {
+    viewOptions.instrumentName = view.selector.instrument_name;
+  }
+  if (view.selector.instrument_type) {
+    viewOptions.instrumentType = instrumentTypeFromConfig(
+      view.selector.instrument_type
+    );
+  }
+  if (view.selector.unit) {
+    viewOptions.instrumentUnit = view.selector.unit;
+  }
+  if (view.selector.meter_name) {
+    viewOptions.meterName = view.selector.meter_name;
+  }
+  if (view.selector.meter_version) {
+    viewOptions.meterVersion = view.selector.meter_version;
+  }
+  if (view.selector.meter_schema_url) {
+    viewOptions.meterSchemaUrl = view.selector.meter_schema_url;
+  }
+
+  checkConfigUse('ViewStream', view.stream, [
+    'name',
+    'description',
+    'aggregation',
+    'aggregation_cardinality_limit',
+    'attribute_keys',
+  ]);
+  if (view.stream.name) {
+    viewOptions.name = view.stream.name;
+  }
+  if (view.stream.description) {
+    viewOptions.description = view.stream.description;
+  }
+  if (view.stream.aggregation) {
+    viewOptions.aggregation = createAggregationOptionFromConfig(
+      view.stream.aggregation
+    );
+  }
+  viewOptions.aggregationCardinalityLimit =
+    view.stream.aggregation_cardinality_limit ?? undefined;
+  if (view.stream.attribute_keys) {
+    const processors: IAttributesProcessor[] = [];
+    if (
+      view.stream.attribute_keys.included &&
+      view.stream.attribute_keys.included.length > 0
+    ) {
+      // TODO(6951): support wildcards
+      // Current sdk-metrics does not support *patterns* via '*' and '?'
+      // as defined by IncludeExclude type in declarative config.
+      const unsupportedKeys = view.stream.attribute_keys.included.filter(
+        k => k.includes('*') || k.includes('?')
+      );
+      if (unsupportedKeys.length > 0) {
+        throw new Error(
+          `invalid /meter_provider/views/?/stream/attribute_keys/included in configuration: do not support wildcards: "${unsupportedKeys.join('", "')}"`
+        );
+      }
+      processors.push(
+        createAllowListAttributesProcessor(view.stream.attribute_keys.included)
+      );
+    }
+    if (
+      view.stream.attribute_keys.excluded &&
+      view.stream.attribute_keys.excluded.length > 0
+    ) {
+      // TODO(6951): support wildcards
+      // Current sdk-metrics does not support *patterns* via '*' and '?'
+      // as defined by IncludeExclude type in declarative config.
+      const unsupportedKeys = view.stream.attribute_keys.excluded.filter(
+        k => k.includes('*') || k.includes('?')
+      );
+      if (unsupportedKeys.length > 0) {
+        throw new Error(
+          `invalid /meter_provider/views/?/stream/attribute_keys/excluded in configuration: do not support wildcards: "${unsupportedKeys.join('", "')}"`
+        );
+      }
+      processors.push(
+        createDenyListAttributesProcessor(view.stream.attribute_keys.excluded)
+      );
+    }
+    if (processors.length > 0) {
+      viewOptions.attributesProcessors = processors;
+    }
+  }
+
+  return viewOptions;
+}
+
+export function createMeterProviderFromConfig(
+  reg: ComponentProviderRegistry,
+  resource: Resource,
+  meter_provider: MeterProviderConfigModel
+): MeterProvider {
+  const readers = meter_provider.readers.map(reader =>
+    createMetricReaderFromConfig(reg, reader)
+  );
+  const views = meter_provider.views?.map(createViewOptionsFromConfig);
+
+  // TODO(5147): exemplar_filter when sdk-metrics package supports it
+  // TODO(6952): meter_configurator/development when sdk-metrics package supports it
+  checkConfigUse('MeterProvider', meter_provider, ['readers', 'views']);
+
+  return new MeterProvider({
+    resource,
+    readers,
+    views,
+    // Note: sdkMetricsEnabled not configurable via decl conf. Once SDK health metrics are stabilized, they will be on by default.
+  });
+}
+
+function createConsoleSpanExporterFromConfig(
+  _reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): SpanExporter {
+  checkConfigUse('ConsoleSpanExporter', properties!, []);
+  return new ConsoleSpanExporter();
+}
+
+function createHttpSpanExporterFromConfig(
+  _reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): SpanExporter {
+  checkConfigUse('OtlpHttpExporter', properties!, [
+    'compression',
+    'endpoint',
+    'headers',
+    'headers_list',
+    'timeout',
+    'tls',
+    'encoding',
+  ]);
+  const props = properties as unknown as OtlpHttpExporterConfigModel;
+  const commonOpts = {
+    compression:
+      props?.compression === 'gzip'
+        ? CompressionAlgorithm.GZIP
+        : CompressionAlgorithm.NONE,
+    url: props?.endpoint ?? undefined,
+    headers: mergeHeadersConfig(props?.headers, props?.headers_list),
+    timeoutMillis: validateExportTimeoutConfig(
+      props?.timeout,
+      'OtlpHttpExporter.timeout'
+    ),
+    httpAgentOptions: httpTlsOptionsFromConfig(props?.tls),
+  };
+  const encoding = props?.encoding ?? 'protobuf';
+  switch (encoding) {
+    case 'json':
+      return new OTLPHttpTraceExporter(commonOpts);
+    case 'protobuf':
+      return new OTLPProtoTraceExporter(commonOpts);
+    default:
+      throw new Error(
+        `unknown OtlpHttpExporter encoding in configuration: "${encoding}"`
+      );
+  }
+}
+
+function createOtlpGrpcSpanExporterFromConfig(
+  _reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): SpanExporter {
+  checkConfigUse('OtlpGrpcExporter', properties!, [
+    'compression',
+    'endpoint',
+    'timeout',
+    'tls',
+    'headers',
+    'headers_list',
+  ]);
+  const props = properties as unknown as OtlpGrpcExporterConfigModel;
+  return new OTLPGrpcTraceExporter({
+    compression:
+      props?.compression === 'gzip'
+        ? CompressionAlgorithm.GZIP
+        : CompressionAlgorithm.NONE,
+    url: props?.endpoint ?? undefined,
+    timeoutMillis: validateExportTimeoutConfig(
+      props?.timeout,
+      'OtlpGrpcExporter.timeout'
+    ),
+    credentials: grpcCredentialsFromConfig(props?.tls),
+    metadata: getGrpcMetadataFromHeaders(props?.headers, props?.headers_list),
+  });
+}
+
+function createSpanExporterFromConfig(
+  reg: ComponentProviderRegistry,
+  exporter: SpanExporterConfigModel
+): SpanExporter {
+  const [name, properties] = mustSingleEntry(exporter, 'SpanExporter');
+  const provider = reg['SpanExporter']?.[name];
+  if (provider) {
+    return provider(reg, properties);
+  } else {
+    throw new Error(`unknown SpanExporter name in configuration: "${name}"`);
+  }
+}
+
+function createBatchSpanProcessorFromConfig(
+  reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): SpanProcessor {
+  checkConfigUse('BatchSpanProcessor', properties!, [
+    'exporter',
+    'max_queue_size',
+    'max_export_batch_size',
+    'schedule_delay',
+    'export_timeout',
+  ]);
+  const props = properties as unknown as BatchSpanProcessorConfigModel;
+  const exporter = createSpanExporterFromConfig(reg, props.exporter);
+  return new BatchSpanProcessor({
+    exporter,
+    maxQueueSize: props.max_queue_size ?? undefined,
+    maxExportBatchSize: props.max_export_batch_size ?? undefined,
+    scheduledDelayMillis: props.schedule_delay ?? undefined,
+    exportTimeoutMillis: validateExportTimeoutConfig(
+      props.export_timeout,
+      'BatchSpanProcessor.export_timeout'
+    ),
+  });
+}
+
+function createSimpleSpanProcessorFromConfig(
+  reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): SpanProcessor {
+  checkConfigUse('SimpleSpanProcessor', properties!, ['exporter']);
+  const props = properties as unknown as SimpleSpanProcessorConfigModel;
+  const exporter = createSpanExporterFromConfig(reg, props.exporter);
+  return new SimpleSpanProcessor({ exporter });
+}
+
+function createSpanProcessorFromConfig(
+  reg: ComponentProviderRegistry,
+  processor: SpanProcessorConfigModel
+): SpanProcessor {
+  const [name, properties] = mustSingleEntry(processor, 'SpanProcessor');
+  const provider = reg['SpanProcessor']?.[name];
+  if (provider) {
+    return provider(reg, properties);
+  } else {
+    throw new Error(`unknown SpanProcessor name in configuration: "${name}"`);
+  }
+}
+
+function createAlwaysRecordSamplerFromConfig(
+  reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): Sampler {
+  checkConfigUse('AlwaysRecordSampler', properties!, ['root']);
+  const props = properties as unknown as AlwaysRecordSamplerConfigModel;
+  return createAlwaysRecordSampler(
+    mustCreateSamplerFromConfig(reg, props.root)
+  );
+}
+
+function createTraceIdRatioBasedSamplerFromConfig(
+  _reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): Sampler {
+  checkConfigUse('TraceIdRatioBasedSampler', properties!, ['ratio']);
+  const DEFAULT_RATIO = 1.0;
+  const props = properties as TraceIdRatioBasedSamplerConfigModel;
+  return new TraceIdRatioBasedSampler(props?.ratio ?? DEFAULT_RATIO);
+}
+
+function createParentBasedSamplerFromConfig(
+  reg: ComponentProviderRegistry,
+  properties: ConfigProperties
+): Sampler {
+  checkConfigUse('ParentBasedSampler', properties!, [
+    'root',
+    'remote_parent_sampled',
+    'remote_parent_not_sampled',
+    'local_parent_sampled',
+    'local_parent_not_sampled',
+  ]);
+  const props = properties as ParentBasedSamplerConfigModel;
+  return new ParentBasedSampler({
+    root: createSamplerFromConfig(reg, props?.root) ?? new AlwaysOnSampler(),
+    remoteParentSampled: createSamplerFromConfig(
+      reg,
+      props?.remote_parent_sampled
+    ),
+    remoteParentNotSampled: createSamplerFromConfig(
+      reg,
+      props?.remote_parent_not_sampled
+    ),
+    localParentSampled: createSamplerFromConfig(
+      reg,
+      props?.local_parent_sampled
+    ),
+    localParentNotSampled: createSamplerFromConfig(
+      reg,
+      props?.local_parent_not_sampled
+    ),
+  });
+}
+
+/**
+ * Returns a Sampler for the `tracer_provider.sampler` in configuration,
+ * or `undefined` if not set.
+ *
+ * Exported for testing.
+ */
+export function createSamplerFromConfig(
+  reg: ComponentProviderRegistry,
+  samplerConfig?: SamplerConfigModel
+): Sampler | undefined {
+  if (!samplerConfig) {
+    return undefined;
+  }
+  return mustCreateSamplerFromConfig(reg, samplerConfig);
+}
+
+function mustCreateSamplerFromConfig(
+  reg: ComponentProviderRegistry,
+  samplerConfig: SamplerConfigModel
+): Sampler {
+  const [name, properties] = mustSingleEntry(samplerConfig, 'Sampler');
+  const provider = reg['Sampler']?.[name];
+  if (provider) {
+    return provider(reg, properties);
+  } else {
+    throw new Error(`unknown Sampler name in configuration: "${name}"`);
+  }
+}
+
+export function createIdGeneratorFromConfig(
+  reg: ComponentProviderRegistry,
+  id_generator?: IdGeneratorConfigModel
+): IdGenerator | undefined {
+  if (!id_generator) {
+    return undefined;
+  }
+  const [name, properties] = mustSingleEntry(id_generator, 'IdGenerator');
+  const provider = reg['IdGenerator']?.[name];
+  if (provider) {
+    return provider(reg, properties);
+  } else {
+    throw new Error(`unknown IdGenerator name in configuration: "${name}"`);
+  }
+}
+
+export function createTracerProviderFromConfig(
+  reg: ComponentProviderRegistry,
+  resource: Resource,
+  tracer_provider: TracerProviderConfigModel,
+  attribute_limits?: AttributeLimitsConfigModel
+): TracerProvider {
+  const spanProcessors = tracer_provider.processors.map(p =>
+    createSpanProcessorFromConfig(reg, p)
+  );
+  const spanLimits = createSpanLimitsFromConfig(
+    tracer_provider.limits,
+    attribute_limits
+  );
+  const sampler = createSamplerFromConfig(reg, tracer_provider.sampler);
+  const idGenerator = createIdGeneratorFromConfig(
+    reg,
+    tracer_provider.id_generator
+  );
+
+  checkConfigUse('TracerProvider', tracer_provider, [
+    'processors',
+    'limits',
+    'sampler',
+    'id_generator',
+  ]);
+
+  // TODO(6960): 'tracer_configurator/development', TracerProvider doesn't currently support this
+  // TODO(6624): meterProvider, if SDK health metrics enabled
+  return new TracerProvider({
+    resource,
+    spanProcessors,
+    spanLimits,
+    sampler,
+    idGenerator,
+  });
+}
+
+export function getBuiltinComponentProviderRegistry(): ComponentProviderRegistry {
+  return {
+    ExperimentalResourceDetector: {
+      // https://opentelemetry.io/docs/specs/otel-config/types/#type-experimentalresourcedetector
+      // The 'container' detector lives in opentelemetry-js-contrib.git.
+      host: () => new CompositeResourceDetector([hostDetector, osDetector]),
+      process: () => processDetector,
+      service: () =>
+        new CompositeResourceDetector([
+          serviceNameEnvDetector,
+          serviceInstanceIdDetector,
+        ]),
+    },
+
+    TextMapPropagator: {
+      tracecontext: () => new W3CTraceContextPropagator(),
+      baggage: () => new W3CBaggagePropagator(),
+      b3: () => new B3Propagator(),
+      b3multi: () =>
+        new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
+    },
+    SpanExporter: {
+      console: createConsoleSpanExporterFromConfig,
+      otlp_http: createHttpSpanExporterFromConfig,
+      otlp_grpc: createOtlpGrpcSpanExporterFromConfig,
+    },
+    SpanProcessor: {
+      batch: createBatchSpanProcessorFromConfig,
+      simple: createSimpleSpanProcessorFromConfig,
+    },
+    Sampler: {
+      always_off: () => new AlwaysOffSampler(),
+      always_on: () => new AlwaysOnSampler(),
+      always_record: createAlwaysRecordSamplerFromConfig,
+      trace_id_ratio_based: createTraceIdRatioBasedSamplerFromConfig,
+      parent_based: createParentBasedSamplerFromConfig,
+      // TODO(6961): composite/development
+      // TODO(6541): probability/development (via composite support for?)
+      // TODO(later): Consider supporting jaeger_remote/development if requested by a user. Only consider `sampler-jaeger-remote` package after axios dep is dropped in #6963.
+    },
+    IdGenerator: {
+      random: () => new RandomIdGenerator(),
+    },
+
+    // TODO(7309): Support `PullMetricExporter` component providers.
+    PushMetricExporter: {
+      console: createConsoleMetricExporterFromConfig,
+      otlp_http: createHttpMetricExporterFromConfig,
+      otlp_grpc: createOtlpGrpcMetricExporterFromConfig,
+    },
+    // Note: The "opencensus" MetricProducer is intentionally not supported.
+    // It is deprecated in OpenTelemetry Configuration v1.2.0.
+    // MetricProducer: {},
+
+    LogRecordExporter: {
+      console: createConsoleLogRecordExporterFromConfig,
+      otlp_http: createHttpLogRecordExporterFromConfig,
+      otlp_grpc: createOtlpGrpcLogRecordExporterFromConfig,
+    },
+    LogRecordProcessor: {
+      batch: createBatchLogRecordProcessorFromConfig,
+      simple: createSimpleLogRecordProcessorFromConfig,
+    },
   };
 }

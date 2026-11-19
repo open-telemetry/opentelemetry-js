@@ -10,11 +10,11 @@
  */
 
 /**
- * Enum value "otlp_http_metric_exporter" for attribute {@link ATTR_OTEL_COMPONENT_TYPE}.
+ * Enum value "otlp_http_json_metric_exporter" for attribute {@link ATTR_OTEL_COMPONENT_TYPE}.
  *
- * OTLP metric exporter over HTTP with protobuf serialization
+ * OTLP metric exporter over HTTP with JSON serialization
  *
  * @experimental This enum value is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER =
-  'otlp_http_metric_exporter' as const;
+export const OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_JSON_METRIC_EXPORTER =
+  'otlp_http_json_metric_exporter' as const;

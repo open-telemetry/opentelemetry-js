@@ -64,6 +64,14 @@ async function batchObservableCallback(batchObservableResult) {
 }
 ```
 
+> [!WARNING]
+> Simple attributes values (string, number, boolean) SHOULD be used whenever possible.
+> Using complex attribute values (arrays, nested objects, etc.) can have significant
+> negative performance overhead on the Metrics SDK, and possibly on observability backends.
+> As well, for performance reasons, the OTel JS Metrics SDK does *not* guard against
+> unserializable values (e.g. a BigInt, a circular reference).
+> Incorrect usage can *crash* the application.
+
 Views can be registered when instantiating a `MeterProvider`:
 
 ```js
@@ -139,6 +147,25 @@ type cardinalityLimits = {
   observableUpDownCounter?: number;
   default?: number;
 };
+```
+
+## Configuring Max Export Batch Size
+
+The `maxExportBatchSize` option in `PeriodicExportingMetricReader` configures the maximum number of metric data points in a single batch provided to `exporter.export()`. If omitted, no limit is applied and all collected metric data points are exported in a single batch.
+
+When `maxExportBatchSize` is configured to a positive integer, `PeriodicExportingMetricReader` splits the collected metric data into smaller batches of at most `maxExportBatchSize` data points and exports them sequentially. The `exportTimeoutMillis` timeout applies to each individual batch export.
+
+```js
+import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
+import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
+
+const exporter = new OTLPMetricExporter();
+const reader = new PeriodicExportingMetricReader({
+  exporter,
+  exportIntervalMillis: 60000,
+  exportTimeoutMillis: 30000,
+  maxExportBatchSize: 200, // Split exports into batches of at most 200 data points
+});
 ```
 
 ## Example

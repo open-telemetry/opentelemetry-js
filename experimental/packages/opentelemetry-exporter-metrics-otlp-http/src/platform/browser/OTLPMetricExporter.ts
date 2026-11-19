@@ -16,7 +16,7 @@ import {
   createLegacyOtlpBrowserExporterMetrics,
 } from '@opentelemetry/otlp-exporter-base/browser-http';
 
-import { OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER } from '../../semconv';
+import { OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_JSON_METRIC_EXPORTER } from '../../semconv';
 
 /**
  * Collector Metric Exporter for Web
@@ -28,7 +28,7 @@ export class OTLPMetricExporter extends OTLPMetricExporterBase {
       createLegacyOtlpBrowserExportDelegate(
         config ?? {},
         JsonMetricsSerializer,
-        OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER,
+        OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_JSON_METRIC_EXPORTER,
         MetricsExporterMetricsHelper,
         config?.selfObsMeterProvider,
         'v1/metrics',
@@ -46,7 +46,7 @@ export class OTLPMetricExporter extends OTLPMetricExporterBase {
   setSelfObsMeterProvider(meterProvider: MeterProvider) {
     this.setMetrics(
       createLegacyOtlpBrowserExporterMetrics(
-        OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_METRIC_EXPORTER,
+        OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_JSON_METRIC_EXPORTER,
         MetricsExporterMetricsHelper,
         this._url,
         meterProvider

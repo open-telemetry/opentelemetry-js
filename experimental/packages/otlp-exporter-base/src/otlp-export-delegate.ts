@@ -28,9 +28,10 @@ export interface IOtlpExportDelegate<Internal> {
   setMetrics(metrics: ExporterMetrics<Internal>): void;
 }
 
-class OTLPExportDelegate<Internal, Response>
-  implements IOtlpExportDelegate<Internal>
-{
+class OTLPExportDelegate<
+  Internal,
+  Response,
+> implements IOtlpExportDelegate<Internal> {
   private _metrics: ExporterMetrics<Internal>;
   private _diagLogger: DiagLogger;
   private _transport: IExporterTransport;

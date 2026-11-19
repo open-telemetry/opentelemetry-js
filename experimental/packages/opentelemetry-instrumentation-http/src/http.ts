@@ -21,6 +21,7 @@ import {
   trace,
   ValueType,
 } from '@opentelemetry/api';
+import type { ConfigProvider } from '@opentelemetry/api-config';
 import type { RPCMetadata } from '@opentelemetry/core';
 import {
   hrTime,
@@ -33,13 +34,14 @@ import {
 import type * as http from 'http';
 import type * as https from 'https';
 import type { Socket } from 'net';
-import * as url from 'url';
+import type * as url from 'url';
 import type { HttpInstrumentationConfig } from './types';
 import { VERSION } from './version';
 import {
   InstrumentationBase,
   InstrumentationNodeModuleDefinition,
   safeExecuteInTheMiddle,
+  readDeclarativeConfig,
 } from '@opentelemetry/instrumentation';
 import { errorMonitor } from 'events';
 import {
@@ -63,12 +65,15 @@ import {
   getOutgoingRequestAttributesOnResponse,
   getOutgoingStableRequestMetricAttributesOnResponse,
   getRequestInfo,
+  isURLLike,
   headerCapture,
   isValidOptionsType,
+  parseErrorType,
   parseResponseStatus,
   setSpanWithError,
 } from './utils';
 import type { Err, Func, Http, HttpRequestArgs, Https } from './internal-types';
+import { DEFAULT_QUERY_STRINGS_TO_REDACT } from './internal-types';
 
 /**
  * `node:http` and `node:https` instrumentation for OpenTelemetry
@@ -84,6 +89,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
   constructor(config: HttpInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-http', VERSION, config);
+
     this._headerCapture = this._createHeaderCapture();
   }
 
@@ -131,6 +137,62 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   override setConfig(config: HttpInstrumentationConfig = {}): void {
     super.setConfig(config);
     this._headerCapture = this._createHeaderCapture();
+  }
+
+  /**
+   * Update the current config (rather than fully *replace* it), with any
+   * settings from declarative config. See the "Declarative Configuration"
+   * section of the README for the properties this instrumentation supports.
+   */
+  setConfigProvider(configProvider: ConfigProvider): void {
+    const config = readDeclarativeConfig({
+      configProvider,
+      instrumentationName: this.instrumentationName,
+      // instrumentation-http owns the `general.http` domain.
+      generalDomains: ['http'],
+      currentConfig: this.getConfig() as Record<string, unknown>,
+      diag: this._diag,
+      reader: (own, general): Partial<HttpInstrumentationConfig> => ({
+        disableIncomingRequestInstrumentation: own.getBoolean(
+          'disable_incoming_request_instrumentation'
+        ),
+        disableOutgoingRequestInstrumentation: own.getBoolean(
+          'disable_outgoing_request_instrumentation'
+        ),
+        requireParentforIncomingSpans: own.getBoolean(
+          'require_parent_for_incoming_spans'
+        ),
+        requireParentforOutgoingSpans: own.getBoolean(
+          'require_parent_for_outgoing_spans'
+        ),
+        redactedQueryParams: own.getStringArray('redacted_query_params'),
+        enableSyntheticSourceDetection: own.getBoolean(
+          'enable_synthetic_source_detection'
+        ),
+        headersToSpanAttributes: {
+          client: {
+            requestHeaders: general.getStringArray(
+              'http.client.request_captured_headers'
+            ),
+            responseHeaders: general.getStringArray(
+              'http.client.response_captured_headers'
+            ),
+          },
+          server: {
+            requestHeaders: general.getStringArray(
+              'http.server.request_captured_headers'
+            ),
+            responseHeaders: general.getStringArray(
+              'http.server.response_captured_headers'
+            ),
+          },
+        },
+      }),
+    });
+
+    if (Object.keys(config).length > 0) {
+      this.setConfig({ ...this.getConfig(), ...config });
+    }
   }
 
   init(): [
@@ -430,6 +492,13 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             status = {
               code: parseResponseStatus(SpanKind.CLIENT, response.statusCode),
             };
+            const errorType = parseErrorType(
+              SpanKind.CLIENT,
+              response.statusCode
+            );
+            if (errorType !== undefined) {
+              span.setAttribute(ATTR_ERROR_TYPE, errorType);
+            }
           }
 
           span.setStatus(status);
@@ -549,6 +618,9 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           ),
           enableSyntheticSourceDetection:
             instrumentation.getConfig().enableSyntheticSourceDetection || false,
+          redactedQueryParams:
+            instrumentation.getConfig().redactedQueryParamsServer ??
+            Array.from(DEFAULT_QUERY_STRINGS_TO_REDACT),
         },
         instrumentation._diag
       );
@@ -657,7 +729,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       }
       const extraOptions =
         typeof args[0] === 'object' &&
-        (typeof options === 'string' || options instanceof url.URL)
+        (typeof options === 'string' || isURLLike(options))
           ? (args.shift() as http.RequestOptions)
           : undefined;
       const { method, invalidUrl, optionsParsed } = getRequestInfo(
@@ -811,6 +883,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     span.setAttributes(attributes).setStatus({
       code: parseResponseStatus(SpanKind.SERVER, response.statusCode),
     });
+
+    const errorType = parseErrorType(SpanKind.SERVER, response.statusCode);
+    if (errorType !== undefined) {
+      span.setAttribute(ATTR_ERROR_TYPE, errorType);
+    }
 
     const route = attributes[ATTR_HTTP_ROUTE];
     if (route) {

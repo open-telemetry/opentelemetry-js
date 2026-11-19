@@ -10,7 +10,6 @@ import {
   ParentBasedSampler,
   TraceIdRatioBasedSampler,
 } from '@opentelemetry/sdk-trace';
-import * as axios from 'axios';
 import { PerOperationSampler } from './PerOperationSampler';
 import type { SamplingStrategyResponse } from './types';
 import { StrategyType } from './types';
@@ -121,9 +120,18 @@ export class JaegerRemoteSampler implements Sampler {
   private async getSamplerConfig(
     serviceName?: string
   ): Promise<SamplingStrategyResponse> {
-    const response = await axios.get<SamplingStrategyResponse>(
-      `${this._endpoint}/sampling?service=${serviceName ?? ''}`
-    );
-    return response.data;
+    // As described in https://www.jaegertracing.io/docs/2.20/architecture/apis/#remote-sampling-apis
+    // the response is a protobuf mapped to JSON so `response.json()` will get the data parsed.
+    const samplingUrl = `${this._endpoint}/sampling?service=${serviceName ?? ''}`;
+    return fetch(samplingUrl)
+      .then(resp => {
+        if (resp.ok) {
+          return resp;
+        }
+        throw new Error(
+          `Fetch sampling error(${resp.status}): ${resp.statusText}`
+        );
+      })
+      .then(resp => resp.json()) as Promise<SamplingStrategyResponse>;
   }
 }

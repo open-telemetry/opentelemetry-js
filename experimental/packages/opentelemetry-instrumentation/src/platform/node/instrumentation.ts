@@ -28,8 +28,8 @@ import { isWrapped } from '../../utils';
  * Base abstract class for instrumenting node plugins
  */
 export abstract class InstrumentationBase<
-    ConfigType extends InstrumentationConfig = InstrumentationConfig,
-  >
+  ConfigType extends InstrumentationConfig = InstrumentationConfig,
+>
   extends InstrumentationAbstract<ConfigType>
   implements types.Instrumentation<ConfigType>
 {
@@ -37,7 +37,8 @@ export abstract class InstrumentationBase<
   private _hooks: (Hooked | HookRequire)[] = [];
   private _requireInTheMiddleSingleton: RequireInTheMiddleSingleton =
     RequireInTheMiddleSingleton.getInstance();
-  private _enabled = false;
+  /** Set by the base enable() and disable(); subclasses only read it. */
+  protected _enabled = false;
 
   constructor(
     instrumentationName: string,
@@ -304,7 +305,7 @@ export abstract class InstrumentationBase<
       const esmHook = new HookImport(
         [module.name],
         { internals: true },
-        <HookFn>hookFn
+        hookFn as HookFn
       );
       this._hooks.push(esmHook);
     }

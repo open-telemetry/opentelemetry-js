@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+const path = require('path');
 const webpack = require('webpack')
 
 // This is the webpack configuration for browser Karma tests with coverage.
@@ -16,16 +17,17 @@ module.exports = {
       // Enable the assert library polyfill because that is used in tests
       "assert": require.resolve('assert/'),
       "util": require.resolve('util/'),
+      // Only node-only platform code uses `path`; browser code paths never reach
+      // it. If that breaks: `TypeError: path.normalize is not a function`.
+      "path": false,
     },
   },
   devtool: 'eval-source-map',
   plugins: [
     new webpack.ProvidePlugin({
-      // Make a global `process` variable that points to the `process` package,
-      // because the `util` package expects there to be a global variable named `process`.
-      // Thanks to https://stackoverflow.com/a/65018686/14239942
-      // NOTE: I wish there was a better way as this pollutes the tests with a defined 'process' global.
-      process: 'process/browser.js'
+      // Not a global: only modules with a free `process` (such as util) get
+      // it. Absolute, since isolated installs hide `process` from those modules.
+      process: require.resolve('process/browser.js')
     }),
     // Benchmark.js checks for AMD's define function which doesn't exist in webpack.
     // NOTE: This pollutes tests with a defined 'self.define' global.
@@ -36,7 +38,18 @@ module.exports = {
   ],
   module: {
     rules: [
-      {test: /\.ts$/, use: 'ts-loader'},
+      {
+        // #platform resolves to src for the package under test only; dependencies
+        // keep their dist, as a global condition would resolve them to their src too.
+        include: path.resolve('src'),
+        resolve: { conditionNames: ['otel', '...'] },
+      },
+      {
+        test: /\.ts$/,
+        // transpileOnly: tsconfig.base.json sets `composite` but we never run
+        // `tsc -b`, so no `.tsbuildinfo` exists; ts-loader's default mode wants one.
+        use: { loader: 'ts-loader', options: { transpileOnly: true } },
+      },
       {
         test: /\.js$/,
         exclude: {

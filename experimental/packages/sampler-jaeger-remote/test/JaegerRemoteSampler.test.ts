@@ -19,7 +19,6 @@ import type { SamplingStrategyResponse } from '../src/types';
 import { StrategyType } from '../src/types';
 import { PerOperationSampler } from '../src/PerOperationSampler';
 import { randomSamplingProability } from './utils';
-import * as axios from 'axios';
 
 describe('JaegerRemoteSampler', () => {
   const endpoint = 'http://localhost:5778';
@@ -32,7 +31,18 @@ describe('JaegerRemoteSampler', () => {
   let clock: sinon.SinonFakeTimers;
 
   beforeEach(() => {
-    clock = sinon.useFakeTimers(Date.now());
+    // process.nextTick and queueMicrotask are faked by default since sinon 19,
+    // which makes the sampler's async polling loop spin, so leave them real.
+    clock = sinon.useFakeTimers({
+      now: Date.now(),
+      toFake: [
+        'setTimeout',
+        'clearTimeout',
+        'setInterval',
+        'clearInterval',
+        'Date',
+      ],
+    });
   });
 
   afterEach(() => {
@@ -475,14 +485,31 @@ describe('JaegerRemoteSampler', () => {
   });
 
   describe('getSamplerConfig', () => {
-    let axiosGetStub: sinon.SinonStub;
+    let fetchStub: sinon.SinonStub;
 
     beforeEach(() => {
-      axiosGetStub = sinon.stub(axios, 'get');
+      fetchStub = sinon.stub(globalThis, 'fetch').callsFake(input => {
+        const url = new URL(input);
+        let response;
+
+        if (url.searchParams.get('service') === 'failingService') {
+          response = new Response('', { status: 500 });
+        } else {
+          const payload = {
+            strategyType: 'PROBABILISTIC',
+            probabilisticSampling: { samplingRate: 1 },
+          };
+          response = new Response(JSON.stringify(payload), {
+            status: 200,
+            headers: { 'content-type': 'application/json' },
+          });
+        }
+        return Promise.resolve(response);
+      });
     });
 
     afterEach(() => {
-      axiosGetStub.restore();
+      fetchStub.restore();
     });
 
     it('Should pass endpoint and service name.', async () => {
@@ -494,9 +521,26 @@ describe('JaegerRemoteSampler', () => {
       });
       await clock.tickAsync(poolingInterval);
       sinon.assert.calledOnceWithExactly(
-        axiosGetStub,
+        fetchStub,
         `${endpoint}/sampling?service=${serviceName}`
       );
+    });
+
+    it('Should keep initial sampler if endpoint fails.', async () => {
+      const jaegerRemoteSampler = new JaegerRemoteSampler({
+        endpoint,
+        serviceName: 'failingService',
+        poolingInterval,
+        initialSampler: alwaysOnSampler,
+      });
+      await clock.tickAsync(poolingInterval);
+      sinon.assert.calledOnceWithExactly(
+        fetchStub,
+        `${endpoint}/sampling?service=failingService`
+      );
+      // @ts-expect-error -- accessing internal property
+      const jaegerCurrentSampler = jaegerRemoteSampler._sampler;
+      assert.equal(jaegerCurrentSampler, alwaysOnSampler);
     });
 
     it('Should pass endpoint and blank service name if nothing is provided.', async () => {
@@ -508,7 +552,7 @@ describe('JaegerRemoteSampler', () => {
       });
       await clock.tickAsync(poolingInterval);
       sinon.assert.calledOnceWithExactly(
-        axiosGetStub,
+        fetchStub,
         `${endpoint}/sampling?service=`
       );
     });

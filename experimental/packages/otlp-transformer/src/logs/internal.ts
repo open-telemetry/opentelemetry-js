@@ -18,7 +18,7 @@ import {
   toAnyValue,
   toAttributes,
 } from '../common/internal';
-import type { SeverityNumber } from '@opentelemetry/api-logs';
+import type { SeverityNumber } from '@opentelemetry/api';
 
 export function createExportLogsServiceRequest(
   logRecords: ReadableLogRecord[],
@@ -89,11 +89,11 @@ function toLogRecord(log: ReadableLogRecord, encoder: Encoder): ILogRecord {
     observedTimeUnixNano: encoder.encodeHrTime(log.hrTimeObserved),
     severityNumber: toSeverityNumber(log.severityNumber),
     severityText: log.severityText,
-    body: toAnyValue(log.body, encoder),
+    body: log.body === undefined ? undefined : toAnyValue(log.body, encoder),
     eventName: log.eventName,
     attributes: toAttributes(log.attributes, encoder),
-    droppedAttributesCount: log.droppedAttributesCount,
-    flags: log.spanContext?.traceFlags,
+    droppedAttributesCount: log.droppedAttributesCount || undefined,
+    flags: log.spanContext?.traceFlags || undefined,
     traceId: encoder.encodeOptionalSpanContext(log.spanContext?.traceId),
     spanId: encoder.encodeOptionalSpanContext(log.spanContext?.spanId),
   };

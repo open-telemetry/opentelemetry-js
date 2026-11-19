@@ -32,7 +32,4 @@ interface ExceptionWithName {
  * @since 1.0.0
  */
 export type Exception =
-  | ExceptionWithCode
-  | ExceptionWithMessage
-  | ExceptionWithName
-  | string;
+  ExceptionWithCode | ExceptionWithMessage | ExceptionWithName | string;

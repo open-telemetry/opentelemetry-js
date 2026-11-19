@@ -9,9 +9,9 @@ meter_provider:
           otlp_http:
             endpoint: http://localhost:4318/v1/metrics
             tls:
-              ca_file: /app/cert.pem
-              key_file: /app/cert.pem
-              cert_file: /app/cert.pem
+              ca_file: ${TEST_DIR}/certs/ca.crt
+              key_file: ${TEST_DIR}/certs/client.key
+              cert_file: ${TEST_DIR}/certs/client.crt
             headers:
               - name: api-key
                 value: "1234"
@@ -21,8 +21,6 @@ meter_provider:
             encoding: protobuf
             temporality_preference: delta
             default_histogram_aggregation: base2_exponential_bucket_histogram
-        producers:
-          - opencensus:
         cardinality_limits:
           default: 2000
           counter: 2000
@@ -39,9 +37,9 @@ meter_provider:
           otlp_http:
             endpoint: http://localhost:4318/v1/metrics
             tls:
-              ca_file: /app/cert.pem
-              key_file: /app/cert.pem
-              cert_file: /app/cert.pem
+              ca_file: ${TEST_DIR}/certs/ca.crt
+              key_file: ${TEST_DIR}/certs/client.key
+              cert_file: ${TEST_DIR}/certs/client.crt
             headers:
               - name: api-key
                 value: "1234"
@@ -51,8 +49,6 @@ meter_provider:
             encoding: json
             temporality_preference: delta
             default_histogram_aggregation: base2_exponential_bucket_histogram
-        producers:
-          - opencensus:
         cardinality_limits:
           default: 2000
           counter: 2000
@@ -67,28 +63,13 @@ meter_provider:
           otlp_grpc:
             endpoint: http://localhost:4317
             tls:
-              ca_file: /app/cert.pem
-              key_file: /app/cert.pem
-              cert_file: /app/cert.pem
-              insecure: false
+              insecure: true
             headers:
               - name: api-key
                 value: "1234"
             headers_list: "api-key=1234"
             compression: gzip
             timeout: 10000
-            temporality_preference: delta
-            default_histogram_aggregation: base2_exponential_bucket_histogram
-    - periodic:
-        exporter:
-          otlp_file/development:
-            output_stream: file:///var/log/metrics.jsonl
-            temporality_preference: delta
-            default_histogram_aggregation: base2_exponential_bucket_histogram
-    - periodic:
-        exporter:
-          otlp_file/development:
-            output_stream: stdout
             temporality_preference: delta
             default_histogram_aggregation: base2_exponential_bucket_histogram
     - periodic:
