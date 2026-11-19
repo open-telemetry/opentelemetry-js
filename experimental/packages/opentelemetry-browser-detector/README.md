@@ -1,6 +1,9 @@
 # OpenTelemetry Browser Detector
 
-**Note: This is an experimental package under active development. New releases may include breaking changes.**
+> [!NOTE]
+> `@opentelemetry/opentelemetry-browser-detector` is deprecated.
+> Vendors and users should plan moving to [the browser detector being developed in the opentelemetry-browser repository](https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/sdk#browser-resource-detection),
+> specifically `@opentelemetry/browser-sdk/browser-detector`.
 
 This module provides detector for browser environments
 

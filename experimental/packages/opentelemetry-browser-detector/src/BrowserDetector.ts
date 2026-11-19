@@ -77,4 +77,7 @@ function getBrowserAttributes(): Attributes {
   return browserAttribs;
 }
 
+/**
+ * @deprecated See https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/sdk#browser-resource-detection
+ */
 export const browserDetector = new BrowserDetector();
