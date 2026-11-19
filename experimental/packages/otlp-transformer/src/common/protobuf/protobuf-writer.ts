@@ -2,13 +2,9 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { diag } from '@opentelemetry/api';
 import type { IProtobufWriter } from './i-protobuf-writer';
 import { estimateVarintSize } from './utils';
 import { utf8ByteLength } from '#platform';
-
-export const GROWING_BUFFER_DEBUG_MESSAGE =
-  'ProtobufWriter: estimated size was too small, growing buffer.';
 
 /**
  * bytes reserved for length in length-delimited fields
@@ -21,6 +17,12 @@ const RESERVED_LENGTH_BYTES = 1;
  * Grows buffer dynamically if initial size is exceeded.
  */
 export class ProtobufWriter implements IProtobufWriter {
+  /**
+   * Initial buffer size in bytes for writers constructed without a size.
+   * Size in bytes.
+   */
+  static initialBufferSize = 1024;
+
   private _buffer: Uint8Array;
   // Avoid using TextEncoder type. While the global is there on all supported runtimes, types may differ.
   private readonly _textEncoder: {
@@ -30,7 +32,7 @@ export class ProtobufWriter implements IProtobufWriter {
 
   public pos: number = 0;
 
-  constructor(estimatedSize = 65536) {
+  constructor(estimatedSize = ProtobufWriter.initialBufferSize) {
     this._buffer = new Uint8Array(estimatedSize);
     this._textEncoder = new TextEncoder();
     this._dataView = new DataView(this._buffer.buffer, this._buffer.byteOffset);
@@ -45,16 +47,13 @@ export class ProtobufWriter implements IProtobufWriter {
       return;
     }
 
-    // It is safe to grow the buffer, but we assume that estimation is correct.
-    // Getting to this point indicates incorrect estimation or over-reservation
-    // of space in this writer and can lead to poor memory performance.
-    diag.debug(GROWING_BUFFER_DEBUG_MESSAGE);
+    // TODO: Re-measure growing a resizable ArrayBuffer in place. On Node.js 24
+    // and 26 its views made every write slower than this copy saves. Browsers
+    // would also need a path other than encodeInto for it, because WebIDL
+    // rejects views on resizable buffers there.
 
     // Double buffer size until we have enough space
-    let newSize = this._buffer.length * 2;
-    while (newSize < needed) {
-      newSize *= 2;
-    }
+    const newSize = Math.max(this._buffer.length * 2, needed);
 
     const newBuffer = new Uint8Array(newSize);
     newBuffer.set(this._buffer);

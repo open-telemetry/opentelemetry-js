@@ -4,12 +4,7 @@
  */
 
 import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { diag } from '@opentelemetry/api';
-import {
-  ProtobufWriter,
-  GROWING_BUFFER_DEBUG_MESSAGE,
-} from '../../src/common/protobuf/protobuf-writer';
+import { ProtobufWriter } from '../../src/common/protobuf/protobuf-writer';
 
 // Use pbjs-generated test helper.
 import * as testbed from '../generated/testbed';
@@ -237,19 +232,7 @@ describe('ProtobufWriter', function () {
   });
 
   describe('buffer growth', function () {
-    let sandbox: sinon.SinonSandbox;
-
-    beforeEach(function () {
-      sandbox = sinon.createSandbox();
-    });
-
-    afterEach(function () {
-      sandbox.restore();
-    });
-
     it('should grow buffer when capacity is exceeded', function () {
-      const diagStub = sandbox.stub(diag, 'debug');
-
       const writer = new ProtobufWriter(4);
       // Write more than 4 bytes
       writer.writeVarint(1);
@@ -260,34 +243,51 @@ describe('ProtobufWriter', function () {
 
       const buffer = writer.finish();
       assert.strictEqual(buffer.length, 5);
-
-      sinon.assert.calledWith(diagStub, GROWING_BUFFER_DEBUG_MESSAGE);
     });
 
     it('should handle buffer growth during writeBytes', function () {
-      const diagStub = sandbox.stub(diag, 'debug');
-
       const writer = new ProtobufWriter(4);
       const largeData = new Uint8Array(100);
       writer.writeBytes(largeData);
 
       const buffer = writer.finish();
       assert.strictEqual(buffer.length, 101);
-
-      sinon.assert.calledWith(diagStub, GROWING_BUFFER_DEBUG_MESSAGE);
     });
 
     it('should handle buffer growth during writeString', function () {
-      const diagStub = sandbox.stub(diag, 'debug');
-
       const writer = new ProtobufWriter(4);
       const longString = 'a'.repeat(100);
       writer.writeString(longString);
 
       const buffer = writer.finish();
       assert.strictEqual(buffer.length, 101);
+    });
 
-      sinon.assert.calledWith(diagStub, GROWING_BUFFER_DEBUG_MESSAGE);
+    it('should grow from an empty buffer', function () {
+      const writer = new ProtobufWriter(0);
+      writer.writeVarint(1);
+      writer.writeString('abc');
+
+      assert.deepStrictEqual(
+        writer.finish(),
+        new Uint8Array([1, 3, 0x61, 0x62, 0x63])
+      );
+    });
+  });
+
+  describe('initialBufferSize', function () {
+    const defaultSize = ProtobufWriter.initialBufferSize;
+
+    afterEach(function () {
+      ProtobufWriter.initialBufferSize = defaultSize;
+    });
+
+    it('sets the buffer size of writers constructed without a size', function () {
+      ProtobufWriter.initialBufferSize = 16;
+      const writer = new ProtobufWriter();
+      writer.writeVarint(1);
+
+      assert.strictEqual(writer.finish().buffer.byteLength, 16);
     });
   });
 
