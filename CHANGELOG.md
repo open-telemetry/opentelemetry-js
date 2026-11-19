@@ -21,6 +21,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :books: Documentation
 
+* docs: fix typos and improve grammar in developer guides [#7367](https://github.com/open-telemetry/opentelemetry-js/pull/7367) @prateeknitcse
+
 ### :house: Internal
 
 * perf(sdk-trace): use named imports from `@opentelemetry/api` in `Tracer`, avoiding the CommonJS interop getters on the span creation path [#7355](https://github.com/open-telemetry/opentelemetry-js/pull/7355) @daniellockyer
