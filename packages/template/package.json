@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/template",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "> TODO: description",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -89,10 +89,10 @@
   },
   "Add these to devDependencies for testing": {
     "@types/mocha": "10.0.10",
-    "@types/sinon": "17.0.4",
+    "@types/sinon": "22.0.2",
     "mocha": "11.7.5",
     "nyc": "17.1.0",
-    "sinon": "18.0.1"
+    "sinon": "22.1.0"
   },
   "Add these to devDependencies if browser is targeted": {
     "@types/webpack-env": "1.16.3",

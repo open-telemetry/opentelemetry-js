@@ -57,5 +57,4 @@ export interface XhrMem {
 export type PropagateTraceHeaderCorsUrl = string | RegExp;
 
 export type PropagateTraceHeaderCorsUrls =
-  | PropagateTraceHeaderCorsUrl
-  | PropagateTraceHeaderCorsUrl[];
+  PropagateTraceHeaderCorsUrl | PropagateTraceHeaderCorsUrl[];

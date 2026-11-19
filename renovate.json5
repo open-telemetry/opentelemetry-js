@@ -3,17 +3,89 @@
     "config:best-practices",
     "helpers:pinGitHubActionDigestsToSemver"
   ],
+  // Rule order matters: later rules override earlier ones.
   "packageRules": [
     {
       "matchManagers": ["github-actions"],
       "pinDigests": true
     },
+    // Stable (>=1.0) minor and patch updates are low risk and clustered by
+    // category. 0.x versions are excluded as they are treated like majors.
     {
-      "groupName": "all patch versions",
-      "groupSlug": "all-patch",
+      "groupName": "stable npm dev dependencies",
+      "groupSlug": "stable-npm-dev",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchCurrentVersion": "!/^0\\./",
+      "matchPackageNames": ["!prettier", "!typescript"],
+      "schedule": ["before 3am every weekday"]
+    },
+    {
+      "groupName": "stable npm runtime dependencies",
+      "groupSlug": "stable-npm-runtime",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["dependencies", "peerDependencies", "optionalDependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchCurrentVersion": "!/^0\\./",
+      "schedule": ["before 3am every weekday"]
+    },
+    {
+      // examples and test workspaces do not ship to users, keep them separate
+      // from the runtime dependencies of published packages
+      "groupName": "stable examples and tests dependencies",
+      "groupSlug": "stable-examples-tests",
+      "matchManagers": ["npm"],
+      "matchFileNames": [
+        "examples/**",
+        "experimental/examples/**",
+        "integration-tests/**",
+        "e2e-tests/**"
+      ],
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchCurrentVersion": "!/^0\\./",
+      "matchPackageNames": ["!prettier", "!typescript"],
+      "schedule": ["before 3am every weekday"]
+    },
+    {
+      "groupName": "stable github-actions",
+      "groupSlug": "stable-github-actions",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchCurrentVersion": "!/^0\\./",
+      "schedule": ["before 3am every weekday"]
+    },
+    {
+      "groupName": "stable docker",
+      "groupSlug": "stable-docker",
+      "matchManagers": ["dockerfile", "docker-compose"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchCurrentVersion": "!/^0\\./",
+      "schedule": ["before 3am every weekday"]
+    },
+    // 0.x patches are safe enough to group
+    {
+      "groupName": "0.x patch versions",
+      "groupSlug": "0x-patch",
       "matchUpdateTypes": ["patch"],
-      "schedule": ["before 3am every weekday"],
-      "matchPackageNames": ["!prettier"]
+      "matchCurrentVersion": "/^0\\./",
+      "matchPackageNames": ["!prettier", "!typescript"],
+      "schedule": ["before 3am every weekday"]
+    },
+    // 0.x minors are breaking per semver: one PR per package, like majors
+    {
+      "matchUpdateTypes": ["minor"],
+      "matchCurrentVersion": "/^0\\./",
+      "schedule": ["before 3am on Monday"]
+    },
+    {
+      // digest updates of already-pinned tags have no meaningful release date
+      // and would never satisfy minimumReleaseAge
+      "matchUpdateTypes": ["digest"],
+      "minimumReleaseAge": "0",
+      "groupName": "digest updates",
+      "groupSlug": "digests",
+      "schedule": ["before 3am on Monday"]
     },
     {
       "groupName": "@protobuf-ts packages",
@@ -26,22 +98,16 @@
       "separateMajorMinor": false
     },
     {
-      "matchUpdateTypes": ["minor"],
-      "matchManagers": ["js"],
-      "dependencyDashboardApproval": true
-    },
-    {
-      "matchUpdateTypes": ["minor"],
-      "matchManagers": ["!js"],
-      "schedule": ["before 3am on Monday"]
-    },
-    {
       "matchUpdateTypes": ["major"],
       "schedule": ["before 3am on Monday"]
     },
     {
-      "matchPackageNames": ["typescript", "lerna"],
-      "dependencyDashboardApproval": true
+      // We compile with the oldest TypeScript we support, see "TypeScript Support"
+      // in README.md: DefinitelyTyped's 2 year support window. Only propose
+      // versions that are at least 2 years old; strict hides newer ones.
+      "matchPackageNames": ["typescript"],
+      "minimumReleaseAge": "2 years",
+      "internalChecksFilter": "strict"
     }
   ],
   "lockFileMaintenance": {

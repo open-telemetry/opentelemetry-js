@@ -196,5 +196,4 @@ export interface StartSdkFromEnvOptions {
 }
 
 export type StartSdkOptions =
-  | StartSdkFromEnvOptions
-  | Omit<StartSdkFromConfigOptions, 'configFile'>;
+  StartSdkFromEnvOptions | Omit<StartSdkFromConfigOptions, 'configFile'>;

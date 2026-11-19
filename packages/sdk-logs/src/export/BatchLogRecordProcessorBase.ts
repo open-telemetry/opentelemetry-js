@@ -137,8 +137,7 @@ class ExportOperation {
 
 export abstract class BatchLogRecordProcessorBase<
   T extends BatchLogRecordProcessorOptions,
-> implements LogRecordProcessor
-{
+> implements LogRecordProcessor {
   private readonly _maxExportBatchSize: number;
   private readonly _maxQueueSize: number;
   private readonly _scheduledDelayMillis: number;
