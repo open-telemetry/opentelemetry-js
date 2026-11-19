@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/propagator-b3",
-  "version": "3.0.0",
+  "version": "3.1.1",
   "description": "OpenTelemetry B3 propagator provides context propagation for systems that are using the B3 header format",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -51,18 +51,18 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/core": "3.0.0"
+    "@opentelemetry/core": "3.1.1"
   },
   "peerDependencies": {
-    "@opentelemetry/api": ">=1.0.0 <1.11.0"
+    "@opentelemetry/api": ">=1.10.0 <1.11.0"
   },
   "devDependencies": {
-    "@opentelemetry/api": ">=1.0.0 <1.11.0",
+    "@opentelemetry/api": ">=1.10.0 <1.11.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
     "mocha": "12.0.3",
     "nyc": "18.0.0",
-    "ts-loader": "9.5.7",
+    "ts-loader": "9.6.2",
     "typescript": "5.2.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-propagator-b3",

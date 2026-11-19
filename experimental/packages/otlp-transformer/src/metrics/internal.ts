@@ -60,8 +60,8 @@ export function toScopeMetrics(
 export function toMetric(metricData: MetricData, encoder: Encoder): IMetric {
   const out: IMetric = {
     name: metricData.descriptor.name,
-    description: metricData.descriptor.description,
-    unit: metricData.descriptor.unit,
+    description: metricData.descriptor.description || undefined,
+    unit: metricData.descriptor.unit || undefined,
   };
 
   const aggregationTemporality = toAggregationTemporality(
@@ -100,9 +100,7 @@ export function toMetric(metricData: MetricData, encoder: Encoder): IMetric {
 
 function toSingularDataPoint(
   dataPoint:
-    | DataPoint<number>
-    | DataPoint<Histogram>
-    | DataPoint<ExponentialHistogram>,
+    DataPoint<number> | DataPoint<Histogram> | DataPoint<ExponentialHistogram>,
   valueType: ValueType,
   encoder: Encoder
 ) {

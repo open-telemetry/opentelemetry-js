@@ -52,8 +52,7 @@ import {
   DEFAULT_QUERY_STRINGS_TO_REDACT,
   STR_REDACTED,
 } from './internal-types';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-import forwardedParse = require('forwarded-parse');
+import { parse as forwardedParse } from 'forwarded-parse';
 
 const defaultQueryStringsToRedact = Array.from(DEFAULT_QUERY_STRINGS_TO_REDACT);
 
@@ -270,13 +269,12 @@ function stringUrlToHttpOptions(
  */
 export const isURLLike = (value: unknown): value is url.URL => {
   const candidate = value as
-    | (url.URL & { auth?: unknown; path?: unknown })
-    | undefined;
+    (url.URL & { auth?: unknown; path?: unknown }) | undefined;
   return Boolean(
     candidate?.href &&
-      candidate.protocol &&
-      candidate.auth === undefined &&
-      candidate.path === undefined
+    candidate.protocol &&
+    candidate.auth === undefined &&
+    candidate.path === undefined
   );
 };
 

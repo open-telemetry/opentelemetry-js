@@ -6,9 +6,7 @@
 import type { InstrumentationModuleFile } from '../../types';
 import { normalize } from './noop-normalize';
 
-export class InstrumentationNodeModuleFile
-  implements InstrumentationModuleFile
-{
+export class InstrumentationNodeModuleFile implements InstrumentationModuleFile {
   public name: string;
   public supportedVersions: string[];
   public patch;

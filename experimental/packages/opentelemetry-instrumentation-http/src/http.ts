@@ -21,6 +21,7 @@ import {
   trace,
   ValueType,
 } from '@opentelemetry/api';
+import type { ConfigProvider } from '@opentelemetry/api-config';
 import type { RPCMetadata } from '@opentelemetry/core';
 import {
   hrTime,
@@ -40,6 +41,7 @@ import {
   InstrumentationBase,
   InstrumentationNodeModuleDefinition,
   safeExecuteInTheMiddle,
+  readDeclarativeConfig,
 } from '@opentelemetry/instrumentation';
 import { errorMonitor } from 'events';
 import {
@@ -87,6 +89,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
   constructor(config: HttpInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-http', VERSION, config);
+
     this._headerCapture = this._createHeaderCapture();
   }
 
@@ -134,6 +137,62 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   override setConfig(config: HttpInstrumentationConfig = {}): void {
     super.setConfig(config);
     this._headerCapture = this._createHeaderCapture();
+  }
+
+  /**
+   * Update the current config (rather than fully *replace* it), with any
+   * settings from declarative config. See the "Declarative Configuration"
+   * section of the README for the properties this instrumentation supports.
+   */
+  setConfigProvider(configProvider: ConfigProvider): void {
+    const config = readDeclarativeConfig({
+      configProvider,
+      instrumentationName: this.instrumentationName,
+      // instrumentation-http owns the `general.http` domain.
+      generalDomains: ['http'],
+      currentConfig: this.getConfig() as Record<string, unknown>,
+      diag: this._diag,
+      reader: (own, general): Partial<HttpInstrumentationConfig> => ({
+        disableIncomingRequestInstrumentation: own.getBoolean(
+          'disable_incoming_request_instrumentation'
+        ),
+        disableOutgoingRequestInstrumentation: own.getBoolean(
+          'disable_outgoing_request_instrumentation'
+        ),
+        requireParentforIncomingSpans: own.getBoolean(
+          'require_parent_for_incoming_spans'
+        ),
+        requireParentforOutgoingSpans: own.getBoolean(
+          'require_parent_for_outgoing_spans'
+        ),
+        redactedQueryParams: own.getStringArray('redacted_query_params'),
+        enableSyntheticSourceDetection: own.getBoolean(
+          'enable_synthetic_source_detection'
+        ),
+        headersToSpanAttributes: {
+          client: {
+            requestHeaders: general.getStringArray(
+              'http.client.request_captured_headers'
+            ),
+            responseHeaders: general.getStringArray(
+              'http.client.response_captured_headers'
+            ),
+          },
+          server: {
+            requestHeaders: general.getStringArray(
+              'http.server.request_captured_headers'
+            ),
+            responseHeaders: general.getStringArray(
+              'http.server.response_captured_headers'
+            ),
+          },
+        },
+      }),
+    });
+
+    if (Object.keys(config).length > 0) {
+      this.setConfig({ ...this.getConfig(), ...config });
+    }
   }
 
   init(): [

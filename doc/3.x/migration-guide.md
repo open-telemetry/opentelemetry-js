@@ -5,6 +5,8 @@ For the most part, this document *only covers breaking changes* (sections marked
 
 The October 2026 releases also include a new *minor* version of the API package (`@opentelemetry/api` v1.10.0), with some significant changes. This document will also cover some of these changes.
 
+The SDK 2.x packages declare a peer dependency on `@opentelemetry/api` below 1.10.0, so they cannot be installed together with `@opentelemetry/api@1.10.0`. To use API v1.10.0, upgrade to SDK 3.x. A project that stays on SDK 2.x keeps `@opentelemetry/api` at 1.9.x.
+
 Refer to the changelogs for full details:
 
 - [CHANGELOG for stable SDK packages](https://github.com/open-telemetry/opentelemetry-js/blob/main/CHANGELOG.md#300)

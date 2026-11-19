@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sdk-trace",
-  "version": "3.0.0",
+  "version": "3.1.1",
   "description": "OpenTelemetry Tracing",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
@@ -74,11 +74,11 @@
   },
   "devDependencies": {
     "@opentelemetry/api": ">=1.10.0 <1.11.0",
-    "@opentelemetry/sdk-metrics": "3.0.0",
+    "@opentelemetry/sdk-metrics": "3.1.1",
     "@types/benchmark": "2.1.5",
     "@types/mocha": "10.0.10",
     "@types/node": "18.19.130",
-    "@types/sinon": "17.0.4",
+    "@types/sinon": "22.0.2",
     "@types/webpack-env": "1.18.8",
     "babel-plugin-istanbul": "8.0.0",
     "karma": "6.4.4",
@@ -90,17 +90,17 @@
     "karma-webpack": "5.0.1",
     "mocha": "12.0.3",
     "nyc": "18.0.0",
-    "sinon": "18.0.1",
-    "ts-loader": "9.5.7",
+    "sinon": "22.1.0",
+    "ts-loader": "9.6.2",
     "typescript": "5.2.2",
-    "webpack": "5.108.4"
+    "webpack": "5.112.2"
   },
   "peerDependencies": {
     "@opentelemetry/api": ">=1.10.0 <1.11.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "3.0.0",
-    "@opentelemetry/resources": "3.0.0",
+    "@opentelemetry/core": "3.1.1",
+    "@opentelemetry/resources": "3.1.1",
     "@opentelemetry/semantic-conventions": "^1.29.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-trace",

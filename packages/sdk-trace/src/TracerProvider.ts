@@ -35,10 +35,10 @@ import {
 } from './inspect';
 
 enum ForceFlushState {
-  'resolved',
-  'timeout',
-  'error',
-  'unresolved',
+  resolved,
+  timeout,
+  error,
+  unresolved,
 }
 
 const defaultNoopTracerProvider = new ProxyTracerProvider();

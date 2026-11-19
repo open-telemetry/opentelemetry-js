@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as grpc from '@grpc/grpc-js';
+// NOTE: do not change this to be an actual import, doing so will break `@opentelemetry/instrumentation-grpc`
+import type { ServiceClientConstructor } from '@grpc/grpc-js';
 
 /**
  * Creates a unary service client constructor that, when instantiated, does not serialize/deserialize anything.
@@ -12,10 +13,10 @@ import * as grpc from '@grpc/grpc-js';
  * @param path service path
  * @param name service name
  */
-export function createServiceClientConstructor(
+export async function createServiceClientConstructor(
   path: string,
   name: string
-): grpc.ServiceClientConstructor {
+): Promise<ServiceClientConstructor> {
   const serviceDefinition = {
     export: {
       path: path,
@@ -36,5 +37,7 @@ export function createServiceClientConstructor(
     },
   };
 
-  return grpc.makeGenericClientConstructor(serviceDefinition, name);
+  const { makeGenericClientConstructor } = await import('@grpc/grpc-js');
+
+  return makeGenericClientConstructor(serviceDefinition, name);
 }

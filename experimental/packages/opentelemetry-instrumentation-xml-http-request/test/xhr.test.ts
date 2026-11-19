@@ -23,6 +23,7 @@ import {
 import { TracerProvider } from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import { fakeXhr } from 'nise';
 import { ATTR_HTTP_REQUEST_BODY_SIZE } from '../src/semconv';
 import { EventNames } from '../src/enums/EventNames';
 import type { XMLHttpRequestInstrumentationConfig } from '../src/xhr';
@@ -218,16 +219,37 @@ function testForCorrectEvents(
   }
 }
 
+// Only fake what the tests need: faking `performance` breaks the tests' own
+// `performance` stubs in the browser, and `nextTick`/`queueMicrotask` (faked by
+// default since sinon 19) stall the fake XHR flow.
+const useFakeTimers = () =>
+  sinon.useFakeTimers({
+    toFake: [
+      'setTimeout',
+      'clearTimeout',
+      'setInterval',
+      'clearInterval',
+      'Date',
+    ],
+  });
+
 describe('xhr', () => {
   const asyncTests = [{ async: true }, { async: false }];
 
   let timer: sinon.SinonFakeTimers;
+  // sinon no longer tracks fake XHRs (removed together with nise), so restore manually
+  let fakeXhrInstance: { restore(): void } | undefined;
+  const restoreFakeXhr = () => {
+    fakeXhrInstance?.restore();
+    fakeXhrInstance = undefined;
+  };
 
   beforeEach(function () {
-    timer = sinon.useFakeTimers();
+    timer = useFakeTimers();
   });
 
   afterEach(function () {
+    restoreFakeXhr();
     sinon.restore();
   });
 
@@ -397,8 +419,9 @@ describe('xhr', () => {
       let rootSpan: api.Span;
 
       const clearData = () => {
+        restoreFakeXhr();
         sinon.restore();
-        timer = sinon.useFakeTimers();
+        timer = useFakeTimers();
         requests = [];
       };
 
@@ -406,8 +429,10 @@ describe('xhr', () => {
         fileUrl: string,
         config?: XMLHttpRequestInstrumentationConfig
       ) => {
-        const fakeXhr = sinon.useFakeXMLHttpRequest();
-        fakeXhr.onCreate = function (xhr: any) {
+        restoreFakeXhr();
+        const fake = fakeXhr.useFakeXMLHttpRequest();
+        fakeXhrInstance = fake;
+        fake.onCreate = function (xhr: any) {
           requests.push(xhr);
         };
         if (isWrapped(XMLHttpRequest.prototype.send)) {

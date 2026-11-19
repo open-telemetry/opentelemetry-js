@@ -528,9 +528,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
 /**
  * Aggregator for ExponentialHistogramAccumulations
  */
-export class ExponentialHistogramAggregator
-  implements Aggregator<ExponentialHistogramAccumulation>
-{
+export class ExponentialHistogramAggregator implements Aggregator<ExponentialHistogramAccumulation> {
   public kind: AggregatorKind.EXPONENTIAL_HISTOGRAM =
     AggregatorKind.EXPONENTIAL_HISTOGRAM;
 

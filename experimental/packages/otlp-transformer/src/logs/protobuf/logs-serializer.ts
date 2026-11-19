@@ -16,7 +16,6 @@ import {
   writeHrTimeAsFixed64,
 } from '../../common/protobuf/common-serializer';
 import type { IProtobufWriter } from '../../common/protobuf/i-protobuf-writer';
-import { ProtobufSizeEstimator } from '../../common/protobuf/protobuf-size-estimator';
 
 /**
  * Serialize a single LogRecord directly from ReadableLogRecord
@@ -61,9 +60,11 @@ function serializeLogRecord(
     writeAttributes(writer, logRecord.attributes, 6);
   }
 
-  // dropped_attributes_count (field 7, uint32)
-  writer.writeTag(7, 0);
-  writer.writeVarint(logRecord.droppedAttributesCount);
+  // dropped_attributes_count (field 7, uint32) - skip if 0
+  if (logRecord.droppedAttributesCount) {
+    writer.writeTag(7, 0);
+    writer.writeVarint(logRecord.droppedAttributesCount);
+  }
 
   // flags (field 8, fixed32) - skip if 0 or undefined
   if (logRecord.spanContext?.traceFlags) {
@@ -198,15 +199,7 @@ export function serializeLogsExportRequest(
 ): Uint8Array {
   const resourceMap = createResourceMap(logRecords);
 
-  // First pass: estimate size
-  const estimator = new ProtobufSizeEstimator();
-  for (const [resource, scopeMap] of resourceMap) {
-    estimator.writeTag(1, 2);
-    serializeResourceLogs(estimator, resource, scopeMap);
-  }
-
-  // Second pass: write with estimated size
-  const writer = new ProtobufWriter(estimator.pos);
+  const writer = new ProtobufWriter();
   for (const [resource, scopeMap] of resourceMap) {
     writer.writeTag(1, 2);
     serializeResourceLogs(writer, resource, scopeMap);

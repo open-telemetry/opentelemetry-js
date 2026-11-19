@@ -36,6 +36,7 @@ import type {
 } from './types';
 import {
   normalizeHttpRequestMethod,
+  redactUrl,
   serverPortFromUrl,
   getXHRBodyLength,
 } from './utils';
@@ -55,8 +56,7 @@ export type XHRCustomAttributeFunction = (
 /**
  * XMLHttpRequest config
  */
-export interface XMLHttpRequestInstrumentationConfig
-  extends InstrumentationConfig {
+export interface XMLHttpRequestInstrumentationConfig extends InstrumentationConfig {
   /**
    * The number of timing resources is limited, after the limit
    * (chrome 250, safari 150) the information is not collected anymore.
@@ -338,7 +338,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     if (normMethod !== origMethod) {
       attributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = origMethod;
     }
-    attributes[ATTR_URL_FULL] = parsedUrl.toString();
+    attributes[ATTR_URL_FULL] = redactUrl(parsedUrl.toString());
     attributes[ATTR_SERVER_ADDRESS] = parsedUrl.hostname;
     const serverPort = serverPortFromUrl(parsedUrl);
     if (serverPort) {

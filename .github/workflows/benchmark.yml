@@ -18,7 +18,7 @@ jobs:
           - ^26.3.0
     runs-on: oracle-bare-metal-64cpu-1024gb-x86-64-ubuntu-24
     container:
-      image: ubuntu:26.04@sha256:3131b4cc82a783df6c9df078f86e01819a13594b865c2cad47bd1bca2b7063bb
+      image: ubuntu:26.04@sha256:d66b366dac61b575bee2aef07e9c26e8070096fbe84a3d4d3eb0da069b5d76db
     timeout-minutes: 10
     steps:
       # Apt packages:
@@ -37,7 +37,7 @@ jobs:
       # `npm run submodule`.
       - run: git config --global --add safe.directory $GITHUB_WORKSPACE
 
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           cache: 'npm'
           cache-dependency-path: |

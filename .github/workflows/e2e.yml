@@ -24,7 +24,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           cache: 'npm'
           cache-dependency-path: |
@@ -40,7 +40,7 @@ jobs:
       # The compile above runs on the repo's pinned build Node (^26.3.0).
       # Switch to the matrix Node version so tests exercise every supported
       # runtime.
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ matrix.node_version }}
 

@@ -31,7 +31,18 @@ describe('JaegerRemoteSampler', () => {
   let clock: sinon.SinonFakeTimers;
 
   beforeEach(() => {
-    clock = sinon.useFakeTimers(Date.now());
+    // process.nextTick and queueMicrotask are faked by default since sinon 19,
+    // which makes the sampler's async polling loop spin, so leave them real.
+    clock = sinon.useFakeTimers({
+      now: Date.now(),
+      toFake: [
+        'setTimeout',
+        'clearTimeout',
+        'setInterval',
+        'clearInterval',
+        'Date',
+      ],
+    });
   });
 
   afterEach(() => {

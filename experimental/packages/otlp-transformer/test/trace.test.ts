@@ -3,14 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import * as signals from '../test/generated/signals';
-import { diag, SpanKind, SpanStatusCode, TraceFlags } from '@opentelemetry/api';
+import { SpanKind, SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import { TraceState } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import type { ReadableSpan } from '@opentelemetry/sdk-trace';
 import * as assert from 'assert';
-import * as sinon from 'sinon';
 import { toBase64 } from './utils';
 import type { OtlpEncodingOptions } from '../src/common/internal-types';
 import { ESpanKind, EStatusCode } from '../src/trace/internal-types';
@@ -20,10 +19,7 @@ import { JsonTraceSerializer } from '../src/trace/json';
 import { hexToBinary } from '../src/common/hex-to-binary';
 import type { ISpan } from '../src/trace/internal-types';
 import { JSON_ENCODER, PROTOBUF_ENCODER } from '../src/common/utils';
-import {
-  GROWING_BUFFER_DEBUG_MESSAGE,
-  ProtobufWriter,
-} from '../src/common/protobuf/protobuf-writer';
+import { ProtobufWriter } from '../src/common/protobuf/protobuf-writer';
 
 function createExpectedSpanJson(options: OtlpEncodingOptions) {
   const useHex = options.useHex ?? false;
@@ -63,7 +59,6 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
               value: { stringValue: 'resource attribute value' },
             },
           ],
-          droppedAttributesCount: 0,
         },
         schemaUrl: undefined,
         scopeSpans: [
@@ -82,7 +77,7 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
                 kind: ESpanKind.SPAN_KIND_CLIENT,
                 links: [
                   {
-                    droppedAttributesCount: 0,
+                    droppedAttributesCount: undefined,
                     spanId: linkSpanId,
                     traceId: linkTraceId,
                     traceState: 'link=foo',
@@ -101,7 +96,7 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
                 endTimeUnixNano: endTime,
                 events: [
                   {
-                    droppedAttributesCount: 0,
+                    droppedAttributesCount: undefined,
                     attributes: [
                       {
                         key: 'event-attribute',
@@ -120,9 +115,9 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
                     value: { stringValue: 'some attribute value' },
                   },
                 ],
-                droppedAttributesCount: 0,
-                droppedEventsCount: 0,
-                droppedLinksCount: 0,
+                droppedAttributesCount: undefined,
+                droppedEventsCount: undefined,
+                droppedLinksCount: undefined,
                 status: {
                   code: EStatusCode.STATUS_CODE_OK,
                   message: undefined,
@@ -175,7 +170,7 @@ function createExpectedSpanData(options: OtlpEncodingOptions) {
     kind: ESpanKind.SPAN_KIND_CLIENT,
     links: [
       {
-        droppedAttributesCount: 0,
+        droppedAttributesCount: undefined,
         spanId: linkSpanId,
         traceId: linkTraceId,
         traceState: 'link=foo',
@@ -192,7 +187,7 @@ function createExpectedSpanData(options: OtlpEncodingOptions) {
     endTimeUnixNano: endTime,
     events: [
       {
-        droppedAttributesCount: 0,
+        droppedAttributesCount: undefined,
         attributes: [
           {
             key: 'event-attribute',
@@ -209,9 +204,9 @@ function createExpectedSpanData(options: OtlpEncodingOptions) {
         value: { stringValue: 'some attribute value' },
       },
     ],
-    droppedAttributesCount: 0,
-    droppedEventsCount: 0,
-    droppedLinksCount: 0,
+    droppedAttributesCount: undefined,
+    droppedEventsCount: undefined,
+    droppedLinksCount: undefined,
     status: {
       code: EStatusCode.STATUS_CODE_OK,
       message: undefined,
@@ -233,7 +228,6 @@ function createExpectedMultiResourceSpanJson(options: OtlpEncodingOptions) {
               value: { stringValue: 'resource attribute value' },
             },
           ],
-          droppedAttributesCount: 0,
         },
         schemaUrl: undefined,
         scopeSpans: [
@@ -257,7 +251,6 @@ function createExpectedMultiResourceSpanJson(options: OtlpEncodingOptions) {
               value: { stringValue: 'another resource value' },
             },
           ],
-          droppedAttributesCount: 0,
         },
         schemaUrl: undefined,
         scopeSpans: [
@@ -569,7 +562,7 @@ describe('Trace', () => {
         assert.ok(exportRequest);
         assert.strictEqual(
           exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].status.code,
-          EStatusCode.STATUS_CODE_UNSET
+          undefined
         );
       });
     });
@@ -660,16 +653,6 @@ describe('Trace', () => {
   });
 
   describe('ProtobufTracesSerializer', function () {
-    let diagStub: sinon.SinonStub;
-
-    beforeEach(function () {
-      diagStub = sinon.stub(diag, 'debug');
-    });
-
-    afterEach(function () {
-      sinon.restore();
-    });
-
     it('serializes an export request', () => {
       const serialized = ProtobufTraceSerializer.serializeRequest([
         span_1_1,
@@ -696,7 +679,19 @@ describe('Trace', () => {
           }
         );
       assert.deepStrictEqual(decodedObj, expected);
-      sinon.assert.neverCalledWith(diagStub, GROWING_BUFFER_DEBUG_MESSAGE);
+    });
+
+    it('omits fields that hold their default value', () => {
+      span_1_1.status.code = SpanStatusCode.UNSET;
+      const serialized = ProtobufTraceSerializer.serializeRequest([span_1_1])!;
+      // The reference encoder omits default values and writes fields in field
+      // number order, so a re-encoded request has the same bytes.
+      const { ExportTraceServiceRequest } =
+        signals.opentelemetry.proto.collector.trace.v1;
+      const reencoded = ExportTraceServiceRequest.encode(
+        ExportTraceServiceRequest.decode(serialized)
+      ).finish();
+      assert.deepStrictEqual(Array.from(serialized), Array.from(reencoded));
     });
 
     it('deserializes a response', () => {
@@ -729,7 +724,6 @@ describe('Trace', () => {
       assert.doesNotThrow(() =>
         ProtobufTraceSerializer.deserializeResponse(new Uint8Array([]))
       );
-      sinon.assert.neverCalledWith(diagStub, GROWING_BUFFER_DEBUG_MESSAGE);
     });
 
     it('does not throw when encountering unexpected wiretypes during deserialization', function () {
