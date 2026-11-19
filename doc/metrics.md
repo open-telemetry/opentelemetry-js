@@ -528,7 +528,7 @@ counter.add(10, { pid: process.pid });
 
 In the above example the instantiated `PrometheusExporter` is configured to expose
 a new http server on port 9464. You can now access the metrics at the endpoint
-<http://localhost:9464/metrics>. This is the URL that can be scraped by Prometheus so it can consumed the metrics collected by OpenTelemetry in your application.
+<http://localhost:9464/metrics>. This is the URL that can be scraped by Prometheus so it can consume the metrics collected by OpenTelemetry in your application.
 
 More information about Prometheus and how to configure can be found at:
 [Prometheus Scraping Config](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config)
