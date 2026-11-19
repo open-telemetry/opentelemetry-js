@@ -13,7 +13,9 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :rocket: Features
 
-* feat(sdk-node, sdk-config): support `tracer_configurator/development` in declarative configuration and export its config model types [#6960](https://github.com/open-telemetry/opentelemetry-js/issues/6960)
+* feat(sdk-node): support `tracer_configurator/development` in declarative configuration [#6960](https://github.com/open-telemetry/opentelemetry-js/issues/6960)
+* feat(sdk-config): export all generated schema types [#7351](https://github.com/open-telemetry/opentelemetry-js/pull/7351) @trentm
+* feat(sdk-node): wire up `always_record` in declarative config to create an AlwaysRecord sampler [#7322](https://github.com/open-telemetry/opentelemetry-js/pull/7322) @trentm
 * feat(sdk-config): add support for parsing `file_format: "1.2"` declarative config files
   * See the OTel Configuration v1.2.0 release notes: <https://github.com/open-telemetry/opentelemetry-configuration/releases/tag/v1.2.0>
 * feat(api-config): add `@opentelemetry/api-config`, an experimental package with the declarative-config `ConfigProvider` and `ConfigProperties` types and a global `config` accessor [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm

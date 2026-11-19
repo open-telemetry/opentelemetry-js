@@ -1717,6 +1717,10 @@ describe('create-from-config', () => {
         repr: 'AlwaysOnSampler',
       },
       {
+        sampler: { always_record: { root: { trace_id_ratio_based: null } } },
+        repr: 'AlwaysRecordSampler{TraceIdRatioBased{1}}',
+      },
+      {
         sampler: { trace_id_ratio_based: { ratio: 0.5 } },
         repr: 'TraceIdRatioBased{0.5}',
       },
