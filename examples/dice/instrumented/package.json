@@ -38,8 +38,8 @@
     "@opentelemetry/winston-transport": "^0.35.0"
   },
   "devDependencies": {
-    "@types/express": "^5.0.0",
+    "@types/express": "5.0.6",
     "@types/node": "^22.0.0",
-    "typescript": "^5.5.0"
+    "typescript": "5.9.3"
   }
 }
