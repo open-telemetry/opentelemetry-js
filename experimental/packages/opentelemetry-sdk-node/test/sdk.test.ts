@@ -114,7 +114,7 @@ describe('NodeSDK', () => {
     setGlobalLoggerProviderSpy = Sinon.spy(logs, 'setGlobalLoggerProvider');
 
     // need to set these to none, since the default value is 'otlp'. Tests either
-    // provide exporters programatically or reset to an appropriate value.
+    // provide exporters programmatically or reset to an appropriate value.
     process.env.OTEL_TRACES_EXPORTER = 'none';
     process.env.OTEL_LOGS_EXPORTER = 'none';
     process.env.OTEL_METRICS_EXPORTER = 'none';
