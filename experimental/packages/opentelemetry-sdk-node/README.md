@@ -222,6 +222,20 @@ Set the log level by setting the `OTEL_LOG_LEVEL` environment variable to enums:
 
 The default level is `INFO`.
 
+## Configure span limits from the environment
+
+Use the specification names for span event and link attribute limits:
+
+| Environment variable | Deprecated fallback | Span limit |
+| -------------------- | ------------------- | ---------- |
+| `OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT` | `OTEL_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT` | Maximum number of attributes per span event |
+| `OTEL_LINK_ATTRIBUTE_COUNT_LIMIT` | `OTEL_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT` | Maximum number of attributes per span link |
+
+The specification name takes precedence when it has a valid value, including `0`.
+The old names are deprecated and remain supported as fallbacks during the transition described in [#7242](https://github.com/open-telemetry/opentelemetry-js/issues/7242).
+For example, replace `OTEL_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT=64` with `OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT=64`.
+An explicitly configured [`spanLimits`](#spanlimits) value overrides the corresponding environment value.
+
 ## Configure Exporters from environment
 
 This is an alternative to programmatically configuring an exporter or span processor. For traces this package will auto setup the default `otlp` exporter with `http/protobuf` protocol if `traceExporter` or `spanProcessor` hasn't been passed into the `NodeSDK` constructor.
