@@ -212,4 +212,85 @@ describe('MultiSpanProcessor', () => {
     //reset global error handler
     setGlobalErrorHandler(loggingErrorHandler());
   });
+
+  it('should wait for all span processors to finish shutdown even when one rejects', async () => {
+    let slowFinished = false;
+    const failingProcessor: SpanProcessor = {
+      onStart: () => {},
+      onEnd: () => {},
+      forceFlush: () => Promise.resolve(),
+      shutdown: () => Promise.reject(new Error('export failed')),
+    };
+    const slowProcessor: SpanProcessor = {
+      onStart: () => {},
+      onEnd: () => {},
+      forceFlush: () => Promise.resolve(),
+      shutdown: () =>
+        new Promise(resolve => {
+          setTimeout(() => {
+            slowFinished = true;
+            resolve();
+          }, 50);
+        }),
+    };
+
+    const multiSpanProcessor = new MultiSpanProcessor([
+      failingProcessor,
+      slowProcessor,
+    ]);
+
+    let caughtError: unknown;
+    try {
+      await multiSpanProcessor.shutdown();
+    } catch (err) {
+      caughtError = err;
+    }
+
+    assert.ok(
+      slowFinished,
+      'slow processor must finish before shutdown settles'
+    );
+    assert.strictEqual((caughtError as Error)?.message, 'export failed');
+  });
+
+  it('should wait for all span processors to finish forceFlush even when one rejects', async () => {
+    let slowFinished = false;
+    const failingProcessor: SpanProcessor = {
+      onStart: () => {},
+      onEnd: () => {},
+      forceFlush: () => Promise.reject(new Error('flush failed')),
+      shutdown: () => Promise.resolve(),
+    };
+    const slowProcessor: SpanProcessor = {
+      onStart: () => {},
+      onEnd: () => {},
+      forceFlush: () =>
+        new Promise(resolve => {
+          setTimeout(() => {
+            slowFinished = true;
+            resolve();
+          }, 50);
+        }),
+      shutdown: () => Promise.resolve(),
+    };
+
+    const multiSpanProcessor = new MultiSpanProcessor([
+      failingProcessor,
+      slowProcessor,
+    ]);
+    const errorHandlerSpy = Sinon.spy();
+    setGlobalErrorHandler(errorHandlerSpy);
+
+    await multiSpanProcessor.forceFlush();
+
+    assert.ok(
+      slowFinished,
+      'slow processor must finish before forceFlush settles'
+    );
+    assert.strictEqual(errorHandlerSpy.callCount, 1);
+    const [[error]] = errorHandlerSpy.args;
+    assert.strictEqual(error.message, 'flush failed');
+
+    setGlobalErrorHandler(loggingErrorHandler());
+  });
 });
