@@ -17,7 +17,7 @@ import { MetricCollector } from './state/MetricCollector';
 import type { ForceFlushOptions, ShutdownOptions } from './types';
 import type { ViewOptions } from './view/View';
 import { View } from './view/View';
-
+import type { MeterConfigurator } from './MeterConfigurator';
 /**
  * MeterProviderOptions provides an interface for configuring a MeterProvider.
  */
@@ -26,6 +26,13 @@ export interface MeterProviderOptions {
   resource?: Resource;
   views?: ViewOptions[];
   readers?: IMetricReader[];
+
+  /**
+   * Configurator used to compute per-meter MeterConfig (e.g. disabling
+   * specific meters by name/pattern).
+   * @experimental This option is experimental and is subject to breaking changes in minor releases.
+   */
+  meterConfigurator?: MeterConfigurator;
 
   /**
    * Whether to enable SDK metrics for this meter provider.
@@ -43,7 +50,8 @@ export class MeterProvider implements IMeterProvider {
 
   constructor(options?: MeterProviderOptions) {
     this._sharedState = new MeterProviderSharedState(
-      options?.resource ?? defaultResource()
+      options?.resource ?? defaultResource(),
+      options?.meterConfigurator
     );
     if (options?.views != null && options.views.length > 0) {
       for (const viewOption of options.views) {
