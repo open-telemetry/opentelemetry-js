@@ -12,6 +12,7 @@ import {
 } from '@opentelemetry/sdk-metrics';
 import type { IncomingMessage, Server, ServerResponse } from 'http';
 import { createServer } from 'http';
+import { isIPv6 } from 'net';
 import type { ExporterConfig } from './export/types';
 import { PrometheusSerializer } from './PrometheusSerializer';
 import { OTEL_COMPONENT_TYPE_VALUE_PROMETHEUS_HTTP_TEXT_METRIC_EXPORTER } from './semconv';
@@ -91,7 +92,8 @@ export class PrometheusExporter extends MetricReader {
       _withoutScopeInfo
     );
 
-    this._baseUrl = `http://${this._host}:${this._port}/`;
+    const urlHost = isIPv6(this._host) ? `[${this._host}]` : this._host;
+    this._baseUrl = `http://${urlHost}:${this._port}/`;
     this._endpoint = (
       config.endpoint || PrometheusExporter.DEFAULT_OPTIONS.endpoint
     ).replace(/^([^/])/, '/$1');
