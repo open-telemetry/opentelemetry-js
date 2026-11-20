@@ -30,6 +30,7 @@ import {
   maybeAddAttribute,
   cleanAttributes,
   cleanSimpleAttributes,
+  internal,
 } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import {
@@ -402,8 +403,9 @@ export class SpanImpl implements Span {
       if (exception.message) {
         attributes[ATTR_EXCEPTION_MESSAGE] = exception.message;
       }
-      if (exception.stack) {
-        attributes[ATTR_EXCEPTION_STACKTRACE] = exception.stack;
+      const stacktrace = internal._buildExceptionStacktrace(exception);
+      if (stacktrace) {
+        attributes[ATTR_EXCEPTION_STACKTRACE] = stacktrace;
       }
     }
 
