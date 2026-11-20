@@ -102,10 +102,17 @@
       "schedule": ["before 3am on Monday"]
     },
     {
+      "matchPackageNames": ["typescript"],
+      "separateMultipleMajor": true,
+      "separateMultipleMinor": true,
+      "separateMinorPatch": true
+    },
+    {
       // We compile with the oldest TypeScript we support, see "TypeScript Support"
       // in README.md: DefinitelyTyped's 2 year support window. Only propose
       // versions that are at least 2 years old; strict hides newer ones.
       "matchPackageNames": ["typescript"],
+      "matchUpdateTypes": ["minor", "major"],
       "minimumReleaseAge": "2 years",
       "internalChecksFilter": "strict"
     }
