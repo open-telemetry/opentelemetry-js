@@ -67,6 +67,7 @@ import {
   getRequestInfo,
   isURLLike,
   headerCapture,
+  requestOptionsTextMapSetter,
   isValidOptionsType,
   parseErrorType,
   parseResponseStatus,
@@ -804,14 +805,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       const parentContext = context.active();
       const requestContext = trace.setSpan(parentContext, span);
 
-      if (!optionsParsed.headers) {
-        optionsParsed.headers = {};
-      } else {
-        // Make a copy of the headers object to avoid mutating an object the
-        // caller might have a reference to.
-        optionsParsed.headers = Object.assign({}, optionsParsed.headers);
-      }
-      propagation.inject(requestContext, optionsParsed.headers);
+      propagation.inject(
+        requestContext,
+        optionsParsed,
+        requestOptionsTextMapSetter
+      );
 
       return context.with(requestContext, () => {
         /*
