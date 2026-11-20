@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1795166064951,
+  "lastUpdate": 1795166661355,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -144435,6 +144435,394 @@ window.BENCHMARK_DATA = {
             "range": "±10.44%",
             "unit": "ops/sec",
             "extra": "15 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "29139614+renovate[bot]@users.noreply.github.com",
+            "name": "renovate[bot]",
+            "username": "renovate[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "c15964b822dbc6587de3b7bd6b91f147c4d7dab5",
+          "message": "chore(deps): update stable npm dev dependencies (#7370)\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
+          "timestamp": "2026-11-20T09:11:36Z",
+          "tree_id": "9fae8fe657b2bcb706cede69fc72036261b5898b",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/c15964b822dbc6587de3b7bd6b91f147c4d7dab5"
+        },
+        "date": 1795166660084,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "generateTraceId",
+            "value": 6220606,
+            "range": "±3.23%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "generateSpanId",
+            "value": 8286984,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 749098,
+            "range": "±1.10%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes w/ setAttributes)",
+            "value": 772289,
+            "range": "±0.37%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "addEvent (128 attributes)",
+            "value": 102894,
+            "range": "±1.13%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "addLink (128 attributes)",
+            "value": 105156,
+            "range": "±0.14%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 765347,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "parseBaggageHeaderString simple",
+            "value": 2648394,
+            "range": "±1.97%",
+            "unit": "ops/sec",
+            "extra": "88 samples"
+          },
+          {
+            "name": "parseBaggageHeaderString with metadata",
+            "value": 3146571,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "parseBaggageHeaderString URI encoded",
+            "value": 3053942,
+            "range": "±0.77%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "parseBaggageHeaderString complex",
+            "value": 1534643,
+            "range": "±0.12%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "Counter.add (fixed attributes)",
+            "value": 19997781,
+            "range": "±0.70%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "Counter.add (varied attributes, 100 combos)",
+            "value": 19531525,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "Counter.add (with view attribute processor)",
+            "value": 1867052,
+            "range": "±0.85%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "context.active() x100",
+            "value": 6940539,
+            "range": "±2.42%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "trace.getTracerProvider() x100",
+            "value": 15182776,
+            "range": "±0.83%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "transform 512 spans (protobuf)",
+            "value": 733,
+            "range": "±0.74%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 512 spans (json)",
+            "value": 881,
+            "range": "±0.42%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 512 logs (protobuf)",
+            "value": 703,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 512 logs (json)",
+            "value": 882,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 512 metrics (protobuf)",
+            "value": 722,
+            "range": "±0.62%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 512 metrics (json)",
+            "value": 420,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "protobuf: 10 spans, 0% exceptions, 3115 bytes",
+            "value": 40211,
+            "range": "±6.87%",
+            "unit": "ops/sec",
+            "extra": "27 samples"
+          },
+          {
+            "name": "protobuf: 10 spans, 10% exceptions (short ASCII), 3334 bytes",
+            "value": 38055,
+            "range": "±7.42%",
+            "unit": "ops/sec",
+            "extra": "27 samples"
+          },
+          {
+            "name": "protobuf: 10 spans, 10% exceptions (long ASCII), 4164 bytes",
+            "value": 30623,
+            "range": "±9.01%",
+            "unit": "ops/sec",
+            "extra": "23 samples"
+          },
+          {
+            "name": "protobuf: 10 spans, 10% exceptions (short Unicode), 3394 bytes",
+            "value": 36553,
+            "range": "±5.71%",
+            "unit": "ops/sec",
+            "extra": "27 samples"
+          },
+          {
+            "name": "protobuf: 10 spans, 10% exceptions (long Unicode), 4224 bytes",
+            "value": 31334,
+            "range": "±6.96%",
+            "unit": "ops/sec",
+            "extra": "25 samples"
+          },
+          {
+            "name": "protobuf: 10 spans, 100% exceptions (short ASCII), 5305 bytes",
+            "value": 24220,
+            "range": "±8.05%",
+            "unit": "ops/sec",
+            "extra": "27 samples"
+          },
+          {
+            "name": "protobuf: 10 spans, 100% exceptions (long ASCII), 13605 bytes",
+            "value": 20416,
+            "range": "±5.96%",
+            "unit": "ops/sec",
+            "extra": "25 samples"
+          },
+          {
+            "name": "protobuf: 10 spans, 100% exceptions (short Unicode), 5905 bytes",
+            "value": 20405,
+            "range": "±5.63%",
+            "unit": "ops/sec",
+            "extra": "26 samples"
+          },
+          {
+            "name": "protobuf: 10 spans, 100% exceptions (long Unicode), 14205 bytes",
+            "value": 17751,
+            "range": "±5.51%",
+            "unit": "ops/sec",
+            "extra": "26 samples"
+          },
+          {
+            "name": "protobuf: 100 spans, 0% exceptions, 29756 bytes",
+            "value": 4901,
+            "range": "±4.58%",
+            "unit": "ops/sec",
+            "extra": "27 samples"
+          },
+          {
+            "name": "protobuf: 100 spans, 10% exceptions (short ASCII), 31947 bytes",
+            "value": 4520,
+            "range": "±5.38%",
+            "unit": "ops/sec",
+            "extra": "27 samples"
+          },
+          {
+            "name": "protobuf: 100 spans, 10% exceptions (long ASCII), 40247 bytes",
+            "value": 4115,
+            "range": "±5.22%",
+            "unit": "ops/sec",
+            "extra": "26 samples"
+          },
+          {
+            "name": "protobuf: 100 spans, 10% exceptions (short Unicode), 32547 bytes",
+            "value": 4179,
+            "range": "±6.37%",
+            "unit": "ops/sec",
+            "extra": "27 samples"
+          },
+          {
+            "name": "protobuf: 100 spans, 10% exceptions (long Unicode), 40847 bytes",
+            "value": 3899,
+            "range": "±5.31%",
+            "unit": "ops/sec",
+            "extra": "25 samples"
+          },
+          {
+            "name": "protobuf: 100 spans, 100% exceptions (short ASCII), 51658 bytes",
+            "value": 2786,
+            "range": "±6.58%",
+            "unit": "ops/sec",
+            "extra": "27 samples"
+          },
+          {
+            "name": "protobuf: 100 spans, 100% exceptions (long ASCII), 134658 bytes",
+            "value": 2027,
+            "range": "±4.31%",
+            "unit": "ops/sec",
+            "extra": "25 samples"
+          },
+          {
+            "name": "protobuf: 100 spans, 100% exceptions (short Unicode), 57658 bytes",
+            "value": 2249,
+            "range": "±5.49%",
+            "unit": "ops/sec",
+            "extra": "27 samples"
+          },
+          {
+            "name": "protobuf: 100 spans, 100% exceptions (long Unicode), 140658 bytes",
+            "value": 1734,
+            "range": "±3.72%",
+            "unit": "ops/sec",
+            "extra": "25 samples"
+          },
+          {
+            "name": "protobuf: 512 spans, 0% exceptions, 152534 bytes",
+            "value": 908,
+            "range": "±3.81%",
+            "unit": "ops/sec",
+            "extra": "26 samples"
+          },
+          {
+            "name": "protobuf: 512 spans, 10% exceptions (short ASCII), 163922 bytes",
+            "value": 834,
+            "range": "±4.76%",
+            "unit": "ops/sec",
+            "extra": "26 samples"
+          },
+          {
+            "name": "protobuf: 512 spans, 10% exceptions (long ASCII), 207082 bytes",
+            "value": 788,
+            "range": "±4.88%",
+            "unit": "ops/sec",
+            "extra": "26 samples"
+          },
+          {
+            "name": "protobuf: 512 spans, 10% exceptions (short Unicode), 167042 bytes",
+            "value": 775,
+            "range": "±4.66%",
+            "unit": "ops/sec",
+            "extra": "27 samples"
+          },
+          {
+            "name": "protobuf: 512 spans, 10% exceptions (long Unicode), 210202 bytes",
+            "value": 773,
+            "range": "±3.89%",
+            "unit": "ops/sec",
+            "extra": "27 samples"
+          },
+          {
+            "name": "protobuf: 512 spans, 100% exceptions (short ASCII), 264662 bytes",
+            "value": 524,
+            "range": "±5.44%",
+            "unit": "ops/sec",
+            "extra": "26 samples"
+          },
+          {
+            "name": "protobuf: 512 spans, 100% exceptions (long ASCII), 689622 bytes",
+            "value": 399,
+            "range": "±5.15%",
+            "unit": "ops/sec",
+            "extra": "24 samples"
+          },
+          {
+            "name": "protobuf: 512 spans, 100% exceptions (short Unicode), 295382 bytes",
+            "value": 418,
+            "range": "±4.41%",
+            "unit": "ops/sec",
+            "extra": "26 samples"
+          },
+          {
+            "name": "protobuf: 512 spans, 100% exceptions (long Unicode), 720342 bytes",
+            "value": 340,
+            "range": "±4.87%",
+            "unit": "ops/sec",
+            "extra": "25 samples"
+          },
+          {
+            "name": "protobuf: 512 spans, 4096-byte attribute, 2211397 bytes",
+            "value": 396,
+            "range": "±5.30%",
+            "unit": "ops/sec",
+            "extra": "23 samples"
+          },
+          {
+            "name": "protobuf: 512 spans, 16384-byte attribute, 8504903 bytes",
+            "value": 135,
+            "range": "±7.64%",
+            "unit": "ops/sec",
+            "extra": "21 samples"
+          },
+          {
+            "name": "protobuf: 512 spans, 65536-byte attribute, 33670727 bytes",
+            "value": 28.05,
+            "range": "±7.62%",
+            "unit": "ops/sec",
+            "extra": "16 samples"
           }
         ]
       }
