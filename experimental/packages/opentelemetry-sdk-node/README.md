@@ -79,6 +79,42 @@ process.on("SIGTERM", () => {
 });
 ```
 
+## Declarative tracer configuration
+
+The experimental `startNodeSdk()` entry point supports per-tracer configuration
+through `tracer_provider.tracer_configurator/development` in a YAML file selected
+by `OTEL_CONFIG_FILE`:
+
+```yaml
+file_format: "1.1"
+tracer_provider:
+  tracer_configurator/development:
+    default_config:
+      enabled: true
+    tracers:
+      - name: "noisy-*"
+        config:
+          enabled: false
+  processors:
+    - batch:
+        exporter:
+          otlp_http:
+            endpoint: http://localhost:4318/v1/traces
+```
+
+```js
+const { startNodeSdk } = require('@opentelemetry/sdk-node');
+const sdk = startNodeSdk();
+```
+
+Matching is case-sensitive and uses the first matching entry. Each entry checks
+for an exact name match before wildcard matching. `*` matches any number of
+characters and `?` matches one character. Unmatched tracers use
+`default_config`; a missing `enabled` value defaults to `true`, including in a
+matched entry's `config`. Disabled tracers preserve parent context without
+recording spans. This feature is opt-in and experimental, and configuration is
+evaluated once per tracer; runtime reconfiguration is not supported.
+
 ## Configuration
 
 Below is a full list of configuration options which may be passed into the `NodeSDK` constructor;

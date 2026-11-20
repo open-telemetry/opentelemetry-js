@@ -50,6 +50,7 @@ export class TracerProvider implements ApiTracerProvider {
     this._activeSpanProcessor = new MultiSpanProcessor(spanProcessors);
 
     this._tracerOptions = {
+      tracerConfigurator: options.tracerConfigurator,
       resource: this._resource,
       sampler:
         options.sampler ??

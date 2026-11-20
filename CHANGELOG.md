@@ -15,6 +15,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :rocket: Features
 
+* feat(sdk-trace): add experimental per-scope `TracerConfigurator` support [#6960](https://github.com/open-telemetry/opentelemetry-js/issues/6960)
+
 ### :bug: Bug Fixes
 
 * fix(resources): don't warn on undefined resource attributes [#7308](https://github.com/open-telemetry/opentelemetry-js/pull/7308) @raphael-theriault-swi
