@@ -9,6 +9,7 @@ import { ProtobufWriter } from '../../src/common/protobuf/protobuf-writer';
 // Use pbjs-generated test helper.
 import * as testbed from '../generated/testbed';
 import { toLongBits } from '../../src/common/utils';
+import { hexToBinary } from '../../src/common/hex-to-binary';
 
 describe('ProtobufWriter', function () {
   describe('round-trip with protobuf.js', function () {
@@ -228,6 +229,29 @@ describe('ProtobufWriter', function () {
           }
         });
       }
+    }
+  });
+
+  describe('writeHexBytes', function () {
+    for (const hex of [
+      '0af7651916cd43dd8448eb211c80319c',
+      'B7AD6B7169203331',
+      '00ff',
+      '',
+    ]) {
+      it(`writes "${hex}" as writeBytes(hexToBinary()) does`, function () {
+        const expected = new ProtobufWriter();
+        expected.writeBytes(hexToBinary(hex));
+        expected.writeString('tail');
+
+        // A small capacity also covers growth while decoding.
+        for (const capacity of [1, 64]) {
+          const writer = new ProtobufWriter(capacity);
+          writer.writeHexBytes(hex);
+          writer.writeString('tail');
+          assert.deepStrictEqual(writer.finish(), expected.finish());
+        }
+      });
     }
   });
 

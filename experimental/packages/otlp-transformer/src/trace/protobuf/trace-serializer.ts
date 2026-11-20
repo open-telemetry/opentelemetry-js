@@ -5,7 +5,6 @@
 import type { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace';
 import type { Link, SpanStatus } from '@opentelemetry/api';
 import { ProtobufWriter } from '../../common/protobuf/protobuf-writer';
-import { hexToBinary } from '../../common/hex-to-binary';
 import type { Resource } from '@opentelemetry/resources';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import {
@@ -109,11 +108,11 @@ function serializeLink(writer: IProtobufWriter, link: Link): void {
 
   // trace_id (field 1, bytes)
   writer.writeTag(1, 2);
-  writer.writeBytes(hexToBinary(context.traceId));
+  writer.writeHexBytes(context.traceId);
 
   // span_id (field 2, bytes)
   writer.writeTag(2, 2);
-  writer.writeBytes(hexToBinary(context.spanId));
+  writer.writeHexBytes(context.spanId);
 
   // trace_state (field 3, string) - skip if empty
   const linkTraceState = context.traceState?.serialize();
@@ -172,11 +171,11 @@ function serializeSpan(writer: IProtobufWriter, span: ReadableSpan): void {
 
   // trace_id (field 1, bytes)
   writer.writeTag(1, 2);
-  writer.writeBytes(hexToBinary(ctx.traceId));
+  writer.writeHexBytes(ctx.traceId);
 
   // span_id (field 2, bytes)
   writer.writeTag(2, 2);
-  writer.writeBytes(hexToBinary(ctx.spanId));
+  writer.writeHexBytes(ctx.spanId);
 
   // trace_state (field 3, string) - skip if empty
   const traceState = ctx.traceState?.serialize();
@@ -188,7 +187,7 @@ function serializeSpan(writer: IProtobufWriter, span: ReadableSpan): void {
   // parent_span_id (field 4, bytes) - skip if empty
   if (span.parentSpanContext?.spanId) {
     writer.writeTag(4, 2);
-    writer.writeBytes(hexToBinary(span.parentSpanContext.spanId));
+    writer.writeHexBytes(span.parentSpanContext.spanId);
   }
 
   // name (field 5, string)
