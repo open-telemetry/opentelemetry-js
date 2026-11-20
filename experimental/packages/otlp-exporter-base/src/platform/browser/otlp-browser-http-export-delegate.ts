@@ -10,19 +10,24 @@ import { createRetryingTransport } from '../../retrying-transport';
 import { createOtlpNetworkExportDelegate } from '../../otlp-network-export-delegate';
 import { createFetchTransport } from './transport/fetch-transport';
 import { type ExporterMetrics } from '../../ExporterMetrics';
+import { createKeepaliveBudgetExportDelegate } from './keepalive-budget-export-delegate';
 
 export function createOtlpFetchExportDelegate<Internal, Response>(
   options: OtlpHttpConfiguration,
   serializer: ISerializer<Internal, Response>,
   metrics: ExporterMetrics<Internal>
 ): IOtlpExportDelegate<Internal> {
-  return createOtlpNetworkExportDelegate(
-    options,
+  return createKeepaliveBudgetExportDelegate(
+    createOtlpNetworkExportDelegate(
+      options,
+      serializer,
+      metrics,
+      createRetryingTransport({
+        transport: createFetchTransport(options),
+      })
+    ),
     serializer,
-    metrics,
-    createRetryingTransport({
-      transport: createFetchTransport(options),
-    })
+    metrics
   );
 }
 
