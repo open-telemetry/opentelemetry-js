@@ -28,6 +28,15 @@ import { VERSION } from './version';
 
 const componentCounter = new Map<string, number>();
 
+const signalDescriptors = {
+  span: { unit: '{span}', displayName: 'spans' },
+  log: { unit: '{log_record}', displayName: 'log records' },
+  metric_data_point: {
+    unit: '{data_point}',
+    displayName: 'metric data points',
+  },
+};
+
 export interface ExporterMetricsOptions<Internal> {
   componentType: string;
   metricsHelper: IExporterMetricsHelper<Internal>;
@@ -103,19 +112,20 @@ export class ExporterMetrics<Internal> {
     }
 
     this.helper = metricsHelper;
+    const { unit, displayName } = signalDescriptors[this.helper.name];
 
     this.inflight = meter.createUpDownCounter(
       `otel.sdk.exporter.${this.helper.name}.inflight`,
       {
-        unit: `{${this.helper.name}}`,
-        description: `The number of ${this.helper.name}s which were passed to the exporter, but that have not been exported yet (neither successful, nor failed).`,
+        unit,
+        description: `The number of ${displayName} which were passed to the exporter, but that have not been exported yet (neither successful, nor failed).`,
       }
     );
     this.exported = meter.createCounter(
       `otel.sdk.exporter.${this.helper.name}.exported`,
       {
-        unit: `{${this.helper.name}}`,
-        description: `The number of ${this.helper.name}s for which the export has finished, either successful or failed.`,
+        unit,
+        description: `The number of ${displayName} for which the export has finished, either successful or failed.`,
       }
     );
     this.duration = meter.createHistogram(
