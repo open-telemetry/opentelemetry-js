@@ -22,6 +22,11 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 * feat(instrumentation): support the `instrumentation/development` section of declarative config. `Instrumentation#setConfigProvider()` is an optional method that `registerInstrumentations()` calls on each instrumentation, alongside `setTracerProvider()` and friends. The `readDeclarativeConfig()` util reads an instrumentation's own block (`instrumentation/development.js.<name>`) and the shared `general` block through a typed reader, mapping snake_case config properties onto config fields. Unrecognized properties and type mismatches warn [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
 * feat(instrumentation-http): read declarative config via `setConfigProvider()`, mapping the `instrumentation/development.js.@opentelemetry/instrumentation-http` properties it supports and the `general.http.{client,server}.*_captured_headers` properties onto `headersToSpanAttributes` [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
 * feat(sdk-node): register a global `ConfigProvider` from the config file, so instrumentations registered with `registerInstrumentations()` receive it [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
+* feat(otlp-exporter-base): support the `compression` option in browser OTLP HTTP exporters [#7166](https://github.com/open-telemetry/opentelemetry-js/pull/7166) @YangJonghun
+  * `compression: CompressionAlgorithm.GZIP` gzips export requests with the built-in `CompressionStream` API, as Node.js exporters already do. Runtimes without gzip support in `CompressionStream` send uncompressed requests and log a warning once per exporter.
+  * The keepalive budget is charged with the compressed size, so more telemetry fits into the requests that survive page unload.
+  * A `compression` option passed to browser exporters or to the deprecated `createOtlpSendBeaconExportDelegate()` was previously ignored but is now applied.
+  * Cross-origin collectors must list `Content-Encoding` in `Access-Control-Allow-Headers`.
 
 ### :bug: Bug Fixes
 
