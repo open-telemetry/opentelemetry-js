@@ -25,17 +25,18 @@ export class MultiSpanProcessor implements SpanProcessor {
     for (const spanProcessor of this._spanProcessors) {
       promises.push(spanProcessor.forceFlush());
     }
-    return new Promise(resolve => {
-      Promise.all(promises)
-        .then(() => {
-          resolve();
-        })
-        .catch(error => {
+    // Wait for every processor to settle before reporting a failure: with
+    // `Promise.all` the rejection of one processor resolves `forceFlush()`
+    // while the others are still flushing.
+    return Promise.allSettled(promises).then(results => {
+      for (const result of results) {
+        if (result.status === 'rejected') {
           globalErrorHandler(
-            error || new Error('MultiSpanProcessor: forceFlush failed')
+            result.reason || new Error('MultiSpanProcessor: forceFlush failed')
           );
-          resolve();
-        });
+          return;
+        }
+      }
     });
   }
 
@@ -65,10 +66,16 @@ export class MultiSpanProcessor implements SpanProcessor {
     for (const spanProcessor of this._spanProcessors) {
       promises.push(spanProcessor.shutdown());
     }
-    return new Promise((resolve, reject) => {
-      Promise.all(promises).then(() => {
-        resolve();
-      }, reject);
+    // Settle only once every processor has finished shutting down, then reject
+    // with the first failure in processor order. `Promise.all` used to reject
+    // at the first failure, so `provider.shutdown()` could return while other
+    // processors were still exporting their last batch.
+    return Promise.allSettled(promises).then(results => {
+      for (const result of results) {
+        if (result.status === 'rejected') {
+          throw result.reason;
+        }
+      }
     });
   }
 }
