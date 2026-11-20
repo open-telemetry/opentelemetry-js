@@ -28,7 +28,6 @@ describe('ComposableAlwaysOnSampler', () => {
     assert.strictEqual(
       composableSampler.getSamplingIntent(
         context.active(),
-        'unused',
         'span',
         SpanKind.SERVER,
         {},

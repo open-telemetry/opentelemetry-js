@@ -7,7 +7,7 @@ import { MIN_THRESHOLD } from './util';
 
 const intent: SamplingIntent = Object.freeze({
   threshold: MIN_THRESHOLD,
-  thresholdReliable: true,
+  adjustedCountReliable: true,
 });
 
 class ComposableAlwaysOnSampler implements ComposableSampler {

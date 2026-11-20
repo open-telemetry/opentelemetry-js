@@ -3,8 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Attributes, TraceState } from '@opentelemetry/api';
-import { type Sampler } from '@opentelemetry/sdk-trace';
+import type {
+  Attributes,
+  Context,
+  Link,
+  SpanKind,
+  TraceState,
+} from '@opentelemetry/api';
 
 /** Information to make a sampling decision. */
 export type SamplingIntent = {
@@ -12,7 +17,7 @@ export type SamplingIntent = {
   threshold: bigint;
 
   /** Whether the threshold can be reliably used for Span-to-Metrics estimation. */
-  thresholdReliable: boolean;
+  adjustedCountReliable: boolean;
 
   /** Any attributes to add to the span for the sampling result. */
   attributes?: Attributes;
@@ -25,7 +30,11 @@ export type SamplingIntent = {
 export interface ComposableSampler {
   /** Returns the information to make a sampling decision. */
   getSamplingIntent(
-    ...args: Parameters<Sampler['shouldSample']>
+    context: Context,
+    spanName: string,
+    spanKind: SpanKind,
+    attributes: Attributes,
+    links: Link[]
   ): SamplingIntent;
 
   /** Returns the sampler name or short description with the configuration. */
@@ -33,6 +42,6 @@ export interface ComposableSampler {
 }
 
 export type SamplingPredicate = (
-  ...args: Parameters<Sampler['shouldSample']>
+  ...args: Parameters<ComposableSampler['getSamplingIntent']>
 ) => boolean;
 export type SamplingRule = [SamplingPredicate, ComposableSampler];
