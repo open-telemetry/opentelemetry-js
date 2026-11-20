@@ -765,7 +765,7 @@ describe('FileConfigFactory', function () {
     });
   });
 
-  it('should throw on non-existant config file', function () {
+  it('should throw on non-existent config file', function () {
     try {
       parseConfigFile('test/fixtures/no-such-file.txt');
     } catch (err) {

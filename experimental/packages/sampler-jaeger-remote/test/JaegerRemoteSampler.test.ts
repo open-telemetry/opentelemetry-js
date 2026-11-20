@@ -468,7 +468,7 @@ describe('JaegerRemoteSampler', () => {
       );
     });
 
-    it('Should reflect sampler name with current sampler runninng in it', async () => {
+    it('Should reflect sampler name with current sampler running in it', async () => {
       const jaegerRemoteSampler = new JaegerRemoteSampler({
         endpoint,
         serviceName,
