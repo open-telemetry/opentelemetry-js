@@ -54,7 +54,7 @@ function envVarSubst(s: string): string {
       continue;
     }
 
-    // Even chunks are processed for possible substition matches.
+    // Even chunks are processed for possible substitution matches.
     const SUBSTITUTION_REF_RE = /\$\{(?:env:)?([^}]+)\}/g;
     let chunk = '';
     let lastIndex = 0;
@@ -85,7 +85,7 @@ function envVarSubst(s: string): string {
  * Re-interpret a string value from env var substitution as a possible
  * YAML number, boolean, or null value.
  *
- * If the interpretted value is any other type, we return the original
+ * If the interpreted value is any other type, we return the original
  * string:
  * - sequences and  mappings may not result from env var substitution, per the spec
  * - a re-parsed YAML string normalizes whitespace, which we do not want

@@ -41,7 +41,7 @@ Some HTTP-related instrumentations are for use in the browser:
 - 2025-12-19: [OTel JS instrumentations producing **`net.*` semconv** are being updated](https://github.com/open-telemetry/opentelemetry-js/issues/5663) to support stable semconv and `OTEL_SEMCONV_STABILITY_OPT_IN`
 - 2025-12-19: [OTel JS instrumentations producing **`db.*` semconv** are being updated](https://github.com/open-telemetry/opentelemetry-js-contrib/issues/2953) to support stable semconv and `OTEL_SEMCONV_STABILITY_OPT_IN`
 - 2026-01-15: A release of packages from the opentelemetry-js-contrib.git repo include the final set of instrumentations supporting `OTEL_SEMCONV_STABILITY_OPT_IN` for the stable `db.*` and `net.*` semconv.
-- 2026-06-23: The [opentelemetry-js](https://github.com/open-telemetry/opentelemetry-js/pull/6942) and [opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib/pull/3596#issuecomment-5051036858) releases changed relevant instrumentations to use stable HTTP and DB semconv by default and dropped supprot for `OTEL_SEMCONV_STABILITY_OPT_IN`.
+- 2026-06-23: The [opentelemetry-js](https://github.com/open-telemetry/opentelemetry-js/pull/6942) and [opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib/pull/3596#issuecomment-5051036858) releases changed relevant instrumentations to use stable HTTP and DB semconv by default and dropped support for `OTEL_SEMCONV_STABILITY_OPT_IN`.
 
 ## Q&A
 
