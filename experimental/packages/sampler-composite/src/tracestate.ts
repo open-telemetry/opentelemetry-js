@@ -28,6 +28,9 @@ export const INVALID_TRACE_STATE: OtelTraceState = Object.freeze({
 
 const TRACE_STATE_SIZE_LIMIT = 256;
 const MAX_VALUE_LENGTH = 14; // 56 bits, 4 bits per hex digit
+// Lowercase hex only. BigInt() also takes uppercase digits and trims whitespace.
+const TH_PATTERN = /^[0-9a-f]{1,14}$/;
+const RV_PATTERN = /^[0-9a-f]{14}$/;
 
 export function parseOtelTraceState(
   traceState: TraceState | undefined
@@ -99,27 +102,17 @@ export function serializeTraceState(otTraceState: OtelTraceState): string {
 }
 
 function parseTh(value: string, defaultValue: bigint): bigint {
-  if (!value || value.length > MAX_VALUE_LENGTH) {
+  if (!TH_PATTERN.test(value)) {
     return defaultValue;
   }
-
-  try {
-    return BigInt('0x' + value.padEnd(MAX_VALUE_LENGTH, '0'));
-  } catch {
-    return defaultValue;
-  }
+  return BigInt('0x' + value.padEnd(MAX_VALUE_LENGTH, '0'));
 }
 
 function parseRv(value: string, defaultValue: bigint): bigint {
-  if (!value || value.length !== MAX_VALUE_LENGTH) {
+  if (!RV_PATTERN.test(value)) {
     return defaultValue;
   }
-
-  try {
-    return BigInt(`0x${value}`);
-  } catch {
-    return defaultValue;
-  }
+  return BigInt(`0x${value}`);
 }
 
 // hex value without trailing zeros
