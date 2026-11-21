@@ -48,6 +48,26 @@ describe('OtelTraceState', () => {
     { input: 'rv:100000000000000', output: '' },
     { input: 'rv:10000000000000', output: 'rv:10000000000000' },
     { input: 'rv:1000000000000', output: '' },
+    // Lowercase hex only, and no whitespace: BigInt() would accept both.
+    { input: 'th:ABCDEF', output: '' },
+    { input: 'th:aBc', output: '' },
+    { input: 'th:0123456789abcde', output: '', testId: 'th with 15 digits' },
+    { input: 'rv:1234567890ABCD', output: '' },
+    {
+      input: 'th:1234567890abc ;rv:1234567890abcd',
+      output: 'rv:1234567890abcd',
+      testId: 'th with a trailing space next to a valid rv',
+    },
+    {
+      input: 'rv:1234567890abc ;th:c',
+      output: 'th:c',
+      testId: 'rv with a trailing space next to a valid th',
+    },
+    {
+      input: 'th:c;rv:1234567890ABCD;x:3',
+      output: 'th:c;x:3',
+      testId: 'uppercase rv next to a valid th',
+    },
   ].forEach(({ input, output, testId }) => {
     it(`should round trip ${testId || `from ${input} to ${output}`}`, () => {
       const result = serializeTraceState(
