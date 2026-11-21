@@ -202,6 +202,9 @@ function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
   let config: ConfigurationModel;
   try {
     config = parseConfigFile(opts.configFile);
+    if (opts.customizeConfig) {
+      opts.customizeConfig(config);
+    }
   } catch (configErr) {
     // Set the diag logger, otherwise the diag.error will typically not be shown.
     const logLevel = diagLogLevelFromSeverityNumberConfig();

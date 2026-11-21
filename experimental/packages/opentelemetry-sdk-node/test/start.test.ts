@@ -44,6 +44,8 @@ import {
   SimpleSpanProcessor,
   TracerProvider,
 } from '@opentelemetry/sdk-trace';
+import type { ConfigurationModel } from '@opentelemetry/sdk-config';
+import { Resource } from '@opentelemetry/resources';
 
 describe('startNodeSdk', function () {
   let setGlobalLoggerProviderSpy: Sinon.SinonSpy;
@@ -342,6 +344,51 @@ describe('startNodeSdk', function () {
     );
 
     await sdk.shutdown();
+  });
+
+  describe('customizeConfig', function () {
+    it('should customize the config', async function () {
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/customize-config.yaml';
+      const sdk = startNodeSdk({
+        customizeConfig: (config: ConfigurationModel) => {
+          // Add a telemetry.distro attribute directly to resource.attributes.
+          // (For real usage tweaking the resource, a resource detector is
+          // preferred so that it doesn't override a user's explicit value
+          // on `config.resource.attributes_list`).
+          config.resource ??= {};
+          config.resource.attributes ??= [];
+          config.resource.attributes.push({
+            name: 'telemetry.distro.name',
+            value: 'mydistro',
+          });
+        },
+      });
+
+      const tracerProvider = trace.getTracerProvider();
+      // Cheat to get access to the SDK-created resource.
+      const resource = (tracerProvider as any)._delegate._resource as Resource;
+      assert.equal(resource.attributes['telemetry.distro.name'], 'mydistro');
+
+      await sdk.shutdown();
+    });
+
+    it('should return a NOOP_SDK if customizeConfig throws', async function () {
+      const diagErrorStub = Sinon.stub(diag, 'error');
+      process.env.OTEL_CONFIG_FILE = 'test/fixtures/customize-config.yaml';
+      const sdk = startNodeSdk({
+        customizeConfig: (config: ConfigurationModel) => {
+          throw new Error('boom in customizeConfig');
+        },
+      });
+
+      assert.strictEqual(sdk, NOOP_SDK);
+      Sinon.assert.calledOnceWithMatch(
+        diagErrorStub,
+        'Could not load OpenTelemetry configuration, SDK will not be setup: boom in customizeConfig'
+      );
+
+      await sdk.shutdown();
+    });
   });
 
   describe('configuring logger provider from env', function () {
