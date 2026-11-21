@@ -7,6 +7,7 @@ import type { Attributes, ContextManager } from '@opentelemetry/api';
 import type { TextMapPropagator } from '@opentelemetry/api';
 import type { Instrumentation } from '@opentelemetry/instrumentation';
 import type { Resource, ResourceDetector } from '@opentelemetry/resources';
+import type { ConfigurationModel } from '@opentelemetry/sdk-config';
 import type {
   LogRecordLimits,
   LogRecordProcessor,
@@ -88,6 +89,21 @@ export interface NodeSDKConfiguration {
 
 export interface StartSdkFromConfigOptions {
   configFile: string;
+  /**
+   * A function invoked after declarative config is parsed, to allow
+   * customization of the config.
+   *
+   * The Declarative Config philosophy is WYSIWYG. This customization function
+   * should not be used to defeat that. Explicit config is preferred.
+   * https://github.com/open-telemetry/opentelemetry-configuration/blob/main/CONTRIBUTING.md#what-you-see-is-what-you-get
+   *
+   * An example use case is for an OpenTelemetry Distribution to automatically
+   * add [telemetry.distro](https://opentelemetry.io/docs/specs/semconv/registry/entities/telemetry/#telemetry-distro)
+   * attributes via a resource detector.
+   *
+   * It is the responsibility of the caller that the `config` remain valid.
+   */
+  customizeConfig?: (config: ConfigurationModel) => void;
   instrumentations?: (Instrumentation | Instrumentation[])[];
 }
 
