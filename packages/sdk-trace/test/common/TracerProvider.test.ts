@@ -94,6 +94,7 @@ describe('TracerProvider', () => {
           const tracer = new TracerProvider({}).getTracer('default');
           assert.deepStrictEqual(cheatSpanLimitsFromTracer(tracer), {
             attributeValueLengthLimit: Infinity,
+            attributeValueDepthLimit: 64,
             attributeCountLimit: 128,
             eventCountLimit: 128,
             linkCountLimit: 128,
@@ -134,6 +135,18 @@ describe('TracerProvider', () => {
           }).getTracer('default');
           const spanLimits = cheatSpanLimitsFromTracer(tracer);
           assert.strictEqual(spanLimits.attributeValueLengthLimit, -10);
+        });
+      });
+
+      describe('when "attributeValueDepthLimit" is defined', () => {
+        it('should have tracer with defined value', () => {
+          const tracer = new TracerProvider({
+            spanLimits: {
+              attributeValueDepthLimit: 2,
+            },
+          }).getTracer('default');
+          const spanLimits = cheatSpanLimitsFromTracer(tracer);
+          assert.strictEqual(spanLimits.attributeValueDepthLimit, 2);
         });
       });
     });

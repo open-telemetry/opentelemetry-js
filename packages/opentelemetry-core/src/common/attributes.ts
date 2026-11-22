@@ -61,15 +61,24 @@ export enum AddAttributeDecision {
   ADD_OVERWRITE_EXISTING = 4,
 }
 
-type AttributeLimits = {
+export type AttributeLimits = {
   attributeCountLimit: number;
   attributeValueLengthLimit: number;
+  /**
+   * Maximum allowed depth for array and map attribute values.
+   * Depth starts at 1 for the top-level attribute value and increments when
+   * descending into an array element or map value. An array or map beyond the
+   * limit is replaced with an empty value.
+   * Defaults to 64. A negative value disables depth limiting.
+   */
+  attributeValueDepthLimit?: number;
 };
 
 // https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#attribute-limits
 const DEFAULT_ATTRIBUTE_LIMITS: AttributeLimits = {
   attributeCountLimit: 128,
   attributeValueLengthLimit: Infinity,
+  attributeValueDepthLimit: 64,
 };
 
 type MaybeAddAttributeOpts = {
@@ -158,7 +167,8 @@ function maybeAddAttributeInternal(
   }
   opts.attributes[opts.key] = copyAndTruncAnyValue(
     opts.value,
-    attributeValueLengthLimit
+    attributeValueLengthLimit,
+    opts.limits.attributeValueDepthLimit
   );
   if (isNewKey) {
     return AddAttributeDecision.ADD_NEW;
@@ -264,7 +274,11 @@ function cleanAttributesInternal(
       droppedAttributesCount++;
       continue;
     }
-    attributes[key] = copyAndTruncAnyValue(val, attributeValueLengthLimit);
+    attributes[key] = copyAndTruncAnyValue(
+      val,
+      attributeValueLengthLimit,
+      limits.attributeValueDepthLimit
+    );
     count++;
   }
 
@@ -392,8 +406,19 @@ function isAnyValueObject(val: object, visited: WeakSet<object>): boolean {
  * @param {AnyValue} val - The attribute value. We are assuming this has
  *    already been guarded by `isAnyValue`. This filters out non-plain objects,
  *    like RegExp & Date, and circular references.
+ * @param {number} limit - The attribute value length limit.
+ * @param {number} [depthLimit] - The maximum allowed depth for arrays and maps.
+ *    Depth starts at 1 for the top-level value. An array or map beyond the
+ *    limit is replaced with an empty value. Undefined or negative disables
+ *    depth limiting.
+ * @param {number} [depth=1] - The depth of `val`, used internally for recursion.
  */
-function copyAndTruncAnyValue(val: AnyValue, limit: number): AnyValue {
+function copyAndTruncAnyValue(
+  val: AnyValue,
+  limit: number,
+  depthLimit?: number,
+  depth = 1
+): AnyValue {
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof#description
   switch (typeof val) {
     // Currently some of these aren't allowed AnyValue's, but having these
@@ -434,9 +459,20 @@ function copyAndTruncAnyValue(val: AnyValue, limit: number): AnyValue {
     }
   }
 
+  // Arrays and plain objects are the only remaining AnyValue types, and are
+  // the only ones the depth limit applies to. A container deeper than the
+  // limit is replaced with an empty value of the same shape.
+  const isArray = Array.isArray(val);
+  if (depthLimit !== undefined && depthLimit >= 0 && depth > depthLimit) {
+    return isArray ? [] : {};
+  }
+  const childDepth = depth + 1;
+
   // Arrays
-  if (Array.isArray(val)) {
-    return val.map(elem => copyAndTruncAnyValue(elem, limit));
+  if (isArray) {
+    return val.map(elem =>
+      copyAndTruncAnyValue(elem, limit, depthLimit, childDepth)
+    );
   }
 
   // Plain objects
@@ -447,7 +483,7 @@ function copyAndTruncAnyValue(val: AnyValue, limit: number): AnyValue {
     // Silently drop undefined properties. They are allowed by isAnyValue()
     // with the expectation they will be dropped here.
     if (v !== undefined) {
-      truncObj[k] = copyAndTruncAnyValue(obj[k], limit);
+      truncObj[k] = copyAndTruncAnyValue(v, limit, depthLimit, childDepth);
     }
   }
   return truncObj;

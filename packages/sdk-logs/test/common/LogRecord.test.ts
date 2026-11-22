@@ -36,6 +36,7 @@ const setup = (limits?: LogRecordLimits, data?: logsAPI.LogRecord) => {
     {
       attributeCountLimit: limits?.attributeCountLimit ?? 128,
       attributeValueLengthLimit: limits?.attributeValueLengthLimit ?? Infinity,
+      attributeValueDepthLimit: limits?.attributeValueDepthLimit ?? 64,
     },
     []
   );
@@ -359,6 +360,38 @@ describe('LogRecord', () => {
         it('should return same value for non-string values', () => {
           logRecord.setAttribute('attr-non-string', true);
           assert.strictEqual(attributes['attr-non-string'], true);
+        });
+      });
+
+      describe('when "attributeValueDepthLimit" option defined', () => {
+        const { logRecord } = setup({ attributeValueDepthLimit: 2 });
+        const { attributes } = logRecord;
+
+        it('should replace arrays and maps beyond the limit', () => {
+          logRecord.setAttribute('attr-array', [[[1, 2]], 'kept']);
+          logRecord.setAttribute('attr-map', { nested: { deeper: { x: 1 } } });
+          logRecord.setAttribute('attr-scalar', 'kept');
+          logRecord.setAttribute('attr-at-limit', [[1, 2], 'kept']);
+
+          assert.deepStrictEqual(attributes['attr-array'], [[[]], 'kept']);
+          assert.deepStrictEqual(attributes['attr-map'], {
+            nested: { deeper: {} },
+          });
+          assert.strictEqual(attributes['attr-scalar'], 'kept');
+          // Containers at exactly the limit are not changed.
+          assert.deepStrictEqual(attributes['attr-at-limit'], [[1, 2], 'kept']);
+        });
+      });
+
+      describe('when "attributeValueDepthLimit" option is invalid', () => {
+        const { logRecord } = setup({ attributeValueDepthLimit: -1 });
+        const { attributes } = logRecord;
+
+        it('should not limit the depth of any value', () => {
+          logRecord.setAttribute('attr-deep', { a: [{ b: [{ c: 'd' }] }] });
+          assert.deepStrictEqual(attributes['attr-deep'], {
+            a: [{ b: [{ c: 'd' }] }],
+          });
         });
       });
 

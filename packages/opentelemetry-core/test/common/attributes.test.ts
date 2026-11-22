@@ -348,6 +348,104 @@ describe('attributes', () => {
       assert.deepStrictEqual(attributes, { str: 'abcdef' });
       assert.equal(droppedAttributesCount, 0);
     });
+
+    // https://opentelemetry.io/docs/specs/otel/common/#attribute-limits
+    it('handles attributeValueDepthLimit', () => {
+      const { attributes, droppedAttributesCount } = cleanAttributes(
+        {
+          // Depth 1: scalar values are never changed by the depth limit.
+          scalar: 'a',
+          // nested (array, 1) -> {deep} (map, 2) -> [[..]] (array, 3)
+          //   -> [{..}] (array, 4) exceeds the limit and is replaced.
+          nested: [{ deep: [[{ tooDeep: 'x' }]] }],
+          // Exactly at the limit: flat (array, 1) -> scalars (2).
+          flat: ['a', 1, true],
+          // shallow (map, 1) -> scalar (2).
+          shallow: { a: 'b' },
+        },
+        {
+          attributeCountLimit: Infinity,
+          attributeValueLengthLimit: Infinity,
+          attributeValueDepthLimit: 3,
+        }
+      );
+
+      assert.deepStrictEqual(attributes, {
+        scalar: 'a',
+        nested: [{ deep: [[]] }],
+        flat: ['a', 1, true],
+        shallow: { a: 'b' },
+      });
+      assert.equal(droppedAttributesCount, 0);
+    });
+
+    it('attributeValueDepthLimit replaces only the containers beyond the limit', () => {
+      const { attributes } = cleanAttributes(
+        {
+          // Depth 2 exceeds a limit of 1: the top-level array is at depth 1 and
+          // is kept, while the nested array at depth 2 is replaced.
+          arr: [[1, 2], [3]],
+          // The top-level map is at depth 1; its nested map is at depth 2.
+          map: { a: { b: 1 }, c: 2 },
+        },
+        {
+          attributeCountLimit: Infinity,
+          attributeValueLengthLimit: Infinity,
+          attributeValueDepthLimit: 1,
+        }
+      );
+
+      assert.deepStrictEqual(attributes, {
+        arr: [[], []],
+        map: { a: {}, c: 2 },
+      });
+    });
+
+    it('attributeValueDepthLimit of 0 replaces the top-level container', () => {
+      const { attributes } = cleanAttributes(
+        { arr: [1, 2], map: { a: 1 }, scalar: 'a' },
+        {
+          attributeCountLimit: Infinity,
+          attributeValueLengthLimit: Infinity,
+          attributeValueDepthLimit: 0,
+        }
+      );
+
+      assert.deepStrictEqual(attributes, { arr: [], map: {}, scalar: 'a' });
+    });
+
+    it('ignores an undefined or negative attributeValueDepthLimit', () => {
+      const deep = { a: [{ b: [{ c: 'd' }] }] };
+      const limits = {
+        attributeCountLimit: Infinity,
+        attributeValueLengthLimit: Infinity,
+      };
+
+      for (const attributeValueDepthLimit of [undefined, -1]) {
+        const { attributes } = cleanAttributes(
+          { deep },
+          { ...limits, attributeValueDepthLimit }
+        );
+        assert.deepStrictEqual(attributes, { deep });
+      }
+    });
+
+    it('combines attributeValueDepthLimit with attributeValueLengthLimit', () => {
+      const { attributes } = cleanAttributes(
+        { nested: [{ s: 'abcdefghij' }, ['abcdefghij']] },
+        {
+          attributeCountLimit: Infinity,
+          attributeValueLengthLimit: 3,
+          attributeValueDepthLimit: 2,
+        }
+      );
+
+      assert.deepStrictEqual(attributes, {
+        // The top-level array (depth 1) and its two children (depth 2) are
+        // kept, so only the length limit applies to the strings.
+        nested: [{ s: 'abc' }, ['abc']],
+      });
+    });
   });
 
   describe('cleanSimpleAttributes', () => {
@@ -560,6 +658,27 @@ describe('attributes', () => {
       });
 
       assert.deepStrictEqual(attributes, { str: 'abcdef' });
+      assert.equal(decision, AddAttributeDecision.ADD_NEW);
+    });
+
+    it('applies attributeValueDepthLimit', () => {
+      const attributes: Attributes = {};
+      const decision = maybeAddAttribute({
+        key: 'nested',
+        value: [{ deep: [[1]] }, 'scalar'],
+        attributes,
+        limits: {
+          attributeCountLimit: 10,
+          attributeValueLengthLimit: Infinity,
+          attributeValueDepthLimit: 2,
+        },
+        currentAttributesCount: 0,
+      });
+
+      assert.deepStrictEqual(attributes, {
+        // The array at depth 3 exceeds the limit and is replaced.
+        nested: [{ deep: [] }, 'scalar'],
+      });
       assert.equal(decision, AddAttributeDecision.ADD_NEW);
     });
   });

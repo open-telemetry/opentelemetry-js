@@ -624,6 +624,7 @@ describe('create-from-config', () => {
         logRecordLimits: {
           attributeCountLimit: 1,
           attributeValueLengthLimit: 2,
+          attributeValueDepthLimit: undefined,
         },
       },
       {
@@ -640,6 +641,7 @@ describe('create-from-config', () => {
         logRecordLimits: {
           attributeCountLimit: 10,
           attributeValueLengthLimit: 11,
+          attributeValueDepthLimit: undefined,
         },
       },
       {
@@ -659,6 +661,39 @@ describe('create-from-config', () => {
         logRecordLimits: {
           attributeCountLimit: 10,
           attributeValueLengthLimit: 2,
+          attributeValueDepthLimit: undefined,
+        },
+      },
+      {
+        testName: 'general attribute value depth limit',
+        config: {
+          attribute_limits: {
+            attribute_value_depth_limit: 5,
+          },
+        },
+        logRecordLimits: {
+          attributeCountLimit: undefined,
+          attributeValueLengthLimit: undefined,
+          attributeValueDepthLimit: 5,
+        },
+      },
+      {
+        testName: 'log record limits beat general attribute value depth limit',
+        config: {
+          attribute_limits: {
+            attribute_value_depth_limit: 5,
+          },
+          logger_provider: {
+            processors: [{ simple: { exporter: { console: null } } }],
+            limits: {
+              attribute_value_depth_limit: 6,
+            },
+          },
+        },
+        logRecordLimits: {
+          attributeCountLimit: undefined,
+          attributeValueLengthLimit: undefined,
+          attributeValueDepthLimit: 6,
         },
       },
     ];
@@ -820,6 +855,7 @@ describe('create-from-config', () => {
         spanLimits: {
           attributeCountLimit: 1,
           attributeValueLengthLimit: 2,
+          attributeValueDepthLimit: undefined,
           eventCountLimit: undefined,
           attributePerEventCountLimit: undefined,
           linkCountLimit: undefined,
@@ -844,6 +880,7 @@ describe('create-from-config', () => {
         spanLimits: {
           attributeCountLimit: 10,
           attributeValueLengthLimit: 11,
+          attributeValueDepthLimit: undefined,
           eventCountLimit: 12,
           attributePerEventCountLimit: 13,
           linkCountLimit: 14,
@@ -871,10 +908,51 @@ describe('create-from-config', () => {
         spanLimits: {
           attributeCountLimit: 10,
           attributeValueLengthLimit: 2,
+          attributeValueDepthLimit: undefined,
           eventCountLimit: 12,
           attributePerEventCountLimit: 13,
           linkCountLimit: 14,
           attributePerLinkCountLimit: 15,
+        },
+      },
+      {
+        testName: 'general attribute value depth limit',
+        config: {
+          attribute_limits: {
+            attribute_value_depth_limit: 5,
+          },
+        },
+        spanLimits: {
+          attributeCountLimit: undefined,
+          attributeValueLengthLimit: undefined,
+          attributeValueDepthLimit: 5,
+          eventCountLimit: undefined,
+          attributePerEventCountLimit: undefined,
+          linkCountLimit: undefined,
+          attributePerLinkCountLimit: undefined,
+        },
+      },
+      {
+        testName: 'span limits beat general attribute value depth limit',
+        config: {
+          attribute_limits: {
+            attribute_value_depth_limit: 5,
+          },
+          tracer_provider: {
+            processors: [{ simple: { exporter: { console: null } } }],
+            limits: {
+              attribute_value_depth_limit: 6,
+            },
+          },
+        },
+        spanLimits: {
+          attributeCountLimit: undefined,
+          attributeValueLengthLimit: undefined,
+          attributeValueDepthLimit: 6,
+          eventCountLimit: undefined,
+          attributePerEventCountLimit: undefined,
+          linkCountLimit: undefined,
+          attributePerLinkCountLimit: undefined,
         },
       },
     ];

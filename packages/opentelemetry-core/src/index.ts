@@ -17,6 +17,7 @@ export {
   sanitizeAttributes,
   isAttributeValue,
 } from './common/attributes';
+export type { AttributeLimits } from './common/attributes';
 export {
   globalErrorHandler,
   setGlobalErrorHandler,

@@ -87,6 +87,7 @@ describe('LoggerProvider', () => {
           const sharedState = loggerProvider['_sharedState'];
           assert.deepStrictEqual(sharedState.logRecordLimits, {
             attributeValueLengthLimit: Infinity,
+            attributeValueDepthLimit: 64,
             attributeCountLimit: 128,
           });
         });

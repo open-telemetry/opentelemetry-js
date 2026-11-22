@@ -60,6 +60,8 @@ export class TracerProvider implements ApiTracerProvider {
         attributeCountLimit: options.spanLimits?.attributeCountLimit ?? 128,
         attributeValueLengthLimit:
           options.spanLimits?.attributeValueLengthLimit ?? Infinity,
+        attributeValueDepthLimit:
+          options.spanLimits?.attributeValueDepthLimit ?? 64,
         eventCountLimit: options.spanLimits?.eventCountLimit ?? 128,
         linkCountLimit: options.spanLimits?.linkCountLimit ?? 128,
         attributePerEventCountLimit:

@@ -43,6 +43,7 @@ const createLogRecord = (
     {
       attributeCountLimit: limits?.attributeCountLimit ?? 128,
       attributeValueLengthLimit: limits?.attributeValueLengthLimit ?? Infinity,
+      attributeValueDepthLimit: limits?.attributeValueDepthLimit ?? 64,
     },
     []
   );
