@@ -7,6 +7,7 @@ import { InstrumentationBase } from '@opentelemetry/instrumentation';
 import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch';
 import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xml-http-request';
 import { browserDetector } from '@opentelemetry/opentelemetry-browser-detector';
+import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { B3Propagator } from '@opentelemetry/propagator-b3';
 import { defaultServiceName } from '@opentelemetry/resources';
 import {
@@ -45,4 +46,5 @@ new W3CTraceContextPropagator();
 new B3Propagator();
 new FetchInstrumentation();
 new XMLHttpRequestInstrumentation();
+new ZoneContextManager();
 void browserDetector;
