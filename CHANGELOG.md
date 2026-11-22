@@ -21,6 +21,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :books: Documentation
 
+* docs(context-zone): document async/await limitations and bundler workarounds [#7378](https://github.com/open-telemetry/opentelemetry-js/pull/7378) @prateeknitcse
 * docs: fix typos and improve grammar in developer guides [#7367](https://github.com/open-telemetry/opentelemetry-js/pull/7367) @prateeknitcse
 
 ### :house: Internal
