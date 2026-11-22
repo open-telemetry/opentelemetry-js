@@ -129,6 +129,9 @@ Later, when another span is created it may use the span from the context as its 
 This is accomplished through the use of mechanisms like [async_hooks](https://nodejs.org/api/async_hooks.html) or [AsyncLocalStorage](https://nodejs.org/api/async_context.html#async_context_class_asynclocalstorage) in node, or [zone.js](https://github.com/angular/zone.js/) on the web in order to propagate the context through a single execution.
 If no context is active, the `ROOT_CONTEXT` is returned, which is just the empty context object.
 
+> [!NOTE]
+> When using `zone.js` in modern browser environments (`ES2017+`), native `async`/`await` expressions require compiler downleveling to preserve context across `await` points. See [ZoneContextManager async/await limitations](../packages/opentelemetry-context-zone/README.md#asyncawait-limitations--build-configuration).
+
 ### Get Active Context
 
 The active context is the context which is returned by `api.context.active()`.

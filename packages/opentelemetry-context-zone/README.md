@@ -13,6 +13,49 @@ If you use Angular it means you already have the [zone-js] and you should use [@
 npm install --save @opentelemetry/context-zone
 ```
 
+## `async`/`await` Limitations & Build Configuration
+
+`ZoneContextManager` relies on [zone-js] to track asynchronous context by monkey-patching asynchronous APIs (such as `Promise`, `setTimeout`, and DOM event listeners).
+
+In modern JavaScript runtimes (`ES2017+`), native `async`/`await` uses native engine-level microtasks that bypass the monkey-patched `Promise` implementation of `zone.js`. Consequently, the execution context is lost after `await` calls (particularly after sequential `await` expressions).
+
+To preserve context across `await` expressions, you do not need to transpile your entire codebase down to ES2015. Instead, configure your bundler or compiler to downlevel only `async`/`await` and async generator syntax:
+
+- **esbuild / Vite / tsup**:
+  Configure `supported` in your build configuration:
+
+  ```js
+  // vite.config.js / esbuild options / tsup.config.ts
+  {
+    esbuild: {
+      supported: {
+        'async-await': false,
+        'async-generator': false,
+      },
+    },
+  }
+  ```
+
+- **TypeScript (`tsconfig.json`)**:
+  Set `"target": "ES2016"` (or lower) so TypeScript transforms `async`/`await` into generator helpers while preserving other modern language features:
+
+  ```json
+  {
+    "compilerOptions": {
+      "target": "ES2016"
+    }
+  }
+  ```
+
+- **Babel**:
+  Add `@babel/plugin-transform-async-to-generator` to your Babel configuration plugins.
+
+- **Angular**:
+  Angular CLI projects using `zone.js` handle async/await downleveling automatically when `zone.js` is included in your polyfills.
+
+> [!NOTE]
+> Native asynchronous context tracking in browsers without transpilation is tracked by the [TC39 AsyncContext proposal](https://github.com/tc39/proposal-async-context).
+
 ## Usage
 
 ```js
