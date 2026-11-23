@@ -275,7 +275,14 @@ export class ProtobufWriter implements IProtobufWriter {
    * Write a field key (field number + wire type)
    */
   writeTag(fieldNumber: number, wireType: number): void {
-    this.writeVarint((fieldNumber << 3) | wireType);
+    const tag = (fieldNumber << 3) | wireType;
+    if (tag < 0x80) {
+      // Field numbers below 16 have a 1-byte tag.
+      this._ensureCapacity(1);
+      this._buffer[this.pos++] = tag;
+      return;
+    }
+    this.writeVarint(tag);
   }
 
   /**

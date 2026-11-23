@@ -232,6 +232,28 @@ describe('ProtobufWriter', function () {
     }
   });
 
+  describe('writeTag', function () {
+    it('writes the same bytes as writeVarint for 1- and 2-byte tags', function () {
+      for (const fieldNumber of [1, 2, 15, 16, 17, 2047, 2048]) {
+        for (let wireType = 0; wireType <= 5; wireType++) {
+          const expected = new ProtobufWriter();
+          expected.writeVarint((fieldNumber << 3) | wireType);
+
+          // A zero capacity also covers growth while writing the tag.
+          for (const capacity of [0, 16]) {
+            const writer = new ProtobufWriter(capacity);
+            writer.writeTag(fieldNumber, wireType);
+            assert.deepStrictEqual(
+              writer.finish(),
+              expected.finish(),
+              `field ${fieldNumber}, wire type ${wireType}`
+            );
+          }
+        }
+      }
+    });
+  });
+
   describe('writeHexBytes', function () {
     for (const hex of [
       '0af7651916cd43dd8448eb211c80319c',
