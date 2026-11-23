@@ -210,7 +210,7 @@ describe('ProtobufWriter', function () {
   });
 
   describe('writeString UTF-8', function () {
-    for (const length of [0, 1, 127, 128, 129, 4096]) {
+    for (const length of [0, 1, 126, 127, 128, 129, 4096]) {
       for (const suffix of ['', 'é世界', '🚀', '\ud800', '\udc00', '\ud800x']) {
         const value = 'a'.repeat(length) + suffix;
         it(`writes TextEncoder bytes for ${length} ASCII characters and ${JSON.stringify(suffix)}`, function () {
