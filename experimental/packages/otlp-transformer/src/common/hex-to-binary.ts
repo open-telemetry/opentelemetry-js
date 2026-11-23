@@ -3,19 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-function intValue(charCode: number): number {
-  // 0-9
-  if (charCode >= 48 && charCode <= 57) {
-    return charCode - 48;
-  }
-
-  // a-f
-  if (charCode >= 97 && charCode <= 102) {
-    return charCode - 87;
-  }
-
-  // A-F
-  return charCode - 55;
+// Maps a hex digit's char code to its value. Other characters map to 0.
+const HEX_VALUES = new Uint8Array(128);
+for (let i = 0; i < 10; i++) {
+  HEX_VALUES[48 + i] = i;
+}
+for (let i = 0; i < 6; i++) {
+  HEX_VALUES[65 + i] = 10 + i;
+  HEX_VALUES[97 + i] = 10 + i;
 }
 
 /**
@@ -29,8 +24,8 @@ export function writeHexToBinary(
   offset: number
 ): void {
   for (let i = 0; i < byteLength; i++) {
-    const hi = intValue(hexStr.charCodeAt(2 * i));
-    const lo = intValue(hexStr.charCodeAt(2 * i + 1));
+    const hi = HEX_VALUES[hexStr.charCodeAt(2 * i) & 0x7f];
+    const lo = HEX_VALUES[hexStr.charCodeAt(2 * i + 1) & 0x7f];
     buf[offset + i] = (hi << 4) | lo;
   }
 }

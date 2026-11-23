@@ -275,6 +275,21 @@ describe('ProtobufWriter', function () {
     });
   });
 
+  describe('hexToBinary', function () {
+    it('decodes every byte value in lowercase and uppercase', function () {
+      for (let byte = 0; byte < 256; byte++) {
+        const hex = byte.toString(16).padStart(2, '0');
+        for (const input of [hex, hex.toUpperCase()]) {
+          assert.deepStrictEqual(
+            hexToBinary(input),
+            new Uint8Array([parseInt(input, 16)]),
+            input
+          );
+        }
+      }
+    });
+  });
+
   describe('writeHexBytes', function () {
     for (const hex of [
       '0af7651916cd43dd8448eb211c80319c',
