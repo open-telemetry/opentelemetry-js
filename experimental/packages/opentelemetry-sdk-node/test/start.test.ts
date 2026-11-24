@@ -45,7 +45,7 @@ import {
   TracerProvider,
 } from '@opentelemetry/sdk-trace';
 import type { ConfigurationModel } from '@opentelemetry/sdk-config';
-import { Resource } from '@opentelemetry/resources';
+import type { Resource } from '@opentelemetry/resources';
 
 describe('startNodeSdk', function () {
   let setGlobalLoggerProviderSpy: Sinon.SinonSpy;
