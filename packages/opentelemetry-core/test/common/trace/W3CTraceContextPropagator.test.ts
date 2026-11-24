@@ -102,6 +102,68 @@ describe('W3CTraceContextPropagator', () => {
       assert.strictEqual(carrier[TRACE_PARENT_HEADER], undefined);
       assert.strictEqual(carrier[TRACE_STATE_HEADER], undefined);
     });
+
+    it('should format traceFlags as 2-digit hex without extra leading zero', () => {
+      for (const [traceFlags, expectedHex] of [
+        [0x00, '00'],
+        [0x02, '02'],
+        [0x10, '10'],
+        [0x11, '11'],
+        [0xff, 'ff'],
+      ] as const) {
+        const outCarrier: { [key: string]: unknown } = {};
+        const spanContext: SpanContext = {
+          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+          spanId: '6e0c63257de34c92',
+          traceFlags,
+        };
+
+        httpTraceContext.inject(
+          trace.setSpanContext(ROOT_CONTEXT, spanContext),
+          outCarrier,
+          defaultTextMapSetter
+        );
+        assert.strictEqual(
+          outCarrier[TRACE_PARENT_HEADER],
+          `00-d4cda95b652f4a1592b449d5929fda1b-6e0c63257de34c92-${expectedHex}`
+        );
+      }
+    });
+
+    it('should mask traceFlags to low 8 bits', () => {
+      const spanContext: SpanContext = {
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: '6e0c63257de34c92',
+        traceFlags: 0x101,
+      };
+
+      httpTraceContext.inject(
+        trace.setSpanContext(ROOT_CONTEXT, spanContext),
+        carrier,
+        defaultTextMapSetter
+      );
+      assert.strictEqual(
+        carrier[TRACE_PARENT_HEADER],
+        '00-d4cda95b652f4a1592b449d5929fda1b-6e0c63257de34c92-01'
+      );
+    });
+
+    it('should round-trip upper traceFlags between extract and inject', () => {
+      const header = '00-d4cda95b652f4a1592b449d5929fda1b-6e0c63257de34c92-11';
+      const extractedCtx = httpTraceContext.extract(
+        ROOT_CONTEXT,
+        { [TRACE_PARENT_HEADER]: header },
+        defaultTextMapGetter
+      );
+      const outCarrier: { [key: string]: unknown } = {};
+      httpTraceContext.inject(extractedCtx, outCarrier, defaultTextMapSetter);
+      assert.strictEqual(outCarrier[TRACE_PARENT_HEADER], header);
+
+      const roundTripped = trace.getSpanContext(
+        httpTraceContext.extract(ROOT_CONTEXT, outCarrier, defaultTextMapGetter)
+      );
+      assert.strictEqual(roundTripped?.traceFlags, 0x11);
+    });
   });
 
   describe('.extract()', () => {
