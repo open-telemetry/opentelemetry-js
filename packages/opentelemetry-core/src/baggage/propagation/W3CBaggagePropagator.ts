@@ -51,7 +51,7 @@ export class W3CBaggagePropagator implements TextMapPropagator {
       return context;
     }
 
-    const baggage: Record<string, BaggageEntry> = {};
+    const baggage: Record<string, BaggageEntry> = Object.create(null);
     let count = 0;
 
     let totalSize = 0;

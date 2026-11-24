@@ -300,6 +300,33 @@ describe('W3CBaggagePropagator', () => {
       assert.ok(bag.getEntry('also'));
       assert.strictEqual(bag.getEntry('toolong'), undefined);
     });
+
+    it('should preserve __proto__ and peer keys in extracted baggage', () => {
+      carrier[BAGGAGE_HEADER] = '__proto__=evil,a=1';
+      const bag = propagation.getBaggage(
+        httpBaggagePropagator.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        )
+      );
+      assert.ok(bag);
+      assert.deepStrictEqual(bag.getEntry('__proto__'), { value: 'evil' });
+      assert.deepStrictEqual(bag.getEntry('a'), { value: '1' });
+    });
+
+    it('should preserve __proto__ when it is the sole baggage entry', () => {
+      carrier[BAGGAGE_HEADER] = '__proto__=evil';
+      const bag = propagation.getBaggage(
+        httpBaggagePropagator.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        )
+      );
+      assert.ok(bag);
+      assert.deepStrictEqual(bag.getEntry('__proto__'), { value: 'evil' });
+    });
   });
 
   describe('fields()', () => {
