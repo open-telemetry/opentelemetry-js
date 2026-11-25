@@ -169,6 +169,18 @@ export class ProtobufWriter implements IProtobufWriter {
    * Write a varint (variable-length integer)
    */
   writeVarint(value: number): void {
+    if (value >= 0 && value < 0x80) {
+      // Short-cut for small-integer varints, which are a single byte.
+      this._ensureCapacity(1);
+      this._buffer[this.pos++] = value;
+      return;
+    }
+    this._writeMultiByteVarint(value);
+  }
+
+  // Kept separate from writeVarint so that writeVarint stays small enough to
+  // be inlined.
+  private _writeMultiByteVarint(value: number): void {
     this._ensureCapacity(estimateVarintSize(value));
     // Check if value fits in 32-bit range
     if (value >= 0 && value <= 0xffffffff) {
@@ -275,14 +287,7 @@ export class ProtobufWriter implements IProtobufWriter {
    * Write a field key (field number + wire type)
    */
   writeTag(fieldNumber: number, wireType: number): void {
-    const tag = (fieldNumber << 3) | wireType;
-    if (tag < 0x80) {
-      // Field numbers below 16 have a 1-byte tag.
-      this._ensureCapacity(1);
-      this._buffer[this.pos++] = tag;
-      return;
-    }
-    this.writeVarint(tag);
+    this.writeVarint((fieldNumber << 3) | wireType);
   }
 
   /**
