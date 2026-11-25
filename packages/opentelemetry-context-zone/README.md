@@ -19,10 +19,10 @@ npm install --save @opentelemetry/context-zone
 
 In modern JavaScript runtimes (`ES2017+`), native `async`/`await` uses native engine-level microtasks that bypass the monkey-patched `Promise` implementation of `zone.js`. Consequently, the execution context is lost after `await` calls (particularly after sequential `await` expressions).
 
-To preserve context across `await` expressions, you do not need to transpile your entire codebase down to ES2015. Instead, configure your bundler or compiler to downlevel only `async`/`await` and async generator syntax:
+To preserve context across `await` expressions, configure your bundler or compiler to downlevel `async`/`await` syntax:
 
 - **esbuild / Vite / tsup**:
-  Configure `supported` in your build configuration:
+  Configure `supported` in your build configuration to selectively downlevel only `async`/`await`:
 
   ```js
   // vite.config.js / esbuild options / tsup.config.ts
@@ -37,7 +37,7 @@ To preserve context across `await` expressions, you do not need to transpile you
   ```
 
 - **TypeScript (`tsconfig.json`)**:
-  Set `"target": "ES2016"` (or lower) so TypeScript transforms `async`/`await` into generator helpers while preserving other modern language features:
+  When compiling with `tsc`, set `"target": "ES2016"` (or lower) so `async`/`await` is transformed into generator helpers. Note that setting `target` to ES2016 also downlevels other features introduced after ES2016. If you want to keep other modern syntax, consider using a bundler (like esbuild or Babel) for selective downleveling instead:
 
   ```json
   {
