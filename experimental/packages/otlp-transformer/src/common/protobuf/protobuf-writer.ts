@@ -308,6 +308,7 @@ export class ProtobufWriter implements IProtobufWriter {
         buffer[start + i] = c;
       }
       if (i === len) {
+        // Short-cut for small-integer varint length
         buffer[this.pos] = len;
         this.pos = start + len;
         return;
