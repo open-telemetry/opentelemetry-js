@@ -97,7 +97,7 @@ export interface StartSdkFromConfigOptions {
    *    { LogRecordProcessor: { my_custom_processor: () => new MyProcessor() } }
    *
    * It is an error if multiple registries provide for the same componentType
-   * and name. Built-in providers cannot be overriden -- attempting to do so
+   * and name. Built-in providers cannot be overridden -- attempting to do so
    * will `diag.warn(...)` and ignore the registry entry.
    */
   componentProviderRegistries?: ComponentProviderRegistry[];

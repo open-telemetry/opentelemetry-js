@@ -102,7 +102,7 @@ export type ComponentProviderRegistry = {
  *
  * Generally a collision (two registries providing for the same component type
  * and name) is an *error*. However, the built-in registry is special: its
- * providers cannot be overriden, but attempting to do so will only
+ * providers cannot be overridden, but attempting to do so will only
  * `diag.warn()`. This is to support forward compatibility, so new component
  * types and names can be added to the built-in set without possibly crashing
  * existing usage.
