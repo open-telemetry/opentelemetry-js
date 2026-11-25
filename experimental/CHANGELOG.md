@@ -31,6 +31,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :house: Internal
 
+* chore(sdk-node): export StartSdkOptions type for "startNodeSdk"
 * chore(opentelemetry-browser-detector): Soft-deprecate `@opentelemetry/opentelemetry-browser-detector` @hectorhdzg
   * The browser detector in this repository is being (soft-)deprecated in favor of [`@opentelemetry/browser-sdk/browser-detector`](https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/sdk#browser-resource-detection). "Soft" deprecation means the export has been marked with `@deprecated` and a notice added to the README, but the package will *not* yet be `npm deprecate`'d to avoid loud notice to users while opentelemetry-browser.git is still in heavy development.
 * refactor(sdk-node): internally use a ComponentProvider implementation for creating SDK components from a declarative config [#7269](https://github.com/open-telemetry/opentelemetry-js/pull/7269) @trentm
