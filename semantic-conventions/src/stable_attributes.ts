@@ -139,13 +139,13 @@ export const ASPNETCORE_ROUTING_MATCH_STATUS_VALUE_SUCCESS = "success" as const;
 export const ATTR_ASPNETCORE_USER_IS_AUTHENTICATED = 'aspnetcore.user.is_authenticated' as const;
 
 /**
- * Client address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
+ * Client address - domain name if available without reverse DNS lookup; otherwise, IP address or UNIX domain socket name.
  *
  * @example client.example.com
  * @example 10.1.2.80
  * @example /tmp/my.sock
  *
- * @note When observed from the server side, and when communicating through an intermediary, `client.address` **SHOULD** represent the client address behind any intermediaries,  for example proxies, if it's available.
+ * @note When observed from the server side, and when communicating through an intermediary, `client.address` **SHOULD** represent the client address behind any intermediaries, for example proxies, if it's available.
  */
 export const ATTR_CLIENT_ADDRESS = 'client.address' as const;
 
@@ -154,7 +154,7 @@ export const ATTR_CLIENT_ADDRESS = 'client.address' as const;
  *
  * @example 65123
  *
- * @note When observed from the server side, and when communicating through an intermediary, `client.port` **SHOULD** represent the client port behind any intermediaries,  for example proxies, if it's available.
+ * @note When observed from the server side, and when communicating through an intermediary, `client.port` **SHOULD** represent the client port behind any intermediaries, for example proxies, if it's available.
  */
 export const ATTR_CLIENT_PORT = 'client.port' as const;
 
@@ -166,7 +166,7 @@ export const ATTR_CLIENT_PORT = 'client.port' as const;
 export const ATTR_CODE_COLUMN_NUMBER = 'code.column.number' as const;
 
 /**
- * The source code file name that identifies the code unit as uniquely as possible (preferably an absolute file path). This attribute **MUST NOT** be used on the Profile signal since the data is already captured in 'message Function'. This constraint is imposed to prevent redundancy and maintain data integrity.
+ * The source code filename that identifies the code unit as uniquely as possible (preferably an absolute file path). This attribute **MUST NOT** be used on the Profile signal since the data is already captured in 'message Function'. This constraint is imposed to prevent redundancy and maintain data integrity.
  *
  * @example "/usr/local/MyApplication/content_root/app/index.php"
  */
@@ -226,7 +226,7 @@ export const ATTR_CONTAINER_ID = 'container.id' as const;
 export const ATTR_CONTAINER_IMAGE_NAME = 'container.image.name' as const;
 
 /**
- * Repo digests of the container image as provided by the container runtime.
+ * Repository digests of the container image as provided by the container runtime.
  *
  * @example ["example@sha256:afcc7f1ac1b49db317a7196c902e61c6c3c4607d63599ee1a82d702d249a0ccb", "internal.registry.example.com:5000/example@sha256:b69959407d21e8a062e0416bf13405bb2b71ed7a84dde4158ebafacfa06f5578"]
  *
@@ -254,8 +254,9 @@ export const ATTR_CONTAINER_IMAGE_TAGS = 'container.image.tags' as const;
  * when the database system supports query text with multiple collections
  * in non-batch operations.
  *
- * For batch operations, if the individual operations are known to have the same
- * collection name then that collection name **SHOULD** be used.
+ * For batch operations, if the individual operations would all have the same
+ * `db.collection.name` when executed as non-batch operations,
+ * then that collection name **SHOULD** be used.
  */
 export const ATTR_DB_COLLECTION_NAME = 'db.collection.name' as const;
 
@@ -320,9 +321,10 @@ export const ATTR_DB_OPERATION_BATCH_SIZE = 'db.operation.batch.size' as const;
  * If spaces can occur in the operation name, multiple consecutive spaces
  * **SHOULD** be normalized to a single space.
  *
- * For batch operations, if the individual operations are known to have the same operation name
- * then that operation name **SHOULD** be used prepended by `BATCH `,
- * otherwise `db.operation.name` **SHOULD** be `BATCH` or some other database
+ * For batch operations, if the individual operations would all have the same
+ * `db.operation.name` when executed as non-batch operations,
+ * then that operation name **SHOULD** be used prepended by `BATCH `.
+ * Otherwise, `db.operation.name` **SHOULD** be `BATCH` or some other database
  * system specific term if more applicable.
  */
 export const ATTR_DB_OPERATION_NAME = 'db.operation.name' as const;
@@ -344,9 +346,10 @@ export const ATTR_DB_OPERATION_NAME = 'db.operation.name' as const;
  * [Generating query summary](/docs/db/database-spans.md#generating-a-summary-of-the-query)
  * section.
  *
- * For batch operations, if the individual operations are known to have the same query summary
- * then that query summary **SHOULD** be used prepended by `BATCH `,
- * otherwise `db.query.summary` **SHOULD** be `BATCH` or some other database
+ * For batch operations, if the individual operations would all have the same
+ * `db.query.summary` when executed as non-batch operations,
+ * then that query summary **SHOULD** be used prepended by `BATCH `.
+ * Otherwise, `db.query.summary` **SHOULD** be `BATCH` or some other database
  * system specific term if more applicable.
  */
 export const ATTR_DB_QUERY_SUMMARY = 'db.query.summary' as const;
@@ -358,7 +361,7 @@ export const ATTR_DB_QUERY_SUMMARY = 'db.query.summary' as const;
  * @example SET mykey ?
  *
  * @note For sanitization see [Sanitization of `db.query.text`](/docs/db/database-spans.md#sanitization-of-dbquerytext).
- * For batch operations, if the individual operations are known to have the same query text then that query text **SHOULD** be used, otherwise all of the individual query texts **SHOULD** be concatenated with separator `; ` or some other database system specific separator if more applicable.
+ * For batch operations, if the individual operations would all have the same `db.query.text` when executed as non-batch operations, then that query text **SHOULD** be used. Otherwise, all of the individual query texts **SHOULD** be concatenated with separator `; ` or some other database system specific separator if more applicable.
  * Parameterized query text **SHOULD NOT** be sanitized. Even though parameterized query text can potentially have sensitive data, by using a parameterized query the user is giving a strong signal that any sensitive data will be passed as parameter values, and the benefit to observability of capturing the static part of the query text by default outweighs the risk.
  */
 export const ATTR_DB_QUERY_TEXT = 'db.query.text' as const;
@@ -372,6 +375,7 @@ export const ATTR_DB_QUERY_TEXT = 'db.query.text' as const;
  * @example 404
  *
  * @note The status code returned by the database. Usually it represents an error code, but may also represent partial success, warning, or differentiate between various types of successful outcomes.
+ * The value **MAY** use a standardized string representation of a numeric status code, if one exists, instead of the numeric code. The value **MAY** be a synthetic status provided by the client library rather than returned by the remote service.
  * Semantic conventions for individual database systems **SHOULD** document what `db.response.status_code` means in the context of that system.
  */
 export const ATTR_DB_RESPONSE_STATUS_CODE = 'db.response.status_code' as const;
@@ -384,8 +388,9 @@ export const ATTR_DB_RESPONSE_STATUS_CODE = 'db.response.status_code' as const;
  * @note It is **RECOMMENDED** to capture the value as provided by the application
  * without attempting to do any case normalization.
  *
- * For batch operations, if the individual operations are known to have the same
- * stored procedure name then that stored procedure name **SHOULD** be used.
+ * For batch operations, if the individual operations would all have the same
+ * `db.stored_procedure.name` when executed as non-batch operations,
+ * then that stored procedure name **SHOULD** be used.
  */
 export const ATTR_DB_STORED_PROCEDURE_NAME = 'db.stored_procedure.name' as const;
 
@@ -1393,7 +1398,7 @@ export const ATTR_K8S_STATEFULSET_NAME = 'k8s.statefulset.name' as const;
 export const ATTR_K8S_STATEFULSET_UID = 'k8s.statefulset.uid' as const;
 
 /**
- * Local address of the network connection - IP address or Unix domain socket name.
+ * Local address of the network connection - IP address or UNIX domain socket name.
  *
  * @example 10.1.2.80
  * @example /tmp/my.sock
@@ -1408,7 +1413,7 @@ export const ATTR_NETWORK_LOCAL_ADDRESS = 'network.local.address' as const;
 export const ATTR_NETWORK_LOCAL_PORT = 'network.local.port' as const;
 
 /**
- * Peer address of the network connection - IP address or Unix domain socket name.
+ * Peer address of the network connection - IP address or UNIX domain socket name.
  *
  * @example 10.1.2.80
  * @example /tmp/my.sock
@@ -1488,7 +1493,7 @@ export const NETWORK_TRANSPORT_VALUE_UDP = "udp" as const;
 /**
  * Enum value "unix" for attribute {@link ATTR_NETWORK_TRANSPORT}.
  *
- * Unix domain socket
+ * UNIX domain socket
  */
 export const NETWORK_TRANSPORT_VALUE_UNIX = "unix" as const;
 
@@ -1567,7 +1572,81 @@ export const OTEL_STATUS_CODE_VALUE_OK = "OK" as const;
 export const ATTR_OTEL_STATUS_DESCRIPTION = 'otel.status_description' as const;
 
 /**
- * Server domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
+ * The fully-qualified logical name of the method from the RPC interface perspective.
+ *
+ * @example com.example.ExampleService/exampleMethod
+ * @example EchoService/Echo
+ * @example _OTHER
+ *
+ * @note The method name **MAY** have unbounded cardinality in edge or error cases.
+ *
+ * Some RPC frameworks or libraries provide a fixed set of recognized methods
+ * for client stubs and server implementations. Instrumentations for such
+ * frameworks **MUST** set this attribute to the original method name only
+ * when the method is recognized by the framework or library.
+ *
+ * When the method is not recognized, for example, when the server receives
+ * a request for a method that is not predefined on the server, or when
+ * instrumentation is not able to reliably detect if the method is predefined,
+ * the attribute **MUST** be set to `_OTHER`.
+ *
+ * If the RPC instrumentation could end up converting valid RPC methods to
+ * `_OTHER`, then it **SHOULD** provide a way to configure the list of recognized
+ * RPC methods.
+ *
+ * The `rpc.method` can be different from the name of any implementing
+ * method/function.
+ * The `code.function.name` attribute may be used to record the fully-qualified
+ * method actually executing the call on the server side, or the
+ * RPC client stub method on the client side.
+ */
+export const ATTR_RPC_METHOD = 'rpc.method' as const;
+
+/**
+ * The original name of the method used by the client.
+ *
+ * @example com.myservice.EchoService/catchAll
+ * @example com.myservice.EchoService/unknownMethod
+ * @example InvalidMethod
+ */
+export const ATTR_RPC_METHOD_ORIGINAL = 'rpc.method_original' as const;
+
+/**
+ * Status code of the RPC returned by the RPC server or generated by the client
+ *
+ * @example OK
+ * @example DEADLINE_EXCEEDED
+ * @example -32602
+ *
+ * @note Usually it represents an error code, but may also represent partial success, warning, or differentiate between various types of successful outcomes.
+ * The value **MAY** use a standardized string representation of a numeric status code, if one exists, instead of the numeric code. The value **MAY** be a synthetic status provided by the client library rather than returned by the remote service.
+ * Semantic conventions for individual RPC frameworks **SHOULD** document what `rpc.status_code` means in the context of that system and which values are considered to represent errors.
+ */
+export const ATTR_RPC_STATUS_CODE = 'rpc.status_code' as const;
+
+/**
+ * The Remote Procedure Call (RPC) system.
+ *
+ * @note The client and server RPC systems may differ for the same RPC interaction. For example, a client may use Apache Dubbo or Connect RPC to communicate with a server that uses gRPC since both protocols provide compatibility with gRPC.
+ */
+export const ATTR_RPC_SYSTEM_NAME = 'rpc.system.name' as const;
+
+/**
+ * Enum value "dubbo" for attribute {@link ATTR_RPC_SYSTEM_NAME}.
+ *
+ * [Apache Dubbo](https://dubbo.apache.org/)
+ */
+export const RPC_SYSTEM_NAME_VALUE_DUBBO = "dubbo" as const;
+
+/**
+ * Enum value "grpc" for attribute {@link ATTR_RPC_SYSTEM_NAME}.
+ *
+ * [gRPC](https://grpc.io/)
+ */
+export const RPC_SYSTEM_NAME_VALUE_GRPC = "grpc" as const;
+
+/**
+ * Server domain name if available without reverse DNS lookup; otherwise, IP address or UNIX domain socket name.
  *
  * @example example.com
  * @example 10.1.2.80
@@ -1731,66 +1810,92 @@ export const ATTR_TELEMETRY_SDK_LANGUAGE = 'telemetry.sdk.language' as const;
 
 /**
  * Enum value "cpp" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [C++](https://opentelemetry.io/docs/languages/cpp/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_CPP = "cpp" as const;
 
 /**
  * Enum value "dotnet" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [.NET](https://opentelemetry.io/docs/languages/dotnet/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_DOTNET = "dotnet" as const;
 
 /**
  * Enum value "erlang" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [Erlang/Elixir](https://opentelemetry.io/docs/languages/erlang/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_ERLANG = "erlang" as const;
 
 /**
  * Enum value "go" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [Go](https://opentelemetry.io/docs/languages/go/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_GO = "go" as const;
 
 /**
  * Enum value "java" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [Java](https://opentelemetry.io/docs/languages/java/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_JAVA = "java" as const;
 
 /**
  * Enum value "kotlin" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [Kotlin](https://opentelemetry.io/docs/languages/kotlin/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_KOTLIN = "kotlin" as const;
 
 /**
  * Enum value "nodejs" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [Node.js](https://opentelemetry.io/docs/languages/js/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_NODEJS = "nodejs" as const;
 
 /**
  * Enum value "php" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [PHP](https://opentelemetry.io/docs/languages/php/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_PHP = "php" as const;
 
 /**
  * Enum value "python" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [Python](https://opentelemetry.io/docs/languages/python/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_PYTHON = "python" as const;
 
 /**
  * Enum value "ruby" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [Ruby](https://opentelemetry.io/docs/languages/ruby/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_RUBY = "ruby" as const;
 
 /**
  * Enum value "rust" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [Rust](https://opentelemetry.io/docs/languages/rust/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_RUST = "rust" as const;
 
 /**
  * Enum value "swift" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [Swift](https://opentelemetry.io/docs/languages/swift/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_SWIFT = "swift" as const;
 
 /**
  * Enum value "webjs" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+ *
+ * [Browser](https://opentelemetry.io/docs/languages/js/)
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUE_WEBJS = "webjs" as const;
 
@@ -1845,8 +1950,14 @@ export const ATTR_URL_FRAGMENT = 'url.fragment' as const;
  *   - [`X-Amz-Signature`](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv-authentication-methods.html)
  *   - [`X-Amz-Credential`](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv-authentication-methods.html)
  *   - [`X-Amz-Security-Token`](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv-authentication-methods.html)
+ *   - [`AWSAccessKeyId`](https://docs.aws.amazon.com/AmazonS3/latest/developerguide/RESTAuthentication.html#RESTAuthenticationQueryStringAuth)
+ *   - [`Signature`](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-creating-signed-url-canned-policy.html)
  *   - [`sig`](https://learn.microsoft.com/azure/storage/common/storage-sas-overview#sas-token)
  *   - [`X-Goog-Signature`](https://cloud.google.com/storage/docs/access-control/signed-urls)
+ *
+ * Several of these keys are used by more than one service or signing scheme. Each link
+ * points to one representative usage rather than an exhaustive list, and does not narrow
+ * the scope of the key to the linked service or signing scheme.
  *
  * This list is subject to change over time.
  *
@@ -1887,8 +1998,14 @@ export const ATTR_URL_PATH = 'url.path' as const;
  *   - [`X-Amz-Signature`](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv-authentication-methods.html)
  *   - [`X-Amz-Credential`](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv-authentication-methods.html)
  *   - [`X-Amz-Security-Token`](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv-authentication-methods.html)
+ *   - [`AWSAccessKeyId`](https://docs.aws.amazon.com/AmazonS3/latest/developerguide/RESTAuthentication.html#RESTAuthenticationQueryStringAuth)
+ *   - [`Signature`](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-creating-signed-url-canned-policy.html)
  *   - [`sig`](https://learn.microsoft.com/azure/storage/common/storage-sas-overview#sas-token)
  *   - [`X-Goog-Signature`](https://cloud.google.com/storage/docs/access-control/signed-urls)
+ *
+ * Several of these keys are used by more than one service or signing scheme. Each link
+ * points to one representative usage rather than an exhaustive list, and does not narrow
+ * the scope of the key to the linked service or signing scheme.
  *
  * This list is subject to change over time.
  *

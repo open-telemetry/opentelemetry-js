@@ -29,9 +29,9 @@ Typically the context manager is provided by your SDK, however it is possible to
 
 ```typescript
 import * as api from "@opentelemetry/api";
-import { AsyncHooksContextManager } from "@opentelemetry/context-async-hooks";
+import { AsyncLocalStorageContextManager } from "@opentelemetry/context-async-hooks";
 
-const contextManager = new AsyncHooksContextManager();
+const contextManager = new AsyncLocalStorageContextManager();
 contextManager.enable();
 api.context.setGlobalContextManager(contextManager);
 ```

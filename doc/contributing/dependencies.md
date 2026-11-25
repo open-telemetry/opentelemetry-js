@@ -21,6 +21,8 @@ All packages from the `@opentelemetry/` namespace MUST have the same pinned vers
 
 An exception is granted for dependencies on `@opentelemetry/api`, which, if used by the package SHOULD NOT be included as a `dependency`. `@opentelemetry/api` SHOULD be included as a `peerDependency` instead. The version range of the `peerDependency` SHOULD reflect the minimum supported, and SHOULD NOT allow versions greater than the latest released minor version.
 
+These ranges are maintained by `scripts/align-api-deps.mjs` on each API release and enforced by `scripts/peer-api-check.mjs`, so they should not be edited by hand. While the API is mid-pre-release they additionally carry the exact pre-release version as an alternative (`^1.3.0 || 1.10.0-rc.0`), which is removed again when the cycle is finalized - see [releasing.md](./releasing.md#pre-releases-of-the-api-package).
+
 ## Third-Party Library Dependencies
 
 Packages categorized as third-party and listed under the `"dependencies"` section (e.g., @grpc/grpc-js, @grpc/proto-loader, etc.) should remain unpinned and utilize the caret (`^`) symbol. This approach offers several advantages:

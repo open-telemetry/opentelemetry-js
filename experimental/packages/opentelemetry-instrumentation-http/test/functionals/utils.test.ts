@@ -8,10 +8,11 @@ import {
   ATTR_ERROR_TYPE,
   ATTR_HTTP_ROUTE,
   ATTR_URL_PATH,
+  ATTR_URL_QUERY,
   ATTR_USER_AGENT_ORIGINAL,
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
-import type { IncomingMessage, ServerResponse } from 'http';
+import type { IncomingMessage, RequestOptions, ServerResponse } from 'http';
 import type { Socket } from 'net';
 import * as sinon from 'sinon';
 import * as url from 'url';
@@ -25,7 +26,7 @@ import type {
 } from '../../src/internal-types';
 import * as utils from '../../src/utils';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { extractHostnameAndPort } from '../../src/utils';
 import type { ParsedUrlQuery } from 'node:querystring';
 
@@ -56,6 +57,52 @@ describe('Utility', () => {
         const status = utils.parseResponseStatus(SpanKind.SERVER, index);
         assert.notStrictEqual(status, SpanStatusCode.UNSET);
       }
+    });
+  });
+
+  describe('parseErrorType()', () => {
+    it('should return the status code as a string for an error', () => {
+      assert.strictEqual(utils.parseErrorType(SpanKind.CLIENT, 404), '404');
+      assert.strictEqual(utils.parseErrorType(SpanKind.CLIENT, 500), '500');
+      assert.strictEqual(utils.parseErrorType(SpanKind.SERVER, 500), '500');
+    });
+
+    it('should return undefined for a successful status code', () => {
+      for (let index = 100; index < 400; index++) {
+        assert.strictEqual(
+          utils.parseErrorType(SpanKind.CLIENT, index),
+          undefined
+        );
+        assert.strictEqual(
+          utils.parseErrorType(SpanKind.SERVER, index),
+          undefined
+        );
+      }
+    });
+
+    it('should treat 4xx as an error on a client span only', () => {
+      for (let index = 400; index < 500; index++) {
+        assert.strictEqual(
+          utils.parseErrorType(SpanKind.CLIENT, index),
+          String(index)
+        );
+        assert.strictEqual(
+          utils.parseErrorType(SpanKind.SERVER, index),
+          undefined
+        );
+      }
+    });
+
+    it('should return undefined when no status code was received', () => {
+      assert.strictEqual(
+        utils.parseErrorType(SpanKind.CLIENT, undefined),
+        undefined
+      );
+      assert.strictEqual(
+        utils.parseErrorType(SpanKind.CLIENT, '500'),
+        undefined
+      );
+      assert.strictEqual(utils.parseErrorType(SpanKind.CLIENT, 600), undefined);
     });
   });
 
@@ -106,6 +153,108 @@ describe('Utility', () => {
         assert.strictEqual(result.pathname, '/aPath');
         assert.strictEqual(result.origin, 'http://google.fr');
       }
+    });
+
+    it('should not throw when method is not a string', () => {
+      // Node.js rejects a non-string method itself; the instrumentation must
+      // not throw before Node.js gets the chance to raise its own error.
+      const result = utils.getRequestInfo(diag, {
+        hostname: 'www.google.com',
+        method: 1234,
+      } as unknown as RequestOptions);
+      assert.strictEqual(result.method, 'GET');
+    });
+
+    it('should treat URL-like objects the same as URL instances, like Node.js does', () => {
+      // Node.js detects URL objects by shape (`href` and `origin`), not by
+      // `instanceof`, so URL objects from other realms (e.g. `vm` contexts)
+      // or WHATWG URL polyfills must take the URL code path as well. Their
+      // properties commonly live on the prototype as getters, which the
+      // options-object code path cannot see (`Object.assign` only copies own
+      // enumerable properties) - taking the wrong path would misdirect the
+      // request.
+      const realUrl = new URL('http://u:p@google.fr:8181/aPath?qu=ry');
+      const urlLike = Object.create({
+        get href() {
+          return realUrl.href;
+        },
+        get origin() {
+          return realUrl.origin;
+        },
+        get protocol() {
+          return realUrl.protocol;
+        },
+        get username() {
+          return realUrl.username;
+        },
+        get password() {
+          return realUrl.password;
+        },
+        get host() {
+          return realUrl.host;
+        },
+        get hostname() {
+          return realUrl.hostname;
+        },
+        get port() {
+          return realUrl.port;
+        },
+        get pathname() {
+          return realUrl.pathname;
+        },
+        get search() {
+          return realUrl.search;
+        },
+        get hash() {
+          return realUrl.hash;
+        },
+      });
+      assert.strictEqual(urlLike instanceof url.URL, false);
+
+      const result = utils.getRequestInfo(diag, urlLike);
+      assert.strictEqual(result.optionsParsed.hostname, 'google.fr');
+      assert.strictEqual(result.optionsParsed.protocol, 'http:');
+      assert.strictEqual(result.optionsParsed.port, 8181);
+      assert.strictEqual(result.optionsParsed.path, '/aPath?qu=ry');
+      assert.strictEqual(result.pathname, '/aPath');
+      assert.strictEqual(result.origin, 'http://google.fr:8181');
+    });
+  });
+
+  describe('isURLLike()', () => {
+    it('should match URL instances and URL-shaped objects', () => {
+      assert.strictEqual(utils.isURLLike(new URL('http://google.fr')), true);
+      // A cross-realm / polyfilled URL is recognised by shape: it carries
+      // `href` and `protocol` but no `auth`/`path` (those live only on request
+      // options and legacy parsed URLs).
+      assert.strictEqual(
+        utils.isURLLike({
+          href: 'http://google.fr/',
+          protocol: 'http:',
+          origin: 'http://google.fr',
+        }),
+        true
+      );
+    });
+
+    it('should not match strings, non-URL objects and legacy parsed URLs', () => {
+      assert.strictEqual(utils.isURLLike('http://google.fr'), false);
+      assert.strictEqual(utils.isURLLike(null), false);
+      assert.strictEqual(utils.isURLLike(undefined), false);
+      assert.strictEqual(utils.isURLLike({ hostname: 'google.fr' }), false);
+      // an object that only carries `href` is not a URL and must not be
+      // treated as one
+      assert.strictEqual(utils.isURLLike({ href: 'http://google.fr/' }), false);
+      // legacy url.parse() results have `href` and `protocol` but also `path`,
+      // so they must keep taking the options-object code path
+      assert.strictEqual(utils.isURLLike(url.parse('http://google.fr')), false);
+      // getRequestInfo()'s own output sets `href`, `origin` and `path`; it is
+      // an options object, not a URL, and must not be re-classified as one
+      const parsedOptions = utils.getRequestInfo(
+        diag,
+        'http://google.fr/aPath?qu=ry'
+      ).optionsParsed;
+      assert.strictEqual(utils.isURLLike(parsedOptions), false);
     });
   });
 
@@ -248,6 +397,123 @@ describe('Utility', () => {
         'http://localhosthttp://?AWSAccessKeyId=secret123'
       );
     });
+    it('should ignore a non-string host and use hostname instead', () => {
+      // Node.js accepts these options: when `hostname` is a valid string it
+      // never looks at `host`. See
+      // https://github.com/open-telemetry/opentelemetry-js/issues/6967
+      const result = utils.getAbsoluteUrl(
+        {
+          host: new URL('http://stale.example.com'),
+          hostname: 'www.google.com',
+          path: '/test/1',
+        } as unknown as ParsedRequestOptions,
+        {}
+      );
+      assert.strictEqual(result, 'http://www.google.com/test/1');
+    });
+    it('should use the host header when neither host nor hostname is a string', () => {
+      // Note: Node.js rejects a non-string `hostname` outright, so these exact
+      // options do not produce a request. This pins the fallback order used
+      // when deriving a best-effort URL, it does not claim Node.js accepts
+      // them.
+      const result = utils.getAbsoluteUrl(
+        {
+          host: 1234,
+          hostname: new URL('http://stale.example.com'),
+          path: '/test/1',
+        } as unknown as ParsedRequestOptions,
+        { host: 'www.google.com:8181' }
+      );
+      assert.strictEqual(result, 'http://www.google.com:8181/test/1');
+    });
+    it('should not throw on options that Node.js itself rejects', () => {
+      // These options never reach the network: Node.js resolves the target as
+      // `validateHost(hostname) || validateHost(host) || 'localhost'`, and
+      // `validateHost` throws ERR_INVALID_ARG_TYPE for any non-string, non-null
+      // value. With no usable `hostname`, the non-string `host` is validated and
+      // rejected - a valid `host` header does not rescue it either.
+      //
+      // So there is no destination to report here, and the URL below is only
+      // ever attached to an error span for a request that never left the
+      // process. What matters is that the instrumentation does not throw first,
+      // so the caller sees Node.js's own error rather than a TypeError from us.
+      // The `localhost` value is this function's long-standing last resort (see
+      // the 'should return default url' case above), not a claim about where
+      // the request went.
+      const result = utils.getAbsoluteUrl(
+        {
+          host: new URL('http://stale.example.com'),
+          hostname: undefined,
+          path: '/test/1',
+        } as unknown as ParsedRequestOptions,
+        { host: 1234 as unknown as string }
+      );
+      assert.strictEqual(result, 'http://localhost/test/1');
+    });
+    it('should not throw when path is not a string', () => {
+      const result = utils.getAbsoluteUrl(
+        {
+          host: 'www.google.com',
+          path: 1234,
+        } as unknown as ParsedRequestOptions,
+        {}
+      );
+      assert.strictEqual(result, 'http://www.google.com1234');
+    });
+  });
+
+  describe('redactQueryString()', () => {
+    it('redacts a matching parameter', () => {
+      assert.strictEqual(
+        utils.redactQueryString(new URLSearchParams('sig=secret&foo=bar'), [
+          'sig',
+        ]),
+        'sig=REDACTED&foo=bar'
+      );
+    });
+
+    it('leaves non-matching parameters unchanged', () => {
+      assert.strictEqual(
+        utils.redactQueryString(new URLSearchParams('foo=bar&baz=qux'), [
+          'sig',
+        ]),
+        'foo=bar&baz=qux'
+      );
+    });
+
+    it('redacts multiple parameters', () => {
+      assert.strictEqual(
+        utils.redactQueryString(
+          new URLSearchParams('sig=a&AWSAccessKeyId=b&keep=c'),
+          ['sig', 'AWSAccessKeyId']
+        ),
+        'sig=REDACTED&AWSAccessKeyId=REDACTED&keep=c'
+      );
+    });
+
+    it('returns the input unchanged when the list is empty', () => {
+      assert.strictEqual(
+        utils.redactQueryString(new URLSearchParams('sig=secret'), []),
+        'sig=secret'
+      );
+    });
+
+    it('redacts a param with an empty value', () => {
+      assert.strictEqual(
+        utils.redactQueryString(new URLSearchParams('sig=&foo=bar'), ['sig']),
+        'sig=REDACTED&foo=bar'
+      );
+    });
+
+    it('redacts all occurrences of a duplicated parameter', () => {
+      assert.strictEqual(
+        utils.redactQueryString(
+          new URLSearchParams('sig=SECRET1&sig=SECRET2&foo=bar'),
+          ['sig']
+        ),
+        'sig=REDACTED&foo=bar'
+      );
+    });
   });
 
   describe('setSpanWithError()', () => {
@@ -295,7 +561,9 @@ describe('Utility', () => {
 
   describe('getIncomingRequestAttributesOnResponse()', () => {
     it('should correctly parse the middleware stack if present', done => {
-      context.setGlobalContextManager(new AsyncHooksContextManager().enable());
+      context.setGlobalContextManager(
+        new AsyncLocalStorageContextManager().enable()
+      );
       context.with(
         setRPCMetadata(context.active(), {
           type: RPCType.HTTP,
@@ -386,6 +654,85 @@ describe('Utility', () => {
         attributes[ATTR_USER_AGENT_SYNTHETIC_TYPE],
         USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT
       );
+    });
+
+    describe('query parameter redaction', () => {
+      function makeRequest(query: string): IncomingMessage {
+        const req = {
+          url: `http://hostname/path?${query}`,
+          method: 'GET',
+          socket: {},
+        } as IncomingMessage;
+        req.headers = { host: 'hostname' };
+        return req;
+      }
+
+      it('redacts default sensitive params by default', () => {
+        const attributes = utils.getIncomingRequestAttributes(
+          makeRequest('sig=secret&foo=bar'),
+          { component: 'http', enableSyntheticSourceDetection: false },
+          diag
+        );
+        assert.strictEqual(attributes[ATTR_URL_QUERY], 'sig=REDACTED&foo=bar');
+      });
+
+      it('redacts all default params (AWSAccessKeyId, Signature, X-Goog-Signature)', () => {
+        const attributes = utils.getIncomingRequestAttributes(
+          makeRequest(
+            'AWSAccessKeyId=key&Signature=sig&X-Goog-Signature=gsig&keep=1'
+          ),
+          { component: 'http', enableSyntheticSourceDetection: false },
+          diag
+        );
+        assert.strictEqual(
+          attributes[ATTR_URL_QUERY],
+          'AWSAccessKeyId=REDACTED&Signature=REDACTED&X-Goog-Signature=REDACTED&keep=1'
+        );
+      });
+
+      it('redacts only params in the custom list when redactedQueryParams is provided', () => {
+        const attributes = utils.getIncomingRequestAttributes(
+          makeRequest('sig=secret&custom=sensitive&foo=bar'),
+          {
+            component: 'http',
+            enableSyntheticSourceDetection: false,
+            redactedQueryParams: ['custom'],
+          },
+          diag
+        );
+        assert.strictEqual(
+          attributes[ATTR_URL_QUERY],
+          'sig=secret&custom=REDACTED&foo=bar'
+        );
+      });
+
+      it('does not redact anything when redactedQueryParams is an empty array', () => {
+        const attributes = utils.getIncomingRequestAttributes(
+          makeRequest('sig=secret&foo=bar'),
+          {
+            component: 'http',
+            enableSyntheticSourceDetection: false,
+            redactedQueryParams: [],
+          },
+          diag
+        );
+        assert.strictEqual(attributes[ATTR_URL_QUERY], 'sig=secret&foo=bar');
+      });
+
+      it('does not set url.query when there is no query string', () => {
+        const req = {
+          url: 'http://hostname/path',
+          method: 'GET',
+          socket: {},
+        } as IncomingMessage;
+        req.headers = { host: 'hostname' };
+        const attributes = utils.getIncomingRequestAttributes(
+          req,
+          { component: 'http', enableSyntheticSourceDetection: false },
+          diag
+        );
+        assert.strictEqual(attributes[ATTR_URL_QUERY], undefined);
+      });
     });
   });
 
@@ -527,6 +874,63 @@ describe('Utility', () => {
       const { hostname, port } = extractHostnameAndPort(parsedOption);
       assert.strictEqual(hostname, 'www.google.com');
       assert.strictEqual(port, '80');
+    });
+
+    it('should ignore a non-string host and use hostname instead', () => {
+      // Node.js accepts these options: when `hostname` is a valid string it
+      // never looks at `host`. See
+      // https://github.com/open-telemetry/opentelemetry-js/issues/6967
+      const { hostname, port } = extractHostnameAndPort({
+        hostname: 'www.google.com',
+        port: null,
+        host: new URL('http://stale.example.com'),
+        protocol: 'http:',
+      } as unknown as ParsedRequestOptions);
+      assert.strictEqual(hostname, 'www.google.com');
+      assert.strictEqual(port, '80');
+    });
+
+    it('should derive host and port from the host field when hostname is not a string', () => {
+      // Note: Node.js rejects a non-string `hostname` outright, so these exact
+      // options do not produce a request. This pins the fallback order used
+      // when deriving best-effort attributes, it does not claim Node.js accepts
+      // them.
+      const { hostname, port } = extractHostnameAndPort({
+        hostname: new URL('http://stale.example.com'),
+        port: null,
+        host: 'www.google.com:8181',
+        protocol: 'http:',
+      } as unknown as ParsedRequestOptions);
+      assert.strictEqual(hostname, 'www.google.com');
+      assert.strictEqual(port, '8181');
+    });
+
+    it('should not throw on options that Node.js itself rejects', () => {
+      // As above: a non-string `hostname` is rejected by Node.js outright
+      // (it is the first value passed to `validateHost`), so this request
+      // never reaches the network. The values below are the pre-existing
+      // defaults used when no host information is available; they describe an
+      // error span rather than a destination. The point of the test is that we
+      // do not throw before Node.js gets to raise its own error.
+      const { hostname, port } = extractHostnameAndPort({
+        hostname: new URL('http://stale.example.com'),
+        port: null,
+        host: 1234,
+        protocol: 'https:',
+      } as unknown as ParsedRequestOptions);
+      assert.strictEqual(hostname, 'localhost');
+      assert.strictEqual(port, '443');
+    });
+
+    it('should ignore a port that is neither a string nor a number', () => {
+      const { hostname, port } = extractHostnameAndPort({
+        hostname: 'www.google.com',
+        port: { value: 8181 },
+        host: null,
+        protocol: 'https:',
+      } as unknown as ParsedRequestOptions);
+      assert.strictEqual(hostname, 'www.google.com');
+      assert.strictEqual(port, '443');
     });
   });
 

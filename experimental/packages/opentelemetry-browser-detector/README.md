@@ -1,6 +1,9 @@
 # OpenTelemetry Browser Detector
 
-**Note: This is an experimental package under active development. New releases may include breaking changes.**
+> [!NOTE]
+> `@opentelemetry/opentelemetry-browser-detector` is deprecated.
+> Vendors and users should plan moving to [the browser detector being developed in the opentelemetry-browser repository](https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/sdk#browser-resource-detection),
+> specifically `@opentelemetry/browser-sdk/browser-detector`.
 
 This module provides detector for browser environments
 
@@ -13,6 +16,9 @@ npm install --save @opentelemetry/opentelemetry-browser-detector
 ## Usage
 
 ```js
+import { context, trace } from '@opentelemetry/api';
+import { TracerProvider } from '@opentelemetry/trace-sdk';
+import { ZoneContextManager } = from '@opentelemetry/context-zone';
 import { resourceFromAttributes, detectResources } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { browserDetector } from '@opentelemetry/opentelemetry-browser-detector';
@@ -21,9 +27,9 @@ async function start(){
   let resource = resourceFromAttributes({
     [ATTR_SERVICE_NAME]: 'Test App Name',
   });
-  let detectedResources= await detectResources({detectors:[browserDetector]});
-  resource=resource.merge(detectedResources);
-  const provider = new WebTracerProvider({
+  let detectedResources = await detectResources({detectors:[browserDetector]});
+  resource = resource.merge(detectedResources);
+  const provider = new TracerProvider({
     resource,
     spanProcessors: [
       new BatchSpanProcessor(
@@ -36,13 +42,11 @@ async function start(){
     ]
   });
 
-  provider.register({
-    // Changing default contextManager to use ZoneContextManager - supports asynchronous operations - optional
-    contextManager: new ZoneContextManager(),
-  });
+  // Changing default contextManager to use ZoneContextManager - supports asynchronous operations - optional
+  context.setGlobalContextManager(new ZoneContextManager().enable());
+  trace.setGlobalTracerProvider(provider);
 
-// Registering instrumentations
-
+  // Registering instrumentations
   registerInstrumentations({
     instrumentations: [
       new DocumentLoadInstrumentation(),

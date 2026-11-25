@@ -9,13 +9,12 @@ import {
   trace,
   diag,
   DiagLogLevel,
+  logs,
   metrics,
   DiagConsoleLogger,
+  createNoopMeter,
 } from '@opentelemetry/api';
-import {
-  AsyncHooksContextManager,
-  AsyncLocalStorageContextManager,
-} from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
 import {
   AggregationTemporality,
@@ -54,7 +53,6 @@ import {
   defaultResource,
 } from '@opentelemetry/resources';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { logs } from '@opentelemetry/api-logs';
 import {
   SimpleLogRecordProcessor,
   InMemoryLogRecordExporter,
@@ -69,9 +67,14 @@ import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/expor
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import { InstrumentationBase } from '@opentelemetry/instrumentation';
 
-import { NOOP_COUNTER_METRIC } from '../../../../api/src/metrics/NoopMeter';
 import { ATTR_HOST_NAME, ATTR_PROCESS_PID } from '../src/semconv';
-import { NOOP_HISTOGRAM_METRIC } from '../../../../api/src/metrics/NoopMeter';
+
+// The noop meter hands out shared singleton instruments, so these can be used
+// to check whether a self-observability metric is a noop without reaching into
+// the API's internals.
+const noopMeter = createNoopMeter();
+const NOOP_COUNTER_METRIC = noopMeter.createCounter('noop');
+const NOOP_HISTOGRAM_METRIC = noopMeter.createHistogram('noop');
 
 class TestInstrumentation extends InstrumentationBase {
   init() {
@@ -146,6 +149,8 @@ describe('NodeSDK', () => {
 
   afterEach(() => {
     Sinon.restore();
+    delete process.env.OTEL_EXPORTER_PROMETHEUS_HOST;
+    delete process.env.OTEL_EXPORTER_PROMETHEUS_PORT;
   });
 
   describe('Basic Registration', () => {
@@ -179,6 +184,21 @@ describe('NodeSDK', () => {
         'logger provider should not have changed'
       );
 
+      await sdk.shutdown();
+    });
+
+    it('should enable instrumentations before registering context and propagation', async () => {
+      const instrumentation = new TestInstrumentation('test', '1.0.0', {
+        enabled: false,
+      });
+      const enable = Sinon.spy(instrumentation, 'enable');
+      const setContext = Sinon.spy(context, 'setGlobalContextManager');
+      const setPropagator = Sinon.spy(propagation, 'setGlobalPropagator');
+      const sdk = new NodeSDK({ instrumentations: [instrumentation] });
+
+      sdk.start();
+
+      Sinon.assert.callOrder(enable, setContext, setPropagator);
       await sdk.shutdown();
     });
 
@@ -306,7 +326,7 @@ describe('NodeSDK', () => {
       });
 
       const sdk = new NodeSDK({
-        metricReader: metricReader,
+        metricReaders: [metricReader],
         autoDetectResources: false,
       });
 
@@ -362,62 +382,6 @@ describe('NodeSDK', () => {
       // Verify that both metric readers are registered
       const sharedState = (meterProvider as any)['_sharedState'];
       assert.strictEqual(sharedState.metricCollectors.length, 2);
-
-      await sdk.shutdown();
-    });
-
-    it('should show deprecation warning when using metricReader option', async () => {
-      const exporter = new ConsoleMetricExporter();
-      const metricReader = new PeriodicExportingMetricReader({
-        exporter: exporter,
-        exportIntervalMillis: 100,
-        exportTimeoutMillis: 100,
-      });
-
-      const warnSpy = Sinon.spy(diag, 'warn');
-
-      const sdk = new NodeSDK({
-        metricReader: metricReader,
-        autoDetectResources: false,
-      });
-
-      sdk.start();
-
-      // Verify deprecation warning was shown
-      Sinon.assert.calledWith(
-        warnSpy,
-        "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
-      );
-
-      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
-
-      await sdk.shutdown();
-    });
-
-    it('should not show deprecation warning when using metricReaders option', async () => {
-      const exporter = new ConsoleMetricExporter();
-      const metricReader = new PeriodicExportingMetricReader({
-        exporter: exporter,
-        exportIntervalMillis: 100,
-        exportTimeoutMillis: 100,
-      });
-
-      const warnSpy = Sinon.spy(diag, 'warn');
-
-      const sdk = new NodeSDK({
-        metricReaders: [metricReader],
-        autoDetectResources: false,
-      });
-
-      sdk.start();
-
-      // Verify no metricReader deprecation warning was shown
-      Sinon.assert.neverCalledWith(
-        warnSpy,
-        "The 'metricReader' option is deprecated. Please use 'metricReaders' instead."
-      );
-
-      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
 
       await sdk.shutdown();
     });
@@ -586,7 +550,7 @@ describe('NodeSDK', () => {
         exporter: logRecordExporter,
       });
       const sdk = new NodeSDK({
-        logRecordProcessor: logRecordProcessor,
+        logRecordProcessors: [logRecordProcessor],
         autoDetectResources: false,
       });
 
@@ -647,7 +611,8 @@ describe('NodeSDK', () => {
 
     it('should register a context manager if only a context manager is provided', async () => {
       // arrange
-      const expectedContextManager = new AsyncHooksContextManager();
+      class MycontextManager extends AsyncLocalStorageContextManager {}
+      const expectedContextManager = new MycontextManager();
       const sdk = new NodeSDK({
         contextManager: expectedContextManager,
       });
@@ -762,7 +727,7 @@ describe('NodeSDK', () => {
     });
 
     const sdk = new NodeSDK({
-      metricReader: metricReader,
+      metricReaders: [metricReader],
       views: [
         {
           name: 'test-view',
@@ -1083,10 +1048,20 @@ describe('NodeSDK', () => {
     });
   });
 
-  describe('configureServiceInstanceId', async () => {
+  describe('service.instance.id resource attribute', async () => {
     afterEach(function () {
       delete process.env.OTEL_NODE_RESOURCE_DETECTORS;
       delete process.env.OTEL_RESOURCE_ATTRIBUTES;
+    });
+
+    it('should be added by default', async () => {
+      const sdk = new NodeSDK();
+      sdk.start();
+      const resource = sdk['_resource'];
+      await resource.waitForAsyncAttributes?.();
+
+      assertServiceInstanceIdIsUUID(resource);
+      await sdk.shutdown();
     });
 
     it('should configure service instance id via OTEL_RESOURCE_ATTRIBUTES env var', async () => {
@@ -1155,7 +1130,7 @@ describe('NodeSDK', () => {
       await sdk.shutdown();
     });
 
-    it('should configure service instance id with service instance id from env variable taking priority over random UUID, based on order', async () => {
+    it('service.instance.id from "env" detector wins if it is last', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
         'service.instance.id=custom-service,service.name=my-service';
       process.env.OTEL_NODE_RESOURCE_DETECTORS = 'serviceinstance,env';
@@ -1174,7 +1149,7 @@ describe('NodeSDK', () => {
       await sdk.shutdown();
     });
 
-    it('should configure service instance id with service instance id from env variable taking priority over random UUID, based on order', async () => {
+    it('"serviceinstance" detector beats "env" if it is last', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
         'service.instance.id=custom-service,service.name=my-service';
       process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,serviceinstance';
@@ -1262,7 +1237,7 @@ describe('NodeSDK', () => {
       });
 
       const sdk = new NodeSDK({
-        metricReader: metricReader,
+        metricReaders: [metricReader],
         autoDetectResources: false,
       });
       sdk.start();
@@ -1325,7 +1300,7 @@ describe('NodeSDK', () => {
       });
       const sdk = new NodeSDK({
         idGenerator,
-        spanProcessor,
+        spanProcessors: [spanProcessor],
       });
       sdk.start();
 
@@ -1803,14 +1778,43 @@ describe('NodeSDK', () => {
 
     it('should use prometheus if that is set', async () => {
       process.env.OTEL_METRICS_EXPORTER = 'prometheus';
+      process.env.OTEL_EXPORTER_PROMETHEUS_HOST = '127.0.0.1';
+      process.env.OTEL_EXPORTER_PROMETHEUS_PORT = '1234';
       delete process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL;
+      const startServerStub = Sinon.stub(
+        PrometheusMetricExporter.prototype,
+        'startServer'
+      ).resolves();
       const sdk = new NodeSDK();
       sdk.start();
       const meterProvider = metrics.getMeterProvider();
       const sharedState = (meterProvider as any)['_sharedState'];
-      assert.ok(
-        sharedState.metricCollectors[0]._metricReader instanceof
-          PrometheusMetricExporter
+      const metricReader = sharedState.metricCollectors[0]._metricReader;
+      assert.ok(metricReader instanceof PrometheusMetricExporter);
+      assert.strictEqual(metricReader['_host'], '127.0.0.1');
+      assert.strictEqual(metricReader['_port'], 1234);
+      Sinon.assert.calledOnce(startServerStub);
+      await sdk.shutdown();
+    });
+
+    it('should use prometheus defaults for invalid environment values', async () => {
+      process.env.OTEL_METRICS_EXPORTER = 'prometheus';
+      process.env.OTEL_EXPORTER_PROMETHEUS_HOST = ' ';
+      process.env.OTEL_EXPORTER_PROMETHEUS_PORT = 'invalid';
+      delete process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL;
+      Sinon.stub(PrometheusMetricExporter.prototype, 'startServer').resolves();
+      const sdk = new NodeSDK();
+      sdk.start();
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      const metricReader = sharedState.metricCollectors[0]._metricReader;
+      assert.strictEqual(
+        metricReader['_host'],
+        PrometheusMetricExporter.DEFAULT_OPTIONS.host
+      );
+      assert.strictEqual(
+        metricReader['_port'],
+        PrometheusMetricExporter.DEFAULT_OPTIONS.port
       );
       await sdk.shutdown();
     });
@@ -1913,7 +1917,7 @@ describe('NodeSDK', () => {
       const exporter = new ConsoleSpanExporter();
       const spanProcessor = new SimpleSpanProcessor({ exporter });
       const sdk = new NodeSDK({
-        spanProcessor,
+        spanProcessors: [spanProcessor],
       });
       sdk.start();
       const listOfProcessors = getSdkSpanProcessors(sdk);

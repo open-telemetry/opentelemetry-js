@@ -11,8 +11,7 @@ import type {
 
 export interface OTLPMetricExporterOptions extends OTLPExporterConfigBase {
   temporalityPreference?:
-    | AggregationTemporalityPreference
-    | AggregationTemporality;
+    AggregationTemporalityPreference | AggregationTemporality;
   aggregationPreference?: AggregationSelector;
 }
 

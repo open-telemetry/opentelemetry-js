@@ -38,7 +38,7 @@ const propagator = new CompositePropagator({
 propagation.setGlobalPropagator(propagator);
 
 const exporter = new ConsoleSpanExporter();
-const processor = new SimpleSpanProcessor(exporter);
+const processor = new SimpleSpanProcessor({ exporter });
 const tracerProvider = new TracerProvider({
   resource: resourceFromAttributes({
     [ATTR_SERVICE_NAME]: 'esm-http-ts-example',

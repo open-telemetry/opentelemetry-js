@@ -26,7 +26,6 @@ import {
   writeHrTimeAsFixed64,
 } from '../../common/protobuf/common-serializer';
 import type { IProtobufWriter } from '../../common/protobuf/i-protobuf-writer';
-import { ProtobufSizeEstimator } from '../../common/protobuf/protobuf-size-estimator';
 import { ProtobufWriter } from '../../common/protobuf/protobuf-writer';
 
 /**
@@ -558,13 +557,7 @@ function toProtoAggregationTemporality(
 export function serializeMetricsExportRequest(
   resourceMetrics: ResourceMetrics
 ): Uint8Array {
-  // First pass: estimate size
-  const estimator = new ProtobufSizeEstimator();
-  estimator.writeTag(1, 2);
-  serializeResourceMetrics(estimator, resourceMetrics);
-
-  // Second pass: write with estimated size
-  const writer = new ProtobufWriter(estimator.pos);
+  const writer = new ProtobufWriter();
   writer.writeTag(1, 2);
   serializeResourceMetrics(writer, resourceMetrics);
 

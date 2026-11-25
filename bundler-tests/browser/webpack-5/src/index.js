@@ -1,5 +1,4 @@
-import { DiagConsoleLogger, diag } from '@opentelemetry/api';
-import { logs } from '@opentelemetry/api-logs';
+import { DiagConsoleLogger, diag, logs } from '@opentelemetry/api';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
 import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
@@ -16,7 +15,6 @@ import {
 } from '@opentelemetry/sdk-logs';
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { TracerProvider } from '@opentelemetry/sdk-trace';
-import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
 
 diag.setLogger(new DiagConsoleLogger());
 
@@ -45,7 +43,6 @@ new OTLPTraceExporter();
 new OTLPMetricExporter();
 new W3CTraceContextPropagator();
 new B3Propagator();
-new WebTracerProvider();
 new FetchInstrumentation();
 new XMLHttpRequestInstrumentation();
 void browserDetector;

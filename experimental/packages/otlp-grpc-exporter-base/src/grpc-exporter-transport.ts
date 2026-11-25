@@ -16,6 +16,7 @@ import type {
   ExportResponse,
   IExporterTransport,
 } from '@opentelemetry/otlp-exporter-base';
+import { createServiceClientConstructor } from './create-service-client-constructor';
 import { VERSION } from './version';
 
 const DEFAULT_USER_AGENT = `OTel-OTLP-Exporter-JavaScript/${VERSION}`;
@@ -112,51 +113,47 @@ export class GrpcExporterTransport implements IExporterTransport {
     this._client?.close();
   }
 
-  send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
+  async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
     // We need to make a for gRPC
     const buffer = Buffer.from(data);
 
     if (this._client == null) {
-      // Lazy require to ensure that grpc is not loaded before instrumentations can wrap it
-      const {
-        createServiceClientConstructor,
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-      } = require('./create-service-client-constructor');
-
       try {
         this._metadata = this._parameters.metadata();
       } catch (error) {
-        return Promise.resolve({
+        return {
           status: 'failure',
           error: error,
-        });
+        };
       }
 
       const clientConstructor: ServiceClientConstructor =
-        createServiceClientConstructor(
+        await createServiceClientConstructor(
           this._parameters.grpcPath,
           this._parameters.grpcName
         );
 
-      try {
-        this._client = new clientConstructor(
-          this._parameters.address,
-          this._parameters.credentials(),
-          {
-            'grpc.default_compression_algorithm': toGrpcCompression(
-              this._parameters.compression
-            ),
-            'grpc.primary_user_agent': createUserAgent(
-              this._parameters.userAgent
-            ),
-          }
-        );
-        this._deadlineExceededCount = 0;
-      } catch (error) {
-        return Promise.resolve({
-          status: 'failure',
-          error: error,
-        });
+      if (this._client == null) {
+        try {
+          this._client = new clientConstructor(
+            this._parameters.address,
+            this._parameters.credentials(),
+            {
+              'grpc.default_compression_algorithm': toGrpcCompression(
+                this._parameters.compression
+              ),
+              'grpc.primary_user_agent': createUserAgent(
+                this._parameters.userAgent
+              ),
+            }
+          );
+          this._deadlineExceededCount = 0;
+        } catch (error) {
+          return {
+            status: 'failure',
+            error: error,
+          };
+        }
       }
     }
 

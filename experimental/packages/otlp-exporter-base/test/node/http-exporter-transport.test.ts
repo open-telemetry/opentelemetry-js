@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { createHttpExporterTransport } from '../../src/transport/http-exporter-transport';
-import { MAX_RESPONSE_BODY_SIZE } from '../../src/transport/http-transport-utils';
+import { createHttpExporterTransport } from '../../src/platform/node/transport/http-exporter-transport';
+import { MAX_RESPONSE_BODY_SIZE } from '../../src/platform/node/transport/http-transport-utils';
 import * as http from 'http';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -232,7 +232,11 @@ describe('HttpExporterTransport', function () {
 
     it('returns retryable when request times out', function (done) {
       // arrange
-      const timer = sinon.useFakeTimers();
+      // do not fake process.nextTick (faked by default since sinon 19), it
+      // would stall the http client's internal stream handling
+      const timer = sinon.useFakeTimers({
+        toFake: ['setTimeout', 'clearTimeout'],
+      });
       server = http.createServer((_, res) => {
         setTimeout(() => {
           res.statusCode = 200;

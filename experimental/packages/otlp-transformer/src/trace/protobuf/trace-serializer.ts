@@ -5,7 +5,6 @@
 import type { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace';
 import type { Link, SpanStatus } from '@opentelemetry/api';
 import { ProtobufWriter } from '../../common/protobuf/protobuf-writer';
-import { hexToBinary } from '../../common/hex-to-binary';
 import type { Resource } from '@opentelemetry/resources';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import {
@@ -15,7 +14,6 @@ import {
   writeHrTimeAsFixed64,
 } from '../../common/protobuf/common-serializer';
 import type { IProtobufWriter } from '../../common/protobuf/i-protobuf-writer';
-import { ProtobufSizeEstimator } from '../../common/protobuf/protobuf-size-estimator';
 
 // Span flags constants matching the OTLP specification
 const SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK = 0x100;
@@ -47,9 +45,11 @@ function serializeStatus(writer: IProtobufWriter, status: SpanStatus): void {
     writer.writeString(status.message);
   }
 
-  // code (field 3, enum/varint) - always write as it defaults to UNSET (0) in proto
-  writer.writeTag(3, 0);
-  writer.writeVarint(status.code);
+  // code (field 3, enum/varint) - skip if UNSET (0)
+  if (status.code) {
+    writer.writeTag(3, 0);
+    writer.writeVarint(status.code);
+  }
 
   writer.finishLengthDelimited(statusStart, writer.pos - statusStartPos);
 }
@@ -80,9 +80,11 @@ function serializeEvent(writer: IProtobufWriter, event: TimedEvent): void {
     writeAttributes(writer, event.attributes, 3);
   }
 
-  // dropped_attributes_count (field 4, uint32)
-  writer.writeTag(4, 0);
-  writer.writeVarint(event.droppedAttributesCount || 0);
+  // dropped_attributes_count (field 4, uint32) - skip if 0
+  if (event.droppedAttributesCount) {
+    writer.writeTag(4, 0);
+    writer.writeVarint(event.droppedAttributesCount);
+  }
 
   writer.finishLengthDelimited(eventStart, writer.pos - eventStartPos);
 }
@@ -106,11 +108,11 @@ function serializeLink(writer: IProtobufWriter, link: Link): void {
 
   // trace_id (field 1, bytes)
   writer.writeTag(1, 2);
-  writer.writeBytes(hexToBinary(context.traceId));
+  writer.writeHexBytes(context.traceId);
 
   // span_id (field 2, bytes)
   writer.writeTag(2, 2);
-  writer.writeBytes(hexToBinary(context.spanId));
+  writer.writeHexBytes(context.spanId);
 
   // trace_state (field 3, string) - skip if empty
   const linkTraceState = context.traceState?.serialize();
@@ -124,9 +126,11 @@ function serializeLink(writer: IProtobufWriter, link: Link): void {
     writeAttributes(writer, link.attributes, 4);
   }
 
-  // dropped_attributes_count (field 5, uint32)
-  writer.writeTag(5, 0);
-  writer.writeVarint(link.droppedAttributesCount || 0);
+  // dropped_attributes_count (field 5, uint32) - skip if 0
+  if (link.droppedAttributesCount) {
+    writer.writeTag(5, 0);
+    writer.writeVarint(link.droppedAttributesCount);
+  }
 
   // flags (field 6, fixed32)
   const linkFlags = buildSpanFlags(context.traceFlags, context.isRemote);
@@ -167,11 +171,11 @@ function serializeSpan(writer: IProtobufWriter, span: ReadableSpan): void {
 
   // trace_id (field 1, bytes)
   writer.writeTag(1, 2);
-  writer.writeBytes(hexToBinary(ctx.traceId));
+  writer.writeHexBytes(ctx.traceId);
 
   // span_id (field 2, bytes)
   writer.writeTag(2, 2);
-  writer.writeBytes(hexToBinary(ctx.spanId));
+  writer.writeHexBytes(ctx.spanId);
 
   // trace_state (field 3, string) - skip if empty
   const traceState = ctx.traceState?.serialize();
@@ -183,7 +187,7 @@ function serializeSpan(writer: IProtobufWriter, span: ReadableSpan): void {
   // parent_span_id (field 4, bytes) - skip if empty
   if (span.parentSpanContext?.spanId) {
     writer.writeTag(4, 2);
-    writer.writeBytes(hexToBinary(span.parentSpanContext.spanId));
+    writer.writeHexBytes(span.parentSpanContext.spanId);
   }
 
   // name (field 5, string)
@@ -211,9 +215,11 @@ function serializeSpan(writer: IProtobufWriter, span: ReadableSpan): void {
     writeAttributes(writer, span.attributes, 9);
   }
 
-  // dropped_attributes_count (field 10, uint32)
-  writer.writeTag(10, 0);
-  writer.writeVarint(span.droppedAttributesCount);
+  // dropped_attributes_count (field 10, uint32) - skip if 0
+  if (span.droppedAttributesCount) {
+    writer.writeTag(10, 0);
+    writer.writeVarint(span.droppedAttributesCount);
+  }
 
   // events (field 11, repeated Event)
   for (const event of span.events) {
@@ -221,9 +227,11 @@ function serializeSpan(writer: IProtobufWriter, span: ReadableSpan): void {
     serializeEvent(writer, event);
   }
 
-  // dropped_events_count (field 12, uint32)
-  writer.writeTag(12, 0);
-  writer.writeVarint(span.droppedEventsCount);
+  // dropped_events_count (field 12, uint32) - skip if 0
+  if (span.droppedEventsCount) {
+    writer.writeTag(12, 0);
+    writer.writeVarint(span.droppedEventsCount);
+  }
 
   // links (field 13, repeated Link)
   for (const link of span.links) {
@@ -231,9 +239,11 @@ function serializeSpan(writer: IProtobufWriter, span: ReadableSpan): void {
     serializeLink(writer, link);
   }
 
-  // dropped_links_count (field 14, uint32)
-  writer.writeTag(14, 0);
-  writer.writeVarint(span.droppedLinksCount);
+  // dropped_links_count (field 14, uint32) - skip if 0
+  if (span.droppedLinksCount) {
+    writer.writeTag(14, 0);
+    writer.writeVarint(span.droppedLinksCount);
+  }
 
   // status (field 15, Status)
   writer.writeTag(15, 2);
@@ -355,15 +365,7 @@ function createResourceMap(
 export function serializeTraceExportRequest(spans: ReadableSpan[]): Uint8Array {
   const resourceMap = createResourceMap(spans);
 
-  // First pass: estimate size
-  const estimator = new ProtobufSizeEstimator();
-  for (const [resource, scopeMap] of resourceMap) {
-    estimator.writeTag(1, 2);
-    serializeResourceSpans(estimator, resource, scopeMap);
-  }
-
-  // Second pass: write with estimated size
-  const writer = new ProtobufWriter(estimator.pos);
+  const writer = new ProtobufWriter();
   for (const [resource, scopeMap] of resourceMap) {
     writer.writeTag(1, 2);
     serializeResourceSpans(writer, resource, scopeMap);

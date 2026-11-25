@@ -1,6 +1,5 @@
-const { context, trace } = require("@opentelemetry/api");
-const { ConsoleSpanExporter, SimpleSpanProcessor} = require("@opentelemetry/sdk-trace-base");
-const { WebTracerProvider } = require("@opentelemetry/sdk-trace-web");
+const { context, trace, propagation } = require("@opentelemetry/api");
+const { ConsoleSpanExporter, SimpleSpanProcessor, TracerProvider } = require("@opentelemetry/sdk-trace");
 const { FetchInstrumentation } = require("@opentelemetry/instrumentation-fetch");
 const { ZoneContextManager } = require("@opentelemetry/context-zone");
 const { B3Propagator } = require("@opentelemetry/propagator-b3");
@@ -9,7 +8,7 @@ const { OTLPTraceExporter: OTLPTraceExporterProto } = require("@opentelemetry/ex
 const { resourceFromAttributes } = require("@opentelemetry/resources");
 const { ATTR_SERVICE_NAME } = require("@opentelemetry/semantic-conventions");
 
-const provider = new WebTracerProvider({
+const provider = new TracerProvider({
   resource: resourceFromAttributes({
     [ATTR_SERVICE_NAME]: 'fetch-proto-web-service'
   }),
@@ -17,15 +16,14 @@ const provider = new WebTracerProvider({
   // to your exporter. Using the SimpleSpanProcessor here as it sends the spans immediately to the
   // exporter without delay
   spanProcessors: [
-    new SimpleSpanProcessor(new ConsoleSpanExporter()),
-    new SimpleSpanProcessor(new OTLPTraceExporterProto()),
+    new SimpleSpanProcessor({ exporter: new ConsoleSpanExporter() }),
+    new SimpleSpanProcessor({ exporter: new OTLPTraceExporterProto() }),
   ]
 });
 
-provider.register({
-  contextManager: new ZoneContextManager(),
-  propagator: new B3Propagator(),
-});
+propagation.setGlobalPropagator(new B3Propagator());
+context.setGlobalContextManager(new ZoneContextManager().enable());
+trace.setGlobalTracerProvider(provider);
 
 registerInstrumentations({
   instrumentations: [

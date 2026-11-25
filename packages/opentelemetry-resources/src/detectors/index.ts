@@ -4,10 +4,12 @@
  */
 
 export { envDetector } from './EnvDetector';
+export { resourceAttributesEnvDetector } from './ResourceAttributesEnvDetector';
+export { serviceNameEnvDetector } from './ServiceNameEnvDetector';
 export {
   hostDetector,
   osDetector,
   processDetector,
   serviceInstanceIdDetector,
-} from './platform';
+} from '#platform';
 export { noopDetector } from './NoopDetector';

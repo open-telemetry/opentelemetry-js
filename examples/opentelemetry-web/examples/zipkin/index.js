@@ -1,10 +1,10 @@
-const { ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
-const { WebTracerProvider } = require('@opentelemetry/sdk-trace-web');
+const { trace } = require('@opentelemetry/api');
+const { ConsoleSpanExporter, SimpleSpanProcessor, TracerProvider } = require('@opentelemetry/sdk-trace');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 const { resourceFromAttributes } = require('@opentelemetry/resources');
 const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 
-const provider = new WebTracerProvider({
+const provider = new TracerProvider({
   resource: resourceFromAttributes({
     [ATTR_SERVICE_NAME]: 'zipkin-web-service'
   }),
@@ -12,19 +12,21 @@ const provider = new WebTracerProvider({
   // to your exporter. Using the SimpleSpanProcessor here as it sends the spans immediately to the
   // exporter without delay
   spanProcessors: [
-    new SimpleSpanProcessor(new ConsoleSpanExporter()),
-    new SimpleSpanProcessor(new ZipkinExporter({
-      // testing interceptor
-      // getExportRequestHeaders: () => {
-      //   return {
-      //     foo: 'bar',
-      //   }
-      // }
-    })),
+    new SimpleSpanProcessor({ exporter: new ConsoleSpanExporter() }),
+    new SimpleSpanProcessor({
+      exporter: new ZipkinExporter({
+        // testing interceptor
+        // getExportRequestHeaders: () => {
+        //   return {
+        //     foo: 'bar',
+        //   }
+        // }
+      })
+    }),
   ]
 });
 
-provider.register();
+trace.setGlobalTracerProvider(provider);
 
 const tracer = provider.getTracer('example-tracer-web');
 

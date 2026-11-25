@@ -4,10 +4,9 @@
  */
 import type { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { ProtobufWriter } from '../../common/protobuf/protobuf-writer';
-import { hexToBinary } from '../../common/hex-to-binary';
 import type { Resource } from '@opentelemetry/resources';
 import type { InstrumentationScope } from '@opentelemetry/core';
-import { SeverityNumber } from '@opentelemetry/api-logs';
+import { SeverityNumber } from '@opentelemetry/api';
 import {
   writeInstrumentationScope,
   writeResource,
@@ -16,7 +15,6 @@ import {
   writeHrTimeAsFixed64,
 } from '../../common/protobuf/common-serializer';
 import type { IProtobufWriter } from '../../common/protobuf/i-protobuf-writer';
-import { ProtobufSizeEstimator } from '../../common/protobuf/protobuf-size-estimator';
 
 /**
  * Serialize a single LogRecord directly from ReadableLogRecord
@@ -61,9 +59,11 @@ function serializeLogRecord(
     writeAttributes(writer, logRecord.attributes, 6);
   }
 
-  // dropped_attributes_count (field 7, uint32)
-  writer.writeTag(7, 0);
-  writer.writeVarint(logRecord.droppedAttributesCount);
+  // dropped_attributes_count (field 7, uint32) - skip if 0
+  if (logRecord.droppedAttributesCount) {
+    writer.writeTag(7, 0);
+    writer.writeVarint(logRecord.droppedAttributesCount);
+  }
 
   // flags (field 8, fixed32) - skip if 0 or undefined
   if (logRecord.spanContext?.traceFlags) {
@@ -74,13 +74,13 @@ function serializeLogRecord(
   // trace_id (field 9, bytes) - skip if empty
   if (logRecord.spanContext?.traceId) {
     writer.writeTag(9, 2);
-    writer.writeBytes(hexToBinary(logRecord.spanContext.traceId));
+    writer.writeHexBytes(logRecord.spanContext.traceId);
   }
 
   // span_id (field 10, bytes) - skip if empty
   if (logRecord.spanContext?.spanId) {
     writer.writeTag(10, 2);
-    writer.writeBytes(hexToBinary(logRecord.spanContext.spanId));
+    writer.writeHexBytes(logRecord.spanContext.spanId);
   }
 
   // observed_time_unix_nano (field 11, fixed64)
@@ -198,15 +198,7 @@ export function serializeLogsExportRequest(
 ): Uint8Array {
   const resourceMap = createResourceMap(logRecords);
 
-  // First pass: estimate size
-  const estimator = new ProtobufSizeEstimator();
-  for (const [resource, scopeMap] of resourceMap) {
-    estimator.writeTag(1, 2);
-    serializeResourceLogs(estimator, resource, scopeMap);
-  }
-
-  // Second pass: write with estimated size
-  const writer = new ProtobufWriter(estimator.pos);
+  const writer = new ProtobufWriter();
   for (const [resource, scopeMap] of resourceMap) {
     writer.writeTag(1, 2);
     serializeResourceLogs(writer, resource, scopeMap);

@@ -1,6 +1,6 @@
 # Instrumentation Developer Guide
 
-A detailed explained guide how to instrument a package is available at [instrumentation package][base-instrumentation]
+A detailed guide explaining how to instrument a package is available at [instrumentation package][base-instrumentation]
 
 For more comprehensive examples please refer to the [HTTP instrumentation][http-instrumentation] or [gRPC instrumentation][grpc-instrumentation] for node
 and [XMLHttpRequest instrumentation][xhr-instrumentation] for web.

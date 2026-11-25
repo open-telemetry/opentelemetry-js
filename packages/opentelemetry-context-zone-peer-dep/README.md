@@ -23,16 +23,15 @@ import { context, trace } from '@opentelemetry/api';
 import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,
-  WebTracerProvider,
-} from '@opentelemetry/sdk-trace-web';
+  TracerProvider,
+} from '@opentelemetry/sdk-trace';
 import { ZoneContextManager } from '@opentelemetry/context-zone-peer-dep';
 
-const providerWithZone = new WebTracerProvider({
+const providerWithZone = new TracerProvider({
   spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
 });
-providerWithZone.register({
-  contextManager: new ZoneContextManager()
-});
+trace.setGlobalTracerProvider(providerWithZone);
+context.setGlobalContextManager(new ZoneContextManager().enable());
 
 // Example how the ZoneContextManager keeps the reference to the correct context during async operations
 const webTracerWithZone = providerWithZone.getTracer('default');

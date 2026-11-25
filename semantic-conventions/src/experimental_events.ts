@@ -163,7 +163,7 @@ export const EVENT_GEN_AI_CLIENT_INFERENCE_OPERATION_DETAILS = 'gen_ai.client.in
 export const EVENT_GEN_AI_CLIENT_OPERATION_EXCEPTION = 'gen_ai.client.operation.exception' as const;
 
 /**
- * This event captures the result of evaluating GenAI output for quality, accuracy, or other characteristics. This event **SHOULD** be parented to GenAI operation span being evaluated when possible or set `gen_ai.response.id` when span id is not available.
+ * This event captures the result of evaluating GenAI output for quality, accuracy, or other characteristics. This event **SHOULD** be parented to GenAI operation span being evaluated when possible or set `gen_ai.response.id` when span ID is not available.
  *
  * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -321,7 +321,7 @@ export const EVENT_SESSION_END = 'session.end' as const;
 /**
  * Indicates that a new session has been started, optionally linking to the prior session.
  *
- * @note For instrumentation that tracks user behavior during user sessions, a `session.start` event **MUST** be emitted every time a session is created. When a new session is created as a continuation of a prior session, the `session.previous_id` **SHOULD** be included in the event. The values of `session.id` and `session.previous_id` **MUST** be different.
+ * @note For instrumentation that tracks user behavior during user sessions, a `session.start` event **MUST** be emitted every time a session is created. When a new session is created as a continuation of a prior session, the `session.previous_id` **MUST** be included in the event. The values of `session.id` and `session.previous_id` **MUST** be different.
  * When the `session.start` event contains both `session.id` and `session.previous_id` fields, the event indicates that the previous session has ended. If the session ID in `session.previous_id` has not yet ended via explicit `session.end` event, then the consumer **SHOULD** treat this continuation event as semantically equivalent to `session.end(session.previous_id)` and `session.start(session.id)`.
  *
  * @experimental This event is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.

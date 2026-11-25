@@ -27,25 +27,21 @@ function isNormalizedKey(key: string): boolean {
   }
 
   const firstCharCode = key.charCodeAt(0);
-  if (
-    !(
-      (firstCharCode >= ASCII_UPPER_A && firstCharCode <= ASCII_UPPER_Z) ||
-      firstCharCode === ASCII_UNDERSCORE
-    )
-  ) {
+  if (!(
+    (firstCharCode >= ASCII_UPPER_A && firstCharCode <= ASCII_UPPER_Z) ||
+    firstCharCode === ASCII_UNDERSCORE
+  )) {
     return false;
   }
 
   for (let i = 1; i < key.length; i++) {
     const charCode = key.charCodeAt(i);
 
-    if (
-      !(
-        (charCode >= ASCII_UPPER_A && charCode <= ASCII_UPPER_Z) ||
-        (charCode >= ASCII_DIGIT_0 && charCode <= ASCII_DIGIT_9) ||
-        charCode === ASCII_UNDERSCORE
-      )
-    ) {
+    if (!(
+      (charCode >= ASCII_UPPER_A && charCode <= ASCII_UPPER_Z) ||
+      (charCode >= ASCII_DIGIT_0 && charCode <= ASCII_DIGIT_9) ||
+      charCode === ASCII_UNDERSCORE
+    )) {
       return false;
     }
   }

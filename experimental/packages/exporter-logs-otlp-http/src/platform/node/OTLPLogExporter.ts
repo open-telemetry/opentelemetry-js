@@ -7,7 +7,7 @@ import type {
   ReadableLogRecord,
   LogRecordExporter,
 } from '@opentelemetry/sdk-logs';
-import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base/node-http';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import {
   JsonLogsSerializer,
@@ -18,7 +18,7 @@ import {
   createOtlpHttpExportDelegate,
 } from '@opentelemetry/otlp-exporter-base/node-http';
 
-import { OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_LOG_EXPORTER } from '../../semconv';
+import { OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_JSON_LOG_EXPORTER } from '../../semconv';
 
 /**
  * Collector Logs Exporter for Node
@@ -34,7 +34,7 @@ export class OTLPLogExporter
           'Content-Type': 'application/json',
         }),
         JsonLogsSerializer,
-        OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_LOG_EXPORTER,
+        OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_JSON_LOG_EXPORTER,
         LogsExporterMetricsHelper,
         config.selfObsMeterProvider
       )

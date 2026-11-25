@@ -10,7 +10,7 @@ import type {
 import type { MetricProducer } from '../../src/export/MetricProducer';
 import { testResource } from '../util';
 
-export const emptyResourceMetrics = {
+export const emptyResourceMetrics: ResourceMetrics = {
   resource: testResource,
   scopeMetrics: [],
 };

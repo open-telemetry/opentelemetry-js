@@ -29,8 +29,7 @@ export interface OtlpGrpcConfiguration extends OtlpSharedConfiguration {
 /**
  * Unresolved configuration where parts of the config may depend on other config options being resolved first.
  */
-export interface UnresolvedOtlpGrpcConfiguration
-  extends OtlpSharedConfiguration {
+export interface UnresolvedOtlpGrpcConfiguration extends OtlpSharedConfiguration {
   url: string;
   metadata: () => Metadata;
   /**

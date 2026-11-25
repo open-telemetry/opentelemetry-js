@@ -1,0 +1,15 @@
+file_format: "1.2"
+tracer_provider:
+  processors:
+    - batch:
+        exporter:
+          otlp_http:
+            endpoint: "http://localhost:4318/v1/traces"
+            # `max_request_size` was added in v1.2.0
+            max_request_size: 1048576  # 1MiB
+  # `always_record` was added in v1.2.0
+  sampler:
+    always_record:
+      root:
+        parent_based:
+
