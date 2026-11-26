@@ -38,6 +38,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 * test: use erasable syntax on type assertions [#7311](https://github.com/open-telemetry/opentelemetry-js/pull/7311) @legendecas
 * fix(otlp-transformer): omit proto3 defalt value fields [#7316](https://github.com/open-telemetry/opentelemetry-js/pull/7316) @legendecas
 * refactor(otlp-transformer): decode hex IDs directly into the protobuf buffer [#7369](https://github.com/open-telemetry/opentelemetry-js/pull/7369) @legendecas
+* perf(otlp-transformer): check and copy short ASCII strings in one pass in `ProtobufWriter#writeString` [#7385](https://github.com/open-telemetry/opentelemetry-js/pull/7385) @daniellockyer
 * perf(otlp-transformer): add a fast path for single-byte varints in `ProtobufWriter#writeVarint` [#7387](https://github.com/open-telemetry/opentelemetry-js/pull/7387) @daniellockyer
 
 ## 0.301.2

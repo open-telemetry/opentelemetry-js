@@ -304,18 +304,25 @@ export class ProtobufWriter implements IProtobufWriter {
    */
   writeString(str: string): void {
     const len = str.length;
-    // Limit ASCII detection to short strings to avoid scanning long values.
+    // An ASCII string shorter than 128 characters has a 1-byte length prefix,
+    // so copy it optimistically and fall through to the UTF-8 encoder below if
+    // a non-ASCII character shows up.
     if (len < 128) {
+      this._ensureCapacity(len + 1);
+      const buffer = this._buffer;
+      const start = this.pos + 1;
       let i = 0;
-      while (i < len && str.charCodeAt(i) < 128) {
-        i++;
+      for (; i < len; i++) {
+        const c = str.charCodeAt(i);
+        if (c >= 128) {
+          break;
+        }
+        buffer[start + i] = c;
       }
       if (i === len) {
-        this.writeVarint(len);
-        this._ensureCapacity(len);
-        for (i = 0; i < len; i++) {
-          this._buffer[this.pos++] = str.charCodeAt(i);
-        }
+        // Short-cut for small-integer varint length
+        buffer[this.pos] = len;
+        this.pos = start + len;
         return;
       }
     }
