@@ -1,7 +1,7 @@
 services:
   # Collector
   collector:
-    image: otel/opentelemetry-collector-contrib:latest
+    image: otel/opentelemetry-collector-contrib:latest@sha256:e40d61f10c9a617cca1ffd1be4d7e2b3a4b0f0001798ff07e58cabe82e618cea
     command: ["--config=/conf/collector-config.yaml"]
     volumes:
       - ./collector-config.yaml:/conf/collector-config.yaml
@@ -14,14 +14,14 @@ services:
 
   # Zipkin
   zipkin-all-in-one:
-    image: openzipkin/zipkin:latest
+    image: openzipkin/zipkin:latest@sha256:d17e856dcbba7ffeefbbfc252f89ab78a4ab6faed47e646d46daad78f91b5ee2
     ports:
       - "9411:9411"
 
   # Prometheus
   prometheus:
     container_name: prometheus
-    image: prom/prometheus:latest
+    image: prom/prometheus:latest@sha256:e04987641b57704f408e31f6373ba4138ecf27cb4a165d24aabb6c38fddd0f06
     volumes:
       - ./prometheus.yaml:/etc/prometheus/prometheus.yml
     ports:
