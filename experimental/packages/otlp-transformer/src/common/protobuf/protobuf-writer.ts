@@ -169,6 +169,18 @@ export class ProtobufWriter implements IProtobufWriter {
    * Write a varint (variable-length integer)
    */
   writeVarint(value: number): void {
+    if (value >= 0 && value < 0x80) {
+      // Short-cut for small-integer varints, which are a single byte.
+      this._ensureCapacity(1);
+      this._buffer[this.pos++] = value;
+      return;
+    }
+    this._writeMultiByteVarint(value);
+  }
+
+  // Kept separate from writeVarint so that writeVarint stays small enough to
+  // be inlined.
+  private _writeMultiByteVarint(value: number): void {
     this._ensureCapacity(estimateVarintSize(value));
     // Check if value fits in 32-bit range
     if (value >= 0 && value <= 0xffffffff) {
