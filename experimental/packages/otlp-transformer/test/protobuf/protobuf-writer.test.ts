@@ -232,6 +232,49 @@ describe('ProtobufWriter', function () {
     }
   });
 
+  describe('writeVarint', function () {
+    for (const [value, bytes] of [
+      [0, [0x00]],
+      [1, [0x01]],
+      [127, [0x7f]],
+      [128, [0x80, 0x01]],
+      [300, [0xac, 0x02]],
+      [2 ** 32 - 1, [0xff, 0xff, 0xff, 0xff, 0x0f]],
+      [-1, [0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x01]],
+    ] as const) {
+      it(`writes ${value}`, function () {
+        // A zero capacity also covers growth while writing the value.
+        for (const capacity of [0, 16]) {
+          const writer = new ProtobufWriter(capacity);
+          writer.writeVarint(value);
+          assert.deepStrictEqual(writer.finish(), new Uint8Array(bytes));
+        }
+      });
+    }
+  });
+
+  describe('writeTag', function () {
+    it('writes 1-, 2- and 3-byte tags', function () {
+      for (const [fieldNumber, wireType, bytes] of [
+        [1, 0, [0x08]],
+        [2, 2, [0x12]],
+        [15, 5, [0x7d]],
+        [16, 0, [0x80, 0x01]],
+        [16, 5, [0x85, 0x01]],
+        [2047, 5, [0xfd, 0x7f]],
+        [2048, 0, [0x80, 0x80, 0x01]],
+      ] as const) {
+        const writer = new ProtobufWriter(0);
+        writer.writeTag(fieldNumber, wireType);
+        assert.deepStrictEqual(
+          writer.finish(),
+          new Uint8Array(bytes),
+          `field ${fieldNumber}, wire type ${wireType}`
+        );
+      }
+    });
+  });
+
   describe('writeHexBytes', function () {
     for (const hex of [
       '0af7651916cd43dd8448eb211c80319c',

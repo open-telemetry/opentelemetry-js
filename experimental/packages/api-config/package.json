@@ -57,7 +57,7 @@
     "sinon": "22.1.0",
     "ts-loader": "9.6.2",
     "typescript": "5.2.2",
-    "webpack": "5.112.2"
+    "webpack": "5.113.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/api-config",
   "sideEffects": false,
