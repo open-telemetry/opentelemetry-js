@@ -618,6 +618,47 @@ describe('BatchSpanProcessorBase', () => {
       assert.equal(callbacks.length, 2);
       assert.equal(spans.length, 10);
     });
+
+    it('should only send a single batch at a time after an export fails', async () => {
+      const clock = sinon.useFakeTimers();
+      const errorHandlerSpy = sinon.spy();
+      setGlobalErrorHandler(errorHandlerSpy);
+      const callbacks: ((result: ExportResult) => void)[] = [];
+      const exporter: SpanExporter = {
+        export: (_spans, resultCallback) => {
+          callbacks.push(resultCallback);
+        },
+        shutdown: async () => {},
+      };
+      const processor = new BatchSpanProcessor({
+        exporter,
+        maxExportBatchSize: 5,
+        maxQueueSize: 20,
+      });
+      const endSpan = () => {
+        const span = createSampledSpan(name);
+        processor.onStart(span, ROOT_CONTEXT);
+        processor.onEnd(span);
+      };
+
+      // The fifth span starts the first export; the other 15 wait in the queue.
+      for (let i = 0; i < 20; i++) endSpan();
+      assert.strictEqual(callbacks.length, 1);
+
+      const exportError = new Error('export failed');
+      callbacks[0]({ code: ExportResultCode.FAILED, error: exportError });
+      await clock.tickAsync(0);
+      // A full batch is still queued, so the next export starts at once.
+      assert.strictEqual(callbacks.length, 2);
+      sinon.assert.calledOnceWithExactly(errorHandlerSpy, exportError);
+
+      // A span ended while that export is outstanding must not start another.
+      endSpan();
+      assert.strictEqual(callbacks.length, 2);
+
+      clock.restore();
+      setGlobalErrorHandler(loggingErrorHandler());
+    });
   });
 
   describe('Metrics', () => {
