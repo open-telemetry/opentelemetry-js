@@ -28,3 +28,13 @@ export const USER_AGENT_SYNTHETIC_TYPE_VALUE_BOT = 'bot' as const;
  * Enum value "test" for attribute {@link ATTR_USER_AGENT_SYNTHETIC_TYPE}.
  */
 export const USER_AGENT_SYNTHETIC_TYPE_VALUE_TEST = 'test' as const;
+
+/**
+ * The body of the request.
+ *
+ * @note This attribute may contain sensitive information.
+ *
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HTTP_REQUEST_BODY_CONTENT =
+  'http.request.body.content' as const;
