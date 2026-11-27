@@ -3,8 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { LogRecord, SeverityNumber } from '@opentelemetry/api';
-import * as api from '@opentelemetry/api';
+import type {
+  AnyValue,
+  Attributes,
+  HrTime,
+  LogRecord,
+  SeverityNumber,
+  SpanContext,
+} from '@opentelemetry/api';
+import { diag, isSpanContextValid, trace } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import {
   AddAttributeDecision,
@@ -24,16 +31,16 @@ import type { LoggerProviderSharedState } from './internal/LoggerProviderSharedS
 export class LogRecordImpl implements ReadableLogRecord {
   readonly resource: Resource;
   readonly instrumentationScope: InstrumentationScope & {
-    attributes?: api.Attributes;
+    attributes?: Attributes;
     droppedAttributesCount?: number;
   };
-  readonly attributes: api.Attributes = {};
-  private _hrTime: api.HrTime;
-  private _hrTimeObserved: api.HrTime;
-  private _spanContext?: api.SpanContext;
+  readonly attributes: Attributes = {};
+  private _hrTime: HrTime;
+  private _hrTimeObserved: HrTime;
+  private _spanContext?: SpanContext;
   private _severityText?: string;
   private _severityNumber?: SeverityNumber;
-  private _body?: api.AnyValue;
+  private _body?: AnyValue;
   private _eventName?: string;
   private _attributesCount: number = 0;
   private _droppedAttributesCount: number = 0;
@@ -41,30 +48,30 @@ export class LogRecordImpl implements ReadableLogRecord {
   private _isReadonly: boolean = false;
   private readonly _logRecordLimits: Required<LogRecordLimits>;
 
-  get hrTime(): api.HrTime {
+  get hrTime(): HrTime {
     return this._hrTime;
   }
-  set hrTime(hrTime: api.HrTime) {
+  set hrTime(hrTime: HrTime) {
     if (this._isLogRecordReadonly()) {
       return;
     }
     this._hrTime = hrTime;
   }
 
-  get hrTimeObserved(): api.HrTime {
+  get hrTimeObserved(): HrTime {
     return this._hrTimeObserved;
   }
-  set hrTimeObserved(hrTimeObserved: api.HrTime) {
+  set hrTimeObserved(hrTimeObserved: HrTime) {
     if (this._isLogRecordReadonly()) {
       return;
     }
     this._hrTimeObserved = hrTimeObserved;
   }
 
-  get spanContext(): api.SpanContext | undefined {
+  get spanContext(): SpanContext | undefined {
     return this._spanContext;
   }
-  set spanContext(spanContext: api.SpanContext | undefined) {
+  set spanContext(spanContext: SpanContext | undefined) {
     if (this._isLogRecordReadonly()) {
       return;
     }
@@ -91,13 +98,13 @@ export class LogRecordImpl implements ReadableLogRecord {
     return this._severityNumber;
   }
 
-  set body(body: api.AnyValue | undefined) {
+  set body(body: AnyValue | undefined) {
     if (this._isLogRecordReadonly()) {
       return;
     }
     this._body = body;
   }
-  get body(): api.AnyValue | undefined {
+  get body(): AnyValue | undefined {
     return this._body;
   }
 
@@ -137,8 +144,8 @@ export class LogRecordImpl implements ReadableLogRecord {
     this._hrTimeObserved = timeInputToHrTime(observedTimestamp ?? now);
 
     if (context) {
-      const spanContext = api.trace.getSpanContext(context);
-      if (spanContext && api.isSpanContextValid(spanContext)) {
+      const spanContext = trace.getSpanContext(context);
+      if (spanContext && isSpanContextValid(spanContext)) {
         this._spanContext = spanContext;
       }
     }
@@ -155,7 +162,7 @@ export class LogRecordImpl implements ReadableLogRecord {
     }
   }
 
-  public setAttribute(key: string, value?: api.AnyValue) {
+  public setAttribute(key: string, value?: AnyValue) {
     if (this._isLogRecordReadonly()) {
       return this;
     }
@@ -172,7 +179,7 @@ export class LogRecordImpl implements ReadableLogRecord {
       this._droppedAttributesCount++;
       if (this._droppedAttributesCount === 1) {
         // Only warn once per LogRecord to avoid log spam
-        api.diag.warn('Dropping extra attributes.');
+        diag.warn('Dropping extra attributes.');
       }
     } else if (decision === AddAttributeDecision.ADD_NEW) {
       this._attributesCount++;
@@ -181,14 +188,14 @@ export class LogRecordImpl implements ReadableLogRecord {
     return this;
   }
 
-  public setAttributes(attributes: api.Attributes) {
+  public setAttributes(attributes: Attributes) {
     for (const [k, v] of Object.entries(attributes)) {
       this.setAttribute(k, v);
     }
     return this;
   }
 
-  public setBody(body: api.AnyValue) {
+  public setBody(body: AnyValue) {
     this.body = body;
     return this;
   }
@@ -261,13 +268,13 @@ export class LogRecordImpl implements ReadableLogRecord {
     }
 
     if (!hasMinimumAttributes) {
-      api.diag.warn(`Failed to record an exception ${exception}`);
+      diag.warn(`Failed to record an exception ${exception}`);
     }
   }
 
   private _isLogRecordReadonly(): boolean {
     if (this._isReadonly) {
-      api.diag.warn('Can not execute the operation on emitted log record');
+      diag.warn('Can not execute the operation on emitted log record');
     }
     return this._isReadonly;
   }
