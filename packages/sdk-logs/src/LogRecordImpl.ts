@@ -182,8 +182,9 @@ export class LogRecordImpl implements ReadableLogRecord {
   }
 
   public setAttributes(attributes: api.Attributes) {
-    for (const [k, v] of Object.entries(attributes)) {
-      this.setAttribute(k, v);
+    const keys = Object.keys(attributes);
+    for (let i = 0; i < keys.length; i++) {
+      this.setAttribute(keys[i], attributes[keys[i]]);
     }
     return this;
   }
