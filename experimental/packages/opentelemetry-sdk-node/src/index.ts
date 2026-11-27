@@ -9,6 +9,7 @@ export type { NodeSDKConfiguration } from './types';
 
 export { startNodeSdk } from './start';
 export type { StartSdkOptions } from './types';
+export type { ComponentProviderRegistry } from './component-provider';
 
 /** Deprecated exports */
 export { startNodeSDK } from './start';

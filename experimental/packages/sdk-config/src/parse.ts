@@ -28,7 +28,7 @@ import validateConfig = require('./generated/validator');
 // settings may be ignored. See
 // https://github.com/open-telemetry/opentelemetry-configuration/blob/main/VERSIONING.md
 const SUPPORTED_FILE_FORMAT_MAJOR = 1;
-const SUPPORTED_FILE_FORMAT_MINOR = 1;
+const SUPPORTED_FILE_FORMAT_MINOR = 2;
 
 function validateFileFormat(fileFormat: unknown, source?: string): void {
   const errPrefix = source ? `${source}: ` : '';
