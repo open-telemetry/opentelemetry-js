@@ -74,7 +74,7 @@
     "nyc": "18.0.0",
     "sinon": "22.1.0",
     "superagent": "10.4.2",
-    "typescript": "5.2.2"
+    "typescript": "5.7.2"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.10.0"

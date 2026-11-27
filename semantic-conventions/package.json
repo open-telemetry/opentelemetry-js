@@ -59,7 +59,7 @@
   },
   "devDependencies": {
     "@types/node": "^14.18.63",
-    "typescript": "5.2.2"
+    "typescript": "5.7.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/semantic-conventions",
   "sideEffects": false

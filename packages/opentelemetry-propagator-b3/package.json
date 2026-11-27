@@ -63,7 +63,7 @@
     "mocha": "12.0.3",
     "nyc": "18.0.0",
     "ts-loader": "9.6.2",
-    "typescript": "5.2.2"
+    "typescript": "5.7.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-propagator-b3",
   "sideEffects": false
