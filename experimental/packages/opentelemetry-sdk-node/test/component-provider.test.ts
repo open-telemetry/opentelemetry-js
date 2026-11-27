@@ -256,10 +256,7 @@ describe('componentProviderRegistries option to startNodeSdk', function () {
     }, /is already registered/);
   });
 
-  it('overriding built-in component provider names warns and is ignored', async () => {
-    const consoleDirStub = sinon.stub(console, 'dir');
-    const diagWarnSpy = sinon.spy(diag, 'warn');
-
+  it('overriding built-in component provider names throws', async () => {
     process.env.OTEL_CONFIG_FILE =
       'test/fixtures/override-builtin-provider.yaml';
     const logRecords: ReadWriteLogRecord[] = [];
@@ -270,26 +267,18 @@ describe('componentProviderRegistries option to startNodeSdk', function () {
         logRecords.push(logRecord);
       }
     }
-    const sdk = startNodeSdk({
-      componentProviderRegistries: [
-        {
-          LogRecordProcessor: {
-            simple: () => new MyProcessor(),
-          },
-        },
-      ],
-    });
-    const logger = logs.getLogger('test');
-    const rec = { body: 'hi', attributes: { foo: 'bar' } };
-    logger.emit(rec);
-    await sdk.shutdown();
 
-    assert.equal(logRecords.length, 0);
-    sinon.assert.calledOnceWithMatch(
-      diagWarnSpy,
-      'cannot override built-in ComponentProvider of type'
-    );
-    sinon.assert.calledOnce(consoleDirStub);
+    assert.throws(() => {
+      startNodeSdk({
+        componentProviderRegistries: [
+          {
+            LogRecordProcessor: {
+              simple: () => new MyProcessor(),
+            },
+          },
+        ],
+      });
+    }, /is already registered/);
   });
 
   it('all the component provider types', async () => {

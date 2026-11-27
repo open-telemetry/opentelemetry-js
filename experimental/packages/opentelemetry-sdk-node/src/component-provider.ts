@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { diag, type TextMapPropagator } from '@opentelemetry/api';
+import type { TextMapPropagator } from '@opentelemetry/api';
 import type { ConfigProperties } from '@opentelemetry/api-config';
 import type { ResourceDetector } from '@opentelemetry/resources';
 import type {
@@ -134,15 +134,9 @@ export function mergeComponentProviderRegistries(
       if (providerFromName !== undefined) {
         for (const name of Object.keys(providerFromName)) {
           if (mergedReg[componentType]?.[name]) {
-            if (builtinReg[componentType]?.[name]) {
-              diag.warn(
-                `cannot override built-in ComponentProvider of type "${componentType}" and name="${name}"`
-              );
-            } else {
-              throw new Error(
-                `a ComponentProvider of type "${componentType}" and name="${name}" is already registered: ${mergedReg[componentType]?.[name]}`
-              );
-            }
+            throw new Error(
+              `a ComponentProvider of type "${componentType}" and name="${name}" is already registered: ${mergedReg[componentType]?.[name]}`
+            );
           } else {
             mergedReg[componentType] ??= {};
             // The `!` is used because tsc doesn't infer existence from `??= {}` above.
