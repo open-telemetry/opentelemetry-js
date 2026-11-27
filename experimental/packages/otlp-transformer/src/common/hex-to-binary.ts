@@ -18,15 +18,25 @@ function intValue(charCode: number): number {
   return charCode - 55;
 }
 
+/**
+ * Decodes the first `byteLength` bytes of a hex string into `buf` at
+ * `offset`, so a serializer can decode straight into its output buffer.
+ */
+export function writeHexToBinary(
+  hexStr: string,
+  byteLength: number,
+  buf: Uint8Array,
+  offset: number
+): void {
+  for (let i = 0; i < byteLength; i++) {
+    const hi = intValue(hexStr.charCodeAt(2 * i));
+    const lo = intValue(hexStr.charCodeAt(2 * i + 1));
+    buf[offset + i] = (hi << 4) | lo;
+  }
+}
+
 export function hexToBinary(hexStr: string): Uint8Array {
   const buf = new Uint8Array(hexStr.length / 2);
-  let offset = 0;
-
-  for (let i = 0; i < hexStr.length; i += 2) {
-    const hi = intValue(hexStr.charCodeAt(i));
-    const lo = intValue(hexStr.charCodeAt(i + 1));
-    buf[offset++] = (hi << 4) | lo;
-  }
-
+  writeHexToBinary(hexStr, buf.length, buf, 0);
   return buf;
 }

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { Attributes } from '@opentelemetry/api';
 import * as assert from 'assert';
 import {
   AddAttributeDecision,
@@ -321,6 +322,32 @@ describe('attributes', () => {
       });
       assert.equal(droppedAttributesCount, 0);
     });
+
+    it('applies attributeValueLengthLimit at the boundary', () => {
+      const { attributes, droppedAttributesCount } = cleanAttributes(
+        { short: 'ab', exact: 'abc', long: 'abcd', num: 123456, bool: true },
+        { attributeCountLimit: Infinity, attributeValueLengthLimit: 3 }
+      );
+
+      assert.deepStrictEqual(attributes, {
+        short: 'ab',
+        exact: 'abc',
+        long: 'abc',
+        num: 123456,
+        bool: true,
+      });
+      assert.equal(droppedAttributesCount, 0);
+    });
+
+    it('ignores a non-positive attributeValueLengthLimit', () => {
+      const { attributes, droppedAttributesCount } = cleanAttributes(
+        { str: 'abcdef' },
+        { attributeCountLimit: Infinity, attributeValueLengthLimit: 0 }
+      );
+
+      assert.deepStrictEqual(attributes, { str: 'abcdef' });
+      assert.equal(droppedAttributesCount, 0);
+    });
   });
 
   describe('cleanSimpleAttributes', () => {
@@ -491,6 +518,49 @@ describe('attributes', () => {
 
       assert.deepStrictEqual(attributes, { a: 1, b: 'eggs' });
       assert.equal(decision, AddAttributeDecision.ADD_OVERWRITE_EXISTING);
+    });
+
+    it('applies attributeValueLengthLimit to strings', () => {
+      const attributes: Attributes = {};
+      const limits = { attributeCountLimit: 10, attributeValueLengthLimit: 3 };
+      for (const [key, value] of Object.entries({
+        short: 'ab',
+        exact: 'abc',
+        long: 'abcdef',
+        num: 123456,
+        bool: true,
+      })) {
+        const decision = maybeAddAttribute({
+          key,
+          value,
+          attributes,
+          limits,
+          currentAttributesCount: Object.keys(attributes).length,
+        });
+        assert.equal(decision, AddAttributeDecision.ADD_NEW);
+      }
+
+      assert.deepStrictEqual(attributes, {
+        short: 'ab',
+        exact: 'abc',
+        long: 'abc',
+        num: 123456,
+        bool: true,
+      });
+    });
+
+    it('ignores a non-positive attributeValueLengthLimit', () => {
+      const attributes: Attributes = {};
+      const decision = maybeAddAttribute({
+        key: 'str',
+        value: 'abcdef',
+        attributes,
+        limits: { attributeCountLimit: 10, attributeValueLengthLimit: 0 },
+        currentAttributesCount: 0,
+      });
+
+      assert.deepStrictEqual(attributes, { str: 'abcdef' });
+      assert.equal(decision, AddAttributeDecision.ADD_NEW);
     });
   });
 

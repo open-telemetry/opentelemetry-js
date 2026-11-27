@@ -12,6 +12,7 @@ export interface IProtobufWriter {
   writeFixed32(value: number): void;
   writeFixed64(low: number, high: number): void;
   writeBytes(bytes: Uint8Array): void;
+  writeHexBytes(hex: string): void;
   writeString(str: string): void;
   writeDouble(value: number): void;
   startLengthDelimited(): number;

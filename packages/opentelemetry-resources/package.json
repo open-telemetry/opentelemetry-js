@@ -84,8 +84,8 @@
     "nyc": "18.0.0",
     "sinon": "22.1.0",
     "typescript": "5.2.2",
-    "webpack": "5.108.4",
-    "webpack-cli": "7.2.3"
+    "webpack": "5.113.0",
+    "webpack-cli": "7.3.1"
   },
   "peerDependencies": {
     "@opentelemetry/api": ">=1.10.0 <1.11.0"

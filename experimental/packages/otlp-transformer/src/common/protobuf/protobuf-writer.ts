@@ -2,13 +2,10 @@
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
-import { diag } from '@opentelemetry/api';
 import type { IProtobufWriter } from './i-protobuf-writer';
 import { estimateVarintSize } from './utils';
+import { writeHexToBinary } from '../hex-to-binary';
 import { utf8ByteLength } from '#platform';
-
-export const GROWING_BUFFER_DEBUG_MESSAGE =
-  'ProtobufWriter: estimated size was too small, growing buffer.';
 
 /**
  * bytes reserved for length in length-delimited fields
@@ -21,6 +18,12 @@ const RESERVED_LENGTH_BYTES = 1;
  * Grows buffer dynamically if initial size is exceeded.
  */
 export class ProtobufWriter implements IProtobufWriter {
+  /**
+   * Initial buffer size in bytes for writers constructed without a size.
+   * Size in bytes.
+   */
+  static initialBufferSize = 1024;
+
   private _buffer: Uint8Array;
   // Avoid using TextEncoder type. While the global is there on all supported runtimes, types may differ.
   private readonly _textEncoder: {
@@ -30,7 +33,7 @@ export class ProtobufWriter implements IProtobufWriter {
 
   public pos: number = 0;
 
-  constructor(estimatedSize = 65536) {
+  constructor(estimatedSize = ProtobufWriter.initialBufferSize) {
     this._buffer = new Uint8Array(estimatedSize);
     this._textEncoder = new TextEncoder();
     this._dataView = new DataView(this._buffer.buffer, this._buffer.byteOffset);
@@ -45,16 +48,13 @@ export class ProtobufWriter implements IProtobufWriter {
       return;
     }
 
-    // It is safe to grow the buffer, but we assume that estimation is correct.
-    // Getting to this point indicates incorrect estimation or over-reservation
-    // of space in this writer and can lead to poor memory performance.
-    diag.debug(GROWING_BUFFER_DEBUG_MESSAGE);
+    // TODO: Re-measure growing a resizable ArrayBuffer in place. On Node.js 24
+    // and 26 its views made every write slower than this copy saves. Browsers
+    // would also need a path other than encodeInto for it, because WebIDL
+    // rejects views on resizable buffers there.
 
     // Double buffer size until we have enough space
-    let newSize = this._buffer.length * 2;
-    while (newSize < needed) {
-      newSize *= 2;
-    }
+    const newSize = Math.max(this._buffer.length * 2, needed);
 
     const newBuffer = new Uint8Array(newSize);
     newBuffer.set(this._buffer);
@@ -169,6 +169,18 @@ export class ProtobufWriter implements IProtobufWriter {
    * Write a varint (variable-length integer)
    */
   writeVarint(value: number): void {
+    if (value >= 0 && value < 0x80) {
+      // Short-cut for small-integer varints, which are a single byte.
+      this._ensureCapacity(1);
+      this._buffer[this.pos++] = value;
+      return;
+    }
+    this._writeMultiByteVarint(value);
+  }
+
+  // Kept separate from writeVarint so that writeVarint stays small enough to
+  // be inlined.
+  private _writeMultiByteVarint(value: number): void {
     this._ensureCapacity(estimateVarintSize(value));
     // Check if value fits in 32-bit range
     if (value >= 0 && value <= 0xffffffff) {
@@ -259,6 +271,19 @@ export class ProtobufWriter implements IProtobufWriter {
   }
 
   /**
+   * Write a hex string as length-delimited bytes, such as a trace or span ID.
+   * The hex is decoded straight into the buffer, without an intermediate
+   * Uint8Array.
+   */
+  writeHexBytes(hex: string): void {
+    const byteLength = hex.length >>> 1;
+    this.writeVarint(byteLength);
+    this._ensureCapacity(byteLength);
+    writeHexToBinary(hex, byteLength, this._buffer, this.pos);
+    this.pos += byteLength;
+  }
+
+  /**
    * Write a field key (field number + wire type)
    */
   writeTag(fieldNumber: number, wireType: number): void {
@@ -279,18 +304,25 @@ export class ProtobufWriter implements IProtobufWriter {
    */
   writeString(str: string): void {
     const len = str.length;
-    // Limit ASCII detection to short strings to avoid scanning long values.
+    // An ASCII string shorter than 128 characters has a 1-byte length prefix,
+    // so copy it optimistically and fall through to the UTF-8 encoder below if
+    // a non-ASCII character shows up.
     if (len < 128) {
+      this._ensureCapacity(len + 1);
+      const buffer = this._buffer;
+      const start = this.pos + 1;
       let i = 0;
-      while (i < len && str.charCodeAt(i) < 128) {
-        i++;
+      for (; i < len; i++) {
+        const c = str.charCodeAt(i);
+        if (c >= 128) {
+          break;
+        }
+        buffer[start + i] = c;
       }
       if (i === len) {
-        this.writeVarint(len);
-        this._ensureCapacity(len);
-        for (i = 0; i < len; i++) {
-          this._buffer[this.pos++] = str.charCodeAt(i);
-        }
+        // Short-cut for small-integer varint length
+        buffer[this.pos] = len;
+        this.pos = start + len;
         return;
       }
     }

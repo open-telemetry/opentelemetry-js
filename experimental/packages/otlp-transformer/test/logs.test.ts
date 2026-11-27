@@ -3,12 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import type { HrTime } from '@opentelemetry/api';
-import { diag, TraceFlags } from '@opentelemetry/api';
+import { TraceFlags } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import type { Resource } from '@opentelemetry/resources';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import * as assert from 'assert';
-import * as sinon from 'sinon';
 import type { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { SeverityNumber } from '@opentelemetry/api';
 import type { Encoder } from '../src/common/utils';
@@ -20,10 +19,7 @@ import { ESeverityNumber } from '../src/logs/internal-types';
 import { createExportLogsServiceRequest } from '../src/logs/internal';
 import { ProtobufLogsSerializer } from '../src/logs/protobuf';
 import { JsonLogsSerializer } from '../src/logs/json';
-import {
-  GROWING_BUFFER_DEBUG_MESSAGE,
-  ProtobufWriter,
-} from '../src/common/protobuf/protobuf-writer';
+import { ProtobufWriter } from '../src/common/protobuf/protobuf-writer';
 
 type InstrumentationScopeWithAttributes = InstrumentationScope & {
   attributes?: Record<string, unknown>;
@@ -465,16 +461,6 @@ describe('Logs', () => {
   });
 
   describe('ProtobufLogsSerializer', function () {
-    let diagStub: sinon.SinonStub;
-
-    beforeEach(function () {
-      diagStub = sinon.stub(diag, 'debug');
-    });
-
-    afterEach(function () {
-      sinon.restore();
-    });
-
     it('serializes an export request', function () {
       const serialized = ProtobufLogsSerializer.serializeRequest([log_1_1_1]);
       assert.ok(serialized, 'serialized response is undefined');
@@ -499,7 +485,6 @@ describe('Logs', () => {
         );
 
       assert.deepStrictEqual(decodedObj, expected);
-      sinon.assert.neverCalledWith(diagStub, GROWING_BUFFER_DEBUG_MESSAGE);
     });
 
     it('omits fields that hold their default value', function () {
@@ -544,7 +529,6 @@ describe('Logs', () => {
       assert.doesNotThrow(() =>
         ProtobufLogsSerializer.deserializeResponse(new Uint8Array([]))
       );
-      sinon.assert.neverCalledWith(diagStub, GROWING_BUFFER_DEBUG_MESSAGE);
     });
 
     it('does not throw when encountering unexpected wiretypes during deserialization', function () {

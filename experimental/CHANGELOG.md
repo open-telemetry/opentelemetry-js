@@ -14,6 +14,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 ### :rocket: Features
 
 * feat(sdk-node): support passing in custom component providers [#7352](https://github.com/open-telemetry/opentelemetry-js/pull/7352) @trentm
+* feat(sdk-config): export all generated schema types [#7351](https://github.com/open-telemetry/opentelemetry-js/pull/7351) @trentm
+* feat(sdk-node): wire up `always_record` in declarative config to create an AlwaysRecord sampler [#7322](https://github.com/open-telemetry/opentelemetry-js/pull/7322) @trentm
 * feat(sdk-config): add support for parsing `file_format: "1.2"` declarative config files
   * See the OTel Configuration v1.2.0 release notes: <https://github.com/open-telemetry/opentelemetry-configuration/releases/tag/v1.2.0>
 * feat(api-config): add `@opentelemetry/api-config`, an experimental package with the declarative-config `ConfigProvider` and `ConfigProperties` types and a global `config` accessor [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
@@ -30,9 +32,15 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :house: Internal
 
+* chore(sdk-node): export StartSdkOptions type for "startNodeSdk"
+* chore(opentelemetry-browser-detector): Soft-deprecate `@opentelemetry/opentelemetry-browser-detector` @hectorhdzg
+  * The browser detector in this repository is being (soft-)deprecated in favor of [`@opentelemetry/browser-sdk/browser-detector`](https://github.com/open-telemetry/opentelemetry-browser/tree/main/packages/sdk#browser-resource-detection). "Soft" deprecation means the export has been marked with `@deprecated` and a notice added to the README, but the package will *not* yet be `npm deprecate`'d to avoid loud notice to users while opentelemetry-browser.git is still in heavy development.
 * refactor(sdk-node): internally use a ComponentProvider implementation for creating SDK components from a declarative config [#7269](https://github.com/open-telemetry/opentelemetry-js/pull/7269) @trentm
 * test: use erasable syntax on type assertions [#7311](https://github.com/open-telemetry/opentelemetry-js/pull/7311) @legendecas
 * fix(otlp-transformer): omit proto3 defalt value fields [#7316](https://github.com/open-telemetry/opentelemetry-js/pull/7316) @legendecas
+* refactor(otlp-transformer): decode hex IDs directly into the protobuf buffer [#7369](https://github.com/open-telemetry/opentelemetry-js/pull/7369) @legendecas
+* perf(otlp-transformer): check and copy short ASCII strings in one pass in `ProtobufWriter#writeString` [#7385](https://github.com/open-telemetry/opentelemetry-js/pull/7385) @daniellockyer
+* perf(otlp-transformer): add a fast path for single-byte varints in `ProtobufWriter#writeVarint` [#7387](https://github.com/open-telemetry/opentelemetry-js/pull/7387) @daniellockyer
 
 ## 0.301.2
 
@@ -44,6 +52,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 ### :house: Internal
 
 * perf(otlp-transformer): use node native utf8ByteLength [#7257](https://github.com/open-telemetry/opentelemetry-js/pull/7257) @legendecas
+* perf(otlp-transformer): single pass protobuf serializer [#7302](https://github.com/open-telemetry/opentelemetry-js/pull/7302) @legendecas
 
 ## 0.301.1
 
