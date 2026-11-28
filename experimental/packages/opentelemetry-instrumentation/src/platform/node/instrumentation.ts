@@ -37,7 +37,12 @@ export abstract class InstrumentationBase<
   private _hooks: (Hooked | HookRequire)[] = [];
   private _requireInTheMiddleSingleton: RequireInTheMiddleSingleton =
     RequireInTheMiddleSingleton.getInstance();
-  /** Set by the base enable() and disable(); subclasses only read it. */
+  /**
+   * Returned by isEnabled(). Here the base enable() and disable() set it, so
+   * subclasses only read it. The published typings come from this file on
+   * every platform, but the browser InstrumentationBase leaves enable() and
+   * disable() to subclasses, which must set it themselves.
+   */
   protected _enabled = false;
 
   constructor(

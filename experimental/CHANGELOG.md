@@ -29,6 +29,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :books: Documentation
 
+* docs(instrumentation): say on `InstrumentationBase#_enabled` that browser subclasses set it themselves, since every platform gets the Node.js typings [#7389](https://github.com/open-telemetry/opentelemetry-js/pull/7389) @overbalance
+
 ### :house: Internal
 
 * chore(sdk-node): export StartSdkOptions type for "startNodeSdk"
