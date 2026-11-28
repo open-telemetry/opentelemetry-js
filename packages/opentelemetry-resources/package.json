@@ -83,7 +83,7 @@
     "nock": "13.5.6",
     "nyc": "18.0.0",
     "sinon": "22.1.0",
-    "typescript": "5.2.2",
+    "typescript": "5.6.3",
     "webpack": "5.113.0",
     "webpack-cli": "7.3.1"
   },
