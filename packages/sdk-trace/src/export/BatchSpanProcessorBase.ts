@@ -239,7 +239,6 @@ export abstract class BatchSpanProcessorBase<
           }
         })
         .catch(e => {
-          this._isExporting = false;
           globalErrorHandler(e);
         });
     };
