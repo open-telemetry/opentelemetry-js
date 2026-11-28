@@ -77,6 +77,7 @@ import type {
   Base2ExponentialBucketHistogramAggregationConfigModel,
   BatchLogRecordProcessorConfigModel,
   BatchSpanProcessorConfigModel,
+  ConsoleMetricExporterConfigModel,
   ExperimentalPrometheusMetricExporterConfigModel,
   ExplicitBucketHistogramAggregationConfigModel,
   ExporterDefaultHistogramAggregationConfigModel,
@@ -811,8 +812,19 @@ function createConsoleMetricExporterFromConfig(
   _reg: ComponentProviderRegistry,
   properties: ConfigProperties
 ): PushMetricExporter {
-  checkConfigUse('ConsoleMetricExporter', properties!, []);
-  return new ConsoleMetricExporter();
+  checkConfigUse('ConsoleMetricExporter', properties!, [
+    'temporality_preference',
+    'default_histogram_aggregation',
+  ]);
+  const props = properties as ConsoleMetricExporterConfigModel;
+  return new ConsoleMetricExporter({
+    temporalityPreference: aggregationTemporalityPreferenceFromConfig(
+      props?.temporality_preference
+    ),
+    aggregationPreference: aggregationSelectorFromConfig(
+      props?.default_histogram_aggregation
+    ),
+  });
 }
 
 function createHttpMetricExporterFromConfig(
