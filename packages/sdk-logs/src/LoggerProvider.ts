@@ -36,6 +36,8 @@ export class LoggerProvider implements ILoggerProvider {
         attributeCountLimit: config.logRecordLimits?.attributeCountLimit ?? 128,
         attributeValueLengthLimit:
           config.logRecordLimits?.attributeValueLengthLimit ?? Infinity,
+        attributeValueDepthLimit:
+          config.logRecordLimits?.attributeValueDepthLimit ?? 64,
       },
       loggerConfigurator:
         config.loggerConfigurator ?? DEFAULT_LOGGER_CONFIGURATOR,

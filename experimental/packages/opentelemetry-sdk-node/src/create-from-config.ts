@@ -551,6 +551,10 @@ export function createLogRecordLimitsFromConfig(
       limits?.attribute_value_length_limit ??
       attribute_limits?.attribute_value_length_limit ??
       undefined,
+    attributeValueDepthLimit:
+      limits?.attribute_value_depth_limit ??
+      attribute_limits?.attribute_value_depth_limit ??
+      undefined,
     attributeCountLimit:
       limits?.attribute_count_limit ??
       attribute_limits?.attribute_count_limit ??
@@ -736,6 +740,10 @@ export function createSpanLimitsFromConfig(
     attributeValueLengthLimit:
       limits?.attribute_value_length_limit ??
       attribute_limits?.attribute_value_length_limit ??
+      undefined,
+    attributeValueDepthLimit:
+      limits?.attribute_value_depth_limit ??
+      attribute_limits?.attribute_value_depth_limit ??
       undefined,
     attributeCountLimit:
       limits?.attribute_count_limit ??

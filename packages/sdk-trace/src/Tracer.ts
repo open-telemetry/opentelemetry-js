@@ -117,6 +117,7 @@ export class Tracer implements APITracer {
         ...cleanAttributes(link.attributes, {
           attributeCountLimit: this._spanLimits.attributePerLinkCountLimit,
           attributeValueLengthLimit: this._spanLimits.attributeValueLengthLimit,
+          attributeValueDepthLimit: this._spanLimits.attributeValueDepthLimit,
         }),
       };
     });

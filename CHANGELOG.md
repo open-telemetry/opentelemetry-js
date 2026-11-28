@@ -15,6 +15,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](doc/3.x/migration-gu
 
 ### :rocket: Features
 
+* feat(core, sdk-trace, sdk-logs): add support for the spec's attribute value depth limit. `AttributeLimits` and the `sdk-trace` `SpanLimits` and `sdk-logs` `LogRecordLimits` options accept a new `attributeValueDepthLimit`, defaulting to 64. Arrays and maps beyond the limit are replaced with an empty value [#7324](https://github.com/open-telemetry/opentelemetry-js/issues/7324) @Goldloli
+
 ### :bug: Bug Fixes
 
 * fix(resources): don't warn on undefined resource attributes [#7308](https://github.com/open-telemetry/opentelemetry-js/pull/7308) @raphael-theriault-swi

@@ -246,6 +246,7 @@ export class SpanImpl implements Span {
       ...cleanSimpleAttributes(attributesOrStartTime, {
         attributeCountLimit: this._spanLimits.attributePerEventCountLimit,
         attributeValueLengthLimit: this._spanLimits.attributeValueLengthLimit,
+        attributeValueDepthLimit: this._spanLimits.attributeValueDepthLimit,
       }),
     });
     return this;
@@ -274,6 +275,7 @@ export class SpanImpl implements Span {
       ...cleanAttributes(link.attributes, {
         attributeCountLimit: this._spanLimits.attributePerLinkCountLimit,
         attributeValueLengthLimit: this._spanLimits.attributeValueLengthLimit,
+        attributeValueDepthLimit: this._spanLimits.attributeValueDepthLimit,
       }),
     });
     return this;

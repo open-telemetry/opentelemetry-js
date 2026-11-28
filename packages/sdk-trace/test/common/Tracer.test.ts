@@ -22,7 +22,7 @@ import {
 import type { InstrumentationScope } from '@opentelemetry/core';
 import { cleanAttributes, suppressTracing } from '@opentelemetry/core';
 import * as assert from 'assert';
-import type { Sampler, Span, SpanProcessor } from '../../src';
+import type { Sampler, Span, SpanLimits, SpanProcessor } from '../../src';
 import { AlwaysOffSampler, AlwaysOnSampler, SamplingDecision } from '../../src';
 import { TracerProvider } from '../../src';
 import { TestStackContextManager } from './export/TestStackContextManager';
@@ -35,6 +35,11 @@ function getTestTracerImpl(
   spanProcessors?: SpanProcessor[]
 ): Tracer {
   const tracerProvider = new TracerProvider({ sampler, spanProcessors });
+  return tracerProvider.getTracer('default', '0.0.1') as Tracer;
+}
+
+function getTestTracerWithSpanLimits(spanLimits: SpanLimits): Tracer {
+  const tracerProvider = new TracerProvider({ spanLimits });
   return tracerProvider.getTracer('default', '0.0.1') as Tracer;
 }
 
@@ -354,5 +359,72 @@ describe('Tracer', () => {
     });
     assert.strictEqual(span.links.length, 1);
     assert.deepStrictEqual(span.links[0].attributes, validAttributes);
+  });
+
+  describe('attributeValueDepthLimit', () => {
+    it('should apply the depth limit to span attributes', () => {
+      const tracer = getTestTracerWithSpanLimits({
+        attributeValueDepthLimit: 2,
+      });
+      const span = tracer.startSpan('my-span', {
+        attributes: {
+          // Depth 1 (array) -> depth 2 (map) -> depth 3 (array): replaced.
+          nested: [{ tooDeep: [1, 2] }, 'kept'],
+          scalar: 'x',
+        },
+      }) as Span;
+
+      assert.deepStrictEqual(span.attributes, {
+        nested: [{ tooDeep: [] }, 'kept'],
+        scalar: 'x',
+      });
+    });
+
+    it('should apply the depth limit to span event attributes', () => {
+      // Span event attributes are limited to "simple" value types, so the only
+      // container they can hold is a flat array at depth 1.
+      const tracer = getTestTracerWithSpanLimits({
+        attributeValueDepthLimit: 0,
+      });
+      const span = tracer.startSpan('my-span') as Span;
+      span.addEvent('my-event', { list: ['a', 'b'], scalar: 'kept' });
+
+      assert.deepStrictEqual(span.events[0].attributes, {
+        list: [],
+        scalar: 'kept',
+      });
+    });
+
+    it('should apply the depth limit to span link attributes', () => {
+      const tracer = getTestTracerWithSpanLimits({
+        attributeValueDepthLimit: 1,
+      });
+      const span = tracer.startSpan('my-span', {
+        links: [
+          {
+            context: {
+              traceId: 'b3cda95b652f4a1592b449d5929fda1b',
+              spanId: '6e0c63257de34c92',
+              traceFlags: TraceFlags.SAMPLED,
+            },
+            attributes: { nested: [[1, 2]] },
+          },
+        ],
+      }) as Span;
+
+      assert.deepStrictEqual(span.links[0].attributes, { nested: [[]] });
+    });
+
+    it('should not apply a depth limit when the limit is negative', () => {
+      const tracer = getTestTracerWithSpanLimits({
+        attributeValueDepthLimit: -1,
+      });
+      const deep = { a: [{ b: [{ c: 'd' }] }] };
+      const span = tracer.startSpan('my-span', {
+        attributes: { deep },
+      }) as Span;
+
+      assert.deepStrictEqual(span.attributes, { deep });
+    });
   });
 });

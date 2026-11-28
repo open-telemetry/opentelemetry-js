@@ -34,6 +34,7 @@ const setup = (exporter: LogRecordExporter, resource?: Resource) => {
     {
       attributeCountLimit: 128,
       attributeValueLengthLimit: Infinity,
+      attributeValueDepthLimit: 64,
     },
     []
   );

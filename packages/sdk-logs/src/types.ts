@@ -99,6 +99,15 @@ export interface LogRecordLimits {
   /** attributeValueLengthLimit is maximum allowed attribute value size */
   attributeValueLengthLimit?: number;
 
+  /**
+   * attributeValueDepthLimit is the maximum allowed depth for nested array and
+   * map attribute values. Depth starts at 1 for the top-level attribute value
+   * and increments when descending into an array element or map value. An array
+   * or map beyond the limit is replaced with an empty value.
+   * Defaults to 64.
+   */
+  attributeValueDepthLimit?: number;
+
   /** attributeCountLimit is number of attributes per LogRecord */
   attributeCountLimit?: number;
 }
