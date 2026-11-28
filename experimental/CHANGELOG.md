@@ -23,6 +23,8 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 * feat(instrumentation-http): read declarative config via `setConfigProvider()`, mapping the `instrumentation/development.js.@opentelemetry/instrumentation-http` properties it supports and the `general.http.{client,server}.*_captured_headers` properties onto `headersToSpanAttributes` [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
 * feat(sdk-node): register a global `ConfigProvider` from the config file, so instrumentations registered with `registerInstrumentations()` receive it [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
 
+* feat(instrumentation-http): add `ignoreIncomingPropagationHook` config option to skip extracting the propagation context from incoming requests, e.g. based on the request's IP address [#6901](https://github.com/open-telemetry/opentelemetry-js/pull/6901) @matthieusieben
+
 ### :bug: Bug Fixes
 
 * fix(exporter-trace-otlp-http, exporter-logs-otlp-http, exporter-metrics-otlp-http): use the `otlp_http_json_*_exporter` `otel.component.type` values for JSON exporters ([#7286](https://github.com/open-telemetry/opentelemetry-js/pull/7286)) @shehjaddev
