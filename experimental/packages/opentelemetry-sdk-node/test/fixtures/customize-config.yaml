@@ -1,0 +1,14 @@
+file_format: "1.2"
+resource:
+  attributes:
+    - name: service.name
+      value: my-service
+    - name: service.version
+      value: 1.2.3
+  attributes_list: 'foo.bar=baz'
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          otlp_http:
+            endpoint: http://localhost:4318/v1/traces
