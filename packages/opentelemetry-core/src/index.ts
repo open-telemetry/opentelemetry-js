@@ -74,6 +74,8 @@ export { isUrlIgnored, urlMatches } from './utils/url';
 export { BindOnceFuture } from './utils/callback';
 export { diagLogLevelFromString } from './utils/configuration';
 import { _export } from './internal/exporter';
+import { _buildExceptionStacktrace } from './internal/exception';
 export const internal = {
   _export,
+  _buildExceptionStacktrace,
 };

@@ -8,6 +8,7 @@ import * as api from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import {
   AddAttributeDecision,
+  internal,
   maybeAddAttribute,
   timeInputToHrTime,
 } from '@opentelemetry/core';
@@ -252,9 +253,10 @@ export class LogRecordImpl implements ReadableLogRecord {
         hasMinimumAttributes = true;
       }
 
-      if (exceptionObj.stack) {
+      const stacktrace = internal._buildExceptionStacktrace(exceptionObj);
+      if (stacktrace) {
         if (!Object.hasOwn(this.attributes, ATTR_EXCEPTION_STACKTRACE)) {
-          this.setAttribute(ATTR_EXCEPTION_STACKTRACE, exceptionObj.stack);
+          this.setAttribute(ATTR_EXCEPTION_STACKTRACE, stacktrace);
         }
         hasMinimumAttributes = true;
       }
