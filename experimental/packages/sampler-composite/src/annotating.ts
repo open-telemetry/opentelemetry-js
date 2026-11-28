@@ -21,7 +21,6 @@ class ComposableAnnotatingSampler implements ComposableSampler {
 
   getSamplingIntent(
     context: Context,
-    traceId: string,
     spanName: string,
     spanKind: SpanKind,
     attributes: Attributes,
@@ -29,7 +28,6 @@ class ComposableAnnotatingSampler implements ComposableSampler {
   ): SamplingIntent {
     const intent = this.delegate.getSamplingIntent(
       context,
-      traceId,
       spanName,
       spanKind,
       attributes,
@@ -37,7 +35,7 @@ class ComposableAnnotatingSampler implements ComposableSampler {
     );
     return {
       threshold: intent.threshold,
-      thresholdReliable: intent.thresholdReliable,
+      adjustedCountReliable: intent.adjustedCountReliable,
       attributes: intent.attributes
         ? { ...intent.attributes, ...this.attributes }
         : this.attributes,

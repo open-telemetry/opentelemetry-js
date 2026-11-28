@@ -43,7 +43,6 @@ class CompositeSampler implements Sampler {
 
     const intent = this.delegate.getSamplingIntent(
       context,
-      traceId,
       spanName,
       spanKind,
       attributes,
@@ -53,7 +52,7 @@ class CompositeSampler implements Sampler {
     let adjustedCountCorrect = false;
     let sampled = false;
     if (isValidThreshold(intent.threshold)) {
-      adjustedCountCorrect = intent.thresholdReliable;
+      adjustedCountCorrect = intent.adjustedCountReliable;
       let randomness: bigint;
       if (isValidRandomValue(otTraceState.randomValue)) {
         randomness = otTraceState.randomValue;

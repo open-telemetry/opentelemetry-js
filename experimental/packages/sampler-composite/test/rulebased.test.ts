@@ -24,7 +24,6 @@ describe('ComposableRuleBasedSampler', () => {
   const alwaysOff = createComposableAlwaysOffSampler();
   const isHealthCheck: SamplingPredicate = (
     _context,
-    _traceId,
     _spanName,
     _spanKind,
     attributes: Attributes,
@@ -34,7 +33,6 @@ describe('ComposableRuleBasedSampler', () => {
   };
   function isCheckout(
     _context: Context,
-    _traceId: string,
     _spanName: string,
     _spanKind: SpanKind,
     attributes: Attributes
@@ -69,7 +67,6 @@ describe('ComposableRuleBasedSampler', () => {
 
     intent = sampler.getSamplingIntent(
       context.active(),
-      'unused-trace-id',
       'span-name',
       SpanKind.SERVER,
       { 'http.route': '/healthcheck' },
@@ -80,7 +77,6 @@ describe('ComposableRuleBasedSampler', () => {
 
     intent = sampler.getSamplingIntent(
       context.active(),
-      'unused-trace-id',
       'span-name',
       SpanKind.SERVER,
       { 'http.route': '/checkout' },
@@ -91,7 +87,6 @@ describe('ComposableRuleBasedSampler', () => {
 
     intent = sampler.getSamplingIntent(
       context.active(),
-      'unused-trace-id',
       'span-name',
       SpanKind.SERVER,
       { 'http.route': '/another' },
@@ -105,13 +100,12 @@ describe('ComposableRuleBasedSampler', () => {
     const sampler2 = createComposableRuleBasedSampler([]);
     const intent = sampler2.getSamplingIntent(
       context.active(),
-      'unused-trace-id',
       'span-name',
       SpanKind.SERVER,
       {},
       []
     );
     assert.strictEqual(intent.threshold, INVALID_THRESHOLD);
-    assert.strictEqual(intent.thresholdReliable, false);
+    assert.strictEqual(intent.adjustedCountReliable, false);
   });
 });

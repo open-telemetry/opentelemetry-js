@@ -10,7 +10,7 @@ import { INVALID_THRESHOLD } from './util';
 
 const NON_SAMPLING_INTENT: SamplingIntent = Object.freeze({
   threshold: INVALID_THRESHOLD,
-  thresholdReliable: false,
+  adjustedCountReliable: false,
 });
 
 class ComposableRuleBasedSampler implements ComposableSampler {
@@ -27,17 +27,15 @@ class ComposableRuleBasedSampler implements ComposableSampler {
 
   getSamplingIntent(
     context: Context,
-    traceId: string,
     spanName: string,
     spanKind: SpanKind,
     attributes: Attributes,
     links: Link[]
   ): SamplingIntent {
     for (const [predicate, sampler] of this.rules) {
-      if (predicate(context, traceId, spanName, spanKind, attributes, links)) {
+      if (predicate(context, spanName, spanKind, attributes, links)) {
         return sampler.getSamplingIntent(
           context,
-          traceId,
           spanName,
           spanKind,
           attributes,
