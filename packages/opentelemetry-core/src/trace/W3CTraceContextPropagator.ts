@@ -68,9 +68,12 @@ export class W3CTraceContextPropagator implements TextMapPropagator {
     )
       return;
 
-    const traceParent = `${VERSION}-${spanContext.traceId}-${
-      spanContext.spanId
-    }-0${Number(spanContext.traceFlags || TraceFlags.NONE).toString(16)}`;
+    const traceFlags = (
+      (Number(spanContext.traceFlags) || TraceFlags.NONE) & 0xff
+    )
+      .toString(16)
+      .padStart(2, '0');
+    const traceParent = `${VERSION}-${spanContext.traceId}-${spanContext.spanId}-${traceFlags}`;
 
     setter.set(carrier, TRACE_PARENT_HEADER, traceParent);
     if (spanContext.traceState) {
