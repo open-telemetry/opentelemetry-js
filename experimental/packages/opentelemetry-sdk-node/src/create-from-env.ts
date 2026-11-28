@@ -357,21 +357,22 @@ function createSpanProcessorsFromEnv(
             getStringFromEnv('OTEL_EXPORTER_OTLP_TRACES_PROTOCOL') ??
             getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL')
           )?.trim() || 'http/protobuf';
+        const config = { selfObsMeterProvider };
         switch (protocol) {
           case 'grpc':
-            exporters.push(new OTLPGrpcTraceExporter());
+            exporters.push(new OTLPGrpcTraceExporter(config));
             break;
           case 'http/json':
-            exporters.push(new OTLPHttpTraceExporter());
+            exporters.push(new OTLPHttpTraceExporter(config));
             break;
           case 'http/protobuf':
-            exporters.push(new OTLPProtoTraceExporter());
+            exporters.push(new OTLPProtoTraceExporter(config));
             break;
           default:
             diag.warn(
               `Unsupported OTLP traces protocol: "${protocol}". Using http/protobuf.`
             );
-            exporters.push(new OTLPProtoTraceExporter());
+            exporters.push(new OTLPProtoTraceExporter(config));
         }
         break;
       }
@@ -462,21 +463,22 @@ function createLogRecordProcessorsFromEnv(
             getStringFromEnv('OTEL_EXPORTER_OTLP_LOGS_PROTOCOL') ??
             getStringFromEnv('OTEL_EXPORTER_OTLP_PROTOCOL')
           )?.trim() || 'http/protobuf'; // Using || to also fall back on empty string
+        const config = { selfObsMeterProvider };
         switch (protocol) {
           case 'grpc':
-            exporters.push(new OTLPGrpcLogExporter());
+            exporters.push(new OTLPGrpcLogExporter(config));
             break;
           case 'http/json':
-            exporters.push(new OTLPHttpLogExporter());
+            exporters.push(new OTLPHttpLogExporter(config));
             break;
           case 'http/protobuf':
-            exporters.push(new OTLPProtoLogExporter());
+            exporters.push(new OTLPProtoLogExporter(config));
             break;
           default:
             diag.warn(
               `Unsupported OTLP logs protocol: "${protocol}". Using http/protobuf.`
             );
-            exporters.push(new OTLPProtoLogExporter());
+            exporters.push(new OTLPProtoLogExporter(config));
         }
         break;
       }

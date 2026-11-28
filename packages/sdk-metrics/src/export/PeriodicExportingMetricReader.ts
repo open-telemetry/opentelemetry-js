@@ -243,6 +243,22 @@ export class PeriodicExportingMetricReader extends MetricReader {
     }
   }
 
+  /**
+   * Called once while the MeterProvider is constructed, before any export.
+   * Exporter instruments record after the batch is serialized, so they show
+   * up on a later collection and do not re-enter this export.
+   */
+  override _setSelfObsMeterProvider(meterProvider: api.MeterProvider): void {
+    super._setSelfObsMeterProvider(meterProvider);
+    const exporter = this._exporter as typeof this._exporter & {
+      /**
+       * Late-bind only. Must not replace a provider already configured on the exporter.
+       */
+      setSelfObsMeterProviderIfAbsent?(meterProvider: api.MeterProvider): void;
+    };
+    exporter.setSelfObsMeterProviderIfAbsent?.(meterProvider);
+  }
+
   protected override onInitialized(): void {
     // start running the interval as soon as this reader is initialized and keep handle for shutdown.
     this._interval = setInterval(() => {
