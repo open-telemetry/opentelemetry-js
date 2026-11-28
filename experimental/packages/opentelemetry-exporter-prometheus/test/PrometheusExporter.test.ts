@@ -170,6 +170,16 @@ describe('PrometheusExporter', () => {
       await exporter.shutdown();
     });
 
+    it('should serve metrics when host is an IPv6 address', async () => {
+      const port = 9913;
+      const exporter = new PrometheusExporter({ host: '::', port });
+      await exporter.startServer();
+      const url = `http://localhost:${port}/metrics`;
+
+      await request(url);
+      await exporter.shutdown();
+    });
+
     it('should call a provided callback on shutdown regardless of if the server is running', async () => {
       const exporter = new PrometheusExporter({ preventServerStart: true });
       await exporter.shutdown();
