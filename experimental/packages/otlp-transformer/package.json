@@ -100,7 +100,7 @@
     "protobufjs": "8.8.1",
     "protobufjs-cli": "2.7.1",
     "ts-loader": "9.6.2",
-    "typescript": "5.2.2",
+    "typescript": "5.4.5",
     "webpack": "5.113.0"
   },
   "dependencies": {
