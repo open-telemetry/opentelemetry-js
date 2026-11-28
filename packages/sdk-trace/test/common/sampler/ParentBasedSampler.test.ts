@@ -10,6 +10,7 @@ import {
   ParentBasedSampler,
   AlwaysOffSampler,
   TraceIdRatioBasedSampler,
+  createParentBasedSampler,
 } from '../../../src';
 
 const traceId = 'd4cda95b652f4a1592b449d5929fda1b';
@@ -36,6 +37,14 @@ describe('ParentBasedSampler', () => {
     assert.strictEqual(
       sampler.toString(),
       'ParentBased{root=TraceIdRatioBased{0.5}, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}'
+    );
+  });
+
+  it('should create a parent-based sampler with the factory function', () => {
+    const sampler = createParentBasedSampler({ root: new AlwaysOnSampler() });
+    assert.strictEqual(
+      sampler.toString(),
+      'ParentBased{root=AlwaysOnSampler, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}'
     );
   });
 
