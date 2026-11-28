@@ -95,9 +95,26 @@ export function startNodeSdk(sdkOptions?: StartSdkOptions): NodeSdk {
   }
 }
 
+function startDisabledSdk(
+  createPropagator: () => TextMapPropagator | null | undefined
+): NodeSdk {
+  try {
+    const propagator = createPropagator();
+    const contextManager = new AsyncLocalStorageContextManager();
+    contextManager.enable();
+    context.setGlobalContextManager(contextManager);
+    if (propagator) {
+      propagation.setGlobalPropagator(propagator);
+    }
+  } catch (createErr) {
+    diag.error(`Could not create OpenTelemetry SDK: ${createErr.message}`);
+  }
+  return NOOP_SDK;
+}
+
 function startNodeSdkFromEnv(opts?: StartSdkFromEnvOptions): NodeSdk {
   if (getBooleanFromEnv('OTEL_SDK_DISABLED')) {
-    return NOOP_SDK;
+    return startDisabledSdk(() => createPropagatorFromOptsAndEnv(opts));
   }
 
   const logLevelStr =
@@ -213,7 +230,11 @@ function startNodeSdkFromConfig(opts: StartSdkFromConfigOptions): NodeSdk {
   }
 
   if (config.disabled) {
-    return NOOP_SDK;
+    return startDisabledSdk(() =>
+      config.propagator
+        ? createPropagatorFromConfig(reg, config.propagator)
+        : undefined
+    );
   }
 
   const logLevel = diagLogLevelFromSeverityNumberConfig(config.log_level);

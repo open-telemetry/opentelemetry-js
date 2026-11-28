@@ -171,7 +171,7 @@ export class NodeSDK {
         readers: configuration.metricReaders,
         views: configuration.views,
       };
-    } else {
+    } else if (!this._disabled) {
       this._meterProviderConfig = {
         readers: getMetricReadersFromEnv(),
         views: configuration.views,
@@ -185,13 +185,11 @@ export class NodeSDK {
    * Call this method to construct SDK components and register them with the OpenTelemetry API.
    */
   public start(): void {
-    if (this._disabled) {
-      return;
+    if (!this._disabled) {
+      registerInstrumentations({
+        instrumentations: this._instrumentations,
+      });
     }
-
-    registerInstrumentations({
-      instrumentations: this._instrumentations,
-    });
 
     setupContextManager(this._configuration?.contextManager);
     setupPropagator(
@@ -199,6 +197,10 @@ export class NodeSDK {
         ? null // null means don't set, so we cannot fall back to env config.
         : (this._configuration?.textMapPropagator ?? getPropagatorFromEnv())
     );
+
+    if (this._disabled) {
+      return;
+    }
 
     if (this._autoDetectResources) {
       const internalConfig: ResourceDetectionConfig = {
