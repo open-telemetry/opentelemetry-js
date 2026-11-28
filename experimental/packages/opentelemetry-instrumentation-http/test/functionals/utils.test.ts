@@ -12,7 +12,12 @@ import {
   ATTR_USER_AGENT_ORIGINAL,
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
-import type { IncomingMessage, RequestOptions, ServerResponse } from 'http';
+import type {
+  IncomingMessage,
+  RequestOptions,
+  ServerResponse,
+} from 'node:http';
+import type { ParsedUrlQuery } from 'node:querystring';
 import type { Socket } from 'net';
 import * as sinon from 'sinon';
 import * as url from 'url';
@@ -28,7 +33,6 @@ import * as utils from '../../src/utils';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { extractHostnameAndPort } from '../../src/utils';
-import type { ParsedUrlQuery } from 'node:querystring';
 
 describe('Utility', () => {
   describe('parseResponseStatus()', () => {
@@ -103,6 +107,86 @@ describe('Utility', () => {
         undefined
       );
       assert.strictEqual(utils.parseErrorType(SpanKind.CLIENT, 600), undefined);
+    });
+  });
+
+  describe('headersTextMapSetter', () => {
+    describe('when carrier is a headers object', () => {
+      it('should set the value on the carrier', () => {
+        const headers = Object.freeze({ 'x-foo': 'bar' });
+        const carrier: RequestOptions = { headers };
+        utils.requestOptionsTextMapSetter.set(
+          carrier,
+          'traceparent',
+          'some-value'
+        );
+        assert.notStrictEqual(carrier.headers, headers);
+        assert.deepStrictEqual(carrier.headers, {
+          'x-foo': 'bar',
+          traceparent: 'some-value',
+        });
+      });
+    });
+
+    describe('when carrier is a raw headers array', () => {
+      it('should append the key and value to the carrier', () => {
+        const carrier: RequestOptions = {
+          headers: ['x-foo', 'bar'],
+        };
+
+        utils.requestOptionsTextMapSetter.set(
+          carrier,
+          'traceparent',
+          'some-value'
+        );
+        assert.deepStrictEqual(carrier.headers, [
+          'x-foo',
+          'bar',
+          'traceparent',
+          'some-value',
+        ]);
+      });
+
+      it('should replace the value of an existing key', () => {
+        const carrier: RequestOptions = {
+          headers: ['x-foo', 'bar', 'traceparent', 'old-value', 'x-baz', 'qux'],
+        };
+        utils.requestOptionsTextMapSetter.set(
+          carrier,
+          'traceparent',
+          'new-value'
+        );
+        assert.deepStrictEqual(carrier.headers, [
+          'x-foo',
+          'bar',
+          'traceparent',
+          'new-value',
+          'x-baz',
+          'qux',
+        ]);
+      });
+
+      it('should replace the value of an existing key regardless of casing', () => {
+        const headers = Object.freeze(['TraceParent', 'old-value']);
+        const carrier: RequestOptions = { headers };
+        utils.requestOptionsTextMapSetter.set(
+          carrier,
+          'traceparent',
+          'new-value'
+        );
+        assert.notStrictEqual(carrier.headers, headers);
+        assert.deepStrictEqual(carrier.headers, ['TraceParent', 'new-value']);
+      });
+
+      it('should append to an empty carrier', () => {
+        const carrier: RequestOptions = { headers: [] };
+        utils.requestOptionsTextMapSetter.set(
+          carrier,
+          'traceparent',
+          'some-value'
+        );
+        assert.deepStrictEqual(carrier.headers, ['traceparent', 'some-value']);
+      });
     });
   });
 

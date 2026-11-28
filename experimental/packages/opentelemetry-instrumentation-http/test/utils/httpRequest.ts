@@ -31,6 +31,7 @@ function get(input: any, options?: any): GetResult {
       };
       let data = '';
       resp.on('data', chunk => {
+        console.error('chunk', chunk);
         data += chunk;
       });
       resp.on('end', () => {
