@@ -44,6 +44,7 @@ const NO_ATTR_LIMITS = {
  * This class represents a basic tracer.
  */
 export class Tracer implements APITracer {
+  private readonly _enabled: boolean;
   private readonly _sampler: Sampler;
   private readonly _spanLimits: Required<SpanLimits>;
   private readonly _idGenerator: IdGenerator;
@@ -61,6 +62,8 @@ export class Tracer implements APITracer {
     options: TracerOptions
   ) {
     this.instrumentationScope = instrumentationScope;
+    this._enabled =
+      options.tracerConfigurator?.(instrumentationScope)?.enabled ?? true;
     this._sampler = options.sampler;
     this._spanLimits = options.spanLimits;
     this._resource = options.resource;
@@ -88,6 +91,15 @@ export class Tracer implements APITracer {
       context = trace.deleteSpan(context);
     }
     const parentSpan = trace.getSpan(context);
+
+    if (!this._enabled) {
+      const parentSpanContext = parentSpan?.spanContext();
+      return trace.wrapSpanContext(
+        parentSpanContext && trace.isSpanContextValid(parentSpanContext)
+          ? parentSpanContext
+          : INVALID_SPAN_CONTEXT
+      );
+    }
 
     if (isTracingSuppressed(context)) {
       diag.debug('Instrumentation suppressed, returning Noop Span');

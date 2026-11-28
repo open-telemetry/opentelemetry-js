@@ -13,6 +13,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 
 ### :rocket: Features
 
+* feat(sdk-node): support `tracer_configurator/development` in declarative configuration [#6960](https://github.com/open-telemetry/opentelemetry-js/issues/6960)
 * feat(sdk-config): export all generated schema types [#7351](https://github.com/open-telemetry/opentelemetry-js/pull/7351) @trentm
 * feat(sdk-node): wire up `always_record` in declarative config to create an AlwaysRecord sampler [#7322](https://github.com/open-telemetry/opentelemetry-js/pull/7322) @trentm
 * feat(sdk-config): add support for parsing `file_format: "1.2"` declarative config files
