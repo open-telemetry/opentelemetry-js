@@ -22,10 +22,12 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 * feat(instrumentation): support the `instrumentation/development` section of declarative config. `Instrumentation#setConfigProvider()` is an optional method that `registerInstrumentations()` calls on each instrumentation, alongside `setTracerProvider()` and friends. The `readDeclarativeConfig()` util reads an instrumentation's own block (`instrumentation/development.js.<name>`) and the shared `general` block through a typed reader, mapping snake_case config properties onto config fields. Unrecognized properties and type mismatches warn [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
 * feat(instrumentation-http): read declarative config via `setConfigProvider()`, mapping the `instrumentation/development.js.@opentelemetry/instrumentation-http` properties it supports and the `general.http.{client,server}.*_captured_headers` properties onto `headersToSpanAttributes` [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
 * feat(sdk-node): register a global `ConfigProvider` from the config file, so instrumentations registered with `registerInstrumentations()` receive it [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
+* feat(otlp-exporter-base): when the page is hidden and a span or log batch exceeds the keepalive budget, the browser fetch exporter sends whole items that fit and counts the rest as failed exports with error type `keepalive_budget_exhausted` [#7232](https://github.com/open-telemetry/opentelemetry-js/pull/7232) @adityareddy-dev
 
 ### :bug: Bug Fixes
 
 * fix(exporter-trace-otlp-http, exporter-logs-otlp-http, exporter-metrics-otlp-http): use the `otlp_http_json_*_exporter` `otel.component.type` values for JSON exporters ([#7286](https://github.com/open-telemetry/opentelemetry-js/pull/7286)) @shehjaddev
+* fix(otlp-exporter-base): warn when the browser fetch transport sends an export without `keepalive` while the page is hidden, since that export can be lost with the page [#7231](https://github.com/open-telemetry/opentelemetry-js/pull/7231) @adityareddy-dev
 
 ### :books: Documentation
 
