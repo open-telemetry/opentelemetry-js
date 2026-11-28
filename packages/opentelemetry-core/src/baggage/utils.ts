@@ -107,9 +107,14 @@ export function parseBaggageHeaderString(
         // Comma separator is counted for every accepted entry after the first
         const entrySize = (count === 0 ? 0 : 1) + entryLength;
         if (totalSize + entrySize > BAGGAGE_MAX_TOTAL_LENGTH) break;
-        baggage[keyPair.key] = keyPair.metadata
-          ? { value: keyPair.value, metadata: keyPair.metadata }
-          : { value: keyPair.value };
+        Object.defineProperty(baggage, keyPair.key, {
+          value: keyPair.metadata
+            ? { value: keyPair.value, metadata: keyPair.metadata }
+            : { value: keyPair.value },
+          enumerable: true,
+          writable: true,
+          configurable: true,
+        });
         count++;
         totalSize += entrySize;
       }
@@ -135,7 +140,12 @@ export function parseKeyPairsIntoRecord(
       const keyPair = parsePairKeyValue(entry);
 
       if (keyPair !== undefined && keyPair.value.length > 0) {
-        result[keyPair.key] = keyPair.value;
+        Object.defineProperty(result, keyPair.key, {
+          value: keyPair.value,
+          enumerable: true,
+          writable: true,
+          configurable: true,
+        });
       }
     });
   }
