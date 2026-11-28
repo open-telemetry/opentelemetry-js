@@ -66,7 +66,7 @@
     "nyc": "18.0.0",
     "sinon": "22.1.0",
     "ts-loader": "9.6.2",
-    "typescript": "5.2.2"
+    "typescript": "5.7.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/sdk-config",
   "sideEffects": false
