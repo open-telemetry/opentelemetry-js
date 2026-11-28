@@ -119,4 +119,18 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
    * @experimental
    */
   redactedQueryParamsServer?: string[];
+  /**
+   * Capture the incoming (server) request body as the
+   * `http.request.body.content` span attribute. Only the bytes the
+   * application reads are captured, up to `incomingRequestBodyMaxSize`. The
+   * body may contain sensitive data.
+   * @experimental
+   */
+  captureIncomingRequestBody?: boolean;
+  /**
+   * Maximum number of bytes of the incoming request body to capture. Must be
+   * a positive integer. Defaults to 1024.
+   * @experimental
+   */
+  incomingRequestBodyMaxSize?: number;
 }

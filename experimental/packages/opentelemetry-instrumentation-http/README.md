@@ -65,6 +65,8 @@ Options                                 | Type                                  
 `requireParentforIncomingSpans`         | Boolean                                    | Require that is a parent span to create new span for incoming requests.
 `redactedQueryParams`                   | `string[]`                                 | **Experimental.** Query parameter names whose values are redacted on outgoing (client) spans. Replaces the built-in list. See [Query parameter redaction](#query-parameter-redaction).
 `redactedQueryParamsServer`             | `string[]`                                 | **Experimental.** Query parameter names whose values are redacted on incoming (server) spans. Replaces the built-in list. See [Query parameter redaction](#query-parameter-redaction).
+`captureIncomingRequestBody`            | `boolean`                                  | **Experimental.** Capture the incoming (server) request body as `http.request.body.content`. See [Request body capture](#request-body-capture).
+`incomingRequestBodyMaxSize`            | `number`                                   | **Experimental.** Maximum number of bytes of the incoming request body to capture. Must be a positive integer. Default `1024`.
 `headersToSpanAttributes`               | `object`                                   | Specify which HTTP headers should be captured as span attributes. This is an object of the form `{client: {requestHeaders: [...], responseHeaders: [...]}, server: {requestHeaders: [...], responseHeaders: [...]}}`, where each `[...]` is an array of HTTP header names (case-insensitive) to capture. Client (outgoing requests, incoming responses) and server (incoming requests, outgoing responses) headers will be converted to span attributes in the form of `http.{request,response}.header.$header_name`, e.g. `http.response.header.content_length`. By default hyphens in header names are converted to underscore. However, if stable semantic conventions are selected (see next section), then, hyphens in header names are not changed, e.g. `http.response.header.content-length`.
 
 #### Query parameter redaction
@@ -106,6 +108,23 @@ new HttpInstrumentation({
   redactedQueryParamsServer: redacted,
 });
 ```
+
+#### Request body capture
+
+To capture the incoming request body in the `http.request.body.content` span attribute, set `captureIncomingRequestBody: true`. `incomingRequestBodyMaxSize` sets the maximum number of bytes to capture.
+
+```js
+new HttpInstrumentation({
+  captureIncomingRequestBody: true,
+  incomingRequestBodyMaxSize: 4096,
+});
+```
+
+Only the bytes the application reads from the request before the response finishes are captured; the application still receives the full body. The body is recorded as a string for textual content types (`text/*`, JSON, XML, YAML, form-urlencoded, or any `charset` parameter), else as a `Uint8Array`. Byte values require an SDK that supports byte array attributes. Bodies with a `Content-Encoding` are not captured.
+
+If the application calls `request.setEncoding()`, the body is captured from the decoded strings it reads, re-encoded with that encoding. Decoding is lossy for bytes that are invalid in the encoding (for example, invalid UTF-8 becomes U+FFFD), so the captured value reflects what the application read rather than the original bytes.
+
+The request body may contain sensitive data. This option and the attribute are experimental and subject to change.
 
 #### Hook function signatures
 

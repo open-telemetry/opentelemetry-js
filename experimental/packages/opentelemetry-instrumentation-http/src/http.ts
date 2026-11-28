@@ -74,6 +74,12 @@ import {
 } from './utils';
 import type { Err, Func, Http, HttpRequestArgs, Https } from './internal-types';
 import { DEFAULT_QUERY_STRINGS_TO_REDACT } from './internal-types';
+import type { BodyBuffer } from './body-capture';
+import {
+  captureIncomingRequestBody,
+  DEFAULT_INCOMING_REQUEST_BODY_MAX_SIZE,
+} from './body-capture';
+import { ATTR_HTTP_REQUEST_BODY_CONTENT } from './semconv';
 
 /**
  * `node:http` and `node:https` instrumentation for OpenTelemetry
@@ -82,6 +88,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span> = new WeakSet<Span>();
   private _headerCapture;
+  private _incomingRequestBodyMaxSize: number | undefined;
   private _httpPatched: boolean = false;
   private _httpsPatched: boolean = false;
   declare private _httpServerDurationHistogram: Histogram;
@@ -91,6 +98,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     super('@opentelemetry/instrumentation-http', VERSION, config);
 
     this._headerCapture = this._createHeaderCapture();
+    this._incomingRequestBodyMaxSize = this._getIncomingRequestBodyMaxSize();
   }
 
   protected override _updateMetricInstruments() {
@@ -137,6 +145,29 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   override setConfig(config: HttpInstrumentationConfig = {}): void {
     super.setConfig(config);
     this._headerCapture = this._createHeaderCapture();
+    // The base constructor calls setConfig before _diag is set; the
+    // constructor computes this afterwards.
+    if (this._diag !== undefined) {
+      this._incomingRequestBodyMaxSize = this._getIncomingRequestBodyMaxSize();
+    }
+  }
+
+  /**
+   * Returns the maximum number of incoming request body bytes to capture, or
+   * `undefined` if the body is not captured.
+   */
+  private _getIncomingRequestBodyMaxSize(): number | undefined {
+    const config = this.getConfig();
+    const maxSize =
+      config.incomingRequestBodyMaxSize ??
+      DEFAULT_INCOMING_REQUEST_BODY_MAX_SIZE;
+    if (!Number.isInteger(maxSize) || maxSize <= 0) {
+      this._diag.warn(
+        `incomingRequestBodyMaxSize must be a positive integer, got ${maxSize}; incoming request bodies will not be captured`
+      );
+      return undefined;
+    }
+    return config.captureIncomingRequestBody === true ? maxSize : undefined;
   }
 
   /**
@@ -664,6 +695,12 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           context.bind(context.active(), request);
           context.bind(context.active(), response);
 
+          const requestBody = instrumentation._captureIncomingRequestBody(
+            span,
+            request,
+            response
+          );
+
           if (instrumentation.getConfig().requestHook) {
             instrumentation._callRequestHook(span, request);
           }
@@ -682,7 +719,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
               response,
               span,
               metricAttributes,
-              startTime
+              startTime,
+              requestBody
             );
           });
           response.on(errorMonitor, (err: Err) => {
@@ -691,7 +729,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
               span,
               metricAttributes,
               startTime,
-              err
+              err,
+              requestBody
             );
           });
 
@@ -703,7 +742,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
                   span,
                   metricAttributes,
                   startTime,
-                  error
+                  error,
+                  requestBody
                 );
                 throw error;
               }
@@ -866,7 +906,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     response: http.ServerResponse,
     span: Span,
     metricAttributes: Attributes,
-    startTime: HrTime
+    startTime: HrTime,
+    requestBody: BodyBuffer | undefined
   ) {
     const attributes = getIncomingRequestAttributesOnResponse(response);
     metricAttributes = Object.assign(
@@ -907,6 +948,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       );
     }
 
+    this._setIncomingRequestBodyAttribute(span, requestBody);
     this._closeHttpSpan(span, SpanKind.SERVER, startTime, metricAttributes);
   }
 
@@ -926,12 +968,42 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     span: Span,
     metricAttributes: Attributes,
     startTime: HrTime,
-    error: Err
+    error: Err,
+    requestBody: BodyBuffer | undefined
   ) {
     setSpanWithError(span, error);
     metricAttributes[ATTR_ERROR_TYPE] = error.name;
 
+    this._setIncomingRequestBodyAttribute(span, requestBody);
     this._closeHttpSpan(span, SpanKind.SERVER, startTime, metricAttributes);
+  }
+
+  private _captureIncomingRequestBody(
+    span: Span,
+    request: http.IncomingMessage,
+    response: http.ServerResponse
+  ): BodyBuffer | undefined {
+    if (this._incomingRequestBodyMaxSize === undefined || !span.isRecording()) {
+      return undefined;
+    }
+    return captureIncomingRequestBody(
+      request,
+      response,
+      this._incomingRequestBodyMaxSize
+    );
+  }
+
+  private _setIncomingRequestBodyAttribute(
+    span: Span,
+    requestBody: BodyBuffer | undefined
+  ) {
+    if (requestBody === undefined || !this._spanNotEnded.has(span)) {
+      return;
+    }
+    const value = requestBody.toAttributeValue();
+    if (value !== undefined) {
+      span.setAttribute(ATTR_HTTP_REQUEST_BODY_CONTENT, value);
+    }
   }
 
   private _startHttpSpan(
