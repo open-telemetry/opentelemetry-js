@@ -26,3 +26,17 @@ module.exports = {
   }
 }
 ```
+
+## Why is context lost after `await` in the browser when using `ZoneContextManager`?
+
+`ZoneContextManager` in `@opentelemetry/context-zone` and `@opentelemetry/context-zone-peer-dep` relies on `zone.js` to track asynchronous context across `Promise` callbacks and browser events.
+
+In modern JavaScript targets (`ES2017+`), native `async`/`await` executes via native microtasks that bypass the monkey-patched `Promise` implementation of `zone.js`. As a result, the active context is lost across `await` expressions.
+
+To resolve this, configure your build tool or bundler to downlevel `async`/`await`:
+
+- **esbuild / Vite / tsup**: Set `supported: { 'async-await': false, 'async-generator': false }` to selectively downlevel `async`/`await`.
+- **TypeScript**: Set `"target": "ES2016"` (or lower) in your `tsconfig.json` (note that this also downlevels other post-ES2016 features).
+- **Babel**: Use `@babel/plugin-transform-async-to-generator`.
+
+For full setup examples, see the [`@opentelemetry/context-zone` README](../packages/opentelemetry-context-zone/README.md#asyncawait-limitations--build-configuration).

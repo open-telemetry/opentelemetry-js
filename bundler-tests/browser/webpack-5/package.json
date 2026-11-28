@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@opentelemetry/api": "file:../../../api",
+    "@opentelemetry/context-zone": "file:../../../packages/opentelemetry-context-zone",
     "@opentelemetry/core": "file:../../../packages/opentelemetry-core",
     "@opentelemetry/exporter-logs-otlp-http": "file:../../../experimental/packages/exporter-logs-otlp-http",
     "@opentelemetry/exporter-metrics-otlp-http": "file:../../../experimental/packages/opentelemetry-exporter-metrics-otlp-http",

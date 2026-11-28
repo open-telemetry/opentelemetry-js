@@ -13,6 +13,49 @@ If you use Angular it means you already have the [zone-js] and you should use [@
 npm install --save @opentelemetry/context-zone
 ```
 
+## `async`/`await` Limitations & Build Configuration
+
+`ZoneContextManager` relies on [zone-js] to track asynchronous context by monkey-patching asynchronous APIs (such as `Promise`, `setTimeout`, and DOM event listeners).
+
+In modern JavaScript runtimes (`ES2017+`), native `async`/`await` uses native engine-level microtasks that bypass the monkey-patched `Promise` implementation of `zone.js`. Consequently, the execution context is lost after `await` calls (particularly after sequential `await` expressions).
+
+To preserve context across `await` expressions, configure your bundler or compiler to downlevel `async`/`await` syntax:
+
+- **esbuild / Vite / tsup**:
+  Configure `supported` in your build configuration to selectively downlevel only `async`/`await`:
+
+  ```js
+  // vite.config.js / esbuild options / tsup.config.ts
+  {
+    esbuild: {
+      supported: {
+        'async-await': false,
+        'async-generator': false,
+      },
+    },
+  }
+  ```
+
+- **TypeScript (`tsconfig.json`)**:
+  When compiling with `tsc`, set `"target": "ES2016"` (or lower) so `async`/`await` is transformed into generator helpers. Note that setting `target` to ES2016 also downlevels other features introduced after ES2016. If you want to keep other modern syntax, consider using a bundler (like esbuild or Babel) for selective downleveling instead:
+
+  ```json
+  {
+    "compilerOptions": {
+      "target": "ES2016"
+    }
+  }
+  ```
+
+- **Babel**:
+  Add `@babel/plugin-transform-async-to-generator` to your Babel configuration plugins.
+
+- **Angular**:
+  Angular CLI projects using `zone.js` handle async/await downleveling automatically when `zone.js` is included in your polyfills.
+
+> [!NOTE]
+> Native asynchronous context tracking in browsers without transpilation is tracked by the [TC39 AsyncContext proposal](https://github.com/tc39/proposal-async-context).
+
 ## Usage
 
 ```js

@@ -9,12 +9,52 @@ If you don't have your own [zone-js] please use [@opentelemetry/context-zone]
 
 ## Installation
 
-Please note that due to an issue with `zone.js`, the `ZoneContextManager` does not work with JS code targeting `ES2017+`.
-In order to use the `ZoneContextManager`, please transpile back to `ES2015`.
-
 ```bash
 npm install --save @opentelemetry/context-zone-peer-dep
 ```
+
+## `async`/`await` Limitations & Build Configuration
+
+`ZoneContextManager` relies on [zone-js] to track asynchronous context by monkey-patching asynchronous APIs (such as `Promise`, `setTimeout`, and DOM event listeners).
+
+In modern JavaScript runtimes (`ES2017+`), native `async`/`await` uses native engine-level microtasks that bypass the monkey-patched `Promise` implementation of `zone.js`. Consequently, the execution context is lost after `await` calls (particularly after sequential `await` expressions).
+
+To preserve context across `await` expressions, configure your bundler or compiler to downlevel `async`/`await` syntax:
+
+- **esbuild / Vite / tsup**:
+  Configure `supported` in your build configuration to selectively downlevel only `async`/`await`:
+
+  ```js
+  // vite.config.js / esbuild options / tsup.config.ts
+  {
+    esbuild: {
+      supported: {
+        'async-await': false,
+        'async-generator': false,
+      },
+    },
+  }
+  ```
+
+- **TypeScript (`tsconfig.json`)**:
+  When compiling with `tsc`, set `"target": "ES2016"` (or lower) so `async`/`await` is transformed into generator helpers. Note that setting `target` to ES2016 also downlevels other features introduced after ES2016. If you want to keep other modern syntax, consider using a bundler (like esbuild or Babel) for selective downleveling instead:
+
+  ```json
+  {
+    "compilerOptions": {
+      "target": "ES2016"
+    }
+  }
+  ```
+
+- **Babel**:
+  Add `@babel/plugin-transform-async-to-generator` to your Babel configuration plugins.
+
+- **Angular**:
+  Angular CLI projects using `zone.js` handle async/await downleveling automatically when `zone.js` is included in your polyfills.
+
+> [!NOTE]
+> Native asynchronous context tracking in browsers without transpilation is tracked by the [TC39 AsyncContext proposal](https://github.com/tc39/proposal-async-context).
 
 ## Usage
 
@@ -36,7 +76,7 @@ context.setGlobalContextManager(new ZoneContextManager().enable());
 // Example how the ZoneContextManager keeps the reference to the correct context during async operations
 const webTracerWithZone = providerWithZone.getTracer('default');
 const span1 = webTracerWithZone.startSpan('foo1');
-context.with(trace.setSpan(context.active(), span1, () => {
+context.with(trace.setSpan(context.active(), span1), () => {
   console.log('Current span is span1', trace.getSpan(context.active()) === span1);
   setTimeout(() => {
     const span2 = webTracerWithZone.startSpan('foo2');
