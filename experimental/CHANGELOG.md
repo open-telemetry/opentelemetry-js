@@ -40,6 +40,7 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 * refactor(otlp-transformer): decode hex IDs directly into the protobuf buffer [#7369](https://github.com/open-telemetry/opentelemetry-js/pull/7369) @legendecas
 * perf(otlp-transformer): check and copy short ASCII strings in one pass in `ProtobufWriter#writeString` [#7385](https://github.com/open-telemetry/opentelemetry-js/pull/7385) @daniellockyer
 * perf(otlp-transformer): add a fast path for single-byte varints in `ProtobufWriter#writeVarint` [#7387](https://github.com/open-telemetry/opentelemetry-js/pull/7387) @daniellockyer
+* perf(otlp-transformer): decode hex IDs with a lookup table [#7386](https://github.com/open-telemetry/opentelemetry-js/pull/7386) @daniellockyer
 
 ## 0.301.2
 
