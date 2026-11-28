@@ -17,6 +17,7 @@ import type {
 } from '@opentelemetry/otlp-transformer';
 import type { OtlpGrpcConfiguration } from './configuration/otlp-grpc-configuration';
 import { createOtlpGrpcExporterTransport } from './grpc-exporter-transport';
+import { getGrpcJs } from './grpc-js-loader';
 import { ATTR_RPC_RESPONSE_STATUS_CODE } from './semconv';
 
 export function createOtlpGrpcExporterMetrics<Internal>(
@@ -40,9 +41,7 @@ export function createOtlpGrpcExporterMetrics<Internal>(
         return {};
       }
       // Lazy-load so that we don't need to require/import '@grpc/grpc-js' before it can be wrapped by instrumentation.
-      const { status } =
-        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/consistent-type-imports
-        require('@grpc/grpc-js') as typeof import('@grpc/grpc-js');
+      const { status } = getGrpcJs();
       const statusName = status[error.code] ?? 'UNKNOWN';
       return {
         [ATTR_RPC_RESPONSE_STATUS_CODE]: statusName,

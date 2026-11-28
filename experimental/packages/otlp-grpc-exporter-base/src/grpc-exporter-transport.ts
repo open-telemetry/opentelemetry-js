@@ -17,6 +17,7 @@ import type {
   IExporterTransport,
 } from '@opentelemetry/otlp-exporter-base';
 import { createServiceClientConstructor } from './create-service-client-constructor';
+import { getGrpcJs, loadGrpcJs } from './grpc-js-loader';
 import { VERSION } from './version';
 
 const DEFAULT_USER_AGENT = `OTel-OTLP-Exporter-JavaScript/${VERSION}`;
@@ -44,10 +45,7 @@ function toGrpcCompression(compression: 'gzip' | 'none'): number {
 
 export function createInsecureCredentials(): ChannelCredentials {
   // Lazy-load so that we don't need to require/import '@grpc/grpc-js' before it can be wrapped by instrumentation.
-  const {
-    credentials,
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-  } = require('@grpc/grpc-js');
+  const { credentials } = getGrpcJs();
   return credentials.createInsecure();
 }
 
@@ -57,19 +55,13 @@ export function createSslCredentials(
   certChain?: Buffer
 ): ChannelCredentials {
   // Lazy-load so that we don't need to require/import '@grpc/grpc-js' before it can be wrapped by instrumentation.
-  const {
-    credentials,
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-  } = require('@grpc/grpc-js');
+  const { credentials } = getGrpcJs();
   return credentials.createSsl(rootCert, privateKey, certChain);
 }
 
 export function createEmptyMetadata(): Metadata {
   // Lazy-load so that we don't need to require/import '@grpc/grpc-js' before it can be wrapped by instrumentation.
-  const {
-    Metadata,
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-  } = require('@grpc/grpc-js');
+  const { Metadata } = getGrpcJs();
   return new Metadata();
 }
 
@@ -118,6 +110,8 @@ export class GrpcExporterTransport implements IExporterTransport {
     const buffer = Buffer.from(data);
 
     if (this._client == null) {
+      await loadGrpcJs();
+
       try {
         this._metadata = this._parameters.metadata();
       } catch (error) {

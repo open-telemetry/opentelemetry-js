@@ -5,6 +5,7 @@
 
 // NOTE: do not change this to be an actual import, doing so will break `@opentelemetry/instrumentation-grpc`
 import type { ServiceClientConstructor } from '@grpc/grpc-js';
+import { loadGrpcJs } from './grpc-js-loader';
 
 /**
  * Creates a unary service client constructor that, when instantiated, does not serialize/deserialize anything.
@@ -37,7 +38,7 @@ export async function createServiceClientConstructor(
     },
   };
 
-  const { makeGenericClientConstructor } = await import('@grpc/grpc-js');
+  const { makeGenericClientConstructor } = await loadGrpcJs();
 
   return makeGenericClientConstructor(serviceDefinition, name);
 }

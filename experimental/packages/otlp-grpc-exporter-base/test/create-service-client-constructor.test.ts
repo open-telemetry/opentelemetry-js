@@ -46,4 +46,11 @@ describe('createServiceClientConstructor', function () {
       '0 true function object'
     );
   });
+
+  it('preloads @grpc/grpc-js asynchronously in GrpcExporterTransport.send before invoking metadata or credentials', function () {
+    assert.strictEqual(
+      runFixture('transport-lazy-loads-grpc.ts'),
+      '0 0 true 1 1 failure'
+    );
+  });
 });
