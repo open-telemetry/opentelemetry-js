@@ -25,4 +25,5 @@ export {
   type ConfigPropertiesReader,
   type DeclarativeConfigReader,
 } from './readDeclarativeConfig';
+export { REDACTED_QUERY_PARAMS, STR_REDACTED, redactUrl } from './redact-url';
 export { SemconvStability, semconvStabilityFromStr } from './semconvStability';

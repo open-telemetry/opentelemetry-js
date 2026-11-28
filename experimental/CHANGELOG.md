@@ -22,6 +22,9 @@ For notes on migrating to 3.x see [the 3.x migration guide](../doc/3.x/migration
 * feat(instrumentation): support the `instrumentation/development` section of declarative config. `Instrumentation#setConfigProvider()` is an optional method that `registerInstrumentations()` calls on each instrumentation, alongside `setTracerProvider()` and friends. The `readDeclarativeConfig()` util reads an instrumentation's own block (`instrumentation/development.js.<name>`) and the shared `general` block through a typed reader, mapping snake_case config properties onto config fields. Unrecognized properties and type mismatches warn [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
 * feat(instrumentation-http): read declarative config via `setConfigProvider()`, mapping the `instrumentation/development.js.@opentelemetry/instrumentation-http` properties it supports and the `general.http.{client,server}.*_captured_headers` properties onto `headersToSpanAttributes` [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
 * feat(sdk-node): register a global `ConfigProvider` from the config file, so instrumentations registered with `registerInstrumentations()` receive it [#6868](https://github.com/open-telemetry/opentelemetry-js/pull/6868) @mwear @trentm
+* feat(instrumentation): add shared `redactUrl` for credential and sensitive query redaction ([#7307](https://github.com/open-telemetry/opentelemetry-js/issues/7307)) @shehjaddev
+  * `instrumentation-fetch` and `instrumentation-xml-http-request` record `url.full` through this helper.
+  * `instrumentation-http` uses the same `REDACTED` token and default sensitive query keys.
 
 ### :bug: Bug Fixes
 
