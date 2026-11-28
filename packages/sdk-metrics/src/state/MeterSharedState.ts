@@ -21,6 +21,7 @@ import { SyncMetricStorage } from './SyncMetricStorage';
 import type { Accumulation, Aggregator } from '../aggregator/types';
 import type { IAttributesProcessor } from '../view/AttributesProcessor';
 import type { MetricStorage } from './MetricStorage';
+import type { MeterConfig } from '../MeterConfig';
 
 /**
  * An internal record for shared meter provider states.
@@ -34,9 +35,10 @@ export class MeterSharedState {
 
   constructor(
     meterProviderSharedState: MeterProviderSharedState,
-    instrumentationScope: InstrumentationScope
+    instrumentationScope: InstrumentationScope,
+    meterConfig?: MeterConfig
   ) {
-    this.meter = new Meter(this);
+    this.meter = new Meter(this, meterConfig);
     this._meterProviderSharedState = meterProviderSharedState;
     this._instrumentationScope = instrumentationScope;
   }
@@ -180,10 +182,12 @@ export class MeterSharedState {
   }
 }
 
+
 interface ScopeMetricsResult {
   scopeMetrics?: ScopeMetrics;
   errors: unknown[];
 }
+
 
 interface MetricStorageConstructor {
   new (
@@ -193,4 +197,4 @@ interface MetricStorageConstructor {
     collectors: MetricCollectorHandle[],
     aggregationCardinalityLimit?: number
   ): MetricStorage;
-}
+} 
